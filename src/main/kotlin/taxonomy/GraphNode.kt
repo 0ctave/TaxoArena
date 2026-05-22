@@ -1,0 +1,78 @@
+package org.eclipse.lmos.arc.app.taxonomy
+
+import java.util.UUID
+
+/**
+ * The core topological unit: Directed Acyclic Graph (DAG) Node.
+ * Updated to use a unified query list for both Leaf Data and Parent Residuals.
+ */
+data class GraphNode(
+    val id: String = UUID.randomUUID().toString(),
+    var label: String,
+    val depth: Int,
+
+    // Topology (DAG)
+    val children: MutableSet<GraphNode> = mutableSetOf(),
+    val parents: MutableSet<GraphNode> = mutableSetOf(),
+
+    // Unified Data Space:
+    // If isLeaf == true: Holds the explicit data for this domain.
+    // If isLeaf == false: Holds the residual "unmapped/outlier" queries that failed to trickle to children.
+    val queries: MutableList<Embedding> = mutableListOf(),
+
+    // Statistical Modeling - Hierarchical Mixture Model (HMM)
+    var distribution: GmmParams? = null,
+    var previousDistribution: GmmParams? = null,
+
+    // Agent Judge Profiles
+    var judgePrompt: String? = null,
+    var judgeRubric: String? = null
+) {
+    val isLeaf: Boolean get() = children.isEmpty()
+
+    // Proportional weight of this node as a component in its parent's GMM
+    var proportionalWeight: Double = 1.0
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is GraphNode) return false
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+
+    /**
+     * Aggregates all queries in the branch (this node + all descendants).
+     * Handles DAG polyhierarchy by ensuring each node is visited only once.
+     */
+    fun getAllQueriesInBranch(): List<Embedding> {
+        val allQueries = mutableListOf<Embedding>()
+        val visited = mutableSetOf<String>()
+        
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            allQueries.addAll(node.queries)
+            node.children.forEach { walk(it) }
+        }
+        
+        walk(this)
+        return allQueries
+    }
+
+    /**
+     * Fast count of all unique queries in the branch.
+     */
+    fun getRecursiveQueryCount(): Int {
+        val visited = mutableSetOf<String>()
+        var count = 0
+        
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            count += node.queries.size
+            node.children.forEach { walk(it) }
+        }
+        
+        walk(this)
+        return count
+    }
+}
