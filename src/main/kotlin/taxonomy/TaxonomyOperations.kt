@@ -26,6 +26,10 @@ class TaxonomyOperations(
 
     suspend fun splitNodesRecursive(node: GraphNode) = splitter.splitNodesRecursive(node)
 
+    suspend fun generateLabelsPostPass(root: GraphNode) = splitter.generateLabelsPostPass(root)
+
+    fun resetConceptCounter() = splitter.resetConceptCounter()
+
     suspend fun optimizeHierarchy(root: GraphNode) = merger.optimizeHierarchy(root)
 
     suspend fun reassignQueries(
@@ -46,14 +50,24 @@ class TaxonomyOperations(
         buildMap(root)
 
         // Process queries in parallel chunks
-        embeddings.chunked(100).map { chunk ->
+        val numCores = Runtime.getRuntime().availableProcessors()
+        val chunkSize = maxOf(5, (embeddings.size + (numCores * 4) - 1) / (numCores * 4)).coerceAtMost(25)
+
+        embeddings.chunked(chunkSize).map { chunk ->
             async(Dispatchers.Default) {
                 chunk.map { emb ->
                     val matches = mutableMapOf<GraphNode, Double>()
                     val previousIds = prevMap[emb.rawText] ?: emptySet()
                     val originals = groundTruthMap[emb.rawText]
                     
-                    trickler.trickleQuery(emb, root, matches, previousIds.toMutableSet(), originalCategories = originals)
+                    trickler.trickleQuery(
+                        query = emb,
+                        currentNode = root,
+                        results = matches,
+                        visited = mutableSetOf(),
+                        previousAssignments = previousIds,
+                        originalCategories = originals
+                    )
                     
                     // STABILITY & GROUND TRUTH BIAS
                     val biasedMatches = matches.mapValues { (node, distance) ->
@@ -72,12 +86,30 @@ class TaxonomyOperations(
         }.awaitAll().flatten().forEach { (emb, biasedMatches) ->
 
             // COMPETITIVE ASSIGNMENT
-            val sortedMatches = biasedMatches.entries
-                .filter { it.key.depth > 0 }
-                .sortedBy { it.value }
-                .take(config.formalism.maxAssignmentsPerQuery)
-                .map { it.key }
-                .ifEmpty { listOf(root) }
+            val candidateEntries = biasedMatches.entries.filter { it.key.depth > 0 }
+            val originals = groundTruthMap[emb.rawText]
+            
+            val originalMatches = candidateEntries.filter { entry ->
+                originals?.any { it.equals(entry.key.label, ignoreCase = true) } ?: false
+            }.sortedBy { it.value }
+            
+            val otherMatches = candidateEntries.filter { entry ->
+                !(originals?.any { it.equals(entry.key.label, ignoreCase = true) } ?: false)
+            }.sortedBy { it.value }
+            
+            val maxAllowed = config.formalism.maxAssignmentsPerQuery
+            val selectedNodes = mutableListOf<GraphNode>()
+            
+            // First, take matching original ground-truth nodes
+            selectedNodes.addAll(originalMatches.take(maxAllowed).map { it.key })
+            
+            // Fill remaining slots with other matches
+            if (selectedNodes.size < maxAllowed) {
+                val remainingCount = maxAllowed - selectedNodes.size
+                selectedNodes.addAll(otherMatches.take(remainingCount).map { it.key })
+            }
+            
+            val sortedMatches = selectedNodes.ifEmpty { listOf(root) }
 
             // Assign to the best mathematically viable destinations
             sortedMatches.forEach { node ->
@@ -137,19 +169,95 @@ class TaxonomyOperations(
         return sb.toString()
     }
 
-    fun printHierarchy(node: GraphNode, indent: String = "", visited: MutableSet<String> = mutableSetOf()) {
+    fun printHierarchy(root: GraphNode) {
+        val sb = java.lang.StringBuilder()
+        sb.append("\n+----------------------------------------------------------\n")
+        sb.append("|              TAXONOMY DAG HIERARCHY\n")
+        sb.append("+----------------------------------------------------------\n")
+        buildTreeString(root, "| ", true, sb, mutableSetOf())
+        sb.append("+----------------------------------------------------------")
+        log.info(sb.toString())
+    }
+
+    private fun buildTreeString(
+        node: GraphNode,
+        prefix: String,
+        isTail: Boolean,
+        sb: java.lang.StringBuilder,
+        visited: MutableSet<String>
+    ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val type = if (node.isLeaf) "Leaf" else "Parent/Residual"
 
         val gmmStats = node.distribution?.let { gmm ->
             val avgVar = gmm.components.flatMap { it.diagonalCovariance!!.toList() }.average()
-            " (GMM ${gmm.components.size} centroids, σ² avg: ${"%.6f".format(avgVar)})"
+            " (GMM ${gmm.components.size} centroids, σ² avg: ${"%.6f".format(java.util.Locale.US, avgVar)})"
         } ?: ""
 
-        log.info("$indent- ${node.label} [${node.queries.size} q - $type]$gmmStats$cross")
+        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$gmmStats$cross"
+        sb.append(prefix).append(if (node.depth == 0) "" else if (isTail) "+-- " else "+-- ").append(nodeLabel).append("\n")
 
         if (visited.contains(node.id)) return
         visited.add(node.id)
-        node.children.forEach { printHierarchy(it, "$indent  ", visited) }
+
+        val children = node.children.toList()
+        for (i in 0 until children.size) {
+            val childIsTail = i == children.size - 1
+            val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "|   "
+            buildTreeString(children[i], nextPrefix, childIsTail, sb, visited)
+        }
+    }
+
+    fun collapseMarginalNodes(root: GraphNode) {
+        val allNodes = mutableListOf<GraphNode>()
+        fun walk(n: GraphNode, visited: MutableSet<String>) {
+            if (!visited.add(n.id)) return
+            allNodes.add(n)
+            n.children.forEach { walk(it, visited) }
+        }
+        walk(root, mutableSetOf())
+        
+        // Sort bottom-up (excluding root node, which has depth == 0)
+        val sortedNodes = allNodes.filter { it.depth > 0 }.sortedByDescending { it.depth }
+        
+        for (C in sortedNodes) {
+            val parentsCopy = C.parents.toList()
+            for (P in parentsCopy) {
+                val siblings = P.children.filter { it != C }
+                if (siblings.isNotEmpty()) {
+                    val childCount = C.getRecursiveQueryCount()
+                    val avgSiblingCount = siblings.map { it.getRecursiveQueryCount() }.average()
+                    if (childCount < avgSiblingCount * config.formalism.collapseMarginalRatio) {
+                        log.info("Collapsing marginal node [${C.label}] (queries: $childCount) into parent [${P.label}] (sibling avg: ${"%.1f".format(java.util.Locale.US, avgSiblingCount)})")
+                        
+                        // Move queries to parent. If C has other parents left, we keep C's queries
+                        val isOrphaned = C.parents.size <= 1
+                        P.queries.addAll(C.queries)
+                        if (isOrphaned) {
+                            C.queries.clear()
+                        }
+                        
+                        // Reparent children of C to P
+                        val childrenCopy = C.children.toList()
+                        for (K in childrenCopy) {
+                            P.children.add(K)
+                            K.parents.add(P)
+                        }
+                        
+                        // Disconnect P and C
+                        P.children.remove(C)
+                        C.parents.remove(P)
+                        
+                        // If C is fully orphaned now, clean up its children links too
+                        if (C.parents.isEmpty()) {
+                            for (K in childrenCopy) {
+                                K.parents.remove(C)
+                            }
+                            C.children.clear()
+                        }
+                    }
+                }
+            }
+        }
     }
 }

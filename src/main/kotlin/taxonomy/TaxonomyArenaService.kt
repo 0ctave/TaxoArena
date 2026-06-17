@@ -30,7 +30,7 @@ data class DomainEvaluation(
     val confidence: Double
 )
 
-enum class MissionControlMode { IDLE, ARENA, JUDGE_PROGRESS, NODE_DETAIL }
+enum class AnalysisMode { IDLE, ARENA, JUDGE_PROGRESS, NODE_DETAIL, SETTINGS, LOGS_SCROLL, METRICS, SNAPSHOTS, TRICKLE_TEST }
 
 data class JudgeProgress(
     val nodeLabel: String,
@@ -39,8 +39,8 @@ data class JudgeProgress(
     val status: String = "INDUCTING"
 )
 
-data class MissionControlState(
-    val mode: MissionControlMode = MissionControlMode.IDLE,
+data class AnalysisPanelState(
+    val mode: AnalysisMode = AnalysisMode.IDLE,
     // Arena Data
     val query: String? = null,
     val modelA: String? = null,
@@ -65,15 +65,15 @@ class TaxonomyArenaService(
     private val log = LoggerFactory.getLogger(TaxonomyArenaService::class.java)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    private val _state = MutableStateFlow(MissionControlState())
-    val state: StateFlow<MissionControlState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(AnalysisPanelState())
+    val state: StateFlow<AnalysisPanelState> = _state.asStateFlow()
 
-    fun setMode(mode: MissionControlMode) {
+    fun setMode(mode: AnalysisMode) {
         _state.value = _state.value.copy(mode = mode)
     }
 
     fun inspectNode(node: GraphNode?) {
-        _state.value = _state.value.copy(mode = MissionControlMode.NODE_DETAIL, selectedNode = node)
+        _state.value = _state.value.copy(mode = AnalysisMode.NODE_DETAIL, selectedNode = node)
     }
 
     fun updateJudgeProgress(label: String, processed: Int, total: Int, status: String = "INDUCTING") {
@@ -81,11 +81,11 @@ class TaxonomyArenaService(
         val newProgress = current.currentInductions.toMutableMap().apply {
             put(label, JudgeProgress(label, processed, total, status))
         }
-        _state.value = current.copy(mode = MissionControlMode.JUDGE_PROGRESS, currentInductions = newProgress)
+        _state.value = current.copy(mode = AnalysisMode.JUDGE_PROGRESS, currentInductions = newProgress)
     }
 
     suspend fun compareModels(query: String, modelA: String, modelB: String): ArenaResult = coroutineScope {
-        _state.value = MissionControlState(mode = MissionControlMode.ARENA, query = query, modelA = modelA, modelB = modelB)
+        _state.value = AnalysisPanelState(mode = AnalysisMode.ARENA, query = query, modelA = modelA, modelB = modelB)
 
         val discoveryJob = async { discoverDomainsAndJudges(query) }
         val (allMatches, judges) = discoveryJob.await()
@@ -121,7 +121,7 @@ class TaxonomyArenaService(
 
     private suspend fun discoverDomainsAndJudges(text: String): Pair<List<GraphNode>, List<GraphNode>> {
         val root = taxonomyService.getGraph() ?: return emptyList<GraphNode>() to emptyList()
-        val distilled = if (config.enableDistillation) {
+        val distilled = if (config.execution.enableDistillation) {
             distillationCache.get(text, "arena") ?: run {
                 val prompt = TaxoPrompts.getDistillationPrompt(text, "General")
                 val result = llmClient.distillQuery(prompt)
@@ -151,8 +151,8 @@ class TaxonomyArenaService(
     private suspend fun evaluatePairwise(node: GraphNode, query: String, nameA: String, nameB: String, traceA: String, traceB: String): DomainEvaluation = coroutineScope {
         val sys = node.judgePrompt!!
         val rub = node.judgeRubric!!
-        val p1 = async { llmClient.queryModel(config.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameA, nameB, traceA, traceB)) }
-        val p2 = async { llmClient.queryModel(config.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameB, nameA, traceB, traceA)) }
+        val p1 = async { llmClient.queryModel(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameA, nameB, traceA, traceB)) }
+        val p2 = async { llmClient.queryModel(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameB, nameA, traceB, traceA)) }
         val res1 = parseJudgeResponse(p1.await())
         val res2 = parseJudgeResponse(p2.await())
         val winner = when {

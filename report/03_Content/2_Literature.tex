@@ -1,0 +1,135 @@
+\chapter{Literature Review}\label{ch:literature-review}
+
+
+\section{Agent Benchmarking Frameworks}\label{sec:agent-benchmarking-frameworks}
+
+The methodology for evaluating artificial intelligence has undergone a fundamental shift, moving from the assessment of internal model knowledge to the measurement of external system agency.
+This evolution is characterized by a transition from static, single-turn datasets to dynamic, multi-step environments that prioritize process traceability over terminal accuracy.
+
+\subsection*{Static Benchmarks and Their Limitations}
+The first generation of Large Language Model (LLM) evaluation relied on static instruments such as \textit{Massive Multitask Language Understanding} (MMLU)\parencite{hendrycks2021measuring} and the \textit{Holistic Evaluation of Language Models} (HELM) framework\parencite{liang2022holistic}.
+MMLU used over \num{15000} multiple-choice questions across 57 subjects to probe professional competence.
+However, the multiple-choice format has been criticized for having little practical value in agentic contexts, as it allows models to ``game'' the benchmark via pattern-matching shortcuts rather than executing multi-step reasoning\parencite{yan2025evaluation, mialon2023gaia}.
+
+
+While HELM attempted a more multidimensional approach by evaluating 42 scenarios across metrics like fairness and toxicity, it remained anchored in a \textit{model-centric} philosophy\parencite{meimandi2025positioning}.
+HELM evaluates the LLM as an isolated engine, failing to account for the stochastic instability that arises when the model is embedded within an agentic stack comprising memory, tool retrieval, and planning loops\parencite{shukla2025evaluating, yan2025evaluation}.
+This narrow focus contributes to the \textit{Scalar Fallacy}, where complex behavioral traits are reduced to a single score that obscures catastrophic failures in safety-critical edge cases\parencite{boubdir2024elo}.
+
+\subsection*{Interactive Agentic Frameworks}
+To address these gaps, the research community introduced interaction-centric frameworks that require models to function as autonomous agents within closed-loop environments.
+\begin{itemize}
+    \item \textbf{AgentBench}\parencite{liu2023agentbench} was the first systematic effort to evaluate LLMs-as-agents across eight environments, including Operating Systems (OS), Databases (DB), and Knowledge Graphs (KG). It identifies a ``Reasoning Ceiling,'' demonstrating that performance on standard NLP tasks does not transfer to agentic tasks where the model must parse real-time terminal feedback and adjust strategies dynamically\parencite{liu2023agentbench}.
+    \item \textbf{ToolBench}\parencite{qin2023toolbench} focuses specifically on \textit{Compositional Tool Use}, providing over \num{16000} real-world APIs. It leverages a Depth-First Search-based Decision Tree (DFSDT) to enable agents to backtrack from failed tool calls.
+    Later iterations, such as \textit{StableToolBench}\parencite{guo2024stabletoolbench}, introduced virtualized API servers to resolve the ``Stability Crisis'' caused by live API downtime during evaluation.
+    \item \textbf{GAIA}\parencite{mialon2023gaia} represents a philosophical shift toward practical general intelligence.
+    It focuses on tasks that are conceptually simple for humans but require multi-modal tool use and web browsing for AI. GAIA's use of unambiguous factoid answers makes it robust against LLM-as-a-judge bias, revealing a stark human-AI performance gap where frontier models often fail on Level 3 long-horizon tasks\parencite{mialon2023gaia, simmering2025benchmarks}.
+\end{itemize}
+
+\subsection*{Trajectory Analysis and OpenTelemetry Standards}
+The realization that agents can reach a correct outcome through invalid reasoning has shifted the unit of analysis toward the \textit{trajectory} ($\tau$).
+Process-based evaluation uses \textit{Process Reward Models} (PRMs) to evaluate intermediate actions and ``Proximity to the Goal'' rather than just the terminal state\parencite{pathak2025detecting, m3bench2026}.
+
+As agentic systems move into production, the industry is converging on \textit{OpenTelemetry} (OTel) as the standard for capturing these trajectories\parencite{dong2024agentops}.
+Standardized OTel semantic conventions provide a common vocabulary for describing agent behaviors through nested spans: \texttt{CreateAgent}, \texttt{InvokeAgent}, and \texttt{ToolCall}\parencite{otel2025semconv}.
+This ``Agent Span Architecture'' allows for \textit{Causal Control}, enabling researchers to reconstruct decision chains and identify ``Silent Failures''—such as reasoning drift or redundant tool-use cycles—that are undetectable by outcome-only metrics\parencite{zheng2025agentsight, pathak2025detecting}.
+Observability frameworks like \textit{AgentOps}\parencite{dong2024agentops} and \textit{AgentTrace}\parencite{agenttrace2025} leverage these standards to bridge the semantic gap between high-level intent and low-level system actions.
+
+
+
+\section{LLM-as-a-Judge \& Reliability}\label{sec:llm-as-a-judge}
+
+As human evaluation becomes a scalability bottleneck for agentic systems, the ``LLM-as-a-judge'' paradigm has emerged as a cornerstone of automated assessment\parencite{zheng2023judging, li2025judge_survey}.
+This approach leverages the high-level reasoning capabilities of frontier models to evaluate the semantic quality and safety of candidate responses or agent trajectories.
+
+\subsection*{The Judge Paradigm}
+Initial implementations of this paradigm relied on monolithic, single-pass evaluations where a strong model (e.g., GPT-4o) provided pointwise scores or pairwise preferences based on linguistic plausibility\parencite{zheng2023judging}.
+However, as tasks move into specialized domains, research is transitioning toward ``Agent-as-a-Judge'' architectures\parencite{xi2025agent_survey}.
+These systems move beyond intuition-based assessment by interacting with external environments to verify side effects, such as checking if a code agent's generated patch passes a compiler or if a flight-booking agent actually updated the system state\parencite{zhuge2025agentjudge, wang2025codevisionary}.
+Furthermore, to address the inconsistency of single models, consensus-based approaches like \textit{CollabEval} and \textit{MAJ-EVAL} utilize multi-agent deliberation, where specialized roles engage in structured debate to reach a collective, robust judgment that correlates more closely with human expert ratings than single-model scores\parencite{chen2025collabeval, anonymous2026maj}.
+
+\subsection*{Bias Mitigation}
+A significant challenge in synthetic evaluation is the presence of systematic biases that can distort rankings.
+\begin{itemize}
+    \item \textbf{Positional Bias:} Judges tend to favor responses based on their order within the prompt, often preferring the first candidate regardless of content\parencite{zheng2024judging}.
+    \item \textbf{Verbosity Bias:} Models consistently assign higher scores to more verbose responses, even when they lack additional information or reasoning depth\parencite{li2024verbosity, chen2024verbosity}.
+    \item \textbf{Self-Preference Bias:} LLMs exhibit a tendency to favor outputs that mirror their own stylistic and policy fingerprints\parencite{wataoka2025selfpreference}.
+    Recent evidence suggests this is a ``familiarity bias'' driven by lower perplexity on self-generated or related model distributions\parencite{wataoka2025selfpreference, zheng2023judging}.
+\end{itemize}
+Mitigation strategies now include order-shuffling, length-normalized scoring, and the use of group-based polling to identify and cancel out these idiosyncratic preferences\parencite{zheng2024judging, anonymous2025bias}.
+
+\subsection*{Calibration and Alignment}
+To bridge the gap between ``generic'' model intuition and domain-specific expert standards, calibration techniques have become essential.
+While prompt engineering remains brittle, new frameworks like \textit{MemAlign} utilize dual-memory systems---semantic memory for general principles and episodic memory for specific edge-case examples---to align synthetic judges with limited human gold labels (typically \num{30} to \num{50} samples) without requiring expensive weight updates\parencite{databricks2025memalign}.
+This is further enhanced by \textit{Judge-wise Reinforcement Learning}, which rewards the judge for providing explicit, faithful justifications (Thoughts) that match the final decision, thereby ensuring the evaluation process itself is auditable and transparent\parencite{huang2025thinkj, chen2025judgelrm}.
+
+
+
+
+\section{Ranking Algorithms}\label{sec:ranking-algorithms}
+
+To quantify the relative performance of autonomous agents, the research community has adapted competitive ranking systems from game theory and psychometrics.
+However, the transition from generative models to agentic systems has exposed the limitations of traditional scalar metrics, necessitating a move toward Bayesian and multidimensional architectures.
+
+\subsection*{Zero-Sum Foundations and the Elo System}
+The foundational framework for comparative evaluation is the \textit{Elo rating system}\parencite{elo1978rating}.
+Developed for zero-sum games like chess, it assumes that an agent's performance is a random variable centered around a latent skill level ($R$). The core logistical assumption of the Elo model is that the probability ($E_A$) of agent $A$ defeating agent $B$ follows a logistic distribution\parencite{ostasiewicz2022evaluation}:
+\begin{equation}
+    E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}} \label{eq:elo-expected}
+\end{equation}
+While Elo is robust for tracking stable skill levels over time, it suffers from several weaknesses in agentic contexts.
+It assumes static skill between matches and does not explicitly model uncertainty, leading to ``ranking instability'' in populations with high variance or sparse interaction data\parencite{boubdir2024elo, huang2026modeling}.
+Furthermore, Elo ratings are fundamentally transitive, meaning they assume that if $A \succ B$ and $B \succ C$, then $A \succ C$.
+Research indicates that LLMs and agents frequently exhibit non-transitive preferences, rendering linear Elo leaderboards statistically misleading\parencite{yan2025evaluation, boubdir2024elo}.
+
+\subsection*{Bayesian Approaches for Sparse Data}
+To address the uncertainty inherent in sparse benchmarking data, the field has integrated Bayesian inference models.
+The \textit{Bradley-Terry model} (BT) provides the formal probabilistic link for pairwise preferences, modeling the merit of each agent as a parameter ($\lambda$)\parencite{bradley1952rank, agrawal2026bt_survey}.
+More advanced systems, such as Microsoft's \textit{TrueSkill}\parencite{herbrich2007trueskill}, represent skill as a Gaussian distribution $\mathcal{N}(\mu, \sigma^2)$.
+By tracking both the mean skill ($\mu$) and the system's uncertainty ($\sigma$), Bayesian models can converge faster than standard Elo by calculating the \textit{information gain} of each match\parencite{herbrich2007trueskill, joshy2024openskill}.
+Modern implementations like the \textit{OpenSkill} library utilize the \textit{Weng-Lin Bayesian approximation}\parencite{weng2011bayesian} to handle asymmetric multi-team scenarios.
+OpenSkill’s Plackett-Luce model is particularly effective for agentic benchmarking, as it can factor in in-game scores and margin-of-victory to speed up convergence toward a stable ranking\parencite{joshy2024openskill, rico2022matchmaking}.
+
+\subsection*{Multidimensional Ranking and Intransitivity}
+A significant structural barrier in agent evaluation is the presence of cyclic dominance, often referred to as the ``Rock-Paper-Scissors'' effect.
+This occurs when agents have specialized capabilities that excel in certain domains but fail in others, violating the transitivity assumption of scalar models\parencite{balduzzi2018melo}.
+To model these complex interactions, current research utilizes vectorized approaches:
+\begin{itemize}
+    \item \textbf{mELO (Multidimensional Elo):} Introduced by Balduzzi et al., this framework utilizes \textit{Hodge Decomposition} to separate agent interactions into a transitive (scalar) component and a cyclic (skew-symmetric) component\parencite{balduzzi2018melo, laz2018melo}.
+    This allows for more accurate win-rate predictions in environments where agents exhibit diverse, niche strategies.
+    \item \textbf{Blade-Chest Model:} This approach infers a $d$-dimensional representation for each player, modeling ``offense'' (Blade) and ``defense'' (Chest) separately\parencite{chen2016bladechest, liu2024probabilistic}.
+    By learning a dataset-specific metric space, the Blade-Chest model can represent any pairwise stochastic preference relation, making it highly expressive for open-ended agency tasks where interaction types vary across queries\parencite{liu2024probabilistic, blitzrank2026}.
+\end{itemize}
+The shift toward these multidimensional engines is critical for overcoming the \textit{Scalar Fallacy} and ensuring that agent rankings reflect specialized skill sets rather than averaged, biased benchmarks.
+
+
+\section{Taxonomy \& Routing}\label{sec:taxonomy-routing}
+
+The effectiveness of specialized evaluation relies on the system's ability to precisely map user queries to the most appropriate assessment logic.
+As agentic ecosystems diversify, the research community is moving away from rigid, hard-coded taxonomies toward dynamic, ``intent-aware'' routing mechanisms that leverage the latent semantic space of Large Language Models.
+
+\subsection*{Intent Classification and Domain Inference}
+A primary challenge in multi-axial evaluation is the accurate categorization of queries into specialized domains.
+Traditional supervised methods often struggle with the ``scaling wall'' of human annotation and the fluid nature of agentic tasks\parencite{raju2024constructing, li2026llmrouterbench}.
+To address this, current research utilizes semi-supervised pipelines to curate domain-specific evaluation sets.
+Frameworks like those proposed by \textcite{raju2024constructing} employ a combination of manual seed curation and clustering (e.g., using \textit{text-embedding-3-small}) to generate high-separability datasets across categories such as medicine, law, and coding.
+This approach ensures that evaluation sets are both diverse and representative of real-world chat distributions, providing a foundation for ``domain-centric'' judging where a model's performance is disaggregated by subject matter\parencite{raju2024constructing, meimandi2025positioning}.
+
+Furthermore, the extraction of fine-grained intent is increasingly handled through hierarchical taxonomies.
+For instance, the \textit{Arch-Router} framework introduces a ``Domain-Action Taxonomy'' that maps queries not just to a topic (e.g., healthcare) but to a specific functional requirement (e.g., record summarization)\parencite{anonymous2025archrouter}.
+By using compact router models (e.g., \num{1.5}B parameters), these systems can perform zero-shot routing to specialized agents or judges without requiring extensive retraining when the underlying pool of evaluators evolves\parencite{anonymous2025archrouter, li2025universal}.
+
+\subsection*{Embedding-Based Routing and Unsupervised Clustering}
+To achieve the low-latency requirements of production systems, research is shifting toward embedding-based routing that bypasses heavy generative classification.
+Techniques such as \textit{Deep Embedded Clustering} (DEC) allow for the simultaneous learning of feature representations and cluster assignments, ensuring that the latent space is optimized for the specific nuances of agentic queries\parencite{xie2016dec}.
+Modern implementations like \textit{EmbedLLM} and \textit{UniRoute} represent both queries and models as compact feature vectors derived from their performance on representative prompts\parencite{zhuang2024embedllm, somerstep2025uniroute}.
+This enables ``query-adaptive'' model selection, where the router predicts the most cost-effective or high-accuracy candidate based on geometric proximity in a learned correctness space\parencite{zhuang2024embedllm, li2025universal}.
+
+A significant advancement in this area is the introduction of ``training-free'' intent classification methods such as \textit{VecStat} and \textit{NormStat}\parencite{chen2025intent}.
+These methods collect simple statistical metrics from the internal hidden layers of the LLM during the initial prefill phase of inference.
+By comparing these statistics to pre-calculated class baselines, the system can infer intent with minimal computational overhead (under \qty{3}{\percent} latency increase), making them ideal for high-throughput, multi-tenant routing environments where the set of target domains changes frequently\parencite{chen2025intent}.
+
+\subsection*{Routing for Multi-Dimensional Reliability}
+Finally, routing is no longer seen merely as a performance optimization but as a tool for ensuring ``Outcome Validity.'' Hybrid semantic routers now utilize embedding-based similarity and specialized classifiers (e.g., ModernBERT) to dispatch trajectories to judges with specific ``Expert Personas''\parencite{park2025expert, dsouza2025semantic}.
+This ensures that safety-critical queries are routed through additional verification loops—such as tool-use guardrails or policy-compliance checkers—while standard informational queries follow a lower-cost path.
+This layered approach allows the evaluation framework to quantify the \textit{Reliability Gap} ($\Delta_{rel}$) more effectively by selectively applying stress-test protocols based on the inferred sensitivity of the task domain\parencite{adam2025hb, dsouza2025semantic}.

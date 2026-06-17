@@ -1,0 +1,55 @@
+\chapter{Examples of the longtable Environment}\label{app:longtable}
+Especially in the appendix, it is common that long tables appear, which contain experimental or simulated data. For this purpose, the \verb+longtable+\index{Packages!longtable@\verb+longtable+} environment can be used. The \verb+\autoref+ command to reference tables works for them as well (\autoref{tab:template_longtable}).
+ \begin{longtable}{lrcp{2cm}}
+  \caption[Name appearing in the List of Tables]{This is a longtable, because it is a long table}\label{tab:template_longtable}\\
+ \toprule
+ Ragged&Ragged&Justified&Parbox\\
+ right&left&&\\ 
+ Result A&Result B&Result C&Result D\\
+ \midrule
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\ 
+\bottomrule
+ \end{longtable}
+ 
+\begin{longtable}{lrcp{2cm}}
+\caption{The caption of a long table on the first page}\\
+\toprule
+%
+ Ragged&Ragged&Justified&Parbox\\
+ right&left&&\\ 
+ Result A&Result B&Result C&Result D\\
+\midrule
+\endfirsthead
+%
+\multicolumn{4}{c}%
+        { \itshape \tablename~\thetable\ (continued).} \\
+        \midrule
+ Ragged&Ragged&Justified&Parbox\\
+ right&left&&\\ 
+ Result A&Result B&Result C&Result D\\
+\midrule
+\endhead
+%
+\midrule
+\multicolumn{4}{r}{{Continued on next page}} \\
+\endfoot
+%
+\bottomrule
+\endlastfoot
+%
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\
+ Text.&Text.&Text.&Longer text to create line breaks.\\ 
+\end{longtable} 

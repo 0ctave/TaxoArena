@@ -4,6 +4,8 @@ import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel
+import dev.langchain4j.model.azure.AzureOpenAiChatModel
+import dev.langchain4j.model.azure.AzureOpenAiEmbeddingModel
 import org.eclipse.lmos.arc.agents.ArcException
 import org.eclipse.lmos.arc.agents.agents
 import org.eclipse.lmos.arc.agents.conversation.AssistantMessage
@@ -30,21 +32,34 @@ import kotlin.time.toJavaDuration
 class ArcConfig {
 
     /**
-     * Explicitly defines the ChatLanguageModel bean for Ollama.
+     * Explicitly defines the ChatLanguageModel bean.
      * The Arc Spring Boot starter will automatically detect this and construct
      * the 'ChatCompleter' bean required by the rest of the application.
      */
     @Bean
     fun chatLanguageModel(
         @Value("\${arc.ollama.base-url:http://localhost:11434}") baseUrl: String,
-        @Value("\${arc.ollama.model:ministral-3:3b}") modelName: String
+        @Value("\${arc.ollama.model:}") arcOllamaModel: String,
+        config: org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig
     ): ChatModel {
-        return OllamaChatModel.builder()
-            .baseUrl(baseUrl)
-            .modelName(modelName)
-            .timeout(5.minutes.toJavaDuration())
-            .numCtx(8192)
-            .build()
+        return if (config.llm.provider == org.eclipse.lmos.arc.app.taxonomy.LlmProviderType.AZURE) {
+            AzureOpenAiChatModel.builder()
+                .endpoint(config.llm.azure.endpoint)
+                .apiKey(config.llm.azure.apiKey)
+                .deploymentName(config.llm.azure.deploymentName)
+                .serviceVersion(config.llm.azure.apiVersion)
+                .timeout(5.minutes.toJavaDuration())
+                .build()
+        } else {
+            val modelName = System.getenv("ARC_MODEL")
+                ?: if (arcOllamaModel.isNotBlank()) arcOllamaModel else config.llm.labelingModel
+            OllamaChatModel.builder()
+                .baseUrl(baseUrl)
+                .modelName(modelName)
+                .timeout(5.minutes.toJavaDuration())
+                .numCtx(8192)
+                .build()
+        }
     }
 
     /**
@@ -53,13 +68,34 @@ class ArcConfig {
     @Bean
     fun embeddingModel(
         @Value("\${arc.ollama.base-url:http://localhost:11434}") baseUrl: String,
-        @Value("\${arc.ollama.embed-model:qwen3-embedding}") embedModelName: String
+        @Value("\${arc.ollama.embed-model:qwen3-embedding}") embedModelName: String,
+        config: org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig
     ): EmbeddingModel {
-        return OllamaEmbeddingModel.builder()
-            .baseUrl(baseUrl)
-            .modelName(embedModelName)
-            .timeout(1.minutes.toJavaDuration())
-            .build()
+        return if (config.llm.embeddingProvider == org.eclipse.lmos.arc.app.taxonomy.LlmProviderType.AZURE) {
+            val deploymentName = if (config.llm.azure.embeddingDeploymentName.isNotBlank()) {
+                config.llm.azure.embeddingDeploymentName
+            } else {
+                config.llm.embeddingModel
+            }
+            AzureOpenAiEmbeddingModel.builder()
+                .endpoint(config.llm.azure.endpoint)
+                .apiKey(config.llm.azure.apiKey)
+                .deploymentName(deploymentName)
+                .serviceVersion(config.llm.azure.apiVersion)
+                .timeout(1.minutes.toJavaDuration())
+                .build()
+        } else {
+            val modelName = if (config.llm.embeddingModel.isNotBlank()) {
+                config.llm.embeddingModel
+            } else {
+                embedModelName
+            }
+            OllamaEmbeddingModel.builder()
+                .baseUrl(baseUrl)
+                .modelName(modelName)
+                .timeout(1.minutes.toJavaDuration())
+                .build()
+        }
     }
 
     @Bean
@@ -86,7 +122,7 @@ class ArcConfig {
 
 
     @Bean
-    fun taxoAgents() = agents {
+    fun taxoAgents(config: org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig) = agents {
         agent {
             name = "TaxoClassifier"
             description = "Classifies research papers into existing taxonomy categories."
@@ -96,13 +132,13 @@ class ArcConfig {
         agent {
             name = "TaxoExpander"
             description = "Dynamically expands taxonomies based on document corpus density."
-            model { System.getenv("ARC_MODEL") ?: "ministral-3:14b" }
+            model { System.getenv("ARC_MODEL") ?: config.llm.labelingModel }
         }
 
         agent {
             name = "TaxoDistiller"
             description = "Denoises raw queries into core taxonomic keywords."
-            model { System.getenv("ARC_MODEL") ?: "ministral-3:14b" }
+            model { System.getenv("ARC_MODEL") ?: config.llm.labelingModel }
         }
     }
 }

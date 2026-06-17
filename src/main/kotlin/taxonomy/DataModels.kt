@@ -12,6 +12,9 @@ data class Embedding(
     val distilledText: String,
     val values: FloatArray
 ) {
+    @kotlinx.serialization.Transient
+    var queryId: Int = -1
+
     val dimensions: Int get() = values.size
 
     // Convert to DoubleArray for high-precision statistical calculations (Mahalanobis/KL)
@@ -54,3 +57,25 @@ data class GmmParams(
 ) {
     val totalSamples: Int get() = components.sumOf { it.sampleCount }
 }
+
+/**
+ * Stores snapshot metrics of the DAG at a specific iteration or final state.
+ */
+@Serializable
+data class IterationMetrics(
+    val iteration: String,
+    val totalNodes: Int,
+    val leafNodes: Int,
+    val crossDomainNodes: Int,
+    val maxDepth: Int,
+    val avgLeafDepth: Double,
+    val totalUniqueQueries: Int,
+    val residualQueries: Int,
+    val totalPathRedundancy: Double,
+    val totalLogVolume: Double,
+    val residualRatio: Double,
+    val maxLeafConcentration: Double,
+    val contaminationRatio: Double,
+    val equilibriumIndex: Double,
+    val relevanceComplianceRatio: Double
+)

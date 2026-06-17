@@ -1,0 +1,24 @@
+\chapter{Automatic Indenting in arara}\label{ch:automatic_indenting_arara}
+In the following, the instructions on using \verb+arara+\index{Scripts!arara@\verb+arara+} for automatic indenting are shown for a Windows operating system. It is assumed that the instructions are similar on a Unix system, because \verb+arara+\index{Scripts!arara@\verb+arara+} is platform independent. However, this has not been verified, yet. In addition, we expect every person using this template to have installed \TeX Live $\geq$ 2018 and the following instructions are only valid for these cases. If you \emph{have} to use an older \TeX Live version, please check earlier commits of this template for the necessary instructions and files.
+
+	\textbf{4.0 (\TeX Live $\geq$ 2018):}
+	      \begin{enumerate}[label={\arabic*{}.}]
+		      \item Add a user command for \verb+arara+\index{Scripts!arara@\verb+arara+} to Texmaker\footnote{\url{https://tex.stackexchange.com/questions/107989/integration-of-arara-in-texmaker}, \\ January 2019}.
+		      \item Add the command in \autoref{code:arara_latexindent} to the beginning of the \path{main.tex} file (right before anything else). Note that the \% before arara is \emph{intentional} and necessary. This command executes the automatic file indenting for all files (and files in subfolders) that are stated within the square brackets as soon as \verb+arara+ is started. An example is given in \autoref{fig:arara_40_latexindent}.
+		      \item Execute \verb+arara+ (if you added it as the first user command, the shortcut Alt+Shift+F1 may be used).
+		      \item Update your files by clicking on File $\rightarrow$ Reload all documents from file.
+		      \item Your source code should now be nicely indented.
+		      \item In case errors appear, \verb+arara+\index{Scripts!arara@\verb+arara+} always creates a backup with the file extension \path{.latexindentbackup}.
+	      \end{enumerate}
+\textbf{Note that} \verb+arara+\index{Scripts!arara@\verb+arara+} \textbf{4.0 does not work with subdirectories by default.}
+	      \begin{lstlisting}[breaklines, caption={Setting up \texttt{arara} for \texttt{latexindent} in Texmaker}, float=tbh, label={code:arara_latexindent}, language=latex]
+%*\%*) arara: indentsubdir: { overwrite : yes, files : [ folder/file1.tex, folder/file2.tex ] , settings: local, where: 00_Arara_and_Latexindent/localSettings.yaml }
+		\end{lstlisting}
+\begin{figure}[tbh]
+	\centering
+	\includegraphics[width=\linewidth]{Example_arara_40_latexindent}
+	\caption[Directives for arara execution for automatic indenting]{Directives for arara execution for automatic indenting. These commands must be added at the beginning of \path{main.tex}}\label{fig:arara_40_latexindent}
+\end{figure}
+
+\textbf{5.0 (\TeX Live $\geq$ 2020):}\\
+As maintaining the code and keeping up-to-date with changes in \verb+arara+\index{Scripts!arara@\verb+arara+} is too cumbersome, these sections will not be updated with every new version of \verb+arara+\index{Scripts!arara@\verb+arara+}. Instead, the instructions above shall serve as starting point in newer versions of \TeX Live.

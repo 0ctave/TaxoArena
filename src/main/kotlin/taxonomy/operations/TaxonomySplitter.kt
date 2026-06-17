@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service
 import taxonomy.StatisticsUtils
 import taxonomy.TaxoPrompts
 import kotlin.math.*
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema
+import dev.langchain4j.model.chat.request.json.JsonSchema
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * Implements Phase 4: Discover (Adaptive Splitting).
@@ -20,19 +25,29 @@ import kotlin.math.*
 @Service
 class TaxonomySplitter(
     private val config: TaxonomyConfig,
-    private val llmClient: TaxonomyLlmClient
+    private val llmClient: TaxonomyLlmClient,
+    private val datasetFetcher: org.eclipse.lmos.arc.app.MMLUDatasetFetcher
 ) {
     private val log = LoggerFactory.getLogger(TaxonomySplitter::class.java)
     private val llmSemaphore = Semaphore(5) // Throttle parallel LLM calls
+    private val conceptCounter = java.util.concurrent.atomic.AtomicInteger(1)
 
-    suspend fun splitNodesRecursive(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
+    fun resetConceptCounter() {
+        conceptCounter.set(1)
+    }
+
+    suspend fun splitNodesRecursive(node: GraphNode, visited: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()) {
         if (visited.contains(node.id)) return
         visited.add(node.id)
 
         val currentChildren = node.children.toList()
-        for (child in currentChildren) {
-            splitNodesRecursive(child, visited)
-        }
+        coroutineScope {
+            currentChildren.map { child ->
+                async(Dispatchers.Default) {
+                    splitNodesRecursive(child, visited)
+                }
+            }
+        }.awaitAll()
 
         // Use splitBaseThreshold from the new Thermodynamic Formalism
         val threshold = config.formalism.splitBaseThreshold
@@ -40,11 +55,14 @@ class TaxonomySplitter(
         if (node.queries.size > threshold) {
             // BOUNDARY ENFORCEMENT: Check if the node has hit the maximum allowed depth
             if (node.depth >= config.formalism.maxDepth) {
-                log.info("Node '${node.label}' exceeds density threshold (${node.queries.size} > $threshold) but has reached max depth (${config.formalism.maxDepth}). Preventing further splits.")
+                log.info("Split Boundary: '${node.label}' reached max depth (${config.formalism.maxDepth}). Preventing split.")
                 return
             }
 
-            log.info("Node '${node.label}' exceeds density threshold (${node.queries.size} > $threshold). Scanning for emergent concepts...")
+            log.info("Split Scan: '${node.label}' exceeds threshold (${node.queries.size} > $threshold). Scanning emergent concepts...")
+
+            val root = getRoot(node)
+            val totalTaxonomyQueries = root.getAllQueriesInBranch().distinctBy { it.rawText }.size
 
             // 1. Try splitting based on GMM component "clues" first (Partitioning)
             var clusters = if (node.distribution != null && node.distribution!!.components.size > 1) {
@@ -53,18 +71,37 @@ class TaxonomySplitter(
 
             // 2. Fallback to DBSCAN if GMM is monolithic or partitioning failed to diversify
             if (clusters.size <= 1) {
-                clusters = performDbscan(node.queries, config.formalism.splitMinThreshold, node.isLeaf)
+                val splitMinThreshold = maxOf(5, (config.formalism.splitBaseThreshold * 0.5).toInt())
+                clusters = performDbscan(node.queries, splitMinThreshold, node.isLeaf, totalTaxonomyQueries)
             }
 
             if (clusters.isNotEmpty()) {
+                val baseDeff = config.formalism.fixedMrlDimension.coerceIn(1, node.queries.firstOrNull()?.dimensions ?: 4096)
+                
+                val dEff = if (config.formalism.enableDynamicDimension) {
+                    val queryCount = node.queries.size.coerceAtLeast(1)
+                    val adaptive = (queryCount * config.formalism.dynamicDimensionFactor).toInt()
+                        .coerceAtLeast(config.formalism.dynamicDimensionFloor)
+                    minOf(baseDeff, adaptive)
+                } else {
+                    baseDeff
+                }
+
                 val validClusters = clusters.filter { cluster ->
                     // 1. Check Relative Max Size ceiling
                     // DYNAMIC CEILING: Root (0) and Macro-Nodes (1) must split to bootstrap growth.
                     // Ceiling starts at 1.0 and decays to the configured relative-max-size.
                     val effectiveRelativeMaxSize = if (node.depth <= 1) 1.0 else config.formalism.relativeMaxSize
+                    val isMegaNode = (node.queries.size > 500 || node.queries.size > (totalTaxonomyQueries * 0.3)) && node.depth < 4
                     
-                    if (cluster.size > node.queries.size * effectiveRelativeMaxSize) {
-                        log.warn("Cluster in '${node.label}' (depth ${node.depth}) violates Relative Max Size ceiling (${cluster.size} > ${node.queries.size} * $effectiveRelativeMaxSize). Skipping.")
+                    if (!isMegaNode && cluster.size > node.queries.size * effectiveRelativeMaxSize) {
+                        log.warn("Split Ceiling: Cluster in '${node.label}' violates max relative size (${cluster.size} > ${node.queries.size} * ${"%.2f".format(java.util.Locale.US, effectiveRelativeMaxSize)}). Skipping.")
+                        return@filter false
+                    }
+
+                    val effectiveMinRelativeSize = if (node.depth <= 1) 0.02 else config.formalism.minRelativeSplitSize
+                    if (cluster.size < node.queries.size * effectiveMinRelativeSize) {
+                        log.warn("Split Floor: Cluster in '${node.label}' is too small (${cluster.size} < ${node.queries.size} * $effectiveMinRelativeSize). Skipping.")
                         return@filter false
                     }
 
@@ -73,7 +110,7 @@ class TaxonomySplitter(
                     
                     // Current Log-Likelihood (Stable)
                     val currentLL = StatisticsUtils.calculateLogLikelihood(currentGmm, node.queries)
-                    val currentPBic = StatisticsUtils.calculatePBic(currentGmm, node.queries, config.formalism.pBicLambda)
+                    val currentPBic = StatisticsUtils.calculatePBic(currentGmm, node.queries, config.formalism.pBicLambda, dEff)
                     
                     // Proposed GMM: Current components + new cluster component
                     val clusterGmm = StatisticsUtils.computeLeafGmm(cluster, 1, config.formalism.oasShrinkage) ?: return@filter false
@@ -91,17 +128,21 @@ class TaxonomySplitter(
                     
                     val combinedDataset = node.queries + cluster
                     val proposedLL = StatisticsUtils.calculateLogLikelihood(proposedGmm, combinedDataset)
-                    val proposedPBic = StatisticsUtils.calculatePBic(proposedGmm, combinedDataset, config.formalism.pBicLambda)
+                    val proposedPBic = StatisticsUtils.calculatePBic(proposedGmm, combinedDataset, config.formalism.pBicLambda, dEff)
                     
                     // Recalculate current for same dataset
                     val currentLL_on_all = StatisticsUtils.calculateLogLikelihood(currentGmm, combinedDataset)
-                    val currentPBic_on_all = StatisticsUtils.calculatePBic(currentGmm, combinedDataset, config.formalism.pBicLambda)
+                    val currentPBic_on_all = StatisticsUtils.calculatePBic(currentGmm, combinedDataset, config.formalism.pBicLambda, dEff)
 
-                    log.info("Split Evaluation for '${node.label}': CurrentBIC=$currentPBic_on_all, ProposedBIC=$proposedPBic")
+                    log.info("Split Eval '${node.label}': CurrentBIC=${"%.4f".format(java.util.Locale.US, currentPBic_on_all)}, ProposedBIC=${"%.4f".format(java.util.Locale.US, proposedPBic)}")
                     
-                    if (node.depth == 1) {
+                    if (isMegaNode) {
+                        val improvement = proposedLL - currentLL_on_all
+                        log.info("Split Eval '${node.label}': Mega-node detected, bypassing strict p-BIC check (LL improvement: ${"%.4f".format(java.util.Locale.US, improvement)})")
+                        if (improvement <= 0.1) return@filter false
+                    } else if (node.depth == 1) {
                         val improvement = (proposedLL - currentLL_on_all)
-                        log.info("p-BIC failed for Macro-Node '${node.label}', LL improvement: $improvement")
+                        log.info("Split Eval '${node.label}': p-BIC rejected macro-split (LL improvement: ${"%.4f".format(java.util.Locale.US, improvement)})")
                         if (improvement <= 1.0) return@filter false
                     } else {
                         if (proposedPBic >= currentPBic_on_all) return@filter false
@@ -116,7 +157,7 @@ class TaxonomySplitter(
                     }
                     
                     if (!isUnique) {
-                        log.info("Cluster in '${node.label}' too similar to existing sibling. Skipping.")
+                        log.info("Split Distinctness: Sub-cluster in '${node.label}' too similar to existing sibling. Skipping.")
                         return@filter false
                     }
 
@@ -129,12 +170,13 @@ class TaxonomySplitter(
                     // OR if the single child is a significant "zoom" (smaller volume).
                     val shouldDiversify = if (validClusters.size == 1) {
                         val cluster = validClusters[0]
-                        // Only create a child if it partitions a specific subset (< 80% of parent mass)
-                        cluster.size < node.queries.size * 0.8
+                        // Only create a child if it partitions a specific subset (< 75% or 65% at depth >= 3)
+                        val maxRatio = if (node.depth >= 3) 0.65 else 0.75
+                        cluster.size < node.queries.size * maxRatio
                     } else true
 
                     if (shouldDiversify) {
-                        log.info("Discovered ${validClusters.size} valid sub-clusters in '${node.label}'. Spawning new children...")
+                        log.info("Concept Discovered: Spawning ${validClusters.size} sub-clusters in '${node.label}'")
                         
                         val newChildren = coroutineScope {
                             validClusters.map { cluster ->
@@ -152,8 +194,20 @@ class TaxonomySplitter(
                             val clusterRawTexts = newChild.queries.map { it.rawText }.toSet()
                             node.queries.removeIf { it.rawText in clusterRawTexts }
                         }
+
+                        // Parallelize recursive decomposition of macro-clusters safely AFTER all sibling permits are fully released!
+                        coroutineScope {
+                            newChildren.forEach { newChild ->
+                                if (newChild.queries.size > config.formalism.splitBaseThreshold * 5 && newChild.depth < config.formalism.maxDepth) {
+                                    log.info("Macro-Concept: '${newChild.label}' is a macro-cluster. Decomposing immediately.")
+                                    async(Dispatchers.Default) {
+                                        splitNodesRecursive(newChild, visited)
+                                    }
+                                }
+                            }
+                        }
                     } else {
-                        log.info("Single sub-cluster in '${node.label}' is too redundant. Skipping child creation to prevent clones.")
+                        log.info("Split Redundancy: Single sub-cluster in '${node.label}' is too redundant. Skipping to prevent clone.")
                     }
                 }
             }
@@ -179,10 +233,12 @@ class TaxonomySplitter(
             }
             if (bestIdx != -1) clusters[bestIdx].add(emb)
         }
-        return clusters.filter { it.size >= config.formalism.splitMinThreshold }
+        val splitMinThreshold = maxOf(5, (config.formalism.splitBaseThreshold * 0.5).toInt())
+        return clusters.filter { it.size >= splitMinThreshold }
     }
 
-    private suspend fun createNodeFromCluster(cluster: List<Embedding>, parent: GraphNode): GraphNode {
+    fun selectRepresentativeQueries(cluster: List<Embedding>): List<String> {
+        if (cluster.isEmpty()) return emptyList()
         // STRATIFIED DIVERSIFIED SAMPLING (To combat sampling bias)
         // 1. Calculate centroid
         val dims = cluster[0].dimensions
@@ -201,40 +257,160 @@ class TaxonomySplitter(
         val middleShell = sortedByDistance.subList(n / 10, (9 * n) / 10).shuffled().take(7)
         val outerBoundary = sortedByDistance.takeLast(n / 10).shuffled().take(6)
         
-        val representativeSamples = (innerCore + middleShell + outerBoundary).map { it.first.rawText }.distinct()
+        return (innerCore + middleShell + outerBoundary).map { it.first.rawText }.distinct()
+    }
+
+    private suspend fun createNodeFromCluster(cluster: List<Embedding>, parent: GraphNode): GraphNode {
+        val representativeSamples = selectRepresentativeQueries(cluster)
 
         // 3. Get branch lineage
         val lineage = mutableListOf<String>()
         var current: GraphNode? = parent
-        while (current != null) {
+        val visitedLineage = mutableSetOf<String>()
+        while (current != null && visitedLineage.add(current.id)) {
             lineage.add(0, current.label)
             current = current.parents.firstOrNull()
         }
 
         val siblingLabels = parent.children.map { it.label }
-        val prompt = TaxoPrompts.clusterLabeling(
-            querySamples = representativeSamples,
-            parentLabel = parent.label,
-            siblingLabels = siblingLabels,
-            branchHistory = lineage
-        )
+        val domainAnchors = representativeSamples.mapNotNull { question ->
+            datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
+                word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            }
+        }.groupBy { it }.mapValues { it.value.size }
+            .entries.sortedByDescending { it.value }
+            .map { "${it.key} (${it.value} queries)" }
 
-        val jsonResponse = llmClient.generateClusterLabel(prompt)
-        val label = extractLabelFromJson(jsonResponse) ?: "Discovered Concept"
+        val label = if (config.formalism.enableLiveLabeling) {
+            val prompt = TaxoPrompts.clusterLabeling(
+                querySamples = representativeSamples,
+                parentLabel = parent.label,
+                siblingLabels = siblingLabels,
+                branchHistory = lineage,
+                domainAnchors = domainAnchors,
+                depth = parent.depth + 1
+            )
 
-        log.info("LLM mapped new cluster (${cluster.size} items) -> '$label' using Stratified Sampling")
+            val labelSchema = JsonSchema.builder()
+                .name("ClusterLabel")
+                .rootElement(
+                    JsonObjectSchema.builder()
+                        .addStringProperty("label", "A concise, domain-specific label for the concept cluster (3-7 words)")
+                        .required("label")
+                        .build()
+                )
+                .build()
+            val jsonResponse = llmClient.queryModelStructured(
+                modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
+                systemPrompt = null,
+                userPrompt = prompt,
+                schema = labelSchema
+            )
+            try {
+                Json.parseToJsonElement(jsonResponse).jsonObject["label"]?.jsonPrimitive?.content
+                    ?: "Discovered Concept"
+            } catch (e: Exception) {
+                log.warn("Structured label parse failed, using fallback. Raw response: $jsonResponse")
+                "Discovered Concept"
+            }
+        } else {
+            "Emergent Concept #${conceptCounter.getAndIncrement()}"
+        }
+
+        log.info("Concept Mapped: Mapped cluster (${cluster.size} items) -> '$label' (Live Labeling: ${config.formalism.enableLiveLabeling})")
 
         val newNode = GraphNode(label = label, depth = parent.depth + 1)
         newNode.queries.addAll(cluster)
         
-        // RECURSIVE DECOMPOSITION: If the new cluster is still too large (> 500 items), 
-        // try to split it immediately to prevent "Domain Eating".
-        if (cluster.size > config.formalism.splitBaseThreshold * 5 && newNode.depth < config.formalism.maxDepth) {
-            log.info("Node '$label' is a macro-cluster. Triggering immediate sub-decomposition.")
-            splitNodesRecursive(newNode)
-        }
-
         return newNode
+    }
+
+    suspend fun generateLabelsPostPass(root: GraphNode) = coroutineScope {
+        log.info("Starting post-pass labeling of the DAG...")
+        val allNodes = mutableListOf<GraphNode>()
+        fun walk(n: GraphNode, visited: MutableSet<String>) {
+            if (!visited.add(n.id)) return
+            allNodes.add(n)
+            n.children.forEach { walk(it, visited) }
+        }
+        walk(root, mutableSetOf())
+
+        val nodesToLabel = allNodes.filter { it.depth > 0 }.sortedBy { it.depth }
+        val maxDepth = nodesToLabel.map { it.depth }.maxOrNull() ?: 0
+
+        for (d in 1..maxDepth) {
+            val levelNodes = nodesToLabel.filter { it.depth == d }
+            levelNodes.map { node ->
+                async(Dispatchers.Default) {
+                    llmSemaphore.withPermit {
+                        val branchQueries = node.getAllQueriesInBranch()
+                        if (branchQueries.isEmpty()) {
+                            node.label = "Emergent Concept #${node.id.take(4)}"
+                            return@withPermit
+                        }
+
+                        val representativeSamples = selectRepresentativeQueries(branchQueries)
+
+                        val parents = node.parents
+                        val siblingLabels = parents.flatMap { it.children }.map { it.label }.filter { it != node.label }
+
+                        val lineage = mutableListOf<String>()
+                        var current: GraphNode? = parents.firstOrNull()
+                        val visitedLineage = mutableSetOf<String>()
+                        while (current != null && visitedLineage.add(current.id)) {
+                            lineage.add(0, current.label)
+                            current = current.parents.firstOrNull()
+                        }
+
+                        val domainAnchors = representativeSamples.mapNotNull { question ->
+                            datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
+                                word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                            }
+                        }.groupBy { it }.mapValues { it.value.size }
+                            .entries.sortedByDescending { it.value }
+                            .map { "${it.key} (${it.value} queries)" }
+
+                        val prompt = TaxoPrompts.clusterLabeling(
+                            querySamples = representativeSamples,
+                            parentLabel = parents.firstOrNull()?.label ?: "Universal Knowledge",
+                            siblingLabels = siblingLabels,
+                            branchHistory = lineage,
+                            domainAnchors = domainAnchors,
+                            depth = node.depth
+                        )
+
+                        val labelSchema = JsonSchema.builder()
+                            .name("ClusterLabel")
+                            .rootElement(
+                                JsonObjectSchema.builder()
+                                    .addStringProperty("label", "A concise, domain-specific label for the concept cluster (3-7 words)")
+                                    .required("label")
+                                    .build()
+                            )
+                            .build()
+
+                        val jsonResponse = llmClient.queryModelStructured(
+                            modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
+                            systemPrompt = null,
+                            userPrompt = prompt,
+                            schema = labelSchema
+                        )
+
+                        val newLabel = try {
+                            Json.parseToJsonElement(jsonResponse).jsonObject["label"]?.jsonPrimitive?.content
+                                ?: "Discovered Concept"
+                        } catch (e: Exception) {
+                            log.warn("Structured label parse failed, using fallback. Raw response: $jsonResponse")
+                            "Discovered Concept"
+                        }
+
+                        log.info("Concept Mapped (Post-Pass): Mapped node ${node.label} (${branchQueries.size} branch items) -> '$newLabel'")
+                        node.label = newLabel
+                    }
+                }
+            }.awaitAll()
+        }
+        log.info("Finished post-pass labeling of the DAG.")
     }
 
     private fun calculateCosineDistance(v1: DoubleArray, v2: DoubleArray): Double {
@@ -253,32 +429,54 @@ class TaxonomySplitter(
     /**
      * Advanced High-Dimensional DBSCAN using Cosine Distance and Knee Detection.
      */
-    private fun performDbscan(embeddings: List<Embedding>, minPts: Int, isLeaf: Boolean): List<List<Embedding>> {
+    private suspend fun performDbscan(
+        embeddings: List<Embedding>,
+        minPts: Int,
+        isLeaf: Boolean,
+        totalTaxonomyQueries: Int
+    ): List<List<Embedding>> {
         if (embeddings.size < minPts) return emptyList()
 
-        val n = embeddings.size
+        val maxSample = 500
+        val isDownsampled = embeddings.size > maxSample
+        val sampledEmbeddings = if (isDownsampled) {
+            embeddings.shuffled(kotlin.random.Random(42)).take(maxSample)
+        } else {
+            embeddings
+        }
+
+        val n = sampledEmbeddings.size
         val distMatrix = Array(n) { DoubleArray(n) }
 
-        // 1. Parallelize Pairwise Cosine Distances calculation
-        runBlocking(Dispatchers.Default) {
+        // Precompute L2 norms once for fast cosine similarity
+        val norms = DoubleArray(n) { idx ->
+            val emb = sampledEmbeddings[idx]
+            var sumSq = 0.0
+            for (d in 0 until emb.dimensions) {
+                val v = emb.values[d].toDouble()
+                sumSq += v * v
+            }
+            sqrt(sumSq)
+        }
+
+        // 1. Parallelize Pairwise Cosine Distances calculation using precomputed norms
+        coroutineScope {
             (0 until n).chunked(maxOf(1, n / Runtime.getRuntime().availableProcessors())).map { chunk ->
-                launch {
+                launch(Dispatchers.Default) {
                     for (i in chunk) {
+                        val viVals = sampledEmbeddings[i].values
+                        val normI = norms[i]
                         for (j in i + 1 until n) {
-                            var dotProduct = 0.0
-                            var normI = 0.0
-                            var normJ = 0.0
-                            val dims = embeddings[i].dimensions
+                            val vjVals = sampledEmbeddings[j].values
+                            var dotProduct = 0.0f
+                            val dims = viVals.size
 
                             for (d in 0 until dims) {
-                                val vi = embeddings[i].values[d].toDouble()
-                                val vj = embeddings[j].values[d].toDouble()
-                                dotProduct += vi * vj
-                                normI += vi * vi
-                                normJ += vj * vj
+                                dotProduct += viVals[d] * vjVals[d]
                             }
 
-                            val similarity = if (normI > 0 && normJ > 0) dotProduct / (sqrt(normI) * sqrt(normJ)) else 0.0
+                            val normProduct = normI * norms[j]
+                            val similarity = if (normProduct > 0.0) dotProduct.toDouble() / normProduct else 0.0
                             val dist = (1.0 - similarity).coerceAtLeast(0.0)
 
                             distMatrix[i][j] = dist
@@ -286,12 +484,12 @@ class TaxonomySplitter(
                         }
                     }
                 }
-            }.forEach { it.join() }
+            }
         }
 
-        // 2. Compute k-NN distances for each point
+        // 2. Compute k-NN distances dynamically based on node size N
         val kDistances = DoubleArray(n)
-        val k = minPts.coerceAtMost(n - 1)
+        val k = maxOf(4, round(ln(n.toDouble()) * 2.0).toInt()).coerceAtMost(n - 1)
         for (i in 0 until n) {
             val distancesFromI = distMatrix[i].sorted()
             kDistances[i] = distancesFromI[k]
@@ -299,17 +497,33 @@ class TaxonomySplitter(
         kDistances.sort() // Sort to form the K-Distance Graph
 
         // 3. Mathematical Knee/Elbow Detection for Optimal Epsilon
-        val kneeEps = findMaximumCurvature(kDistances)
+        // If N > 500, downsample the k-distances curve to exactly 500 points to keep knee detection instant
+        val kneeEps = if (n > 500) {
+            val downsampled = DoubleArray(500) { idx ->
+                val sourceIdx = (idx * (n - 1)) / 499
+                kDistances[sourceIdx]
+            }
+            findMaximumCurvature(downsampled)
+        } else {
+            findMaximumCurvature(kDistances)
+        }
 
         // --- MACRO-CONCEPT RELAXATION ---
         // Leaves require strict, tight granularization (Knee Epsilon) to split logically.
         // Parents (like the Root) contain disconnected, sparse outliers. The strict knee traps them as noise.
-        // Relaxing the radius to the mean of the k-distances allows macro-concepts to form and drains the Root.
-        // MEGA-NODE EXCEPTION: If a leaf is massive (> 250 q), it has become a "de-facto root" and needs relaxation.
-        val isMegaNode = embeddings.size > 250
-        val eps = if (isLeaf && !isMegaNode) kneeEps else maxOf(kneeEps, kDistances.average())
+        // Relaxing the radius to the robust median of the k-distances allows macro-concepts to form.
+        // DYNAMIC MEGA-NODE EXCEPTION: If a leaf contains > 30% of total taxonomy queries, it is a mega-node.
+        val isMegaNode = n.toDouble() > (totalTaxonomyQueries * 0.3)
+        val medianEps = kDistances[n / 2]
+        val baseEps = if (isLeaf && !isMegaNode) kneeEps else maxOf(kneeEps, medianEps)
 
-        log.debug("Auto-tuned Cosine Epsilon (isLeaf=$isLeaf): Knee=$kneeEps, Final=$eps")
+        // DENSITY-BASED CONSERVATIVE LINEAR SCALING
+        // Epsilon shrinks proportionally to the node's local query size relative to the total active query pool, floor at 0.70
+        val ratio = n.toDouble() / totalTaxonomyQueries
+        val densityMultiplier = (1.0 - (ratio * 0.3)).coerceIn(0.7, 1.0)
+        val eps = (baseEps * densityMultiplier).coerceIn(config.formalism.dbscanEpsFloor, config.formalism.dbscanEpsCeiling)
+
+        log.debug("Auto-tuned Cosine Epsilon (isLeaf=$isLeaf, totalTaxonomyQueries=$totalTaxonomyQueries, isMegaNode=$isMegaNode): Knee=$kneeEps, Median=$medianEps, Base=$baseEps, DensityMultiplier=${"%.4f".format(java.util.Locale.US, densityMultiplier)}, Final=$eps")
 
         // 4. Standard DBSCAN Execution
         val visited = BooleanArray(n)
@@ -325,10 +539,14 @@ class TaxonomySplitter(
                 val cluster = mutableListOf<Embedding>()
                 clusters.add(cluster)
 
-                cluster.add(embeddings[i])
+                cluster.add(sampledEmbeddings[i])
                 inCluster[i] = true
 
                 val seeds = neighbors.toMutableList()
+                val inSeeds = BooleanArray(n)
+                for (idx in seeds) {
+                    inSeeds[idx] = true
+                }
                 var seedIdx = 0
 
                 while (seedIdx < seeds.size) {
@@ -338,12 +556,15 @@ class TaxonomySplitter(
                         val currentNeighbors = getNeighbors(currentP, distMatrix, eps)
                         if (currentNeighbors.size >= minPts) {
                             for (cn in currentNeighbors) {
-                                if (!seeds.contains(cn)) seeds.add(cn)
+                                if (!inSeeds[cn]) {
+                                    seeds.add(cn)
+                                    inSeeds[cn] = true
+                                }
                             }
                         }
                     }
                     if (!inCluster[currentP]) {
-                        cluster.add(embeddings[currentP])
+                        cluster.add(sampledEmbeddings[currentP])
                         inCluster[currentP] = true
                     }
                     seedIdx++
@@ -351,7 +572,45 @@ class TaxonomySplitter(
             }
         }
 
-        return clusters.filter { it.size >= minPts }
+        val filteredClusters = clusters.filter { it.size >= minPts }
+
+        if (!isDownsampled || filteredClusters.isEmpty()) {
+            return filteredClusters
+        }
+
+        // Calculate centroid for each cluster
+        val centroids = filteredClusters.map { cluster ->
+            val dims = cluster[0].dimensions
+            val mean = DoubleArray(dims)
+            for (emb in cluster) {
+                for (d in 0 until dims) {
+                    mean[d] += emb.values[d].toDouble()
+                }
+            }
+            for (d in 0 until dims) {
+                mean[d] /= cluster.size.toDouble()
+            }
+            mean
+        }
+
+        // Assign all original embeddings to the closest cluster centroid if within eps
+        val fullClusters = List(filteredClusters.size) { mutableListOf<Embedding>() }
+        for (emb in embeddings) {
+            var bestIdx = -1
+            var minDist = Double.MAX_VALUE
+            for (idx in centroids.indices) {
+                val dist = calculateCosineDistance(emb.toDoubleArray(), centroids[idx])
+                if (dist < minDist) {
+                    minDist = dist
+                    bestIdx = idx
+                }
+            }
+            if (bestIdx != -1 && minDist <= eps) {
+                fullClusters[bestIdx].add(emb)
+            }
+        }
+
+        return fullClusters.filter { it.size >= minPts }
     }
 
     /**
@@ -397,8 +656,13 @@ class TaxonomySplitter(
         return neighbors
     }
 
-    private fun extractLabelFromJson(json: String): String? {
-        val regex = """"label"\s*:\s*"([^"]+)"""".toRegex()
-        return regex.find(json)?.groups?.get(1)?.value
+    private fun getRoot(node: GraphNode): GraphNode {
+        var curr = node
+        val visited = mutableSetOf<String>()
+        while (curr.parents.isNotEmpty() && visited.add(curr.id)) {
+            curr = curr.parents.first()
+        }
+        return curr
     }
+
 }

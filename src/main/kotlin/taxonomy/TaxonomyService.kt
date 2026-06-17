@@ -34,8 +34,48 @@ class TaxonomyService(
     private val _rootNode = MutableStateFlow<GraphNode?>(null)
     val rootNodeFlow: StateFlow<GraphNode?> = _rootNode.asStateFlow()
 
+    private val _graphVersion = MutableStateFlow(0)
+    val graphVersionFlow: StateFlow<Int> = _graphVersion.asStateFlow()
+
+    fun notifyGraphUpdated() {
+        _rootNode.value?.let { assignQueryIds(it) }
+        _graphVersion.value = _graphVersion.value + 1
+    }
+
+    private val _metricsHistory = MutableStateFlow<List<IterationMetrics>>(emptyList())
+    val metricsHistoryFlow: StateFlow<List<IterationMetrics>> = _metricsHistory.asStateFlow()
+
+    fun clearMetricsHistory() {
+        _metricsHistory.value = emptyList()
+    }
+
+    fun addIterationMetrics(iteration: String, report: TaxonomyMetrics.Report) {
+        val metrics = IterationMetrics(
+            iteration = iteration,
+            totalNodes = report.totalNodes,
+            leafNodes = report.leafNodes,
+            crossDomainNodes = report.crossDomainNodes,
+            maxDepth = report.maxDepth,
+            avgLeafDepth = report.avgLeafDepth,
+            totalUniqueQueries = report.totalUniqueQueries,
+            residualQueries = report.residualQueries,
+            totalPathRedundancy = report.totalPathRedundancy,
+            totalLogVolume = report.totalLogVolume,
+            residualRatio = report.residualRatio,
+            maxLeafConcentration = report.maxLeafConcentration,
+            contaminationRatio = report.contaminationRatio,
+            equilibriumIndex = report.equilibriumIndex,
+            relevanceComplianceRatio = report.relevanceComplianceRatio
+        )
+        _metricsHistory.value = _metricsHistory.value + metrics
+    }
+
+    fun getMetricsHistory(): List<IterationMetrics> = _metricsHistory.value
+
+
     fun setGraph(node: GraphNode) {
         _rootNode.value = node
+        notifyGraphUpdated()
     }
 
     fun getGraph(): GraphNode? = _rootNode.value
@@ -44,7 +84,7 @@ class TaxonomyService(
         log.info("Incoming query: '${if (text.length > 50) text.take(50) + "..." else text}'")
         val currentRoot = getGraph() ?: throw IllegalStateException("Taxonomy not loaded")
         
-        val distilled = if (config.enableDistillation) {
+        val distilled = if (config.execution.enableDistillation) {
              distillationCache.get(text, "query") ?: run {
                 val prompt = TaxoPrompts.getDistillationPrompt(text, "General")
                 val result = llmClient.distillQuery(prompt)
@@ -100,6 +140,11 @@ class TaxonomyService(
     }
 
     fun loadGraph(path: String) {
-        persistence.load(path)?.let { setGraph(it) }
+        persistence.load(path)?.let {
+            setGraph(it)
+            clearMetricsHistory()
+            val report = TaxonomyMetrics(it).generateReport()
+            addIterationMetrics("Loaded", report)
+        }
     }
 }

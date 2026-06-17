@@ -1,0 +1,91 @@
+%-----------------------------
+% MUST BE CHANGED BY THE USER
+%-----------------------------
+%-----------------------------
+% BOOLEAN FOR DECISION B/M THESIS OR DISSERTATION
+%-----------------------------
+\newboolean{isDiss}
+% Options:
+% true: Dissertation
+% false: Bachelor/Master thesis
+\setboolean{isDiss}{false}
+%-----------------------------
+% BOOLEAN FOR DECISION MASTER OR BACHELOR THESIS
+%-----------------------------
+\newboolean{isMT}
+% Options:
+% true: Master thesis
+% false: Bachelor thesis
+\setboolean{isMT}{true}
+%-----------------------------
+% BOOLEAN FOR DECISION EMBARGO NOTICE
+%-----------------------------
+\newboolean{containsEN}
+% Options:
+% true: Thesis contains embargo notice due to a confidentiality agreement between company and TU Berlin
+% false: Thesis does not contain such a notice
+\setboolean{containsEN}{false}
+\newcommand{\firmenname}{Firmenname (definiert in \path{b_Meta.tex})} % Firma, bei der die Abschlussarbeit verfasst wurde
+%-----------------------------
+% TITLE, AUTHOR, AND DOCUMENT TYPE
+%-----------------------------
+\newcommand{\mytitle}{This Is a Very Good Title That Illustrates What This Great Piece of Work Is All About and That Gives an Impression of What a Long Title Looks Like}
+\newcommand{\autor}{M. Sc. \\ First name middle name last name}
+\newcommand{\orcid}{XXXX-XXXX-XXXX-XXXX}
+\newcommand{\mydocumenttype}{Dissertation}
+\ifthenelse{\boolean{isDiss}}{%
+    }{\ifthenelse{\boolean{isMT}}{\renewcommand{\mydocumenttype}{Master's Thesis}%
+    }{\renewcommand{\mydocumenttype}{Bachelor's Thesis}}%
+    }%
+%-----------------------------
+% FOR BACHELOR/MASTER THESIS
+%-----------------------------
+\newcommand{\courseofstudy}{Mein Studiengang}
+\newcommand{\mymatriculationnumber}{XXXXXX}
+\newcommand{\myadvisor}{My advisor, M.Sc.}
+%-----------------------------
+% KEYWORDS FOR THE ABSTRACT
+%-----------------------------
+\newcommand{\germankeywords}{Schlüsselwort1, Schlüsselwort2, Schlüsselwort3}
+\newcommand{\englishkeywords}{Keyword1, Keyword2, Keyword3}
+%-----------------------------
+% FOR DISSERTATION
+%-----------------------------
+\newcommand{\chairman}{Prof.~Dr.-Ing.~habil.~Martina Superwichtig}
+\newcommand{\firstreviewer}{\mysupervisor}
+\newcommand{\secondreviewer}{Prof.~Dr.-Ing.~Hans-Georg Wichtig}
+\newcommand{\dayofdefense}{\DTMdisplaydate{2020}{1}{1}{-1}}
+%-----------------------------
+% MUST BE CHANGED BY THE USER
+%-----------------------------
+
+
+
+
+%-----------------------------
+% NOT TO BE CHANGED BY THE USER
+%-----------------------------
+\usepackage[
+    a-2b,                   % PDF/A-2b conformity
+    mathxmp,                % for writing metadata from xmpdata file
+]{pdfx}                     % package for PDF/A standard
+\newcommand{\myuniversity}{Technische Universität Berlin}
+\newcommand{\myfaculty}{Fakultät III -- Prozesswissenschaften}
+\newcommand{\myinstitute}{Institut für Prozess- und Verfahrenstechnik}
+\newcommand{\mydepartment}{Fachgebiet Dynamik und Betrieb technischer Anlagen}
+\newcommand{\myplace}{Berlin}
+\newcommand{\mysupervisor}{Prof.~Dr.-Ing.~habil.~Jens-Uwe Repke}
+\newboolean{isSG}
+% Options:
+% true: document in styleguide mode
+% false: dissertation or thesis mode
+\setboolean{isSG}{false}
+\newcommand{\version}{3.7.0}
+\ifthenelse{\boolean{isSG}}{\setboolean{isDiss}{true}}{}
+% Subtitle English
+\newcommand{\myengsubtitle}{Thesis in partial fulfillment of the requirements for the degree \\ \ifthenelse{\boolean{isMT}}{Master}{Bachelor} of Science (\ifthenelse{\boolean{isMT}}{M.Sc.}{B.Sc.})}
+% Subtitle German
+\newcommand{\mygersubtitle}{Wissenschaftliche Arbeit zur Erlangung des Grades \\ \ifthenelse{\boolean{isMT}}{Master}{Bachelor} of Science (\ifthenelse{\boolean{isMT}}{M.Sc.}{B.Sc.})}
+%-----------------------------
+% NOT TO BE CHANGED BY THE USER
+%-----------------------------

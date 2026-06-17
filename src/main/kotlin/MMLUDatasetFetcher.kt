@@ -48,11 +48,17 @@ class MMLUDatasetFetcher(
         }
     }
 
-    suspend fun fetchDataset(maxQueries: Int = 500): Map<String, List<String>> {
+    suspend fun fetchDataset(maxQueries: Int = 12000, selectedDomains: List<String> = emptyList()): Map<String, List<String>> {
+        val limit = if (selectedDomains.isEmpty()) maxQueries else 100000
         val totalInDb = getDbCount()
-        val allRows = loadFromDb(maxQueries)
+        val allRows = loadFromDb(limit, selectedDomains)
 
-        if (allRows.size >= maxQueries) {
+        if (selectedDomains.isNotEmpty()) {
+            log.info("Loaded ${allRows.size} MMLU Pro queries from local cache for domains: ${selectedDomains.joinToString(", ")}.")
+            return finalizeData(allRows)
+        }
+
+        if (allRows.size >= 1000 || allRows.size >= maxQueries) {
             log.info("Loaded MMLU Pro dataset from local cache (${allRows.size} queries).")
             return finalizeData(allRows)
         }
@@ -69,8 +75,8 @@ class MMLUDatasetFetcher(
 
         log.info("Downloading MMLU Pro dataset from Hugging Face...")
         while (allRows.size < maxQueries) {
-            val limit = minOf(batchSize, maxQueries - allRows.size)
-            val url = "https://datasets-server.huggingface.co/rows?dataset=TIGER-Lab%2FMMLU-Pro&config=default&split=test&offset=$hfOffset&length=$limit"
+            val limitVal = minOf(batchSize, maxQueries - allRows.size)
+            val url = "https://datasets-server.huggingface.co/rows?dataset=TIGER-Lab%2FMMLU-Pro&config=default&split=test&offset=$hfOffset&length=$limitVal"
 
             val requestBuilder = HttpRequest.newBuilder().uri(URI.create(url)).GET()
             if (hfToken.isNotBlank()) {
@@ -102,7 +108,7 @@ class MMLUDatasetFetcher(
                 saveBatchToDb(newRows)
 
                 allRows.addAll(newRows)
-                hfOffset += limit
+                hfOffset += limitVal
                 retries = 0
                 waitTime = 2000L
 
@@ -116,12 +122,27 @@ class MMLUDatasetFetcher(
         return finalizeData(allRows.take(maxQueries))
     }
 
-    private fun loadFromDb(limit: Int): MutableList<HFProRowData> {
+    private fun loadFromDb(limit: Int, selectedDomains: List<String> = emptyList()): MutableList<HFProRowData> {
         val rows = mutableListOf<HFProRowData>()
         try {
             DriverManager.getConnection(dbUrl).use { conn ->
-                conn.prepareStatement("SELECT question, category, cot_content, options, answer FROM mmlu_pro ORDER BY id ASC LIMIT ?").use { pstmt ->
-                    pstmt.setInt(1, limit)
+                val sql = if (selectedDomains.isEmpty()) {
+                    "SELECT question, category, cot_content, options, answer FROM mmlu_pro ORDER BY id ASC LIMIT ?"
+                } else {
+                    val rawDomains = selectedDomains.map { it.trim().lowercase().replace(" ", "_") }
+                    val placeholders = rawDomains.joinToString(",") { "?" }
+                    "SELECT question, category, cot_content, options, answer FROM mmlu_pro WHERE category IN ($placeholders) ORDER BY id ASC LIMIT ?"
+                }
+                conn.prepareStatement(sql).use { pstmt ->
+                    if (selectedDomains.isEmpty()) {
+                        pstmt.setInt(1, limit)
+                    } else {
+                        val rawDomains = selectedDomains.map { it.trim().lowercase().replace(" ", "_") }
+                        rawDomains.forEachIndexed { index, domain ->
+                            pstmt.setString(index + 1, domain)
+                        }
+                        pstmt.setInt(rawDomains.size + 1, limit)
+                    }
                     val rs = pstmt.executeQuery()
                     while (rs.next()) {
                         rows.add(HFProRowData(
@@ -227,6 +248,78 @@ class MMLUDatasetFetcher(
         val percent = (progress * 100).toInt()
         print("\r$prefix: [$bar] $percent% ($current/$total)")
         if (current >= total) println()
+    }
+
+    fun splitTrainTest(dataset: Map<String, List<String>>, testRatio: Double = 0.2): Pair<Map<String, List<String>>, Map<String, List<String>>> {
+        val train = mutableMapOf<String, List<String>>()
+        val test = mutableMapOf<String, List<String>>()
+        for ((category, queries) in dataset) {
+            val total = queries.size
+            val testCount = (total * testRatio).toInt()
+            val trainCount = (total - testCount).coerceAtLeast(1)
+            val trainQueries = queries.take(trainCount)
+            val testQueries = queries.drop(trainCount)
+            
+            train[category] = trainQueries
+            if (testQueries.isNotEmpty()) {
+                test[category] = testQueries
+            }
+        }
+        
+        try {
+            val file = java.io.File("reserved_test_queries.json")
+            val prettyJson = Json { prettyPrint = true }
+            file.writeText(prettyJson.encodeToString(test))
+            log.info("Successfully reserved ${test.values.flatten().size} test queries across ${test.size} domains to reserved_test_queries.json.")
+        } catch (e: Exception) {
+            log.error("Failed to save reserved test queries to file", e)
+        }
+        
+        return Pair(train, test)
+    }
+
+    fun getAvailableDomains(): List<Pair<String, Int>> {
+        val list = mutableListOf<Pair<String, Int>>()
+        try {
+            DriverManager.getConnection(dbUrl).use { conn ->
+                conn.createStatement().use { stmt ->
+                    val rs = stmt.executeQuery("SELECT category, COUNT(*) FROM mmlu_pro GROUP BY category ORDER BY category ASC")
+                    while (rs.next()) {
+                        val rawCat = rs.getString(1) ?: "unknown"
+                        val count = rs.getInt(2)
+                        val prettyCat = rawCat.split("_", "-").joinToString(" ") { word ->
+                            word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                        }
+                        list.add(Pair(prettyCat, count))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to get available domains from SQLite", e)
+        }
+        return list
+    }
+
+    fun getQueryToCategoryMap(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        try {
+            DriverManager.getConnection(dbUrl).use { conn ->
+                conn.createStatement().use { stmt ->
+                    val rs = stmt.executeQuery("SELECT question, category FROM mmlu_pro")
+                    while (rs.next()) {
+                        val q = rs.getString("question")
+                        val rawCat = rs.getString("category") ?: "Unknown"
+                        val prettyCat = rawCat.split("_", "-").joinToString(" ") { word ->
+                            word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                        }
+                        map[q] = prettyCat
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to build query-to-category map", e)
+        }
+        return map
     }
 }
 

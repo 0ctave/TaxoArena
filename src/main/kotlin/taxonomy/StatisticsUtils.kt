@@ -150,7 +150,7 @@ object StatisticsUtils {
             val v1 = var1[i].coerceAtLeast(1e-9)
             sum += (v0 / v1) + ((mean1[i] - mean0[i]).pow(2.0) / v1) - 1.0 + ln(v1 / v0)
         }
-        return 0.5 * sum
+        return (0.5 * sum) / k.toDouble()
     }
 
     /**
@@ -195,15 +195,20 @@ object StatisticsUtils {
      * Penalized Bayesian Information Criterion (p-BIC).
      * Normalized by dimensionality to maintain stability in 4096-D.
      */
-    fun calculatePBic(gmm: GmmParams, embeddings: List<Embedding>, lambda: Double): Double {
+    fun calculatePBic(
+        gmm: GmmParams,
+        embeddings: List<Embedding>,
+        lambda: Double,
+        dEff: Int = embeddings.firstOrNull()?.dimensions ?: 4096
+    ): Double {
         if (embeddings.isEmpty()) return Double.POSITIVE_INFINITY
         val n = embeddings.size
         val d = embeddings[0].dimensions
         
         val totalLogLikelihood = calculateLogLikelihood(gmm, embeddings)
 
-        // k: number of parameters
-        val k = gmm.components.size * (2 * d + 1) - 1
+        // k: number of parameters calculated with dEff to avoid overparameterization penalty in 4096-D
+        val k = gmm.components.size * (2 * dEff + 1) - 1
         
         var totalLogVolume = 0.0
         for (comp in gmm.components) {
@@ -282,7 +287,7 @@ object StatisticsUtils {
 
         // Score: Higher is better containment. 
         // We use an exponential decay on KL and normalize by volume gap.
-        return exp(-0.1 * avgKl / inclusionFactor)
+        return exp(-15.0 * avgKl / inclusionFactor)
     }
 
     fun gmmSimilarity(gmmA: GmmParams, gmmB: GmmParams): Double {

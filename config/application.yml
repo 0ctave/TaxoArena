@@ -42,16 +42,37 @@ huggingface:
   token: ***REMOVED***
 
 taxoadapt:
-  sample: 12000
-  enable-distillation: false
-  enable-visualization: false
-  enable-tui: true
-  run-batch: false
+  execution:
+    run-batch: false
+    calibrate: false
+    start-service: true
+    num-iterations: 5
+    enable-distillation: false
+    enable-visualization: false
+    enable-tui: true
 
-  start-service: true
-  num-iterations: 5
-  judge-model: "qwen3.6:27b"
-  max-judge-generality: 1  # 0=leaves only, 1=leaves+parents, 2=leaves+parents+grandparents
+  dataset:
+    sample: 12000
+    split-dataset: true
+    test-split-ratio: 0.2
+    selected-domains: []
+
+  llm:
+    provider: AZURE
+    embedding-provider: OLLAMA
+    embedding-model: "embeddinggemma:latest"
+    judge-model: "Mistral-Large-3"
+    labeling-model: "Mistral-Large-3"
+    max-judge-generality: 1  # 0=leaves only, 1=leaves+parents, 2=leaves+parents+grandparents
+    gemini:
+      api-key: ""
+      model-name: "gemini-1.5-flash"
+    azure:
+      endpoint: "***REMOVED***"
+      api-key: "***REMOVED***"
+      deployment-name: "Mistral-Large-3"
+      embedding-deployment-name: ""
+      api-version: "2024-02-15-preview"
 
   persistence:
     load-path: "taxonomy_final.json"
@@ -65,7 +86,7 @@ taxoadapt:
 
     # Hysteresis Likeness Factors (Probabilities)
     tau-fit: 0.88
-    tau-reparent: 0.70  
+    tau-reparent: 0.80
     tau-merge: 0.92
     
     # Balanced: 1.2 scaling allows API queries to pass restrictive gates
@@ -73,7 +94,6 @@ taxoadapt:
 
     # Context-Aware Density (Depth Decay)
     split-base-threshold: 25
-    split-min-threshold: 15
     depth-decay-lambda: 0.08
 
     # Splitting Compression (p-BIC)
@@ -83,8 +103,11 @@ taxoadapt:
     max-centroids-per-node: 3
     relative-max-size: 0.7
 
-    # Branching Control
-    max-trickle-branches: 5
-    trickle-all-viable: true
+    # Branching Control (Set to <= 0 for all viable)
+    max-trickle-branches: -1
 
-    max-assignments-per-query: 1
+    max-assignments-per-query: 2
+
+    # MRL Routing configuration
+    enable-mrl: true
+    fixed-mrl-dimension: 384

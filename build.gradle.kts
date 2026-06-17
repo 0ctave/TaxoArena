@@ -74,9 +74,12 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-google-ai-gemini:$langchain4jVersion")
     implementation("dev.langchain4j:langchain4j-ollama:$langchain4jVersion")
     implementation("dev.langchain4j:langchain4j-open-ai:$langchain4jVersion")
+    implementation("dev.langchain4j:langchain4j-azure-open-ai:$langchain4jVersion")
 
     // TUI - Mosaic (Jetpack Compose for Terminal)
+    implementation("com.jakewharton.mosaic:mosaic-animation:0.18.0")
     implementation("com.jakewharton.mosaic:mosaic-runtime:0.18.0")
+    implementation("com.jakewharton.mosaic:mosaic-terminal:0.18.0")
     implementation("org.fusesource.jansi:jansi:2.4.1")
 
     implementation("org.xerial:sqlite-jdbc:3.51.3.0")

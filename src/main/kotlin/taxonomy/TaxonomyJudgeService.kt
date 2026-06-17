@@ -17,8 +17,8 @@ class TaxonomyJudgeService(
     private val log = LoggerFactory.getLogger(TaxonomyJudgeService::class.java)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    suspend fun generateJudgesForDag(root: GraphNode, replaceExisting: Boolean = false) = coroutineScope {
-        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting)...")
+    suspend fun generateJudgesForDag(root: GraphNode, replaceExisting: Boolean = false, maxGenerality: Int = config.llm.maxJudgeGenerality) = coroutineScope {
+        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting, Max Generality: $maxGenerality)...")
         val allNodes = mutableSetOf<GraphNode>()
         fun walk(n: GraphNode) { if (allNodes.add(n)) n.children.forEach { walk(it) } }
         walk(root)
@@ -26,7 +26,7 @@ class TaxonomyJudgeService(
         val nodeDistances = calculateDistancesFromLeaves(allNodes)
         val targetNodes = allNodes.filter { node ->
             val dist = nodeDistances[node.id] ?: 999
-            dist <= config.maxJudgeGenerality && (replaceExisting || node.judgePrompt == null)
+            dist <= maxGenerality && (replaceExisting || node.judgePrompt == null)
         }.sortedBy { nodeDistances[it.id] ?: 999 }
 
         if (targetNodes.isEmpty()) {
@@ -68,48 +68,61 @@ class TaxonomyJudgeService(
 
         if (details.isEmpty()) return
 
-        // PROGRESS TRACKING START
-        arenaService.updateJudgeProgress(node.label, 0, details.size, "BATCHING")
-
         val chunks = details.chunked(25)
+        val chunksCount = chunks.size
+        val hasSynthesis = chunksCount > 1
+        val finalSteps = chunksCount + (if (hasSynthesis) 1 else 0) + 1 // +1 for final judge synthesis
+        var currentStep = 0
+
+        // PROGRESS TRACKING START
+        arenaService.updateJudgeProgress(node.label, currentStep, finalSteps, "BATCHING")
+
         val partialGuidelines = chunks.mapIndexed { index, batch ->
             val corpusStrings = batch.map { item ->
                 val answerIndex = item.answer?.firstOrNull()?.let { it.uppercaseChar() - 'A' } ?: -1
                 val correctChoiceText = if (answerIndex in item.options.indices) item.options[answerIndex] else "Unknown"
                 "Q: ${item.question} | A: ${item.answer} ($correctChoiceText)"
             }
-            val result = llmClient.queryModel(config.judgeModel, null, JudgePrompts.induceBatchGuidelines(corpusStrings))
+            val result = llmClient.queryModel(config.llm.judgeModel, null, JudgePrompts.induceBatchGuidelines(corpusStrings))
             
             // UPDATE PROGRESS
-            val processed = (index + 1) * 25
-            arenaService.updateJudgeProgress(node.label, minOf(processed, details.size), details.size, "INDUCTING")
+            currentStep = index + 1
+            arenaService.updateJudgeProgress(node.label, currentStep, finalSteps, "INDUCTING")
             
             result
         }
 
-        arenaService.updateJudgeProgress(node.label, details.size, details.size, "SYNTHESIZING")
-
-        val masterGuidelines = if (partialGuidelines.size > 1) {
-            llmClient.queryModel(config.judgeModel, null, JudgePrompts.synthesizeGlobalGuidelines(partialGuidelines))
+        val masterGuidelines = if (chunksCount > 1) {
+            arenaService.updateJudgeProgress(node.label, currentStep, finalSteps, "SYNTHESIZING")
+            val res = llmClient.queryModel(config.llm.judgeModel, null, JudgePrompts.synthesizeGlobalGuidelines(partialGuidelines))
+            currentStep = chunksCount + 1
+            arenaService.updateJudgeProgress(node.label, currentStep, finalSteps, "SYNTHESIZING")
+            res
         } else partialGuidelines.first()
 
-        val rawSynthesis = llmClient.queryModel(config.judgeModel, null, JudgePrompts.synthesizeFinalJudge(masterGuidelines))
+        arenaService.updateJudgeProgress(node.label, currentStep, finalSteps, "FINALIZING")
+        val rawSynthesis = llmClient.queryModel(config.llm.judgeModel, null, JudgePrompts.synthesizeFinalJudge(masterGuidelines))
+        currentStep = finalSteps - 1
+        arenaService.updateJudgeProgress(node.label, currentStep, finalSteps, "SAVING")
         
         if (validateAndSaveJudge(node, rawSynthesis)) {
-            arenaService.updateJudgeProgress(node.label, details.size, details.size, "READY")
+            arenaService.updateJudgeProgress(node.label, finalSteps, finalSteps, "READY")
         } else {
             // PHASE 3: AUTOMATED REPAIR
             log.warn("Judge JSON for '${node.label}' is malformed. Attempting LLM repair...")
-            arenaService.updateJudgeProgress(node.label, details.size, details.size, "REPAIRING")
+            val repairSteps = finalSteps + 1
+            arenaService.updateJudgeProgress(node.label, finalSteps - 1, repairSteps, "REPAIRING")
             
-            val repairedJson = llmClient.queryModel(config.judgeModel, null, JudgePrompts.repairMalformedJson(rawSynthesis))
+            val repairedJson = llmClient.queryModel(config.llm.judgeModel, null, JudgePrompts.repairMalformedJson(rawSynthesis))
+            currentStep = finalSteps
+            arenaService.updateJudgeProgress(node.label, currentStep, repairSteps, "SAVING")
             
             if (validateAndSaveJudge(node, repairedJson)) {
                 log.info("Successfully repaired judge JSON for '${node.label}'.")
-                arenaService.updateJudgeProgress(node.label, details.size, details.size, "READY")
+                arenaService.updateJudgeProgress(node.label, repairSteps, repairSteps, "READY")
             } else {
                 log.error("Failed to repair judge JSON for '${node.label}' after LLM assistance.")
-                arenaService.updateJudgeProgress(node.label, details.size, details.size, "ERROR")
+                arenaService.updateJudgeProgress(node.label, repairSteps, repairSteps, "ERROR")
             }
         }
     }

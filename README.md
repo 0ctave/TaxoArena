@@ -162,3 +162,17 @@ By participating in this project, you agree to abide by its [Code of Conduct](./
 This project follows the [REUSE standard for software licensing](https://reuse.software/).    
 Each file contains copyright and license information, and license texts can be found in the [./LICENSES](./LICENSES) folder. For more information visit https://reuse.software/.    
 You can find a guide for developers at https://telekom.github.io/reuse-template/.   
+
+
+
+
+
+
+
+
+
+• The Current State: In  TaxonomySplitter.kt  and  TaxonomyMerger.kt , the engine queries LLMs for JSON structures and uses string manipulation fallback methods ( cleanJson ) to find curly brackets  {}  before parsing with Kotlinx Serialization. This is fragile and can break if the model adds          
+conversational preambles.                                                                                                                                                                                                                                                                                      
+• Day-to-Day Improvement: Force native structured JSON generation:                                                                                                                                                                                                                                             
+• Configure  OllamaChatModel  or  OpenAiChatModel  to enforce  responseFormat(ResponseFormat.JSON)  schema constraints.                                                                                                                                                                                    
+• This guarantees 100% syntactically perfect JSON outputs from the LLM, eliminating custom string cleanup blocks and preventing JSON parsing exceptions on the host JVM.    

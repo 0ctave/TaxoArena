@@ -1,0 +1,109 @@
+\chapter{Introduction}\label{ch:introduction}
+Some introducing words \dots
+
+
+\section{Motivation}\label{sec:motivation}
+
+
+
+\subsection{The Agentic Turn}\label{subsec:the-agentic-turn}
+
+The field of Artificial Intelligence is currently traversing a definitive inflection point, transitioning from an era of generative assistance to one of autonomous agencies\parencite{wissuchek2025agentic}.
+This transformation, referred to in recent literature as the \textit{agentic turn}, marks the evolution of Large Language Models (LLMs) from passive, text-generating interfaces into active, goal-oriented digital workers\parencite{haidemariam2025turn, domino2025agentic}.
+This shift is characterized by two primary structural dimensions:
+
+\begin{itemize}
+    \item \textbf{From Chat to Action:} The preceding phase of generative AI was defined by ``Copilots'' – assistive tools designed to support human users with discrete, prompt-driven tasks\parencite{pwc2025survey}.
+    However, standard single-turn LLM calls are inherently brittle, as they rely on the user to provide perfect context and lack intermediate verification\parencite{stevens2025reliable}.
+    The emerging paradigm is defined by \textit{Agentic AI}, where the LLM serves as the cognitive engine within a broader software stack, capable of independent perception, reasoning, and planning\parencite{schick2023toolformer, yao2023react}.
+    Unlike traditional automation which follows rigid, rule-based scripts, agentic systems are goal-oriented rather than rule-following, allowing them to manage multistep workflows across heterogeneous tools and APIs\parencite{domino2025agentic}.
+
+    \item \textbf{The Trajectory:} This evolution requires a fundamental change in the unit of analysis for system performance.
+    Rather than evaluating a static output string or a single-turn response, current research defines the core metric as a temporal sequence or \textit{trajectory} ($\tau$) \parencite{mialon2023gaia, yao2023react}.
+    This trajectory captures the iterative feedback loop that enables autonomy and is formally defined by the notation:
+    \begin{equation}
+        \tau = (Observation, Thought, Action, Outcome)\label{eq:equation}
+    \end{equation}
+    In this framework, the agent interweaves natural language reasoning traces (Thoughts) with task-specific executions (Actions)\parencite{yao2023react}.
+    It uses environmental feedback (Observations) to refine its internal state and ensure the final result (Outcome) aligns with high-level user goals\parencite{wei2022cot, shinn2023reflexion}.
+    This pattern allows systems to autonomously manage long-horizon tasks and recover from errors without constant human intervention\parencite{park2023generative}.
+\end{itemize}
+
+
+As of 2025, approximately \qty{79}{\percent} of enterprises have begun adopting agentic systems, signaling that the transition to the ``Autonomous Enterprise'' has reached the mainstream\parencite{pwc2025survey}.
+However, as these systems move from ``talking'' to ``doing'', they have exposed the limitations of traditional benchmarks.
+While leading systems on the GAIA leaderboard have approached human-level accuracy ($\sim$\qty{92}{\percent}) by early 2026\parencite{simmering2025benchmarks}, these metrics primarily capture performance on static, deductive tasks under nominal conditions.
+This high success rate masks a persistent ``Evaluation Gap''\parencite{yan2025evaluation}, where single-run accuracy fails to account for the stochastic instability of agentic behavior or the capacity to induce hidden rules in non-deterministic environments\parencite{adam2025hb, yan2025evaluation}.
+
+
+
+
+
+\subsection{The Evaluation Gap}\label{subsec:the-evaluation-gap}
+
+The rapid transition toward agentic autonomy has outpaced the capabilities of traditional evaluation frameworks, creating a misalignment between laboratory benchmarks and production-ready reliability\parencite{yan2025evaluation, shukla2025evaluating}.
+This misalignment stems from a failure of \textit{construct validity}---the degree to which a benchmark truly measures the intended administrative or cognitive ability\parencite{meimandi2025positioning}.
+
+\subsection*{Static vs. Dynamic Benchmarking}
+Traditional benchmarks such as \textit{Massive Multitask Language Understanding} (MMLU)\parencite{hendrycks2020measuring} and \textit{Grade School Math 8K} (GSM8K)\parencite{cobbe2021gsm8k} assess ``static'' capabilities by measuring a model's ability to retrieve information or perform deductive logic in isolated contexts\parencite{shukla2025evaluating}.
+These paradigms operate as ``fixed-target'' evaluations, which are increasingly susceptible to data contamination and model overfitting, where performance gains stem from pattern-matching rather than genuine reasoning\parencite{liang2025overfitting, dsouza2025automating}.
+Furthermore, audits of prominent agentic benchmarks using the \textit{ABC Checklist} reveal that \qty{70}{\percent} of existing frameworks contain shortcuts or impossible tasks, while \qty{80}{\percent} fail to disclose known design issues\parencite{kang2025broken}.
+This leads to \textit{Outcome Validity} errors, where an agent achieves a goal through invalid reasoning or brittle environmental glitches that go undetected by static reward designs\parencite{kang2025broken, adam2025hb}.
+
+To address this, current research is shifting toward \textit{Dynamic Benchmarking}, which treats evaluation as a co-evolving, ``moving-target'' task.
+Frameworks like \textit{BeTaL} (\textit{Benchmark Tuning with an LLM-in-the-loop}) automate this by parameterizing benchmark templates to generate tasks with specific difficulty, achieving a 2-4$\times$ improvement in target-difficulty alignment over static baselines\parencite{dsouza2025automating}.
+This is further extended by protocols like \textit{Agent-Centric Text Anomaly Detection} (ATAD), which uses a three-agent interaction model---Teacher, Orchestrator, and Student---to iteratively escalate task complexity based on model performance\parencite{atad2026protocol}.
+By replacing static datasets with interactive environments, dynamic benchmarking exposes the \textit{Reliability Gap} ($\Delta_{rel}$), formally defined as the discrepancy between nominal success rates ($SR_{nominal}$) and the expected success across varied fault conditions ($f \in F$):
+\begin{equation}
+    \Delta_{rel} = SR_{nominal} - E_{f \sim F} \label{eq:reliability-gap-intro}
+\end{equation} where $F$ represents environmental perturbations such as tool failures, data corruption, or timing constraints\parencite{adam2025hb, yan2025evaluation}.
+
+\subsection*{The ``Scalar Fallacy'' and Aggregation Bias}
+Current ranking systems frequently reduce multidimensional agent capabilities into a single scalar, such as an Elo rating or an aggregate accuracy score.
+This results in \textit{Aggregation Bias}, where averaging performance across all demographics or tasks obscures catastrophic failures in safety-critical subgroups or specific policy compliance\parencite{boubdir2024elo, shukla2025evaluating}.
+Furthermore, Elo-based rankings suffer from high volatility and non-transitivity, especially when LLM-as-a-Judge systems exhibit cyclic preferences (e.g., $A \succ B \succ C \succ A$)\parencite{boubdir2024elo, blitzrank2026}.
+Bridging this gap requires a transition toward \textit{Query-Adaptive Multidimensional Ranking} and tournament frameworks that collapse non-transitive preferences into principled equivalence classes to handle the nuanced reliability of autonomous agents\parencite{blitzrank2026, arenaRL2026}.
+
+
+
+
+\section{Problem Statement}\label{sec:problem-statement}
+
+While the \textit{Evaluation Gap} identifies the conceptual failure of static benchmarks, the practical transition to robust agentic evaluation is hindered by two critical implementation bottlenecks that remain unresolved in current literature.
+
+\begin{enumerate}
+    \item \textbf{The Expert Annotation Bottleneck (Data Scarcity):}
+    The shift toward dynamic benchmarking requires granular, process-aware feedback that goes beyond binary success labels.
+    Currently, human expert annotation remains the gold standard for verifying the \textit{construct validity} of agent trajectories\parencite{meimandi2025positioning, simmering2025benchmarks}.
+    However, this creates a profound scalability bottleneck: benchmarking thousands of agent variations or fine-tuning runs across long-horizon tasks (frequently exceeding \num{1000000} tokens) is economically and temporally prohibitive\parencite{li2026agencybench, upbench2026}.
+    Standard automated evaluators often suffer from \textit{Preference Leakage} or domain-specific hallucinations, leaving researchers with a ``sparse data'' problem where the most reliable signals are the hardest to scale\parencite{Park2025, yan2025evaluation}.
+
+    \item \textbf{Ranking Instability and Convergence Efficiency:}
+    Even when evaluation signals are available, standard ranking systems like Elo are structurally ill-equipped for the ``agentic turn.'' In high-dimensional agent populations—where systems exhibit non-transitive ``Rock-Paper-Scissors'' skill sets—traditional Elo rankings suffer from high volatility and slow convergence\parencite{boubdir2024elo, blitzrank2026}.
+    Specifically, achieving a stable ranking in open-ended agency environments often requires an $O(N^2)$ interaction complexity (e.g., Round-Robin tournaments), which is intractable for real-time benchmarking or large-scale model selection\parencite{arenaRL2026, blitzrank2026}.
+    Current Bayesian methods, while faster, have not been sufficiently vectorized to handle multi-axial skill sets (e.g., separating tool-calling proficiency from safety compliance), leading to the \textit{Scalar Fallacy} discussed in \autoref{subsec:the-evaluation-gap}.
+\end{enumerate}
+
+Without a framework that automates domain-specific judge dispatch and uses efficient Bayesian inference for multidimensional skills, the field lacks a scalable mechanism to rank autonomous agents fairly.
+This thesis addresses these challenges by developing a hybrid semantic routing system and a vectorized Bayesian ranking engine designed for high-dimensional convergence efficiency.
+
+\section{Research Goal}\label{sec:research-goal}
+
+The primary goal of this thesis is to design and validate a multidimensional evaluation framework that bridges the current \textit{Evaluation Gap} in agentic AI. To achieve this, the research focuses on three integrated pillars:
+
+\begin{enumerate}
+    \item \textbf{System Design: Hybrid Semantic Router} \\
+    The first goal is to develop a \textit{Hybrid Semantic Router} designed to dispatch benchmarking tasks to domain-specific judges based on the semantic properties of the query\parencite{du2025protocolbench}.
+    Unlike monolithic evaluation setups, this router will use embedding-based similarity and lightweight classifiers (e.g., Llama-3-8B) to ensure that agent trajectories are assessed by judges with specialized \textit{Expert Personas}\parencite{Park2025}.
+    This addressing the limitations of general-purpose LLM-as-a-Judge systems in high-stakes domains such as software engineering, healthcare, and logistics\parencite{shukla2025evaluating, meimandi2025positioning}, while restricting the domain ranking space only to specific expert judges, following the idea ``only judge what can be judged''.
+
+    \item \textbf{Ranking Methodology: Vectorized Bayesian Engine} \\
+    The second goal is to implement a \textbf{Vectorized ELO (OpenSkill)} engine to address the \textit{Scalar Fallacy} and the problem of non-transitive preferences in model evaluation\parencite{boubdir2024elo, joshy2024openskill}.
+    By extending the Bayesian inference principles of the OpenSkill library—specifically the Plackett-Luce model—this engine will track multi-axial skill sets (e.g., reasoning, tool-calling proficiency, and safety compliance) simultaneously\parencite{joshy2024openskill, weng2011bayesian}.
+    This allows the framework to handle cyclic preferences ($A \succ B \succ C \succ A$) by collapsing them into principled SCC-based (Strongly Connected Component) equivalence classes, providing a more stable and discriminative ranking than traditional linear leaderboards\parencite{blitzrank2026, arenaRL2026}.
+
+    \item \textbf{Validation: Procedural Convergence Analysis} \\
+    The final goal is to demonstrate the framework's \textit{convergence efficiency} and robustness.
+    This will be validated using a \textbf{Procedurally Generated Agent Population}—a synthetic cohort of agents with varying skill profiles—evaluated against a diverse stream of non-deterministic user queries\parencite{dsouza2025automating}.
+    Drawing on Unsupervised Environment Design (UED) principles, this validation phase will quantify the speed at which multidimensional rankings stabilize compared to baseline Elo metrics when subjected to ``moving-target'' evaluation tasks like those found in \textit{AndroidWorld} or \textit{ATAD}\parencite{dsouza2025automating, rawles2025androidworld, atad2026protocol}.
+\end{enumerate}

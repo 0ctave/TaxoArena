@@ -20,7 +20,7 @@ class TaxonomyFitter(
     /**
      * Recursively traverses the DAG bottom-up to fit statistical models.
      */
-    suspend fun fitNodeRecursive(node: GraphNode, visited: MutableSet<String> = mutableSetOf()): Unit = coroutineScope {
+    suspend fun fitNodeRecursive(node: GraphNode, visited: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()): Unit = coroutineScope {
         if (visited.contains(node.id)) return@coroutineScope
         visited.add(node.id)
 
@@ -38,7 +38,7 @@ class TaxonomyFitter(
                 val newGmm = StatisticsUtils.computeLeafGmm(node.queries, config.formalism.maxCentroidsPerNode, config.formalism.oasShrinkage)
                 
                 // STABILIZATION: Apply EMA blending
-                node.distribution = StatisticsUtils.stabilizeGmm(node.previousDistribution, newGmm, 0.7) // Fixed EMA for internal stability
+                node.distribution = StatisticsUtils.stabilizeGmm(node.previousDistribution, newGmm, config.formalism.emaAlpha)
                 node.previousDistribution = node.distribution
             }
         }

@@ -90,11 +90,11 @@ class TaxonomyPersistence(
         val serialized = SerializedGraph(
             rootId = root.id, 
             nodes = serialNodes,
-            distillationEnabled = config.enableDistillation
+            distillationEnabled = config.execution.enableDistillation
         )
         
         File(path).writeText(json.encodeToString(serialized))
-        log.info("Saved ${allNodes.size} nodes structure successfully (Texts & Vectors offloaded to SQL).")
+        log.info("Saved ${allNodes.size} nodes successfully (offloaded structure to SQL).")
     }
 
     fun load(path: String): GraphNode? {
@@ -143,7 +143,7 @@ class TaxonomyPersistence(
             sNode.parentIds.forEach { pId -> nodeMap[pId]?.let { node.parents.add(it) } }
         }
 
-        log.info("Successfully loaded and hydrated DAG with ${nodeMap.size} nodes.")
+        log.info("[DB] Successfully loaded and hydrated DAG with ${nodeMap.size} nodes.")
         return nodeMap[serialized.rootId]
     }
 }

@@ -1,0 +1,31 @@
+\chapter{Large Figures}
+This appendix contains two examples of how to include a large figure, e.g., a P\&I diagram, into the thesis when it is desirable to have it in DIN A3.
+\section{Include as Figure}
+In this case, the page format is changed to DIN A3 and the figure is included as a float (see \autoref{fig:large_figure}).
+\section{Include as Page}
+In another approach, the page format is changed to DIN A3 and the figure is included as PDF to cover the whole page. The disadvantage of this approach is having no caption to reference the figure in the text. This may be resolved with a reference to the page, here: page~\pageref{page:large_figure_2.1}.
+\cleardoublepage
+\KOMAoptions{paper=a3,paper=landscape,pagesize}
+\recalctypearea
+\begin{figure}
+\centering
+\includegraphics[width=0.90\linewidth]{Example_large_figure}
+\caption{Example of a large figure for DIN A3; taken from \href{https://de.wikipedia.org/wiki/Datei:P\%26ID.JPG}{Wikipedia}}\label{fig:large_figure}
+\end{figure}
+\clearpage
+\thispagestyle{empty}
+\vspace*{0.33\textheight}
+\begin{dedication_env}
+This page intentionally left blank
+\end{dedication_env}
+\cleardoublepage
+\includepdf[link,linkname=Example_large_figure_2,pagecommand={\thispagestyle{empty}\refstepcounter{includepdfpage}\label{page:large_figure_2.\theincludepdfpage}}]{Example_large_figure_2}
+\clearpage
+\thispagestyle{empty}
+\vspace*{0.33\textheight}
+\begin{dedication_env}
+This page intentionally left blank
+\end{dedication_env}
+\cleardoublepage
+\KOMAoptions{paper=a4,paper=portrait,pagesize}
+\recalctypearea
