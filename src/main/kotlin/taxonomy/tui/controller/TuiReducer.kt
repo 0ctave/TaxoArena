@@ -121,13 +121,20 @@ object TuiReducer {
                     state.startup.selectedWelcomeIdx
                         .coerceIn(0, (welcomeOptionsCount - 1).coerceAtLeast(0))
 
+                // The snapshot list is the data the welcome screen needs; once it has
+                // arrived, leave the initial LOADING screen for WELCOME.
+                val nextStartupState =
+                    if (state.startup.state == StartupState.LOADING) StartupState.WELCOME
+                    else state.startup.state
+
                 state.copy(
                     snapshot = state.snapshot.copy(
                         snapshotList = snapshots,
                         selectedSnapshotIdx = safeSelectedSnapshotIdx
                     ),
                     startup = state.startup.copy(
-                        selectedWelcomeIdx = safeWelcomeIdx
+                        selectedWelcomeIdx = safeWelcomeIdx,
+                        state = nextStartupState
                     )
                 )
             }
