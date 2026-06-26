@@ -141,18 +141,44 @@ class TaxonomyTuiService(
         }
     }
 
+    /** Restore the terminal out of the alternate screen / re-enable the cursor. */
+    private fun restoreTerminal() {
+        try {
+            // Leave alt-screen, show cursor, reset attributes.
+            print("\u001b[?1049l\u001b[?25h\u001b[0m")
+            System.out.flush()
+            AnsiConsole.systemUninstall()
+        } catch (_: Throwable) {
+        }
+    }
+
     override fun run(vararg args: String?) = runBlocking {
         if (!config.execution.enableTui) return@runBlocking
-
-        // Snapshot-driven persistence: restore the tunables of the most recent snapshot on startup
-        // so the TUI opens with the last loaded/generated configuration (secrets stay env-sourced).
-        snapshotManager.latestConfig()?.let { config.applyEffectiveConfig(it) }
 
         System.setProperty("jline.terminal.color", "true")
         System.setProperty("jline.terminal.type", "xterm-256color")
         AnsiConsole.systemInstall()
         System.setOut(PrintStream(System.`out`, true, "UTF-8"))
         print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
+
+        // Ctrl-C / SIGTERM: always restore the terminal and exit hard so the app never
+        // appears frozen in the alternate screen buffer.
+        val shutdownHook = Thread {
+            restoreTerminal()
+            Runtime.getRuntime().halt(0)
+        }
+        runCatching { Runtime.getRuntime().addShutdownHook(shutdownHook) }
+
+        // Snapshot-driven persistence: restore the tunables of the most recent snapshot.
+        // Done OFF the startup path so the TUI (LOADING screen) appears instantly; the
+        // welcome screen unblocks once the snapshot list has loaded.
+        tuiScope.launch {
+            try {
+                snapshotManager.latestConfig()?.let { config.applyEffectiveConfig(it) }
+            } catch (t: Throwable) {
+                log.warn("Failed to restore last snapshot config: {}", t.message)
+            }
+        }
 
         try {
             val deps = toTuiDependencies()
@@ -181,21 +207,23 @@ class TaxonomyTuiService(
                 }
             }
 
+            // Blocks until the user quits the TUI. When it returns, the app should exit
+            // (the TUI is the foreground UI) rather than hang in a background loop.
             runWithTerminal(NonInteractivePolicy.Exit, block)
-
-            if (config.execution.startService) {
-                while (true) delay(10_000.milliseconds)
-            }
         } catch (e: Throwable) {
-            print("\u001b[?1049l")
+            restoreTerminal()
             val real = if (e is InvocationTargetException) e.cause ?: e else e
             System.err.println("\n[TUI RECOVERY] Layout failure.")
             System.err.println("Cause: ${real.message ?: "Unknown failure"}")
             real.printStackTrace()
             delay(15_000.milliseconds)
         } finally {
-            print("\u001b[?1049l")
-            AnsiConsole.systemUninstall()
+            restoreTerminal()
+            runCatching { Runtime.getRuntime().removeShutdownHook(shutdownHook) }
+            // Exit the JVM so quitting the TUI fully stops the process.
+            if (System.getProperty("org.gradle.test.worker") == null) {
+                Runtime.getRuntime().halt(0)
+            }
         }
     }
 }
