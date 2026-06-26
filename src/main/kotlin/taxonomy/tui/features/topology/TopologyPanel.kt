@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import taxonomy.model.GraphNode
 import taxonomy.tui.components.TreeLine
 import taxonomy.tui.state.TopologyUiState
+import taxonomy.tui.components.AsciiTreeTable
+import taxonomy.tui.components.DagTable
 import taxonomy.tui.components.DomainSelectorTable
 
 /**

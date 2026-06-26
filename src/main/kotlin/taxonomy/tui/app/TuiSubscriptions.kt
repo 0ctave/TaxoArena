@@ -4,7 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import taxonomy.model.GraphNode
+import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.components.TreeLine
+import taxonomy.tui.components.buildTreeLines
 
 @Immutable
 data class TuiSubscriptions(
@@ -14,15 +18,13 @@ data class TuiSubscriptions(
     val labelingProgress: Any?,
     val embeddingProgress: Any?,
     val metricsHistory: List<Any>,
-    val arenaControlState: Any,
+    val arenaControlState: AnalysisPanelState,
+    val treeLines: List<TreeLine>,
 )
 
 /**
- * Collect all long-lived reactive service state in one place.
- *
- * The old DashboardView directly collected rootNodeFlow, graphVersionFlow,
- * generationProgressFlow, labelingProgressFlow, embeddingProgressFlow,
- * metricsHistoryFlow, and arenaService.state in the top-level composable [file:203][file:288].
+ * Collect all long-lived reactive service state in one place so the render tree
+ * only depends on a single immutable snapshot.
  */
 @Composable
 fun rememberTuiSubscriptions(
@@ -36,6 +38,8 @@ fun rememberTuiSubscriptions(
     val metricsHistory by deps.taxonomyService.metricsHistoryFlow.collectAsState()
     val arenaControlState by deps.arenaService.state.collectAsState()
 
+    val treeLines = remember(rootNode, graphVersion) { buildTreeLines(rootNode) }
+
     return TuiSubscriptions(
         rootNode = rootNode,
         graphVersion = graphVersion,
@@ -43,6 +47,7 @@ fun rememberTuiSubscriptions(
         labelingProgress = labelingProgress,
         embeddingProgress = embeddingProgress,
         metricsHistory = metricsHistory.map { it as Any },
-        arenaControlState = arenaControlState as Any,
+        arenaControlState = arenaControlState,
+        treeLines = treeLines,
     )
 }

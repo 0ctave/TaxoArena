@@ -127,6 +127,7 @@ sealed interface TuiEvent {
     data class SetViewingBatchTrickleResults(val value: Boolean) : TuiEvent
     data class SetBatchTrickleScrollOffset(val offset: Int) : TuiEvent
 
+    data object StartBenchmarkFlow : TuiEvent
     data class SetSelectedBenchmarkField(val index: Int) : TuiEvent
     data object StartEditingBenchmarkField : TuiEvent
     data object ConfirmEditingBenchmarkField : TuiEvent

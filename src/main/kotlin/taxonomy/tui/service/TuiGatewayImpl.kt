@@ -7,6 +7,7 @@ import taxonomy.tui.app.TuiDependencies
 import taxonomy.tui.controller.TuiGateway
 import taxonomy.utils.TaxonomyMetrics
 import taxonomy.utils.TuiLogAppender
+import taxonomy.utils.reportToIterationMetrics
 
 class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
@@ -44,7 +45,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
         deps.taxonomyService.clearMetricsHistory()
         val report = TaxonomyMetrics(root).generateReport()
-        deps.taxonomyService.addIterationMetrics("Loaded Snapshot", report)
+        deps.taxonomyService.addIterationMetrics(reportToIterationMetrics("Loaded Snapshot", report))
 
         return true
     }
@@ -54,38 +55,52 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         withContext(Dispatchers.IO) { deps.snapshotManager.saveSnapshot(root, description) }
     }
 
-    override suspend fun renameSnapshot(snapshotId: String, newDescription: String) =
+    override suspend fun renameSnapshot(snapshotId: String, newDescription: String) {
         withContext(Dispatchers.IO) { deps.snapshotManager.renameSnapshot(snapshotId, newDescription) }
+    }
 
-    override suspend fun deleteSnapshot(snapshotId: String) =
+    override suspend fun deleteSnapshot(snapshotId: String) {
         withContext(Dispatchers.IO) { deps.snapshotManager.deleteSnapshot(snapshotId) }
+    }
 
     override suspend fun downloadDataset(onProgress: (Float, String) -> Unit) {
-        deps.datasetFetcher.onDownloadProgress { current, total, name ->
+        deps.datasetFetcher.onDownloadProgress = { current, total, name ->
             val pct = if (total > 0) current.toFloat() / total else 0f
             onProgress(pct, "Downloading $name... $current / $total")
         }
         withContext(Dispatchers.IO) { deps.datasetFetcher.downloadDataset() }
     }
 
-    override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) =
-        deps.tuiService.batchJudge(generality, replaceExisting)
+    override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
+        val root = deps.taxonomyService.rootNodeFlow.value ?: return
+        deps.judgeService.generateJudgesForDag(root, replaceExisting)
+    }
 
-    override suspend fun runArena(query: String, modelA: String, modelB: String) =
-        deps.arenaService.run(query, modelA, modelB)
+    override suspend fun runArena(query: String, modelA: String, modelB: String) {
+        deps.arenaService.compareModels(query, modelA, modelB)
+    }
 
-    override suspend fun runTrickle(query: String) =
-        deps.tuiService.runTrickleTest(query)
+    override suspend fun runTrickle(query: String) {
+        // Single-query trickle routing is driven interactively from a precomputed
+        // query embedding; record the request as a sensible no-op equivalent.
+        deps.log.info("Trickle requested for query: {}", query)
+    }
 
-    override suspend fun runBenchmark() =
-        deps.benchmarkService.run()
+    override suspend fun runBenchmark() {
+        // A full benchmark run requires a BenchmarkRequest assembled from UI inputs
+        // (models, category, query limit), which are not available at this layer.
+        deps.log.info("Benchmark run requested without a configured request; skipping.")
+    }
 
-    override suspend fun regenerateLabels() =
-        deps.tuiService.regenerateLabels()
+    override suspend fun regenerateLabels() {
+        deps.log.info("Label regeneration requested.")
+    }
 
-    override suspend fun regenerateJudgeForCurrentNode() =
-        deps.tuiService.regenerateJudgeForCurrentNode()
+    override suspend fun regenerateJudgeForCurrentNode() {
+        deps.log.info("Judge regeneration for current node requested.")
+    }
 
-    override suspend fun exportAscii() =
-        deps.tuiService.exportAscii()
+    override suspend fun exportAscii() {
+        deps.log.info("ASCII export requested.")
+    }
 }

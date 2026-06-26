@@ -237,7 +237,7 @@ class TuiController(
 
             "enter", " " -> {
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
-                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODEDETAIL))
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
 
             "q", "escape" -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
@@ -246,7 +246,7 @@ class TuiController(
 
     private fun handleAnalysisKeys(state: TuiAppState, key: String) {
         when (state.analysis.mode) {
-            AnalysisMode.NODEDETAIL -> when (key) {
+            AnalysisMode.NODE_DETAIL -> when (key) {
                 "w", "z", "arrowup" ->
                     dispatch(TuiEvent.SetInspectorScroll((state.analysis.inspectorScroll - 1).coerceAtLeast(0)))
 
@@ -270,7 +270,7 @@ class TuiController(
 
             AnalysisMode.SNAPSHOTS -> handleSnapshotKeys(state, key)
 
-            AnalysisMode.TRICKLETEST -> when (key) {
+            AnalysisMode.TRICKLE_TEST -> when (key) {
                 "w", "z", "arrowup" ->
                     dispatch(TuiEvent.SetBatchTrickleScrollOffset((state.trickle.batchTrickleScrollOffset - 1).coerceAtLeast(0)))
 

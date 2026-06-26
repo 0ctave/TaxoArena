@@ -1,22 +1,21 @@
 package taxonomy.tui.features.analysis
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import com.jakewharton.mosaic.layout.padding
 import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.White
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Text
-import taxonomy.arena.AnalysisMode
-import taxonomy.arena.TaxonomyArenaState
+import taxonomy.service.AnalysisMode
+import taxonomy.service.AnalysisPanelState
 import taxonomy.tui.components.Panel
 
 @Composable
 fun MetricsOrInspectorPanel(
     width: Int,
     height: Int,
-    controlState: TaxonomyArenaState,
+    controlState: AnalysisPanelState,
     inspectorScroll: Int,
     metricsScroll: Int,
 ) {

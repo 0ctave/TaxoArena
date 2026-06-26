@@ -21,8 +21,7 @@ data class TuiDependencies(
     val monitor get() = host.inferenceMonitor
     val config get() = host.config
     val taxonomyEngine get() = host.taxonomyEngine
-
-    // Optional but useful if these exist on host:
+    val benchmarkService get() = host.benchmarkService
     val evalLoader get() = host.evalLoader
 }
 
@@ -33,7 +32,7 @@ fun TaxonomyTuiService.toTuiDependencies(): TuiDependencies =
         log = log,
     )
 
-fun buildController(): TuiController {
+fun TuiDependencies.buildController(): TuiController {
     val gateway = TuiGatewayImpl(this)
     val effects = DefaultTuiEffects(tuiScope, gateway)
     return TuiController(effects = effects)
