@@ -31,6 +31,16 @@ import kotlin.time.toJavaDuration
 @Configuration
 class ArcConfig {
 
+    private val log = LoggerFactory.getLogger(ArcConfig::class.java)
+
+    /**
+     * True only when the Azure endpoint and API key are both present.
+     * Guards against a blank `${AZURE_AI_ENDPOINT}` / `${AZURE_AI_API_KEY}`
+     * (e.g. a missing `.env`) crashing context startup inside LangChain4j.
+     */
+    private fun azureConfigured(config: TaxonomyConfig): Boolean =
+        config.llm.azure.endpoint.isNotBlank() && config.llm.azure.apiKey.isNotBlank()
+
     /**
      * Explicitly defines the ChatLanguageModel bean.
      * The Arc Spring Boot starter will automatically detect this and construct
@@ -42,7 +52,15 @@ class ArcConfig {
         @Value("\${arc.ollama.model:}") arcOllamaModel: String,
         config: TaxonomyConfig
     ): ChatModel {
-        return if (config.llm.provider == LlmProviderType.AZURE) {
+        if (config.llm.provider == LlmProviderType.AZURE && !azureConfigured(config)) {
+            log.warn(
+                "LLM provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. " +
+                    "Create a root-level .env (see .env.example) or export these variables. " +
+                    "Falling back to the Ollama chat model at {} so the application can still start.",
+                baseUrl
+            )
+        }
+        return if (config.llm.provider == LlmProviderType.AZURE && azureConfigured(config)) {
             AzureOpenAiChatModel.builder()
                 .endpoint(config.llm.azure.endpoint)
                 .apiKey(config.llm.azure.apiKey)
@@ -71,7 +89,15 @@ class ArcConfig {
         @Value("\${arc.ollama.embed-model:qwen3-embedding}") embedModelName: String,
         config: TaxonomyConfig
     ): EmbeddingModel {
-        return if (config.llm.embeddingProvider == LlmProviderType.AZURE) {
+        if (config.llm.embeddingProvider == LlmProviderType.AZURE && !azureConfigured(config)) {
+            log.warn(
+                "Embedding provider is AZURE but AZURE_AI_ENDPOINT/AZURE_AI_API_KEY are blank. " +
+                    "Create a root-level .env (see .env.example) or export these variables. " +
+                    "Falling back to the Ollama embedding model at {} so the application can still start.",
+                baseUrl
+            )
+        }
+        return if (config.llm.embeddingProvider == LlmProviderType.AZURE && azureConfigured(config)) {
             val deploymentName = if (config.llm.azure.embeddingDeploymentName.isNotBlank()) {
                 config.llm.azure.embeddingDeploymentName
             } else {
