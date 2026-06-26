@@ -40,6 +40,32 @@ class ModelEvalLoader(
     // ─── Public API ───────────────────────────────────────────────────────────
 
     /**
+     * Unified entry point: ingest a `.zip` (single inner json), a raw `.json`, or a
+     * directory of per-category json files. Model name is derived from the filename
+     * (`model_outputs_<MODEL>_<N>shots`) when not supplied.
+     */
+    suspend fun loadFromPath(
+        path: String,
+        modelName: String? = null,
+        onProgress: ((current: Int, total: Int) -> Unit)? = null
+    ): EvalLoadStats = withContext(Dispatchers.IO) {
+        val resolved = modelName?.takeIf { it.isNotBlank() }
+            ?: PrecomputedModelOutputLoader.deriveModelName(path)
+        val file = File(path)
+        val raw = when {
+            file.isDirectory -> parseDirectory(path)
+            path.endsWith(".zip") -> parseZip(path)
+            path.endsWith(".json") -> parseJsonBytes(file.readBytes(), file.name)
+            else -> {
+                log.warn("Unsupported eval source: $path")
+                emptyList()
+            }
+        }
+        log.info("Loading eval results for '$resolved' from $path (${raw.size} raw items)")
+        ingestRaw(raw, resolved, onProgress)
+    }
+
+    /**
      * Load all model results from a zip file produced by TIGER-AI-Lab eval scripts.
      * Resolves cross-links to mmlu_pro and embeddings_cache tables.
      * Idempotent — safe to call multiple times.

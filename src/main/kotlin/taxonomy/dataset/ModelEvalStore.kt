@@ -275,6 +275,39 @@ class ModelEvalStore {
         return ids
     }
 
+    /**
+     * Fetch a single model's precomputed result for one question, or null if absent.
+     * Used by the precomputed Arena pairwise path (no live generation).
+     */
+    fun getResult(modelName: String, questionId: Int): ModelEvalResult? = conn().use { c ->
+        c.prepareStatement(
+            "SELECT * FROM eval_results WHERE model_name = ? AND question_id = ? LIMIT 1"
+        ).use { ps ->
+            ps.setString(1, modelName)
+            ps.setInt(2, questionId)
+            ps.executeQuery().toEvalResults().firstOrNull()
+        }
+    }
+
+    /** Question ids shared by ALL given models (intersection), capped by limit (0 = all). */
+    fun getSharedQuestionIds(models: List<String>, limit: Int = 0): List<Int> {
+        if (models.isEmpty()) return emptyList()
+        val placeholders = models.joinToString(",") { "?" }
+        val sql = buildString {
+            append("SELECT question_id FROM eval_results WHERE model_name IN ($placeholders) ")
+            append("GROUP BY question_id HAVING COUNT(DISTINCT model_name) = ${models.size} ")
+            append("ORDER BY question_id")
+            if (limit > 0) append(" LIMIT $limit")
+        }
+        return conn().use { c ->
+            c.prepareStatement(sql).use { ps ->
+                models.forEachIndexed { i, m -> ps.setString(i + 1, m) }
+                val rs = ps.executeQuery()
+                buildList { while (rs.next()) add(rs.getInt(1)) }
+            }
+        }
+    }
+
     fun getLoadedModels(): List<String> = conn().use { c ->
         c.createStatement().use { s ->
             val rs = s.executeQuery("SELECT DISTINCT model_name FROM eval_results ORDER BY model_name")

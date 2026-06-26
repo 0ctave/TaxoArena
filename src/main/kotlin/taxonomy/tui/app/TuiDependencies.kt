@@ -23,6 +23,7 @@ data class TuiDependencies(
     val taxonomyEngine get() = host.taxonomyEngine
     val benchmarkService get() = host.benchmarkService
     val evalLoader get() = host.evalLoader
+    val evalStore get() = host.evalStore
 }
 
 fun TaxonomyTuiService.toTuiDependencies(): TuiDependencies =

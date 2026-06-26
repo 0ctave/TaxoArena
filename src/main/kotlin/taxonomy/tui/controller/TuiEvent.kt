@@ -112,6 +112,10 @@ sealed interface TuiEvent {
     data object ConfirmBatchGeneralityInput : TuiEvent
 
     data object StartArenaFlow : TuiEvent
+    data class ArenaModelsLoaded(val models: List<String>) : TuiEvent
+    data class SetArenaUsePrecomputed(val value: Boolean) : TuiEvent
+    data class UpdateArenaQuestionIdInput(val value: String) : TuiEvent
+    data object ConfirmArenaQuestionIdInput : TuiEvent
     data class UpdateArenaQueryInput(val value: String) : TuiEvent
     data class UpdateArenaModelAInput(val value: String) : TuiEvent
     data class UpdateArenaModelBInput(val value: String) : TuiEvent
@@ -128,6 +132,9 @@ sealed interface TuiEvent {
     data class SetBatchTrickleScrollOffset(val offset: Int) : TuiEvent
 
     data object StartBenchmarkFlow : TuiEvent
+    data object RunBenchmark : TuiEvent
+    data object RunEvalLoad : TuiEvent
+    data class BenchmarkModelsLoaded(val models: List<String>) : TuiEvent
     data class SetSelectedBenchmarkField(val index: Int) : TuiEvent
     data object StartEditingBenchmarkField : TuiEvent
     data object ConfirmEditingBenchmarkField : TuiEvent

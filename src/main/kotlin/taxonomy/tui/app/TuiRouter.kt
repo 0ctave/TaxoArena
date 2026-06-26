@@ -290,6 +290,8 @@ private fun MainDashboardRoute(
                 batchTrickleScroll = state.trickle.batchTrickleScrollOffset,
                 trickleResults = state.trickle.batchTrickleResults,
                 snapshotState = state.snapshot,
+                arenaState = state.arena,
+                benchmarkState = state.benchmark,
             )
         }
     }

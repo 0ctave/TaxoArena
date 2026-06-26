@@ -14,8 +14,19 @@ interface TuiEffects {
 
     fun runBatchJudge(generality: Int, replaceExisting: Boolean)
     fun runArena(query: String, modelA: String, modelB: String)
+    fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
+    fun loadArenaModels(dispatch: (TuiEvent) -> Unit)
     fun runTrickle(query: String)
-    fun runBenchmark()
+    fun runBenchmarkConfigured(
+        models: List<String>,
+        queryLimit: Int,
+        category: String?,
+        confidenceGate: Double,
+        parallelism: Int,
+        updateRankings: Boolean
+    )
+    fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit)
+    fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit)
     fun regenerateLabels()
     fun regenerateJudgeForCurrentNode()
     fun exportAscii()
@@ -91,12 +102,48 @@ class DefaultTuiEffects(
         scope.launch { gateway.runArena(query, modelA, modelB) }
     }
 
+    override fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String) {
+        scope.launch { gateway.runArenaPrecomputed(questionId, modelA, modelB) }
+    }
+
+    override fun loadArenaModels(dispatch: (TuiEvent) -> Unit) {
+        scope.launch { dispatch(TuiEvent.ArenaModelsLoaded(gateway.loadedModels())) }
+    }
+
     override fun runTrickle(query: String) {
         scope.launch { gateway.runTrickle(query) }
     }
 
-    override fun runBenchmark() {
-        scope.launch { gateway.runBenchmark() }
+    override fun runBenchmarkConfigured(
+        models: List<String>,
+        queryLimit: Int,
+        category: String?,
+        confidenceGate: Double,
+        parallelism: Int,
+        updateRankings: Boolean
+    ) {
+        scope.launch {
+            gateway.runBenchmarkConfigured(
+                models, queryLimit, category, confidenceGate, parallelism, updateRankings
+            )
+        }
+    }
+
+    override fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            val status = try {
+                gateway.loadEval(path, modelName)
+            } catch (t: Throwable) {
+                "Load failed: ${t.message}"
+            }
+            dispatch(TuiEvent.SetEvalLoaderStatus(status))
+            dispatch(TuiEvent.SetEvalLoaderRunning(false))
+            dispatch(TuiEvent.BenchmarkModelsLoaded(gateway.loadedModels()))
+        }
+    }
+
+    override fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit) {
+        scope.launch { dispatch(TuiEvent.BenchmarkModelsLoaded(gateway.loadedModels())) }
     }
 
     override fun regenerateLabels() {
@@ -124,8 +171,18 @@ interface TuiGateway {
 
     suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean)
     suspend fun runArena(query: String, modelA: String, modelB: String)
+    suspend fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
+    suspend fun loadedModels(): List<String>
     suspend fun runTrickle(query: String)
-    suspend fun runBenchmark()
+    suspend fun runBenchmarkConfigured(
+        models: List<String>,
+        queryLimit: Int,
+        category: String?,
+        confidenceGate: Double,
+        parallelism: Int,
+        updateRankings: Boolean
+    )
+    suspend fun loadEval(path: String, modelName: String): String
     suspend fun regenerateLabels()
     suspend fun regenerateJudgeForCurrentNode()
     suspend fun exportAscii()

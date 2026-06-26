@@ -413,18 +413,41 @@ object TuiReducer {
                     )
                 )
 
-            TuiEvent.StartArenaFlow ->
+            TuiEvent.StartArenaFlow -> {
+                val roster = state.arena.loadedModels
+                val defaultA = state.arena.arenaModelAInput.ifBlank { roster.getOrNull(0).orEmpty() }
+                val defaultB = state.arena.arenaModelBInput.ifBlank { roster.getOrNull(1).orEmpty() }
                 state.copy(
                     analysis = state.analysis.copy(mode = AnalysisMode.ARENA),
                     arena = state.arena.copy(
-                        isEnteringArenaQuery = true,
+                        isEnteringArenaQuestionId = state.arena.usePrecomputed,
+                        arenaQuestionIdInput = "",
+                        isEnteringArenaQuery = !state.arena.usePrecomputed,
                         arenaQueryInput = "",
                         isEnteringArenaModelA = false,
                         isEnteringArenaModelB = false,
-                        arenaModelAInput = state.arena.arenaModelAInput.ifBlank { "qwen3.5:2b" },
-                        arenaModelBInput = state.arena.arenaModelBInput.ifBlank { "ministral:3b-14b" }
+                        arenaModelAInput = defaultA,
+                        arenaModelBInput = defaultB
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
+                )
+            }
+
+            is TuiEvent.ArenaModelsLoaded ->
+                state.copy(arena = state.arena.copy(loadedModels = event.models))
+
+            is TuiEvent.SetArenaUsePrecomputed ->
+                state.copy(arena = state.arena.copy(usePrecomputed = event.value))
+
+            is TuiEvent.UpdateArenaQuestionIdInput ->
+                state.copy(arena = state.arena.copy(arenaQuestionIdInput = event.value))
+
+            TuiEvent.ConfirmArenaQuestionIdInput ->
+                state.copy(
+                    arena = state.arena.copy(
+                        isEnteringArenaQuestionId = false,
+                        isEnteringArenaModelA = true
+                    )
                 )
 
             is TuiEvent.UpdateArenaQueryInput ->
@@ -468,6 +491,7 @@ object TuiReducer {
             TuiEvent.CancelArenaInput ->
                 state.copy(
                     arena = state.arena.copy(
+                        isEnteringArenaQuestionId = false,
                         isEnteringArenaQuery = false,
                         isEnteringArenaModelA = false,
                         isEnteringArenaModelB = false
@@ -528,6 +552,29 @@ object TuiReducer {
                         benchmarkScrollOffset = 0
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
+                )
+
+            is TuiEvent.BenchmarkModelsLoaded ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        loadedModels = event.models,
+                        evalDbDistinctModels = event.models.size,
+                        benchmarkModelsInput = state.benchmark.benchmarkModelsInput
+                            .ifBlank { event.models.take(2).joinToString(", ") }
+                    )
+                )
+
+            TuiEvent.RunBenchmark ->
+                state.copy(
+                    benchmark = state.benchmark.copy(benchmarkSubScreen = taxonomy.tui.state.BenchmarkSubScreen.RESULTS)
+                )
+
+            TuiEvent.RunEvalLoad ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        evalLoaderIsRunning = true,
+                        evalLoaderStatus = "Loading…"
+                    )
                 )
 
             is TuiEvent.SetSelectedBenchmarkField ->
