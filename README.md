@@ -10,6 +10,34 @@ It can also be used to kickstart a new Spring Boot project that uses the Arc Age
 
 ## How to run
 
+#### 0. Configure secrets via environment variables
+
+Secrets are **not** stored in `config/application.yml`. Copy the provided
+template and fill in your own credentials before starting the application:
+
+```bash
+cp .env.example .env
+# then edit .env and set the values
+```
+
+`config/application.yml` reads the following environment variables (the `.env`
+file is git-ignored and must never be committed):
+
+| Variable | Purpose |
+| --- | --- |
+| `HUGGINGFACE_TOKEN` | HuggingFace access token |
+| `AZURE_AI_API_KEY` | Azure AI / OpenAI API key for the configured deployment |
+| `AZURE_AI_ENDPOINT` | Azure AI endpoint URL |
+| `GEMINI_API_KEY` | Google Gemini API key (only when `llm.provider` is `GEMINI`) |
+
+Export them into your shell (or source the `.env` file) before running, e.g.:
+
+```bash
+export HUGGINGFACE_TOKEN=hf_...
+export AZURE_AI_API_KEY=...
+export AZURE_AI_ENDPOINT=https://<resource-name>.services.ai.azure.com/
+```
+
 #### 1. Add language model configuration
 
 Add an OpenAI API-KEY to `config/application.yml` or as the environment variable, `OPENAI_API_KEY`.
