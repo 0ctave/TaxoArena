@@ -380,6 +380,7 @@ private fun MainDashboardRoute(
             width = arenaW,
             height = topH,
             focused = state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB,
+            mode = state.analysis.mode,
             controlState = subscriptions.arenaControlState,
             inspectorScroll = state.analysis.inspectorScroll,
             metricsScroll = state.analysis.metricsScrollOffset,
@@ -389,6 +390,7 @@ private fun MainDashboardRoute(
             snapshotState = state.snapshot,
             arenaState = state.arena,
             benchmarkState = state.benchmark,
+            latestMetrics = subscriptions.metricsHistory.lastOrNull() as? taxonomy.model.IterationMetrics,
             activeProcess = activeProcess,
         )
     }

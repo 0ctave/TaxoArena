@@ -2,6 +2,8 @@ package taxonomy.tui.controller
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import taxonomy.model.GraphNode
+import taxonomy.service.AnalysisMode
 import taxonomy.service.DagSnapshot
 
 interface TuiEffects {
@@ -31,6 +33,8 @@ interface TuiEffects {
     fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit)
     fun regenerateLabels()
     fun regenerateJudgeForCurrentNode()
+    fun inspectNode(node: GraphNode?)
+    fun setAnalysisMode(mode: AnalysisMode)
     fun exportAscii()
 
     /** Toggle a dataset domain on/off, then refresh the settings view. */
@@ -187,6 +191,14 @@ class DefaultTuiEffects(
         scope.launch { gateway.regenerateJudgeForCurrentNode() }
     }
 
+    override fun inspectNode(node: GraphNode?) {
+        gateway.inspectNode(node)
+    }
+
+    override fun setAnalysisMode(mode: AnalysisMode) {
+        gateway.setAnalysisMode(mode)
+    }
+
     override fun exportAscii() {
         scope.launch { gateway.exportAscii() }
     }
@@ -230,6 +242,8 @@ interface TuiGateway {
     suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String
     suspend fun regenerateLabels()
     suspend fun regenerateJudgeForCurrentNode()
+    fun inspectNode(node: GraphNode?)
+    fun setAnalysisMode(mode: AnalysisMode)
     suspend fun exportAscii()
 
     fun toggleDomain(domainName: String)
