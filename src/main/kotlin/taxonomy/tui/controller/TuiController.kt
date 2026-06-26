@@ -211,6 +211,7 @@ class TuiController(
             FocusPanel.TOPOLOGY -> handleTopologyKeys(state, key)
             FocusPanel.ANALYSIS_HUB -> handleAnalysisKeys(state, key)
             FocusPanel.SYSTEM_LOGS -> handleLogsKeys(state, key)
+            FocusPanel.PROCESSES -> Unit
             FocusPanel.CONFIG -> handleConfigKeys(state, key)
         }
     }

@@ -17,7 +17,31 @@ object TuiTheme {
     val DEPTH_COLORS: List<Color> = listOf(White, Cyan, Green, Yellow, Magenta, Red, Cyan)
     val SPINNER: List<String>     = listOf("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏")
 
+    // ── Semantic palette (single source of truth for state colors) ──
+    /** Primary accent: focus, selection, primary actions. */
+    val ACCENT: Color  = Cyan
+    /** Secondary accent for distinct identities. */
+    val ACCENT2: Color = Magenta
+    /** Completed / success / healthy. */
+    val OK: Color      = Green
+    /** In-progress / running / warning. */
+    val RUNNING: Color = Yellow
+    /** Error / failure. */
+    val ERROR: Color   = Red
+    /** Default foreground / informational. */
+    val INFO: Color    = White
+
     fun depthColor(depth: Int): Color = DEPTH_COLORS[depth.coerceIn(0, DEPTH_COLORS.lastIndex)]
+
+    /** Border/title color for a panel given whether it currently holds focus. */
+    fun panelAccent(focused: Boolean): Color = if (focused) ACCENT else INFO
+
+    /** Color for a progress/status indicator given its lifecycle state. */
+    fun statusColor(done: Boolean, error: Boolean = false): Color = when {
+        error -> ERROR
+        done  -> OK
+        else  -> RUNNING
+    }
 }
 
 fun depthColor(depth: Int): Color = TuiTheme.depthColor(depth)
