@@ -41,7 +41,7 @@ class LiveLabelingTest {
     fun testLiveLabelingDisabledFlow() = kotlinx.coroutines.runBlocking {
         // 1. Create dependencies
         val config = TaxonomyConfig()
-        config.enableLiveLabeling = false
+        config.execution.enableLiveLabeling = false
 
         val llmClient = TestLlmClient()
         val datasetFetcher = mock(MMLUDatasetFetcher::class.java)

@@ -28,16 +28,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         } ?: return false
 
         deps.taxonomyService.setGraph(root)
-        deps.config.dataset.selectedDomains = snapshot.settings.selectedDomains
-        deps.config.dataset.datasetType = snapshot.settings.datasetType
-        deps.config.execution.enableLabeling = snapshot.settings.enableLabeling
-        deps.config.execution.enableLiveLabeling = snapshot.settings.enableLiveLabeling
-        deps.config.formalism.maxDepth = snapshot.settings.maxDepth
-        deps.config.formalism.minClusterSize = snapshot.settings.minClusterSize
-        deps.config.formalism.separationEpsilon = snapshot.settings.separationEpsilon
-        deps.config.formalism.cosineTau = snapshot.settings.cosineTau
-        deps.config.formalism.assignmentGap = snapshot.settings.assignmentGap
-        deps.config.formalism.emaAlpha = snapshot.settings.emaAlpha
+        // The full effective config travels with the snapshot; legacy snapshots fall back to
+        // the partial SnapshotSettings (mapped via toEffectiveConfig). Adding a new config field
+        // flows through automatically with no extra wiring here.
+        deps.config.applyEffectiveConfig(snapshot.config ?: snapshot.settings.toEffectiveConfig())
 
         val uuid = snapshot.logUuid
         val historicalLogs = if (uuid != null) {

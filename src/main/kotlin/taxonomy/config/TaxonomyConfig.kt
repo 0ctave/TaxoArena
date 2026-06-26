@@ -17,81 +17,6 @@ class TaxonomyConfig {
     var llm: LlmConfig = LlmConfig()
     var formalism: FormalismConfig = FormalismConfig()
 
-    // --- Backwards Compatibility Fallback Bindings ---
-
-    var calibrate: Boolean
-        get() = execution.calibrate
-        set(value) { execution.calibrate = value }
-
-    var startService: Boolean
-        get() = execution.startService
-        set(value) { execution.startService = value }
-
-    var numIterations: Int
-        get() = execution.numIterations
-        set(value) { execution.numIterations = value }
-
-    var enableVisualization: Boolean
-        get() = execution.enableVisualization
-        set(value) { execution.enableVisualization = value }
-
-    var enableTui: Boolean
-        get() = execution.enableTui
-        set(value) { execution.enableTui = value }
-
-    var judgeModel: String
-        get() = llm.judgeModel
-        set(value) { llm.judgeModel = value }
-
-    var labelingModel: String
-        get() = llm.labelingModel
-        set(value) { llm.labelingModel = value }
-
-    var maxJudgeGenerality: Int
-        get() = llm.maxJudgeGenerality
-        set(value) { llm.maxJudgeGenerality = value }
-
-
-    var splitDataset: Boolean
-        get() = dataset.splitDataset
-        set(value) { dataset.splitDataset = value }
-
-    var testSplitRatio: Double
-        get() = dataset.testSplitRatio
-        set(value) { dataset.testSplitRatio = value }
-
-    var selectedDomains: List<String>
-        get() = dataset.selectedDomains
-        set(value) { dataset.selectedDomains = value }
-
-    var datasetType: DatasetType
-        get() = dataset.datasetType
-        set(value) { dataset.datasetType = value }
-
-    var provider: LlmProviderType
-        get() = llm.provider
-        set(value) { llm.provider = value }
-
-    var embeddingProvider: LlmProviderType
-        get() = llm.embeddingProvider
-        set(value) { llm.embeddingProvider = value }
-
-    var embeddingModel: String
-        get() = llm.embeddingModel
-        set(value) { llm.embeddingModel = value }
-
-    var enableEarlyStopping: Boolean
-        get() = execution.enableEarlyStopping
-        set(value) { execution.enableEarlyStopping = value }
-
-    var enableLabeling: Boolean
-        get() = execution.enableLabeling
-        set(value) { execution.enableLabeling = value }
-
-    var enableLiveLabeling: Boolean
-        get() = execution.enableLiveLabeling
-        set(value) { execution.enableLiveLabeling = value }
-
     class ExecutionConfig {
         var calibrate: Boolean = false
         var startService: Boolean = false
@@ -182,21 +107,21 @@ class TaxonomyConfig {
         val sb = StringBuilder()
         sb.append("\n┌── TAXONOMY CONFIGURATION PARAMETERS ─────────────────────\n")
         sb.append("│ Execution Settings:\n")
-        sb.append("│   - Dataset Type:         ${datasetType.name}\n")
-        sb.append("│   - Num Iterations:       $numIterations\n")
-        sb.append("│   - Early Stopping:       ${enableEarlyStopping}\n")
-        sb.append("│   - Labeling:             $enableLabeling\n")
-        sb.append("│   - Live Labeling:        $enableLiveLabeling\n")
-        sb.append("│   - Selected Domains:     ${selectedDomains.ifEmpty { listOf("All") }}\n")
-        sb.append("│   - Split Dataset:        $splitDataset\n")
-        sb.append("│   - Test Split Ratio:     $testSplitRatio\n")
+        sb.append("│   - Dataset Type:         ${dataset.datasetType.name}\n")
+        sb.append("│   - Num Iterations:       ${execution.numIterations}\n")
+        sb.append("│   - Early Stopping:       ${execution.enableEarlyStopping}\n")
+        sb.append("│   - Labeling:             ${execution.enableLabeling}\n")
+        sb.append("│   - Live Labeling:        ${execution.enableLiveLabeling}\n")
+        sb.append("│   - Selected Domains:     ${dataset.selectedDomains.ifEmpty { listOf("All") }}\n")
+        sb.append("│   - Split Dataset:        ${dataset.splitDataset}\n")
+        sb.append("│   - Test Split Ratio:     ${dataset.testSplitRatio}\n")
         sb.append("├── LLM & Embedding Models:\n")
-        sb.append("│   - LLM Provider:         $provider\n")
-        sb.append("│   - Embedding Provider:   $embeddingProvider\n")
-        sb.append("│   - Embedding Model:      $embeddingModel\n")
-        sb.append("│   - Judge Model:          $judgeModel\n")
-        sb.append("│   - Labeling Model:       $labelingModel\n")
-        sb.append("│   - Max Judge Generality: $maxJudgeGenerality\n")
+        sb.append("│   - LLM Provider:         ${llm.provider}\n")
+        sb.append("│   - Embedding Provider:   ${llm.embeddingProvider}\n")
+        sb.append("│   - Embedding Model:      ${llm.embeddingModel}\n")
+        sb.append("│   - Judge Model:          ${llm.judgeModel}\n")
+        sb.append("│   - Labeling Model:       ${llm.labelingModel}\n")
+        sb.append("│   - Max Judge Generality: ${llm.maxJudgeGenerality}\n")
         sb.append("├── Advanced Mathematical Formalism Controls:\n")
         sb.append("│   - Max Depth:            ${formalism.maxDepth}\n")
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
@@ -207,6 +132,65 @@ class TaxonomyConfig {
         sb.append("│   - EMA Alpha:            ${formalism.emaAlpha}\n")
         sb.append("└──────────────────────────────────────────────────────────")
         return sb.toString()
+    }
+
+    /** Capture the current tunables as an immutable, serializable snapshot (secrets excluded). */
+    fun toEffectiveConfig(): EffectiveConfig = EffectiveConfig(
+        execution = EffectiveConfig.Execution(
+            numIterations = execution.numIterations,
+            enableEarlyStopping = execution.enableEarlyStopping,
+            enableLabeling = execution.enableLabeling,
+            enableLiveLabeling = execution.enableLiveLabeling
+        ),
+        dataset = EffectiveConfig.Dataset(
+            datasetType = dataset.datasetType,
+            splitDataset = dataset.splitDataset,
+            testSplitRatio = dataset.testSplitRatio,
+            selectedDomains = dataset.selectedDomains
+        ),
+        llm = EffectiveConfig.Llm(
+            provider = llm.provider,
+            embeddingProvider = llm.embeddingProvider,
+            judgeModel = llm.judgeModel,
+            labelingModel = llm.labelingModel,
+            embeddingModel = llm.embeddingModel,
+            maxJudgeGenerality = llm.maxJudgeGenerality
+        ),
+        formalism = EffectiveConfig.Formalism(
+            maxDepth = formalism.maxDepth,
+            minClusterSize = formalism.minClusterSize,
+            separationEpsilon = formalism.separationEpsilon,
+            cosineTau = formalism.cosineTau,
+            assignmentGap = formalism.assignmentGap,
+            emaAlpha = formalism.emaAlpha
+        )
+    )
+
+    /** Apply a restored snapshot's tunables onto the live config. Secrets are left untouched. */
+    fun applyEffectiveConfig(c: EffectiveConfig) {
+        execution.numIterations = c.execution.numIterations
+        execution.enableEarlyStopping = c.execution.enableEarlyStopping
+        execution.enableLabeling = c.execution.enableLabeling
+        execution.enableLiveLabeling = c.execution.enableLiveLabeling
+
+        dataset.datasetType = c.dataset.datasetType
+        dataset.splitDataset = c.dataset.splitDataset
+        dataset.testSplitRatio = c.dataset.testSplitRatio
+        dataset.selectedDomains = c.dataset.selectedDomains
+
+        llm.provider = c.llm.provider
+        llm.embeddingProvider = c.llm.embeddingProvider
+        llm.judgeModel = c.llm.judgeModel
+        llm.labelingModel = c.llm.labelingModel
+        llm.embeddingModel = c.llm.embeddingModel
+        llm.maxJudgeGenerality = c.llm.maxJudgeGenerality
+
+        formalism.maxDepth = c.formalism.maxDepth
+        formalism.minClusterSize = c.formalism.minClusterSize
+        formalism.separationEpsilon = c.formalism.separationEpsilon
+        formalism.cosineTau = c.formalism.cosineTau
+        formalism.assignmentGap = c.formalism.assignmentGap
+        formalism.emaAlpha = c.formalism.emaAlpha
     }
 }
 

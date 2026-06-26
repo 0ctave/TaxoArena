@@ -144,6 +144,10 @@ class TaxonomyTuiService(
     override fun run(vararg args: String?) = runBlocking {
         if (!config.execution.enableTui) return@runBlocking
 
+        // Snapshot-driven persistence: restore the tunables of the most recent snapshot on startup
+        // so the TUI opens with the last loaded/generated configuration (secrets stay env-sourced).
+        snapshotManager.latestConfig()?.let { config.applyEffectiveConfig(it) }
+
         System.setProperty("jline.terminal.color", "true")
         System.setProperty("jline.terminal.type", "xterm-256color")
         AnsiConsole.systemInstall()

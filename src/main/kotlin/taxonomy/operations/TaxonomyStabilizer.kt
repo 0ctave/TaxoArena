@@ -114,7 +114,7 @@ class TaxonomyStabilizer(
             consecutiveConvergedCount = 0
         }
 
-        val isConverged = config.enableEarlyStopping &&
+        val isConverged = config.execution.enableEarlyStopping &&
                 consecutiveConvergedCount >= requiredConsecutive
 
         if (isConverged) log.info("Convergence Met: Taxonomy mixture has stabilized for $requiredConsecutive consecutive iterations.")
