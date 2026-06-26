@@ -21,6 +21,7 @@ import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.ProcessesPanel
 import taxonomy.tui.components.ProgressBar
+import taxonomy.tui.components.SettingKind
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.TuiTheme.SPINNER
@@ -211,12 +212,25 @@ private fun ConfigRoute(
                 Column(modifier = Modifier.padding(left = 2, top = 1)) {
                     settingItems.forEachIndexed { idx, item ->
                         val selected = idx == state.config.selectedSettingIdx
-                        val value =
-                            if (selected && state.config.isEditingSetting) state.config.editingValue + "_"
-                            else item.getValue()
+                        val editing = selected && state.config.isEditingSetting
+                        // Typed-input rendering: boolean -> checkbox, select -> ‹ value ›,
+                        // number/text -> value (with a caret while editing).
+                        val rendered = when {
+                            editing -> state.config.editingValue + "_"
+                            item.kind == SettingKind.BOOLEAN ->
+                                if (item.getValue().toBooleanStrictOrNull() == true) "[x] on" else "[ ] off"
+                            item.kind == SettingKind.SELECT -> "‹ ${item.getValue()} ›"
+                            else -> item.getValue()
+                        }
+                        val caret = if (selected) "▶ " else "  "
+                        val rowColor = when {
+                            editing -> TuiTheme.RUNNING
+                            selected -> TuiTheme.ACCENT
+                            else -> TuiTheme.INFO
+                        }
                         Text(
-                            value = (if (selected) "> " else "  ") + item.name + ": " + value,
-                            color = if (selected) Cyan else White,
+                            value = (caret + item.name + ": " + rendered).take(rightW - 4),
+                            color = rowColor,
                             textStyle = if (selected) Bold else Unspecified
                         )
                     }
@@ -460,9 +474,9 @@ private fun buildConfigFooter(
         downloading ->
             "Tab Switch Panels  W/S Navigate  Downloading..."
         isDatasetDownloaded ->
-            "Tab Switch  W/S Navigate  Space/Enter Toggle/Edit  R Generate DAG  Esc/Q Back"
+            "Tab Domains/Settings · W/S Move · Space/Enter Toggle/Cycle/Edit · R Generate · Esc Back"
         else ->
-            "Tab Switch  W/S Navigate  Space/Enter Toggle/Edit  D Download Dataset  Esc/Q Back"
+            "Tab Domains/Settings · W/S Move · Space/Enter Toggle/Edit · D Download · Esc Back"
     }
 
 private fun flattenNodes(rootNode: GraphNode?): List<GraphNode> {

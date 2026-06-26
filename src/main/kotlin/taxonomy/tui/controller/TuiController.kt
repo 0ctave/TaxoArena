@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import taxonomy.service.AnalysisMode
+import taxonomy.tui.components.SettingItem
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
@@ -14,7 +15,11 @@ class TuiController(
     private val effects: TuiEffects,
     private val focusController: FocusController = FocusController(),
     private val scrollController: ScrollController = ScrollController(),
-    private val commandController: CommandController = CommandController(effects)
+    private val commandController: CommandController = CommandController(effects),
+    /** Current setting items, used to resolve the selected item for edit/apply. */
+    private val settingItemsProvider: () -> List<SettingItem> = { emptyList() },
+    /** Available dataset domains (name, count), used to resolve domain toggles. */
+    private val availableDomainsProvider: () -> List<Pair<String, Int>> = { emptyList() },
 ) {
 
     private val _state = MutableStateFlow(initialState)
@@ -143,9 +148,15 @@ class TuiController(
                 }
             }
 
-            "enter", " " -> {
-                if (state.config.activeSubPanel == ConfigSubPanel.SETTINGS) {
-                    dispatch(TuiEvent.StartEditingSetting())
+            "enter", " ", "space" -> {
+                if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) {
+                    val domains = availableDomainsProvider()
+                    domains.getOrNull(state.config.selectedDomainIdx)?.let { (name, _) ->
+                        dispatch(TuiEvent.ToggleSelectedDomain(name))
+                    }
+                } else {
+                    // Settings: instant toggle/cycle for boolean/select, editor for number/text.
+                    dispatch(TuiEvent.ActivateSelectedSetting)
                 }
             }
 
@@ -158,7 +169,14 @@ class TuiController(
 
     private fun handleSettingEditorKeys(state: TuiAppState, key: String) {
         when (key) {
-            "enter" -> dispatch(TuiEvent.ConfirmEditingSetting)
+            "enter" -> {
+                // Apply the typed value BEFORE the reducer clears editingValue, then close.
+                val item = settingItemsProvider().getOrNull(state.config.selectedSettingIdx)
+                if (item != null) {
+                    dispatch(TuiEvent.ApplySetting(item.name, state.config.editingValue))
+                }
+                dispatch(TuiEvent.ConfirmEditingSetting)
+            }
             "escape", "q" -> dispatch(TuiEvent.CancelEditingSetting)
             "backspace" -> dispatch(TuiEvent.UpdateEditingValue(state.config.editingValue.dropLast(1)))
             else -> {
@@ -489,7 +507,7 @@ class TuiController(
         val state = _state.value
         when (state.startup.state) {
             StartupState.WELCOME -> handleWelcomeMouse(event)
-            StartupState.CONFIGANDDOMAINS -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
+            StartupState.CONFIGANDDOMAINS -> handleConfigMouse(state, event)
             StartupState.MAINDASHBOARD -> {
                 if (event.x < 60) {
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
@@ -498,6 +516,50 @@ class TuiController(
                 }
             }
             StartupState.LOADING -> Unit
+        }
+    }
+
+    /**
+     * Mouse in the config screen: choose the DOMAINS or SETTINGS sub-panel by x,
+     * select the row under the cursor by y, and toggle/activate it (click = select,
+     * a second click on the same row = toggle/cycle/edit).
+     */
+    private fun handleConfigMouse(state: TuiAppState, event: TuiEvent.MousePressed) {
+        dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
+        if (state.config.isEditingSetting) return
+
+        // Header (2) + HRule (1) + panel title (1) + spacer (1) ≈ first content row at y=5.
+        val firstRowY = 5
+        val rowIndex = (event.y - firstRowY).coerceAtLeast(-1)
+        if (rowIndex < 0) return
+
+        val leftWidth = (state.shell.width * 0.35).toInt().coerceAtLeast(20)
+        if (event.x < leftWidth) {
+            // DOMAINS sub-panel.
+            if (state.config.activeSubPanel != ConfigSubPanel.DOMAINS) {
+                dispatch(TuiEvent.SetConfigSubPanel(ConfigSubPanel.DOMAINS))
+            }
+            val domains = availableDomainsProvider()
+            domains.getOrNull(rowIndex)?.let { (name, _) ->
+                if (rowIndex == state.config.selectedDomainIdx) {
+                    dispatch(TuiEvent.ToggleSelectedDomain(name))
+                } else {
+                    dispatch(TuiEvent.SetSelectedDomainIdx(rowIndex))
+                }
+            }
+        } else {
+            // SETTINGS sub-panel.
+            if (state.config.activeSubPanel != ConfigSubPanel.SETTINGS) {
+                dispatch(TuiEvent.SetConfigSubPanel(ConfigSubPanel.SETTINGS))
+            }
+            val items = settingItemsProvider()
+            if (rowIndex in items.indices) {
+                if (rowIndex == state.config.selectedSettingIdx) {
+                    dispatch(TuiEvent.ActivateSelectedSetting)
+                } else {
+                    dispatch(TuiEvent.SetSelectedSettingIdx(rowIndex))
+                }
+            }
         }
     }
 

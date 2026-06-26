@@ -104,6 +104,12 @@ object TuiReducer {
             TuiEvent.RefreshSnapshots ->
                 state
 
+            // Side-effect-only config events (handled in CommandController).
+            is TuiEvent.ToggleSelectedDomain,
+            TuiEvent.ActivateSelectedSetting,
+            is TuiEvent.ApplySetting ->
+                state
+
             is TuiEvent.SnapshotsLoaded -> {
                 val snapshots = event.snapshots
                 val safeSelectedSnapshotIdx =

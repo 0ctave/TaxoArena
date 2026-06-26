@@ -2,8 +2,10 @@ package taxonomy.tui.app
 
 import kotlinx.coroutines.CoroutineScope
 import taxonomy.service.TaxonomyTuiService
+import taxonomy.tui.controller.CommandController
 import taxonomy.tui.controller.DefaultTuiEffects
 import taxonomy.tui.controller.TuiController
+import taxonomy.tui.service.TuiConfigFacade
 import taxonomy.tui.service.TuiGatewayImpl
 
 data class TuiDependencies(
@@ -36,5 +38,12 @@ fun TaxonomyTuiService.toTuiDependencies(): TuiDependencies =
 fun TuiDependencies.buildController(): TuiController {
     val gateway = TuiGatewayImpl(this)
     val effects = DefaultTuiEffects(tuiScope, gateway)
-    return TuiController(effects = effects)
+    val facade = TuiConfigFacade(this)
+    val commandController = CommandController(effects, settingItemsProvider = facade::buildSettingItems)
+    return TuiController(
+        effects = effects,
+        commandController = commandController,
+        settingItemsProvider = facade::buildSettingItems,
+        availableDomainsProvider = facade::getAvailableDomains,
+    )
 }
