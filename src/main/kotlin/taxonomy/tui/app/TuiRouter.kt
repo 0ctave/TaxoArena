@@ -34,7 +34,9 @@ import taxonomy.tui.features.topology.TopologyPanel
 import taxonomy.tui.service.TuiConfigFacade
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
+import taxonomy.tui.state.NavContext
 import taxonomy.tui.state.TuiAppState
+import taxonomy.tui.state.deriveNavContext
 import java.util.Locale
 
 @Composable
@@ -257,22 +259,36 @@ private fun MainDashboardRoute(
         flattenNodes(subscriptions.rootNode)
     }
 
+    // Context-driven navigator: show the explorable DAG when one is loaded,
+    // otherwise prompt to load a snapshot or generate a new taxonomy.
+    val hasDag = subscriptions.rootNode != null && allNodes.isNotEmpty()
+    val navContext = deriveNavContext(hasDag = hasDag, choosingDomains = false)
+    val navFocused = state.shell.focusedPanel == FocusPanel.TOPOLOGY
+
     Row(modifier = Modifier.height(topH)) {
         Panel(
-            title = "TOPOLOGY",
-            accentColor = if (state.shell.focusedPanel == FocusPanel.TOPOLOGY) Cyan else White,
+            title = if (navContext == NavContext.DAG_EXPLORE) "DAG EXPLORER" else "NAVIGATOR",
+            accentColor = TuiTheme.panelAccent(navFocused),
             width = dagW,
             height = topH,
         ) {
-            TopologyPanel(
-                width = dagW - 4,
-                height = topH - 2,
-                state = state.topology,
-                availableDomains = availableDomains,
-                selectedDomains = deps.config.dataset.selectedDomains,
-                allNodes = allNodes,
-                treeLines = subscriptions.treeLines,
-            )
+            when (navContext) {
+                NavContext.DAG_EXPLORE -> TopologyPanel(
+                    width = dagW - 4,
+                    height = topH - 2,
+                    state = state.topology,
+                    availableDomains = availableDomains,
+                    selectedDomains = deps.config.dataset.selectedDomains,
+                    allNodes = allNodes,
+                    treeLines = subscriptions.treeLines,
+                )
+                else -> Column(modifier = Modifier.padding(left = 2, top = 1)) {
+                    Text("No taxonomy DAG loaded.", color = TuiTheme.INFO, textStyle = Bold)
+                    Spacer()
+                    Text("[X] Welcome / load a snapshot", color = TuiTheme.ACCENT)
+                    Text("[R] Configure & generate a new DAG", color = TuiTheme.ACCENT)
+                }
+            }
         }
 
         VDivider(topH, White, Cyan)
