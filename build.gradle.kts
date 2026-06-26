@@ -65,7 +65,7 @@ dependencies {
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webflux:1.1.1")
+    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webflux:2.0.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // Langchain4j
