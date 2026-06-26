@@ -20,7 +20,10 @@ cp .env.example .env
 # then edit .env and set the values
 ```
 
-`config/application.yml` reads the following environment variables (the `.env`
+The root-level `.env` file is **loaded automatically** at startup (via
+[spring-dotenv](https://github.com/paulschwarz/spring-dotenv)), so its entries
+resolve the `${...}` placeholders in `config/application.yml` with no extra
+steps. `config/application.yml` reads the following variables (the `.env`
 file is git-ignored and must never be committed):
 
 | Variable | Purpose |
@@ -30,7 +33,12 @@ file is git-ignored and must never be committed):
 | `AZURE_AI_ENDPOINT` | Azure AI endpoint URL |
 | `GEMINI_API_KEY` | Google Gemini API key (only when `llm.provider` is `GEMINI`) |
 
-Export them into your shell (or source the `.env` file) before running, e.g.:
+`AZURE_AI_API_KEY` and `AZURE_AI_ENDPOINT` are required when `taxoadapt.llm.provider`
+is `AZURE` (the default). If they are left blank the application no longer
+crashes — it logs a warning and falls back to the local Ollama chat/embedding
+model, so an Ollama-only setup boots without any Azure credentials.
+
+Real values belong in `.env`. You may also export them into your shell instead, e.g.:
 
 ```bash
 export HUGGINGFACE_TOKEN=hf_...

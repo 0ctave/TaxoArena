@@ -37,6 +37,9 @@ dependencies {
     val langchain4jVersion = "1.8.0"
 
 
+    // Transparently loads a root-level `.env` file into the Spring Environment
+    implementation("me.paulschwarz:spring-dotenv:5.1.0")
+
     // Coroutines for asynchronous LLM calls
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
