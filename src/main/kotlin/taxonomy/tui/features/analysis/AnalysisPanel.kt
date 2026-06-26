@@ -29,6 +29,9 @@ fun AnalysisPanel(
     width: Int,
     height: Int,
     focused: Boolean = false,
+    /** The active hub mode, driven by MVI state (key presses). The panel switches on THIS,
+     *  not on the service's controlState.mode (which only changes when a run mutates it). */
+    mode: AnalysisMode,
     controlState: AnalysisPanelState,
     inspectorScroll: Int,
     metricsScroll: Int,
@@ -38,6 +41,7 @@ fun AnalysisPanel(
     snapshotState: SnapshotUiState,
     arenaState: ArenaUiState,
     benchmarkState: BenchmarkUiState,
+    latestMetrics: taxonomy.model.IterationMetrics? = null,
     /** Most relevant active process, or null when idle. Pinned at the top so a
      *  running process is always one keystroke away regardless of what the
      *  dashboard is currently showing (selection wins, process resumable). */
@@ -45,7 +49,7 @@ fun AnalysisPanel(
 ) {
     // This panel owns the single bordered frame for the right-hand hub. The title reflects
     // the active mode, and the sub-panels below render content only (no nested borders).
-    val title = when (controlState.mode) {
+    val title = when (mode) {
         AnalysisMode.ARENA -> "MODEL ARENA"
         AnalysisMode.BENCHMARK -> "BENCHMARK"
         AnalysisMode.TRICKLE_TEST -> "TRICKLE TEST"
@@ -67,13 +71,15 @@ fun AnalysisPanel(
             val bodyH = (height - 2 - bannerH).coerceAtLeast(1)
             val bodyW = width - 2
 
-            when (controlState.mode) {
+            when (mode) {
                 AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState)
                 AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
                 AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleResults, batchTrickleScroll)
                 AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
                 AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
-                else -> MetricsOrInspectorPanel(bodyW, bodyH, controlState, inspectorScroll, metricsScroll)
+                else -> MetricsOrInspectorPanel(
+                    bodyW, bodyH, mode, controlState, inspectorScroll, metricsScroll, latestMetrics
+                )
             }
         }
     }
