@@ -566,10 +566,10 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
         } else {
             add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
         }
-        // Generation requires the dataset (domains come from the downloaded data).
+        // When the dataset is already present, R generates straight away and we don't clutter
+        // the bar with the download key. When it's missing, downloading is the headline action.
         if (state.runtime.isDatasetDownloaded) {
             add(HotkeyAction("R", "Generate DAG", TuiTheme.OK, isPrimary = true))
-            add(HotkeyAction("D", "Re-download"))
         } else {
             add(HotkeyAction("D", "Download Dataset", TuiTheme.OK, isPrimary = true))
             add(HotkeyAction("R", "(download first)", TuiTheme.INFO))
