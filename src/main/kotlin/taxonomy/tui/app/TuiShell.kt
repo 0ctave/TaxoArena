@@ -14,6 +14,10 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import taxonomy.tui.components.HRule
 import taxonomy.tui.components.Header
 
+/** Minimum terminal size required to render the full 3-region layout. */
+private const val MIN_WIDTH = 100
+private const val MIN_HEIGHT = 20
+
 @Composable
 fun TuiShell(
     width: Int,
@@ -24,12 +28,12 @@ fun TuiShell(
     activeSnapshotName: String?,
     content: @Composable () -> Unit,
 ) {
-    if (width < 100 || height < 20) {
+    if (width < MIN_WIDTH || height < MIN_HEIGHT) {
         Column {
-            Text("", color = Yellow, textStyle = Bold)
-            Text("WINDOW TOO SMALL", color = Black, background = Yellow, textStyle = Bold)
-            Text("", color = Yellow, textStyle = Bold)
-            Text("Minimum: 100x20  Current: ${width}x$height", color = White)
+            Text(" WINDOW TOO SMALL ", color = Black, background = Yellow, textStyle = Bold)
+            Text("", color = White)
+            Text("Minimum ${MIN_WIDTH}x$MIN_HEIGHT · current ${width}x$height", color = Yellow)
+            Text("Resize the terminal to continue.", color = White)
         }
         return
     }
