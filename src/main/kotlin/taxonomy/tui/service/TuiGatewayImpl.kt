@@ -3,6 +3,8 @@ package taxonomy.tui.service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import taxonomy.model.BenchmarkRequest
+import taxonomy.model.GraphNode
+import taxonomy.service.AnalysisMode
 import taxonomy.model.ModelSource
 import taxonomy.service.DagSnapshot
 import taxonomy.tui.app.TuiDependencies
@@ -153,6 +155,16 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override suspend fun regenerateJudgeForCurrentNode() {
         deps.log.info("Judge regeneration for current node requested.")
+    }
+
+    override fun inspectNode(node: GraphNode?) {
+        // Push the selected node into the arena/analysis service state so the Node Inspector
+        // panel (which reads controlState.selectedNode) renders it.
+        deps.arenaService.inspectNode(node)
+    }
+
+    override fun setAnalysisMode(mode: AnalysisMode) {
+        deps.arenaService.setMode(mode)
     }
 
     override suspend fun exportAscii() {

@@ -319,6 +319,9 @@ class TuiController(
             }
 
             "enter" -> {
+                // Populate the inspector's node (service state) THEN switch the hub to the
+                // node-detail view (MVI mode) and focus it.
+                effects.inspectNode(selectedTreeNode(state))
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
@@ -609,6 +612,7 @@ class TuiController(
             if (node.children.isNotEmpty()) {
                 dispatch(TuiEvent.ToggleNodeExpanded(node.id))
             } else {
+                effects.inspectNode(node)
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
