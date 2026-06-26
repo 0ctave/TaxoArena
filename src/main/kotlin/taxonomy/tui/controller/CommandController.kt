@@ -40,11 +40,46 @@ class CommandController(
             }
 
             TuiEvent.ConfirmArenaModelBInput -> {
-                effects.runArena(
-                    query = state.arena.arenaQueryInput,
-                    modelA = state.arena.arenaModelAInput,
-                    modelB = state.arena.arenaModelBInput
+                if (state.arena.usePrecomputed) {
+                    val qId = state.arena.arenaQuestionIdInput.trim().toIntOrNull()
+                    if (qId != null) {
+                        effects.runArenaPrecomputed(
+                            questionId = qId,
+                            modelA = state.arena.arenaModelAInput,
+                            modelB = state.arena.arenaModelBInput
+                        )
+                    }
+                } else {
+                    effects.runArena(
+                        query = state.arena.arenaQueryInput,
+                        modelA = state.arena.arenaModelAInput,
+                        modelB = state.arena.arenaModelBInput
+                    )
+                }
+            }
+
+            TuiEvent.RunBenchmark -> {
+                val models = state.benchmark.benchmarkModelsInput
+                    .split(",").map { it.trim() }.filter { it.isNotBlank() }
+                    .ifEmpty { state.benchmark.loadedModels }
+                effects.runBenchmarkConfigured(
+                    models = models,
+                    queryLimit = state.benchmark.benchmarkQueryLimitInput.trim().toIntOrNull() ?: 0,
+                    category = state.benchmark.benchmarkCategoryInput.trim().ifBlank { null },
+                    confidenceGate = state.benchmark.benchmarkConfidenceGateInput.trim().toDoubleOrNull() ?: 0.65,
+                    parallelism = state.benchmark.benchmarkParallelismInput.trim().toIntOrNull() ?: 4,
+                    updateRankings = state.benchmark.benchmarkUpdateRankingsInput.trim().toBooleanStrictOrNull() ?: true
                 )
+            }
+
+            TuiEvent.RunEvalLoad -> {
+                if (state.benchmark.evalLoaderPathInput.isNotBlank()) {
+                    effects.loadEval(
+                        path = state.benchmark.evalLoaderPathInput.trim(),
+                        modelName = state.benchmark.evalLoaderModelInput.trim(),
+                        dispatch = dispatch
+                    )
+                }
             }
 
             TuiEvent.ConfirmTrickleQueryInput -> {
@@ -68,6 +103,7 @@ class CommandController(
 
     fun startArena(dispatch: (TuiEvent) -> Unit) {
         dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
+        effects.loadArenaModels(dispatch)
         dispatch(TuiEvent.StartArenaFlow)
     }
 
@@ -78,6 +114,8 @@ class CommandController(
 
     fun startBenchmark(dispatch: (TuiEvent) -> Unit) {
         dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.BENCHMARK))
+        dispatch(TuiEvent.StartBenchmarkFlow)
+        effects.loadBenchmarkModels(dispatch)
     }
 
     fun startMetrics(dispatch: (TuiEvent) -> Unit) {

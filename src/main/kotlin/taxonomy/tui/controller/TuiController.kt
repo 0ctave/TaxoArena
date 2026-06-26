@@ -288,6 +288,9 @@ class TuiController(
                 "s", "arrowdown" ->
                     dispatch(TuiEvent.SetBenchmarkScrollOffset(state.benchmark.benchmarkScrollOffset + 1))
 
+                "enter" -> dispatch(TuiEvent.RunBenchmark)
+                "o" -> dispatch(TuiEvent.RunEvalLoad)
+
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
             }
@@ -381,6 +384,19 @@ class TuiController(
                     else -> {
                         if (key.all(Char::isDigit)) {
                             dispatch(TuiEvent.UpdateBatchGeneralityInput(state.analysis.batchGeneralityInput + key))
+                        }
+                    }
+                }
+            }
+
+            state.arena.isEnteringArenaQuestionId -> {
+                when (key) {
+                    "enter" -> dispatch(TuiEvent.ConfirmArenaQuestionIdInput)
+                    "escape", "q" -> dispatch(TuiEvent.CancelArenaInput)
+                    "backspace" -> dispatch(TuiEvent.UpdateArenaQuestionIdInput(state.arena.arenaQuestionIdInput.dropLast(1)))
+                    else -> {
+                        if (key.all(Char::isDigit) && key.isNotEmpty()) {
+                            dispatch(TuiEvent.UpdateArenaQuestionIdInput(state.arena.arenaQuestionIdInput + key))
                         }
                     }
                 }
@@ -510,6 +526,7 @@ class TuiController(
                 state.snapshot.isSavingSnapshot ||
                 state.config.isEditingSetting ||
                 state.analysis.isEnteringBatchGenerality ||
+                state.arena.isEnteringArenaQuestionId ||
                 state.arena.isEnteringArenaQuery ||
                 state.arena.isEnteringArenaModelA ||
                 state.arena.isEnteringArenaModelB ||

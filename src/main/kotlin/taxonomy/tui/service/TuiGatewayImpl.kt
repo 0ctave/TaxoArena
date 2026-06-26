@@ -2,6 +2,8 @@ package taxonomy.tui.service
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import taxonomy.model.BenchmarkRequest
+import taxonomy.model.ModelSource
 import taxonomy.service.DagSnapshot
 import taxonomy.tui.app.TuiDependencies
 import taxonomy.tui.controller.TuiGateway
@@ -80,17 +82,61 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         deps.arenaService.compareModels(query, modelA, modelB)
     }
 
+    override suspend fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String) {
+        deps.arenaService.compareModelsPrecomputed(questionId, modelA, modelB)
+    }
+
+    override suspend fun loadedModels(): List<String> =
+        withContext(Dispatchers.IO) { deps.evalStore.getLoadedModels() }
+
     override suspend fun runTrickle(query: String) {
         // Single-query trickle routing is driven interactively from a precomputed
         // query embedding; record the request as a sensible no-op equivalent.
         deps.log.info("Trickle requested for query: {}", query)
     }
 
-    override suspend fun runBenchmark() {
-        // A full benchmark run requires a BenchmarkRequest assembled from UI inputs
-        // (models, category, query limit), which are not available at this layer.
-        deps.log.info("Benchmark run requested without a configured request; skipping.")
+    override suspend fun runBenchmarkConfigured(
+        models: List<String>,
+        queryLimit: Int,
+        category: String?,
+        confidenceGate: Double,
+        parallelism: Int,
+        updateRankings: Boolean
+    ) {
+        if (models.size < 2) {
+            deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
+            return
+        }
+        val request = BenchmarkRequest(
+            models = models.map { ModelSource(it) },
+            queryLimit = queryLimit,
+            category = category?.takeIf { it.isNotBlank() },
+            confidenceGate = confidenceGate,
+            parallelism = parallelism.coerceAtLeast(1),
+            updateRankings = updateRankings
+        )
+        deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models…")
+        try {
+            val report = deps.benchmarkService.runBenchmark(request) { live ->
+                deps.arenaService.updateBenchmarkProgress(
+                    "Processed ${live.processed}/${live.total} · " +
+                        "agreement ${"%.2f".format(live.runningAgreement)} · " +
+                        "coverage ${"%.2f".format(live.runningCoverage)}"
+                )
+            }
+            deps.arenaService.completeBenchmark(report)
+        } catch (t: Throwable) {
+            deps.log.error("Benchmark failed", t)
+            deps.arenaService.updateBenchmarkProgress("Benchmark failed: ${t.message}")
+        }
     }
+
+    override suspend fun loadEval(path: String, modelName: String): String =
+        withContext(Dispatchers.IO) {
+            val stats = deps.evalLoader.loadFromPath(path, modelName.ifBlank { null })
+            "Loaded '${stats.modelName}': ${stats.inserted} new, ${stats.skipped} existing, " +
+                "${stats.linkedToDataset} linked, ${stats.errors} errors"
+        }
 
     override suspend fun regenerateLabels() {
         deps.log.info("Label regeneration requested.")

@@ -8,7 +8,7 @@ data class BenchmarkUiState(
 
     val isEnteringBenchmarkConfig: Boolean = false,
 
-    val benchmarkModelsInput: String = "qwen3.5:2b, ministral:3b-14b",
+    val benchmarkModelsInput: String = "",
     val benchmarkQueryLimitInput: String = "20",
     val benchmarkCategoryInput: String = "",
     val benchmarkConfidenceGateInput: String = "0.65",
@@ -27,7 +27,10 @@ data class BenchmarkUiState(
 
     val evalDbTotalRows: Int = 0,
     val evalDbDistinctModels: Int = 0,
-    val evalDbPathExists: Boolean = false
+    val evalDbPathExists: Boolean = false,
+
+    // Roster of models currently loaded in the eval_results store.
+    val loadedModels: List<String> = emptyList()
 )
 
 enum class BenchmarkSubScreen {

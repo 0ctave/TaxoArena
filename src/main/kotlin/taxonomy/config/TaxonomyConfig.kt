@@ -109,6 +109,10 @@ class TaxonomyConfig {
         var splitDataset: Boolean = true
         var testSplitRatio: Double = 0.2
         var selectedDomains: List<String> = emptyList()
+
+        // Directory holding TIGER-AI-Lab MMLU-Pro eval_results files
+        // (`model_outputs_<MODEL>_<N>shots.zip` / `.json`) for precomputed-answer mode.
+        var evalResultsDir: String = "eval_results"
     }
 
     class LlmConfig {

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.EmbeddingCache
+import taxonomy.dataset.ModelEvalStore
 import taxonomy.model.BenchmarkReport
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
@@ -70,6 +71,8 @@ class TaxonomyArenaService(
     private val llmClient: TaxonomyLlmClient,
     private val embeddingCache: EmbeddingCache,
     private val ops: TaxonomyOperations,
+    private val evalStore: ModelEvalStore,
+    private val rankingService: TaxonomyRankingService,
 ) {
     private val log = LoggerFactory.getLogger("ArenaService")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
@@ -275,6 +278,78 @@ class TaxonomyArenaService(
                 evaluatePairwise(node, questionWithOptions, modelA, modelB, traceA, traceB)
             }
         }.awaitAll()
+    }
+
+    /**
+     * Precomputed-answers Arena: fetch each model's stored MMLU-Pro trajectory for the
+     * given question_id, route the query embedding to its leaf judges, and evaluate the
+     * two precomputed answers WITHOUT any live generation. Optionally aggregates the
+     * verdicts into the Bradley-Terry ranking (TaxonomyRankingService).
+     */
+    suspend fun compareModelsPrecomputed(
+        questionId: Int,
+        modelA: String,
+        modelB: String,
+        confidenceGate: Double = 0.65,
+        updateRankings: Boolean = true
+    ): ArenaResult = coroutineScope {
+        val resA = evalStore.getResult(modelA, questionId)
+        val resB = evalStore.getResult(modelB, questionId)
+
+        if (resA == null || resB == null) {
+            val missing = listOfNotNull(
+                modelA.takeIf { resA == null },
+                modelB.takeIf { resB == null }
+            ).joinToString(", ")
+            log.warn("Precomputed arena: missing outputs for q#$questionId ($missing)")
+            _state.value = AnalysisPanelState(
+                mode = AnalysisMode.ARENA,
+                query = "q#$questionId",
+                modelA = modelA,
+                modelB = modelB,
+                domainStatus = mapOf("(no judge)" to "Missing precomputed output: $missing")
+            )
+            return@coroutineScope ArenaResult(
+                "q#$questionId", modelA, modelB,
+                resA?.modelOutput ?: "", resB?.modelOutput ?: "", emptyList()
+            )
+        }
+
+        val query = resA.questionText
+        _state.value = AnalysisPanelState(
+            mode = AnalysisMode.ARENA, query = query, modelA = modelA, modelB = modelB
+        )
+
+        val evaluations = evaluateWithPrecomputedTraces(
+            query = query,
+            options = resA.options,
+            modelA = modelA,
+            traceA = resA.modelOutput,
+            modelB = modelB,
+            traceB = resB.modelOutput
+        )
+
+        _state.value = _state.value.copy(
+            domainStatus = evaluations.associate { (it.domainLabel) to it.winner }
+        )
+
+        if (updateRankings) {
+            evaluations.filter { it.confidence >= confidenceGate }.forEach { eval ->
+                val isTie = eval.winner == "Tie"
+                val winner = if (eval.winner == "Model B") modelB else modelA
+                val loser = if (eval.winner == "Model B") modelA else modelB
+                rankingService.recordMatch(
+                    query = query,
+                    domain = eval.domainLabel,
+                    winner = if (isTie) modelA else winner,
+                    loser = if (isTie) modelB else loser,
+                    isTie = isTie,
+                    confidence = eval.confidence
+                )
+            }
+        }
+
+        ArenaResult(query, modelA, modelB, resA.modelOutput, resB.modelOutput, evaluations)
     }
 
     private fun parseJudgeResponse(response: String): Triple<String, String, Double> {

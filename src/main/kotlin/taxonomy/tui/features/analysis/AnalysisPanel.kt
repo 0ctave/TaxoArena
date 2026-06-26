@@ -18,6 +18,8 @@ import taxonomy.tui.features.arena.ArenaPanel
 import taxonomy.tui.features.benchmark.BenchmarkPanel
 import taxonomy.tui.features.progress.JudgeProgressPanel
 import taxonomy.tui.features.trickle.TricklePanel
+import taxonomy.tui.state.ArenaUiState
+import taxonomy.tui.state.BenchmarkUiState
 import taxonomy.tui.state.SnapshotUiState
 
 @Composable
@@ -31,10 +33,12 @@ fun AnalysisPanel(
     batchTrickleScroll: Int,
     trickleResults: BatchTrickleTestResults?,
     snapshotState: SnapshotUiState,
+    arenaState: ArenaUiState,
+    benchmarkState: BenchmarkUiState,
 ) {
     when (controlState.mode) {
-        AnalysisMode.ARENA -> ArenaPanel(width, height, controlState)
-        AnalysisMode.BENCHMARK -> BenchmarkPanel(width, height, controlState, benchmarkScroll)
+        AnalysisMode.ARENA -> ArenaPanel(width, height, controlState, arenaState)
+        AnalysisMode.BENCHMARK -> BenchmarkPanel(width, height, controlState, benchmarkScroll, benchmarkState)
         AnalysisMode.TRICKLE_TEST -> TricklePanel(width, height, trickleResults, batchTrickleScroll)
         AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(width, height, controlState)
         AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(width, height, snapshotState)
