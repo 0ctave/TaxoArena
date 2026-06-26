@@ -107,6 +107,15 @@ sealed interface TuiEvent {
     data object DatasetDownloadCompleted : TuiEvent
     data class DatasetDownloadFailed(val message: String) : TuiEvent
 
+    /** Generate a brand-new taxonomy DAG from the configured dataset/domains. */
+    data object StartGeneration : TuiEvent
+    data class GenerationProgress(
+        val progress: Float,
+        val statusText: String
+    ) : TuiEvent
+    data object GenerationCompleted : TuiEvent
+    data class GenerationFailed(val message: String) : TuiEvent
+
     data class SetInspectorScroll(val offset: Int) : TuiEvent
     data class SetMetricsScroll(val offset: Int) : TuiEvent
     data class SetLogsScroll(val offset: Int) : TuiEvent

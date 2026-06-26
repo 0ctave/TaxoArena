@@ -14,5 +14,7 @@ data class ConfigUiState(
     val datasetDownloadProgress: Float = 0f,
     val datasetDownloadStatusText: String = "",
 
+    val generationStatusText: String = "",
+
     val settingsVersion: Int = 0
 )

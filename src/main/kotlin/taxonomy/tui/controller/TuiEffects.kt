@@ -11,6 +11,7 @@ interface TuiEffects {
     fun renameSnapshot(snapshotId: String, newDescription: String, dispatch: (TuiEvent) -> Unit)
     fun deleteSnapshot(snapshotId: String, dispatch: (TuiEvent) -> Unit)
     fun downloadDataset(dispatch: (TuiEvent) -> Unit)
+    fun generateDag(dispatch: (TuiEvent) -> Unit)
 
     fun runBatchJudge(generality: Int, replaceExisting: Boolean)
     fun runArena(query: String, modelA: String, modelB: String)
@@ -99,6 +100,20 @@ class DefaultTuiEffects(
         }
     }
 
+    override fun generateDag(dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            try {
+                gateway.generateDag { progress, text ->
+                    dispatch(TuiEvent.GenerationProgress(progress, text))
+                }
+                dispatch(TuiEvent.GenerationCompleted)
+                dispatch(TuiEvent.IncrementSettingsVersion)
+            } catch (t: Throwable) {
+                dispatch(TuiEvent.GenerationFailed(t.message ?: "DAG generation failed"))
+            }
+        }
+    }
+
     override fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
         scope.launch { gateway.runBatchJudge(generality, replaceExisting) }
     }
@@ -183,6 +198,7 @@ interface TuiGateway {
     suspend fun deleteSnapshot(snapshotId: String)
 
     suspend fun downloadDataset(onProgress: (Float, String) -> Unit)
+    suspend fun generateDag(onProgress: (Float, String) -> Unit)
 
     suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean)
     suspend fun runArena(query: String, modelA: String, modelB: String)
