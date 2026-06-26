@@ -10,6 +10,7 @@ import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
+import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.service.DagSnapshot
 import taxonomy.tui.components.Panel
 
@@ -27,9 +28,9 @@ fun WelcomePanel(
 
             val selectedNew = selectedWelcomeIdx == 0
             Text(
-                text = (if (selectedNew) "> " else "  ") + "Generate new DAG",
+                value = (if (selectedNew) "> " else "  ") + "Generate new DAG",
                 color = if (selectedNew) Cyan else White,
-                textStyle = if (selectedNew) Bold else null
+                textStyle = if (selectedNew) Bold else Unspecified
             )
 
             Spacer()
@@ -38,9 +39,9 @@ fun WelcomePanel(
             snapshots.forEachIndexed { idx, snap ->
                 val selected = selectedWelcomeIdx == idx + 1
                 Text(
-                    text = (if (selected) "> " else "  ") + snap.description,
+                    value = (if (selected) "> " else "  ") + snap.description,
                     color = if (selected) Cyan else White,
-                    textStyle = if (selected) Bold else null
+                    textStyle = if (selected) Bold else Unspecified
                 )
             }
         }

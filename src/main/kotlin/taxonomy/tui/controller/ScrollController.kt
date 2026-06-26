@@ -27,9 +27,9 @@ class ScrollController {
             }
             FocusPanel.ANALYSIS_HUB -> {
                 when (state.analysis.mode) {
-                    AnalysisMode.NODEDETAIL,
+                    AnalysisMode.NODE_DETAIL,
                     AnalysisMode.METRICS,
-                    AnalysisMode.TRICKLETEST,
+                    AnalysisMode.TRICKLE_TEST,
                     AnalysisMode.BENCHMARK -> TuiEvent.ScrollBy(ScrollbarTarget.ANALYSIS, delta)
                     AnalysisMode.SNAPSHOTS -> null
                     else -> null

@@ -380,7 +380,7 @@ object TuiReducer {
             TuiEvent.StartBatchGeneralityInput ->
                 state.copy(
                     analysis = state.analysis.copy(
-                        mode = AnalysisMode.JUDGEPROGRESS,
+                        mode = AnalysisMode.JUDGE_PROGRESS,
                         isEnteringBatchGenerality = true,
                         batchGeneralityInput = "1"
                     ),
@@ -476,7 +476,7 @@ object TuiReducer {
 
             TuiEvent.StartTrickleFlow ->
                 state.copy(
-                    analysis = state.analysis.copy(mode = AnalysisMode.TRICKLETEST),
+                    analysis = state.analysis.copy(mode = AnalysisMode.TRICKLE_TEST),
                     trickle = state.trickle.copy(
                         isEnteringTrickleQuery = true,
                         trickleQueryInput = "",
@@ -675,7 +675,7 @@ object TuiReducer {
 
             ScrollbarTarget.ANALYSIS ->
                 when (state.analysis.mode) {
-                    AnalysisMode.NODEDETAIL ->
+                    AnalysisMode.NODE_DETAIL ->
                         state.copy(
                             analysis = state.analysis.copy(inspectorScroll = safe)
                         )
@@ -685,7 +685,7 @@ object TuiReducer {
                             analysis = state.analysis.copy(metricsScrollOffset = safe)
                         )
 
-                    AnalysisMode.TRICKLETEST ->
+                    AnalysisMode.TRICKLE_TEST ->
                         state.copy(
                             trickle = state.trickle.copy(batchTrickleScrollOffset = safe)
                         )
@@ -754,7 +754,7 @@ object TuiReducer {
 
             ScrollbarTarget.ANALYSIS ->
                 when (state.analysis.mode) {
-                    AnalysisMode.NODEDETAIL ->
+                    AnalysisMode.NODE_DETAIL ->
                         state.copy(
                             analysis = state.analysis.copy(
                                 inspectorScroll = (state.analysis.inspectorScroll + delta).coerceAtLeast(0)
@@ -768,7 +768,7 @@ object TuiReducer {
                             )
                         )
 
-                    AnalysisMode.TRICKLETEST ->
+                    AnalysisMode.TRICKLE_TEST ->
                         state.copy(
                             trickle = state.trickle.copy(
                                 batchTrickleScrollOffset = (state.trickle.batchTrickleScrollOffset + delta).coerceAtLeast(0)

@@ -14,12 +14,12 @@ class CommandController(
             }
 
             TuiEvent.ConfirmSaveSnapshot -> {
-                effects.saveSnapshot(state.snapshots.snapshotDescInput, dispatch)
+                effects.saveSnapshot(state.snapshot.snapshotDescInput, dispatch)
             }
 
             TuiEvent.ConfirmRenameSnapshot -> {
-                val id = state.snapshots.activeSnapshotId ?: return
-                effects.renameSnapshot(id, state.snapshots.renameInput, dispatch)
+                val id = state.snapshot.activeSnapshotId ?: return
+                effects.renameSnapshot(id, state.snapshot.renameInput, dispatch)
             }
 
             is TuiEvent.RequestLoadSnapshot -> {
@@ -41,15 +41,15 @@ class CommandController(
 
             TuiEvent.ConfirmArenaModelBInput -> {
                 effects.runArena(
-                    query = state.analysis.arenaQueryInput,
-                    modelA = state.analysis.arenaModelAInput,
-                    modelB = state.analysis.arenaModelBInput
+                    query = state.arena.arenaQueryInput,
+                    modelA = state.arena.arenaModelAInput,
+                    modelB = state.arena.arenaModelBInput
                 )
             }
 
             TuiEvent.ConfirmTrickleQueryInput -> {
-                if (state.analysis.trickleQueryInput.isNotBlank()) {
-                    effects.runTrickle(state.analysis.trickleQueryInput)
+                if (state.trickle.trickleQueryInput.isNotBlank()) {
+                    effects.runTrickle(state.trickle.trickleQueryInput)
                 }
             }
 
@@ -72,7 +72,7 @@ class CommandController(
     }
 
     fun startTrickle(dispatch: (TuiEvent) -> Unit) {
-        dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.TRICKLETEST))
+        dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.TRICKLE_TEST))
         dispatch(TuiEvent.StartTrickleFlow)
     }
 
