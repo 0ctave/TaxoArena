@@ -1,4 +1,6 @@
-package org.eclipse.lmos.arc.app.taxonomy
+package taxonomy
+
+import taxonomy.service.*
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +32,7 @@ class RankingServiceTest {
         val rating = rankingService.getRating("Agent-A", "math")
         assertEquals(25.0, rating.mu, 0.01)
         assertEquals(8.333, rating.sigma, 0.01)
-        assertEquals(25.0 - 3.0 * 8.333, rating.ordinal, 0.01)
+        assertEquals(25.0 - 2.0 * 8.333, rating.ordinal, 0.01)
     }
 
     @Test

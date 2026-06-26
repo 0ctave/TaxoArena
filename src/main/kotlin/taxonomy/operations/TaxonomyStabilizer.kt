@@ -1,10 +1,10 @@
-package org.eclipse.lmos.arc.app.taxonomy.operations
+package taxonomy.operations
 
-import org.eclipse.lmos.arc.app.taxonomy.GraphNode
-import org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import taxonomy.StatisticsUtils
+import taxonomy.config.TaxonomyConfig
+import taxonomy.model.GraphNode
+import taxonomy.utils.StatisticsUtils
 import kotlin.math.abs
 
 /**
@@ -15,11 +15,14 @@ import kotlin.math.abs
 class TaxonomyStabilizer(
     private val config: TaxonomyConfig
 ) {
-    private val log = LoggerFactory.getLogger(TaxonomyStabilizer::class.java)
+    private val log = LoggerFactory.getLogger("Stabilizer")
 
     private var prevNodes: Set<String>? = null
     private var prevRelations: Set<Pair<String, String>>? = null
     private var prevVolume: Double? = null
+
+    private var consecutiveConvergedCount = 0
+    private val requiredConsecutive = 5
 
     data class StabilizationResult(
         val ged: Int,
@@ -36,6 +39,12 @@ class TaxonomyStabilizer(
         prevNodes = null
         prevRelations = null
         prevVolume = null
+        consecutiveConvergedCount = 0
+    }
+
+    private fun minIterations(root: GraphNode): Int {
+        val domainCount = root.children.size  // depth-1 nodes = domain count
+        return (domainCount * 0.8).toInt().coerceAtLeast(5)
     }
 
     /**
@@ -49,9 +58,9 @@ class TaxonomyStabilizer(
         fun collect(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
             if (visited.contains(node.id)) return
             visited.add(node.id)
-            currentNodes.add(node.label)
+            currentNodes.add(node.id)
             for (child in node.children) {
-                currentRelations.add(node.label to child.label)
+                currentRelations.add(node.id to child.id)
                 collect(child, visited)
             }
         }
@@ -72,31 +81,45 @@ class TaxonomyStabilizer(
         }
 
         // 3. Compute leaf Log-Semantic Volume Minimization
-        val leafNodes = getAllNodes(root).filter { it.isLeaf && it.distribution != null }
-        val currentVolume = leafNodes.sumOf { StatisticsUtils.calculateLogSemanticVolume(it.distribution!!) }
+        val leafNodes = getAllNodes(root).filter { it.isLeaf }
+        val currentVolume = leafNodes.sumOf { StatisticsUtils.calculateLogSemanticVolume(it) }
         
         val volumeDelta = if (prevVolume == null) 0.0 else abs(currentVolume - prevVolume!!)
         val volumeRelativeDelta = if (prevVolume == null || prevVolume == 0.0) 0.0 else volumeDelta / abs(prevVolume!!)
 
         // 4. Decide convergence
         val isFirstIteration = prevVolume == null
-        val isConverged = if (isFirstIteration || !config.formalism.enableEarlyStopping) {
+
+        val totalEdges = countEdges(root).coerceAtLeast(1)
+        val relativeGed = ged.toDouble() / totalEdges
+
+        val singleIterConverged = if (isFirstIteration) {
             false
         } else {
-            ged <= config.formalism.gedThreshold && volumeDelta <= config.formalism.volumeThreshold
+            relativeGed <= config.formalism.gedThreshold
         }
 
-        log.info(
-            "Stabilization Monitor (Iter $iteration): Leaf Log-Volume = ${"%.4f".format(java.util.Locale.US, currentVolume)} " +
-            "(Delta: ${"%.4f".format(java.util.Locale.US, volumeDelta)} / ${"%.4f%%".format(java.util.Locale.US, volumeRelativeDelta * 100.0)}), " +
-            "GED = $ged (Threshold <= ${config.formalism.gedThreshold})"
-        )
-
-        if (isConverged) {
-            log.info("Convergence Met: Taxonomy mixture has stabilized structurally and statistically.")
+        if (iteration < minIterations(root)) {
+            consecutiveConvergedCount = 0
+            prevNodes = currentNodes
+            prevRelations = currentRelations
+            prevVolume = currentVolume
+            return StabilizationResult(ged, currentVolume, volumeDelta, volumeRelativeDelta, false)
         }
 
-        // 5. Store current state for the next check
+        if (singleIterConverged) {
+            consecutiveConvergedCount++
+            log.info("Convergence streak: $consecutiveConvergedCount/$requiredConsecutive")
+        } else {
+            consecutiveConvergedCount = 0
+        }
+
+        val isConverged = config.enableEarlyStopping &&
+                consecutiveConvergedCount >= requiredConsecutive
+
+        if (isConverged) log.info("Convergence Met: Taxonomy mixture has stabilized for $requiredConsecutive consecutive iterations.")
+
+        // Update tracking state for next iteration
         prevNodes = currentNodes
         prevRelations = currentRelations
         prevVolume = currentVolume
@@ -109,5 +132,17 @@ class TaxonomyStabilizer(
         visited.add(node)
         node.children.forEach { getAllNodes(it, visited) }
         return visited
+    }
+
+    fun countEdges(root: GraphNode): Int {
+        val visited = mutableSetOf<String>()
+        var edges = 0
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            edges += node.children.size
+            node.children.forEach { walk(it) }
+        }
+        walk(root)
+        return edges
     }
 }

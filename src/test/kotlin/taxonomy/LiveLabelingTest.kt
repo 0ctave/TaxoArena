@@ -1,8 +1,22 @@
-package org.eclipse.lmos.arc.app.taxonomy
+package taxonomy
 
-import org.eclipse.lmos.arc.app.MMLUDatasetFetcher
-import org.eclipse.lmos.arc.app.taxonomy.operations.TaxonomyLlmClient
-import org.eclipse.lmos.arc.app.taxonomy.operations.TaxonomySplitter
+import taxonomy.*
+import taxonomy.arena.*
+import taxonomy.prompts.*
+import taxonomy.utils.*
+import taxonomy.config.*
+import taxonomy.model.*
+import taxonomy.controller.*
+import taxonomy.service.*
+import taxonomy.dataset.*
+import taxonomy.operations.*
+import taxonomy.tui.*
+import taxonomy.runner.*
+
+import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.operations.TaxonomyLlmClient
+import taxonomy.operations.TaxonomySplitter
+import taxonomy.operations.TaxonomyFitter
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -12,7 +26,6 @@ class LiveLabelingTest {
 
     class TestLlmClient : TaxonomyLlmClient {
         override suspend fun generateClusterLabel(prompt: String): String = ""
-        override suspend fun distillQuery(prompt: String): String = ""
         override suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String = ""
         override suspend fun queryModelStructured(
             modelName: String,
@@ -28,21 +41,25 @@ class LiveLabelingTest {
     fun testLiveLabelingDisabledFlow() = kotlinx.coroutines.runBlocking {
         // 1. Create dependencies
         val config = TaxonomyConfig()
-        config.formalism.enableLiveLabeling = false
+        config.enableLiveLabeling = false
 
         val llmClient = TestLlmClient()
         val datasetFetcher = mock(MMLUDatasetFetcher::class.java)
+        val fitter = mock(TaxonomyFitter::class.java)
 
-        val splitter = TaxonomySplitter(config, llmClient, datasetFetcher)
+        val splitter = TaxonomySplitter(config, llmClient, datasetFetcher, fitter)
 
         // 2. Create a mock taxonomy hierarchy with temporary labels
         val root = GraphNode(id = "root", label = "Universal Knowledge", depth = 0)
-        val child = GraphNode(id = "child", label = "Emergent Concept #1", depth = 1).apply {
+        val parent = GraphNode(id = "parent", label = "Parent Concept", depth = 1)
+        val child = GraphNode(id = "child", label = "Emergent Concept #1", depth = 2).apply {
             queries.add(Embedding("What is computer science?", "What is computer science?", FloatArray(4) { 0.1f }))
             queries.add(Embedding("How does CPU work?", "How does CPU work?", FloatArray(4) { 0.2f }))
         }
-        root.children.add(child)
-        child.parents.add(root)
+        root.children.add(parent)
+        parent.parents.add(root)
+        parent.children.add(child)
+        child.parents.add(parent)
 
         // 3. Run post-pass labeling
         splitter.resetConceptCounter()

@@ -1,136 +1,105 @@
-package org.eclipse.lmos.arc.app.taxonomy.operations
+package taxonomy.operations
 
-import kotlinx.coroutines.*
-import org.eclipse.lmos.arc.app.taxonomy.Embedding
-import org.eclipse.lmos.arc.app.taxonomy.GmmParams
-import org.eclipse.lmos.arc.app.taxonomy.GraphNode
-import org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import taxonomy.StatisticsUtils
-import taxonomy.TaxoPrompts
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.*
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 import dev.langchain4j.model.chat.request.json.JsonSchema
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.coroutines.*
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import taxonomy.config.TaxonomyConfig
+import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.model.*
+import taxonomy.prompts.TaxoPrompts
+import taxonomy.utils.StatisticsUtils
+import kotlin.math.sqrt
 
 /**
- * Implements Phase 5: Optimize (Parenting, Merging & Pruning).
+ * Implements Phase 5: Optimize (Structural Refinement).
  * Polishes the DAG by deleting empty nodes, combining highly similar sibling domains,
  * creating polyhierarchical cross-links, and enforcing strict transitive reduction.
- * Adjusted to utilize the Thermodynamic Formalism parameters (tauFit, tauReparent, tauMerge).
+ *
+ * KEY CHANGE: Cross-link edges are now stored in GraphNode.crossLinkChildren, not in
+ * GraphNode.children. This preserves isLeaf = children.isEmpty() for the tree structure,
+ * so the trickler correctly distributes queries to all real leaf nodes.
  */
 @Service
 class TaxonomyMerger(
     private val config: TaxonomyConfig,
     private val llmClient: TaxonomyLlmClient,
-    private val datasetFetcher: org.eclipse.lmos.arc.app.MMLUDatasetFetcher
+    private val datasetFetcher: MMLUDatasetFetcher
 ) {
-    private val log = LoggerFactory.getLogger(TaxonomyMerger::class.java)
+
+    private var cachedAncestorMap: Map<String, Set<String>>? = null
+    private var ancestorMapRootId: String? = null
+
+    private val log = LoggerFactory.getLogger("Merger")
 
     suspend fun optimizeHierarchy(root: GraphNode) {
-        // 1. Prune dead or starved nodes (Bottom-Up)
         pruneUnrelevantNodes(root)
- 
-        // 2. Sibling Reparenting & Overarching Synthesis
-        synthesizeOverarchingDomains(root)
- 
-        // 3. Merge highly overlapping siblings
         mergeSimilarSiblings(root)
- 
-        // 4. Global Redundancy Merging (Cross-branch deduplication)
-        mergeGlobalRedundancies(root)
- 
-        // 5. Parenting (Cross-linking across branches)
-        evaluateCrossLinks(root)
- 
-        // 6. Prune passthrough nodes (Collapse single-child chains)
-        prunePassthroughNodes(root)
- 
-        // 8. Final Clean: Prune any starved/empty leaf nodes created during optimization passes
+
+        val ancestorMap = buildAncestorMap(root)  // ← build once
+        evaluateCrossLinks(root, ancestorMap)
+
+        do {} while (prunePassthroughNodes(root))
         pruneUnrelevantNodes(root)
- 
-        // 7. Global Transitive Reduction (Guarantee DAG topological purity)
-        transitiveReduction(root)
+        removeStaleParentRefs(root)
+
+        invalidateAncestorCache()
+        val ancestorMapFinal = buildAncestorMap(root)  // ← rebuild after structural changes
+        transitiveReduction(root, ancestorMapFinal)
     }
 
-    private suspend fun mergeGlobalRedundancies(root: GraphNode) = coroutineScope {
-        val allNodes = getAllNodes(root).filter { it.depth > 0 && it.distribution != null }.toList()
-        if (allNodes.size < 2) return@coroutineScope
-
-        log.info("Checking for global semantic redundancies across ${allNodes.size} nodes...")
-
-        val mergedIds = ConcurrentHashMap.newKeySet<String>()
-
-        for (i in 0 until allNodes.size) {
-            val nodeA = allNodes[i]
-            if (mergedIds.contains(nodeA.id)) continue
-
-            val redundancies = (i + 1 until allNodes.size).chunked(50).map { chunk ->
-                async(Dispatchers.Default) {
-                    chunk.mapNotNull { j ->
-                        val nodeB = allNodes[j]
-                        val gmmB = nodeB.distribution ?: return@mapNotNull null
-                        if (isDescendant(nodeA, nodeB) || isDescendant(nodeB, nodeA)) return@mapNotNull null
-
-                        val similarity = StatisticsUtils.gmmSimilarity(nodeA.distribution!!, gmmB)
-                        val sizeA = nodeA.getRecursiveQueryCount()
-                        val sizeB = nodeB.getRecursiveQueryCount()
-                        val sizeRatio = minOf(sizeA, sizeB).toDouble() / maxOf(sizeA, sizeB).toDouble().coerceAtLeast(1.0)
-                        val effectiveTauMerge = config.formalism.tauMerge - (0.05 * (1.0 - sizeRatio))
-                        if (similarity >= effectiveTauMerge) {
-                            nodeB to similarity
-                        } else null
-                    }
-                }
-            }.awaitAll().flatten()
-
-            for ((nodeB, similarity) in redundancies) {
-                if (!mergedIds.contains(nodeB.id)) {
-                    log.info(
-                        "[REDUNDANCY] Fusing '${nodeB.label}' into '${nodeA.label}' (Similarity: ${"%.4f".format(java.util.Locale.US, similarity)})"
-                    )
-                    fuseNodes(nodeA, nodeB)
-                    mergedIds.add(nodeB.id)
-                }
-            }
-        }
+    fun prunePassthroughNodesPublic(root: GraphNode) {
+        do {} while (prunePassthroughNodes(root))
     }
 
-    private fun blendGmmParams(distributions: List<GmmParams>): GmmParams? {
-        val validDists = distributions.filter { it.components.isNotEmpty() }
-        if (validDists.isEmpty()) return null
-        if (validDists.size == 1) return validDists[0]
-        
-        val totalSamples = validDists.sumOf { it.totalSamples }.toDouble().coerceAtLeast(1.0)
-        val blendedComponents = validDists.flatMap { dist ->
-            val weightMultiplier = dist.totalSamples.toDouble() / totalSamples
-            dist.components.map { c ->
-                c.copy(weight = c.weight * weightMultiplier)
-            }
+    private fun blendVmfAndNiw(target: GraphNode, source: GraphNode) {
+        val nA = target.getRecursiveQueryCount().toDouble().coerceAtLeast(1.0)
+        val nB = source.getRecursiveQueryCount().toDouble().coerceAtLeast(1.0)
+        val d = target.sliceDim
+
+        // vMF Blend
+        val mu = FloatArray(d) { i ->
+            (nA * target.vmfMu[i] + nB * source.vmfMu[i]).toFloat()
         }
-        val maxEmpiricalThreshold = validDists.maxOf { it.empiricalThreshold }
-        return GmmParams(blendedComponents, maxEmpiricalThreshold)
+        var norm = 0.0
+        for (i in 0 until d) norm += mu[i] * mu[i]
+        norm = sqrt(norm)
+        if (norm > 0.0) {
+            for (i in 0 until d) mu[i] = (mu[i] / norm).toFloat()
+        } else if (d > 0) {
+            mu[0] = 1.0f
+        }
+        target.vmfMu = mu
+        target.vmfKappa = (nA * target.vmfKappa + nB * source.vmfKappa) / (nA + nB)
+        target.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, target.vmfKappa)
+
+        // NiW Blend
+        target.niwKappa0 = (nA * target.niwKappa0 + nB * source.niwKappa0) / (nA + nB)
+        target.niwNu0 = (nA * target.niwNu0 + nB * source.niwNu0) / (nA + nB)
+        val mN = FloatArray(d) { i ->
+            ((nA * target.niwM0[i] + nB * source.niwM0[i]) / (nA + nB)).toFloat()
+        }
+        target.niwM0 = mN
+        val lambdaN = FloatArray(d) { i ->
+            ((nA * target.niwLambda[i] + nB * source.niwLambda[i]) / (nA + nB)).toFloat()
+        }
+        target.niwLambda = lambdaN
     }
 
     private fun fuseNodes(target: GraphNode, source: GraphNode) {
+        require(target.sliceDim == source.sliceDim) {
+            "Cannot fuse nodes at different dims: ${target.label}(${target.sliceDim}) vs ${source.label}(${source.sliceDim})"
+        }
+
         // 1. Combine queries
         target.queries.addAll(source.queries)
 
-        // 2. Statistical GMM blend (Weighted component combination)
-        val distA = target.distribution
-        val distB = source.distribution
-        val blended = if (distA != null && distB != null) {
-            blendGmmParams(listOf(distA, distB))
-        } else distA ?: distB
+        // 2. Blend parameters
+        blendVmfAndNiw(target, source)
 
-        target.distribution = blended
-
-        // 3. Redirect parents
-        source.parents.forEach { parent ->
+        // 3. Redirect tree parents with defensive copy
+        source.parents.toList().forEach { parent ->
             if (parent != target) {
                 parent.children.remove(source)
                 parent.children.add(target)
@@ -138,8 +107,8 @@ class TaxonomyMerger(
             }
         }
 
-        // 4. Redirect children
-        source.children.forEach { child ->
+        // 4. Redirect tree children with defensive copy
+        source.children.toList().forEach { child ->
             if (child != target) {
                 child.parents.remove(source)
                 child.parents.add(target)
@@ -147,9 +116,19 @@ class TaxonomyMerger(
             }
         }
 
-        // 5. Clean up source
+        // 5. Redirect cross-link children (FIX: also handle crossLinkChildren)
+        source.crossLinkChildren.toList().forEach { child ->
+            if (child != target) {
+                child.parents.remove(source)
+                child.parents.add(target)
+                target.crossLinkChildren.add(child)
+            }
+        }
+
+        // 6. Clean up source
         source.parents.clear()
         source.children.clear()
+        source.crossLinkChildren.clear()
         source.queries.clear()
     }
 
@@ -162,170 +141,52 @@ class TaxonomyMerger(
             pruneUnrelevantNodes(child, visited)
         }
 
-        // RELEVANCE GUARD: Identify nodes that are "starved" or semantically insignificant.
-        val nodesToPrune = node.children.filter { child ->
-            val totalQueriesInBranch = gatherAllEmbeddingsInBranch(child).size
-            
-            val isStarved = child.isLeaf && totalQueriesInBranch < 5
-            val isEmptyParent = !child.isLeaf && child.children.isEmpty()
-            val isDeadLeaf = child.isLeaf && child.queries.isEmpty()
+        // Cache branch-query counts once per child — getAllQueriesInBranch() is O(subtree).
+        val branchSizes = node.children.associateWith { it.getAllQueriesInBranch().size }
 
-            isStarved || isEmptyParent || isDeadLeaf
+        val nodesToPrune = node.children.filter { child ->
+            val totalQueriesInBranch = branchSizes[child] ?: 0
+            val isTrulyDead = totalQueriesInBranch == 0
+
+            val liveSiblings = node.children.filter { (branchSizes[it] ?: 0) > 0 }
+            val siblingAvg = if (liveSiblings.size > 1)
+                liveSiblings.map { branchSizes[it] ?: 0 }.average()
+            else
+                node.children.map { branchSizes[it] ?: 0 }.average()
+
+            val isStarved = child.isLeaf && totalQueriesInBranch < (siblingAvg * 0.2).coerceAtLeast(5.0)
+            val isEmptyParent = !child.isLeaf && child.children.isEmpty()
+
+            val wouldLeaveParentSingleChild = (node.children.size - 1) <= 1
+
+            isTrulyDead || ((isStarved || isEmptyParent) && !wouldLeaveParentSingleChild)
         }
 
         if (nodesToPrune.isNotEmpty()) {
             nodesToPrune.forEach { target ->
-                log.info("[PRUNED] '${target.label}' (Reason: Starved or Empty)")
+                if (target.parents.isEmpty() && !node.children.contains(target)) return@forEach  // already pruned this pass
+                log.info("[PRUNED] '${target.label}' (starved/empty)")
                 node.queries.addAll(target.queries)
                 node.children.remove(target)
                 target.parents.remove(node)
-                target.parents.forEach { p -> p.children.remove(target) }
+                // Clean up crossLinkChildren back-refs (Problem 10)
+                target.parents.toList().forEach { p ->
+                    p.children.remove(target)
+                    p.crossLinkChildren.remove(target)
+                }
+                target.crossLinkChildren.toList().forEach { clChild ->
+                    clChild.parents.remove(target)
+                    if (clChild.treeParentId == target.id) clChild.treeParentId = null
+                }
+                target.crossLinkChildren.clear()
                 target.children.forEach { c -> c.parents.remove(target) }
+                target.children.clear()
             }
         }
-    }
-
-    private suspend fun synthesizeOverarchingDomains(
-        node: GraphNode, 
-        visited: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
-    ) {
-        if (visited.contains(node.id)) return
-        visited.add(node.id)
-
-        val children = node.children.toList()
-        coroutineScope {
-            children.map { child ->
-                async(Dispatchers.Default) {
-                    synthesizeOverarchingDomains(child, visited)
-                }
-            }
-        }.awaitAll()
-
-        if (children.size < 2) return
-
-        // 1. Identify pairs with high symmetric overlap in parallel
-        val pairs = coroutineScope {
-            val jobs = mutableListOf<Deferred<Pair<GraphNode, GraphNode>?>>()
-            for (i in 0 until children.size) {
-                for (j in i + 1 until children.size) {
-                    val nodeA = children[i]
-                    val nodeB = children[j]
-                    jobs.add(async(Dispatchers.Default) {
-                        val gmmA = nodeA.distribution ?: return@async null
-                        val gmmB = nodeB.distribution ?: return@async null
-                        val avgDb = gmmA.components.map { cA ->
-                            gmmB.components.minOf { cB ->
-                                StatisticsUtils.bhattacharyyaDistance(cA.mean!!, cA.diagonalCovariance!!, cB.mean!!, cB.diagonalCovariance!!)
-                            }
-                        }.average()
-                        if (avgDb < 0.4) {
-                            nodeA to nodeB
-                        } else null
-                    })
-                }
-            }
-            jobs.awaitAll().filterNotNull()
-        }
-
-        if (pairs.isEmpty()) return
-
-        // Group highly overlapping siblings using Union-Find to handle multi-node overlapping groups
-        val uf = UnionFind(children)
-        for ((nodeA, nodeB) in pairs) {
-            uf.union(nodeA, nodeB)
-        }
-
-        val clusters = children.groupBy { uf.find(it) }.values.filter { it.size > 1 }
-        if (clusters.isEmpty()) return
-
-        log.info("[SYNTHESIS] Found ${clusters.size} overarching groups under parent '${node.label}'. Synthesizing hypernyms...")
-
-        // 2. Synthesize Overarching Parents concurrently
-        val synthesizedParents = coroutineScope {
-            clusters.map { cluster ->
-                async(Dispatchers.Default) {
-                    val samples = cluster.flatMap { gatherAllEmbeddingsInBranch(it) }
-                        .distinctBy { it.rawText }
-                        .shuffled()
-                        .take(20)
-                        .map { it.rawText }
-
-                    val domainAnchors = samples.mapNotNull { question ->
-                        datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
-                            word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-                        }
-                    }.groupBy { it }.mapValues { it.value.size }
-                        .entries.sortedByDescending { it.value }
-                        .map { "${it.key} (${it.value} queries)" }
-
-                    val prompt = TaxoPrompts.clusterLabeling(
-                        querySamples = samples,
-                        parentLabel = node.label,
-                        siblingLabels = node.children.filter { it !in cluster }.map { it.label },
-                        branchHistory = emptyList(),
-                        domainAnchors = domainAnchors,
-                        depth = node.depth + 1
-                    )
-
-                    val labelSchema = JsonSchema.builder()
-                        .name("ClusterLabel")
-                        .rootElement(
-                            JsonObjectSchema.builder()
-                                .addStringProperty("label", "A concise, domain-specific label for the concept cluster (3-7 words)")
-                                .required("label")
-                                .build()
-                        )
-                        .build()
-                    val jsonResponse = llmClient.queryModelStructured(
-                        modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
-                        systemPrompt = null,
-                        userPrompt = prompt,
-                        schema = labelSchema
-                    )
-                    val hypernym = try {
-                        Json.parseToJsonElement(jsonResponse).jsonObject["label"]?.jsonPrimitive?.content
-                            ?: cluster.joinToString(" / ") { it.label }
-                    } catch (e: Exception) {
-                        log.warn("Structured hypernym parse failed. Raw: $jsonResponse")
-                        cluster.joinToString(" / ") { it.label }
-                    }
-                    
-                    Triple(cluster, hypernym, blendGmmParams(cluster.mapNotNull { it.distribution }))
-                }
-            }.awaitAll()
-        }
-
-        // 3. Apply fusions in a single pass sequentially
-        for ((cluster, hypernym, combinedGmm) in synthesizedParents) {
-            log.info("[SYNTHESIS] Synthesized: Hypernym '$hypernym' for group ${cluster.map { it.label }}")
-
-            val newParent = GraphNode(label = hypernym, depth = node.depth + 1)
-            newParent.distribution = combinedGmm
-
-            // Remove cluster children from parent, add newParent
-            for (child in cluster) {
-                node.children.remove(child)
-                child.parents.remove(node)
-                
-                newParent.children.add(child)
-                child.parents.add(newParent)
-            }
-            node.children.add(newParent)
-            newParent.parents.add(node)
-        }
-    }
-
-    private fun gatherAllEmbeddingsInBranch(node: GraphNode, visited: MutableSet<String> = mutableSetOf()): List<Embedding> {
-        if (visited.contains(node.id)) return emptyList()
-        visited.add(node.id)
-        val result = mutableListOf<Embedding>()
-        result.addAll(node.queries)
-        node.children.forEach { result.addAll(gatherAllEmbeddingsInBranch(it, visited)) }
-        return result
     }
 
     private suspend fun mergeSimilarSiblings(
-        node: GraphNode, 
+        node: GraphNode,
         visited: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
     ) {
         if (visited.contains(node.id)) return
@@ -345,24 +206,27 @@ class TaxonomyMerger(
 
         log.debug("Evaluating sibling merges for parent '${node.label}' with ${children.size} children...")
 
-        // 1. Parallel pairwise GMM similarity calculations
+        // 1. Parallel pairwise vMF JS-divergence calculations
+        val siblingMergeThreshold = config.formalism.separationEpsilon
         val pairsToMerge = coroutineScope {
             val jobs = mutableListOf<Deferred<Triple<GraphNode, GraphNode, Double>?>>()
             for (i in 0 until children.size) {
                 for (j in i + 1 until children.size) {
                     val nodeA = children[i]
                     val nodeB = children[j]
+                    if (nodeA.vmfMu.isEmpty() || nodeB.vmfMu.isEmpty()) continue
                     jobs.add(async(Dispatchers.Default) {
-                        val gmmA = nodeA.distribution ?: return@async null
-                        val gmmB = nodeB.distribution ?: return@async null
-                        val similarity = StatisticsUtils.gmmSimilarity(gmmA, gmmB)
-                        val sizeA = nodeA.getRecursiveQueryCount()
-                        val sizeB = nodeB.getRecursiveQueryCount()
-                        val sizeRatio = minOf(sizeA, sizeB).toDouble() / maxOf(sizeA, sizeB).toDouble().coerceAtLeast(1.0)
-                        val effectiveTauMerge = config.formalism.tauMerge - (0.05 * (1.0 - sizeRatio))
-                        if (similarity >= effectiveTauMerge) {
-                            Triple(nodeA, nodeB, similarity)
-                        } else null
+                        val commonDim = minOf(nodeA.vmfMu.size, nodeB.vmfMu.size)
+                        val muA = StatisticsUtils.projectVector(nodeA.vmfMu, commonDim)
+                        val muB = StatisticsUtils.projectVector(nodeB.vmfMu, commonDim)
+                        val div = StatisticsUtils.vmfJsDivergence(
+                            muA,
+                            nodeA.vmfKappa,
+                            muB,
+                            nodeB.vmfKappa,
+                            commonDim
+                        )
+                        if (div < siblingMergeThreshold) Triple(nodeA, nodeB, div) else null
                     })
                 }
             }
@@ -377,147 +241,99 @@ class TaxonomyMerger(
             uf.union(nodeA, nodeB)
         }
 
-        // Group children by their representative root in Union-Find
         val clusters = children.groupBy { uf.find(it) }.values.filter { it.size > 1 }
         if (clusters.isEmpty()) return
 
-        log.info("[MERGE] Found ${clusters.size} merge groups under parent '${node.label}'. Invoking LLM labeling...")
+        log.info("[MERGE] Found ${clusters.size} groups under '${node.label}'")
 
-        // 3. Concurrent LLM hypernym labeling via coroutines
-        val mergedNodes = coroutineScope {
-            clusters.map { cluster ->
-                async(Dispatchers.Default) {
-                    val combinedQueries = cluster.flatMap { it.queries }.distinctBy { it.rawText }
-                    
-                    val label = if (combinedQueries.isNotEmpty()) {
-                        // Stratified sampling
-                        val dims = combinedQueries[0].dimensions
-                        val centroid = DoubleArray(dims)
-                        for (emb in combinedQueries) {
-                            for (d in 0 until dims) centroid[d] += emb.values[d].toDouble()
-                        }
-                        for (d in 0 until dims) centroid[d] /= combinedQueries.size.toDouble()
+        for (cluster in clusters) {
+            val target = cluster[0]
+            val sources = cluster.subList(1, cluster.size)
+            val combinedQueries = cluster.flatMap { it.queries }.distinctBy { it.rawText }
 
-                        val sortedByDistance = combinedQueries.map { it to calculateCosineDistance(it.toDoubleArray(), centroid) }
-                            .sortedBy { it.second }
-
-                        val representativeSamples = (sortedByDistance.take(10).map { it.first.rawText } + 
-                                                     sortedByDistance.takeLast(10).map { it.first.rawText }).distinct()
-
-                        val lineage = mutableListOf<String>()
-                        var curr: GraphNode? = node
-                        val visitedLineage = mutableSetOf<String>()
-                        while (curr != null && visitedLineage.add(curr.id)) {
-                            lineage.add(0, curr.label)
-                            curr = curr.parents.firstOrNull()
-                        }
-
-                        val domainAnchors = representativeSamples.mapNotNull { question ->
-                            datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
-                                word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-                            }
-                        }.groupBy { it }.mapValues { it.value.size }
-                            .entries.sortedByDescending { it.value }
-                            .map { "${it.key} (${it.value} queries)" }
-
-                        val prompt = TaxoPrompts.clusterLabeling(
-                            querySamples = representativeSamples,
-                            parentLabel = node.label,
-                            siblingLabels = node.children.filter { it !in cluster }.map { it.label },
-                            branchHistory = lineage,
-                            domainAnchors = domainAnchors,
-                            depth = node.depth + 1
-                        )
-
-                        val labelSchema = JsonSchema.builder()
-                            .name("ClusterLabel")
-                            .rootElement(
-                                JsonObjectSchema.builder()
-                                    .addStringProperty("label", "A concise, domain-specific label for the concept cluster (3-7 words)")
-                                    .required("label")
-                                    .build()
-                            )
-                            .build()
-                        val jsonResponse = llmClient.queryModelStructured(
-                            modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
-                            systemPrompt = null,
-                            userPrompt = prompt,
-                            schema = labelSchema
-                        )
-                        try {
-                            Json.parseToJsonElement(jsonResponse).jsonObject["label"]?.jsonPrimitive?.content
-                                ?: cluster.joinToString(" & ") { it.label }
-                        } catch (e: Exception) {
-                            log.warn("Structured merge label parse failed. Raw: $jsonResponse")
-                            cluster.joinToString(" & ") { it.label }
-                        }
-                    } else {
-                        cluster.joinToString(" & ") { it.label }
+            val newLabel = if (config.execution.enableLiveLabeling && config.execution.enableLabeling && combinedQueries.isNotEmpty()) {
+                val representativeSamples = selectRepresentativeQueries(combinedQueries)
+                val siblingLabels = node.children.filter { it !in cluster }.mapNotNull { it.label }
+                val lineage = mutableListOf<String>()
+                var curr: GraphNode? = node
+                val visitedLineage = mutableSetOf<String>()
+                while (curr != null && visitedLineage.add(curr.id)) {
+                    lineage.add(0, curr.label ?: "Emergent Concept")
+                    curr = curr.parents.firstOrNull()
+                }
+                val domainAnchors = representativeSamples.mapNotNull { question ->
+                    datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
+                        word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                     }
-                    
-                    Triple(cluster, combinedQueries, label)
-                }
-            }.awaitAll()
-        }
+                }.groupBy { it }.mapValues { it.value.size }
+                    .entries.sortedByDescending { it.value }
+                    .map { "${it.key} (${it.value} queries)" }
 
-        // 4. Apply fusions in a single pass sequentially
-        for ((cluster, combinedQueries, newLabel) in mergedNodes) {
-            log.info("[MERGE] Merged: ${cluster.map { it.label }} -> '$newLabel'")
-            
-            // Create the new merged node
-            val mergedNode = GraphNode(label = newLabel, depth = node.depth + 1)
-            mergedNode.queries.addAll(combinedQueries)
+                val prompt = TaxoPrompts.clusterLabeling(
+                    querySamples = representativeSamples,
+                    parentLabel = node.label ?: "Universal Knowledge",
+                    siblingLabels = siblingLabels,
+                    branchHistory = lineage,
+                    domainAnchors = domainAnchors,
+                    depth = node.depth + 1
+                )
 
-            // Statistical GMM Blend of the cluster
-            val validGmmList = cluster.mapNotNull { it.distribution }
-            mergedNode.distribution = blendGmmParams(validGmmList)
-
-            // Redirect children of all nodes in the cluster to the mergedNode
-            val allChildren = cluster.flatMap { it.children }
-                .filter { it !in cluster }
-                .toSet()
-
-            for (child in allChildren) {
-                for (srcNode in cluster) {
-                    child.parents.remove(srcNode)
-                }
-                child.parents.add(mergedNode)
-                mergedNode.children.add(child)
+                val labelSchema = JsonSchema.builder()
+                    .name("ClusterLabel")
+                    .rootElement(
+                        JsonObjectSchema.builder()
+                            .addStringProperty(
+                                "label",
+                                "A concise, domain-specific label for the concept cluster (3-7 words)"
+                            )
+                            .required("label")
+                            .build()
+                    )
+                    .build()
+                val jsonResponse = llmClient.queryModelStructured(
+                    modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
+                    systemPrompt = null,
+                    userPrompt = prompt,
+                    schema = labelSchema
+                )
+                TaxoPrompts.parseClusterLabel(jsonResponse)
+                    ?: cluster.joinToString(" & ") { it.label ?: "" }
+            } else {
+                cluster.joinToString(" & ") { it.label ?: "" }
             }
 
-            // Redirect parents of all nodes in the cluster to the mergedNode
-            val rawParents = cluster.flatMap { it.parents }
-                .filter { it !in cluster }
-                .toSet()
+            log.info("[MERGE] Fused ${cluster.map { it.label }} -> '$newLabel'")
+            target.label = newLabel
 
-            // Filter parent list: remove parent nodes that are already ancestors of other parents in rawParents
-            val optimizedParents = rawParents.filter { p1 ->
-                !rawParents.any { p2 -> p1.id != p2.id && isDescendant(p1, p2) }
-            }
-
-            for (p in rawParents) {
-                for (srcNode in cluster) {
-                    p.children.remove(srcNode)
-                }
-            }
-
-            for (p in optimizedParents) {
-                p.children.add(mergedNode)
-                mergedNode.parents.add(p)
-            }
-
-            // Explicitly clean up all merged source nodes to avoid memory leaks
-            for (srcNode in cluster) {
-                srcNode.parents.clear()
-                srcNode.children.clear()
-                srcNode.queries.clear()
+            for (source in sources) {
+                fuseNodes(target, source)
             }
         }
     }
 
+    private fun selectRepresentativeQueries(cluster: List<Embedding>): List<String> {
+        if (cluster.isEmpty()) return emptyList()
+        val dims = cluster[0].dimensions
+        val centroid = DoubleArray(dims)
+        for (emb in cluster) {
+            for (d in 0 until dims) centroid[d] += emb.values[d].toDouble()
+        }
+        for (d in 0 until dims) centroid[d] /= cluster.size.toDouble()
+
+        val sortedByDistance = cluster.map { it to calculateCosineDistance(it.toDoubleArray(), centroid) }
+            .sortedBy { it.second }
+
+        val n = sortedByDistance.size
+        val innerCore = sortedByDistance.take(n / 10).shuffled().take(7)
+        val middleShell = sortedByDistance.subList(n / 10, (9 * n) / 10).shuffled().take(7)
+        val outerBoundary = sortedByDistance.takeLast(n / 10).shuffled().take(6)
+
+        return (innerCore + middleShell + outerBoundary).map { it.first.rawText }.distinct()
+    }
+
     private class UnionFind(nodes: List<GraphNode>) {
         private val parentMap = nodes.associateWith { it }.toMutableMap()
-        
+
         fun find(n: GraphNode): GraphNode {
             var curr = n
             while (parentMap[curr] != curr) {
@@ -526,7 +342,7 @@ class TaxonomyMerger(
             }
             return curr
         }
-        
+
         fun union(n1: GraphNode, n2: GraphNode) {
             val root1 = find(n1)
             val root2 = find(n2)
@@ -536,180 +352,237 @@ class TaxonomyMerger(
         }
     }
 
-    private fun calculateGmmCentroid(gmm: GmmParams): DoubleArray? {
-        val validComponents = gmm.components.filter { it.mean != null }
-        if (validComponents.isEmpty()) return null
-        
-        val firstMean = validComponents.first().mean ?: return null
-        val dims = firstMean.size
-        val centroid = DoubleArray(dims)
-        var totalWeight = 0.0
-        
-        for (comp in validComponents) {
-            val mean = comp.mean ?: continue
-            val weight = comp.weight
-            for (d in 0 until dims) {
-                centroid[d] += mean[d] * weight
-            }
-            totalWeight += weight
-        }
-        
-        if (totalWeight > 0.0) {
-            for (d in 0 until dims) {
-                centroid[d] /= totalWeight
-            }
-        }
-        return centroid
+    private fun getDepth1Ancestor(
+        node: GraphNode,
+        ancestorMap: Map<String, Set<String>>,
+        allNodeById: Map<String, GraphNode>
+    ): String? {
+        // The node itself if it's at depth 1
+        if (node.depth == 1) return node.id
+        // Otherwise find the ancestor at depth 1
+        return ancestorMap[node.id]
+            ?.mapNotNull { allNodeById[it] }
+            ?.firstOrNull { it.depth == 1 }
+            ?.id
     }
 
-    private suspend fun evaluateCrossLinks(root: GraphNode) = coroutineScope {
+    /**
+     * FIX (Bug 12): Cross-links are stored in crossLinkChildren, NOT in children.
+     *
+     * Before this fix: potentialParent.children.add(node) caused isLeaf = false on
+     * any node that received a cross-link, routing all trickled queries to the one
+     * node with a genuinely empty children set.
+     *
+     * After this fix: isLeaf = children.isEmpty() is unaffected by cross-links.
+     * All tree leaf nodes remain leaves. The trickler distributes correctly.
+     */
+    private suspend fun evaluateCrossLinks(root: GraphNode, ancestorMap: Map<String, Set<String>>) {
         val allNodes = getAllNodes(root).filter { it.depth > 0 }
+        val allNodeById = allNodes.associateBy { it.id }
 
-        for (node in allNodes) {
-            val nodeGmm = node.distribution ?: continue
-            val nodeCentroid = calculateGmmCentroid(nodeGmm) ?: continue
-
-            val potentialParents = allNodes.filter { potentialParent ->
-                node != potentialParent &&
-                        !node.parents.contains(potentialParent) &&
-                        !isDescendant(node, potentialParent) &&
-                        !isDescendant(potentialParent, node) &&
-                        potentialParent.depth <= node.depth &&
-                        (node.depth - potentialParent.depth) <= 3 &&
-                        potentialParent.distribution?.let { parentGmm ->
-                            calculateGmmCentroid(parentGmm)?.let { parentCentroid ->
-                                calculateCosineDistance(nodeCentroid, parentCentroid) <= 0.48
-                            }
-                        } ?: false
-            }
-
-            if (potentialParents.isEmpty()) continue
-
-            val crossLinks = potentialParents.chunked(50).map { chunk ->
+        coroutineScope {
+            allNodes.map { node ->
                 async(Dispatchers.Default) {
-                    chunk.mapNotNull { potentialParent ->
-                        val parentGmm = potentialParent.distribution ?: return@mapNotNull null
+                    val directQueries = node.queries.toList()
+                    if (directQueries.isEmpty() || directQueries.size < config.formalism.minClusterSize) return@async
 
-                        // Use the new Asymmetric Entailment Scorer
-                        val entailmentScore = StatisticsUtils.calculateEntailmentScore(
-                            nodeGmm, parentGmm, config.formalism.inclusionScalingFactor
-                        )
+                    // Fast pre-check: low-kappa nodes won't win majority vote
+                    if (node.vmfKappa < 0.5) return@async
 
-                        // If the score exceeds tauReparent, the child is likely a sub-concept of this parent
-                        if (entailmentScore >= config.formalism.tauReparent) {
-                             potentialParent to entailmentScore
-                        } else null
+                    val potentialParents = allNodes.filter { pp ->
+                        node != pp &&
+                                !node.parents.contains(pp) &&
+                                pp.id !in (ancestorMap[node.id] ?: emptySet()) &&
+                                node.id !in (ancestorMap[pp.id] ?: emptySet()) &&
+                                pp.depth <= node.depth &&
+                                (node.depth - pp.depth) <= 3 &&
+                                getDepth1Ancestor(node, ancestorMap, allNodeById) !=
+                                getDepth1Ancestor(pp, ancestorMap, allNodeById)
                     }
-                }
-            }.awaitAll().flatten()
 
-            for ((potentialParent, score) in crossLinks) {
-                log.info(
-                    "Cross-linked '${node.label}' -> '${potentialParent.label}' (Entailment: ${"%.4f".format(java.util.Locale.US, score)})"
-                )
-                node.parents.add(potentialParent)
-                potentialParent.children.add(node)
-
-                // Clean up redundant shortcuts created by cross-linking
-                val redundantParents = node.parents.filter { p ->
-                    p.id != potentialParent.id && isDescendant(p, potentialParent)
+                    val links = mutableListOf<String>()
+                    for (pp in potentialParents) {
+                        var votes = 0
+                        for (q in directQueries) {
+                            val slicedA = q.projectTo(node.sliceDim)
+                            val slicedB = q.projectTo(pp.sliceDim)
+                            val cosA = StatisticsUtils.dotProduct(slicedA, node.vmfMu)
+                            val cosB = StatisticsUtils.dotProduct(slicedB, pp.vmfMu)
+                            if (cosB - cosA > 0.05) votes++
+                        }
+                        if (votes >= directQueries.size / 2) {
+                            links.add("'${node.label}' -> '${pp.label}'($votes/${directQueries.size})")
+                            synchronized(node) { node.parents.add(pp) }
+                            synchronized(pp) { pp.crossLinkChildren.add(node) }
+                        }
+                    }
+                    if (links.isNotEmpty()) log.info("[XL] Crosslinked: ${links.joinToString(", ")}")
                 }
-
-                for (rp in redundantParents) {
-                    log.info("Cross-link Reduction: Severed redundant parent '${rp.label}' from '${node.label}'")
-                    node.parents.remove(rp)
-                    rp.children.remove(node)
-                }
-            }
+            }.awaitAll()
         }
     }
 
-    private fun transitiveReduction(root: GraphNode) {
+    /**
+     * FIX: transitiveReduction must consider BOTH children and crossLinkChildren.
+     * Tree parent protection (treeParentId) still applies.
+     * Redundant parents are removed from BOTH sets.
+     */
+    private fun transitiveReduction(root: GraphNode, ancestorMap: Map<String, Set<String>>) {
         val allNodes = getAllNodes(root)
+        var keptEdges = 0
+        var severedShortcuts = 0
         for (node in allNodes) {
             val redundantParents = node.parents.filter { p1 ->
-                node.parents.any { p2 -> p1.id != p2.id && isDescendant(p1, p2) }
+                if (node.treeParentId == p1.id) {
+                    keptEdges++
+                    return@filter false
+                }
+                // Safe lookup: if p1 or p2 is not in ancestorMap (stale ref), treat as non-redundant
+                val p1Ancestors = ancestorMap[p1.id] ?: return@filter false
+                node.parents.any { p2 ->
+                    p1.id != p2.id && p1.id in (ancestorMap[p2.id] ?: emptySet())
+                }
             }
-
             for (rp in redundantParents) {
-                log.info("Transitive Reduction: Severed redundant shortcut '${rp.label}' -> '${node.label}'")
+                severedShortcuts++
                 node.parents.remove(rp)
                 rp.children.remove(node)
+                rp.crossLinkChildren.remove(node)
+            }
+        }
+        if (severedShortcuts > 0) {
+            log.info("[TR] Severed $severedShortcuts shortcuts ($keptEdges edges kept)")
+        } else {
+            log.debug("[TR] Severed $severedShortcuts shortcuts ($keptEdges edges kept)")
+        }
+    }
+
+    /**
+     * Removes any parent references that point to nodes no longer in the DAG.
+     * Must run after pruning/collapsing and before transitiveReduction.
+     */
+    private fun removeStaleParentRefs(root: GraphNode) {
+        val allNodes = getAllNodes(root)
+        val allIds = allNodes.map { it.id }.toSet()
+        for (node in allNodes) {
+            val stale = node.parents.filter { it.id !in allIds }
+            for (s in stale) {
+                log.debug("[STALE-REF] Removing ghost parent '${s.label}' from '${node.label}'")
+                node.parents.remove(s)
             }
         }
     }
 
-    private fun prunePassthroughNodes(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
-        if (visited.contains(node.id)) return
+    private fun prunePassthroughNodes(node: GraphNode, visited: MutableSet<String> = mutableSetOf()): Boolean {
+        if (visited.contains(node.id)) return false
         visited.add(node.id)
 
-        val currentChildren = node.children.toList()
+        var anyPruned = false
+
+        val currentChildren = node.treeChildren.toList()
         for (child in currentChildren) {
-            prunePassthroughNodes(child, visited)
+            if (prunePassthroughNodes(child, visited)) anyPruned = true
         }
 
-        // Identify passthrough nodes: 
-        // 1. Exactly 1 child AND (0 queries OR statistically identical to child)
-        // 2. Not the Root node
-        val nodesToBypass = node.children.filter { child ->
-            if (child.children.size != 1 || child.depth == 0) return@filter false
-            
-            val grandchild = child.children.first()
-            val sim = child.distribution?.let { cGmm ->
-                grandchild.distribution?.let { gGmm ->
-                    StatisticsUtils.gmmSimilarity(cGmm, gGmm)
-                }
-            } ?: 0.0
-            
-            child.queries.isEmpty() || (sim > 0.98 && child.queries.size < 50)
+        val nodesToBypass = node.treeChildren.filter { child ->
+            if (child.treeChildren.size != 1 || child.depth <= 1) return@filter false
+            val grandchild = child.treeChildren.first()
+
+            val commonDim = minOf(child.sliceDim, grandchild.sliceDim)
+            val mu1 = StatisticsUtils.projectVector(child.vmfMu, commonDim)
+            val mu2 = StatisticsUtils.projectVector(grandchild.vmfMu, commonDim)
+            val div = StatisticsUtils.vmfJsDivergence(mu1, child.vmfKappa, mu2, grandchild.vmfKappa, commonDim)
+
+            div < config.formalism.separationEpsilon && child.queries.size < config.formalism.minClusterSize
         }
+
+        if (nodesToBypass.isNotEmpty()) anyPruned = true
 
         for (passthrough in nodesToBypass) {
-            val grandchild = passthrough.children.first()
-            log.info("Collapsed Chain: '${passthrough.label}' -> '${grandchild.label}'")
-            
-            // Move any residual queries
+            val grandchild = passthrough.treeChildren.first()
+            log.info("[COLLAPSE] '${passthrough.label}' -> '${grandchild.label}'")
+
+            // Move residual queries down
             grandchild.queries.addAll(passthrough.queries)
-            
-            // Redirect parent (node) to grandchild
+
+            // Re-parent grandchild under node (the passthrough's parent)
             node.children.remove(passthrough)
             node.children.add(grandchild)
-            
+
+            grandchild.treeParentId = node.id
+
             grandchild.parents.remove(passthrough)
             grandchild.parents.add(node)
-            
-            // Handle other parents
-            passthrough.parents.forEach { p ->
+
+            recomputeDepths(grandchild, node.depth + 1)
+
+            // Handle passthrough's other tree parents
+            passthrough.parents.toList().forEach { p ->
                 if (p != node) {
                     p.children.remove(passthrough)
                     p.children.add(grandchild)
                     grandchild.parents.add(p)
                 }
             }
-            
+
+            passthrough.crossLinkChildren.toList().forEach { clChild ->
+                clChild.parents.remove(passthrough)
+                // Only add if grandchild is not already a tree/cross-link parent of clChild
+                if (!clChild.parents.contains(grandchild)) {
+                    clChild.parents.add(grandchild)
+                    grandchild.crossLinkChildren.add(clChild)  // ← cross-link, NOT children
+                }
+            }
+
             passthrough.parents.clear()
             passthrough.children.clear()
+            passthrough.crossLinkChildren.clear()
             passthrough.queries.clear()
         }
+
+        return anyPruned
     }
 
+    /**
+     * FIX: getAllNodes must walk BOTH children AND crossLinkChildren so that
+     * cross-linked nodes are included in ancestor maps and transitive reduction.
+     */
     private fun getAllNodes(node: GraphNode, visited: MutableSet<GraphNode> = mutableSetOf()): Set<GraphNode> {
         if (visited.contains(node)) return visited
         visited.add(node)
         node.children.forEach { getAllNodes(it, visited) }
+        node.crossLinkChildren.forEach { getAllNodes(it, visited) }
         return visited
     }
 
-    private fun isDescendant(
-        node: GraphNode,
-        potentialDescendant: GraphNode,
-        visited: MutableSet<String> = mutableSetOf()
-    ): Boolean {
-        if (node.id == potentialDescendant.id) return true
-        if (visited.contains(node.id)) return false
-        visited.add(node.id)
-        return node.children.any { isDescendant(it, potentialDescendant, visited) }
+    private fun buildAncestorMap(root: GraphNode): Map<String, Set<String>> {
+        if (root.id == ancestorMapRootId && cachedAncestorMap != null) {
+            return cachedAncestorMap!!
+        }
+
+        val ancestorMap = mutableMapOf<String, Set<String>>()
+        val allNodes = getAllNodes(root)
+
+        for (node in allNodes) {
+            val ancestors = mutableSetOf<String>()
+            fun collect(n: GraphNode) {
+                n.parents.forEach { parent ->
+                    if (ancestors.add(parent.id)) {
+                        collect(parent)
+                    }
+                }
+            }
+            collect(node)
+            ancestorMap[node.id] = ancestors
+        }
+
+        cachedAncestorMap = ancestorMap
+        ancestorMapRootId = root.id
+
+        return ancestorMap
     }
+
+    fun invalidateAncestorCache() { cachedAncestorMap = null }
 
 
     private fun calculateCosineDistance(v1: DoubleArray, v2: DoubleArray): Double {
@@ -723,5 +596,18 @@ class TaxonomyMerger(
         }
         val similarity = if (norm1 > 0 && norm2 > 0) dotProduct / (sqrt(norm1) * sqrt(norm2)) else 0.0
         return 1.0 - similarity
+    }
+
+    private fun recomputeDepths(node: GraphNode, newDepth: Int, visited: MutableSet<String> = mutableSetOf()) {
+        if (!visited.add(node.id)) return
+        val oldSliceDim = node.sliceDim
+        node.depth = newDepth
+        node.sliceDim = dimForDepth(newDepth)
+        // If the embedding dimension changed, the stored vmfMu is the wrong size.
+        // Clear PHASE_VMF_FIT so the fitter recomputes it before the next split/trickle.
+        if (node.sliceDim != oldSliceDim) {
+            node.phaseCompleted = node.phaseCompleted and PHASE_VMF_FIT.inv()
+        }
+        node.children.forEach { recomputeDepths(it, newDepth + 1, visited) }
     }
 }

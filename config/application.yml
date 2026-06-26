@@ -46,10 +46,10 @@ taxoadapt:
     run-batch: false
     calibrate: false
     start-service: true
-    num-iterations: 5
-    enable-distillation: false
+    num-iterations: 15
     enable-visualization: false
     enable-tui: true
+    enable-live-labeling: false
 
   dataset:
     sample: 12000
@@ -60,7 +60,7 @@ taxoadapt:
   llm:
     provider: AZURE
     embedding-provider: OLLAMA
-    embedding-model: "embeddinggemma:latest"
+    embedding-model: "qwen3-embedding:latest"
     judge-model: "Mistral-Large-3"
     labeling-model: "Mistral-Large-3"
     max-judge-generality: 1  # 0=leaves only, 1=leaves+parents, 2=leaves+parents+grandparents
@@ -74,40 +74,17 @@ taxoadapt:
       embedding-deployment-name: ""
       api-version: "2024-02-15-preview"
 
-  persistence:
-    load-path: "taxonomy_final.json"
-    save-path: "taxonomy_final.json"
-
   # --- Advanced Mathematical Formalism Controls ---
 
   formalism:
     # Graph Limits
-    max-depth: 6
+    max-depth: 8
+    min-cluster-size: 25
+    separation-epsilon: 0.02
+    cosine-tau: 5.0
+    assignment-margin: 1.0
+    ema-alpha: 0.7
+    ged-threshold: 0.005
+    volume-threshold: 0.0001
+    enable-early-stopping: true
 
-    # Hysteresis Likeness Factors (Probabilities)
-    tau-fit: 0.88
-    tau-reparent: 0.80
-    tau-merge: 0.92
-    
-    # Balanced: 1.2 scaling allows API queries to pass restrictive gates
-    inclusion-scaling-factor: 1.2
-
-    # Context-Aware Density (Depth Decay)
-    split-base-threshold: 25
-    depth-decay-lambda: 0.08
-
-    # Splitting Compression (p-BIC)
-    p-bic-lambda: 0.005
-
-    # GMM / HMM Multi-Centroid Parameters
-    max-centroids-per-node: 3
-    relative-max-size: 0.7
-
-    # Branching Control (Set to <= 0 for all viable)
-    max-trickle-branches: -1
-
-    max-assignments-per-query: 2
-
-    # MRL Routing configuration
-    enable-mrl: true
-    fixed-mrl-dimension: 384

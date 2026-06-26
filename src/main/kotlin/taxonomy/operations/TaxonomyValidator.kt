@@ -1,12 +1,12 @@
-package org.eclipse.lmos.arc.app.taxonomy.operations
+package taxonomy.operations
 
-import org.eclipse.lmos.arc.app.taxonomy.GraphNode
-import org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import kotlinx.serialization.json.*
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 import dev.langchain4j.model.chat.request.json.JsonSchema
+import kotlinx.serialization.json.*
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import taxonomy.config.TaxonomyConfig
+import taxonomy.model.GraphNode
 
 /**
  * Executes a thorough automatic evaluation suite using the configured judge model to determine the quality of the
@@ -20,7 +20,7 @@ class TaxonomyValidator(
     private val config: TaxonomyConfig,
     private val llmClient: TaxonomyLlmClient
 ) {
-    private val log = LoggerFactory.getLogger(TaxonomyValidator::class.java)
+    private val log = LoggerFactory.getLogger("Validator")
     private val json = Json { ignoreUnknownKeys = true }
 
     // --- Pre-built reusable schemas ---

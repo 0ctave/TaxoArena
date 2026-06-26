@@ -1,4 +1,8 @@
-package org.eclipse.lmos.arc.app.taxonomy
+package taxonomy
+
+import taxonomy.arena.*
+import taxonomy.model.*
+import taxonomy.service.*
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
@@ -8,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.sql.DriverManager
 
-@SpringBootTest(properties = [
-    "taxoadapt.execution.enable-tui=false",
-    "taxoadapt.execution.run-batch=false",
-    "taxoadapt.execution.start-service=false"
-])
+@SpringBootTest(
+    classes = [org.eclipse.lmos.arc.app.TaxoAdaptApplication::class],
+    properties = [
+        "taxoadapt.execution.enable-tui=false",
+        "taxoadapt.execution.run-batch=false",
+        "taxoadapt.execution.start-service=false"
+    ]
+)
 class TournamentSimulatorTest {
 
     @Autowired

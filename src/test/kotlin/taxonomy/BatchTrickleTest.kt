@@ -1,17 +1,33 @@
-package org.eclipse.lmos.arc.app.taxonomy
+package taxonomy
 
-import org.eclipse.lmos.arc.app.MMLUDatasetFetcher
-import org.eclipse.lmos.arc.app.taxonomy.operations.TaxonomyTrickler
+import taxonomy.*
+import taxonomy.arena.*
+import taxonomy.prompts.*
+import taxonomy.utils.*
+import taxonomy.config.*
+import taxonomy.model.*
+import taxonomy.controller.*
+import taxonomy.service.*
+import taxonomy.dataset.*
+import taxonomy.operations.*
+import taxonomy.tui.*
+import taxonomy.runner.*
+
+import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.operations.TaxonomyTrickler
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest(properties = [
-    "taxoadapt.execution.enable-tui=false",
-    "taxoadapt.execution.run-batch=false",
-    "taxoadapt.execution.start-service=false"
-])
+@SpringBootTest(
+    classes = [org.eclipse.lmos.arc.app.TaxoAdaptApplication::class],
+    properties = [
+        "taxoadapt.execution.enable-tui=false",
+        "taxoadapt.execution.run-batch=false",
+        "taxoadapt.execution.start-service=false"
+    ]
+)
 class BatchTrickleTest {
 
     @Autowired

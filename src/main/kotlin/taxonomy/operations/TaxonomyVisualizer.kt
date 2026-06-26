@@ -1,11 +1,11 @@
-package org.eclipse.lmos.arc.app.taxonomy.operations
+package taxonomy.operations
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.eclipse.lmos.arc.app.taxonomy.GraphNode
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import taxonomy.model.GraphNode
 import java.io.File
 
 @Serializable
@@ -45,7 +45,7 @@ data class TaxonomyExport(
 
 @Service
 class TaxonomyVisualizer {
-    private val log = LoggerFactory.getLogger(TaxonomyVisualizer::class.java)
+    private val log = LoggerFactory.getLogger("Visualizer")
     
     // CRITICAL: Disable prettyPrint for massive numeric exports to prevent hanging
     private val json = Json { 
@@ -53,7 +53,7 @@ class TaxonomyVisualizer {
         encodeDefaults = true 
     }
 
-    fun exportForVisualization(root: GraphNode, groundTruthMap: Map<String, Set<String>> = emptyMap(), fileName: String = "taxonomy_visualization.json") {
+    fun exportForVisualization(root: GraphNode, groundTruthMap: Map<String, List<String>> = emptyMap(), fileName: String = "taxonomy_visualization.json") {
         log.info("Exporting taxonomy for UMAP visualization to $fileName (Fast-Export Mode)...")
         
         val nodes = mutableListOf<VisualNode>()
@@ -67,21 +67,24 @@ class TaxonomyVisualizer {
             if (visited.contains(node.id)) return
             visited.add(node.id)
 
-            val gmmComps = node.distribution?.components?.map { comp ->
-                // Matryoshka Truncation: Take only the first 1024 dimensions
-                val truncatedMean = FloatArray(minOf(comp.mean!!.size, 1024)) { comp.mean!![it].toFloat() }
-                val truncatedVar = FloatArray(minOf(comp.diagonalCovariance!!.size, 1024)) { comp.diagonalCovariance!![it].toFloat() }
-                VisualGmmComponent(
+            val gmmComps = if (node.vmfMu.isNotEmpty()) {
+                val truncatedMean = FloatArray(minOf(node.vmfMu.size, 1024)) { node.vmfMu[it] }
+                val truncatedVar = if (node.niwLambda.isNotEmpty()) {
+                    FloatArray(minOf(node.niwLambda.size, 1024)) { node.niwLambda[it] }
+                } else {
+                    FloatArray(truncatedMean.size) { 1.0f }
+                }
+                listOf(VisualGmmComponent(
                     mean = truncatedMean,
                     diagonalCovariance = truncatedVar,
-                    weight = comp.weight,
-                    sampleCount = comp.sampleCount
-                )
-            } ?: emptyList()
+                    weight = 1.0,
+                    sampleCount = node.queries.size
+                ))
+            } else emptyList()
 
             nodes.add(VisualNode(
                 id = node.id,
-                label = node.label,
+                label = node.label ?: node.id,
                 depth = node.depth,
                 isLeaf = node.isLeaf,
                 parentIds = node.parents.map { it.id },
@@ -102,7 +105,7 @@ class TaxonomyVisualizer {
                     distilled = emb.distilledText,
                     vector = truncatedVector,
                     assignedNodeId = node.id,
-                    assignedNodeLabel = node.label,
+                    assignedNodeLabel = node.label ?: node.id,
                     originalCategories = originals
                 ))
             }

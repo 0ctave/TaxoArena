@@ -1,28 +1,31 @@
-package org.eclipse.lmos.arc.app.taxonomy.operations
+package taxonomy.operations
 
-import org.eclipse.lmos.arc.app.LLMProvider
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import kotlinx.serialization.json.*
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
-import kotlinx.coroutines.*
-import org.eclipse.lmos.arc.app.taxonomy.GenerationMonitor
-import dev.langchain4j.model.chat.StreamingChatModel
-import dev.langchain4j.model.ollama.OllamaStreamingChatModel
-import dev.langchain4j.model.azure.AzureOpenAiStreamingChatModel
-import dev.langchain4j.model.chat.response.StreamingChatResponseHandler
-import dev.langchain4j.model.chat.response.ChatResponse
-import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.SystemMessage
+import dev.langchain4j.data.message.UserMessage
+import dev.langchain4j.model.azure.AzureOpenAiStreamingChatModel
+import dev.langchain4j.model.chat.StreamingChatModel
 import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.request.ResponseFormat
 import dev.langchain4j.model.chat.request.ResponseFormatType
-import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 import dev.langchain4j.model.chat.request.json.JsonSchema
+import dev.langchain4j.model.chat.response.ChatResponse
+import dev.langchain4j.model.chat.response.StreamingChatResponseHandler
+import dev.langchain4j.model.ollama.OllamaStreamingChatModel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import taxonomy.config.LLMProvider
+import taxonomy.config.LlmProviderType
+import taxonomy.config.TaxonomyConfig
+import taxonomy.utils.GenerationMonitor
 import java.util.concurrent.ConcurrentHashMap
-import java.io.PrintStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration.Companion.milliseconds
@@ -32,7 +35,6 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 interface TaxonomyLlmClient {
     suspend fun generateClusterLabel(prompt: String): String
-    suspend fun distillQuery(prompt: String): String
     suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String
 
     /**
@@ -64,19 +66,21 @@ class ArcTaxonomyLLMClient(
     @org.springframework.beans.factory.annotation.Value("\${arc.ollama.num-ctx:8192}") private val defaultNumCtx: Int,
     @org.springframework.beans.factory.annotation.Value("\${arc.ollama.max-parallel:4}") private val maxParallel: Int,
     private val monitor: GenerationMonitor,
-    private val config: org.eclipse.lmos.arc.app.taxonomy.TaxonomyConfig
+    private val config: TaxonomyConfig
 ) : TaxonomyLlmClient {
-    private val log = LoggerFactory.getLogger(ArcTaxonomyLLMClient::class.java)
+    private val log = LoggerFactory.getLogger("LLMClient")
     private val httpClient = java.net.http.HttpClient.newHttpClient()
     private val json = Json { ignoreUnknownKeys = true }
 
     private val semaphore = Semaphore(maxParallel)
     private val streamingModelCache = ConcurrentHashMap<String, StreamingChatModel>()
- 
+
+    private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     private suspend fun getStreamingModel(modelName: String): StreamingChatModel {
         return streamingModelCache[modelName] ?: withContext(Dispatchers.IO) {
             streamingModelCache.computeIfAbsent(modelName) { name ->
-                if (config.llm.provider == org.eclipse.lmos.arc.app.taxonomy.LlmProviderType.AZURE) {
+                if (config.llm.provider == LlmProviderType.AZURE) {
                     log.info("Initializing Azure OpenAI Streaming connection for deployment '$name' at ${config.llm.azure.endpoint}")
                     AzureOpenAiStreamingChatModel.builder()
                         .endpoint(config.llm.azure.endpoint)
@@ -162,18 +166,17 @@ class ArcTaxonomyLLMClient(
                 }
                 
                 // Keep the slot visible for a few seconds if it's a TUI request
-                GlobalScope.launch {
+                clientScope.launch {
                     delay(3000.milliseconds)
                     monitor.removeSlot(slot)
                 }
-                
+
                 return@withPermit responseText
 
             } catch (e: Exception) {
                 monitor.releaseSlot(slot)
                 monitor.removeSlot(slot)
-                log.error("Streaming failure for '$modelName'", e)
-                return@withPermit "Error: ${e.message}"
+                throw e
             }
         }
     }
@@ -257,9 +260,6 @@ class ArcTaxonomyLLMClient(
             else config.llm.labelingModel
     }
 
-    override suspend fun distillQuery(prompt: String): String {
-        return queryModel(getEffectiveModelName(), null, prompt)
-    }
 
     override suspend fun generateClusterLabel(prompt: String): String {
         return queryModel(getEffectiveModelName(), null, prompt)
