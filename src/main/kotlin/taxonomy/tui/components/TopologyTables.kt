@@ -41,9 +41,10 @@ fun DomainSelectorTable(
             val (name, count) = domains[i]
             val checked = allSelected || selectedDomains.contains(name)
             val selected = i == selectedIdx
-            val mark = if (checked) "[x]" else "[ ]"
+            val mark = if (checked) "\u2611" else "\u2610" // ☑ / ☐
+            val caret = if (selected) "\u276f " else "  "      // ❯
             Text(
-                value = (if (selected) "> " else "  ") + "$mark $name ($count)",
+                value = (caret + "$mark $name ($count)").take((pWidth - 1).coerceAtLeast(1)),
                 color = if (selected) Cyan else if (checked) Green else White,
                 textStyle = if (selected) Bold else Unspecified
             )
@@ -74,7 +75,7 @@ fun AsciiTreeTable(
             val selected = i == selectedIdx
             Text(
                 buildAnnotatedString {
-                    append(if (selected) "> " else "  ")
+                    append(if (selected) "\u276f " else "  ") // ❯
                     append(line.text)
                 }.take((pWidth - 1).coerceAtLeast(1)),
                 color = when {

@@ -99,7 +99,16 @@ sealed interface TuiEvent {
     data class UpdateEditingValue(val value: String) : TuiEvent
     data object IncrementSettingsVersion : TuiEvent
 
-    data object StartDatasetDownload : TuiEvent
+    // Download is a two-step flow: prompt for a query count (blank = full dataset),
+    // then start the actual download with that count.
+    // Seeds runtime.isDatasetDownloaded from the on-disk dataset cache at startup.
+    data object RefreshDatasetStatus : TuiEvent
+    data object RefreshArenaModels : TuiEvent
+    data class DatasetStatusLoaded(val downloaded: Boolean) : TuiEvent
+    data object PromptDatasetDownload : TuiEvent
+    data class UpdateDownloadCountInput(val value: String) : TuiEvent
+    data object CancelDatasetDownload : TuiEvent
+    data class StartDatasetDownload(val maxQueries: Int) : TuiEvent
     data class DatasetDownloadProgress(
         val progress: Float,
         val statusText: String

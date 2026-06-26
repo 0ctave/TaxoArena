@@ -21,6 +21,15 @@ class CommandController(
                 effects.refreshSnapshots(dispatch)
             }
 
+            TuiEvent.RefreshDatasetStatus -> {
+                effects.refreshDatasetStatus(dispatch)
+            }
+
+            // Refreshes the precomputed eval roster (used to gate Arena/Benchmark entry).
+            TuiEvent.RefreshArenaModels -> {
+                effects.loadArenaModels(dispatch)
+            }
+
             TuiEvent.ConfirmSaveSnapshot -> {
                 effects.saveSnapshot(state.snapshot.snapshotDescInput, dispatch)
             }
@@ -38,8 +47,8 @@ class CommandController(
                 effects.deleteSnapshot(event.snapshotId, dispatch)
             }
 
-            TuiEvent.StartDatasetDownload -> {
-                effects.downloadDataset(dispatch)
+            is TuiEvent.StartDatasetDownload -> {
+                effects.downloadDataset(event.maxQueries, dispatch)
             }
 
             TuiEvent.StartGeneration -> {
@@ -73,17 +82,21 @@ class CommandController(
                 effects.runBatchJudge(generality, state.analysis.batchReplaceExisting)
             }
 
-            TuiEvent.ConfirmArenaModelBInput -> {
-                if (state.arena.usePrecomputed) {
-                    val qId = state.arena.arenaQuestionIdInput.trim().toIntOrNull()
-                    if (qId != null) {
-                        effects.runArenaPrecomputed(
-                            questionId = qId,
-                            modelA = state.arena.arenaModelAInput,
-                            modelB = state.arena.arenaModelBInput
-                        )
-                    }
-                } else {
+            // Models-first flow: the run fires on the FINAL input. In precomputed mode that's
+            // the question_id; in live mode it's the free-text query.
+            TuiEvent.ConfirmArenaQuestionIdInput -> {
+                val qId = state.arena.arenaQuestionIdInput.trim().toIntOrNull()
+                if (qId != null) {
+                    effects.runArenaPrecomputed(
+                        questionId = qId,
+                        modelA = state.arena.arenaModelAInput,
+                        modelB = state.arena.arenaModelBInput
+                    )
+                }
+            }
+
+            TuiEvent.ConfirmArenaQueryInput -> {
+                if (state.arena.arenaQueryInput.isNotBlank()) {
                     effects.runArena(
                         query = state.arena.arenaQueryInput,
                         modelA = state.arena.arenaModelAInput,
