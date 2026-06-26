@@ -39,7 +39,7 @@ arc:
         url: http://localhost:11434
 
 huggingface:
-  token: ***REMOVED***
+  token: ${HUGGINGFACE_TOKEN:}
 
 taxoadapt:
   execution:
@@ -65,11 +65,11 @@ taxoadapt:
     labeling-model: "Mistral-Large-3"
     max-judge-generality: 1  # 0=leaves only, 1=leaves+parents, 2=leaves+parents+grandparents
     gemini:
-      api-key: ""
+      api-key: ${GEMINI_API_KEY:}
       model-name: "gemini-1.5-flash"
     azure:
-      endpoint: "***REMOVED***"
-      api-key: "***REMOVED***"
+      endpoint: ${AZURE_AI_ENDPOINT:}
+      api-key: ${AZURE_AI_API_KEY:}
       deployment-name: "Mistral-Large-3"
       embedding-deployment-name: ""
       api-version: "2024-02-15-preview"
