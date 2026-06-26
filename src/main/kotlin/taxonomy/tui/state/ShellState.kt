@@ -12,6 +12,7 @@ enum class FocusPanel {
     TOPOLOGY,
     ANALYSIS_HUB,
     SYSTEM_LOGS,
+    PROCESSES,
     CONFIG
 }
 

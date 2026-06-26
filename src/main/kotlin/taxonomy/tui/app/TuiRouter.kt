@@ -18,8 +18,11 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.model.GraphNode
 import taxonomy.tui.components.DomainSelectorTable
 import taxonomy.tui.components.Panel
+import taxonomy.tui.components.ProcessRow
+import taxonomy.tui.components.ProcessesPanel
 import taxonomy.tui.components.ProgressBar
 import taxonomy.tui.components.StartupState
+import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.TuiTheme.SPINNER
 import taxonomy.tui.components.VDivider
 import taxonomy.tui.controller.TuiEvent
@@ -298,7 +301,7 @@ private fun MainDashboardRoute(
 
     Spacer()
 
-    BottomLogsAndTraces(width, bottomH, deps, state)
+    BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
 
     Text("Tab switch panels  W/S navigate  Enter select  X welcome", color = White)
 }
@@ -309,14 +312,16 @@ private fun BottomLogsAndTraces(
     bottomH: Int,
     deps: TuiDependencies,
     state: TuiAppState,
+    subscriptions: TuiSubscriptions? = null,
 ) {
     Row(modifier = Modifier.height(bottomH)) {
-        val logsW = (width * 0.60).toInt().coerceAtLeast(20)
-        val traceW = (width - logsW - 1).coerceAtLeast(16)
+        // Logs and live processes share the bottom region 50/50 (side by side).
+        val logsW = (width * 0.55).toInt().coerceAtLeast(20)
+        val procW = (width - logsW - 1).coerceAtLeast(16)
 
         Panel(
             title = "SYSTEM LOGS",
-            accentColor = if (state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS) Cyan else White,
+            accentColor = TuiTheme.panelAccent(state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS),
             width = logsW,
             height = bottomH
         ) {
@@ -325,23 +330,96 @@ private fun BottomLogsAndTraces(
 
         VDivider(bottomH, White, Cyan)
 
-        Panel(title = "GPU TRACES", accentColor = White, width = traceW - 1, height = bottomH) {
-            Column(modifier = Modifier.padding(left = 1, top = 1)) {
-                val slots = deps.monitor.activeSlots
-                if (slots.isEmpty()) {
-                    Text("Idle ${SPINNER[state.shell.spinnerTick % SPINNER.size]}", color = Yellow)
-                } else {
-                    slots.values.take((bottomH - 2).coerceAtLeast(1)).forEach { slot ->
-                        Text(
-                            "${slot.modelName} (${slot.tokenCount}t): ${slot.text.takeLast(traceW - 12)}",
-                            color = if (slot.isComplete) Green else White
-                        )
-                    }
-                }
-            }
+        Panel(
+            title = "PROCESSES",
+            accentColor = TuiTheme.panelAccent(state.shell.focusedPanel == FocusPanel.PROCESSES),
+            width = procW - 1,
+            height = bottomH
+        ) {
+            ProcessesPanel(
+                width = procW - 4,
+                height = bottomH - 2,
+                rows = deriveProcessRows(deps, state, subscriptions),
+                spinnerTick = state.shell.spinnerTick,
+            )
         }
     }
 }
+
+/**
+ * Collect every active (or just-finished) process from the various service
+ * sources into one uniform list for the [ProcessesPanel].
+ */
+private fun deriveProcessRows(
+    deps: TuiDependencies,
+    state: TuiAppState,
+    subscriptions: TuiSubscriptions?,
+): List<ProcessRow> {
+    val rows = mutableListOf<ProcessRow>()
+
+    // Dataset download.
+    if (state.config.downloadingDataset) {
+        rows += ProcessRow(
+            name = "Dataset download",
+            percent = state.config.datasetDownloadProgress * 100.0,
+            status = state.config.datasetDownloadStatusText,
+        )
+    }
+
+    // Embedding compute (Pair<current,total>).
+    (subscriptions?.embeddingProgress as? Pair<*, *>)?.let { (cur, total) ->
+        val c = (cur as? Int) ?: 0; val t = (total as? Int) ?: 0
+        if (t > 0 && c < t) rows += ProcessRow(
+            name = "Embedding queries",
+            percent = c.toDouble() / t * 100.0,
+            status = "$c / $t",
+        )
+    }
+
+    // DAG generation / iteration (rich GenerationProgress).
+    if (state.runtime.isRegenerating || subscriptions?.generationProgress != null) {
+        val pct = extractPercent(subscriptions?.generationProgress)
+        rows += ProcessRow(
+            name = "DAG generation",
+            percent = pct,
+            status = extractStatus(subscriptions?.generationProgress),
+            done = pct >= 100.0 && !state.runtime.isRegenerating,
+        )
+    }
+
+    // Node labeling (Pair<current,total>).
+    (subscriptions?.labelingProgress as? Pair<*, *>)?.let { (cur, total) ->
+        val c = (cur as? Int) ?: 0; val t = (total as? Int) ?: 0
+        if (t > 0 && c < t) rows += ProcessRow(
+            name = "Labeling nodes",
+            percent = c.toDouble() / t * 100.0,
+            status = "$c / $t",
+        )
+    }
+
+    // Judge / GPU inference slots.
+    deps.monitor.activeSlots.values.forEach { slot ->
+        rows += ProcessRow(
+            name = "Judge ${slot.modelName}",
+            percent = null,
+            status = "${slot.tokenCount}t ${slot.text.takeLast(24)}",
+            done = slot.isComplete,
+        )
+    }
+
+    return rows
+}
+
+private fun extractStatus(progress: Any?): String =
+    when (progress) {
+        null -> ""
+        else -> try {
+            val m = progress::class.java.methods.firstOrNull { it.name == "getStatusText" }
+            (m?.invoke(progress) as? String) ?: ""
+        } catch (_: Throwable) {
+            ""
+        }
+    }
 
 private fun extractPercent(progress: Any?): Double =
     when (progress) {

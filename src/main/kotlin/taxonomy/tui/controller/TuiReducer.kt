@@ -35,7 +35,8 @@ object TuiReducer {
                         focusedPanel = when (state.shell.focusedPanel) {
                             FocusPanel.TOPOLOGY -> FocusPanel.ANALYSIS_HUB
                             FocusPanel.ANALYSIS_HUB -> FocusPanel.SYSTEM_LOGS
-                            FocusPanel.SYSTEM_LOGS -> FocusPanel.CONFIG
+                            FocusPanel.SYSTEM_LOGS -> FocusPanel.PROCESSES
+                            FocusPanel.PROCESSES -> FocusPanel.TOPOLOGY
                             FocusPanel.CONFIG -> FocusPanel.TOPOLOGY
                         }
                     )
