@@ -17,6 +17,8 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.model.GraphNode
 import taxonomy.tui.components.DomainSelectorTable
+import taxonomy.tui.components.HotkeyAction
+import taxonomy.tui.components.HotkeyBar
 import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.ProcessesPanel
@@ -116,7 +118,15 @@ private fun WelcomeRoute(
         }
     }
 
-    Text("Use W/S to choose, Enter to select.", color = White)
+    HotkeyBar(
+        width,
+        listOf(
+            HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
+            HotkeyAction("Enter", "Select", TuiTheme.ACCENT, isPrimary = true),
+            HotkeyAction("D", "Delete Snapshot"),
+            HotkeyAction("Q", "Quit"),
+        )
+    )
 }
 
 @Composable
@@ -127,7 +137,10 @@ private fun LoadingRoute(
 ) {
     val contentH = (height - 4).coerceAtLeast(4)
     LoadingPanel(width = width - 2, height = contentH, spinnerTick = state.shell.spinnerTick)
-    Text("Please wait while the active taxonomic graph is restored...", color = White)
+    HotkeyBar(
+        width,
+        listOf(HotkeyAction("...", "Restoring active taxonomic graph", TuiTheme.RUNNING))
+    )
 }
 
 @Composable
@@ -138,8 +151,12 @@ private fun ConfigRoute(
     state: TuiAppState,
     subscriptions: TuiSubscriptions,
 ) {
-    val topH = ((height - 4) * 0.62).toInt().coerceAtLeast(10)
-    val bottomH = (height - 4 - topH).coerceAtLeast(5)
+    // Vertical budget: shell already draws Header(1) + 2 rules(2). This route then adds a
+    // Spacer(1) and a footer(1), so the panels must fit in (height - 5) to keep the header
+    // and bottom rule on-screen. Under-counting here scrolls the header off the top.
+    val bodyH = (height - 5).coerceAtLeast(9)
+    val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+    val bottomH = (bodyH - topH).coerceAtLeast(4)
     val leftW = (width * 0.35).toInt().coerceAtLeast(20)
     val rightW = (width - leftW - 1).coerceAtLeast(20)
 
@@ -150,10 +167,11 @@ private fun ConfigRoute(
     }
 
     if (state.runtime.isRegenerating) {
-        Panel("TAXONOMY GENERATION IN PROGRESS", Cyan, width - 2, topH) {
+        // Generation spans the full body so progress + live status are front-and-center.
+        Panel("TAXONOMY GENERATION IN PROGRESS", Cyan, width - 2, topH + bottomH + 1) {
             Column(modifier = Modifier.padding(left = 2, top = 1)) {
                 Text(
-                    "Running Adaptive Taxonomy Evolution in 4096-D Embedding Space...",
+                    "Running Adaptive Taxonomy Evolution in 4096-D embedding space...",
                     color = White,
                     textStyle = Bold
                 )
@@ -162,6 +180,19 @@ private fun ConfigRoute(
                     percent = extractPercent(subscriptions.generationProgress),
                     width = (width - 25).coerceIn(20, 80),
                     label = "Generation Progress"
+                )
+                Spacer()
+                Text(
+                    "Status  ${extractStatus(subscriptions.generationProgress)
+                        .ifBlank { state.config.generationStatusText }}",
+                    color = Cyan
+                )
+                Spacer()
+                Text("Dataset  ${deps.config.dataset.datasetType.name}", color = White)
+                val selDomains = deps.config.dataset.selectedDomains
+                Text(
+                    "Domains  " + if (selDomains.isEmpty()) "all" else selDomains.joinToString(", "),
+                    color = White
                 )
             }
         }
@@ -241,15 +272,13 @@ private fun ConfigRoute(
 
     Spacer()
 
-    BottomLogsAndTraces(width, bottomH, deps, state)
+    // While generating, the in-progress panel already fills the body; the live processes
+    // are echoed there and in the logs, so we skip the split bottom region.
+    if (!state.runtime.isRegenerating) {
+        BottomLogsAndTraces(width, bottomH, deps, state)
+    }
 
-    Text(
-        buildConfigFooter(
-            isDatasetDownloaded = state.runtime.isDatasetDownloaded,
-            downloading = state.config.downloadingDataset
-        ),
-        color = White
-    )
+    HotkeyBar(width, configHotkeys(state))
 }
 
 @Composable
@@ -260,8 +289,9 @@ private fun MainDashboardRoute(
     state: TuiAppState,
     subscriptions: TuiSubscriptions,
 ) {
-    val topH = ((height - 4) * 0.62).toInt().coerceAtLeast(10)
-    val bottomH = (height - 4 - topH).coerceAtLeast(5)
+    val bodyH = (height - 5).coerceAtLeast(9)
+    val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+    val bottomH = (bodyH - topH).coerceAtLeast(4)
     val dagW = 60.coerceAtMost(width - 20)
     val arenaW = (width - dagW - 1).coerceAtLeast(20)
 
@@ -299,8 +329,11 @@ private fun MainDashboardRoute(
                 else -> Column(modifier = Modifier.padding(left = 2, top = 1)) {
                     Text("No taxonomy DAG loaded.", color = TuiTheme.INFO, textStyle = Bold)
                     Spacer()
-                    Text("[X] Welcome / load a snapshot", color = TuiTheme.ACCENT)
-                    Text("[R] Configure & generate a new DAG", color = TuiTheme.ACCENT)
+                    Text("To generate a new taxonomy:", color = TuiTheme.INFO)
+                    Text("  [X] Welcome \u2192 Enter (Create new) \u2192 [R] Generate", color = TuiTheme.ACCENT)
+                    Spacer()
+                    Text("To explore an existing one:", color = TuiTheme.INFO)
+                    Text("  [X] Welcome \u2192 pick a saved snapshot", color = TuiTheme.ACCENT)
                 }
             }
         }
@@ -337,7 +370,7 @@ private fun MainDashboardRoute(
 
     BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
 
-    Text("Tab switch panels  W/S navigate  Enter select  X welcome", color = White)
+    HotkeyBar(width, dashboardHotkeys(hasDag = hasDag, focused = state.shell.focusedPanel))
 }
 
 @Composable
@@ -466,18 +499,62 @@ private fun extractPercent(progress: Any?): Double =
         }
     }
 
-private fun buildConfigFooter(
-    isDatasetDownloaded: Boolean,
-    downloading: Boolean,
-): String =
-    when {
-        downloading ->
-            "Tab Switch Panels  W/S Navigate  Downloading..."
-        isDatasetDownloaded ->
-            "Tab Domains/Settings · W/S Move · Space/Enter Toggle/Cycle/Edit · R Generate · Esc Back"
-        else ->
-            "Tab Domains/Settings · W/S Move · Space/Enter Toggle/Edit · D Download · Esc Back"
+/** Contextual key hints for the config / domain-setup screen. */
+private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
+    if (state.runtime.isRegenerating) {
+        return listOf(HotkeyAction("...", "Generating taxonomy DAG", TuiTheme.RUNNING))
     }
+    if (state.config.downloadingDataset) {
+        return listOf(HotkeyAction("...", "Downloading dataset", TuiTheme.RUNNING))
+    }
+    if (state.config.isEditingSetting) {
+        return listOf(
+            HotkeyAction("Type", "Edit value", TuiTheme.ACCENT),
+            HotkeyAction("Enter", "Save", TuiTheme.OK, isPrimary = true),
+            HotkeyAction("Esc", "Cancel", TuiTheme.ERROR),
+        )
+    }
+    val inDomains = state.config.activeSubPanel == ConfigSubPanel.DOMAINS
+    return buildList {
+        add(HotkeyAction("Tab", if (inDomains) "\u2192 Settings" else "\u2192 Domains", TuiTheme.ACCENT))
+        add(HotkeyAction("W/S", "Move"))
+        if (inDomains) {
+            add(HotkeyAction("Space", "Toggle Domain"))
+        } else {
+            add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
+        }
+        // Generation is the headline action and depends on whether data is present.
+        if (state.runtime.isDatasetDownloaded) {
+            add(HotkeyAction("R", "Generate DAG", TuiTheme.OK, isPrimary = true))
+        } else {
+            add(HotkeyAction("R", "Download + Generate", TuiTheme.OK, isPrimary = true))
+            add(HotkeyAction("D", "Download Only"))
+        }
+        add(HotkeyAction("Esc", "Back", TuiTheme.ERROR))
+    }
+}
+
+/** Contextual key hints for the main dashboard. */
+private fun dashboardHotkeys(hasDag: Boolean, focused: FocusPanel): List<HotkeyAction> {
+    if (!hasDag) {
+        return listOf(
+            HotkeyAction("X", "Welcome / New DAG", TuiTheme.ACCENT, isPrimary = true),
+            HotkeyAction("Tab", "Switch Panels"),
+            HotkeyAction("Q", "Quit", TuiTheme.ERROR),
+        )
+    }
+    return buildList {
+        add(HotkeyAction("Tab", "Switch Panels", TuiTheme.ACCENT))
+        add(HotkeyAction("W/S", "Navigate"))
+        add(HotkeyAction("Enter", "Inspect"))
+        add(HotkeyAction("M", "Metrics"))
+        add(HotkeyAction("A", "Arena"))
+        add(HotkeyAction("B", "Benchmark"))
+        add(HotkeyAction("T", "Trickle"))
+        add(HotkeyAction("N", "Save Snapshot"))
+        add(HotkeyAction("X", "Welcome", TuiTheme.ACCENT))
+    }
+}
 
 private fun flattenNodes(rootNode: GraphNode?): List<GraphNode> {
     if (rootNode == null) return emptyList()

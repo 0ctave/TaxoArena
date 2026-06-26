@@ -2,6 +2,7 @@ package taxonomy.tui.controller
 
 import taxonomy.service.AnalysisMode
 import taxonomy.tui.components.SettingItem
+import taxonomy.tui.components.StartupState
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.TuiAppState
 
@@ -39,6 +40,10 @@ class CommandController(
 
             TuiEvent.StartDatasetDownload -> {
                 effects.downloadDataset(dispatch)
+            }
+
+            TuiEvent.StartGeneration -> {
+                effects.generateDag(dispatch)
             }
 
             is TuiEvent.ToggleSelectedDomain -> {
@@ -118,11 +123,17 @@ class CommandController(
             }
 
             is TuiEvent.KeyPressed -> {
-                when (event.key.lowercase()) {
-                    "e" -> effects.exportAscii()
-                    "l" -> effects.regenerateLabels()
-                    "r" -> effects.regenerateJudgeForCurrentNode()
-                    else -> Unit
+                // These global command keys only apply while exploring a generated DAG on
+                // the main dashboard. On the config screen, R means "generate a new DAG"
+                // (handled by handleConfigKeys -> StartGeneration), so we must NOT also fire
+                // judge regeneration here.
+                if (state.startup.state == StartupState.MAINDASHBOARD) {
+                    when (event.key.lowercase()) {
+                        "e" -> effects.exportAscii()
+                        "l" -> effects.regenerateLabels()
+                        "r" -> effects.regenerateJudgeForCurrentNode()
+                        else -> Unit
+                    }
                 }
             }
 

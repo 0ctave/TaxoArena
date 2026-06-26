@@ -370,6 +370,36 @@ object TuiReducer {
                     )
                 )
 
+            TuiEvent.StartGeneration ->
+                state.copy(
+                    // Stay on the config screen so the in-progress panel is visible while
+                    // the engine streams GenerationProgress into the Processes panel.
+                    startup = state.startup.copy(state = StartupState.CONFIGANDDOMAINS),
+                    config = state.config.copy(generationStatusText = "Preparing dataset..."),
+                    runtime = state.runtime.copy(isRegenerating = true)
+                )
+
+            is TuiEvent.GenerationProgress ->
+                state.copy(
+                    config = state.config.copy(generationStatusText = event.statusText)
+                )
+
+            TuiEvent.GenerationCompleted ->
+                state.copy(
+                    startup = state.startup.copy(state = StartupState.MAINDASHBOARD),
+                    shell = state.shell.copy(focusedPanel = FocusPanel.TOPOLOGY),
+                    config = state.config.copy(generationStatusText = ""),
+                    runtime = state.runtime.copy(isRegenerating = false, hasActiveGraph = true)
+                )
+
+            is TuiEvent.GenerationFailed ->
+                state.copy(
+                    config = state.config.copy(
+                        generationStatusText = event.message
+                    ),
+                    runtime = state.runtime.copy(isRegenerating = false)
+                )
+
             is TuiEvent.SetInspectorScroll ->
                 state.copy(
                     analysis = state.analysis.copy(

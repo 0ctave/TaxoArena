@@ -161,7 +161,10 @@ class TuiController(
             }
 
             "d" -> dispatch(TuiEvent.StartDatasetDownload)
-            "r" -> dispatch(TuiEvent.EnterMainDashboard)
+            // R from the config screen generates a brand-new DAG right now: it auto-downloads
+            // the dataset if needed, runs adaptTaxonomy, streams progress, then lands on the
+            // dashboard with the new graph. It does NOT just switch screens.
+            "r" -> if (!state.runtime.isRegenerating) dispatch(TuiEvent.StartGeneration)
             "arrowdown" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.SYSTEM_LOGS))
             "escape", "q" -> dispatch(TuiEvent.ReturnToWelcome)
         }

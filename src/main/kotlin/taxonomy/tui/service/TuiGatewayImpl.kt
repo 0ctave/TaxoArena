@@ -152,4 +152,31 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override fun applySetting(name: String, value: String): Boolean =
         configFacade.applySetting(name, value)
+
+    override suspend fun generateDag(onProgress: (Float, String) -> Unit) {
+        withContext(Dispatchers.IO) {
+            // 1. Ensure the dataset is present locally (auto-download if missing).
+            if (!deps.datasetFetcher.isDatasetDownloaded()) {
+                deps.datasetFetcher.onDownloadProgress = { current, total, name ->
+                    val pct = if (total > 0) current.toFloat() / total else 0f
+                    onProgress(pct * 0.3f, "Downloading $name... $current / $total")
+                }
+                deps.datasetFetcher.downloadDataset()
+            }
+
+            // 2. Fetch the configured dataset / selected domains.
+            onProgress(0.32f, "Loading dataset \"${deps.config.dataset.datasetType.name}\"...")
+            val dataset = deps.datasetFetcher.fetchDataset(
+                selectedDomains = deps.config.dataset.selectedDomains
+            )
+
+            // 3. Run the adaptation engine. It streams GenerationProgress into
+            //    taxonomyService (surfaced by the Processes panel), then we publish the graph.
+            val root = deps.taxonomyEngine.adaptTaxonomy(
+                rootLabel = deps.config.dataset.datasetType.name,
+                dataset = dataset
+            )
+            deps.taxonomyService.setGraph(root)
+        }
+    }
 }
