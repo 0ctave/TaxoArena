@@ -34,7 +34,7 @@ tasks.withType<Test> {
 
 dependencies {
     val arcVersion = "0.203.0"
-    val langchain4jVersion = "1.8.0"
+    val langchain4jVersion = "1.17.0"
 
 
     // Coroutines for asynchronous LLM calls
