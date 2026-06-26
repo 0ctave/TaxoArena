@@ -22,7 +22,6 @@ fun BenchmarkPanel(
     scrollOffset: Int,
     benchmarkState: BenchmarkUiState,
 ) {
-    Panel("BENCHMARK", Cyan, width, height) {
         Column(modifier = Modifier.padding(left = 2, top = 1)) {
             if (benchmarkState.loadedModels.isNotEmpty()) {
                 Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}", color = Green)
@@ -67,5 +66,4 @@ fun BenchmarkPanel(
             Spacer()
             Text("Enter run benchmark · o load eval_results", color = Cyan)
         }
-    }
 }

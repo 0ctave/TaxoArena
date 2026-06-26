@@ -4,7 +4,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import taxonomy.service.AnalysisMode
+import taxonomy.model.GraphNode
 import taxonomy.tui.components.SettingItem
+import taxonomy.tui.components.TreeLine
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
@@ -20,6 +22,12 @@ class TuiController(
     private val settingItemsProvider: () -> List<SettingItem> = { emptyList() },
     /** Available dataset domains (name, count), used to resolve domain toggles. */
     private val availableDomainsProvider: () -> List<Pair<String, Int>> = { emptyList() },
+    /** Rebuilds the DAG tree lines from the live graph + expand state, so key handlers can
+     *  resolve the selected tree row to a node (expand/collapse, inspect). */
+    private val treeLinesProvider: (Map<String, Boolean>) -> List<TreeLine> = { emptyList() },
+    /** Invoked when the user asks to quit (Ctrl-C / Ctrl-Q / quit hotkey). Restores the
+     *  terminal and stops the process. */
+    private val onQuit: () -> Unit = {},
 ) {
 
     private val _state = MutableStateFlow(initialState)
@@ -32,6 +40,10 @@ class TuiController(
     }
 
     fun dispatch(event: TuiEvent) {
+        if (event is TuiEvent.QuitRequested) {
+            onQuit()
+            return
+        }
         _state.value = TuiReducer.reduce(_state.value, event)
         commandController.handle(_state.value, event, ::dispatch)
 
@@ -99,6 +111,9 @@ class TuiController(
             "escape", "q" -> {
                 if (state.snapshot.isViewingSnapshot) {
                     dispatch(TuiEvent.EnterMainDashboard)
+                } else {
+                    // Welcome is the top-level screen; q/Esc here exits the whole app.
+                    dispatch(TuiEvent.QuitRequested)
                 }
             }
         }
@@ -292,13 +307,30 @@ class TuiController(
                 dispatch(TuiEvent.SetTopologyAutoScroll(false))
             }
 
-            "enter", " " -> {
+            // Right / l expands the selected node; left / h collapses it. Space toggles.
+            "arrowright", "l", "d" -> selectedTreeNode(state)?.let {
+                if (it.children.isNotEmpty()) dispatch(TuiEvent.SetNodeExpanded(it.id, true))
+            }
+            "arrowleft", "h", "a" -> selectedTreeNode(state)?.let {
+                if (it.children.isNotEmpty()) dispatch(TuiEvent.SetNodeExpanded(it.id, false))
+            }
+            " ", "space" -> selectedTreeNode(state)?.let {
+                if (it.children.isNotEmpty()) dispatch(TuiEvent.ToggleNodeExpanded(it.id))
+            }
+
+            "enter" -> {
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
 
             "q", "escape" -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
         }
+    }
+
+    /** The DAG node currently highlighted in the tree, if any. */
+    private fun selectedTreeNode(state: TuiAppState): GraphNode? {
+        val lines = treeLinesProvider(state.topology.expandedNodes)
+        return lines.getOrNull(state.topology.selectedTreeIdx)?.node
     }
 
     private fun handleAnalysisKeys(state: TuiAppState, key: String) {
@@ -546,13 +578,7 @@ class TuiController(
         when (state.startup.state) {
             StartupState.WELCOME -> handleWelcomeMouse(event)
             StartupState.CONFIGANDDOMAINS -> handleConfigMouse(state, event)
-            StartupState.MAINDASHBOARD -> {
-                if (event.x < 60) {
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-                } else {
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
-                }
-            }
+            StartupState.MAINDASHBOARD -> handleDashboardMouse(state, event)
             StartupState.LOADING -> Unit
         }
     }
@@ -562,6 +588,36 @@ class TuiController(
      * select the row under the cursor by y, and toggle/activate it (click = select,
      * a second click on the same row = toggle/cycle/edit).
      */
+    private fun handleDashboardMouse(state: TuiAppState, event: TuiEvent.MousePressed) {
+        val dagW = 60.coerceAtMost(state.shell.width - 20)
+        if (event.x >= dagW) {
+            dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
+            return
+        }
+        dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+
+        // Vertical layout above the first tree row: Header(1) + top HRule(1) +
+        // panel border top(1) + table header(1) = 4 rows. Mouse y is 0-indexed.
+        val firstRowY = 4
+        val rowIndex = event.y - firstRowY + state.topology.treeScrollOffset
+        if (rowIndex < 0) return
+
+        val lines = treeLinesProvider(state.topology.expandedNodes)
+        val node = lines.getOrNull(rowIndex)?.node ?: return
+        if (rowIndex == state.topology.selectedTreeIdx) {
+            // Second click on the same row toggles expand/collapse (or inspects a leaf).
+            if (node.children.isNotEmpty()) {
+                dispatch(TuiEvent.ToggleNodeExpanded(node.id))
+            } else {
+                dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
+            }
+        } else {
+            dispatch(TuiEvent.SetSelectedTreeIdx(rowIndex))
+            dispatch(TuiEvent.SetTopologyAutoScroll(false))
+        }
+    }
+
     private fun handleConfigMouse(state: TuiAppState, event: TuiEvent.MousePressed) {
         dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
         if (state.config.isEditingSetting) return

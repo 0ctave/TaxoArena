@@ -9,9 +9,10 @@ import com.jakewharton.mosaic.terminal.Terminal
 @Composable
 fun TuiApp(
     terminal: Terminal,
-    deps: TuiDependencies
+    deps: TuiDependencies,
+    onQuit: () -> Unit = {},
 ) {
-    val controller = remember { deps.buildController() }
+    val controller = remember { deps.buildController(onQuit) }
     val state by controller.state.collectAsState()
     val subscriptions = rememberTuiSubscriptions(deps)
 

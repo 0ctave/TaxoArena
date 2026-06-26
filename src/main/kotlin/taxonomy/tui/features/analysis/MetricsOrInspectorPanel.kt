@@ -9,8 +9,8 @@ import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Text
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
-import taxonomy.tui.components.Panel
 
+/** Content-only: the parent [AnalysisPanel] owns the border and title. */
 @Composable
 fun MetricsOrInspectorPanel(
     width: Int,
@@ -19,15 +19,7 @@ fun MetricsOrInspectorPanel(
     inspectorScroll: Int,
     metricsScroll: Int,
 ) {
-    val title = when (controlState.mode) {
-        AnalysisMode.NODE_DETAIL -> "NODE INSPECTOR"
-        AnalysisMode.METRICS -> "METRICS"
-        AnalysisMode.SETTINGS -> "SETTINGS"
-        else -> "ANALYSIS HUB"
-    }
-
-    Panel(title, Cyan, width, height) {
-        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+    Column(modifier = Modifier.padding(left = 1)) {
             when (controlState.mode) {
                 AnalysisMode.NODE_DETAIL -> {
                     val node = controlState.selectedNode
@@ -53,6 +45,5 @@ fun MetricsOrInspectorPanel(
                     Text("Select a mode from topology shortcuts.", color = White)
                 }
             }
-        }
     }
 }

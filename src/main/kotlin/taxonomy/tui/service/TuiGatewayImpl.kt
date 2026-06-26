@@ -65,7 +65,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
     override suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit) {
         deps.datasetFetcher.onDownloadProgress = { current, total, name ->
             val pct = if (total > 0) current.toFloat() / total else 0f
-            onProgress(pct, "Downloading $name... $current / $total")
+            onProgress(
+                pct,
+                "$name \u00b7 ${"%,d".format(current)} / ${"%,d".format(total)} rows"
+            )
         }
         // maxQueries <= 0 means "full dataset"; the fetcher treats a very large cap as all.
         val cap = if (maxQueries <= 0) Int.MAX_VALUE else maxQueries
@@ -130,11 +133,18 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         }
     }
 
-    override suspend fun loadEval(path: String, modelName: String): String =
+    override suspend fun loadEval(
+        path: String,
+        modelName: String,
+        onProgress: (Int, Int) -> Unit,
+    ): String =
         withContext(Dispatchers.IO) {
-            val stats = deps.evalLoader.loadFromPath(path, modelName.ifBlank { null })
-            "Loaded '${stats.modelName}': ${stats.inserted} new, ${stats.skipped} existing, " +
-                "${stats.linkedToDataset} linked, ${stats.errors} errors"
+            val stats = deps.evalLoader.loadFromPath(path, modelName.ifBlank { null }) { cur, total ->
+                onProgress(cur, total)
+            }
+            "Loaded '${stats.modelName}': ${"%,d".format(stats.inserted)} new, " +
+                "${"%,d".format(stats.skipped)} existing, ${"%,d".format(stats.linkedToDataset)} linked, " +
+                "${stats.errors} errors"
         }
 
     override suspend fun regenerateLabels() {
