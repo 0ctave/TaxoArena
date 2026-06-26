@@ -55,7 +55,7 @@ dependencies {
     implementation("org.eclipse.lmos:arc-view-spring-boot-starter:$arcVersion")
 
     // Tracing
-    implementation(platform("io.micrometer:micrometer-tracing-bom:1.4.5"))
+    implementation(platform("io.micrometer:micrometer-tracing-bom:1.7.0"))
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
