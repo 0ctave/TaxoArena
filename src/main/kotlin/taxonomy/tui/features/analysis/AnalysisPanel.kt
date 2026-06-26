@@ -14,6 +14,8 @@ import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
 import taxonomy.tui.BatchTrickleTestResults
 import taxonomy.tui.components.Panel
+import taxonomy.tui.components.ProcessRow
+import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.features.arena.ArenaPanel
 import taxonomy.tui.features.benchmark.BenchmarkPanel
 import taxonomy.tui.features.progress.JudgeProgressPanel
@@ -35,15 +37,35 @@ fun AnalysisPanel(
     snapshotState: SnapshotUiState,
     arenaState: ArenaUiState,
     benchmarkState: BenchmarkUiState,
+    /** Most relevant active process, or null when idle. Pinned at the top so a
+     *  running process is always one keystroke away regardless of what the
+     *  dashboard is currently showing (selection wins, process resumable). */
+    activeProcess: ProcessRow? = null,
 ) {
-    when (controlState.mode) {
-        AnalysisMode.ARENA -> ArenaPanel(width, height, controlState, arenaState)
-        AnalysisMode.BENCHMARK -> BenchmarkPanel(width, height, controlState, benchmarkScroll, benchmarkState)
-        AnalysisMode.TRICKLE_TEST -> TricklePanel(width, height, trickleResults, batchTrickleScroll)
-        AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(width, height, controlState)
-        AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(width, height, snapshotState)
-        else -> MetricsOrInspectorPanel(width, height, controlState, inspectorScroll, metricsScroll)
+    // Pinned resumable-process banner: always visible while work is running.
+    val bannerH = if (activeProcess != null) 1 else 0
+    if (activeProcess != null) {
+        ProcessBanner(width, activeProcess)
     }
+    val bodyH = (height - bannerH).coerceAtLeast(1)
+
+    when (controlState.mode) {
+        AnalysisMode.ARENA -> ArenaPanel(width, bodyH, controlState, arenaState)
+        AnalysisMode.BENCHMARK -> BenchmarkPanel(width, bodyH, controlState, benchmarkScroll, benchmarkState)
+        AnalysisMode.TRICKLE_TEST -> TricklePanel(width, bodyH, trickleResults, batchTrickleScroll)
+        AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(width, bodyH, controlState)
+        AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(width, bodyH, snapshotState)
+        else -> MetricsOrInspectorPanel(width, bodyH, controlState, inspectorScroll, metricsScroll)
+    }
+}
+
+/** One-line pinned banner summarising the active process with a resume hint. */
+@Composable
+private fun ProcessBanner(width: Int, p: ProcessRow) {
+    val color = TuiTheme.statusColor(done = p.done, error = p.error)
+    val pct = p.percent?.let { " ${"%.0f".format(java.util.Locale.US, it)}%%" } ?: ""
+    val text = "▶ ${p.name}$pct — ${p.status}  [P] resume".take(width - 1)
+    Text(text, color = color, textStyle = Bold)
 }
 
 @Composable

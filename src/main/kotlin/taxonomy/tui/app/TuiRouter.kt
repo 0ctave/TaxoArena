@@ -295,10 +295,13 @@ private fun MainDashboardRoute(
 
         Panel(
             title = "ANALYSIS HUB",
-            accentColor = if (state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB) Cyan else White,
+            accentColor = TuiTheme.panelAccent(state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB),
             width = arenaW,
             height = topH,
         ) {
+            // Most relevant active process, pinned at the top of the dashboard
+            // so it is always visible and one keystroke away (selection wins).
+            val activeProcess = deriveProcessRows(deps, state, subscriptions).firstOrNull { !it.done }
             AnalysisPanel(
                 width = arenaW - 4,
                 height = topH - 2,
@@ -311,6 +314,7 @@ private fun MainDashboardRoute(
                 snapshotState = state.snapshot,
                 arenaState = state.arena,
                 benchmarkState = state.benchmark,
+                activeProcess = activeProcess,
             )
         }
     }
