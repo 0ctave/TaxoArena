@@ -186,7 +186,7 @@ private fun ConfigRoute(
         Row(modifier = Modifier.height(topH)) {
             Panel(
                 title = "DOMAINS",
-                accentColor = if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) Cyan else White,
+                accentColor = TuiTheme.panelAccent(state.config.activeSubPanel == ConfigSubPanel.DOMAINS),
                 width = leftW,
                 height = topH
             ) {
@@ -204,7 +204,7 @@ private fun ConfigRoute(
 
             Panel(
                 title = "SETTINGS",
-                accentColor = if (state.config.activeSubPanel == ConfigSubPanel.SETTINGS) Cyan else White,
+                accentColor = TuiTheme.panelAccent(state.config.activeSubPanel == ConfigSubPanel.SETTINGS),
                 width = rightW,
                 height = topH
             ) {
