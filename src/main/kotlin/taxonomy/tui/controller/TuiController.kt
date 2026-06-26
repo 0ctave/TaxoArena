@@ -27,6 +27,8 @@ class TuiController(
 
     init {
         dispatch(TuiEvent.RefreshSnapshots)
+        dispatch(TuiEvent.RefreshDatasetStatus)
+        dispatch(TuiEvent.RefreshArenaModels)
     }
 
     fun dispatch(event: TuiEvent) {
@@ -122,6 +124,24 @@ class TuiController(
             return
         }
 
+        // Download-count prompt: type a number (blank = full dataset), Enter to start.
+        if (state.config.promptingDownloadCount) {
+            when (key) {
+                "enter" -> {
+                    val n = state.config.downloadCountInput.toIntOrNull() ?: 0
+                    dispatch(TuiEvent.StartDatasetDownload(n))
+                }
+                "escape", "q" -> dispatch(TuiEvent.CancelDatasetDownload)
+                "backspace" -> dispatch(
+                    TuiEvent.UpdateDownloadCountInput(state.config.downloadCountInput.dropLast(1))
+                )
+                else -> if (key.length == 1 && key[0].isDigit()) {
+                    dispatch(TuiEvent.UpdateDownloadCountInput(state.config.downloadCountInput + key))
+                }
+            }
+            return
+        }
+
         when (key) {
             "tab" -> {
                 val next = if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) {
@@ -160,11 +180,15 @@ class TuiController(
                 }
             }
 
-            "d" -> dispatch(TuiEvent.StartDatasetDownload)
-            // R from the config screen generates a brand-new DAG right now: it auto-downloads
-            // the dataset if needed, runs adaptTaxonomy, streams progress, then lands on the
-            // dashboard with the new graph. It does NOT just switch screens.
-            "r" -> if (!state.runtime.isRegenerating) dispatch(TuiEvent.StartGeneration)
+            "d" -> dispatch(TuiEvent.PromptDatasetDownload)
+            // R generates a new DAG, but only once the dataset is present locally. Domains are
+            // read from the downloaded data, so generation is gated on a download first. If the
+            // dataset is missing, R opens the download prompt instead.
+            "r" -> when {
+                state.runtime.isRegenerating -> Unit
+                state.runtime.isDatasetDownloaded -> dispatch(TuiEvent.StartGeneration)
+                else -> dispatch(TuiEvent.PromptDatasetDownload)
+            }
             "arrowdown" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.SYSTEM_LOGS))
             "escape", "q" -> dispatch(TuiEvent.ReturnToWelcome)
         }
@@ -200,8 +224,19 @@ class TuiController(
             "tab" -> dispatch(focusController.cycleForward(state))
             "x" -> dispatch(TuiEvent.ReturnToWelcome)
             "m" -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.METRICS))
-            "a" -> commandController.startArena(::dispatch)
-            "b" -> commandController.startBenchmark(::dispatch)
+            // Arena and Benchmark are gated on a loaded precomputed eval roster. Without it
+            // there are no model answers to judge, so we surface the metrics view (which shows
+            // the "load eval_results" hint) instead of dropping the user into an empty arena.
+            "a" -> if (state.arena.loadedModels.isNotEmpty()) {
+                commandController.startArena(::dispatch)
+            } else {
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
+            }
+            "b" -> if (state.arena.loadedModels.isNotEmpty()) {
+                commandController.startBenchmark(::dispatch)
+            } else {
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.BENCHMARK))
+            }
             "t" -> commandController.startTrickle(::dispatch)
 
             "g" -> {

@@ -26,26 +26,33 @@ fun ArenaPanel(
             val mode = if (arenaState.usePrecomputed) "PRECOMPUTED (no live generation)" else "LIVE"
             Text("Mode: $mode", color = Green)
 
-            if (arenaState.loadedModels.isNotEmpty()) {
-                Text("Loaded models: ${arenaState.loadedModels.joinToString(", ")}", color = White)
-            } else {
-                Text("No precomputed models loaded — use Benchmark (o) to load eval_results.", color = Yellow)
+            if (arenaState.loadedModels.isEmpty()) {
+                // Gated: no roster means nothing to judge.
+                Text("No precomputed eval_results loaded.", color = Yellow)
+                Spacer()
+                Text("Load MMLU-Pro model outputs first:", color = White)
+                Text("  press [O] to load eval_results", color = Cyan)
+                Text("Then pick Model A \u2192 Model B \u2192 question_id.", color = White)
+                return@Column
             }
+
+            Text("Loaded models: ${arenaState.loadedModels.joinToString(", ")}", color = White)
             Spacer()
 
+            // Models-first flow: A → B → question_id (precomputed) or query (live).
             when {
-                arenaState.isEnteringArenaQuestionId ->
-                    Text("Enter question_id: ${arenaState.arenaQuestionIdInput}_", color = Cyan)
-                arenaState.isEnteringArenaQuery ->
-                    Text("Enter query: ${arenaState.arenaQueryInput}_", color = Cyan)
                 arenaState.isEnteringArenaModelA ->
-                    Text("Model A: ${arenaState.arenaModelAInput}_", color = Cyan)
+                    Text("Model A \u276f ${arenaState.arenaModelAInput}\u2588", color = Cyan)
                 arenaState.isEnteringArenaModelB ->
-                    Text("Model B: ${arenaState.arenaModelBInput}_", color = Cyan)
+                    Text("Model B \u276f ${arenaState.arenaModelBInput}\u2588", color = Cyan)
+                arenaState.isEnteringArenaQuestionId ->
+                    Text("question_id \u276f ${arenaState.arenaQuestionIdInput}\u2588", color = Cyan)
+                arenaState.isEnteringArenaQuery ->
+                    Text("Query \u276f ${arenaState.arenaQueryInput}\u2588", color = Cyan)
                 else -> {
-                    Text("Query: ${controlState.query ?: "—"}", color = White)
-                    Text("Model A: ${controlState.modelA ?: "—"}", color = White)
-                    Text("Model B: ${controlState.modelB ?: "—"}", color = White)
+                    Text("Model A   ${controlState.modelA ?: "—"}", color = White)
+                    Text("Model B   ${controlState.modelB ?: "—"}", color = White)
+                    Text("Query     ${controlState.query ?: "—"}", color = White)
                 }
             }
 

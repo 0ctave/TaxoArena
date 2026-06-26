@@ -3,6 +3,7 @@ package taxonomy.tui.app
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.jakewharton.mosaic.layout.height
+import com.jakewharton.mosaic.layout.width
 import com.jakewharton.mosaic.layout.padding
 import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
@@ -27,7 +28,6 @@ import taxonomy.tui.components.SettingKind
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.TuiTheme.SPINNER
-import taxonomy.tui.components.VDivider
 import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.features.analysis.AnalysisPanel
 import taxonomy.tui.features.logs.LogsPanel
@@ -91,7 +91,7 @@ private fun WelcomeRoute(
             snapshots = state.snapshot.snapshotList,
         )
 
-        VDivider(contentH, White, Cyan)
+        Spacer(Modifier.width(1).height(contentH))
 
         Panel("SNAPSHOT SUMMARY", White, rightW, contentH) {
             Column(modifier = Modifier.padding(left = 2, top = 1)) {
@@ -166,7 +166,24 @@ private fun ConfigRoute(
         facade.getAvailableDomains()
     }
 
-    if (state.runtime.isRegenerating) {
+    if (state.config.promptingDownloadCount) {
+        Panel("DOWNLOAD DATASET", Cyan, width - 2, topH + bottomH + 1) {
+            Column(modifier = Modifier.padding(left = 2, top = 1)) {
+                Text(
+                    "How many queries to download for " +
+                        "${deps.config.dataset.datasetType.name}?",
+                    color = White,
+                    textStyle = Bold
+                )
+                Spacer()
+                val shown = state.config.downloadCountInput.ifEmpty { "(full dataset)" }
+                Text("  Count  \u276f $shown\u2588", color = Cyan, textStyle = Bold)
+                Spacer()
+                Text("Leave blank to download the full dataset.", color = TuiTheme.INFO)
+                Text("Enter a number to cap the query count (e.g. 2000 for a quick test).", color = TuiTheme.INFO)
+            }
+        }
+    } else if (state.runtime.isRegenerating) {
         // Generation spans the full body so progress + live status are front-and-center.
         Panel("TAXONOMY GENERATION IN PROGRESS", Cyan, width - 2, topH + bottomH + 1) {
             Column(modifier = Modifier.padding(left = 2, top = 1)) {
@@ -232,7 +249,7 @@ private fun ConfigRoute(
                 )
             }
 
-            VDivider(topH, White, Cyan)
+            Spacer(Modifier.width(1).height(topH))
 
             Panel(
                 title = "SETTINGS",
@@ -245,15 +262,15 @@ private fun ConfigRoute(
                         val selected = idx == state.config.selectedSettingIdx
                         val editing = selected && state.config.isEditingSetting
                         // Typed-input rendering: boolean -> checkbox, select -> ‹ value ›,
-                        // number/text -> value (with a caret while editing).
+                        // number/text -> value (with a blinking caret while editing).
                         val rendered = when {
-                            editing -> state.config.editingValue + "_"
+                            editing -> state.config.editingValue + "\u2588" // █ caret
                             item.kind == SettingKind.BOOLEAN ->
-                                if (item.getValue().toBooleanStrictOrNull() == true) "[x] on" else "[ ] off"
-                            item.kind == SettingKind.SELECT -> "‹ ${item.getValue()} ›"
+                                if (item.getValue().toBooleanStrictOrNull() == true) "\u2611 on" else "\u2610 off"
+                            item.kind == SettingKind.SELECT -> "\u2039 ${item.getValue()} \u203a" // ‹ value ›
                             else -> item.getValue()
                         }
-                        val caret = if (selected) "▶ " else "  "
+                        val caret = if (selected) "\u276f " else "  " // ❯
                         val rowColor = when {
                             editing -> TuiTheme.RUNNING
                             selected -> TuiTheme.ACCENT
@@ -272,9 +289,9 @@ private fun ConfigRoute(
 
     Spacer()
 
-    // While generating, the in-progress panel already fills the body; the live processes
-    // are echoed there and in the logs, so we skip the split bottom region.
-    if (!state.runtime.isRegenerating) {
+    // While generating or prompting for a download count, the panel fills the body, so we
+    // skip the split bottom region.
+    if (!state.runtime.isRegenerating && !state.config.promptingDownloadCount) {
         BottomLogsAndTraces(width, bottomH, deps, state)
     }
 
@@ -338,7 +355,7 @@ private fun MainDashboardRoute(
             }
         }
 
-        VDivider(topH, White, Cyan)
+        Spacer(Modifier.width(1).height(topH))
 
         Panel(
             title = "ANALYSIS HUB",
@@ -395,7 +412,7 @@ private fun BottomLogsAndTraces(
             LogsPanel(logsW - 4, bottomH, state.logs.logScrollOffset, title = "")
         }
 
-        VDivider(bottomH, White, Cyan)
+        Spacer(Modifier.width(1).height(bottomH))
 
         Panel(
             title = "PROCESSES",
@@ -507,6 +524,13 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
     if (state.config.downloadingDataset) {
         return listOf(HotkeyAction("...", "Downloading dataset", TuiTheme.RUNNING))
     }
+    if (state.config.promptingDownloadCount) {
+        return listOf(
+            HotkeyAction("0-9", "Query count", TuiTheme.ACCENT),
+            HotkeyAction("Enter", "Download (blank = full)", TuiTheme.OK, isPrimary = true),
+            HotkeyAction("Esc", "Cancel", TuiTheme.ERROR),
+        )
+    }
     if (state.config.isEditingSetting) {
         return listOf(
             HotkeyAction("Type", "Edit value", TuiTheme.ACCENT),
@@ -523,12 +547,13 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
         } else {
             add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
         }
-        // Generation is the headline action and depends on whether data is present.
+        // Generation requires the dataset (domains come from the downloaded data).
         if (state.runtime.isDatasetDownloaded) {
             add(HotkeyAction("R", "Generate DAG", TuiTheme.OK, isPrimary = true))
+            add(HotkeyAction("D", "Re-download"))
         } else {
-            add(HotkeyAction("R", "Download + Generate", TuiTheme.OK, isPrimary = true))
-            add(HotkeyAction("D", "Download Only"))
+            add(HotkeyAction("D", "Download Dataset", TuiTheme.OK, isPrimary = true))
+            add(HotkeyAction("R", "(download first)", TuiTheme.INFO))
         }
         add(HotkeyAction("Esc", "Back", TuiTheme.ERROR))
     }

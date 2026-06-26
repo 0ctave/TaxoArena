@@ -14,6 +14,11 @@ data class ConfigUiState(
     val datasetDownloadProgress: Float = 0f,
     val datasetDownloadStatusText: String = "",
 
+    // Download count prompt: when true, the user is typing how many queries to fetch
+    // (blank = full dataset).
+    val promptingDownloadCount: Boolean = false,
+    val downloadCountInput: String = "",
+
     val generationStatusText: String = "",
 
     val settingsVersion: Int = 0

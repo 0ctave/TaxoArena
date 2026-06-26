@@ -101,7 +101,9 @@ object TuiReducer {
             is TuiEvent.ScrollBy ->
                 applyScrollBy(state, event.target, event.delta)
 
-            TuiEvent.RefreshSnapshots ->
+            TuiEvent.RefreshSnapshots,
+            TuiEvent.RefreshDatasetStatus,
+            TuiEvent.RefreshArenaModels ->
                 state
 
             // Side-effect-only config events (handled in CommandController).
@@ -336,12 +338,43 @@ object TuiReducer {
                     )
                 )
 
-            TuiEvent.StartDatasetDownload ->
+            is TuiEvent.DatasetStatusLoaded ->
+                state.copy(runtime = state.runtime.copy(isDatasetDownloaded = event.downloaded))
+
+            TuiEvent.PromptDatasetDownload ->
                 state.copy(
                     config = state.config.copy(
+                        promptingDownloadCount = true,
+                        downloadCountInput = ""
+                    )
+                )
+
+            is TuiEvent.UpdateDownloadCountInput ->
+                state.copy(
+                    // Digits only; blank is allowed and means "full dataset".
+                    config = state.config.copy(
+                        downloadCountInput = event.value.filter { it.isDigit() }.take(7)
+                    )
+                )
+
+            TuiEvent.CancelDatasetDownload ->
+                state.copy(
+                    config = state.config.copy(
+                        promptingDownloadCount = false,
+                        downloadCountInput = ""
+                    )
+                )
+
+            is TuiEvent.StartDatasetDownload ->
+                state.copy(
+                    config = state.config.copy(
+                        promptingDownloadCount = false,
+                        downloadCountInput = "",
                         downloadingDataset = true,
                         datasetDownloadProgress = 0f,
-                        datasetDownloadStatusText = "Initializing download..."
+                        datasetDownloadStatusText =
+                            if (event.maxQueries <= 0) "Initializing full download..."
+                            else "Initializing download of ${event.maxQueries} queries..."
                     )
                 )
 
@@ -461,15 +494,16 @@ object TuiReducer {
                 val roster = state.arena.loadedModels
                 val defaultA = state.arena.arenaModelAInput.ifBlank { roster.getOrNull(0).orEmpty() }
                 val defaultB = state.arena.arenaModelBInput.ifBlank { roster.getOrNull(1).orEmpty() }
+                // Models-first flow: pick Model A -> Model B -> (precomputed) question_id.
                 state.copy(
                     analysis = state.analysis.copy(mode = AnalysisMode.ARENA),
                     arena = state.arena.copy(
-                        isEnteringArenaQuestionId = state.arena.usePrecomputed,
-                        arenaQuestionIdInput = "",
-                        isEnteringArenaQuery = !state.arena.usePrecomputed,
-                        arenaQueryInput = "",
-                        isEnteringArenaModelA = false,
+                        isEnteringArenaModelA = true,
                         isEnteringArenaModelB = false,
+                        isEnteringArenaQuestionId = false,
+                        arenaQuestionIdInput = "",
+                        isEnteringArenaQuery = false,
+                        arenaQueryInput = "",
                         arenaModelAInput = defaultA,
                         arenaModelBInput = defaultB
                     ),
@@ -486,11 +520,12 @@ object TuiReducer {
             is TuiEvent.UpdateArenaQuestionIdInput ->
                 state.copy(arena = state.arena.copy(arenaQuestionIdInput = event.value))
 
+            // After the question_id is confirmed the matchup is fully specified; the
+            // CommandController fires the actual comparison. Just close the input.
             TuiEvent.ConfirmArenaQuestionIdInput ->
                 state.copy(
                     arena = state.arena.copy(
-                        isEnteringArenaQuestionId = false,
-                        isEnteringArenaModelA = true
+                        isEnteringArenaQuestionId = false
                     )
                 )
 
@@ -509,11 +544,11 @@ object TuiReducer {
                     arena = state.arena.copy(arenaModelBInput = event.value)
                 )
 
+            // Live mode only: query is the last input before the run fires.
             TuiEvent.ConfirmArenaQueryInput ->
                 state.copy(
                     arena = state.arena.copy(
-                        isEnteringArenaQuery = false,
-                        isEnteringArenaModelA = true
+                        isEnteringArenaQuery = false
                     )
                 )
 
@@ -525,10 +560,14 @@ object TuiReducer {
                     )
                 )
 
+            // Model B confirmed: in precomputed mode collect the question_id next; in live
+            // mode collect the free-text query next.
             TuiEvent.ConfirmArenaModelBInput ->
                 state.copy(
                     arena = state.arena.copy(
-                        isEnteringArenaModelB = false
+                        isEnteringArenaModelB = false,
+                        isEnteringArenaQuestionId = state.arena.usePrecomputed,
+                        isEnteringArenaQuery = !state.arena.usePrecomputed
                     )
                 )
 

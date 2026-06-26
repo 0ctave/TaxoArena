@@ -59,12 +59,17 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         withContext(Dispatchers.IO) { deps.snapshotManager.deleteSnapshot(snapshotId) }
     }
 
-    override suspend fun downloadDataset(onProgress: (Float, String) -> Unit) {
+    override suspend fun isDatasetDownloaded(): Boolean =
+        withContext(Dispatchers.IO) { deps.datasetFetcher.isDatasetDownloaded() }
+
+    override suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit) {
         deps.datasetFetcher.onDownloadProgress = { current, total, name ->
             val pct = if (total > 0) current.toFloat() / total else 0f
             onProgress(pct, "Downloading $name... $current / $total")
         }
-        withContext(Dispatchers.IO) { deps.datasetFetcher.downloadDataset() }
+        // maxQueries <= 0 means "full dataset"; the fetcher treats a very large cap as all.
+        val cap = if (maxQueries <= 0) Int.MAX_VALUE else maxQueries
+        withContext(Dispatchers.IO) { deps.datasetFetcher.downloadDataset(maxQueries = cap) }
     }
 
     override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) {

@@ -10,7 +10,8 @@ interface TuiEffects {
     fun saveSnapshot(description: String, dispatch: (TuiEvent) -> Unit)
     fun renameSnapshot(snapshotId: String, newDescription: String, dispatch: (TuiEvent) -> Unit)
     fun deleteSnapshot(snapshotId: String, dispatch: (TuiEvent) -> Unit)
-    fun downloadDataset(dispatch: (TuiEvent) -> Unit)
+    fun refreshDatasetStatus(dispatch: (TuiEvent) -> Unit)
+    fun downloadDataset(maxQueries: Int, dispatch: (TuiEvent) -> Unit)
     fun generateDag(dispatch: (TuiEvent) -> Unit)
 
     fun runBatchJudge(generality: Int, replaceExisting: Boolean)
@@ -86,10 +87,16 @@ class DefaultTuiEffects(
         }
     }
 
-    override fun downloadDataset(dispatch: (TuiEvent) -> Unit) {
+    override fun refreshDatasetStatus(dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            dispatch(TuiEvent.DatasetStatusLoaded(gateway.isDatasetDownloaded()))
+        }
+    }
+
+    override fun downloadDataset(maxQueries: Int, dispatch: (TuiEvent) -> Unit) {
         scope.launch {
             try {
-                gateway.downloadDataset { progress, text ->
+                gateway.downloadDataset(maxQueries) { progress, text ->
                     dispatch(TuiEvent.DatasetDownloadProgress(progress, text))
                 }
                 dispatch(TuiEvent.DatasetDownloadCompleted)
@@ -197,7 +204,8 @@ interface TuiGateway {
     suspend fun renameSnapshot(snapshotId: String, newDescription: String)
     suspend fun deleteSnapshot(snapshotId: String)
 
-    suspend fun downloadDataset(onProgress: (Float, String) -> Unit)
+    suspend fun isDatasetDownloaded(): Boolean
+    suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit)
     suspend fun generateDag(onProgress: (Float, String) -> Unit)
 
     suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean)
