@@ -195,7 +195,14 @@ class TaxonomyTuiService(
                             startMosaicComposition(terminal) {
                                 TuiApp(
                                     terminal = terminal,
-                                    deps = deps
+                                    deps = deps,
+                                    onQuit = {
+                                        // Raw-mode terminals deliver Ctrl-C as a key, not SIGINT,
+                                        // so quitting is driven explicitly: restore the screen and
+                                        // stop the JVM hard so we never hang in the alt-screen.
+                                        restoreTerminal()
+                                        Runtime.getRuntime().halt(0)
+                                    },
                                 )
                             }
                             childCont.resumeWith(Result.success(Unit))

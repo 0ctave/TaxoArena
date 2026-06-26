@@ -28,6 +28,7 @@ import taxonomy.tui.state.SnapshotUiState
 fun AnalysisPanel(
     width: Int,
     height: Int,
+    focused: Boolean = false,
     controlState: AnalysisPanelState,
     inspectorScroll: Int,
     metricsScroll: Int,
@@ -42,20 +43,39 @@ fun AnalysisPanel(
      *  dashboard is currently showing (selection wins, process resumable). */
     activeProcess: ProcessRow? = null,
 ) {
-    // Pinned resumable-process banner: always visible while work is running.
-    val bannerH = if (activeProcess != null) 1 else 0
-    if (activeProcess != null) {
-        ProcessBanner(width, activeProcess)
+    // This panel owns the single bordered frame for the right-hand hub. The title reflects
+    // the active mode, and the sub-panels below render content only (no nested borders).
+    val title = when (controlState.mode) {
+        AnalysisMode.ARENA -> "MODEL ARENA"
+        AnalysisMode.BENCHMARK -> "BENCHMARK"
+        AnalysisMode.TRICKLE_TEST -> "TRICKLE TEST"
+        AnalysisMode.JUDGE_PROGRESS -> "JUDGE PROGRESS"
+        AnalysisMode.SNAPSHOTS -> "SNAPSHOTS"
+        AnalysisMode.NODE_DETAIL -> "NODE INSPECTOR"
+        AnalysisMode.METRICS -> "METRICS"
+        AnalysisMode.SETTINGS -> "SETTINGS"
+        else -> "ANALYSIS HUB"
     }
-    val bodyH = (height - bannerH).coerceAtLeast(1)
 
-    when (controlState.mode) {
-        AnalysisMode.ARENA -> ArenaPanel(width, bodyH, controlState, arenaState)
-        AnalysisMode.BENCHMARK -> BenchmarkPanel(width, bodyH, controlState, benchmarkScroll, benchmarkState)
-        AnalysisMode.TRICKLE_TEST -> TricklePanel(width, bodyH, trickleResults, batchTrickleScroll)
-        AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(width, bodyH, controlState)
-        AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(width, bodyH, snapshotState)
-        else -> MetricsOrInspectorPanel(width, bodyH, controlState, inspectorScroll, metricsScroll)
+    Panel(title, TuiTheme.panelAccent(focused), width, height) {
+        Column {
+            // Pinned resumable-process banner: always visible while work is running.
+            val bannerH = if (activeProcess != null) 1 else 0
+            if (activeProcess != null) {
+                ProcessBanner(width - 2, activeProcess)
+            }
+            val bodyH = (height - 2 - bannerH).coerceAtLeast(1)
+            val bodyW = width - 2
+
+            when (controlState.mode) {
+                AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState)
+                AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
+                AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleResults, batchTrickleScroll)
+                AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
+                AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
+                else -> MetricsOrInspectorPanel(bodyW, bodyH, controlState, inspectorScroll, metricsScroll)
+            }
+        }
     }
 }
 
@@ -74,28 +94,24 @@ private fun SnapshotHubPanel(
     height: Int,
     state: SnapshotUiState,
 ) {
-    Panel("SNAPSHOTS", Cyan, width, height) {
-        Column(modifier = Modifier.padding(left = 2, top = 1)) {
-            when {
-                state.isSavingSnapshot ->
-                    Text("Save snapshot — description: ${state.snapshotDescInput}_", color = Cyan)
-                state.isRenamingSnapshot ->
-                    Text("Rename snapshot — new name: ${state.renameInput}_", color = Cyan)
-            }
-            if (state.snapshotList.isEmpty()) {
-                Text("No snapshots saved yet. Press N to save the active DAG.", color = White)
-            } else {
-                val visible = (height - 3).coerceAtLeast(1)
-                state.snapshotList.take(visible).forEachIndexed { idx, snap ->
-                    val selected = idx == state.selectedSnapshotIdx
-                    Text(
-                        value = (if (selected) "> " else "  ") + snap.description,
-                        color = if (selected) Cyan else White,
-                        textStyle = if (selected) Bold else Unspecified
-                    )
-                }
-                Spacer()
-                Text("L/Enter load  D delete  N save  Esc back", color = White)
+    Column(modifier = Modifier.padding(left = 1)) {
+        when {
+            state.isSavingSnapshot ->
+                Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588", color = Cyan)
+            state.isRenamingSnapshot ->
+                Text("Rename snapshot \u2014 new name: ${state.renameInput}\u2588", color = Cyan)
+        }
+        if (state.snapshotList.isEmpty()) {
+            Text("No snapshots saved yet. Press N to save the active DAG.", color = White)
+        } else {
+            val visible = (height - 2).coerceAtLeast(1)
+            state.snapshotList.take(visible).forEachIndexed { idx, snap ->
+                val selected = idx == state.selectedSnapshotIdx
+                Text(
+                    value = (if (selected) "\u276f " else "  ") + snap.description,
+                    color = if (selected) Cyan else White,
+                    textStyle = if (selected) Bold else Unspecified
+                )
             }
         }
     }

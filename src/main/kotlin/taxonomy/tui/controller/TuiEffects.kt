@@ -159,7 +159,13 @@ class DefaultTuiEffects(
     override fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit) {
         scope.launch {
             val status = try {
-                gateway.loadEval(path, modelName)
+                gateway.loadEval(path, modelName) { cur, total ->
+                    dispatch(
+                        TuiEvent.SetEvalLoaderStatus(
+                            "Parsing ${"%,d".format(cur)} / ${"%,d".format(total)} records\u2026"
+                        )
+                    )
+                }
             } catch (t: Throwable) {
                 "Load failed: ${t.message}"
             }
@@ -221,7 +227,7 @@ interface TuiGateway {
         parallelism: Int,
         updateRankings: Boolean
     )
-    suspend fun loadEval(path: String, modelName: String): String
+    suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String
     suspend fun regenerateLabels()
     suspend fun regenerateJudgeForCurrentNode()
     suspend fun exportAscii()

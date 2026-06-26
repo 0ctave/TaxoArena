@@ -41,6 +41,12 @@ fun BindTerminalInput(
 private fun mapKeyboard(event: KeyboardEvent): TuiEvent? {
     if (event.eventType == KeyboardEvent.EventTypeRelease) return null
 
+    // Global quit: Ctrl-C (raw-mode delivers it as codepoint 3, or as Ctrl + 'c'/'q').
+    val ctrl = (event.modifiers and KeyboardEvent.ModifierCtrl) != 0
+    if (event.codepoint == 3 || (ctrl && (event.codepoint == 'c'.code || event.codepoint == 'q'.code))) {
+        return TuiEvent.QuitRequested
+    }
+
     val key = when (event.codepoint) {
         KeyboardEvent.Up -> "arrowup"
         KeyboardEvent.Down -> "arrowdown"

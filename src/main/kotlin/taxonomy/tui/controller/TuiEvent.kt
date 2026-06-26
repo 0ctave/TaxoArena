@@ -14,6 +14,9 @@ sealed interface TuiEvent {
     data object SpinnerTick : TuiEvent
     data object LogsTick : TuiEvent
 
+    /** User asked to quit the whole TUI (Ctrl-C, Ctrl-Q, or the quit hotkey). */
+    data object QuitRequested : TuiEvent
+
     data class KeyPressed(
         val key: String,
         val rawKey: String = key

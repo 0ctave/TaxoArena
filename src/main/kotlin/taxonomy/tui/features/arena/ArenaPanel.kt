@@ -11,9 +11,9 @@ import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import taxonomy.service.AnalysisPanelState
-import taxonomy.tui.components.Panel
 import taxonomy.tui.state.ArenaUiState
 
+/** Content-only: the parent [taxonomy.tui.features.analysis.AnalysisPanel] owns the border. */
 @Composable
 fun ArenaPanel(
     width: Int,
@@ -21,8 +21,7 @@ fun ArenaPanel(
     controlState: AnalysisPanelState,
     arenaState: ArenaUiState,
 ) {
-    Panel("MODEL ARENA", Cyan, width, height) {
-        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+    Column(modifier = Modifier.padding(left = 1)) {
             val mode = if (arenaState.usePrecomputed) "PRECOMPUTED (no live generation)" else "LIVE"
             Text("Mode: $mode", color = Green)
 
@@ -65,6 +64,5 @@ fun ArenaPanel(
                     Text("  $domain: $status", color = White)
                 }
             }
-        }
     }
 }

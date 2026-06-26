@@ -21,7 +21,8 @@ object TuiReducer {
                     shell = state.shell.copy(spinnerTick = state.shell.spinnerTick + 1)
                 )
 
-            TuiEvent.LogsTick ->
+            TuiEvent.LogsTick,
+            TuiEvent.QuitRequested -> // quit is a pure side-effect, handled in the controller
                 state
 
             is TuiEvent.FocusPanelRequested ->
@@ -405,9 +406,11 @@ object TuiReducer {
 
             TuiEvent.StartGeneration ->
                 state.copy(
-                    // Stay on the config screen so the in-progress panel is visible while
-                    // the engine streams GenerationProgress into the Processes panel.
-                    startup = state.startup.copy(state = StartupState.CONFIGANDDOMAINS),
+                    // Jump to the dashboard so the DAG Explorer streams the live evolution as
+                    // the engine builds it (graphVersion bumps drive the rebuild). Progress is
+                    // surfaced by the pinned banner + the Processes panel.
+                    startup = state.startup.copy(state = StartupState.MAINDASHBOARD),
+                    shell = state.shell.copy(focusedPanel = FocusPanel.TOPOLOGY),
                     config = state.config.copy(generationStatusText = "Preparing dataset..."),
                     runtime = state.runtime.copy(isRegenerating = true)
                 )

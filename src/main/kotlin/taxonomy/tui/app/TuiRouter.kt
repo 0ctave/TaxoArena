@@ -18,6 +18,7 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.model.GraphNode
 import taxonomy.tui.components.DomainSelectorTable
+import taxonomy.tui.components.buildTreeLines
 import taxonomy.tui.components.HotkeyAction
 import taxonomy.tui.components.HotkeyBar
 import taxonomy.tui.components.Panel
@@ -124,7 +125,7 @@ private fun WelcomeRoute(
             HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
             HotkeyAction("Enter", "Select", TuiTheme.ACCENT, isPrimary = true),
             HotkeyAction("D", "Delete Snapshot"),
-            HotkeyAction("Q", "Quit"),
+            HotkeyAction("Q / Ctrl-C", "Quit", TuiTheme.ERROR),
         )
     )
 }
@@ -319,6 +320,14 @@ private fun MainDashboardRoute(
     val allNodes = remember(subscriptions.rootNode, subscriptions.graphVersion) {
         flattenNodes(subscriptions.rootNode)
     }
+    // Rebuild the collapsible tree whenever the graph OR the expand/collapse state changes.
+    val treeLines = remember(
+        subscriptions.rootNode,
+        subscriptions.graphVersion,
+        state.topology.expandedNodes,
+    ) {
+        buildTreeLines(subscriptions.rootNode, state.topology.expandedNodes)
+    }
 
     // Context-driven navigator: show the explorable DAG when one is loaded,
     // otherwise prompt to load a snapshot or generate a new taxonomy.
@@ -341,46 +350,47 @@ private fun MainDashboardRoute(
                     availableDomains = availableDomains,
                     selectedDomains = deps.config.dataset.selectedDomains,
                     allNodes = allNodes,
-                    treeLines = subscriptions.treeLines,
+                    treeLines = treeLines,
                 )
                 else -> Column(modifier = Modifier.padding(left = 2, top = 1)) {
-                    Text("No taxonomy DAG loaded.", color = TuiTheme.INFO, textStyle = Bold)
-                    Spacer()
-                    Text("To generate a new taxonomy:", color = TuiTheme.INFO)
-                    Text("  [X] Welcome \u2192 Enter (Create new) \u2192 [R] Generate", color = TuiTheme.ACCENT)
-                    Spacer()
-                    Text("To explore an existing one:", color = TuiTheme.INFO)
-                    Text("  [X] Welcome \u2192 pick a saved snapshot", color = TuiTheme.ACCENT)
+                    if (state.runtime.isRegenerating) {
+                        // Generation has started but the first nodes aren't seeded yet.
+                        Text("\u25cc Building taxonomy DAG\u2026", color = TuiTheme.RUNNING, textStyle = Bold)
+                        Spacer()
+                        Text(state.config.generationStatusText.ifBlank { "Preparing\u2026" }, color = TuiTheme.INFO)
+                        Text("The hierarchy will appear here as it forms.", color = TuiTheme.INFO)
+                    } else {
+                        Text("No taxonomy DAG loaded.", color = TuiTheme.INFO, textStyle = Bold)
+                        Spacer()
+                        Text("To generate a new taxonomy:", color = TuiTheme.INFO)
+                        Text("  [X] Welcome \u2192 Enter (Create new) \u2192 [R] Generate", color = TuiTheme.ACCENT)
+                        Spacer()
+                        Text("To explore an existing one:", color = TuiTheme.INFO)
+                        Text("  [X] Welcome \u2192 pick a saved snapshot", color = TuiTheme.ACCENT)
+                    }
                 }
             }
         }
 
         Spacer(Modifier.width(1).height(topH))
 
-        Panel(
-            title = "ANALYSIS HUB",
-            accentColor = TuiTheme.panelAccent(state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB),
+        // AnalysisPanel owns its own bordered frame (title reflects the active mode).
+        val activeProcess = deriveProcessRows(deps, state, subscriptions).firstOrNull { !it.done }
+        AnalysisPanel(
             width = arenaW,
             height = topH,
-        ) {
-            // Most relevant active process, pinned at the top of the dashboard
-            // so it is always visible and one keystroke away (selection wins).
-            val activeProcess = deriveProcessRows(deps, state, subscriptions).firstOrNull { !it.done }
-            AnalysisPanel(
-                width = arenaW - 4,
-                height = topH - 2,
-                controlState = subscriptions.arenaControlState,
-                inspectorScroll = state.analysis.inspectorScroll,
-                metricsScroll = state.analysis.metricsScrollOffset,
-                benchmarkScroll = state.benchmark.benchmarkScrollOffset,
-                batchTrickleScroll = state.trickle.batchTrickleScrollOffset,
-                trickleResults = state.trickle.batchTrickleResults,
-                snapshotState = state.snapshot,
-                arenaState = state.arena,
-                benchmarkState = state.benchmark,
-                activeProcess = activeProcess,
-            )
-        }
+            focused = state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB,
+            controlState = subscriptions.arenaControlState,
+            inspectorScroll = state.analysis.inspectorScroll,
+            metricsScroll = state.analysis.metricsScrollOffset,
+            benchmarkScroll = state.benchmark.benchmarkScrollOffset,
+            batchTrickleScroll = state.trickle.batchTrickleScrollOffset,
+            trickleResults = state.trickle.batchTrickleResults,
+            snapshotState = state.snapshot,
+            arenaState = state.arena,
+            benchmarkState = state.benchmark,
+            activeProcess = activeProcess,
+        )
     }
 
     Spacer()
@@ -409,7 +419,7 @@ private fun BottomLogsAndTraces(
             width = logsW,
             height = bottomH
         ) {
-            LogsPanel(logsW - 4, bottomH, state.logs.logScrollOffset, title = "")
+            LogsPanel(logsW - 4, bottomH - 2, state.logs.logScrollOffset)
         }
 
         Spacer(Modifier.width(1).height(bottomH))
@@ -454,9 +464,9 @@ private fun deriveProcessRows(
     (subscriptions?.embeddingProgress as? Pair<*, *>)?.let { (cur, total) ->
         val c = (cur as? Int) ?: 0; val t = (total as? Int) ?: 0
         if (t > 0 && c < t) rows += ProcessRow(
-            name = "Embedding queries",
+            name = "Embeddings",
             percent = c.toDouble() / t * 100.0,
-            status = "$c / $t",
+            status = "${"%,d".format(c)} / ${"%,d".format(t)} computed",
         )
     }
 
@@ -477,7 +487,16 @@ private fun deriveProcessRows(
         if (t > 0 && c < t) rows += ProcessRow(
             name = "Labeling nodes",
             percent = c.toDouble() / t * 100.0,
-            status = "$c / $t",
+            status = "${"%,d".format(c)} / ${"%,d".format(t)} labelled",
+        )
+    }
+
+    // Eval-results load (unzip + parse). Surfaced via the benchmark eval-loader state.
+    if (state.benchmark.evalLoaderIsRunning) {
+        rows += ProcessRow(
+            name = "Eval results",
+            percent = null,
+            status = state.benchmark.evalLoaderStatus.ifBlank { "Unzipping & parsing\u2026" },
         )
     }
 
@@ -565,19 +584,29 @@ private fun dashboardHotkeys(hasDag: Boolean, focused: FocusPanel): List<HotkeyA
         return listOf(
             HotkeyAction("X", "Welcome / New DAG", TuiTheme.ACCENT, isPrimary = true),
             HotkeyAction("Tab", "Switch Panels"),
-            HotkeyAction("Q", "Quit", TuiTheme.ERROR),
+            HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
+        )
+    }
+    // When the DAG navigator is focused, surface the tree-specific controls.
+    if (focused == FocusPanel.TOPOLOGY) {
+        return listOf(
+            HotkeyAction("W/S", "Navigate", TuiTheme.ACCENT),
+            HotkeyAction("\u2192/\u2190", "Expand/Collapse"),
+            HotkeyAction("Space", "Toggle"),
+            HotkeyAction("Enter", "Inspect"),
+            HotkeyAction("Tab", "Switch Panels"),
+            HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
         )
     }
     return buildList {
         add(HotkeyAction("Tab", "Switch Panels", TuiTheme.ACCENT))
-        add(HotkeyAction("W/S", "Navigate"))
-        add(HotkeyAction("Enter", "Inspect"))
         add(HotkeyAction("M", "Metrics"))
         add(HotkeyAction("A", "Arena"))
         add(HotkeyAction("B", "Benchmark"))
         add(HotkeyAction("T", "Trickle"))
         add(HotkeyAction("N", "Save Snapshot"))
         add(HotkeyAction("X", "Welcome", TuiTheme.ACCENT))
+        add(HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR))
     }
 }
 

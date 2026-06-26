@@ -17,7 +17,6 @@ fun TricklePanel(
     results: BatchTrickleTestResults?,
     scrollOffset: Int,
 ) {
-    Panel("TRICKLE TEST", Cyan, width, height) {
         Column(modifier = Modifier.padding(left = 2, top = 1)) {
             if (results == null) {
                 Text("No trickle results available.", color = White)
@@ -30,5 +29,4 @@ fun TricklePanel(
                 Text("Scroll: $scrollOffset", color = White)
             }
         }
-    }
 }

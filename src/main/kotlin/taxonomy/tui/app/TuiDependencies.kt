@@ -35,7 +35,7 @@ fun TaxonomyTuiService.toTuiDependencies(): TuiDependencies =
         log = log,
     )
 
-fun TuiDependencies.buildController(): TuiController {
+fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
     val gateway = TuiGatewayImpl(this)
     val effects = DefaultTuiEffects(tuiScope, gateway)
     val facade = TuiConfigFacade(this)
@@ -45,5 +45,9 @@ fun TuiDependencies.buildController(): TuiController {
         commandController = commandController,
         settingItemsProvider = facade::buildSettingItems,
         availableDomainsProvider = facade::getAvailableDomains,
+        treeLinesProvider = { expanded ->
+            taxonomy.tui.components.buildTreeLines(taxonomyService.rootNodeFlow.value, expanded)
+        },
+        onQuit = onQuit,
     )
 }
