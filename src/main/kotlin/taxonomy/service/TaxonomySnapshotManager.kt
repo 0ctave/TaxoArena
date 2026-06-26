@@ -21,6 +21,19 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Metrics stored alongside a DAG snapshot.
+ *
+ * The fields mirror the canonical [taxonomy.model.TaxonomyMetricsData] exactly
+ * (plus the snapshot-only [nodesWithJudges]); all defaults are tolerant so old
+ * snapshot rows written before a field existed still deserialize. The JSON
+ * shape is kept FLAT (unchanged from earlier versions) for backward
+ * compatibility — never reorder/rename existing fields.
+ *
+ * Construction must go through [fromReport] so there is a single place that
+ * maps a computed report into persisted metrics. Use [toData] / [fromData] to
+ * convert to and from the canonical payload.
+ */
 @Serializable
 data class SnapshotMetrics(
     val totalNodes: Int,
@@ -44,8 +57,70 @@ data class SnapshotMetrics(
     val maxLeafConcentration: Double = 0.0,
     val equilibriumIndex: Double = 0.0,
     val leafDistribEntropy: Double = 0.0,
-    val medianLeafAssignments: Double = 0.0
-)
+    val medianLeafAssignments: Double = 0.0,
+    /** Average vMF κ per depth level. Defaulted for backward compatibility. */
+    val kappaByDepth: Map<Int, Double> = emptyMap()
+) {
+    /** Project onto the canonical metrics payload (drops snapshot-only fields). */
+    fun toData(): TaxonomyMetricsData = TaxonomyMetricsData(
+        totalNodes            = totalNodes,
+        leafNodes             = leafNodes,
+        crossDomainNodes      = crossDomainNodes,
+        maxDepth              = maxDepth,
+        avgLeafDepth          = avgLeafDepth,
+        medianLeafAssignments = medianLeafAssignments,
+        totalUniqueQueries    = totalUniqueQueries,
+        residualQueries       = residualQueries,
+        residualRatio         = residualRatio,
+        maxLeafConcentration  = maxLeafConcentration,
+        contaminationRatio    = contaminationRatio,
+        equilibriumIndex      = equilibriumIndex,
+        nmi                   = nmi,
+        ari                   = ari,
+        dendrogramPurity      = dendrogramPurity,
+        weightedLeafPurity    = weightedLeafPurity,
+        edgeF1                = edgeF1,
+        sphericalSilhouette   = sphericalSilhouette,
+        ancestorCorrectRate   = ancestorCorrectRate,
+        avgMatchCount         = avgMatchCount,
+        kappaByDepth          = kappaByDepth,
+        leafDistribEntropy    = leafDistribEntropy,
+    )
+
+    companion object {
+        /** Single bridge from the canonical payload to persisted snapshot metrics. */
+        fun fromData(data: TaxonomyMetricsData, nodesWithJudges: Int = 0): SnapshotMetrics =
+            SnapshotMetrics(
+                totalNodes            = data.totalNodes,
+                leafNodes             = data.leafNodes,
+                crossDomainNodes      = data.crossDomainNodes,
+                maxDepth              = data.maxDepth,
+                totalUniqueQueries    = data.totalUniqueQueries,
+                nmi                   = data.nmi,
+                ari                   = data.ari,
+                dendrogramPurity      = data.dendrogramPurity,
+                weightedLeafPurity    = data.weightedLeafPurity,
+                edgeF1                = data.edgeF1,
+                sphericalSilhouette   = data.sphericalSilhouette,
+                ancestorCorrectRate   = data.ancestorCorrectRate,
+                avgMatchCount         = data.avgMatchCount,
+                contaminationRatio    = data.contaminationRatio,
+                nodesWithJudges       = nodesWithJudges,
+                avgLeafDepth          = data.avgLeafDepth,
+                residualQueries       = data.residualQueries,
+                residualRatio         = data.residualRatio,
+                maxLeafConcentration  = data.maxLeafConcentration,
+                equilibriumIndex      = data.equilibriumIndex,
+                leafDistribEntropy    = data.leafDistribEntropy,
+                medianLeafAssignments = data.medianLeafAssignments,
+                kappaByDepth          = data.kappaByDepth,
+            )
+
+        /** Single bridge from a freshly computed report to persisted snapshot metrics. */
+        fun fromReport(report: TaxonomyMetrics.Report, nodesWithJudges: Int = 0): SnapshotMetrics =
+            fromData(report.toData(), nodesWithJudges)
+    }
+}
 
 @Serializable
 data class SnapshotSettings(
@@ -343,30 +418,7 @@ class TaxonomySnapshotManager(
         
         val nodesWithJudges = serializedGraph.nodes.count { !it.judgePrompt.isNullOrEmpty() }
         val report = TaxonomyMetrics(root).generateReport()
-        val metrics = SnapshotMetrics(
-            totalNodes = report.totalNodes,
-            leafNodes = report.leafNodes,
-            crossDomainNodes = report.crossDomainNodes,
-            maxDepth = report.maxDepth,
-            totalUniqueQueries = report.totalUniqueQueries,
-            nmi = report.nmi,
-            ari = report.ari,
-            dendrogramPurity = report.dendrogramPurity,
-            weightedLeafPurity = report.weightedLeafPurity,
-            edgeF1 = report.edgeF1,
-            sphericalSilhouette = report.sphericalSilhouette,
-            ancestorCorrectRate = report.ancestorCorrectRate,
-            avgMatchCount = report.avgMatchCount,
-            contaminationRatio = report.contaminationRatio,
-            nodesWithJudges = nodesWithJudges,
-            avgLeafDepth = report.avgLeafDepth,
-            residualQueries = report.residualQueries,
-            residualRatio = report.residualRatio,
-            maxLeafConcentration = report.maxLeafConcentration,
-            equilibriumIndex = report.equilibriumIndex,
-            leafDistribEntropy = report.leafDistribEntropy,
-            medianLeafAssignments = report.medianLeafAssignments
-        )
+        val metrics = SnapshotMetrics.fromReport(report, nodesWithJudges)
 
         val settings = SnapshotSettings(
             selectedDomains = config.dataset.selectedDomains,
@@ -510,7 +562,7 @@ class TaxonomySnapshotManager(
                             }
                             oldSnapshot = DagSnapshot(snapshotId, timestamp, description,
                                 SerializedGraph("", emptyList()),
-                                SnapshotMetrics(0, 0, 0, 0, 0),  // only 5 required fields now
+                                SnapshotMetrics(0, 0, 0, 0, 0),  // placeholder; real metrics recomputed below
                                 settings, logUuid, reservedQueries, readConfig(rs, settings))                        }
                     }
                 }
@@ -526,30 +578,7 @@ class TaxonomySnapshotManager(
 
             val nodesWithJudges = serializedGraph.nodes.count { !it.judgePrompt.isNullOrEmpty() }
             val report = TaxonomyMetrics(root).generateReport()
-            val metrics = SnapshotMetrics(
-                totalNodes = report.totalNodes,
-                leafNodes = report.leafNodes,
-                crossDomainNodes = report.crossDomainNodes,
-                maxDepth = report.maxDepth,
-                totalUniqueQueries = report.totalUniqueQueries,
-                nmi = report.nmi,
-                ari = report.ari,
-                dendrogramPurity = report.dendrogramPurity,
-                weightedLeafPurity = report.weightedLeafPurity,
-                edgeF1 = report.edgeF1,
-                sphericalSilhouette = report.sphericalSilhouette,
-                ancestorCorrectRate = report.ancestorCorrectRate,
-                avgMatchCount = report.avgMatchCount,
-                contaminationRatio = report.contaminationRatio,
-                nodesWithJudges = nodesWithJudges,
-                avgLeafDepth = report.avgLeafDepth,
-                residualQueries = report.residualQueries,
-                residualRatio = report.residualRatio,
-                maxLeafConcentration = report.maxLeafConcentration,
-                equilibriumIndex = report.equilibriumIndex,
-                leafDistribEntropy = report.leafDistribEntropy,
-                medianLeafAssignments = report.medianLeafAssignments
-            )
+            val metrics = SnapshotMetrics.fromReport(report, nodesWithJudges)
             
             val updatedSnapshot = oldSnap.copy(
                 graph = serializedGraph,

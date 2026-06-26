@@ -59,35 +59,83 @@ data class GmmParams(
 }
 
 /**
- * Stores snapshot metrics of the DAG at a specific iteration or final state.
+ * Canonical, framework-wide metrics payload for the Taxonomy DAG at a single
+ * point in time.
+ *
+ * This is the SINGLE SOURCE OF TRUTH for computed DAG metrics. It is computed
+ * once by [taxonomy.utils.TaxonomyMetrics.generateReport] and then carried,
+ * unchanged, into:
+ *   - the per-iteration history ([IterationMetrics] = label + this payload),
+ *   - DAG snapshot persistence ([taxonomy.service.SnapshotMetrics] wraps this),
+ *   - the TUI metrics view.
+ *
+ * All defaults are tolerant so older serialized snapshots (which may omit
+ * fields) still deserialize cleanly.
  */
 @Serializable
-data class IterationMetrics(
-    val iteration: String,
-    val totalNodes: Int,
-    val leafNodes: Int,
-    val crossDomainNodes: Int,
-    val maxDepth: Int,
-    val avgLeafDepth: Double,
+data class TaxonomyMetricsData(
+    val totalNodes: Int = 0,
+    val leafNodes: Int = 0,
+    val crossDomainNodes: Int = 0,
+    val maxDepth: Int = 0,
+    val avgLeafDepth: Double = 0.0,
     val medianLeafAssignments: Double = 1.0,
-    val totalUniqueQueries: Int,
-    val residualQueries: Int,
-    val residualRatio: Double,
-    val maxLeafConcentration: Double,
-    val contaminationRatio: Double,
-    val equilibriumIndex: Double,
-    // vMF / NiW Evaluation Metrics
+    val totalUniqueQueries: Int = 0,
+    val residualQueries: Int = 0,
+    val residualRatio: Double = 0.0,
+    val maxLeafConcentration: Double = 0.0,
+    val contaminationRatio: Double = 0.0,
+    val equilibriumIndex: Double = 0.0,
+    // vMF / NiW evaluation metrics
     val nmi: Double = 0.0,
     val ari: Double = 0.0,
     val dendrogramPurity: Double = 0.0,
     val weightedLeafPurity: Double = 0.0,
     val edgeF1: Double = 0.0,
     val sphericalSilhouette: Double = 0.0,
-
     val ancestorCorrectRate: Double = 0.0,
-    val avgMatchCount: Double = 1.0,       // ADD
-    val leafDistribEntropy: Double = 0.0
+    val avgMatchCount: Double = 1.0,
+    /** Average vMF concentration (κ) per depth level. */
+    val kappaByDepth: Map<Int, Double> = emptyMap(),
+    val leafDistribEntropy: Double = 0.0,
 )
+
+/**
+ * A labelled metrics point in the per-iteration history.
+ *
+ * Composes the canonical [TaxonomyMetricsData] rather than duplicating its
+ * fields, so there is exactly one definition of every metric. Property
+ * accessors delegate to [metrics] for backward compatibility with call-sites
+ * that read `iterationMetrics.totalNodes` etc. directly.
+ */
+@Serializable
+data class IterationMetrics(
+    val iteration: String,
+    val metrics: TaxonomyMetricsData = TaxonomyMetricsData(),
+) {
+    val totalNodes: Int                 get() = metrics.totalNodes
+    val leafNodes: Int                  get() = metrics.leafNodes
+    val crossDomainNodes: Int           get() = metrics.crossDomainNodes
+    val maxDepth: Int                   get() = metrics.maxDepth
+    val avgLeafDepth: Double            get() = metrics.avgLeafDepth
+    val medianLeafAssignments: Double   get() = metrics.medianLeafAssignments
+    val totalUniqueQueries: Int         get() = metrics.totalUniqueQueries
+    val residualQueries: Int            get() = metrics.residualQueries
+    val residualRatio: Double           get() = metrics.residualRatio
+    val maxLeafConcentration: Double    get() = metrics.maxLeafConcentration
+    val contaminationRatio: Double      get() = metrics.contaminationRatio
+    val equilibriumIndex: Double        get() = metrics.equilibriumIndex
+    val nmi: Double                     get() = metrics.nmi
+    val ari: Double                     get() = metrics.ari
+    val dendrogramPurity: Double        get() = metrics.dendrogramPurity
+    val weightedLeafPurity: Double      get() = metrics.weightedLeafPurity
+    val edgeF1: Double                  get() = metrics.edgeF1
+    val sphericalSilhouette: Double     get() = metrics.sphericalSilhouette
+    val ancestorCorrectRate: Double     get() = metrics.ancestorCorrectRate
+    val avgMatchCount: Double           get() = metrics.avgMatchCount
+    val kappaByDepth: Map<Int, Double>  get() = metrics.kappaByDepth
+    val leafDistribEntropy: Double      get() = metrics.leafDistribEntropy
+}
 
 fun Embedding.projectTo(targetDim: Int): DoubleArray {
     val sliced = values.copyOf(targetDim).map { it.toDouble() }.toDoubleArray()

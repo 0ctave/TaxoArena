@@ -5,6 +5,7 @@ import taxonomy.config.TaxonomyConfig
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
 import taxonomy.model.IterationMetrics
+import taxonomy.model.TaxonomyMetricsData
 import taxonomy.model.projectTo
 
 /**
@@ -56,6 +57,37 @@ class TaxonomyMetrics(
          * compiles without change.
          */
         val vmfKappaByDepth: Map<Int, Double> get() = kappaByDepth
+
+        /**
+         * Project this compute-time report onto the canonical, serializable
+         * [TaxonomyMetricsData] payload that is shared across iteration
+         * history, snapshots, and the TUI. This is the single bridge between
+         * the metrics computation and everything that consumes metrics.
+         */
+        fun toData(): TaxonomyMetricsData = TaxonomyMetricsData(
+            totalNodes            = totalNodes,
+            leafNodes             = leafNodes,
+            crossDomainNodes      = crossDomainNodes,
+            maxDepth              = maxDepth,
+            avgLeafDepth          = avgLeafDepth,
+            medianLeafAssignments = medianLeafAssignments,
+            totalUniqueQueries    = totalUniqueQueries,
+            residualQueries       = residualQueries,
+            residualRatio         = residualRatio,
+            maxLeafConcentration  = maxLeafConcentration,
+            contaminationRatio    = contaminationRatio,
+            equilibriumIndex      = equilibriumIndex,
+            nmi                   = nmi,
+            ari                   = ari,
+            dendrogramPurity      = dendrogramPurity,
+            weightedLeafPurity    = weightedLeafPurity,
+            edgeF1                = edgeF1,
+            sphericalSilhouette   = sphericalSilhouette,
+            ancestorCorrectRate   = ancestorCorrectRate,
+            avgMatchCount         = avgMatchCount,
+            kappaByDepth          = kappaByDepth,
+            leafDistribEntropy    = leafDistribEntropy,
+        )
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -443,27 +475,9 @@ class TaxonomyMetrics(
     }
 }
 
+/**
+ * Wrap a computed [TaxonomyMetrics.Report] as a labelled history point.
+ * Trivial now that [IterationMetrics] composes the canonical payload.
+ */
 fun reportToIterationMetrics(label: String, r: TaxonomyMetrics.Report): IterationMetrics =
-    IterationMetrics(
-        iteration             = label,
-        totalNodes            = r.totalNodes,
-        leafNodes             = r.leafNodes,
-        crossDomainNodes      = r.crossDomainNodes,
-        maxDepth              = r.maxDepth,
-        avgLeafDepth          = r.avgLeafDepth,
-        totalUniqueQueries    = r.totalUniqueQueries,
-        residualQueries       = r.residualQueries,
-        residualRatio         = r.residualRatio,
-        maxLeafConcentration  = r.maxLeafConcentration,
-        contaminationRatio    = r.contaminationRatio,
-        equilibriumIndex      = r.equilibriumIndex,
-        nmi                   = r.nmi,
-        ari                   = r.ari,
-        dendrogramPurity      = r.dendrogramPurity,
-        weightedLeafPurity    = r.weightedLeafPurity,
-        edgeF1                = r.edgeF1,
-        sphericalSilhouette   = r.sphericalSilhouette,
-        ancestorCorrectRate   = r.ancestorCorrectRate,
-        avgMatchCount         = r.avgMatchCount,
-        leafDistribEntropy    = r.leafDistribEntropy
-    )
+    IterationMetrics(iteration = label, metrics = r.toData())
