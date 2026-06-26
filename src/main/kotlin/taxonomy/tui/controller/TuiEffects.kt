@@ -30,6 +30,11 @@ interface TuiEffects {
     fun regenerateLabels()
     fun regenerateJudgeForCurrentNode()
     fun exportAscii()
+
+    /** Toggle a dataset domain on/off, then refresh the settings view. */
+    fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit)
+    /** Apply a setting value by item name (instant toggle or confirmed editor), then refresh. */
+    fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit)
 }
 
 class DefaultTuiEffects(
@@ -157,6 +162,16 @@ class DefaultTuiEffects(
     override fun exportAscii() {
         scope.launch { gateway.exportAscii() }
     }
+
+    override fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit) {
+        gateway.toggleDomain(domainName)
+        dispatch(TuiEvent.IncrementSettingsVersion)
+    }
+
+    override fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit) {
+        gateway.applySetting(name, value)
+        dispatch(TuiEvent.IncrementSettingsVersion)
+    }
 }
 
 interface TuiGateway {
@@ -186,4 +201,7 @@ interface TuiGateway {
     suspend fun regenerateLabels()
     suspend fun regenerateJudgeForCurrentNode()
     suspend fun exportAscii()
+
+    fun toggleDomain(domainName: String)
+    fun applySetting(name: String, value: String): Boolean
 }

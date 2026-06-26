@@ -1,11 +1,18 @@
 package taxonomy.tui.controller
 
 import taxonomy.service.AnalysisMode
+import taxonomy.tui.components.SettingItem
+import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.TuiAppState
 
 class CommandController(
-    private val effects: TuiEffects
+    private val effects: TuiEffects,
+    /** Provides the current setting items so instant toggles/edits resolve by index. */
+    private val settingItemsProvider: () -> List<SettingItem> = { emptyList() }
 ) {
+
+    private fun selectedSetting(state: TuiAppState): SettingItem? =
+        settingItemsProvider().getOrNull(state.config.selectedSettingIdx)
 
     fun handle(state: TuiAppState, event: TuiEvent, dispatch: (TuiEvent) -> Unit) {
         when (event) {
@@ -32,6 +39,28 @@ class CommandController(
 
             TuiEvent.StartDatasetDownload -> {
                 effects.downloadDataset(dispatch)
+            }
+
+            is TuiEvent.ToggleSelectedDomain -> {
+                effects.toggleDomain(event.domainName, dispatch)
+            }
+
+            TuiEvent.ActivateSelectedSetting -> {
+                if (state.config.activeSubPanel == ConfigSubPanel.SETTINGS) {
+                    val item = selectedSetting(state) ?: return
+                    val instantValue = item.nextValue()
+                    if (item.isInstant && instantValue != null) {
+                        // Boolean/Select: toggle/cycle in place, no text entry.
+                        effects.applySetting(item.name, instantValue, dispatch)
+                    } else {
+                        // Number/Text: open the editor pre-filled with the current value.
+                        dispatch(TuiEvent.StartEditingSetting(item.getValue()))
+                    }
+                }
+            }
+
+            is TuiEvent.ApplySetting -> {
+                effects.applySetting(event.name, event.value, dispatch)
             }
 
             TuiEvent.ConfirmBatchGeneralityInput -> {
