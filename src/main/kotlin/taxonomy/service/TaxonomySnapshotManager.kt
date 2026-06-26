@@ -59,7 +59,27 @@ data class SnapshotSettings(
     val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO
-)
+) {
+    /** Map the legacy persisted settings onto the effective config; unknown fields keep defaults. */
+    fun toEffectiveConfig(): EffectiveConfig = EffectiveConfig(
+        execution = EffectiveConfig.Execution(
+            enableLabeling = enableLabeling,
+            enableLiveLabeling = enableLiveLabeling
+        ),
+        dataset = EffectiveConfig.Dataset(
+            datasetType = datasetType,
+            selectedDomains = selectedDomains
+        ),
+        formalism = EffectiveConfig.Formalism(
+            maxDepth = maxDepth,
+            minClusterSize = minClusterSize,
+            separationEpsilon = separationEpsilon,
+            cosineTau = cosineTau,
+            assignmentGap = assignmentGap,
+            emaAlpha = emaAlpha
+        )
+    )
+}
 
 @Serializable
 data class DagSnapshot(
@@ -70,7 +90,10 @@ data class DagSnapshot(
     val metrics: SnapshotMetrics,
     val settings: SnapshotSettings,
     val logUuid: String? = null,
-    val reservedQueries: Map<String, List<String>> = emptyMap()
+    val reservedQueries: Map<String, List<String>> = emptyMap(),
+    // Full effective config that travels with the snapshot. Null for legacy
+    // snapshots saved before config embedding; callers fall back to [settings].
+    val config: EffectiveConfig? = null
 )
 
 @Serializable
@@ -81,7 +104,8 @@ data class DagSnapshotMetadata(
     val metrics: SnapshotMetrics,
     val settings: SnapshotSettings,
     val logUuid: String? = null,
-    val reservedQueries: Map<String, List<String>> = emptyMap()
+    val reservedQueries: Map<String, List<String>> = emptyMap(),
+    val config: EffectiveConfig? = null
 )
 
 @Component
@@ -109,6 +133,23 @@ class TaxonomySnapshotManager(
             conn.autoCommit = true
         }
 
+    /** Decode the embedded effective config, falling back to legacy [SnapshotSettings] for old rows. */
+    private fun decodeConfig(configStr: String?, settings: SnapshotSettings): EffectiveConfig =
+        if (!configStr.isNullOrEmpty()) {
+            try {
+                json.decodeFromString<EffectiveConfig>(configStr)
+            } catch (e: Exception) {
+                settings.toEffectiveConfig()
+            }
+        } else {
+            settings.toEffectiveConfig()
+        }
+
+    private fun readConfig(rs: java.sql.ResultSet, settings: SnapshotSettings): EffectiveConfig {
+        val configStr = try { rs.getString("config") } catch (e: Exception) { null }
+        return decodeConfig(configStr, settings)
+    }
+
     init {
         initDatabase()
         migrateExistingJsonSnapshots()
@@ -131,12 +172,19 @@ class TaxonomySnapshotManager(
                             metrics TEXT NOT NULL,
                             settings TEXT NOT NULL,
                             log_uuid TEXT,
-                            reserved_queries TEXT
+                            reserved_queries TEXT,
+                            config TEXT
                         )
                     """.trimIndent())
-                    
+
                     try {
                         stmt.execute("ALTER TABLE snapshots ADD COLUMN reserved_queries TEXT")
+                    } catch (e: Exception) {
+                        // Column might already exist, which is fine
+                    }
+
+                    try {
+                        stmt.execute("ALTER TABLE snapshots ADD COLUMN config TEXT")
                     } catch (e: Exception) {
                         // Column might already exist, which is fine
                     }
@@ -164,14 +212,14 @@ class TaxonomySnapshotManager(
             log.info("Migrating ${jsonFiles.size} existing JSON snapshots to snapshots.db...")
             connection.use { conn ->
                 conn.prepareStatement("""
-                    INSERT OR REPLACE INTO snapshots (id, timestamp, description, graph, metrics, settings, log_uuid, reserved_queries)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO snapshots (id, timestamp, description, graph, metrics, settings, log_uuid, reserved_queries, config)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """).use { stmt ->
                     for (file in jsonFiles) {
                         try {
                             val content = file.readText()
                             val snapshot = json.decodeFromString<DagSnapshot>(content)
-                            
+
                             stmt.setString(1, snapshot.id)
                             stmt.setString(2, snapshot.timestamp)
                             stmt.setString(3, snapshot.description)
@@ -180,6 +228,7 @@ class TaxonomySnapshotManager(
                             stmt.setString(6, json.encodeToString(snapshot.settings))
                             stmt.setString(7, snapshot.logUuid)
                             stmt.setString(8, json.encodeToString(snapshot.reservedQueries))
+                            stmt.setString(9, snapshot.config?.let { json.encodeToString(it) })
                             stmt.execute()
 
                             // Delete migrated JSON file
@@ -207,8 +256,8 @@ class TaxonomySnapshotManager(
             connection.use { conn ->
                 conn.createStatement().use { stmt ->
                     stmt.executeQuery("""
-                        SELECT id, timestamp, description, metrics, settings, log_uuid, reserved_queries 
-                        FROM snapshots 
+                        SELECT id, timestamp, description, metrics, settings, log_uuid, reserved_queries, config
+                        FROM snapshots
                         ORDER BY timestamp DESC
                     """.trimIndent()).use { rs ->
                         while (rs.next()) {
@@ -241,7 +290,8 @@ class TaxonomySnapshotManager(
                                     metrics = metrics,
                                     settings = settings,
                                     logUuid = logUuid,
-                                    reservedQueries = reservedQueries
+                                    reservedQueries = reservedQueries,
+                                    config = readConfig(rs, settings)
                                 )
                             )
                         }
@@ -252,6 +302,30 @@ class TaxonomySnapshotManager(
             log.error("Failed to list snapshots from DB", e)
         }
         return list
+    }
+
+    /**
+     * Effective config of the most recently saved/loaded snapshot, used to restore tunables on
+     * startup. Falls back to legacy [SnapshotSettings] for snapshots saved before config embedding.
+     */
+    fun latestConfig(): EffectiveConfig? {
+        try {
+            connection.use { conn ->
+                conn.createStatement().use { stmt ->
+                    stmt.executeQuery("""
+                        SELECT settings, config FROM snapshots ORDER BY timestamp DESC LIMIT 1
+                    """.trimIndent()).use { rs ->
+                        if (rs.next()) {
+                            val settings = json.decodeFromString<SnapshotSettings>(rs.getString("settings"))
+                            return decodeConfig(rs.getString("config"), settings)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to load latest snapshot config from DB", e)
+        }
+        return null
     }
 
     fun saveSnapshot(root: GraphNode, description: String, logsToSave: List<String>? = null): DagSnapshot {
@@ -326,6 +400,8 @@ class TaxonomySnapshotManager(
             emptyMap()
         }
 
+        val effectiveConfig = config.toEffectiveConfig()
+
         val snapshot = DagSnapshot(
             id = snapshotId,
             timestamp = timestampStr,
@@ -334,14 +410,15 @@ class TaxonomySnapshotManager(
             metrics = metrics,
             settings = settings,
             logUuid = uuid,
-            reservedQueries = reservedQueries
+            reservedQueries = reservedQueries,
+            config = effectiveConfig
         )
-        
+
         try {
             connection.use { conn ->
                 conn.prepareStatement("""
-                    INSERT OR REPLACE INTO snapshots (id, timestamp, description, graph, metrics, settings, log_uuid, reserved_queries)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO snapshots (id, timestamp, description, graph, metrics, settings, log_uuid, reserved_queries, config)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """).use { stmt ->
                     stmt.setString(1, snapshotId)
                     stmt.setString(2, timestampStr)
@@ -351,6 +428,7 @@ class TaxonomySnapshotManager(
                     stmt.setString(6, json.encodeToString(settings))
                     stmt.setString(7, uuid)
                     stmt.setString(8, json.encodeToString(reservedQueries))
+                    stmt.setString(9, json.encodeToString(effectiveConfig))
                     stmt.execute()
                 }
             }
@@ -367,7 +445,7 @@ class TaxonomySnapshotManager(
             var snapshot: DagSnapshot? = null
             connection.use { conn ->
                 conn.prepareStatement("""
-                    SELECT timestamp, metrics, settings, log_uuid, reserved_queries FROM snapshots WHERE id = ?
+                    SELECT timestamp, metrics, settings, log_uuid, reserved_queries, config FROM snapshots WHERE id = ?
                 """).use { stmt ->
                     stmt.setString(1, snapshotId)
                     stmt.executeQuery().use { rs ->
@@ -386,7 +464,7 @@ class TaxonomySnapshotManager(
                                     emptyMap()
                                 }
                             }
-                            snapshot = DagSnapshot(snapshotId, timestamp, newDescription, SerializedGraph("", emptyList()), metrics, settings, logUuid, reservedQueries)
+                            snapshot = DagSnapshot(snapshotId, timestamp, newDescription, SerializedGraph("", emptyList()), metrics, settings, logUuid, reservedQueries, readConfig(rs, settings))
                         }
                     }
                 }
@@ -411,7 +489,7 @@ class TaxonomySnapshotManager(
             var oldSnapshot: DagSnapshot? = null
             connection.use { conn ->
                 conn.prepareStatement("""
-                    SELECT timestamp, description, settings, log_uuid, reserved_queries FROM snapshots WHERE id = ?
+                    SELECT timestamp, description, settings, log_uuid, reserved_queries, config FROM snapshots WHERE id = ?
                 """).use { stmt ->
                     stmt.setString(1, snapshotId)
                     stmt.executeQuery().use { rs ->
@@ -433,7 +511,7 @@ class TaxonomySnapshotManager(
                             oldSnapshot = DagSnapshot(snapshotId, timestamp, description,
                                 SerializedGraph("", emptyList()),
                                 SnapshotMetrics(0, 0, 0, 0, 0),  // only 5 required fields now
-                                settings, logUuid, reservedQueries)                        }
+                                settings, logUuid, reservedQueries, readConfig(rs, settings))                        }
                     }
                 }
             }
