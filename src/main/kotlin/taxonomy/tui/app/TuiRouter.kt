@@ -391,6 +391,7 @@ private fun MainDashboardRoute(
             arenaState = state.arena,
             benchmarkState = state.benchmark,
             latestMetrics = subscriptions.metricsHistory.lastOrNull() as? taxonomy.model.IterationMetrics,
+            metricsHistory = subscriptions.metricsHistory.mapNotNull { it as? taxonomy.model.IterationMetrics },
             activeProcess = activeProcess,
         )
     }

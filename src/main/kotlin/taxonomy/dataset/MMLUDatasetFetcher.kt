@@ -539,22 +539,41 @@ class MMLUDatasetFetcher(
         if (current >= total) println()
     }
 
-    fun splitTrainTest(dataset: Map<String, List<String>>, testRatio: Double = 0.2): Pair<Map<String, List<String>>, Map<String, List<String>>> {
+    /**
+     * Domain-stratified random train/test split: each domain contributes the SAME [testRatio]
+     * fraction to the test set (balanced across domains), and both sets are drawn at random.
+     * By default the seed is fresh per call so the split is non-deterministic; pass [seed] for
+     * a reproducible split. The reserved test set is written to reserved_test_queries.json so
+     * it travels with the DAG snapshot and is never seen during generation.
+     */
+    fun splitTrainTest(
+        dataset: Map<String, List<String>>,
+        testRatio: Double = 0.2,
+        seed: Long = java.util.concurrent.ThreadLocalRandom.current().nextLong(),
+    ): Pair<Map<String, List<String>>, Map<String, List<String>>> {
         val train = mutableMapOf<String, List<String>>()
         val test = mutableMapOf<String, List<String>>()
+        val rng = java.util.Random(seed)
         for ((category, queries) in dataset) {
             val total = queries.size
-            val testCount = (total * testRatio).toInt()
+            // Round the per-domain test count so every domain gives ~testRatio to test,
+            // keeping at least one train query.
+            val testCount = Math.round(total * testRatio).toInt().coerceIn(0, (total - 1).coerceAtLeast(0))
             val trainCount = (total - testCount).coerceAtLeast(1)
-            val shuffled = queries.shuffled(java.util.Random(42))
+            val shuffled = queries.shuffled(rng)
             val trainQueries = shuffled.take(trainCount)
             val testQueries = shuffled.drop(trainCount)
-            
+
             train[category] = trainQueries
             if (testQueries.isNotEmpty()) {
                 test[category] = testQueries
             }
         }
+        log.info(
+            "Train/test split (ratio=$testRatio, seed=$seed): " +
+                "${train.values.sumOf { it.size }} train / ${test.values.sumOf { it.size }} test " +
+                "across ${dataset.size} domains."
+        )
         
         try {
             val file = java.io.File("reserved_test_queries.json")

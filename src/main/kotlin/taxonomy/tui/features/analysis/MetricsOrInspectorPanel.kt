@@ -30,6 +30,7 @@ fun MetricsOrInspectorPanel(
     inspectorScroll: Int,
     metricsScroll: Int,
     latestMetrics: IterationMetrics? = null,
+    metricsHistory: List<IterationMetrics> = emptyList(),
 ) {
     Column {
         when (mode) {
@@ -72,16 +73,26 @@ fun MetricsOrInspectorPanel(
             }
 
             AnalysisMode.METRICS -> {
-                val m = latestMetrics?.metrics
-                if (m == null) {
+                // Navigable per-iteration history: metricsScroll selects the iteration.
+                val history = metricsHistory.ifEmpty { listOfNotNull(latestMetrics) }
+                if (history.isEmpty()) {
                     Text("No metrics yet \u2014 generate or load a DAG first.", color = Yellow)
+                    return@Column
+                }
+                val idx = metricsScroll.coerceIn(0, history.size - 1)
+                val entry = history[idx]
+                val m = entry.metrics
+                if (m == null) {
+                    Text("No metrics for this iteration.", color = Yellow)
                 } else {
                     fun pct(d: Double) = String.format(Locale.US, "%.1f%%", d * 100.0)
                     fun num(d: Double) = String.format(Locale.US, "%.3f", d)
-                    latestMetrics.iteration.takeIf { it.isNotBlank() }?.let {
-                        Text(it, color = Cyan, textStyle = Bold)
-                        Spacer()
-                    }
+                    val nav = if (history.size > 1) "  (${idx + 1}/${history.size}  W/S)" else ""
+                    Text(
+                        (entry.iteration.takeIf { it.isNotBlank() } ?: "Iteration ${idx + 1}") + nav,
+                        color = Cyan, textStyle = Bold
+                    )
+                    Spacer()
                     Text("Total nodes      ${m.totalNodes}", color = White)
                     Text("Leaf nodes       ${m.leafNodes}", color = White)
                     Text("Cross-domain     ${m.crossDomainNodes}", color = White)

@@ -42,6 +42,7 @@ fun AnalysisPanel(
     arenaState: ArenaUiState,
     benchmarkState: BenchmarkUiState,
     latestMetrics: taxonomy.model.IterationMetrics? = null,
+    metricsHistory: List<taxonomy.model.IterationMetrics> = emptyList(),
     /** Most relevant active process, or null when idle. Pinned at the top so a
      *  running process is always one keystroke away regardless of what the
      *  dashboard is currently showing (selection wins, process resumable). */
@@ -78,7 +79,8 @@ fun AnalysisPanel(
                 AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
                 AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 else -> MetricsOrInspectorPanel(
-                    bodyW, bodyH, mode, controlState, inspectorScroll, metricsScroll, latestMetrics
+                    bodyW, bodyH, mode, controlState, inspectorScroll, metricsScroll,
+                    latestMetrics, metricsHistory
                 )
             }
         }

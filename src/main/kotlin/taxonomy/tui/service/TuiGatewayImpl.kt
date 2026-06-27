@@ -205,11 +205,21 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 selectedDomains = deps.config.dataset.selectedDomains
             )
 
-            // 3. Run the adaptation engine. It streams GenerationProgress into
-            //    taxonomyService (surfaced by the Processes panel), then we publish the graph.
+            // 2b. Domain-stratified RANDOM train/test split. The DAG is built ONLY from the
+            //     train set; the held-out test set is written to reserved_test_queries.json so
+            //     it is never seen during generation and travels with the snapshot on save.
+            onProgress(0.34f, "Reserving a balanced random test set...")
+            val (trainSet, testSet) = deps.datasetFetcher.splitTrainTest(dataset, testRatio = 0.2)
+            onProgress(
+                0.36f,
+                "Train ${trainSet.values.sumOf { it.size }} / test ${testSet.values.sumOf { it.size }}"
+            )
+
+            // 3. Run the adaptation engine on the TRAIN set only. It streams GenerationProgress
+            //    into taxonomyService (surfaced by the Processes panel); then publish the graph.
             val root = deps.taxonomyEngine.adaptTaxonomy(
                 rootLabel = deps.config.dataset.datasetType.name,
-                dataset = dataset
+                dataset = trainSet
             )
             deps.taxonomyService.setGraph(root)
         }
