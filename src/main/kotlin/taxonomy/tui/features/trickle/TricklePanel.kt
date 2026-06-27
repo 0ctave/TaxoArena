@@ -21,19 +21,22 @@ fun TricklePanel(
     state: TrickleUiState,
 ) {
     Column {
+        // Mosaic's TextSurface throws Check failed when a Text overflows its row. Truncate every
+        // user-input echo to the panel column to avoid the same crash class seen in ArenaPanel.
+        val w = (width - 1).coerceAtLeast(1)
         when {
             state.isEnteringTrickleQuery -> {
-                Text("Route a query through the DAG", color = Cyan)
+                Text("Route a query through the DAG".take(w), color = Cyan)
                 Spacer()
-                Text("Query ❯ ${state.trickleQueryInput}█", color = Cyan)
+                Text("Query ❯ ${state.trickleQueryInput}█".take(w), color = Cyan)
                 Spacer()
-                Text("Enter to run · Esc to cancel", color = White)
+                Text("Enter to run · Esc to cancel".take(w), color = White)
             }
 
             state.isRunningTrickleQuery -> {
-                Text("Routing query through DAG…", color = Yellow)
+                Text("Routing query through DAG…".take(w), color = Yellow)
                 Spacer()
-                Text("Query: ${state.trickleQueryInput}", color = White)
+                Text("Query: ${state.trickleQueryInput}".take(w), color = White)
             }
 
             state.trickleResultNodes.isNotEmpty() -> {

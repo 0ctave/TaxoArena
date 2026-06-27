@@ -1,8 +1,8 @@
 package taxonomy.tui.features.arena
 
 import androidx.compose.runtime.Composable
-import com.jakewharton.mosaic.layout.padding
 import com.jakewharton.mosaic.modifier.Modifier
+import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.Green
 import com.jakewharton.mosaic.ui.Color.Companion.White
@@ -14,6 +14,23 @@ import taxonomy.service.AnalysisPanelState
 import taxonomy.tui.state.ArenaUiState
 import taxonomy.tui.state.BenchmarkUiState
 
+/**
+ * Truncating wrapper around [Text].
+ *
+ * Mosaic 0.18.0's `TextSurface.get` throws `IllegalStateException("Check failed.")` when a
+ * `Text` composable is asked to draw past the end of its allocated row (see crash logged
+ * from `TaxonomyTuiService.run` while the user was editing the Arena benchmark inputs).
+ * Every single-line text in this panel must therefore be clamped to the available column
+ * width *before* it reaches Mosaic's draw scope. Centralising the clamp here means
+ * adding/editing a panel line is one call site instead of a `.take(width)` ritual that
+ * is easy to forget — which is exactly how this regression slipped in.
+ */
+@Composable
+private fun SafeText(text: String, width: Int, color: Color = White) {
+    val safe = if (width <= 0) "" else if (text.length > width) text.take(width) else text
+    Text(safe, color = color)
+}
+
 /** Content-only: the parent [taxonomy.tui.features.analysis.AnalysisPanel] owns the border. */
 @Composable
 fun ArenaPanel(
@@ -23,35 +40,41 @@ fun ArenaPanel(
     arenaState: ArenaUiState,
     benchmarkState: BenchmarkUiState,
 ) {
+    // The inner column lives inside the bordered AnalysisPanel; available row width is the
+    // panel's body width minus the column's own 1-cell safety margin so a stray trailing
+    // glyph cannot collide with the right border.
+    val w = (width - 1).coerceAtLeast(1)
+
     Column {
             if (arenaState.isViewingLeaderboard) {
-                Text("Leaderboard (global)", color = Cyan)
+                SafeText("Leaderboard (global)", w, Cyan)
                 Spacer()
                 if (arenaState.leaderboard.isEmpty()) {
-                    Text("No ratings recorded yet — run a benchmark or arena match.", color = Yellow)
+                    SafeText("No ratings recorded yet — run a benchmark or arena match.", w, Yellow)
                 } else {
-                    Text("%-22s %-10s %6s %6s %5s".format("Model", "Domain", "μ", "σ", "Rank"), color = Yellow)
+                    SafeText("%-22s %-10s %6s %6s %5s".format("Model", "Domain", "μ", "σ", "Rank"), w, Yellow)
                     val rows = (height - 4).coerceAtLeast(1)
                     arenaState.leaderboard
                         .flatMap { g -> g.agents.map { g.rank to it } }
                         .drop(arenaState.leaderboardScrollOffset)
                         .take(rows)
                         .forEach { (rank, a) ->
-                            Text(
+                            SafeText(
                                 "%-22s %-10s %6.1f %6.1f %5d".format(
                                     a.agentName.take(22), a.domain.take(10), a.mu, a.sigma, rank
-                                ).take((width - 2).coerceAtLeast(1)),
-                                color = White
+                                ),
+                                w,
+                                White
                             )
                         }
                 }
                 Spacer()
-                Text("W/S to scroll · L to close", color = Cyan)
+                SafeText("W/S to scroll · L to close", w, Cyan)
                 return@Column
             }
 
             val mode = if (arenaState.usePrecomputed) "PRECOMPUTED (no live generation)" else "LIVE"
-            Text("Mode: $mode", color = Green)
+            SafeText("Mode: $mode", w, Green)
 
             // Ingestion in progress (kicked off from the eval-catalog picker): show which model
             // is being parsed and a coarse progress bar so the wait is legible.
@@ -60,18 +83,23 @@ fun ArenaPanel(
                 val i = benchmarkState.evalLoadingModelIdx + 1
                 val n = benchmarkState.evalLoadingModelCount
                 val cur = benchmarkState.evalLoadingCurrentModel.ifBlank { "\u2026" }
-                Text("Ingesting eval_results\u2026", color = Yellow)
-                Text("  $cur  $i/$n", color = White)
+                SafeText("Ingesting eval_results\u2026", w, Yellow)
+                SafeText("  $cur  $i/$n", w, White)
                 if (benchmarkState.evalLoadingItemTotal > 0) {
-                    Text(
+                    SafeText(
                         "  items ${benchmarkState.evalLoadingItem}/${benchmarkState.evalLoadingItemTotal}",
-                        color = White
+                        w,
+                        White
                     )
-                    Text(progressBar(
-                        benchmarkState.evalLoadingItem,
-                        benchmarkState.evalLoadingItemTotal,
-                        (width - 4).coerceIn(1, 40)
-                    ), color = Green)
+                    SafeText(
+                        progressBar(
+                            benchmarkState.evalLoadingItem,
+                            benchmarkState.evalLoadingItemTotal,
+                            (w - 4).coerceIn(1, 40)
+                        ),
+                        w,
+                        Green
+                    )
                 }
                 return@Column
             }
@@ -79,41 +107,44 @@ fun ArenaPanel(
             if (arenaState.loadedModels.isEmpty()) {
                 // Gated: no roster means nothing to judge.
                 Spacer()
-                Text("No precomputed eval_results loaded.", color = Yellow)
+                SafeText("No precomputed eval_results loaded.", w, Yellow)
                 Spacer()
-                Text("Press [O] to pick and ingest MMLU-Pro model outputs.", color = Cyan)
-                Text("Then choose Model A \u2192 Model B \u2192 question_id.", color = White)
+                SafeText("Press [O] to pick and ingest MMLU-Pro model outputs.", w, Cyan)
+                SafeText("Then choose Model A \u2192 Model B \u2192 question_id.", w, White)
                 return@Column
             }
 
-            Text("Loaded: ${arenaState.loadedModels.size} models", color = Green)
-            Text("  ${arenaState.loadedModels.joinToString(", ").take((width - 4).coerceAtLeast(1))}", color = White)
+            SafeText("Loaded: ${arenaState.loadedModels.size} models", w, Green)
+            SafeText("  ${arenaState.loadedModels.joinToString(", ")}", w, White)
             Spacer()
 
             // Models-first flow: A → B → question_id (precomputed) or query (live).
+            // These input echoes grow with each keystroke and were the original crash trigger:
+            // the user's typed string eventually exceeded the panel column and TextSurface.get
+            // threw. SafeText clamps every keystroke-driven line to the visible column.
             when {
                 arenaState.isEnteringArenaModelA ->
-                    Text("Model A \u276f ${arenaState.arenaModelAInput}\u2588", color = Cyan)
+                    SafeText("Model A \u276f ${arenaState.arenaModelAInput}\u2588", w, Cyan)
                 arenaState.isEnteringArenaModelB ->
-                    Text("Model B \u276f ${arenaState.arenaModelBInput}\u2588", color = Cyan)
+                    SafeText("Model B \u276f ${arenaState.arenaModelBInput}\u2588", w, Cyan)
                 arenaState.isEnteringArenaQuestionId ->
-                    Text("question_id \u276f ${arenaState.arenaQuestionIdInput}\u2588", color = Cyan)
+                    SafeText("question_id \u276f ${arenaState.arenaQuestionIdInput}\u2588", w, Cyan)
                 arenaState.isEnteringArenaQuery ->
-                    Text("Query \u276f ${arenaState.arenaQueryInput}\u2588", color = Cyan)
+                    SafeText("Query \u276f ${arenaState.arenaQueryInput}\u2588", w, Cyan)
                 else -> {
-                    Text("Model A   ${controlState.modelA ?: "—"}", color = White)
-                    Text("Model B   ${controlState.modelB ?: "—"}", color = White)
-                    Text("Query     ${controlState.query ?: "—"}", color = White)
+                    SafeText("Model A   ${controlState.modelA ?: "—"}", w, White)
+                    SafeText("Model B   ${controlState.modelB ?: "—"}", w, White)
+                    SafeText("Query     ${controlState.query ?: "—"}", w, White)
                 }
             }
 
             Spacer()
             if (controlState.domainStatus.isEmpty()) {
-                Text("No domain evaluations yet.", color = White)
+                SafeText("No domain evaluations yet.", w, White)
             } else {
-                Text("Per-domain status", color = Yellow)
+                SafeText("Per-domain status", w, Yellow)
                 controlState.domainStatus.forEach { (domain, status) ->
-                    Text("  $domain: $status", color = White)
+                    SafeText("  $domain: $status", w, White)
                 }
             }
     }
