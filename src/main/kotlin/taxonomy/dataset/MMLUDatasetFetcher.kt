@@ -25,6 +25,20 @@ class MMLUDatasetFetcher(
 ) {
     var onDownloadProgress: ((current: Int, total: Int, datasetName: String) -> Unit)? = null
     private val log = LoggerFactory.getLogger("taxonomy.DatasetFetcher")
+
+    companion object {
+        /** Sentinel cap meaning "pull the whole dataset" (no caller-imposed row limit). */
+        const val UNBOUNDED_MAX_QUERIES: Int = Int.MAX_VALUE
+
+        /**
+         * Resolve the value to report as the progress *total*. A real, bounded cap is a
+         * meaningful denominator; the [UNBOUNDED_MAX_QUERIES] sentinel (or a non-positive
+         * cap) is not, so we report 0 to signal "unknown total" and let the UI fall back to
+         * an indeterminate bar instead of dividing by Int.MAX_VALUE.
+         */
+        fun resolveProgressTotal(maxQueries: Int): Int =
+            if (maxQueries in 1 until UNBOUNDED_MAX_QUERIES) maxQueries else 0
+    }
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
     private val dbUrl = "jdbc:sqlite:mmlu_pro_dataset_cache_v2.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
@@ -192,8 +206,9 @@ class MMLUDatasetFetcher(
                 retries = 0
                 waitTime = 2000L
 
-                printProgressBar(allRows.size, maxQueries, "MMLU Pro Download Progress")
-                onDownloadProgress?.invoke(allRows.size, maxQueries, "MMLU Pro")
+                val progressTotal = resolveProgressTotal(maxQueries)
+                printProgressBar(allRows.size, progressTotal, "MMLU Pro Download Progress")
+                onDownloadProgress?.invoke(allRows.size, progressTotal, "MMLU Pro")
             } catch (e: Exception) {
                 log.error("Failed parsing MMLU Pro row items", e)
                 break
@@ -361,7 +376,7 @@ class MMLUDatasetFetcher(
                         newRows.addAll(subjectRows)
                         offset += batchSize
                         log.info("Fetched batch ${batch + 1} for $configName (${subjectRows.size} rows)")
-                        onDownloadProgress?.invoke(allRows.size + newRows.size, maxQueries, "ARC")
+                        onDownloadProgress?.invoke(allRows.size + newRows.size, resolveProgressTotal(maxQueries), "ARC")
                         if (subjectRows.size < batchSize) break
                     } else {
                         log.warn("Failed fetching $configName batch: HTTP ${response.statusCode()}")
@@ -687,7 +702,7 @@ class MMLUDatasetFetcher(
                     newRows.addAll(subjectRows)
                     offset += batchSize
                     log.info("Fetched batch ${batch + 1} for 20 Newsgroups (${subjectRows.size} rows)")
-                    onDownloadProgress?.invoke(allRows.size + newRows.size, maxQueries, "20 Newsgroups")
+                    onDownloadProgress?.invoke(allRows.size + newRows.size, resolveProgressTotal(maxQueries), "20 Newsgroups")
                     if (subjectRows.size < batchSize) break
                 } else {
                     log.warn("Failed fetching 20 Newsgroups batch: HTTP ${response.statusCode()}")
@@ -761,7 +776,7 @@ class MMLUDatasetFetcher(
                     newRows.addAll(subjectRows)
                     offset += batchSize
                     log.info("Fetched batch ${batch + 1} for AG News (${subjectRows.size} rows)")
-                    onDownloadProgress?.invoke(allRows.size + newRows.size, maxQueries, "AG News")
+                    onDownloadProgress?.invoke(allRows.size + newRows.size, resolveProgressTotal(maxQueries), "AG News")
                     if (subjectRows.size < batchSize) break
                 } else {
                     log.warn("Failed fetching AG News batch: HTTP ${response.statusCode()}")
