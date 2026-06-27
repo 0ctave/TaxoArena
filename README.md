@@ -8,6 +8,57 @@ SPDX-License-Identifier: CC0-1.0
 The following project is a demo project for the Arc Agent Framework. 
 It can also be used to kickstart a new Spring Boot project that uses the Arc Agent Framework.
 
+> **Documentation:** the full organized project context lives under [`docs/`](docs/README.md).
+
+## Deterministic Build & Reproducibility
+
+The build is pinned to exact toolchain versions so that CI, agents, and contributors all
+produce the same artifacts.
+
+- **JDK:** Temurin 21 — the build pins `java { languageVersion = JavaLanguageVersion.of(21) }`.
+  Bootstrap via Gradle toolchains; we ship JDK 21 under `~/.gradle/jdks/` for our CI / agents.
+  **Do not build with JDK ≥ 22 / 25** (the Mosaic / Compose plugin is currently incompatible).
+- **Kotlin:** 2.1.10 (`kotlin("jvm")` and `plugin.compose` are both pinned to 2.1.10).
+- **Gradle:** 8.10 (from `gradle/wrapper/gradle-wrapper.properties`). Always invoke via `./gradlew`.
+- **Spring Boot:** 3.4.3 (WebFlux).
+- **Project version:** `0.1.0-SNAPSHOT` (`gradle.properties`).
+
+**Build command** (verified by PR #46/#47/#48/#49/#50/#51/#52):
+
+```bash
+./gradlew compileKotlin compileTestKotlin
+```
+
+**Test command:**
+
+```bash
+./gradlew test
+```
+
+### Dataset checksum
+
+```
+mmlu_pro_dataset_cache.db SHA-256: 380534531249c6db559d3fdfbd9b11849dd2b920d4467af4e218dbae787afbee
+```
+
+Regenerate with `sha256sum mmlu_pro_dataset_cache.db | head -c 64` (or `shasum -a 256` on macOS).
+
+The dataset DB is currently tracked in git. This will be addressed in a future
+framework-stability PR that moves it out of the repo behind a `./gradlew downloadDataset` task.
+
+### Reproducible-run table
+
+Each recent metrics PR maps to the build invocation used to verify it, so reviewers can
+reproduce the headline numbers:
+
+| PR | Verification command |
+|----|---------------------|
+| #46 | `./gradlew compileKotlin compileTestKotlin && ./gradlew test --tests "*Nmi*" --tests "*DendrogramPurity*" --tests "*Kappa*" --tests "*HierarchicalF1*"` |
+| #48 | `./gradlew test --tests "*MetricsGroundTruth*"` |
+| #49 | `./gradlew test --tests "*TotalDasgupta*" --tests "*RoutingECE*" --tests "*TripletAccuracy*" --tests "*NormalisedSackin*"` |
+| #50 | `./gradlew test --tests "*BenchmarkE2E*"` |
+| #51 | `./gradlew test --tests "*LogsPanel*" --tests "*SnapshotLog*"` |
+
 ## How to run
 
 #### 0. Configure secrets via environment variables
