@@ -67,6 +67,17 @@ class TuiController(
         val state = _state.value
         val key = event.key.lowercase()
 
+        // The help overlay is a global, state-independent toggle. While it's open it swallows
+        // every other key; '?' or Esc closes it.
+        if (state.shell.helpOverlayOpen) {
+            if (key == "?" || key == "escape") dispatch(TuiEvent.ToggleHelpOverlay)
+            return
+        }
+        if (key == "?") {
+            dispatch(TuiEvent.ToggleHelpOverlay)
+            return
+        }
+
         if (state.startup.state == StartupState.LOADING) return
 
         when (state.startup.state) {
@@ -363,6 +374,16 @@ class TuiController(
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
 
+            // R on a highlighted node inspects it, opens the node-detail view, and regenerates
+            // its judge — so judge generation works straight from the tree, not only after Enter.
+            "r" -> selectedTreeNode(state)?.let { node ->
+                effects.inspectNode(node)
+                dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
+                dispatch(TuiEvent.SetGeneratingJudge(true))
+                effects.regenerateJudgeForCurrentNode(::dispatch)
+            }
+
             "q", "escape" -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
         }
     }
@@ -381,6 +402,13 @@ class TuiController(
 
                 "s", "arrowdown" ->
                     dispatch(TuiEvent.SetInspectorScroll(state.analysis.inspectorScroll + 1))
+
+                // The inspected node is already the gateway's current node (set on Enter), so
+                // regenerate its specialised judge in place and flag the spinner.
+                "r" -> {
+                    dispatch(TuiEvent.SetGeneratingJudge(true))
+                    effects.regenerateJudgeForCurrentNode(::dispatch)
+                }
 
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))

@@ -48,6 +48,9 @@ sealed interface TuiEvent {
     data class FocusPanelRequested(val panel: FocusPanel) : TuiEvent
     data object CycleFocusForward : TuiEvent
 
+    /** Show/hide the global keyboard-reference overlay (the "?" hotkey). */
+    data object ToggleHelpOverlay : TuiEvent
+
     data class SetStartupState(val state: StartupState) : TuiEvent
     data object ReturnToWelcome : TuiEvent
     data object EnterConfigSetup : TuiEvent

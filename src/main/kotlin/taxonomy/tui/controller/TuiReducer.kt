@@ -30,6 +30,11 @@ object TuiReducer {
                     shell = state.shell.copy(focusedPanel = event.panel)
                 )
 
+            TuiEvent.ToggleHelpOverlay ->
+                state.copy(
+                    shell = state.shell.copy(helpOverlayOpen = !state.shell.helpOverlayOpen)
+                )
+
             TuiEvent.CycleFocusForward ->
                 state.copy(
                     shell = state.shell.copy(

@@ -19,6 +19,7 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.model.GraphNode
 import taxonomy.tui.components.DomainSelectorTable
 import taxonomy.tui.components.buildTreeLines
+import taxonomy.tui.components.GlobalHotkeys
 import taxonomy.tui.components.HotkeyAction
 import taxonomy.tui.components.HotkeyBar
 import taxonomy.tui.components.Panel
@@ -70,11 +71,83 @@ fun TuiRouter(
         maxDepth = maxDepth,
         leafCount = leafCount,
     ) {
-        when (state.startup.state) {
-            StartupState.LOAD_DAG -> WelcomeRoute(width, height, state)
-            StartupState.LOADING -> LoadingRoute(width, height, state)
-            StartupState.CONFIGANDDOMAINS -> ConfigRoute(width, height, deps, state, subscriptions)
-            StartupState.MAINDASHBOARD -> MainDashboardRoute(width, height, deps, state, subscriptions)
+        if (state.shell.helpOverlayOpen) {
+            HelpOverlay(width, height, state)
+        } else {
+            when (state.startup.state) {
+                StartupState.LOAD_DAG -> WelcomeRoute(width, height, state)
+                StartupState.LOADING -> LoadingRoute(width, height, state)
+                StartupState.CONFIGANDDOMAINS -> ConfigRoute(width, height, deps, state, subscriptions)
+                StartupState.MAINDASHBOARD -> MainDashboardRoute(width, height, deps, state, subscriptions)
+            }
+        }
+    }
+}
+
+/**
+ * Full-screen keyboard reference. Lists the globally-available keys plus the keys for the
+ * currently active screen/mode. Closed with "?" or Esc (handled in the controller).
+ */
+@Composable
+private fun HelpOverlay(
+    width: Int,
+    height: Int,
+    state: TuiAppState,
+) {
+    val bodyH = (height - 4).coerceAtLeast(6)
+    Panel("HELP — KEYBOARD REFERENCE", Cyan, width - 2, bodyH) {
+        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+            Text("Global", color = Cyan, textStyle = Bold)
+            Text("  ?         Toggle this help", color = White)
+            Text("  Tab       Switch panels / sub-panel", color = White)
+            Text("  X         Load DAG (return to load screen)", color = White)
+            Text("  Ctrl-C    Quit", color = White)
+            Spacer()
+
+            when (state.startup.state) {
+                StartupState.LOAD_DAG -> {
+                    Text("Load / Welcome", color = Cyan, textStyle = Bold)
+                    Text("  W/S, ↑/↓   Move selection", color = White)
+                    Text("  Enter      Create new DAG / load snapshot", color = White)
+                    Text("  D          Delete selected snapshot", color = White)
+                    Text("  Q / Esc    Quit", color = White)
+                }
+
+                StartupState.CONFIGANDDOMAINS -> {
+                    Text("Config & Domains", color = Cyan, textStyle = Bold)
+                    Text("  Tab        Switch Domains / Settings", color = White)
+                    Text("  W/S        Move", color = White)
+                    Text("  Space      Toggle domain", color = White)
+                    Text("  Enter      Toggle / cycle / edit setting", color = White)
+                    Text("  D          Download dataset", color = White)
+                    Text("  R          Generate DAG (dataset must be present)", color = White)
+                    Text("  Esc / Q    Back to welcome", color = White)
+                }
+
+                StartupState.MAINDASHBOARD -> {
+                    Text("Dashboard", color = Cyan, textStyle = Bold)
+                    Text("  M Metrics   A Arena   B Benchmark   T Trickle", color = White)
+                    Text("  G Generate judges   F Force-regen judges", color = White)
+                    Spacer()
+                    Text("DAG Explorer (topology focus)", color = Cyan, textStyle = Bold)
+                    Text("  W/S        Navigate", color = White)
+                    Text("  →/L        Expand     ←/H  Collapse     Space  Toggle", color = White)
+                    Text("  Enter      Inspect node", color = White)
+                    Text("  R          Generate / regenerate node judge", color = White)
+                    Spacer()
+                    Text("Node detail", color = Cyan, textStyle = Bold)
+                    Text("  R          Regenerate judge     W/S  Scroll     ←/Q  Back", color = White)
+                    Spacer()
+                    Text("Metrics", color = Cyan, textStyle = Bold)
+                    Text("  W/S        Select iter / scroll     P  Perf     Home/End  First/Last", color = White)
+                }
+
+                StartupState.LOADING -> {
+                    Text("Loading…", color = White)
+                }
+            }
+            Spacer()
+            Text("Press ? or Esc to close.", color = TuiTheme.RUNNING, textStyle = Bold)
         }
     }
 }
@@ -126,12 +199,13 @@ private fun WelcomeRoute(
 
     HotkeyBar(
         width,
-        listOf(
+        contextual = listOf(
             HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
             HotkeyAction("Enter", "Select", TuiTheme.ACCENT, isPrimary = true),
             HotkeyAction("D", "Delete Snapshot"),
-            HotkeyAction("Q / Ctrl-C", "Quit", TuiTheme.ERROR),
-        )
+            HotkeyAction("Q", "Quit", TuiTheme.ERROR),
+        ),
+        global = GlobalHotkeys.forState(state),
     )
 }
 
@@ -145,7 +219,8 @@ private fun LoadingRoute(
     LoadingPanel(width = width - 2, height = contentH, spinnerTick = state.shell.spinnerTick)
     HotkeyBar(
         width,
-        listOf(HotkeyAction("...", "Restoring active taxonomic graph", TuiTheme.RUNNING))
+        contextual = listOf(HotkeyAction("...", "Restoring active taxonomic graph", TuiTheme.RUNNING)),
+        global = GlobalHotkeys.forState(state),
     )
 }
 
@@ -302,7 +377,7 @@ private fun ConfigRoute(
         BottomLogsAndTraces(width, bottomH, deps, state)
     }
 
-    HotkeyBar(width, configHotkeys(state))
+    HotkeyBar(width, contextual = configHotkeys(state), global = GlobalHotkeys.forState(state))
 }
 
 @Composable
@@ -433,14 +508,12 @@ private fun MainDashboardRoute(
             if (state.analysis.metricsZoneFocus == taxonomy.tui.state.MetricsZoneFocus.DETAIL)
                 listOf(
                     HotkeyAction("W/S", "Scroll", isPrimary = true),
-                    HotkeyAction("TAB", "Table"),
                     HotkeyAction("P", "Perf"),
                     HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
                 )
             else
                 listOf(
                     HotkeyAction("W/S", "Select", isPrimary = true),
-                    HotkeyAction("TAB", "Detail"),
                     HotkeyAction("P", "Perf"),
                     HotkeyAction("Home/End", "First/Last"),
                     HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
@@ -453,7 +526,7 @@ private fun MainDashboardRoute(
                 isViewingSnapshot = state.snapshot.isViewingSnapshot,
             )
         }
-    HotkeyBar(width, hotkeys)
+    HotkeyBar(width, contextual = hotkeys, global = GlobalHotkeys.forState(state))
 }
 
 @Composable
@@ -644,8 +717,8 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
     }
     val inDomains = state.config.activeSubPanel == ConfigSubPanel.DOMAINS
     return buildList {
-        add(HotkeyAction("Tab", if (inDomains) "\u2192 Settings" else "\u2192 Domains", TuiTheme.ACCENT))
-        add(HotkeyAction("W/S", "Move"))
+        // Tab (switch sub-panel) is covered by the global hotkey bar.
+        add(HotkeyAction("W/S", "Move", TuiTheme.ACCENT))
         if (inDomains) {
             add(HotkeyAction("Space", "Toggle Domain"))
         } else {

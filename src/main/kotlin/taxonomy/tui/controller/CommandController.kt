@@ -2,7 +2,6 @@ package taxonomy.tui.controller
 
 import taxonomy.service.AnalysisMode
 import taxonomy.tui.components.SettingItem
-import taxonomy.tui.components.StartupState
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.TuiAppState
 
@@ -165,23 +164,10 @@ class CommandController(
                 }
             }
 
-            is TuiEvent.KeyPressed -> {
-                // These global command keys only apply while exploring a generated DAG on
-                // the main dashboard. On the config screen, R means "generate a new DAG"
-                // (handled by handleConfigKeys -> StartGeneration), so we must NOT also fire
-                // judge regeneration here.
-                if (state.startup.state == StartupState.MAINDASHBOARD) {
-                    when (event.key.lowercase()) {
-                        // In Arena mode "l" toggles the leaderboard (handled in the controller),
-                        // so only treat it as label regeneration outside Arena.
-                        "l" -> if (state.analysis.mode != AnalysisMode.ARENA) effects.regenerateLabels()
-                        "r" -> {
-                            dispatch(TuiEvent.SetGeneratingJudge(true))
-                            effects.regenerateJudgeForCurrentNode(dispatch)
-                        }
-                        else -> Unit
-                    }
-                }
+            // Re-probe the on-disk dataset cache whenever the user enters the config screen, so
+            // generation doesn't re-prompt for a download that's already present locally.
+            TuiEvent.EnterConfigSetup -> {
+                effects.refreshDatasetStatus(dispatch)
             }
 
             else -> Unit
