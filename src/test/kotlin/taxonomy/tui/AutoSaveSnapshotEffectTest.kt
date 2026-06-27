@@ -51,6 +51,7 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
         confidenceGate: Double,
         parallelism: Int,
         updateRankings: Boolean,
+        reservedOnly: Boolean,
         onLive: (taxonomy.model.BenchmarkLiveStats) -> Unit
     ) {}
     override suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String = ""

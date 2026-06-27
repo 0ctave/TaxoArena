@@ -710,7 +710,12 @@ object TuiReducer {
                         selectedBenchmarkField = 0,
                         isEditingBenchmarkField = false,
                         benchmarkEditingValue = "",
-                        benchmarkScrollOffset = 0
+                        benchmarkScrollOffset = 0,
+                        benchmarkActiveSection = taxonomy.tui.state.BenchmarkSection.MODELS,
+                        benchmarkIsPickingModels = false,
+                        benchmarkIsPickingDomains = false,
+                        benchmarkPickerCursor = 0,
+                        benchmarkLiveView = taxonomy.tui.state.BenchmarkLiveView.SUMMARY
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
                 )
@@ -909,14 +914,18 @@ object TuiReducer {
             TuiEvent.StartEditingBenchmarkField ->
                 state.copy(
                     benchmark = state.benchmark.copy(
-                        isEditingBenchmarkField = true
+                        isEditingBenchmarkField = true,
+                        // The only text-editable option is the query limit; prefill it.
+                        benchmarkEditingValue = state.benchmark.benchmarkQueryLimitInput
                     )
                 )
 
             TuiEvent.ConfirmEditingBenchmarkField ->
                 state.copy(
                     benchmark = state.benchmark.copy(
-                        isEditingBenchmarkField = false
+                        isEditingBenchmarkField = false,
+                        benchmarkQueryLimitInput =
+                            state.benchmark.benchmarkEditingValue.trim().ifBlank { "0" }
                     )
                 )
 
@@ -939,6 +948,83 @@ object TuiReducer {
                 state.copy(
                     benchmark = state.benchmark.copy(
                         benchmarkScrollOffset = event.offset.coerceAtLeast(0)
+                    )
+                )
+
+            is TuiEvent.SetBenchmarkSection ->
+                state.copy(
+                    benchmark = state.benchmark.copy(benchmarkActiveSection = event.section)
+                )
+
+            is TuiEvent.OpenBenchmarkPicker ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkIsPickingModels = !event.domains,
+                        benchmarkIsPickingDomains = event.domains,
+                        benchmarkPickerCursor = 0,
+                        benchmarkDomainOptions =
+                            if (event.domains) event.domainOptions else state.benchmark.benchmarkDomainOptions
+                    )
+                )
+
+            TuiEvent.CloseBenchmarkPicker ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkIsPickingModels = false,
+                        benchmarkIsPickingDomains = false
+                    )
+                )
+
+            is TuiEvent.MoveBenchmarkPickerCursor -> {
+                val size = if (state.benchmark.benchmarkIsPickingDomains)
+                    state.benchmark.benchmarkDomainOptions.size
+                else state.benchmark.loadedModels.size
+                val maxIdx = (size - 1).coerceAtLeast(0)
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkPickerCursor =
+                            (state.benchmark.benchmarkPickerCursor + event.delta).coerceIn(0, maxIdx)
+                    )
+                )
+            }
+
+            TuiEvent.ToggleBenchmarkPickerItem -> {
+                if (state.benchmark.benchmarkIsPickingDomains) {
+                    val name = state.benchmark.benchmarkDomainOptions
+                        .getOrNull(state.benchmark.benchmarkPickerCursor) ?: return state
+                    val sel = state.benchmark.benchmarkSelectedDomains
+                    val next = if (name in sel) sel - name else sel + name
+                    state.copy(benchmark = state.benchmark.copy(benchmarkSelectedDomains = next))
+                } else {
+                    val name = state.benchmark.loadedModels
+                        .getOrNull(state.benchmark.benchmarkPickerCursor) ?: return state
+                    val sel = state.benchmark.benchmarkSelectedModels
+                    val next = if (name in sel) sel - name else sel + name
+                    state.copy(benchmark = state.benchmark.copy(benchmarkSelectedModels = next))
+                }
+            }
+
+            TuiEvent.ToggleBenchmarkReservedOnly -> {
+                val now = state.benchmark.benchmarkReservedOnlyInput.toBooleanStrictOrNull() ?: true
+                state.copy(
+                    benchmark = state.benchmark.copy(benchmarkReservedOnlyInput = (!now).toString())
+                )
+            }
+
+            TuiEvent.ToggleBenchmarkUpdateRankings -> {
+                val now = state.benchmark.benchmarkUpdateRankingsInput.toBooleanStrictOrNull() ?: true
+                state.copy(
+                    benchmark = state.benchmark.copy(benchmarkUpdateRankingsInput = (!now).toString())
+                )
+            }
+
+            TuiEvent.ToggleBenchmarkLiveView ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkLiveView =
+                            if (state.benchmark.benchmarkLiveView == taxonomy.tui.state.BenchmarkLiveView.SUMMARY)
+                                taxonomy.tui.state.BenchmarkLiveView.STREAM
+                            else taxonomy.tui.state.BenchmarkLiveView.SUMMARY
                     )
                 )
 

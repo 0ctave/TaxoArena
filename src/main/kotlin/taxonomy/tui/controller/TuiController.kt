@@ -9,6 +9,7 @@ import taxonomy.tui.app.DashboardLayout
 import taxonomy.tui.components.SettingItem
 import taxonomy.tui.components.TreeLine
 import taxonomy.tui.components.StartupState
+import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
@@ -256,6 +257,12 @@ class TuiController(
         // The eval-catalog picker is a modal overlay: while open it swallows every other key.
         if (state.benchmark.isPickingEvalCatalog) {
             handleEvalCatalogPickerKeys(state, key)
+            return
+        }
+        // The Arena benchmark model/domain picker borrows the left Topology panel; while it's
+        // open it swallows keys the same way the eval-catalog picker does.
+        if (state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains) {
+            handleBenchmarkPickerKeys(state, key)
             return
         }
         if (isTextInputActive(state)) {
@@ -529,19 +536,7 @@ class TuiController(
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
             }
 
-            BenchmarkType.ARENA -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetBenchmarkScrollOffset((state.benchmark.benchmarkScrollOffset - 1).coerceAtLeast(0)))
-
-                "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetBenchmarkScrollOffset(state.benchmark.benchmarkScrollOffset + 1))
-
-                "enter" -> dispatch(TuiEvent.RunBenchmark)
-                "o" -> dispatch(TuiEvent.OpenEvalCatalogPicker)
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.ResetBenchmarkType)
-            }
+            BenchmarkType.ARENA -> handleArenaBenchmarkKeys(state, key)
 
             // "b" (start batch test) is handled at the dashboard level so it works regardless
             // of which panel holds focus; here we only handle scrolling and going back.
@@ -557,6 +552,73 @@ class TuiController(
                         dispatch(TuiEvent.ResetBenchmarkType)
                     }
             }
+        }
+    }
+
+    /**
+     * Arena benchmark config dashboard. Tab cycles the MODELS / DOMAINS / OPTIONS / START
+     * sections; Enter activates the focused section (opens a picker, edits an option, or starts
+     * the run); V toggles the live SUMMARY/STREAM view. Within OPTIONS, W/S moves between the
+     * three fields and Enter edits/toggles the focused one.
+     */
+    private fun handleArenaBenchmarkKeys(state: TuiAppState, key: String) {
+        val b = state.benchmark
+        when (key) {
+            "v" -> dispatch(TuiEvent.ToggleBenchmarkLiveView)
+            "tab" -> dispatch(TuiEvent.SetBenchmarkSection(nextBenchmarkSection(b.benchmarkActiveSection)))
+            "o" -> dispatch(TuiEvent.OpenEvalCatalogPicker)
+            "q", "escape", "arrowleft", "backspace" -> dispatch(TuiEvent.ResetBenchmarkType)
+            else -> when (b.benchmarkActiveSection) {
+                BenchmarkSection.OPTIONS -> handleBenchmarkOptionsKeys(state, key)
+                BenchmarkSection.MODELS -> if (key == "enter" || key == " " || key == "space") {
+                    dispatch(TuiEvent.OpenBenchmarkPicker(domains = false))
+                }
+                BenchmarkSection.DOMAINS -> if (key == "enter" || key == " " || key == "space") {
+                    dispatch(TuiEvent.OpenBenchmarkPicker(
+                        domains = true,
+                        domainOptions = availableDomainsProvider().map { it.first }
+                    ))
+                }
+                BenchmarkSection.START -> if (key == "enter" || key == " " || key == "space") {
+                    if (b.benchmarkSelectedModels.size >= 2 && b.benchmarkSelectedDomains.isNotEmpty()) {
+                        dispatch(TuiEvent.RunBenchmark)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun nextBenchmarkSection(section: BenchmarkSection): BenchmarkSection = when (section) {
+        BenchmarkSection.MODELS -> BenchmarkSection.DOMAINS
+        BenchmarkSection.DOMAINS -> BenchmarkSection.OPTIONS
+        BenchmarkSection.OPTIONS -> BenchmarkSection.START
+        BenchmarkSection.START -> BenchmarkSection.MODELS
+    }
+
+    /** OPTIONS section: field 0 = query limit (text edit), 1 = reserved-only, 2 = update-rankings. */
+    private fun handleBenchmarkOptionsKeys(state: TuiAppState, key: String) {
+        val field = state.benchmark.selectedBenchmarkField
+        when (key) {
+            "w", "z", "arrowup" -> dispatch(TuiEvent.SetSelectedBenchmarkField((field - 1).coerceAtLeast(0)))
+            "s", "arrowdown" -> dispatch(TuiEvent.SetSelectedBenchmarkField((field + 1).coerceAtMost(2)))
+            "enter", " ", "space" -> when (field) {
+                0 -> dispatch(TuiEvent.StartEditingBenchmarkField)
+                1 -> dispatch(TuiEvent.ToggleBenchmarkReservedOnly)
+                2 -> dispatch(TuiEvent.ToggleBenchmarkUpdateRankings)
+            }
+        }
+    }
+
+    /**
+     * Arena benchmark model/domain picker overlay (borrows the left Topology panel). W/S move the
+     * cursor, Space toggles the highlighted row into the selection, Enter/Q/Esc close the picker.
+     */
+    private fun handleBenchmarkPickerKeys(state: TuiAppState, key: String) {
+        when (key) {
+            "w", "z", "arrowup" -> dispatch(TuiEvent.MoveBenchmarkPickerCursor(-1))
+            "s", "arrowdown" -> dispatch(TuiEvent.MoveBenchmarkPickerCursor(1))
+            " ", "space" -> dispatch(TuiEvent.ToggleBenchmarkPickerItem)
+            "enter", "q", "escape" -> dispatch(TuiEvent.CloseBenchmarkPicker)
         }
     }
 

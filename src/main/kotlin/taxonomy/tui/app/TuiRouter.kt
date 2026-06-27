@@ -424,13 +424,44 @@ private fun MainDashboardRoute(
     val navContext = deriveNavContext(hasDag = hasDag, choosingDomains = false)
     val navFocused = state.shell.focusedPanel == FocusPanel.TOPOLOGY
 
+    // When the Arena benchmark config flips into a multi-select picker, the left panel becomes
+    // the model/domain selector (reusing DomainSelectorTable) instead of the topology view.
+    val benchmarkPicking = state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains
+    val pickerTitle = if (state.benchmark.benchmarkIsPickingModels) "SELECT MODELS" else "SELECT DOMAINS"
+
     Row(modifier = Modifier.height(topH)) {
         Panel(
-            title = if (navContext == NavContext.DAG_EXPLORE) "DAG EXPLORER" else "NAVIGATOR",
+            title = when {
+                benchmarkPicking -> pickerTitle
+                navContext == NavContext.DAG_EXPLORE -> "DAG EXPLORER"
+                else -> "NAVIGATOR"
+            },
             accentColor = TuiTheme.panelAccent(navFocused),
             width = dagW,
             height = topH,
         ) {
+            if (benchmarkPicking) {
+                val domains = if (state.benchmark.benchmarkIsPickingModels)
+                    state.benchmark.loadedModels.map { it to 0 }
+                else
+                    availableDomains
+                val selected = if (state.benchmark.benchmarkIsPickingModels)
+                    state.benchmark.benchmarkSelectedModels.toList()
+                else
+                    state.benchmark.benchmarkSelectedDomains.toList()
+                // Keep the cursor row on-screen by scrolling the window when it runs past the bottom.
+                val visibleRows = (topH - 3).coerceAtLeast(1)
+                val pickerOffset = (state.benchmark.benchmarkPickerCursor - visibleRows + 1).coerceAtLeast(0)
+                DomainSelectorTable(
+                    pWidth = dagW - 4,
+                    pHeight = topH - 2,
+                    domains = domains,
+                    offset = pickerOffset,
+                    selectedIdx = state.benchmark.benchmarkPickerCursor,
+                    selectedDomains = selected,
+                )
+                return@Panel
+            }
             when (navContext) {
                 NavContext.DAG_EXPLORE -> TopologyPanel(
                     width = dagW - 4,
@@ -518,6 +549,16 @@ private fun MainDashboardRoute(
                     HotkeyAction("Home/End", "First/Last"),
                     HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
                 )
+        } else if (inAnalysisHub &&
+            state.analysis.mode == taxonomy.service.AnalysisMode.BENCHMARK &&
+            state.benchmark.benchmarkType == taxonomy.tui.state.BenchmarkType.ARENA &&
+            (subscriptions.arenaControlState.isRunningBenchmark || subscriptions.arenaControlState.benchmarkReport != null)
+        ) {
+            listOf(
+                HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+                HotkeyAction("O", "Load eval_results"),
+                HotkeyAction("Q", "Back", TuiTheme.ERROR),
+            )
         } else {
             dashboardHotkeys(
                 hasDag = hasDag,

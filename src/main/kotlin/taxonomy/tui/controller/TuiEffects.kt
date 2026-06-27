@@ -34,6 +34,7 @@ interface TuiEffects {
         confidenceGate: Double,
         parallelism: Int,
         updateRankings: Boolean,
+        reservedOnly: Boolean,
         dispatch: (TuiEvent) -> Unit
     )
     fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit)
@@ -227,11 +228,12 @@ class DefaultTuiEffects(
         confidenceGate: Double,
         parallelism: Int,
         updateRankings: Boolean,
+        reservedOnly: Boolean,
         dispatch: (TuiEvent) -> Unit
     ) {
         scope.launch {
             gateway.runBenchmarkConfigured(
-                models, queryLimit, category, confidenceGate, parallelism, updateRankings
+                models, queryLimit, category, confidenceGate, parallelism, updateRankings, reservedOnly
             ) { stats -> dispatch(TuiEvent.BenchmarkLiveUpdate(stats)) }
         }
     }
@@ -353,6 +355,7 @@ interface TuiGateway {
         confidenceGate: Double,
         parallelism: Int,
         updateRankings: Boolean,
+        reservedOnly: Boolean,
         onLive: (taxonomy.model.BenchmarkLiveStats) -> Unit
     )
     suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String

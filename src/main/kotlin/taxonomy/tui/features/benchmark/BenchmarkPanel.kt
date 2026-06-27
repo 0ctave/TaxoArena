@@ -14,6 +14,8 @@ import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.state.BenchmarkLiveView
+import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.BenchmarkUiState
 
@@ -124,7 +126,12 @@ fun EvalCatalogPicker(
     }
 }
 
-/** Existing Arena benchmark (MMLU-Pro pairwise eval) view. */
+/**
+ * Arena benchmark config dashboard. Four stacked sections (MODELS / DOMAINS / OPTIONS / START)
+ * configure a multi-model MMLU-Pro pairwise eval; the model/domain pickers live in the left
+ * Topology panel. Once a run starts, this switches to the V-toggleable live view
+ * (SUMMARY dashboard vs per-question STREAM).
+ */
 @Composable
 private fun ArenaBenchmarkView(
     width: Int,
@@ -133,10 +140,10 @@ private fun ArenaBenchmarkView(
     scrollOffset: Int,
     benchmarkState: BenchmarkUiState,
 ) {
-    // Mosaic's TextSurface throws Check failed when a Text overflows its row. Truncate every
-    // dynamic line (loaded-model list, user input echoes) to the panel column to avoid the
-    // same crash class that hit ArenaPanel during benchmark configuration.
+    // Mosaic's TextSurface throws Check failed when a Text overflows its row, so every dynamic
+    // line is truncated to the panel column.
     val w = (width - 1).coerceAtLeast(1)
+    val isLive = controlState.isRunningBenchmark || controlState.benchmarkReport != null
     Column {
         if (benchmarkState.loadedModels.isNotEmpty()) {
             Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}".take(w), color = Green)
@@ -160,19 +167,6 @@ private fun ArenaBenchmarkView(
                 }
             }
 
-            controlState.isRunningBenchmark -> {
-                Text("Running benchmark...", color = White)
-                Text(controlState.benchmarkProgress, color = White)
-                benchmarkState.liveStats?.let { live ->
-                    Text(
-                        "Live: ${live.processed}/${live.total} · " +
-                            "agreement ${"%.2f".format(live.runningAgreement)} · " +
-                            "coverage ${"%.2f".format(live.runningCoverage)}",
-                        color = White
-                    )
-                }
-            }
-
             benchmarkState.evalLoaderIsRunning -> {
                 Text("Loading eval results...", color = White)
                 if (benchmarkState.evalLoadingModelCount > 0) {
@@ -188,29 +182,148 @@ private fun ArenaBenchmarkView(
                 }
             }
 
-            controlState.benchmarkReport != null -> {
-                val report = controlState.benchmarkReport!!
-                Text("Queries: ${report.totalQueries}", color = White)
-                Text("Model Pairs: ${report.totalModelPairs}", color = White)
-                Text("Coverage: ${"%.3f".format(report.coverageRate)}", color = White)
-                Text("Judge Agreement: ${"%.3f".format(report.overallJudgeAccuracyAgreement)}", color = White)
-                Spacer()
-                Text("Scroll offset: $scrollOffset", color = White)
-            }
+            isLive -> ArenaBenchmarkLiveView(w, height, controlState, benchmarkState)
 
-            else -> {
-                Text("Models: ${benchmarkState.benchmarkModelsInput.ifBlank { "(all loaded)" }}".take(w), color = White)
-                Text("Query limit: ${benchmarkState.benchmarkQueryLimitInput.ifBlank { "0 (all)" }}".take(w), color = White)
-                Text("Category: ${benchmarkState.benchmarkCategoryInput.ifBlank { "—" }}".take(w), color = White)
-                Text("Confidence gate: ${benchmarkState.benchmarkConfidenceGateInput}".take(w), color = White)
-                Text("Parallelism: ${benchmarkState.benchmarkParallelismInput}".take(w), color = White)
-                Text("Update rankings: ${benchmarkState.benchmarkUpdateRankingsInput}".take(w), color = White)
-            }
+            else -> ArenaBenchmarkConfig(w, benchmarkState)
         }
 
         Spacer()
-        Text("Enter run benchmark · o load eval_results · Q back", color = Cyan)
+        val hint = if (isLive) "V toggle view · o load eval_results · Q back"
+        else "Tab section · W/S move · Enter select/edit · o load eval_results · Q back"
+        Text(hint.take(w), color = Cyan)
     }
+}
+
+/** The four-section config dashboard shown before a run starts. */
+@Composable
+private fun ArenaBenchmarkConfig(w: Int, b: BenchmarkUiState) {
+    val active = b.benchmarkActiveSection
+    @Composable
+    fun header(section: BenchmarkSection, label: String) {
+        val on = section == active
+        Text(
+            ((if (on) "❯ " else "  ") + label).take(w),
+            color = if (on) Cyan else White,
+            textStyle = if (on) Bold else Unspecified,
+        )
+    }
+
+    // MODELS
+    header(BenchmarkSection.MODELS, "MODELS")
+    val models = b.benchmarkSelectedModels
+    val modelsLine = if (models.size < 2) "(pick ≥2)"
+    else "${models.size} selected: ${models.joinToString(", ")}"
+    Text("    $modelsLine".take(w), color = if (models.size < 2) Yellow else Green)
+
+    // DOMAINS
+    header(BenchmarkSection.DOMAINS, "DOMAINS")
+    val domains = b.benchmarkSelectedDomains
+    val domainsLine = if (domains.isEmpty()) "(all)"
+    else "${domains.size} selected: ${domains.joinToString(", ")}"
+    Text("    $domainsLine".take(w), color = if (domains.isEmpty()) White else Green)
+
+    // OPTIONS
+    header(BenchmarkSection.OPTIONS, "OPTIONS")
+    val optActive = active == BenchmarkSection.OPTIONS
+    val ql = b.benchmarkQueryLimitInput.ifBlank { "0" }
+    val qlDisplay = if (optActive && b.selectedBenchmarkField == 0 && b.isEditingBenchmarkField)
+        b.benchmarkEditingValue + "█" else "$ql${if (ql == "0") " (all)" else ""}"
+    optionRow(w, "Query limit", qlDisplay, optActive && b.selectedBenchmarkField == 0)
+    optionRow(w, "Reserved-only", b.benchmarkReservedOnlyInput, optActive && b.selectedBenchmarkField == 1)
+    optionRow(w, "Update rankings", b.benchmarkUpdateRankingsInput, optActive && b.selectedBenchmarkField == 2)
+
+    // START
+    header(BenchmarkSection.START, "START")
+    val ready = models.size >= 2 && domains.isNotEmpty()
+    if (ready) {
+        Text("    ▶ Run benchmark (Enter)".take(w), color = Green, textStyle = Bold)
+    } else {
+        Text("    Select ≥2 models and ≥1 domain first".take(w), color = Yellow)
+    }
+}
+
+@Composable
+private fun optionRow(w: Int, label: String, value: String, focused: Boolean) {
+    Text(
+        ("    " + (if (focused) "› " else "  ") + label.padEnd(16) + value).take(w),
+        color = if (focused) Cyan else White,
+        textStyle = if (focused) Bold else Unspecified,
+    )
+}
+
+/** Live-run view, switched between a summary dashboard and a per-question stream by V. */
+@Composable
+private fun ArenaBenchmarkLiveView(
+    w: Int,
+    height: Int,
+    controlState: AnalysisPanelState,
+    b: BenchmarkUiState,
+) {
+    val running = controlState.isRunningBenchmark
+    val report = controlState.benchmarkReport
+    Text(
+        "BENCHMARK · ${if (running) "running" else "complete"} · view: ${b.benchmarkLiveView}".take(w),
+        color = Cyan, textStyle = Bold,
+    )
+    when (b.benchmarkLiveView) {
+        BenchmarkLiveView.SUMMARY -> {
+            b.liveStats?.let { live ->
+                val pct = if (live.total > 0) live.processed * 100 / live.total else 0
+                Text("Progress: ${live.processed}/${live.total} ($pct%)".take(w), color = White)
+                Text(
+                    "Agreement ${"%.2f".format(live.runningAgreement)} · " +
+                        "Coverage ${"%.2f".format(live.runningCoverage)}".take(w),
+                    color = White,
+                )
+                if (live.perCategoryProgress.isNotEmpty()) {
+                    Text("Per-category:".take(w), color = Yellow)
+                    live.perCategoryProgress.entries.take((height - 7).coerceAtLeast(1)).forEach { (cat, n) ->
+                        Text("  ${cat.take(20).padEnd(20)} $n".take(w), color = White)
+                    }
+                }
+            }
+            if (report != null) {
+                Text("Queries ${report.totalQueries} · pairs ${report.totalModelPairs}".take(w), color = White)
+                modelAccuracies(report).forEach { (model, acc) ->
+                    val bar = "█".repeat((acc * 20).toInt().coerceIn(0, 20))
+                    Text("  ${model.take(16).padEnd(16)} ${bar.padEnd(20)} ${"%.0f%%".format(acc * 100)}".take(w), color = Green)
+                }
+            } else if (running) {
+                Text("Model accuracy: streaming…".take(w), color = White)
+            }
+        }
+
+        BenchmarkLiveView.STREAM -> {
+            if (report != null) {
+                report.queryResults.takeLast(10).forEach { r ->
+                    val answers = r.modelAnswers.entries.joinToString(" ") { (m, a) ->
+                        val ok = r.modelCorrect[m] == true
+                        "${m.take(8)}:$a${if (ok) "✓" else "✗"}"
+                    }
+                    Text("• ${r.query.take(28)} | GT:${r.gtCorrectAnswer} | $answers".take(w), color = White)
+                }
+            } else {
+                b.liveStats?.let { live ->
+                    Text("Now: ${live.currentQuestion.take(w - 6)}".take(w), color = White)
+                }
+                Text("Per-question results stream in on completion…".take(w), color = Yellow)
+            }
+        }
+    }
+}
+
+/** Per-model accuracy over a completed report's per-query results. */
+private fun modelAccuracies(report: taxonomy.model.BenchmarkReport): List<Pair<String, Double>> {
+    val correct = mutableMapOf<String, Int>()
+    val total = mutableMapOf<String, Int>()
+    report.queryResults.forEach { r ->
+        r.modelCorrect.forEach { (m, ok) ->
+            total[m] = (total[m] ?: 0) + 1
+            if (ok) correct[m] = (correct[m] ?: 0) + 1
+        }
+    }
+    return total.keys.sortedByDescending { (correct[it] ?: 0).toDouble() / (total[it] ?: 1) }
+        .map { it to (correct[it] ?: 0).toDouble() / (total[it] ?: 1) }
 }
 
 /** Batch routing accuracy test (formerly the Trickle tab's batch test). */

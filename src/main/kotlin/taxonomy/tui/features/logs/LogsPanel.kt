@@ -17,6 +17,7 @@ import com.jakewharton.mosaic.ui.Color.Companion.Yellow
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
+import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.utils.TuiLogAppender
 
 /**
@@ -46,12 +47,9 @@ fun LogsPanel(
     // split LoggerContext, or simply nothing logged yet).
     val diag = remember(TuiLogAppender.logsVersion.value) { TuiLogAppender.diagnostics() }
     val visible = height.coerceAtLeast(1)
-    val end = (logs.size - scrollOffset).coerceIn(0, logs.size)
-    val start = (end - visible).coerceAtLeast(0)
-    val lines = logs.subList(start, end)
 
-    Column {
-        if (lines.isEmpty()) {
+    if (logs.isEmpty()) {
+        Column {
             val appenders = if (diag.attachedAppenderNames.isEmpty()) "none"
                 else diag.attachedAppenderNames.joinToString(",")
             val last = diag.lastAppendAt?.toString() ?: "never"
@@ -62,8 +60,21 @@ fun LogsPanel(
             Text("  appends seen (life)  : ${diag.appendCount}", color = White)
             Text("  last append at       : $last", color = White)
             Text("  loggerContext hash   : ${diag.loggerContextIdentityHash}", color = White)
-            return@Column
         }
+        return
+    }
+
+    ScrollablePanelContent(
+        pWidth = width,
+        pHeight = visible,
+        itemCount = logs.size,
+        scrollOffset = scrollOffset,
+        hasPadding = false,
+        reversed = true,
+    ) { visibleHeight, _, contentWidth ->
+        val end = (logs.size - scrollOffset).coerceIn(0, logs.size)
+        val start = (end - visibleHeight).coerceAtLeast(0)
+        val lines = logs.subList(start, end)
         lines.forEach { raw ->
             val first = raw.split('\n', '\r').firstOrNull()?.trim() ?: ""
             val (glyph, color) = when {
@@ -72,7 +83,7 @@ fun LogsPanel(
                 first.contains("INFO") || first.contains("DEBUG") -> "\u2139 " to Cyan
                 else -> "  " to White
             }
-            val body = first.take((width - 4).coerceAtLeast(1))
+            val body = first.take((contentWidth - 2).coerceAtLeast(1))
             Text(
                 buildAnnotatedString {
                     withStyle(SpanStyle(color = color, textStyle = Bold)) { append(glyph) }

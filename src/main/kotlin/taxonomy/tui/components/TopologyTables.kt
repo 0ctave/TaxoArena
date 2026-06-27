@@ -81,8 +81,6 @@ fun AsciiTreeTable(
     val QCOL = TreeTableLayout.QUERY_COL
     val treeW = TreeTableLayout.treeWidth(pWidth)
     val visible = TreeTableLayout.visibleRows(pHeight)
-    val start = offset.coerceIn(0, maxOf(0, lines.size - visible))
-    val end = (start + visible).coerceAtMost(lines.size)
 
     Column {
         // Column header.
@@ -98,7 +96,15 @@ fun AsciiTreeTable(
             }.take(pWidth - 1)
         )
 
-        for (i in start until end) {
+        ScrollablePanelContent(
+            pWidth = pWidth,
+            pHeight = visible,
+            itemCount = lines.size,
+            scrollOffset = offset,
+            hasPadding = false,
+        ) { visibleHeight, startIdx, contentWidth ->
+            val end = (startIdx + visibleHeight).coerceAtMost(lines.size)
+            for (i in startIdx until end) {
             val line = lines[i]
             val node = line.node
             val selected = i == selectedIdx
@@ -128,10 +134,11 @@ fun AsciiTreeTable(
                 ) { append(judgeGlyph) }
             }
             Text(
-                row.take(pWidth - 1),
+                row.take(contentWidth),
                 modifier = Modifier.height(1),
                 textStyle = if (selected) Bold else Unspecified
             )
+            }
         }
     }
 }
