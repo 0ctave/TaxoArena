@@ -121,6 +121,8 @@ sealed interface TuiEvent {
 
     /** Generate a brand-new taxonomy DAG from the configured dataset/domains. */
     data object StartGeneration : TuiEvent
+    /** Cancel an in-flight generation or download. */
+    data object CancelGeneration : TuiEvent
     data class GenerationProgress(
         val progress: Float,
         val statusText: String

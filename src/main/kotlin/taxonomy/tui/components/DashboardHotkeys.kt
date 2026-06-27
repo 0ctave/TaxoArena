@@ -16,7 +16,7 @@ object DashboardHotkeys {
         if (isRegenerating) {
             return listOf(
                 HotkeyAction("\u25cc", "Building DAG", TuiTheme.RUNNING),
-                HotkeyAction("Tab", "Switch Panels"),
+                HotkeyAction("Esc", "Cancel", TuiTheme.ERROR),
                 HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
             )
         }

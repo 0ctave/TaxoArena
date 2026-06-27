@@ -121,6 +121,11 @@ class TuiController(
     }
 
     private fun handleConfigKeys(state: TuiAppState, key: String) {
+        // While a dataset download is running, Esc/C cancels it.
+        if (state.config.downloadingDataset && (key == "escape" || key == "c")) {
+            dispatch(TuiEvent.CancelGeneration)
+            return
+        }
         if (state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS) {
             when (key) {
                 "w", "z", "arrowup" ->
@@ -233,6 +238,11 @@ class TuiController(
     private fun handleMainDashboardKeys(state: TuiAppState, key: String) {
         if (isTextInputActive(state)) {
             handleActiveTextInput(state, key)
+            return
+        }
+        // While the DAG is generating, Esc/C cancels the run.
+        if (state.runtime.isRegenerating && (key == "escape" || key == "c")) {
+            dispatch(TuiEvent.CancelGeneration)
             return
         }
 

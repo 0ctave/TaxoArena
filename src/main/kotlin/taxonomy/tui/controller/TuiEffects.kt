@@ -1,6 +1,8 @@
 package taxonomy.tui.controller
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import taxonomy.model.GraphNode
 import taxonomy.service.AnalysisMode
@@ -15,6 +17,7 @@ interface TuiEffects {
     fun refreshDatasetStatus(dispatch: (TuiEvent) -> Unit)
     fun downloadDataset(maxQueries: Int, dispatch: (TuiEvent) -> Unit)
     fun generateDag(dispatch: (TuiEvent) -> Unit)
+    fun cancelActiveJob()
 
     fun runBatchJudge(generality: Int, replaceExisting: Boolean)
     fun runArena(query: String, modelA: String, modelB: String)
@@ -47,6 +50,14 @@ class DefaultTuiEffects(
     private val scope: CoroutineScope,
     private val gateway: TuiGateway
 ) : TuiEffects {
+
+    /** The long-running generation/download job, so it can be cancelled mid-flight. */
+    private var activeJob: Job? = null
+
+    override fun cancelActiveJob() {
+        activeJob?.cancel()
+        activeJob = null
+    }
 
     override fun refreshSnapshots(dispatch: (TuiEvent) -> Unit) {
         scope.launch {
@@ -98,13 +109,16 @@ class DefaultTuiEffects(
     }
 
     override fun downloadDataset(maxQueries: Int, dispatch: (TuiEvent) -> Unit) {
-        scope.launch {
+        activeJob = scope.launch {
             try {
                 gateway.downloadDataset(maxQueries) { progress, text ->
                     dispatch(TuiEvent.DatasetDownloadProgress(progress, text))
                 }
                 dispatch(TuiEvent.DatasetDownloadCompleted)
                 dispatch(TuiEvent.IncrementSettingsVersion)
+            } catch (c: CancellationException) {
+                dispatch(TuiEvent.DatasetDownloadFailed("Download cancelled"))
+                throw c
             } catch (t: Throwable) {
                 dispatch(TuiEvent.DatasetDownloadFailed(t.message ?: "Dataset download failed"))
             }
@@ -112,13 +126,16 @@ class DefaultTuiEffects(
     }
 
     override fun generateDag(dispatch: (TuiEvent) -> Unit) {
-        scope.launch {
+        activeJob = scope.launch {
             try {
                 gateway.generateDag { progress, text ->
                     dispatch(TuiEvent.GenerationProgress(progress, text))
                 }
                 dispatch(TuiEvent.GenerationCompleted)
                 dispatch(TuiEvent.IncrementSettingsVersion)
+            } catch (c: CancellationException) {
+                dispatch(TuiEvent.GenerationFailed("Generation cancelled"))
+                throw c
             } catch (t: Throwable) {
                 dispatch(TuiEvent.GenerationFailed(t.message ?: "DAG generation failed"))
             }

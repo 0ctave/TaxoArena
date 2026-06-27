@@ -404,6 +404,15 @@ object TuiReducer {
                     )
                 )
 
+            TuiEvent.CancelGeneration ->
+                state.copy(
+                    config = state.config.copy(
+                        downloadingDataset = false,
+                        generationStatusText = "Cancelled"
+                    ),
+                    runtime = state.runtime.copy(isRegenerating = false)
+                )
+
             TuiEvent.StartGeneration ->
                 state.copy(
                     // Jump to the dashboard so the DAG Explorer streams the live evolution as
