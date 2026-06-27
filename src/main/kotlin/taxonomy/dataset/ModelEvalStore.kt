@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.sql.Connection
 import java.sql.DriverManager
@@ -39,12 +40,16 @@ data class EvalLoadStats(
 )
 
 @Service
-class ModelEvalStore {
+class ModelEvalStore(
+    // Injectable so integration tests can point at a throwaway DB file. Defaults to the
+    // shared dataset cache so joins with mmlu_pro work without ATTACH in production.
+    @Value("\${taxoadapt.eval.db-path:mmlu_pro_dataset_cache_v2.db}")
+    private val dbPath: String = "mmlu_pro_dataset_cache_v2.db"
+) {
     private val log = LoggerFactory.getLogger("ModelEvalStore")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
 
-    // Lives in the same DB as the dataset so joins work without ATTACH
-    private val dbUrl = "jdbc:sqlite:mmlu_pro_dataset_cache_v2.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val dbUrl = "jdbc:sqlite:$dbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
     private fun conn(): Connection = DriverManager.getConnection(dbUrl).also { it.autoCommit = true }
 

@@ -25,7 +25,8 @@ data class BenchmarkRequest(
     val category: String? = null,   // optional: restrict to one GT category
     val confidenceGate: Double = 0.65,
     val parallelism: Int = 6,
-    val updateRankings: Boolean = true
+    val updateRankings: Boolean = true,
+    val reservedOnly: Boolean = true   // benchmark only the reserved test pool by default
 )
 
 @Serializable
