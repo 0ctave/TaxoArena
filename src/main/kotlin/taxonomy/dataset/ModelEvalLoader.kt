@@ -40,7 +40,7 @@ class ModelEvalLoader(
     @Value("\${taxoadapt.eval.reserved-file:reserved_test_queries.json}")
     private val reservedFilePath: String = "reserved_test_queries.json"
 ) {
-    private val log = LoggerFactory.getLogger("ModelEvalLoader")
+    private val log = LoggerFactory.getLogger("taxonomy.ModelEvalLoader")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
     private val datasetDbUrl = "jdbc:sqlite:$datasetDbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
     private val embeddingDbUrl = "jdbc:sqlite:$embeddingDbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"

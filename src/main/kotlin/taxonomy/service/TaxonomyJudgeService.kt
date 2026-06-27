@@ -20,7 +20,7 @@ class TaxonomyJudgeService(
     private val config: TaxonomyConfig,
     private val arenaService: TaxonomyArenaService
 ) {
-    private val log = LoggerFactory.getLogger("JudgeService")
+    private val log = LoggerFactory.getLogger("taxonomy.JudgeService")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     suspend fun generateJudgesForDag(root: GraphNode, replaceExisting: Boolean = false) = coroutineScope {

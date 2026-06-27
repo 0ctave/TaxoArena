@@ -22,7 +22,7 @@ class TaxonomyOperations(
     private val merger: TaxonomyMerger,
     private val config: TaxonomyConfig
 ) {
-    private val log = LoggerFactory.getLogger("Operations")
+    private val log = LoggerFactory.getLogger("taxonomy.Operations")
 
     fun routeQuery(
         query: Embedding,

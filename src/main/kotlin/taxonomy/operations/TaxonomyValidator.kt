@@ -20,7 +20,7 @@ class TaxonomyValidator(
     private val config: TaxonomyConfig,
     private val llmClient: TaxonomyLlmClient
 ) {
-    private val log = LoggerFactory.getLogger("Validator")
+    private val log = LoggerFactory.getLogger("taxonomy.Validator")
     private val json = Json { ignoreUnknownKeys = true }
 
     // --- Pre-built reusable schemas ---

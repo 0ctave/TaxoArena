@@ -21,7 +21,7 @@ data class PrecomputedModelOutput(
 
 @Service
 class PrecomputedModelOutputLoader {
-    private val log = LoggerFactory.getLogger("ModelOutputLoader")
+    private val log = LoggerFactory.getLogger("taxonomy.ModelOutputLoader")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
 
     companion object {

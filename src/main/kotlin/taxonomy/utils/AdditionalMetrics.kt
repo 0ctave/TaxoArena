@@ -25,7 +25,7 @@ import kotlin.random.Random
  * the greatest depth (the smallest, most defensible subtree under polyhierarchy).
  */
 
-private val additionalMetricsLog = LoggerFactory.getLogger("AdditionalMetrics")
+private val additionalMetricsLog = LoggerFactory.getLogger("taxonomy.AdditionalMetrics")
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Shared helpers

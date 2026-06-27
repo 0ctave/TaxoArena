@@ -15,7 +15,7 @@ import kotlin.math.abs
 class TaxonomyStabilizer(
     private val config: TaxonomyConfig
 ) {
-    private val log = LoggerFactory.getLogger("Stabilizer")
+    private val log = LoggerFactory.getLogger("taxonomy.Stabilizer")
 
     private var prevNodes: Set<String>? = null
     private var prevRelations: Set<Pair<String, String>>? = null

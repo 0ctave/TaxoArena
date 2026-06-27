@@ -32,7 +32,7 @@ class TaxonomyService(
     private val llmClient: TaxonomyLlmClient,
     private val perfTracker: TaxonomyPerformanceTracker
 ) {
-    private val log = LoggerFactory.getLogger("Service")
+    private val log = LoggerFactory.getLogger("taxonomy.Service")
 
     fun getPerformanceReport(): Map<String, PerformanceStats> = perfTracker.getReport()
     fun getPerformanceReportString(): String = perfTracker.printReport()

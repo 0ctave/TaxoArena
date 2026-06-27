@@ -19,7 +19,7 @@ class TaxonomyMetrics(
     private val root:           GraphNode,
     private val groundTruthMap: Map<String, List<String>> = emptyMap()
 ) {
-    private val log = LoggerFactory.getLogger("Metrics")
+    private val log = LoggerFactory.getLogger("taxonomy.Metrics")
 
     // ─────────────────────────────────────────────────────────────────────────
     //  Report data class  (matches the canonical definition in framework ref)

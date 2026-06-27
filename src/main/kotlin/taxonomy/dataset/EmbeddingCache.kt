@@ -19,7 +19,7 @@ class EmbeddingCache(
     private val config: TaxonomyConfig,
     private val embeddingModel: EmbeddingModel
 ) {
-    private val log = LoggerFactory.getLogger("EmbeddingCache")
+    private val log = LoggerFactory.getLogger("taxonomy.EmbeddingCache")
 
     // In-memory cache for the CURRENT run only. Prevents repeated DB calls for the same query.
     private val sessionCache = ConcurrentHashMap<String, FloatArray>()

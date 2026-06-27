@@ -50,7 +50,7 @@ class TaxonomyPersistence(
     private val config: TaxonomyConfig,
     private val embeddingCache: EmbeddingCache
 ) {
-    private val log = LoggerFactory.getLogger("Persistence")
+    private val log = LoggerFactory.getLogger("taxonomy.Persistence")
     private val json = Json { 
         prettyPrint = false 
         ignoreUnknownKeys = true

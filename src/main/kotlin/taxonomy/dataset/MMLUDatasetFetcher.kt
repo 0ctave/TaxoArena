@@ -22,7 +22,7 @@ class MMLUDatasetFetcher(
     @Value("\${huggingface.token:}") private val hfToken: String
 ) {
     var onDownloadProgress: ((current: Int, total: Int, datasetName: String) -> Unit)? = null
-    private val log = LoggerFactory.getLogger("DatasetFetcher")
+    private val log = LoggerFactory.getLogger("taxonomy.DatasetFetcher")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
     private val dbUrl = "jdbc:sqlite:mmlu_pro_dataset_cache_v2.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 

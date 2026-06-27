@@ -180,7 +180,7 @@ interface LLMProvider {
 @Component
 class ArcLLMProvider(private val chatCompleter: ChatCompleter) : LLMProvider {
 
-    private val log = LoggerFactory.getLogger("ArcLLMProvider")
+    private val log = LoggerFactory.getLogger("taxonomy.ArcLLMProvider")
 
     override suspend fun completePrompt(agentName: String, prompt: String): String {
         log.debug("Routing prompt to Arc Agent: {}", agentName)

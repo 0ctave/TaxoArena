@@ -217,7 +217,7 @@ class TaxonomySnapshotManager(
     private val config: TaxonomyConfig,
     private val persistence: TaxonomyPersistence
 ) {
-    private val log = LoggerFactory.getLogger("SnapshotManager")
+    private val log = LoggerFactory.getLogger("taxonomy.SnapshotManager")
     private val json = Json { 
         prettyPrint = true 
         ignoreUnknownKeys = true
@@ -465,7 +465,13 @@ class TaxonomySnapshotManager(
         val timestampFileStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
         val datasetName = config.dataset.datasetType.name
         val uuid = "$datasetName/${timestampFileStr}_${java.util.UUID.randomUUID()}"
-        val logs = logsToSave ?: synchronized(TuiLogAppender.logs) { TuiLogAppender.logs.toList() }
+        // Prefer an explicit override, then the trace recorded during the last generation
+        // (per-snapshot partitioning), falling back to the whole live buffer for snapshots saved
+        // outside a generation lifecycle (e.g. after loading and editing an existing DAG).
+        val logs = logsToSave
+            ?: TuiLogAppender.lastGenerationTrace().ifEmpty {
+                synchronized(TuiLogAppender.logs) { TuiLogAppender.logs.toList() }
+            }
         writeLogs(uuid, logs)
         // Bound the in-object trace so a long-running session doesn't bloat the snapshot row.
         val logTrace = logs.takeLast(MAX_LOG_TRACE)
