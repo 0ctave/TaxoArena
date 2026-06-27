@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.File
 import java.sql.DriverManager
@@ -30,12 +31,19 @@ private data class RawEvalItem(
 @Service
 class ModelEvalLoader(
     private val store: ModelEvalStore,
-    private val datasetFetcher: MMLUDatasetFetcher   // for cross-referencing questions
+    private val datasetFetcher: MMLUDatasetFetcher,   // for cross-referencing questions
+    // Injectable so integration tests can point at throwaway DB/files. Defaults match prod.
+    @Value("\${taxoadapt.eval.db-path:mmlu_pro_dataset_cache_v2.db}")
+    private val datasetDbPath: String = "mmlu_pro_dataset_cache_v2.db",
+    @Value("\${taxoadapt.eval.embedding-db-path:embeddings_cache.db}")
+    private val embeddingDbPath: String = "embeddings_cache.db",
+    @Value("\${taxoadapt.eval.reserved-file:reserved_test_queries.json}")
+    private val reservedFilePath: String = "reserved_test_queries.json"
 ) {
     private val log = LoggerFactory.getLogger("ModelEvalLoader")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
-    private val datasetDbUrl = "jdbc:sqlite:mmlu_pro_dataset_cache_v2.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
-    private val embeddingDbUrl = "jdbc:sqlite:embeddings_cache.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val datasetDbUrl = "jdbc:sqlite:$datasetDbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val embeddingDbUrl = "jdbc:sqlite:$embeddingDbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
     // ─── Public API ───────────────────────────────────────────────────────────
 
@@ -98,7 +106,7 @@ class ModelEvalLoader(
      * reserved_test_queries.json produced by MMLUDatasetFetcher.splitTrainTest().
      * Must be called once after initial loads — subsequent loads check the link table.
      */
-    fun syncReservedPool(reservedQueriesJson: File = File("reserved_test_queries.json")) {
+    fun syncReservedPool(reservedQueriesJson: File = File(reservedFilePath)) {
         if (!reservedQueriesJson.exists()) {
             log.warn("reserved_test_queries.json not found — skipping reserved sync")
             return
@@ -290,7 +298,7 @@ class ModelEvalLoader(
     }
 
     private fun loadReservedTextsFromFile(): Set<String> {
-        val file = File("reserved_test_queries.json")
+        val file = File(reservedFilePath)
         if (!file.exists()) return emptySet()
         return try {
             val map: Map<String, List<String>> = json.decodeFromString(file.readText())

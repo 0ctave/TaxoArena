@@ -37,7 +37,7 @@ class TaxonomyBenchmarkService(
         val matrix = evalStore.getResultsMatrix(
             models = modelNames,
             category = req.category,
-            reservedOnly = true, // We only benchmark on the reserved pool
+            reservedOnly = req.reservedOnly, // defaults to the reserved pool only
             limit = req.queryLimit
         )
 
