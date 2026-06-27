@@ -29,6 +29,13 @@ data class BenchmarkUiState(
     val evalDbDistinctModels: Int = 0,
     val evalDbPathExists: Boolean = false,
 
+    // Live per-question progress streamed from a running benchmark (null when idle).
+    val liveStats: taxonomy.model.BenchmarkLiveStats? = null,
+
+    // Eval-results auto-download progress: file name → fraction complete [0,1].
+    val isDownloadingEval: Boolean = false,
+    val evalDownloadProgress: Map<String, Float> = emptyMap(),
+
     // Roster of models currently loaded in the eval_results store.
     val loadedModels: List<String> = emptyList()
 )

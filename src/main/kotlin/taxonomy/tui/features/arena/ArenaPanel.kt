@@ -22,6 +22,31 @@ fun ArenaPanel(
     arenaState: ArenaUiState,
 ) {
     Column {
+            if (arenaState.isViewingLeaderboard) {
+                Text("Leaderboard (global)", color = Cyan)
+                Spacer()
+                if (arenaState.leaderboard.isEmpty()) {
+                    Text("No ratings recorded yet — run a benchmark or arena match.", color = Yellow)
+                } else {
+                    Text("%-22s %-10s %6s %6s %5s".format("Model", "Domain", "μ", "σ", "Rank"), color = Yellow)
+                    val rows = (height - 4).coerceAtLeast(1)
+                    arenaState.leaderboard
+                        .flatMap { g -> g.agents.map { g.rank to it } }
+                        .take(rows)
+                        .forEach { (rank, a) ->
+                            Text(
+                                "%-22s %-10s %6.1f %6.1f %5d".format(
+                                    a.agentName.take(22), a.domain.take(10), a.mu, a.sigma, rank
+                                ).take((width - 2).coerceAtLeast(1)),
+                                color = White
+                            )
+                        }
+                }
+                Spacer()
+                Text("Press L to close the leaderboard.", color = Cyan)
+                return@Column
+            }
+
             val mode = if (arenaState.usePrecomputed) "PRECOMPUTED (no live generation)" else "LIVE"
             Text("Mode: $mode", color = Green)
 

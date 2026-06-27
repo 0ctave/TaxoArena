@@ -30,10 +30,18 @@ class EmbeddingCache(
     val dimensionality: Int
         get() = sessionCache.values.firstOrNull()?.size ?: config.formalism.let { dimForDepth(4) }
 
-    private val connection: java.sql.Connection
-        get() = DriverManager.getConnection(dbUrl).also { conn ->
+    // Single held-open connection (WAL mode) guarded by a lock to avoid the cost
+    // and contention of opening a new SQLite connection on every call.
+    private val dbLock = Any()
+    private val connection: java.sql.Connection by lazy {
+        DriverManager.getConnection(dbUrl).also { conn ->
             conn.autoCommit = true
         }
+    }
+
+    private inline fun <T> withConn(block: (java.sql.Connection) -> T): T = synchronized(dbLock) {
+        block(connection)
+    }
 
     init {
         initDatabase()
@@ -41,7 +49,7 @@ class EmbeddingCache(
 
     private fun initDatabase() {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.createStatement().use { stmt ->
                     // 1. Existing embeddings table
                     stmt.execute(
@@ -84,7 +92,7 @@ class EmbeddingCache(
 
     fun putQuery(id: String, raw: String, distilled: String) {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("INSERT OR REPLACE INTO queries (id, raw_text, distilled_text) VALUES (?, ?, ?)")
                     .use { pstmt ->
                         pstmt.setString(1, id)
@@ -100,7 +108,7 @@ class EmbeddingCache(
 
     fun getQuery(id: String): Pair<String, String>? {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("SELECT raw_text, distilled_text FROM queries WHERE id = ?").use { pstmt ->
                     pstmt.setString(1, id)
                     val rs = pstmt.executeQuery()
@@ -119,7 +127,7 @@ class EmbeddingCache(
         if (ids.isEmpty()) return emptyMap()
         val result = mutableMapOf<String, Pair<String, String>>()
         try {
-            DriverManager.getConnection(dbUrl).use { conn ->
+            withConn { conn ->
                 // SQLite has a 999-variable limit; chunk to be safe
                 ids.chunked(900).forEach { chunk ->
                     val placeholders = chunk.joinToString(",") { "?" }
@@ -142,7 +150,7 @@ class EmbeddingCache(
 
     fun putGmmVectors(id: String, mean: DoubleArray, cov: DoubleArray) {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("INSERT OR REPLACE INTO gmm_vectors (id, mean_json, cov_json) VALUES (?, ?, ?)")
                     .use { pstmt ->
                         pstmt.setString(1, id)
@@ -158,7 +166,7 @@ class EmbeddingCache(
 
     fun getGmmVectors(id: String): Pair<DoubleArray, DoubleArray>? {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("SELECT mean_json, cov_json FROM gmm_vectors WHERE id = ?").use { pstmt ->
                     pstmt.setString(1, id)
                     val rs = pstmt.executeQuery()
@@ -178,7 +186,7 @@ class EmbeddingCache(
     fun get(query: String): FloatArray? {
         sessionCache[query]?.let { return it }
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("SELECT vector FROM embeddings WHERE query = ?").use { pstmt ->
                     pstmt.setString(1, query)
                     val rs = pstmt.executeQuery()
@@ -250,7 +258,7 @@ class EmbeddingCache(
 
     private fun saveBatchToDisk(embeddings: List<Pair<String, FloatArray>>) {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.autoCommit = false
                 try {
                     conn.prepareStatement("INSERT OR REPLACE INTO embeddings (query, vector) VALUES (?, ?)").use { pstmt ->
@@ -267,6 +275,8 @@ class EmbeddingCache(
                 } catch (e: Exception) {
                     conn.rollback()
                     throw e
+                } finally {
+                    conn.autoCommit = true
                 }
             }
         } catch (e: Exception) {

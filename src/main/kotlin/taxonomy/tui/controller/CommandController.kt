@@ -119,7 +119,30 @@ class CommandController(
                     category = state.benchmark.benchmarkCategoryInput.trim().ifBlank { null },
                     confidenceGate = state.benchmark.benchmarkConfidenceGateInput.trim().toDoubleOrNull() ?: 0.65,
                     parallelism = state.benchmark.benchmarkParallelismInput.trim().toIntOrNull() ?: 4,
-                    updateRankings = state.benchmark.benchmarkUpdateRankingsInput.trim().toBooleanStrictOrNull() ?: true
+                    updateRankings = state.benchmark.benchmarkUpdateRankingsInput.trim().toBooleanStrictOrNull() ?: true,
+                    dispatch = dispatch
+                )
+            }
+
+            TuiEvent.RunBatchTrickleTest -> {
+                effects.runBatchTrickle(dispatch)
+            }
+
+            TuiEvent.DownloadEvalResults -> {
+                effects.downloadEvalResults(dispatch)
+            }
+
+            TuiEvent.ToggleLeaderboard -> {
+                effects.loadLeaderboard(dispatch)
+            }
+
+            TuiEvent.EvalDownloadComplete -> {
+                // Re-parse the freshly downloaded eval_results into the eval store.
+                dispatch(TuiEvent.SetEvalLoaderRunning(true))
+                effects.loadEval(
+                    path = "",
+                    modelName = "",
+                    dispatch = dispatch
                 )
             }
 
@@ -138,7 +161,7 @@ class CommandController(
 
             TuiEvent.ConfirmTrickleQueryInput -> {
                 if (state.trickle.trickleQueryInput.isNotBlank()) {
-                    effects.runTrickle(state.trickle.trickleQueryInput)
+                    effects.runTrickle(state.trickle.trickleQueryInput, dispatch)
                 }
             }
 
@@ -150,7 +173,9 @@ class CommandController(
                 if (state.startup.state == StartupState.MAINDASHBOARD) {
                     when (event.key.lowercase()) {
                         "e" -> effects.exportAscii()
-                        "l" -> effects.regenerateLabels()
+                        // In Arena mode "l" toggles the leaderboard (handled in the controller),
+                        // so only treat it as label regeneration outside Arena.
+                        "l" -> if (state.analysis.mode != AnalysisMode.ARENA) effects.regenerateLabels()
                         "r" -> effects.regenerateJudgeForCurrentNode()
                         else -> Unit
                     }

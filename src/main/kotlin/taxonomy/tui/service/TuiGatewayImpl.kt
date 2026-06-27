@@ -2,16 +2,29 @@ package taxonomy.tui.service
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import taxonomy.model.BenchmarkLiveStats
 import taxonomy.model.BenchmarkRequest
 import taxonomy.model.GraphNode
 import taxonomy.service.AnalysisMode
 import taxonomy.model.ModelSource
 import taxonomy.service.DagSnapshot
+import taxonomy.service.LeaderboardGroup
+import taxonomy.service.QueryResponseNode
+import taxonomy.tui.BatchTrickleTestResults
 import taxonomy.tui.app.TuiDependencies
 import taxonomy.tui.controller.TuiGateway
 import taxonomy.utils.TaxonomyMetrics
 import taxonomy.utils.TuiLogAppender
 import taxonomy.utils.reportToIterationMetrics
+import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
@@ -101,15 +114,171 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
     override suspend fun loadedModels(): List<String> =
         withContext(Dispatchers.IO) { deps.evalStore.getLoadedModels() }
 
-    override suspend fun runTrickle(query: String) {
+    override suspend fun runTrickle(query: String): List<QueryResponseNode> {
         // Route the query through the live DAG; queryTaxonomy logs the matched lineage,
-        // which surfaces in the System Logs panel.
-        withContext(Dispatchers.IO) {
+        // which surfaces in the System Logs panel. The matched nodes are returned so the
+        // Trickle panel can render them.
+        return withContext(Dispatchers.IO) {
             try {
-                deps.taxonomyService.queryTaxonomy(query)
+                deps.log.info("Trickle query: '$query'")
+                val nodes = deps.taxonomyService.queryTaxonomy(query)
+                deps.log.info("Trickle matched ${nodes.size} top-level result(s).")
+                nodes
             } catch (t: Throwable) {
                 deps.log.warn("Trickle routing failed: {}", t.message)
+                emptyList()
             }
+        }
+    }
+
+    private val batchJson = Json { ignoreUnknownKeys = true; isLenient = true }
+
+    override suspend fun runBatchTrickle(
+        onProgress: (String) -> Unit,
+        onComplete: (BatchTrickleTestResults) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            val reservedFile = File("reserved_test_queries.json")
+            if (!reservedFile.exists()) {
+                deps.log.warn("Batch trickle: reserved_test_queries.json not found.")
+                onProgress("No reserved test set found (reserved_test_queries.json).")
+                onComplete(BatchTrickleTestResults())
+                return@withContext
+            }
+
+            val byDomain: Map<String, List<String>> = try {
+                batchJson.decodeFromString(reservedFile.readText())
+            } catch (t: Throwable) {
+                deps.log.error("Batch trickle: failed to parse reserved set", t)
+                onComplete(BatchTrickleTestResults())
+                return@withContext
+            }
+
+            // Cap the sample so a full run stays interactive in the TUI.
+            val sampleCap = 200
+            val pairs = byDomain.flatMap { (domain, queries) -> queries.map { domain to it } }
+                .shuffled()
+                .take(sampleCap)
+
+            if (pairs.isEmpty()) {
+                onProgress("Reserved test set is empty.")
+                onComplete(BatchTrickleTestResults())
+                return@withContext
+            }
+
+            deps.log.info("Batch trickle: running ${pairs.size} reserved queries…")
+            var correct = 0
+            var ancestorCorrect = 0
+            var leafHits = 0
+            var processed = 0
+
+            for ((domain, query) in pairs) {
+                val results = try {
+                    deps.taxonomyService.queryTaxonomy(query)
+                } catch (t: Throwable) {
+                    deps.log.warn("Batch trickle query failed: {}", t.message)
+                    emptyList()
+                }
+                val best = flattenTrickle(results).maxByOrNull { it.confidence }
+                if (best != null) {
+                    val segments = best.fullPath.split(" > ").map { it.trim() }
+                    // Leaf-level accuracy: the best match's own label matches the source domain.
+                    if (best.label.equals(domain, ignoreCase = true)) correct++
+                    // Ancestor accuracy: the domain appears anywhere along the matched path.
+                    if (segments.any { it.equals(domain, ignoreCase = true) }) ancestorCorrect++
+                    if (best.children.isEmpty()) leafHits++
+                }
+                processed++
+                if (processed % 10 == 0 || processed == pairs.size) {
+                    onProgress("Tested $processed / ${pairs.size} reserved queries…")
+                }
+            }
+
+            val total = pairs.size.toDouble()
+            val out = BatchTrickleTestResults(
+                totalQueries = pairs.size,
+                overallAccuracy = correct / total,
+                overallAncestorAccuracy = ancestorCorrect / total,
+                leafRate = leafHits / total
+            )
+            deps.log.info(
+                "Batch trickle complete: ${pairs.size} queries · " +
+                    "accuracy ${"%.2f".format(out.overallAccuracy)} · " +
+                    "ancestor ${"%.2f".format(out.overallAncestorAccuracy)} · " +
+                    "leaf-rate ${"%.2f".format(out.leafRate)}"
+            )
+            onComplete(out)
+        }
+    }
+
+    private fun flattenTrickle(nodes: List<QueryResponseNode>): List<QueryResponseNode> =
+        nodes.flatMap { listOf(it) + flattenTrickle(it.children) }
+
+    override suspend fun loadLeaderboard(): List<LeaderboardGroup> =
+        withContext(Dispatchers.IO) {
+            try {
+                deps.arenaService.getLeaderboard("global")
+            } catch (t: Throwable) {
+                deps.log.warn("Leaderboard load failed: {}", t.message)
+                emptyList()
+            }
+        }
+
+    override suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit) {
+        withContext(Dispatchers.IO) {
+            val targetDir = File(deps.config.dataset.evalResultsDir)
+            // Skip the network round-trip entirely if the cache is already populated.
+            val existing = targetDir.listFiles { f -> f.isFile && f.length() > 0 }
+            if (targetDir.isDirectory && existing != null && existing.isNotEmpty()) {
+                deps.log.info("Eval results already cached in '${targetDir.path}' (${existing.size} files); skipping download.")
+                return@withContext
+            }
+            targetDir.mkdirs()
+
+            val client = HttpClient.newBuilder().build()
+            val listingUrl =
+                "https://api.github.com/repos/TIGER-AI-Lab/MMLU-Pro/contents/eval_results"
+            deps.log.info("Downloading MMLU-Pro eval_results from GitHub…")
+
+            val listingReq = HttpRequest.newBuilder()
+                .uri(URI.create(listingUrl))
+                .header("User-Agent", "TaxoArena-TUI")
+                .header("Accept", "application/vnd.github.v3+json")
+                .GET()
+                .build()
+            val listingResp = client.send(listingReq, HttpResponse.BodyHandlers.ofString())
+            if (listingResp.statusCode() != 200) {
+                deps.log.error("GitHub listing failed (HTTP ${listingResp.statusCode()}).")
+                return@withContext
+            }
+
+            val entries = batchJson.parseToJsonElement(listingResp.body()).jsonArray
+            val files = entries.mapNotNull { el ->
+                val obj = el.jsonObject
+                val type = obj["type"]?.jsonPrimitive?.content
+                val name = obj["name"]?.jsonPrimitive?.content
+                val url = obj["download_url"]?.jsonPrimitive?.content
+                val size = obj["size"]?.jsonPrimitive?.content?.toLongOrNull() ?: 0L
+                if (type == "file" && name != null && url != null) Triple(name, url, size) else null
+            }
+            deps.log.info("Found ${files.size} eval files to download.")
+
+            for ((name, url, size) in files) {
+                try {
+                    val fileReq = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .header("User-Agent", "TaxoArena-TUI")
+                        .GET()
+                        .build()
+                    val bytes = client.send(fileReq, HttpResponse.BodyHandlers.ofByteArray()).body()
+                    File(targetDir, name).writeBytes(bytes)
+                    onProgress(name, bytes.size.toLong(), if (size > 0) size else bytes.size.toLong())
+                    deps.log.info("Downloaded eval file '$name' (${bytes.size} bytes).")
+                } catch (t: Throwable) {
+                    deps.log.warn("Failed to download eval file '$name': {}", t.message)
+                }
+            }
+            deps.log.info("Eval results download complete.")
         }
     }
 
@@ -119,7 +288,8 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         category: String?,
         confidenceGate: Double,
         parallelism: Int,
-        updateRankings: Boolean
+        updateRankings: Boolean,
+        onLive: (BenchmarkLiveStats) -> Unit
     ) {
         if (models.size < 2) {
             deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
@@ -133,6 +303,11 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             parallelism = parallelism.coerceAtLeast(1),
             updateRankings = updateRankings
         )
+        deps.log.info(
+            "Starting benchmark: ${models.size} models [${models.joinToString()}] · " +
+                "queryLimit=$queryLimit · category=${category ?: "all"} · " +
+                "confidenceGate=$confidenceGate · parallelism=$parallelism · updateRankings=$updateRankings"
+        )
         deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models…")
         try {
             val report = deps.benchmarkService.runBenchmark(request) { live ->
@@ -141,8 +316,14 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                         "agreement ${"%.2f".format(live.runningAgreement)} · " +
                         "coverage ${"%.2f".format(live.runningCoverage)}"
                 )
+                onLive(live)
             }
             deps.arenaService.completeBenchmark(report)
+            deps.log.info(
+                "Benchmark complete: ${report.totalQueries} queries · ${report.totalModelPairs} pairs · " +
+                    "coverage ${"%.3f".format(report.coverageRate)} · " +
+                    "judge-agreement ${"%.3f".format(report.overallJudgeAccuracyAgreement)}"
+            )
         } catch (t: Throwable) {
             deps.log.error("Benchmark failed", t)
             deps.arenaService.updateBenchmarkProgress("Benchmark failed: ${t.message}")
@@ -198,6 +379,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override suspend fun generateDag(onProgress: (Float, String) -> Unit) {
         withContext(Dispatchers.IO) {
+            deps.log.info("DAG generation started for dataset '${deps.config.dataset.datasetType.name}'.")
             // 1. Ensure the dataset is present locally (auto-download if missing).
             if (!deps.datasetFetcher.isDatasetDownloaded()) {
                 deps.datasetFetcher.onDownloadProgress = { current, total, name ->
@@ -230,6 +412,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 dataset = trainSet
             )
             deps.taxonomyService.setGraph(root)
+            deps.log.info("DAG generation complete: ${trainSet.values.sumOf { it.size }} train queries processed.")
         }
     }
 }

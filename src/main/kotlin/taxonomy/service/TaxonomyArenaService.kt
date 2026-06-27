@@ -84,6 +84,10 @@ class TaxonomyArenaService(
         _state.value = _state.value.copy(mode = mode)
     }
 
+    /** Passthrough to the ranking service so the TUI gateway can render the Arena leaderboard. */
+    fun getLeaderboard(domain: String = "global"): List<LeaderboardGroup> =
+        rankingService.getLeaderboard(domain)
+
     fun inspectNode(node: GraphNode?) {
         _state.value = _state.value.copy(mode = AnalysisMode.NODE_DETAIL, selectedNode = node)
     }

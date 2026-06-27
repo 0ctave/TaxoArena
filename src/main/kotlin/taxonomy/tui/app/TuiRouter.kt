@@ -521,6 +521,30 @@ private fun deriveProcessRows(
         )
     }
 
+    // Eval-results auto-download from GitHub.
+    if (state.benchmark.isDownloadingEval) {
+        val files = state.benchmark.evalDownloadProgress
+        val done = files.values.count { it >= 1f }
+        val pct = if (files.isNotEmpty()) done.toDouble() / files.size * 100.0 else null
+        rows += ProcessRow(
+            name = "Eval download",
+            percent = pct,
+            status = if (files.isEmpty()) "Fetching listing…" else "$done / ${files.size} files",
+        )
+    }
+
+    // Live benchmark progress.
+    if (subscriptions?.arenaControlState?.isRunningBenchmark == true) {
+        state.benchmark.liveStats?.let { live ->
+            val pct = if (live.total > 0) live.processed.toDouble() / live.total * 100.0 else null
+            rows += ProcessRow(
+                name = "Benchmark",
+                percent = pct,
+                status = "${live.processed} / ${live.total} · agreement ${"%.2f".format(live.runningAgreement)}",
+            )
+        }
+    }
+
     // Eval-results load (unzip + parse). Surfaced via the benchmark eval-loader state.
     if (state.benchmark.evalLoaderIsRunning) {
         rows += ProcessRow(
