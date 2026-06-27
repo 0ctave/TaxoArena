@@ -5,6 +5,11 @@ import kotlinx.serialization.Serializable
 /**
  * Represents a high-dimensional vector x ∈ ℝᵈ along with its source text.
  * Stores both the original raw query and its distilled semantic signature.
+ *
+ * groundTruthCategory carries the MMLU-Pro category string (e.g. "chemistry")
+ * stamped at query-creation time in TaxonomyEngine. This survives LLM relabeling
+ * and is the single source of truth for GT-dependent metrics (H-F₁, NMI, ECE).
+ * Default is "" so that existing serialized caches deserialize cleanly.
  */
 @Serializable
 data class Embedding(
