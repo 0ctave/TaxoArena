@@ -138,6 +138,41 @@ class TaxonomyTuiService(
         originalErr = null
     }
 
+    /**
+     * Pre-flight: ask Mosaic's internal native binding whether a real TTY is attached, BEFORE we
+     * enter the alt-screen or redirect streams. Returns:
+     *  - `true`  — a TTY was bound (and immediately released so [runWithTerminal] can re-bind),
+     *  - `false` — Mosaic reports no controlling terminal (pipe / IDE / non-interactive shell),
+     *  - `null`  — the probe itself could not run (internal API changed); caller proceeds optimistically.
+     *
+     * `com.jakewharton.mosaic.tty.Tty` is an internal Kotlin class, so it is reached by reflection:
+     * the `tryBind()` static factory returns a `Tty?`, and `Tty` is [AutoCloseable].
+     */
+    private fun probeTty(): Boolean? = try {
+        val ttyClass = Class.forName("com.jakewharton.mosaic.tty.Tty")
+        // Prefer the @JvmStatic Tty.tryBind(); fall back to the Companion.tryBind() instance method.
+        val handle = try {
+            ttyClass.getMethod("tryBind").also { it.isAccessible = true }.invoke(null)
+        } catch (_: NoSuchMethodException) {
+            val companion = ttyClass.getField("Companion").get(null)
+            companion.javaClass.getMethod("tryBind").also { it.isAccessible = true }.invoke(companion)
+        }
+        if (handle == null) {
+            log.info("TTY probe: Tty.tryBind() returned null — no controlling terminal")
+            false
+        } else {
+            val stdin = runCatching {
+                ttyClass.getMethod("isStdinTty").invoke(handle) as? Boolean
+            }.getOrNull()
+            log.info("TTY probe: bound=true, stdin.isatty={}", stdin)
+            runCatching { (handle as AutoCloseable).close() } // release for the real bind in withTerminal
+            true
+        }
+    } catch (t: Throwable) {
+        log.warn("Could not pre-probe TTY via Mosaic internals — proceeding optimistically: {}", t.message)
+        null
+    }
+
     internal suspend fun startMosaicComposition(
         terminal: Terminal,
         content: @Composable () -> Unit
@@ -195,11 +230,33 @@ class TaxonomyTuiService(
 
         System.setProperty("jline.terminal.color", "true")
         System.setProperty("jline.terminal.type", "xterm-256color")
-        // Install jansi while System.out is still the REAL terminal so it can probe the tty and
-        // enable ANSI processing, then enter the alt-screen on that real stream. Only AFTER this
-        // do we redirect (stderr-only by default) — redirecting stdout first hid the tty from
-        // jansi/jline and Mosaic never rendered.
+        // 1) Install jansi while System.out is still the REAL terminal so it can probe the tty and
+        //    enable ANSI processing. Sanity-log around it so a silent failure is visible in the log.
+        log.info("TUI bootstrap: installing jansi (enableTui={})", config.execution.enableTui)
         AnsiConsole.systemInstall()
+        log.info("TUI bootstrap: jansi systemInstall complete")
+
+        // 2) Pre-flight TTY probe via Mosaic's internal native binding, BEFORE entering the
+        //    alt-screen or redirecting streams. If there is no TTY, bail loudly on the real
+        //    terminal instead of wedging the screen in the alt buffer with no visible output.
+        if (!config.execution.skipTtyPrecheck) {
+            when (probeTty()) {
+                false -> {
+                    AnsiConsole.systemUninstall()
+                    System.err.println(
+                        "[TUI] No TTY detected. stdin.isatty=false. Running under a pipe, IDE, " +
+                            "or non-interactive shell? Set taxoadapt.execution.enable-tui=false " +
+                            "to run headless."
+                    )
+                    return@runBlocking
+                }
+                null -> log.warn("TTY pre-probe unavailable — proceeding optimistically")
+                true -> log.info("TTY pre-probe OK — entering alt-screen")
+            }
+        }
+
+        // 3) TTY confirmed (or probe skipped/unavailable): enter the alt-screen on the real stream,
+        //    THEN redirect stray writes (stderr-only by default) into the log.
         print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
         redirectStdStreams()
 
@@ -262,12 +319,26 @@ class TaxonomyTuiService(
             val started = runWithTerminal(NonInteractivePolicy.Exit, block)
             log.info("Mosaic TUI session ended (started={})", started)
         } catch (e: Throwable) {
+            // Capture the real stderr BEFORE restoreTerminal() nulls originalErr, so the diagnostic
+            // below lands on the user's terminal rather than the redirected log sink.
+            val savedErr = originalErr
             restoreTerminal()
             val real = if (e is InvocationTargetException) e.cause ?: e else e
-            log.warn("Mosaic TUI failed to start/render: {}", real.message)
-            System.err.println("\n[TUI RECOVERY] Layout failure.")
-            System.err.println("Cause: ${real.message ?: "Unknown failure"}")
-            real.printStackTrace()
+            val sink = savedErr ?: System.err
+            val nonInteractive = real.message?.contains("non-interactive", ignoreCase = true) == true
+            if (nonInteractive) {
+                log.warn("Mosaic refused to run interactively: {}", real.message)
+                sink.println("\n[TUI] Mosaic could not enter interactive mode: ${real.message}")
+                sink.println(
+                    "      No usable TTY (pipe / IDE / non-interactive shell). " +
+                        "Set taxoadapt.execution.enable-tui=false to run headless."
+                )
+            } else {
+                log.warn("Mosaic TUI failed to start/render: {}", real.message)
+                sink.println("\n[TUI RECOVERY] Layout failure.")
+                sink.println("Cause: ${real.message ?: "Unknown failure"}")
+                real.printStackTrace(sink)
+            }
             delay(15_000.milliseconds)
         } finally {
             restoreTerminal()

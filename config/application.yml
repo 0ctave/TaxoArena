@@ -35,6 +35,9 @@ taxoadapt:
     # redirected by default; redirecting stdout breaks Mosaic's tty detection (see PR #59).
     redirect-std-streams: true
     redirect-stdout-also: false
+    # Pre-flight TTY probe (PR #60) fails fast with a clear message when there is no terminal.
+    # Set true to skip it if the probe itself ever misbehaves.
+    # skip-tty-precheck: false
 
   dataset:
     sample: 12000

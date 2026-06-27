@@ -42,6 +42,14 @@ class TaxonomyConfig {
          * println is corrupting the screen and the safer ordering still renders correctly.
          */
         var redirectStdoutAlso: Boolean = false
+
+        /**
+         * Kill-switch for the pre-flight TTY probe done before the TUI enters the alt-screen.
+         * The probe reflectively calls Mosaic's internal `Tty.tryBind()` to fail fast (and loudly)
+         * when there is no controlling terminal. Set true to skip it entirely if the probe itself
+         * ever misbehaves (e.g. the internal API changes); the TUI then starts optimistically.
+         */
+        var skipTtyPrecheck: Boolean = false
         val llmParallelism: Int = 8
     }
 
