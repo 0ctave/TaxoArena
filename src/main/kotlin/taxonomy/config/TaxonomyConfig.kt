@@ -37,11 +37,11 @@ class TaxonomyConfig {
         var redirectStdStreams: Boolean = true
 
         /**
-         * Emergency escape hatch: also redirect System.out into the log. Off by default because it
-         * defeats Mosaic's terminal detection (see [redirectStdStreams]); only enable if a stray
-         * println is corrupting the screen and the safer ordering still renders correctly.
+         * Also redirect System.out into the log (with a passthrough to the real terminal). On by
+         * default to match the PR #58 behavior that rendered correctly on Windows / JDK 23. Flip to
+         * false to redirect only System.err if a future environment needs stdout left untouched.
          */
-        var redirectStdoutAlso: Boolean = false
+        var redirectStdoutAlso: Boolean = true
 
         /**
          * Kill-switch for the pre-flight TTY probe done before the TUI enters the alt-screen.

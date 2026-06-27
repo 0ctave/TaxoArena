@@ -31,10 +31,11 @@ taxoadapt:
     enable-visualization: false
     enable-tui: true
     enable-live-labeling: false
-    # While the TUI owns the screen, redirect stray writes into logs/taxoarena.log. Only stderr is
-    # redirected by default; redirecting stdout breaks Mosaic's tty detection (see PR #59).
+    # While the TUI owns the screen, redirect stray writes into logs/taxoarena.log. Both stdout and
+    # stderr are redirected by default (the PR #58 behavior restored in PR #63); the stdout sink keeps
+    # a passthrough to the real terminal so Mosaic frames still render. Set false for stderr-only.
     redirect-std-streams: true
-    redirect-stdout-also: false
+    redirect-stdout-also: true
     # Pre-flight TTY probe (PR #60) fails fast with a clear message when there is no terminal.
     # Set true to skip it if the probe itself ever misbehaves.
     # skip-tty-precheck: false

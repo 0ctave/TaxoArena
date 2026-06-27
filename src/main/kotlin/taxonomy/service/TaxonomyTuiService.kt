@@ -107,19 +107,17 @@ class TaxonomyTuiService(
     private var originalErr: PrintStream? = null
 
     /**
-     * Funnel stray writes into the log for the TUI's lifetime. By default ONLY System.err is
-     * redirected: replacing System.out breaks Mosaic's terminal capability detection (jansi/jline
-     * probe the live System.out chain for a tty, and an [SlfBufferStream] in the middle hides it),
-     * which is why the TUI failed to render before. stdout is therefore left pointing at the real
-     * (jansi-wrapped) terminal and kept quiet by logback-spring.xml having no console appender.
+     * Funnel stray writes into the log for the TUI's lifetime. Restored to the PR #58 behavior:
+     * BOTH System.out and System.err are redirected by default ([ExecutionConfig.redirectStdoutAlso]
+     * defaults to true). The redirected stdout keeps a passthrough to the real terminal so Mosaic's
+     * ANSI frames still reach the screen while stray library writes are funneled into the log.
      *
-     * Must run AFTER [AnsiConsole.systemInstall] so the captured stream is the jansi wrapper; the
-     * optional stdout redirect ([ExecutionConfig.redirectStdoutAlso]) then passes ANSI frames
-     * straight through that wrapper to the real terminal.
+     * Runs BEFORE [AnsiConsole.systemInstall] (the PR #58 ordering that renders correctly on
+     * Windows / JDK 23); the explicit UTF-8 System.out re-wrap in run() happens after jansi installs.
      */
     private fun redirectStdStreams() {
         if (!config.execution.redirectStdStreams) return
-        if (originalErr != null) return // already redirected
+        if (originalOut != null) return // already redirected
         val realOut = System.out
         originalOut = realOut
         originalErr = System.err
@@ -230,19 +228,12 @@ class TaxonomyTuiService(
 
         System.setProperty("jline.terminal.color", "true")
         System.setProperty("jline.terminal.type", "xterm-256color")
-        // 1) Install jansi while System.out is still the REAL terminal so it can probe the tty and
-        //    enable ANSI processing. Sanity-log around it so a silent failure is visible in the log.
-        log.info("TUI bootstrap: installing jansi (enableTui={})", config.execution.enableTui)
-        AnsiConsole.systemInstall()
-        log.info("TUI bootstrap: jansi systemInstall complete")
-
-        // 2) Pre-flight TTY probe via Mosaic's internal native binding, BEFORE entering the
-        //    alt-screen or redirecting streams. If there is no TTY, bail loudly on the real
-        //    terminal instead of wedging the screen in the alt buffer with no visible output.
+        // 1) Pre-flight TTY probe FIRST, before ANY terminal mutation (no jansi, no redirect, no
+        //    alt-screen yet), so if there's no tty we bail cleanly without leaving the terminal in
+        //    a half-mutated state.
         if (!config.execution.skipTtyPrecheck) {
             when (probeTty()) {
                 false -> {
-                    AnsiConsole.systemUninstall()
                     System.err.println(
                         "[TUI] No TTY detected. stdin.isatty=false. Running under a pipe, IDE, " +
                             "or non-interactive shell? Set taxoadapt.execution.enable-tui=false " +
@@ -251,14 +242,26 @@ class TaxonomyTuiService(
                     return@runBlocking
                 }
                 null -> log.warn("TTY pre-probe unavailable — proceeding optimistically")
-                true -> log.info("TTY pre-probe OK — entering alt-screen")
+                true -> log.info("TTY pre-probe OK")
             }
         }
 
-        // 3) TTY confirmed (or probe skipped/unavailable): enter the alt-screen on the real stream,
-        //    THEN redirect stray writes (stderr-only by default) into the log.
-        print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
+        // 2) PR #58 working order: redirect streams BEFORE jansi. This is the ordering that worked
+        //    on Windows / JDK 23; PR #59's jansi-first reorder is what broke TUI rendering there.
+        log.info("TUI bootstrap: redirecting std streams (PR #58 working order)")
         redirectStdStreams()
+
+        // 3) Install jansi so it can enable ANSI processing.
+        log.info("TUI bootstrap: installing jansi (enableTui={})", config.execution.enableTui)
+        AnsiConsole.systemInstall()
+        log.info("TUI bootstrap: jansi systemInstall complete")
+
+        // 4) Re-wrap System.out with explicit UTF-8 — load-bearing on Windows where the default
+        //    console charset is not UTF-8 and would mangle the Mosaic frame bytes.
+        System.setOut(java.io.PrintStream(System.out, true, "UTF-8"))
+
+        // 5) Enter the alt-screen.
+        print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
 
         // Ctrl-C / SIGTERM: always restore the terminal and exit hard so the app never
         // appears frozen in the alternate screen buffer.
