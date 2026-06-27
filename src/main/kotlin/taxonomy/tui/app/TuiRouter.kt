@@ -331,6 +331,11 @@ private fun MainDashboardRoute(
     ) {
         buildTreeLines(subscriptions.rootNode, state.topology.expandedNodes)
     }
+    // Memoize recursive query counts per node, recomputed only when the graph changes
+    // (not per visible row per frame).
+    val queryCounts = remember(subscriptions.rootNode, subscriptions.graphVersion) {
+        allNodes.associate { it.id to it.getRecursiveQueryCount() }
+    }
 
     // Context-driven navigator: show the explorable DAG when one is loaded,
     // otherwise prompt to load a snapshot or generate a new taxonomy.
@@ -354,6 +359,7 @@ private fun MainDashboardRoute(
                     selectedDomains = deps.config.dataset.selectedDomains,
                     allNodes = allNodes,
                     treeLines = treeLines,
+                    queryCounts = queryCounts,
                 )
                 else -> Column(modifier = Modifier.padding(left = 2, top = 1)) {
                     if (state.runtime.isRegenerating) {

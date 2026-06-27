@@ -283,7 +283,6 @@ class TuiController(
                 }
             }
 
-            "v" -> dispatch(TuiEvent.ToggleAsciiTree)
             else -> routeByFocusedPanel(state, key)
         }
     }
@@ -301,20 +300,12 @@ class TuiController(
     private fun handleTopologyKeys(state: TuiAppState, key: String) {
         when (key) {
             "w", "z", "arrowup" -> {
-                if (state.topology.showAsciiTree) {
-                    dispatch(TuiEvent.SetSelectedTreeIdx((state.topology.selectedTreeIdx - 1).coerceAtLeast(0)))
-                } else {
-                    dispatch(TuiEvent.SetSelectedListIdx((state.topology.selectedListIdx - 1).coerceAtLeast(0)))
-                }
+                dispatch(TuiEvent.SetSelectedTreeIdx((state.topology.selectedTreeIdx - 1).coerceAtLeast(0)))
                 dispatch(TuiEvent.SetTopologyAutoScroll(false))
             }
 
             "s", "arrowdown" -> {
-                if (state.topology.showAsciiTree) {
-                    dispatch(TuiEvent.SetSelectedTreeIdx(state.topology.selectedTreeIdx + 1))
-                } else {
-                    dispatch(TuiEvent.SetSelectedListIdx(state.topology.selectedListIdx + 1))
-                }
+                dispatch(TuiEvent.SetSelectedTreeIdx(state.topology.selectedTreeIdx + 1))
                 dispatch(TuiEvent.SetTopologyAutoScroll(false))
             }
 

@@ -1,7 +1,6 @@
 package taxonomy.tui.state
 
 data class TopologyUiState(
-    val showAsciiTree: Boolean = true,
     val showDomainSelector: Boolean = false,
 
     val selectedListIdx: Int = 0,

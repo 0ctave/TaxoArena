@@ -5,7 +5,6 @@ import taxonomy.model.GraphNode
 import taxonomy.tui.components.TreeLine
 import taxonomy.tui.state.TopologyUiState
 import taxonomy.tui.components.AsciiTreeTable
-import taxonomy.tui.components.DagTable
 import taxonomy.tui.components.DomainSelectorTable
 
 /**
@@ -20,7 +19,8 @@ internal fun TopologyPanel(
     availableDomains: List<Pair<String, Int>>,
     selectedDomains: List<String>,
     allNodes: List<GraphNode>,
-    treeLines: List<TreeLine>
+    treeLines: List<TreeLine>,
+    queryCounts: Map<String, Int> = emptyMap(),
 ) {
     when {
         state.showDomainSelector -> {
@@ -33,23 +33,15 @@ internal fun TopologyPanel(
                 selectedDomains = selectedDomains
             )
         }
-        state.showAsciiTree -> {
-            // Note: TaxonomyTuiService receiver removed in favor of pure passing
+        else -> {
+            // Single canonical DAG view: collapsible tree with the recursive query column.
             AsciiTreeTable(
                 pWidth = width,
                 pHeight = height,
                 lines = treeLines,
                 offset = state.treeScrollOffset,
-                selectedIdx = state.selectedTreeIdx
-            )
-        }
-        else -> {
-            DagTable(
-                pWidth = width,
-                pHeight = height,
-                nodes = allNodes,
-                offset = state.scrollOffset,
-                selectedIdx = state.selectedListIdx
+                selectedIdx = state.selectedTreeIdx,
+                queryCounts = queryCounts,
             )
         }
     }
