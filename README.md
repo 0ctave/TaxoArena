@@ -18,6 +18,10 @@ produce the same artifacts.
 - **JDK:** Temurin 21 — the build pins `java { languageVersion = JavaLanguageVersion.of(21) }`.
   Bootstrap via Gradle toolchains; we ship JDK 21 under `~/.gradle/jdks/` for our CI / agents.
   **Do not build with JDK ≥ 22 / 25** (the Mosaic / Compose plugin is currently incompatible).
+
+  **JDK requirement:** Run with Temurin JDK 21. Higher JDKs (22+, 23) may work but trigger the
+  Mosaic Panama-FFI variant which has platform-specific quirks on Windows. If you must use JDK 22+,
+  set `taxoadapt.execution.skip-tty-precheck=true` to bypass the reflective TTY probe.
 - **Kotlin:** 2.1.10 (`kotlin("jvm")` and `plugin.compose` are both pinned to 2.1.10).
 - **Gradle:** 8.10 (from `gradle/wrapper/gradle-wrapper.properties`). Always invoke via `./gradlew`.
 - **Spring Boot:** 3.4.3 (WebFlux).

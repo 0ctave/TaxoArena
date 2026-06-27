@@ -20,12 +20,6 @@ spring:
     lazy-initialization: true
   reactor:
     context-propagation: auto
-  # Safety net: even if an unused spring-ai MCP server autoconfig sneaks in via a transitive dep,
-  # keep it from registering beans under web-application-type=none (caused silent context-start
-  # failure before PR #61, which also dropped the spring-ai-starter-mcp-server-webflux dependency).
-  autoconfigure:
-    exclude:
-      - org.springframework.ai.mcp.server.common.autoconfigure.annotations.McpServerAnnotationScannerAutoConfiguration
 
 # Arc web/agent-script stack disabled: the TUI only uses the langchain4j-backed
 # LLM client (ChatConfig), not the Arc GraphQL server, chat UI, agent scripts,

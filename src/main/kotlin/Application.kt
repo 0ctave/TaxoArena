@@ -53,5 +53,19 @@ fun main(args: Array<String>) {
             ev.exception?.printStackTrace(System.err)
         }
     )
-    app.run(*args)
+    // app.run() can throw before the ApplicationFailedEvent listener above ever fires — e.g. the
+    // autoconfigure-exclude validation in Spring Boot 3.4 runs so early that no failure event is
+    // broadcast, so the JVM would otherwise exit silently. Catch here as the outermost net.
+    try {
+        app.run(*args)
+    } catch (e: SpringApplication.AbandonedRunException) {
+        // Not a failure: the AOT processor (processAot task) deliberately throws this to abort
+        // after the context is prepared. Re-throw so the AOT machinery sees it as expected.
+        throw e
+    } catch (t: Throwable) {
+        System.err.println("[BOOT FAILED] Exception during SpringApplication.run: ${t.message}")
+        t.printStackTrace(System.err)
+        System.err.flush()
+        kotlin.system.exitProcess(1)
+    }
 }
