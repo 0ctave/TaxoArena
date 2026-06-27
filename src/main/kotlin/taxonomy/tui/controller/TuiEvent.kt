@@ -186,8 +186,29 @@ sealed interface TuiEvent {
     data object RunEvalLoad : TuiEvent
     /** Live per-question progress streamed from a running benchmark. */
     data class BenchmarkLiveUpdate(val stats: taxonomy.model.BenchmarkLiveStats) : TuiEvent
-    /** Auto-download the MMLU-Pro eval_results cache from GitHub (the "o" hotkey). */
+    /** Auto-download the MMLU-Pro eval_results cache from GitHub (the "d" key inside the picker). */
     data object DownloadEvalResults : TuiEvent
+
+    // ── Per-model eval ingestion picker (the "o" hotkey in Arena/Benchmark) ──
+    /** Re-scan the eval_results cache directory (no parsing); result lands via [EvalCatalogLoaded]. */
+    data object RefreshEvalCatalog : TuiEvent
+    /** Open the picker overlay and trigger a fresh scan. */
+    data object OpenEvalCatalogPicker : TuiEvent
+    data object CloseEvalCatalogPicker : TuiEvent
+    data class EvalCatalogLoaded(val entries: List<taxonomy.dataset.EvalCatalogEntry>) : TuiEvent
+    data class MoveEvalCatalogCursor(val delta: Int) : TuiEvent
+    data object ToggleEvalCatalogSelection : TuiEvent
+    data object SelectAllNonIngestedEntries : TuiEvent
+    /** Confirm the picked models; the CommandController fires the ingestion side-effect. */
+    data object ConfirmEvalCatalogSelection : TuiEvent
+    data class EvalIngestionProgress(
+        val modelIdx: Int,
+        val modelCount: Int,
+        val modelName: String,
+        val item: Int,
+        val itemTotal: Int
+    ) : TuiEvent
+    data object EvalIngestionComplete : TuiEvent
     data class EvalDownloadProgress(
         val fileName: String,
         val bytesDownloaded: Long,

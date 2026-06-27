@@ -60,7 +60,22 @@ data class BenchmarkUiState(
     val evalDownloadProgress: Map<String, Float> = emptyMap(),
 
     // Roster of models currently loaded in the eval_results store.
-    val loadedModels: List<String> = emptyList()
+    val loadedModels: List<String> = emptyList(),
+
+    // ── Per-model eval ingestion picker (the [O] hotkey in Arena/Benchmark) ──
+    // The picker lists the eval_results cache and ingests only the selected models, instead of
+    // parsing every file in the directory.
+    val isPickingEvalCatalog: Boolean = false,
+    val evalCatalog: List<taxonomy.dataset.EvalCatalogEntry> = emptyList(),
+    val evalCatalogSelection: Set<String> = emptySet(),
+    val evalCatalogCursor: Int = 0,
+
+    // Live per-model ingestion progress (modelCount == 0 means "not ingesting").
+    val evalLoadingModelIdx: Int = 0,
+    val evalLoadingModelCount: Int = 0,
+    val evalLoadingCurrentModel: String = "",
+    val evalLoadingItem: Int = 0,
+    val evalLoadingItemTotal: Int = 0
 )
 
 enum class BenchmarkSubScreen {

@@ -253,6 +253,11 @@ class TuiController(
     }
 
     private fun handleMainDashboardKeys(state: TuiAppState, key: String) {
+        // The eval-catalog picker is a modal overlay: while open it swallows every other key.
+        if (state.benchmark.isPickingEvalCatalog) {
+            handleEvalCatalogPickerKeys(state, key)
+            return
+        }
         if (isTextInputActive(state)) {
             handleActiveTextInput(state, key)
             return
@@ -297,11 +302,13 @@ class TuiController(
             }
             "t" -> commandController.startTrickle(::dispatch)
 
-            // Global in their respective modes: "o" downloads MMLU-Pro eval_results while in
-            // Benchmark; "l" toggles the leaderboard while in Arena. Outside those modes the
-            // keys fall through to the focused panel's handler.
-            "o" -> if (state.analysis.mode == AnalysisMode.BENCHMARK) {
-                dispatch(TuiEvent.DownloadEvalResults)
+            // Global in their respective modes: "o" opens the per-model eval-results ingestion
+            // picker while in Arena or Benchmark; "l" toggles the leaderboard while in Arena.
+            // Outside those modes the keys fall through to the focused panel's handler.
+            "o" -> if (state.analysis.mode == AnalysisMode.BENCHMARK ||
+                state.analysis.mode == AnalysisMode.ARENA
+            ) {
+                dispatch(TuiEvent.OpenEvalCatalogPicker)
             } else {
                 routeByFocusedPanel(state, key)
             }
@@ -530,7 +537,7 @@ class TuiController(
                     dispatch(TuiEvent.SetBenchmarkScrollOffset(state.benchmark.benchmarkScrollOffset + 1))
 
                 "enter" -> dispatch(TuiEvent.RunBenchmark)
-                "o" -> dispatch(TuiEvent.DownloadEvalResults)
+                "o" -> dispatch(TuiEvent.OpenEvalCatalogPicker)
 
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.ResetBenchmarkType)
@@ -550,6 +557,23 @@ class TuiController(
                         dispatch(TuiEvent.ResetBenchmarkType)
                     }
             }
+        }
+    }
+
+    /**
+     * Eval-results ingestion picker overlay. W/S move the cursor, Space toggles the highlighted
+     * model, A selects all not-yet-ingested models, D re-downloads the cache, Enter confirms (and
+     * starts ingestion), Q/Esc cancels.
+     */
+    private fun handleEvalCatalogPickerKeys(state: TuiAppState, key: String) {
+        when (key) {
+            "w", "z", "arrowup" -> dispatch(TuiEvent.MoveEvalCatalogCursor(-1))
+            "s", "arrowdown" -> dispatch(TuiEvent.MoveEvalCatalogCursor(1))
+            " ", "space" -> dispatch(TuiEvent.ToggleEvalCatalogSelection)
+            "a" -> dispatch(TuiEvent.SelectAllNonIngestedEntries)
+            "d" -> dispatch(TuiEvent.DownloadEvalResults)
+            "enter" -> dispatch(TuiEvent.ConfirmEvalCatalogSelection)
+            "q", "escape" -> dispatch(TuiEvent.CloseEvalCatalogPicker)
         }
     }
 
