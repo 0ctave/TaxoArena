@@ -33,6 +33,12 @@ fun TricklePanel(
                 Text("Enter to run \u00b7 Esc to cancel", color = White)
             }
 
+            state.isRunningTrickleQuery -> {
+                Text("Routing query through DAG…", color = Yellow)
+                Spacer()
+                Text("Query: ${state.trickleQueryInput}", color = White)
+            }
+
             state.isRunningBatchTrickleTest -> {
                 Text("Running batch trickle test\u2026", color = Yellow)
                 if (state.batchTrickleProgress.isNotBlank()) {

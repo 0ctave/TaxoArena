@@ -404,7 +404,12 @@ object TuiReducer {
                         downloadingDataset = false,
                         generationStatusText = "Cancelled"
                     ),
-                    runtime = state.runtime.copy(isRegenerating = false)
+                    runtime = state.runtime.copy(isRegenerating = false),
+                    trickle = state.trickle.copy(
+                        isRunningBatchTrickleTest = false,
+                        batchTrickleProgress = "Cancelled"
+                    ),
+                    benchmark = state.benchmark.copy(isDownloadingEval = false)
                 )
 
             TuiEvent.StartGeneration ->
@@ -608,13 +613,17 @@ object TuiReducer {
                 state.copy(
                     trickle = state.trickle.copy(
                         isEnteringTrickleQuery = false,
+                        isRunningTrickleQuery = true,
                         trickleResultNodes = emptyList()
                     )
                 )
 
             is TuiEvent.TrickleResultReceived ->
                 state.copy(
-                    trickle = state.trickle.copy(trickleResultNodes = event.nodes)
+                    trickle = state.trickle.copy(
+                        trickleResultNodes = event.nodes,
+                        isRunningTrickleQuery = false
+                    )
                 )
 
             TuiEvent.RunBatchTrickleTest ->
@@ -645,6 +654,7 @@ object TuiReducer {
                 state.copy(
                     trickle = state.trickle.copy(
                         isEnteringTrickleQuery = false,
+                        isRunningTrickleQuery = false,
                         trickleQueryInput = ""
                     )
                 )
@@ -714,10 +724,22 @@ object TuiReducer {
                     benchmark = state.benchmark.copy(isDownloadingEval = false)
                 )
 
-            TuiEvent.ToggleLeaderboard ->
+            TuiEvent.ToggleLeaderboard -> {
+                val nowOpen = !state.arena.isViewingLeaderboard
                 state.copy(
                     arena = state.arena.copy(
-                        isViewingLeaderboard = !state.arena.isViewingLeaderboard
+                        isViewingLeaderboard = nowOpen,
+                        // Reset scroll to the top whenever the leaderboard is closed.
+                        leaderboardScrollOffset =
+                            if (nowOpen) state.arena.leaderboardScrollOffset else 0
+                    )
+                )
+            }
+
+            is TuiEvent.SetLeaderboardScrollOffset ->
+                state.copy(
+                    arena = state.arena.copy(
+                        leaderboardScrollOffset = event.offset.coerceAtLeast(0)
                     )
                 )
 

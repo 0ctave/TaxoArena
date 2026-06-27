@@ -180,6 +180,7 @@ sealed interface TuiEvent {
     data object EvalDownloadComplete : TuiEvent
     /** Toggle the Arena leaderboard sub-view (the "l" hotkey while in Arena mode). */
     data object ToggleLeaderboard : TuiEvent
+    data class SetLeaderboardScrollOffset(val offset: Int) : TuiEvent
     data class LeaderboardLoaded(val groups: List<taxonomy.service.LeaderboardGroup>) : TuiEvent
     data class BenchmarkModelsLoaded(val models: List<String>) : TuiEvent
     data class SetSelectedBenchmarkField(val index: Int) : TuiEvent

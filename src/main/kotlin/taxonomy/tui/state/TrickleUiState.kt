@@ -8,6 +8,7 @@ data class TrickleUiState(
     val trickleQueryInput: String = "",
 
     val trickleResultNodes: List<QueryResponseNode> = emptyList(),
+    val isRunningTrickleQuery: Boolean = false,
 
     val isRunningBatchTrickleTest: Boolean = false,
     val batchTrickleProgress: String = "",

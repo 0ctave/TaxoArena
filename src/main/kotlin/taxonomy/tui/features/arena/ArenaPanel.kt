@@ -32,6 +32,7 @@ fun ArenaPanel(
                     val rows = (height - 4).coerceAtLeast(1)
                     arenaState.leaderboard
                         .flatMap { g -> g.agents.map { g.rank to it } }
+                        .drop(arenaState.leaderboardScrollOffset)
                         .take(rows)
                         .forEach { (rank, a) ->
                             Text(
@@ -43,7 +44,7 @@ fun ArenaPanel(
                         }
                 }
                 Spacer()
-                Text("Press L to close the leaderboard.", color = Cyan)
+                Text("W/S to scroll · L to close", color = Cyan)
                 return@Column
             }
 

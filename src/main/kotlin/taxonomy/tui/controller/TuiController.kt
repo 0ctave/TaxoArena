@@ -210,7 +210,7 @@ class TuiController(
                 state.runtime.isDatasetDownloaded -> dispatch(TuiEvent.StartGeneration)
                 else -> dispatch(TuiEvent.PromptDatasetDownload)
             }
-            "arrowdown" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.SYSTEM_LOGS))
+            "arrowdown", "arrowright" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.SYSTEM_LOGS))
             "escape", "q" -> dispatch(TuiEvent.ReturnToWelcome)
         }
     }
@@ -241,8 +241,11 @@ class TuiController(
             handleActiveTextInput(state, key)
             return
         }
-        // While the DAG is generating, Esc/C cancels the run.
-        if (state.runtime.isRegenerating && (key == "escape" || key == "c")) {
+        // Esc/C cancels any long-running job: DAG generation, batch trickle, or eval download.
+        val canCancel = state.runtime.isRegenerating ||
+                state.trickle.isRunningBatchTrickleTest ||
+                state.benchmark.isDownloadingEval
+        if (canCancel && (key == "escape" || key == "c")) {
             dispatch(TuiEvent.CancelGeneration)
             return
         }
@@ -254,10 +257,14 @@ class TuiController(
             // Arena and Benchmark are gated on a loaded precomputed eval roster. Without it
             // there are no model answers to judge, so we surface the metrics view (which shows
             // the "load eval_results" hint) instead of dropping the user into an empty arena.
-            "a" -> if (state.arena.loadedModels.isNotEmpty()) {
-                commandController.startArena(::dispatch)
-            } else {
-                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
+            "a" -> {
+                // Always refresh the model roster so Arena reflects newly downloaded eval results.
+                effects.loadArenaModels(::dispatch)
+                if (state.arena.loadedModels.isNotEmpty()) {
+                    commandController.startArena(::dispatch)
+                } else {
+                    dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
+                }
             }
             // In Trickle mode, "b" runs the batch trickle test (matching the panel hint);
             // otherwise it enters/starts the Benchmark view as before.
@@ -376,6 +383,21 @@ class TuiController(
 
                 "s", "arrowdown" ->
                     dispatch(TuiEvent.SetMetricsScroll(state.analysis.metricsScrollOffset + 1))
+
+                "q", "escape", "arrowleft", "backspace" ->
+                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+            }
+
+            AnalysisMode.ARENA -> when (key) {
+                "w", "z", "arrowup" ->
+                    dispatch(TuiEvent.SetLeaderboardScrollOffset(
+                        (state.arena.leaderboardScrollOffset - 1).coerceAtLeast(0)
+                    ))
+
+                "s", "arrowdown" ->
+                    dispatch(TuiEvent.SetLeaderboardScrollOffset(
+                        state.arena.leaderboardScrollOffset + 1
+                    ))
 
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
