@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.model.BenchmarkLiveStats
 import taxonomy.model.BenchmarkRequest
 import taxonomy.model.GraphNode
@@ -100,8 +101,9 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         // Surface a live status immediately so the panel never sits on a blank indeterminate
         // bar while the first HTTP round-trip to Hugging Face is in flight.
         onProgress(0f, "Connecting to Hugging Face\u2026")
-        // maxQueries <= 0 means "full dataset"; the fetcher treats a very large cap as all.
-        val cap = if (maxQueries <= 0) Int.MAX_VALUE else maxQueries
+        // maxQueries <= 0 means "full dataset"; the fetcher treats the unbounded sentinel as all
+        // and reports an unknown (indeterminate) progress total rather than the sentinel itself.
+        val cap = if (maxQueries <= 0) MMLUDatasetFetcher.UNBOUNDED_MAX_QUERIES else maxQueries
         withContext(Dispatchers.IO) { deps.datasetFetcher.downloadDataset(maxQueries = cap) }
     }
 

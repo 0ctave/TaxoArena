@@ -17,7 +17,7 @@ A short architectural map of TaxoArena. Source root: `src/main/kotlin/taxonomy`.
 | `src/main/kotlin/taxonomy/utils/ShannonNmi.kt` | Flat-partition Shannon NMI (Strehl-Ghosh symmetric, added PR #68). |
 | `src/main/kotlin/taxonomy/utils/OverlappingNmi.kt` | LFK 2009 cover-based NMI; retained but no longer used for the headline `nmi` metric. |
 | `src/main/kotlin/taxonomy/dataset/EmbeddingCache.kt` | Embedding cache; "Generating new embedding" log is DEBUG (PR #69). |
-| `src/main/kotlin/taxonomy/dataset/MMLUDatasetFetcher.kt` | Requires all 14 MMLU-Pro categories before cache short-circuit (PR #69). |
+| `src/main/kotlin/taxonomy/dataset/MMLUDatasetFetcher.kt` | Requires all 14 MMLU-Pro categories before cache short-circuit (PR #69). Reports an unknown (0) progress total for unbounded full-dataset pulls instead of the `Int.MAX_VALUE` cap sentinel, so the TUI shows an indeterminate bar (PR #71). |
 | `src/main/kotlin/taxonomy/tui/features/arena/ArenaPanel.kt` | Arena benchmark config dashboard (PR #69). |
 | `src/main/kotlin/taxonomy/tui/features/benchmark/BenchmarkPanel.kt` | Extended for model/domain selection. |
 | `src/main/kotlin/taxonomy/tui/state/BenchmarkUiState.kt` | Fields: `selectedModels`, `selectedDomains`, `activeSection`, `liveView` enum. |

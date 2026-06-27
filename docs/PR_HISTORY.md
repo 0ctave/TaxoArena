@@ -1,6 +1,6 @@
 # PR HISTORY
 
-Tabular history of PRs that landed in this work block (#46–#69).
+Tabular history of PRs that landed in this work block (#46–#71).
 
 | PR # | Title | Key file(s) | Note |
 | --- | --- | --- | --- |
@@ -28,3 +28,4 @@ Tabular history of PRs that landed in this work block (#46–#69).
 | #67 | Truncate Text inputs in Arena/Benchmark/Trickle/Snapshot panels | `taxonomy/tui/features` | Mosaic TextSurface Check-failed fix. |
 | #68 | Fix NMI bug — replaced disjoint-cover LFK NMI with flat-partition Shannon NMI | `ShannonNmi.kt`, `ShannonNmiTest.kt`, `TaxonomyMetrics.kt` | See `docs/METRICS.md`. |
 | #69 | Arena benchmark config dashboard (Models/Domains/Options/Start, Tab nav, V toggle SUMMARY↔STREAM) + 4 fixes | `ArenaPanel.kt`, `EmbeddingCache.kt`, `MMLUDatasetFetcher.kt` | DAG click row-offset (+2), restored scrollbars (Logs/AsciiTreeTable/NodeDetail), demoted "Generating new embedding" to DEBUG, MMLU-Pro cache requires all 14 categories before short-circuit. |
+| #71 | Fix "Dataset download" progress bar showing `… / 2147483647 rows` | `MMLUDatasetFetcher.kt`, `TuiGatewayImpl.kt`, `MMLUDatasetFetcherProgressTest.kt` | Full-dataset pulls passed the `Int.MAX_VALUE` cap sentinel straight through to the progress `total`. Fetcher now reports `0` (unknown) for the unbounded sentinel via `resolveProgressTotal`, so the UI shows an indeterminate "Fetching… N rows" bar instead of dividing by `Int.MAX_VALUE`. |
