@@ -380,10 +380,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         deps.arenaService.setMode(mode)
     }
 
-    override suspend fun exportAscii() {
-        deps.log.info("ASCII export requested.")
-    }
-
     private val configFacade by lazy { TuiConfigFacade(deps) }
 
     override fun toggleDomain(domainName: String) {

@@ -39,10 +39,9 @@ interface TuiEffects {
     fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit)
     fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit)
     fun regenerateLabels()
-    fun regenerateJudgeForCurrentNode()
+    fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit)
     fun inspectNode(node: GraphNode?)
     fun setAnalysisMode(mode: AnalysisMode)
-    fun exportAscii()
 
     /** Toggle a dataset domain on/off, then refresh the settings view. */
     fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit)
@@ -247,8 +246,14 @@ class DefaultTuiEffects(
         scope.launch { gateway.regenerateLabels() }
     }
 
-    override fun regenerateJudgeForCurrentNode() {
-        scope.launch { gateway.regenerateJudgeForCurrentNode() }
+    override fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            try {
+                gateway.regenerateJudgeForCurrentNode()
+            } finally {
+                dispatch(TuiEvent.SetGeneratingJudge(false))
+            }
+        }
     }
 
     override fun inspectNode(node: GraphNode?) {
@@ -257,10 +262,6 @@ class DefaultTuiEffects(
 
     override fun setAnalysisMode(mode: AnalysisMode) {
         gateway.setAnalysisMode(mode)
-    }
-
-    override fun exportAscii() {
-        scope.launch { gateway.exportAscii() }
     }
 
     override fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit) {
@@ -311,7 +312,6 @@ interface TuiGateway {
     suspend fun regenerateJudgeForCurrentNode()
     fun inspectNode(node: GraphNode?)
     fun setAnalysisMode(mode: AnalysisMode)
-    suspend fun exportAscii()
 
     fun toggleDomain(domainName: String)
     fun applySetting(name: String, value: String): Boolean

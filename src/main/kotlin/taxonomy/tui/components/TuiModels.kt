@@ -5,7 +5,7 @@ import taxonomy.model.GraphNode
 
 /** Navigation state for the top-level app flow. */
 enum class StartupState {
-    WELCOME,
+    LOAD_DAG,
     CONFIGANDDOMAINS,
     MAINDASHBOARD,
     LOADING

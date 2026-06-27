@@ -31,6 +31,7 @@ fun MetricsOrInspectorPanel(
     metricsScroll: Int,
     latestMetrics: IterationMetrics? = null,
     metricsHistory: List<IterationMetrics> = emptyList(),
+    isGeneratingJudge: Boolean = false,
 ) {
     Column {
         when (mode) {
@@ -50,10 +51,19 @@ fun MetricsOrInspectorPanel(
                     if (node.crossLinkChildren.isNotEmpty())
                         Text("Cross-links    ${node.crossLinkChildren.size}", color = Yellow)
                     val judged = node.judgePrompt != null
-                    Text(
-                        "Judge          ${if (judged) "\u2714 specialised" else "\u25cb none"}",
-                        color = if (judged) Green else White
-                    )
+                    Spacer()
+                    when {
+                        isGeneratingJudge -> Text("\u29d6 Generating judge\u2026", color = Yellow, textStyle = Bold)
+                        judged -> {
+                            Text("Judge          \u2714 specialised", color = Green)
+                            Text("[R] Regenerate judge", color = White)
+                        }
+                        else -> {
+                            Text("\u250c\u2500 Generate Judge \u2500\u2510", color = Cyan, textStyle = Bold)
+                            Text("\u2502  [R] Generate  \u2502", color = Cyan, textStyle = Bold)
+                            Text("\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518", color = Cyan, textStyle = Bold)
+                        }
+                    }
                     if (node.parents.size > 1) {
                         Spacer()
                         Text("Parents:", color = Cyan)
@@ -124,7 +134,7 @@ fun MetricsOrInspectorPanel(
             }
 
             AnalysisMode.SETTINGS ->
-                Text("Open the config screen (X \u2192 Welcome \u2192 Create new) to edit settings.", color = White)
+                Text("Open the config screen (X \u2192 Load DAG \u2192 Create new) to edit settings.", color = White)
 
             else -> {
                 Text("Analysis Hub", color = Cyan, textStyle = Bold)

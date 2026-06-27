@@ -66,7 +66,7 @@ class TuiController(
         if (state.startup.state == StartupState.LOADING) return
 
         when (state.startup.state) {
-            StartupState.WELCOME -> handleWelcomeKeys(state, key)
+            StartupState.LOAD_DAG -> handleWelcomeKeys(state, key)
             StartupState.CONFIGANDDOMAINS -> handleConfigKeys(state, key)
             StartupState.MAINDASHBOARD -> handleMainDashboardKeys(state, key)
             StartupState.LOADING -> Unit
@@ -306,11 +306,11 @@ class TuiController(
                 dispatch(TuiEvent.StartBatchGeneralityInput)
             }
 
+            // Snapshots are auto-saved on generation, so "N" only renames the snapshot
+            // currently being viewed (no manual save-new action).
             "n" -> {
                 if (state.snapshot.isViewingSnapshot && state.snapshot.activeSnapshotId != null) {
                     dispatch(TuiEvent.StartRenameSnapshot)
-                } else {
-                    dispatch(TuiEvent.StartSaveSnapshot)
                 }
             }
 
@@ -670,7 +670,7 @@ class TuiController(
     private fun handleMousePressed(event: TuiEvent.MousePressed) {
         val state = _state.value
         when (state.startup.state) {
-            StartupState.WELCOME -> handleWelcomeMouse(event)
+            StartupState.LOAD_DAG -> handleWelcomeMouse(event)
             StartupState.CONFIGANDDOMAINS -> handleConfigMouse(state, event)
             StartupState.MAINDASHBOARD -> handleDashboardMouse(state, event)
             StartupState.LOADING -> Unit

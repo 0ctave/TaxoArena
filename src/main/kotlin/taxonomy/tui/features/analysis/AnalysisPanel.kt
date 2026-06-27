@@ -83,7 +83,7 @@ fun AnalysisPanel(
                 AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 else -> MetricsOrInspectorPanel(
                     bodyW, bodyH, mode, controlState, inspectorScroll, metricsScroll,
-                    latestMetrics, metricsHistory
+                    latestMetrics, metricsHistory, arenaState.isGeneratingJudge
                 )
             }
         }

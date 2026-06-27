@@ -71,7 +71,7 @@ fun TuiRouter(
         leafCount = leafCount,
     ) {
         when (state.startup.state) {
-            StartupState.WELCOME -> WelcomeRoute(width, height, state)
+            StartupState.LOAD_DAG -> WelcomeRoute(width, height, state)
             StartupState.LOADING -> LoadingRoute(width, height, state)
             StartupState.CONFIGANDDOMAINS -> ConfigRoute(width, height, deps, state, subscriptions)
             StartupState.MAINDASHBOARD -> MainDashboardRoute(width, height, deps, state, subscriptions)
@@ -378,10 +378,10 @@ private fun MainDashboardRoute(
                         Text("No taxonomy DAG loaded.", color = TuiTheme.INFO, textStyle = Bold)
                         Spacer()
                         Text("To generate a new taxonomy:", color = TuiTheme.INFO)
-                        Text("  [X] Welcome \u2192 Enter (Create new) \u2192 [R] Generate", color = TuiTheme.ACCENT)
+                        Text("  [X] Load DAG \u2192 Enter (Create new) \u2192 [R] Generate", color = TuiTheme.ACCENT)
                         Spacer()
                         Text("To explore an existing one:", color = TuiTheme.INFO)
-                        Text("  [X] Welcome \u2192 pick a saved snapshot", color = TuiTheme.ACCENT)
+                        Text("  [X] Load DAG \u2192 pick a saved snapshot", color = TuiTheme.ACCENT)
                     }
                 }
             }
@@ -414,14 +414,26 @@ private fun MainDashboardRoute(
 
     BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
 
-    HotkeyBar(
-        width,
-        dashboardHotkeys(
-            hasDag = hasDag,
-            focused = state.shell.focusedPanel,
-            isRegenerating = state.runtime.isRegenerating,
-        )
-    )
+    val hotkeys =
+        if (state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB &&
+            state.analysis.mode == taxonomy.service.AnalysisMode.NODE_DETAIL
+        ) {
+            val hasJudge = subscriptions.arenaControlState.selectedNode?.judgePrompt != null
+            listOf(
+                HotkeyAction("R", if (hasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
+                HotkeyAction("W/S", "Scroll"),
+                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                HotkeyAction("M", "Metrics"),
+            )
+        } else {
+            dashboardHotkeys(
+                hasDag = hasDag,
+                focused = state.shell.focusedPanel,
+                isRegenerating = state.runtime.isRegenerating,
+                isViewingSnapshot = state.snapshot.isViewingSnapshot,
+            )
+        }
+    HotkeyBar(width, hotkeys)
 }
 
 @Composable
@@ -636,8 +648,9 @@ private fun dashboardHotkeys(
     hasDag: Boolean,
     focused: FocusPanel,
     isRegenerating: Boolean,
+    isViewingSnapshot: Boolean,
 ): List<HotkeyAction> =
-    taxonomy.tui.components.DashboardHotkeys.forState(hasDag, focused, isRegenerating)
+    taxonomy.tui.components.DashboardHotkeys.forState(hasDag, focused, isRegenerating, isViewingSnapshot)
 
 private fun flattenNodes(rootNode: GraphNode?): List<GraphNode> {
     if (rootNode == null) return emptyList()

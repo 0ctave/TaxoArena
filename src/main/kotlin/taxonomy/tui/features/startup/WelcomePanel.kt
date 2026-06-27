@@ -25,14 +25,14 @@ fun WelcomePanel(
     selectedWelcomeIdx: Int,
     snapshots: List<DagSnapshot>,
 ) {
-    Panel("SETUP HUB", Cyan, width, height) {
+    Panel("LOAD DAG", Cyan, width, height) {
         Column {
             Text("  ╔══ TAXO ARENA ══╗", color = Cyan, textStyle = Bold)
             Text("  ║  DAG · ARENA   ║", color = Cyan, textStyle = Bold)
             Text("  ╚════════════════╝", color = Cyan, textStyle = Bold)
             Spacer()
 
-            Text("Select an option to initialize the taxonomic DAG.", color = White)
+            Text("Select a saved snapshot or start a new generation.", color = White)
             Spacer()
 
             val selectedNew = selectedWelcomeIdx == 0

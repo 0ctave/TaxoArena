@@ -139,6 +139,9 @@ sealed interface TuiEvent {
     data object CancelBatchGeneralityInput : TuiEvent
     data object ConfirmBatchGeneralityInput : TuiEvent
 
+    /** Track in-flight single-node judge generation (R in NODE_DETAIL). */
+    data class SetGeneratingJudge(val value: Boolean) : TuiEvent
+
     data object StartArenaFlow : TuiEvent
     data class ArenaModelsLoaded(val models: List<String>) : TuiEvent
     data class SetArenaUsePrecomputed(val value: Boolean) : TuiEvent

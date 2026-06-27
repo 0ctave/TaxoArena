@@ -51,7 +51,7 @@ object TuiReducer {
             TuiEvent.ReturnToWelcome ->
                 state.copy(
                     startup = state.startup.copy(
-                        state = StartupState.WELCOME,
+                        state = StartupState.LOAD_DAG,
                         selectedWelcomeIdx = 0,
                         loadingSnapshotId = null
                     ),
@@ -127,7 +127,7 @@ object TuiReducer {
                 // The snapshot list is the data the welcome screen needs; once it has
                 // arrived, leave the initial LOADING screen for WELCOME.
                 val nextStartupState =
-                    if (state.startup.state == StartupState.LOADING) StartupState.WELCOME
+                    if (state.startup.state == StartupState.LOADING) StartupState.LOAD_DAG
                     else state.startup.state
 
                 state.copy(
@@ -239,7 +239,7 @@ object TuiReducer {
             is TuiEvent.SnapshotLoadFailed ->
                 state.copy(
                     startup = state.startup.copy(
-                        state = StartupState.WELCOME,
+                        state = StartupState.LOAD_DAG,
                         loadingSnapshotId = null
                     )
                 )
@@ -521,6 +521,9 @@ object TuiReducer {
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
                 )
             }
+
+            is TuiEvent.SetGeneratingJudge ->
+                state.copy(arena = state.arena.copy(isGeneratingJudge = event.value))
 
             is TuiEvent.ArenaModelsLoaded ->
                 state.copy(arena = state.arena.copy(loadedModels = event.models))
