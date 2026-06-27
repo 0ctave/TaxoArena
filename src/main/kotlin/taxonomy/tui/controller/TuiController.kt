@@ -9,6 +9,7 @@ import taxonomy.tui.app.DashboardLayout
 import taxonomy.tui.components.SettingItem
 import taxonomy.tui.components.TreeLine
 import taxonomy.tui.components.StartupState
+import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.TuiAppState
@@ -243,7 +244,7 @@ class TuiController(
         }
         // Esc/C cancels any long-running job: DAG generation, batch trickle, or eval download.
         val canCancel = state.runtime.isRegenerating ||
-                state.trickle.isRunningBatchTrickleTest ||
+                state.benchmark.isRunningBatchTrickleTest ||
                 state.benchmark.isDownloadingEval
         if (canCancel && (key == "escape" || key == "c")) {
             dispatch(TuiEvent.CancelGeneration)
@@ -266,14 +267,18 @@ class TuiController(
                     dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
                 }
             }
-            // In Trickle mode, "b" runs the batch trickle test (matching the panel hint);
-            // otherwise it enters/starts the Benchmark view as before.
-            "b" -> if (state.analysis.mode == AnalysisMode.TRICKLE_TEST) {
-                dispatch(TuiEvent.RunBatchTrickleTest)
-            } else if (state.arena.loadedModels.isNotEmpty()) {
-                commandController.startBenchmark(::dispatch)
+            // "b" opens the Benchmark hub (always on the type-selection screen). Once the
+            // TRICKLE benchmark type is active, "b" instead starts the batch routing test —
+            // matching the panel hint. The roster gate now lives inside the ARENA sub-view
+            // (Trickle benchmark needs no precomputed models), so entry isn't gated on a roster.
+            "b" -> if (state.analysis.mode == AnalysisMode.BENCHMARK &&
+                state.benchmark.benchmarkType == BenchmarkType.TRICKLE
+            ) {
+                if (!state.benchmark.isRunningBatchTrickleTest) {
+                    dispatch(TuiEvent.RunBatchTrickleTest)
+                }
             } else {
-                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.BENCHMARK))
+                commandController.startBenchmark(::dispatch)
             }
             "t" -> commandController.startTrickle(::dispatch)
 
@@ -405,18 +410,51 @@ class TuiController(
 
             AnalysisMode.SNAPSHOTS -> handleSnapshotKeys(state, key)
 
+            // Trickle mode is now a single-query routing diagnosis only; the batch test moved
+            // to the Benchmark hub's TRICKLE type. Single-query results aren't scrollable.
             AnalysisMode.TRICKLE_TEST -> when (key) {
+                "q", "escape", "arrowleft", "backspace" ->
+                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+            }
+
+            AnalysisMode.BENCHMARK -> handleBenchmarkKeys(state, key)
+
+            else -> when (key) {
+                "q", "escape", "arrowleft", "backspace" ->
+                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+            }
+        }
+    }
+
+    /**
+     * Benchmark hub key handling, split across its three sub-states: the type-selection
+     * screen (NONE), the Arena benchmark (ARENA), and the batch Trickle benchmark (TRICKLE).
+     */
+    private fun handleBenchmarkKeys(state: TuiAppState, key: String) {
+        when (state.benchmark.benchmarkType) {
+            BenchmarkType.NONE -> when (key) {
                 "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetBatchTrickleScrollOffset((state.trickle.batchTrickleScrollOffset - 1).coerceAtLeast(0)))
+                    dispatch(TuiEvent.SetBenchmarkTypeSelectionIndex(
+                        state.benchmark.benchmarkTypeSelectionIndex - 1
+                    ))
 
                 "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetBatchTrickleScrollOffset(state.trickle.batchTrickleScrollOffset + 1))
+                    dispatch(TuiEvent.SetBenchmarkTypeSelectionIndex(
+                        state.benchmark.benchmarkTypeSelectionIndex + 1
+                    ))
+
+                "enter", " ", "space" -> {
+                    val selected =
+                        if (state.benchmark.benchmarkTypeSelectionIndex == 0) BenchmarkType.ARENA
+                        else BenchmarkType.TRICKLE
+                    dispatch(TuiEvent.SetBenchmarkType(selected))
+                }
 
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
             }
 
-            AnalysisMode.BENCHMARK -> when (key) {
+            BenchmarkType.ARENA -> when (key) {
                 "w", "z", "arrowup" ->
                     dispatch(TuiEvent.SetBenchmarkScrollOffset((state.benchmark.benchmarkScrollOffset - 1).coerceAtLeast(0)))
 
@@ -427,12 +465,22 @@ class TuiController(
                 "o" -> dispatch(TuiEvent.DownloadEvalResults)
 
                 "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+                    dispatch(TuiEvent.ResetBenchmarkType)
             }
 
-            else -> when (key) {
+            // "b" (start batch test) is handled at the dashboard level so it works regardless
+            // of which panel holds focus; here we only handle scrolling and going back.
+            BenchmarkType.TRICKLE -> when (key) {
+                "w", "z", "arrowup" ->
+                    dispatch(TuiEvent.SetBenchmarkScrollOffset((state.benchmark.benchmarkScrollOffset - 1).coerceAtLeast(0)))
+
+                "s", "arrowdown" ->
+                    dispatch(TuiEvent.SetBenchmarkScrollOffset(state.benchmark.benchmarkScrollOffset + 1))
+
                 "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+                    if (!state.benchmark.isRunningBatchTrickleTest) {
+                        dispatch(TuiEvent.ResetBenchmarkType)
+                    }
             }
         }
     }

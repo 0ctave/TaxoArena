@@ -1,6 +1,27 @@
 package taxonomy.tui.state
 
+import taxonomy.tui.BatchTrickleTestResults
+
+/**
+ * Which evaluation the Benchmark hub is showing. [NONE] is the type-selection screen
+ * shown whenever the hub is (re)entered.
+ */
+enum class BenchmarkType {
+    NONE,    // Selection screen (entry state)
+    ARENA,   // Multi-model pairwise eval over MMLU-Pro
+    TRICKLE  // Batch routing accuracy test (moved from the Trickle tab)
+}
+
 data class BenchmarkUiState(
+    val benchmarkType: BenchmarkType = BenchmarkType.NONE,
+    // 0 = ARENA, 1 = TRICKLE (W/S navigation on the selection screen).
+    val benchmarkTypeSelectionIndex: Int = 0,
+
+    // Batch routing accuracy test, run under the TRICKLE benchmark type.
+    val isRunningBatchTrickleTest: Boolean = false,
+    val batchTrickleProgress: String = "",
+    val batchTrickleResults: BatchTrickleTestResults? = null,
+
     val selectedBenchmarkField: Int = 0,
     val isEditingBenchmarkField: Boolean = false,
     val benchmarkEditingValue: String = "",

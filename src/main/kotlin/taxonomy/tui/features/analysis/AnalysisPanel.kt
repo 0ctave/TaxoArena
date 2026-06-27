@@ -16,7 +16,6 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
-import taxonomy.tui.BatchTrickleTestResults
 import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.TuiTheme
@@ -41,7 +40,6 @@ fun AnalysisPanel(
     inspectorScroll: Int,
     metricsScroll: Int,
     benchmarkScroll: Int,
-    batchTrickleScroll: Int,
     trickleState: taxonomy.tui.state.TrickleUiState,
     snapshotState: SnapshotUiState,
     arenaState: ArenaUiState,
@@ -80,7 +78,7 @@ fun AnalysisPanel(
             when (mode) {
                 AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState)
                 AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
-                AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState, batchTrickleScroll)
+                AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState)
                 AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
                 AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 else -> MetricsOrInspectorPanel(
