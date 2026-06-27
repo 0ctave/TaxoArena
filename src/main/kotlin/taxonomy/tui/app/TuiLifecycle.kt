@@ -27,19 +27,11 @@ fun BindTuiLifecycle(
         }
     }
 
-    // Log drain → LogsTick
+    // Logs are now accumulated directly by TuiLogAppender.append() on the logging
+    // thread (see TuiLogAppender), so no UI-side drain is needed. This loop only nudges
+    // the scroll/snapshot bookkeeping periodically so the panel tracks the tail.
     LaunchedEffect(Unit) {
         while (true) {
-            var changed = false
-            while (true) {
-                val next = TuiLogAppender.logQueue.poll() ?: break
-                TuiLogAppender.logs.add(next)
-                changed = true
-            }
-            if (changed) {
-                while (TuiLogAppender.logs.size > 2000) TuiLogAppender.logs.removeAt(0)
-                TuiLogAppender.logsVersion.value++
-            }
             dispatch(TuiEvent.LogsTick)
             delay(50.milliseconds)
         }

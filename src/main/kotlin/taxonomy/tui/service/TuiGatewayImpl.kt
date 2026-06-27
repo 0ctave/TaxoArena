@@ -49,10 +49,15 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         deps.config.applyEffectiveConfig(snapshot.config ?: snapshot.settings.toEffectiveConfig())
 
         val uuid = snapshot.logUuid
-        val historicalLogs = if (uuid != null) {
+        val fileLogs = if (uuid != null) {
             withContext(Dispatchers.IO) { deps.snapshotManager.loadSnapshotLogs(uuid) }
         } else emptyList()
-        TuiLogAppender.loadHistoricalLogs(historicalLogs)
+        // Prefer the external .log file; fall back to the trace carried inside the snapshot
+        // object (populated for JSON-migrated snapshots). Replayed lines are tagged so they're
+        // visibly distinct from live generation logs in the LogsPanel.
+        val replayLogs = (if (fileLogs.isNotEmpty()) fileLogs else snapshot.logTrace)
+            .map { if (it.startsWith("[SNAPSHOT REPLAY]")) it else "[SNAPSHOT REPLAY] $it" }
+        TuiLogAppender.loadHistoricalLogs(replayLogs)
 
         deps.taxonomyService.clearMetricsHistory()
         val report = TaxonomyMetrics(root).generateReport()
