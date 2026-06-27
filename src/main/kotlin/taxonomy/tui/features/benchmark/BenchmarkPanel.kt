@@ -22,7 +22,7 @@ fun BenchmarkPanel(
     scrollOffset: Int,
     benchmarkState: BenchmarkUiState,
 ) {
-        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+        Column {
             if (benchmarkState.loadedModels.isNotEmpty()) {
                 Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}", color = Green)
             } else {

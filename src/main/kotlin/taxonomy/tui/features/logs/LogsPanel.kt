@@ -37,7 +37,7 @@ fun LogsPanel(
     val start = (end - visible).coerceAtLeast(0)
     val lines = logs.subList(start, end)
 
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
         if (lines.isEmpty()) {
             Text("No logs yet.", color = White)
             return@Column

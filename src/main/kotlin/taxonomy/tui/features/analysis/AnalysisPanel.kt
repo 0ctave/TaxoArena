@@ -37,7 +37,7 @@ fun AnalysisPanel(
     metricsScroll: Int,
     benchmarkScroll: Int,
     batchTrickleScroll: Int,
-    trickleResults: BatchTrickleTestResults?,
+    trickleState: taxonomy.tui.state.TrickleUiState,
     snapshotState: SnapshotUiState,
     arenaState: ArenaUiState,
     benchmarkState: BenchmarkUiState,
@@ -74,7 +74,7 @@ fun AnalysisPanel(
             when (mode) {
                 AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState)
                 AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
-                AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleResults, batchTrickleScroll)
+                AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState, batchTrickleScroll)
                 AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
                 AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 else -> MetricsOrInspectorPanel(
@@ -100,7 +100,7 @@ private fun SnapshotHubPanel(
     height: Int,
     state: SnapshotUiState,
 ) {
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
         when {
             state.isSavingSnapshot ->
                 Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588", color = Cyan)

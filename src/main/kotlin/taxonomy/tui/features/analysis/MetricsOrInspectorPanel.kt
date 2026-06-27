@@ -31,7 +31,7 @@ fun MetricsOrInspectorPanel(
     metricsScroll: Int,
     latestMetrics: IterationMetrics? = null,
 ) {
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
         when (mode) {
             AnalysisMode.NODE_DETAIL -> {
                 val node = controlState.selectedNode

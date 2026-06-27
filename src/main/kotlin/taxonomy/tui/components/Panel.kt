@@ -76,8 +76,9 @@ fun Panel(
                     )
                 }
             }
-            // Content sits inside the frame with a 1-col left inset.
-            Box(modifier = Modifier.padding(left = 1).width(innerW).height(h - 2)) {
+            // Content sits inside the frame with a 2-col left inset and a 1-row top inset so
+            // text never hugs the border (panels share this breathing room).
+            Box(modifier = Modifier.padding(left = 2, top = 1).width((innerW - 2).coerceAtLeast(1)).height((h - 3).coerceAtLeast(1))) {
                 content()
             }
         }
