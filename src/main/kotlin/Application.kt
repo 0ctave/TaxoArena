@@ -57,7 +57,19 @@ fun main(args: Array<String>) {
     // autoconfigure-exclude validation in Spring Boot 3.4 runs so early that no failure event is
     // broadcast, so the JVM would otherwise exit silently. Catch here as the outermost net.
     try {
-        app.run(*args)
+        val ctx = app.run(*args)
+        // Confirm the context actually started and the TUI CommandLineRunner was registered. If no
+        // runner beans exist, the TUI service was never wired (component scan / annotation problem)
+        // and the process would otherwise exit silently right after startup.
+        val runners = ctx.getBeansOfType(org.springframework.boot.CommandLineRunner::class.java)
+        System.err.println("[BOOT] Spring context started; CommandLineRunner beans: ${runners.keys}")
+        if (runners.isEmpty()) {
+            System.err.println(
+                "[BOOT FAILED] No CommandLineRunner beans found — TUI service was not registered. " +
+                    "Check @ComponentScan packages and @Component annotations."
+            )
+        }
+        System.err.flush()
     } catch (e: SpringApplication.AbandonedRunException) {
         // Not a failure: the AOT processor (processAot task) deliberately throws this to abort
         // after the context is prepared. Re-throw so the AOT machinery sees it as expected.
