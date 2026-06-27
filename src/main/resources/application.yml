@@ -1,5 +1,12 @@
 # SPDX-FileCopyrightText: 2025 Deutsche Telekom AG and others
 # SPDX-License-Identifier: Apache-2.0
+#
+# Classpath base config (ships in the jar). Kept to only what TUI-mode code paths consume:
+#   spring.main.web-application-type=none + arc.*.enabled=false  -> run headless, skip the Arc
+#     web/GraphQL/chat/script stack (the bulk of startup cost).
+#   logging.level.*  -> quiet noisy packages so nothing leaks onto the TUI alt-screen.
+# Removed in PR #59: the management/actuator block (no endpoints can be served when headless and
+# no code reads management.*).
 spring:
   application:
     name: TaxoAdapt
@@ -44,30 +51,5 @@ logging:
     org.springframework: WARN
     io.netty: WARN
     reactor: WARN
-
-
-management:
-  otlp:
-    tracing:
-      endpoint: http://localhost:6006/v1/traces
-  tracing:
-    enabled: false
-    sampling:
-      probability: 1.0
-  server:
-    port: 9090
-  endpoints:
-    web:
-      base-path: /
-      exposure:
-        include: prometheus,metrics,info,health
-  endpoint:
-    metrics:
-      enabled: true
-    health:
-      probes:
-        enabled: true
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+# NOTE: the `management:`/actuator block was removed — web-application-type=none means no
+# endpoints can be served, and no code reads management.*. See PR #59.

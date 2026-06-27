@@ -28,12 +28,20 @@ class TaxonomyConfig {
         var enableLiveLabeling: Boolean = false
 
         /**
-         * While the TUI owns the screen, funnel stray System.out/System.err writes (third-party
-         * println, stack traces) into the log instead of letting them corrupt the alt-screen.
-         * Mosaic's own ANSI frames are detected and passed straight through to the real terminal.
-         * Flip to false if a terminal ever fails to render with the redirect installed.
+         * While the TUI owns the screen, funnel stray writes into the log instead of letting them
+         * corrupt the alt-screen. By default only System.err is redirected: replacing System.out
+         * breaks Mosaic's tty capability detection (jansi/jline inspect the live System.out chain),
+         * so stdout is left pointing at the real terminal and logback-spring.xml keeps it quiet by
+         * having no console appender. Flip to false to disable the redirect entirely.
          */
         var redirectStdStreams: Boolean = true
+
+        /**
+         * Emergency escape hatch: also redirect System.out into the log. Off by default because it
+         * defeats Mosaic's terminal detection (see [redirectStdStreams]); only enable if a stray
+         * println is corrupting the screen and the safer ordering still renders correctly.
+         */
+        var redirectStdoutAlso: Boolean = false
         val llmParallelism: Int = 8
     }
 

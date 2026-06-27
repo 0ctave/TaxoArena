@@ -2,46 +2,22 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-spring:
-  application:
-    name: taxoadapt-arc-engine
+# External override config (loaded from ./config/ by Spring Boot). Every key below is read by code:
+#   arc.ollama.base-url / num-ctx  -> ArcTaxonomyLLMClient.kt:64,66, ArcLLMProvider.kt:51
+#   huggingface.token              -> MMLUDatasetFetcher.kt:22
+#   taxoadapt.*                    -> TaxonomyConfig (@ConfigurationProperties)
+# Removed in PR #59: jvm.args (Spring doesn't consume it; pass -D flags on the CLI), arc.ai.clients
+# (unused — ArcLLMProvider reads only arc.ollama.*), and the duplicate spring.application.name.
 
 logging:
   level:
     root: WARN
     taxonomy: INFO
 
-# JVM options for TUI mode
-jvm:
-  args:
-    - --add-opens=java.base/java.awt.X11.XCBResources=ALL-UNNAMED
-    - --add-opens=java.base/java.awt=X11GraphicsDevicePermission$ResourcePermission=ALL-UNNAMED
-    - --add-opens=java.desktop/java.awt=ALL-UNNAMED
-    - -Djava.awt.headless=false
-    - -Djava.awt.graphicsenv=true
-    - -Dfile.encoding=UTF-8
-    - -Djava.io.tmpdir=/tmp
-    - -Dawt.toolkit=sun.awt.X11.XToolkit
-    - -Dsun.java2d.uiScale=1.0
-    - -Dsun.java2d.xrender=true
-    - -Dline.editor.buffer-size=65536
-    - -Dline.ui.max-width=1920
-    - -Dline.ui.max-height=1080
-
 arc:
   ollama:
     base-url: http://localhost:11434
     num-ctx: 8192
-  ai:
-    clients:
-      - id: ministral
-        modelName: ministral-3:14b
-        client: ollama
-        url: http://localhost:11434
-      - id: qwen3.5
-        modelName: qwen3.5:2b
-        client: ollama
-        url: http://localhost:11434
 
 huggingface:
   token: ${HUGGINGFACE_TOKEN:}
@@ -55,6 +31,10 @@ taxoadapt:
     enable-visualization: false
     enable-tui: true
     enable-live-labeling: false
+    # While the TUI owns the screen, redirect stray writes into logs/taxoarena.log. Only stderr is
+    # redirected by default; redirecting stdout breaks Mosaic's tty detection (see PR #59).
+    redirect-std-streams: true
+    redirect-stdout-also: false
 
   dataset:
     sample: 12000

@@ -107,20 +107,28 @@ class TaxonomyTuiService(
     private var originalErr: PrintStream? = null
 
     /**
-     * Funnel stray stdout/stderr writes into the log for the TUI's lifetime. Mosaic's ANSI
-     * frames (which it prints via System.out) are detected by [SlfBufferStream] and passed
-     * straight through to the real terminal, so rendering is unaffected.
+     * Funnel stray writes into the log for the TUI's lifetime. By default ONLY System.err is
+     * redirected: replacing System.out breaks Mosaic's terminal capability detection (jansi/jline
+     * probe the live System.out chain for a tty, and an [SlfBufferStream] in the middle hides it),
+     * which is why the TUI failed to render before. stdout is therefore left pointing at the real
+     * (jansi-wrapped) terminal and kept quiet by logback-spring.xml having no console appender.
+     *
+     * Must run AFTER [AnsiConsole.systemInstall] so the captured stream is the jansi wrapper; the
+     * optional stdout redirect ([ExecutionConfig.redirectStdoutAlso]) then passes ANSI frames
+     * straight through that wrapper to the real terminal.
      */
     private fun redirectStdStreams() {
         if (!config.execution.redirectStdStreams) return
-        if (originalOut != null) return // already redirected
+        if (originalErr != null) return // already redirected
         val realOut = System.out
         originalOut = realOut
         originalErr = System.err
-        val outLog = LoggerFactory.getLogger("stdout")
         val errLog = LoggerFactory.getLogger("stderr")
-        System.setOut(PrintStream(taxonomy.utils.SlfBufferStream(outLog, isError = false, passthrough = realOut), true, "UTF-8"))
         System.setErr(PrintStream(taxonomy.utils.SlfBufferStream(errLog, isError = true, passthrough = null), true, "UTF-8"))
+        if (config.execution.redirectStdoutAlso) {
+            val outLog = LoggerFactory.getLogger("stdout")
+            System.setOut(PrintStream(taxonomy.utils.SlfBufferStream(outLog, isError = false, passthrough = realOut), true, "UTF-8"))
+        }
     }
 
     private fun restoreStdStreams() {
@@ -187,12 +195,13 @@ class TaxonomyTuiService(
 
         System.setProperty("jline.terminal.color", "true")
         System.setProperty("jline.terminal.type", "xterm-256color")
-        // Capture and replace stdout/stderr BEFORE jansi installs, so the real terminal is the
-        // passthrough target for Mosaic frames and everything else is funneled into the log.
-        redirectStdStreams()
+        // Install jansi while System.out is still the REAL terminal so it can probe the tty and
+        // enable ANSI processing, then enter the alt-screen on that real stream. Only AFTER this
+        // do we redirect (stderr-only by default) — redirecting stdout first hid the tty from
+        // jansi/jline and Mosaic never rendered.
         AnsiConsole.systemInstall()
-        System.setOut(PrintStream(System.`out`, true, "UTF-8"))
         print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
+        redirectStdStreams()
 
         // Ctrl-C / SIGTERM: always restore the terminal and exit hard so the app never
         // appears frozen in the alternate screen buffer.
@@ -249,10 +258,13 @@ class TaxonomyTuiService(
 
             // Blocks until the user quits the TUI. When it returns, the app should exit
             // (the TUI is the foreground UI) rather than hang in a background loop.
-            runWithTerminal(NonInteractivePolicy.Exit, block)
+            log.info("Starting Mosaic TUI session")
+            val started = runWithTerminal(NonInteractivePolicy.Exit, block)
+            log.info("Mosaic TUI session ended (started={})", started)
         } catch (e: Throwable) {
             restoreTerminal()
             val real = if (e is InvocationTargetException) e.cause ?: e else e
+            log.warn("Mosaic TUI failed to start/render: {}", real.message)
             System.err.println("\n[TUI RECOVERY] Layout failure.")
             System.err.println("Cause: ${real.message ?: "Unknown failure"}")
             real.printStackTrace()
