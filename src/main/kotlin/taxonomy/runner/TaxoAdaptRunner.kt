@@ -23,7 +23,7 @@ class TaxoAdaptRunner(
     private val datasetFetcher: MMLUDatasetFetcher,
     private val validator: TaxonomyValidator
 ) : CommandLineRunner {
-    private val log = LoggerFactory.getLogger("Runner")
+    private val log = LoggerFactory.getLogger("taxonomy.Runner")
 
     // Dedicated scope for app logic that survives the runner's exit
     private val appScope = CoroutineScope(Dispatchers.Default + SupervisorJob())

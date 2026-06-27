@@ -19,7 +19,7 @@ class MMLUCacheRunner(
     private val embeddingCache: EmbeddingCache
 ) : CommandLineRunner {
 
-    private val log = LoggerFactory.getLogger("MMLUCacheRunner")
+    private val log = LoggerFactory.getLogger("taxonomy.MMLUCacheRunner")
 
     override fun run(vararg args: String?) = runBlocking {
         log.info("Starting MMLU Pro Dataset Fetcher & Embedding Cacher...")

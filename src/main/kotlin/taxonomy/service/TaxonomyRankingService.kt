@@ -48,7 +48,7 @@ data class LeaderboardGroup(
 
 @Service
 class TaxonomyRankingService {
-    private val log = LoggerFactory.getLogger("RankingService")
+    private val log = LoggerFactory.getLogger("taxonomy.RankingService")
     private val dbUrl = "jdbc:sqlite:ratings.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
     // Initial constant values matching standard OpenSkill (Weng-Lin) defaults

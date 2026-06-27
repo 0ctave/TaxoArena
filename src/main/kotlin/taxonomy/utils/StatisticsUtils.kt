@@ -8,7 +8,7 @@ import kotlin.math.*
  * Upgraded Statistical engine for vMF and NiW operations.
  */
 object StatisticsUtils {
-    private val log = LoggerFactory.getLogger("Statistics")
+    private val log = LoggerFactory.getLogger("taxonomy.Statistics")
 
     /**
      * Banerjee closed-form kappa estimation with small-sample shrinkage correction.

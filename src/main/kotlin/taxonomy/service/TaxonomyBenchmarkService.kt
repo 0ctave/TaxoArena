@@ -24,7 +24,7 @@ class TaxonomyBenchmarkService(
     private val taxonomyService: TaxonomyService,
     private val evalStore: ModelEvalStore
 ) {
-    private val log = LoggerFactory.getLogger("BenchmarkService")
+    private val log = LoggerFactory.getLogger("taxonomy.BenchmarkService")
 
     suspend fun runBenchmark(
         req: BenchmarkRequest,

@@ -26,7 +26,7 @@ class TaxonomySplitter(
     private val datasetFetcher: MMLUDatasetFetcher,
     private val fitter: TaxonomyFitter
 ) {
-    private val log = LoggerFactory.getLogger("Splitter")
+    private val log = LoggerFactory.getLogger("taxonomy.Splitter")
     private val conceptCounter = java.util.concurrent.atomic.AtomicInteger(1)
 
     private val llmSemaphore by lazy { Semaphore(config.execution.llmParallelism) }

@@ -39,9 +39,12 @@ fun LogsPanel(
     val logs = remember(TuiLogAppender.logsVersion.value) {
         synchronized(TuiLogAppender.logs) { ArrayList(TuiLogAppender.logs) }
     }
-    // Queried once (Logback wiring doesn't change at runtime) so an empty panel can explain
-    // *why* — a detached appender or a non-INFO `taxonomy` level both silence the logs.
-    val diag = remember { TuiLogAppender.diagnostics() }
+    // Re-queried whenever the buffer version changes (keyed on logsVersion) so the empty-state
+    // overlay reflects *live* pipeline health — appends seen, last-append time, attached appenders
+    // and the active LoggerContext — rather than a stale one-time snapshot. This is what lets a
+    // blank panel explain precisely why it is blank (root-level filtering, detached appender,
+    // split LoggerContext, or simply nothing logged yet).
+    val diag = remember(TuiLogAppender.logsVersion.value) { TuiLogAppender.diagnostics() }
     val visible = height.coerceAtLeast(1)
     val end = (logs.size - scrollOffset).coerceIn(0, logs.size)
     val start = (end - visible).coerceAtLeast(0)
@@ -49,10 +52,16 @@ fun LogsPanel(
 
     Column {
         if (lines.isEmpty()) {
-            Text(
-                "no logs yet (taxonomy: INFO active=${diag.infoActive}, appender attached=${diag.appenderAttached})",
-                color = White,
-            )
+            val appenders = if (diag.attachedAppenderNames.isEmpty()) "none"
+                else diag.attachedAppenderNames.joinToString(",")
+            val last = diag.lastAppendAt?.toString() ?: "never"
+            Text("no logs yet — pipeline diagnostics:", color = White)
+            Text("  taxonomy INFO active : ${diag.infoActive}", color = White)
+            Text("  TUI appender attached: ${diag.appenderAttached}  (root appenders: $appenders)", color = White)
+            Text("  buffer size          : ${diag.bufferSize}", color = White)
+            Text("  appends seen (life)  : ${diag.appendCount}", color = White)
+            Text("  last append at       : $last", color = White)
+            Text("  loggerContext hash   : ${diag.loggerContextIdentityHash}", color = White)
             return@Column
         }
         lines.forEach { raw ->

@@ -31,7 +31,7 @@ class TaxonomyMerger(
     private var cachedAncestorMap: Map<String, Set<String>>? = null
     private var ancestorMapRootId: String? = null
 
-    private val log = LoggerFactory.getLogger("Merger")
+    private val log = LoggerFactory.getLogger("taxonomy.Merger")
 
     suspend fun optimizeHierarchy(root: GraphNode) {
         pruneUnrelevantNodes(root)

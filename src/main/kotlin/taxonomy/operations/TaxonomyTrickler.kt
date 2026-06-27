@@ -19,7 +19,7 @@ import kotlin.math.ln
 class TaxonomyTrickler(
     private val config: TaxonomyConfig
 ) {
-    private val log = LoggerFactory.getLogger("Trickler")
+    private val log = LoggerFactory.getLogger("taxonomy.Trickler")
 
     /**
      * Routes a query through the DAG.

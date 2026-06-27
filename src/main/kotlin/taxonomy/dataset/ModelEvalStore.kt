@@ -46,7 +46,7 @@ class ModelEvalStore(
     @Value("\${taxoadapt.eval.db-path:mmlu_pro_dataset_cache_v2.db}")
     private val dbPath: String = "mmlu_pro_dataset_cache_v2.db"
 ) {
-    private val log = LoggerFactory.getLogger("ModelEvalStore")
+    private val log = LoggerFactory.getLogger("taxonomy.ModelEvalStore")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
 
     private val dbUrl = "jdbc:sqlite:$dbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"

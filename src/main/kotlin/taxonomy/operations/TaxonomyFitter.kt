@@ -19,7 +19,7 @@ import kotlin.math.sqrt
 class TaxonomyFitter(
     private val config: TaxonomyConfig
 ) {
-    private val log = LoggerFactory.getLogger("Fitter")
+    private val log = LoggerFactory.getLogger("taxonomy.Fitter")
 
     /**
      * Parallel BFS level-by-level fitting. Processes root-first (shallow to deep)

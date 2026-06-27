@@ -98,7 +98,7 @@ class TaxonomyTuiService(
     internal val evalStore: ModelEvalStore,
 ) : CommandLineRunner {
 
-    internal val log = LoggerFactory.getLogger("TuiService")
+    internal val log = LoggerFactory.getLogger("taxonomy.TuiService")
     internal val tuiScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     internal val tuiVersion = "v2.0.0"
 

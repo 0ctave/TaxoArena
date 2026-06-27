@@ -32,7 +32,7 @@ class TaxonomyEngine(
     private val taxonomyService: TaxonomyService,
     private val perfTracker: TaxonomyPerformanceTracker
 ) {
-    private val log = LoggerFactory.getLogger("Engine")
+    private val log = LoggerFactory.getLogger("taxonomy.Engine")
 
     suspend fun adaptTaxonomy(rootLabel: String, dataset: Map<String, List<String>>): GraphNode = coroutineScope {
         log.info("Starting Taxonomy Adaptation: $rootLabel")

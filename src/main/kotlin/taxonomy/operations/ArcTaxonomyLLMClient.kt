@@ -68,7 +68,7 @@ class ArcTaxonomyLLMClient(
     private val monitor: GenerationMonitor,
     private val config: TaxonomyConfig
 ) : TaxonomyLlmClient {
-    private val log = LoggerFactory.getLogger("LLMClient")
+    private val log = LoggerFactory.getLogger("taxonomy.LLMClient")
     private val httpClient = java.net.http.HttpClient.newHttpClient()
     private val json = Json { ignoreUnknownKeys = true }
 

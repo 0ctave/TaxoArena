@@ -24,7 +24,7 @@ class TournamentSimulator(
     private val rankingService: TaxonomyRankingService,
     private val taxonomyService: TaxonomyService
 ) {
-    private val log = LoggerFactory.getLogger("TournamentSimulator")
+    private val log = LoggerFactory.getLogger("taxonomy.TournamentSimulator")
     private val drawMargin = 0.1
 
     // Predefined synthetic agent true skill profiles mapping domain categories to true mu

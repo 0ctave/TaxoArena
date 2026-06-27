@@ -56,7 +56,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         // object (populated for JSON-migrated snapshots). Replayed lines are tagged so they're
         // visibly distinct from live generation logs in the LogsPanel.
         val replayLogs = (if (fileLogs.isNotEmpty()) fileLogs else snapshot.logTrace)
-            .map { if (it.startsWith("[SNAPSHOT REPLAY]")) it else "[SNAPSHOT REPLAY] $it" }
+            .map { if (it.startsWith("[REPLAY]")) it else "[REPLAY] $it" }
         TuiLogAppender.loadHistoricalLogs(replayLogs)
 
         deps.taxonomyService.clearMetricsHistory()
@@ -396,6 +396,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override suspend fun generateDag(onProgress: (Float, String) -> Unit) {
         withContext(Dispatchers.IO) {
+            // Bracket the whole generation so every framework log line it emits is captured into a
+            // per-session trace; saveSnapshot() then persists exactly this slice with the snapshot.
+            TuiLogAppender.startRecording()
+            try {
             deps.log.info("DAG generation started for dataset '${deps.config.dataset.datasetType.name}'.")
             // 1. Ensure the dataset is present locally (auto-download if missing).
             if (!deps.datasetFetcher.isDatasetDownloaded()) {
@@ -430,6 +434,9 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             )
             deps.taxonomyService.setGraph(root)
             deps.log.info("DAG generation complete: ${trainSet.values.sumOf { it.size }} train queries processed.")
+            } finally {
+                TuiLogAppender.recordGenerationTrace(TuiLogAppender.stopAndGetRecording())
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ class TaxonomyArenaService(
     private val evalStore: ModelEvalStore,
     private val rankingService: TaxonomyRankingService,
 ) {
-    private val log = LoggerFactory.getLogger("ArenaService")
+    private val log = LoggerFactory.getLogger("taxonomy.ArenaService")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     private val _state = MutableStateFlow(AnalysisPanelState())

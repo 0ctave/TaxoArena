@@ -45,7 +45,7 @@ data class TaxonomyExport(
 
 @Service
 class TaxonomyVisualizer {
-    private val log = LoggerFactory.getLogger("Visualizer")
+    private val log = LoggerFactory.getLogger("taxonomy.Visualizer")
     
     // CRITICAL: Disable prettyPrint for massive numeric exports to prevent hanging
     private val json = Json { 

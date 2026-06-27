@@ -3,8 +3,8 @@ package taxonomy.tui.app
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.delay
+import org.slf4j.LoggerFactory
 import taxonomy.tui.controller.TuiEvent
-import taxonomy.utils.TuiLogAppender
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -19,6 +19,14 @@ fun BindTuiLifecycle(
     dispatch: (TuiEvent) -> Unit,
     subscriptions: TuiSubscriptions,
 ) {
+    // One-shot self-test: emit a single INFO line on a `taxonomy.*` logger at TUI startup. If this
+    // line shows up in the panel the whole pipeline (level filtering → root appender → buffer →
+    // Compose recomposition) is proven alive; if it never appears, the empty-state diagnostics
+    // below pinpoint where it broke.
+    LaunchedEffect(Unit) {
+        LoggerFactory.getLogger("taxonomy.tui.bootstrap").info("TUI logging pipeline alive")
+    }
+
     // Clock → SpinnerTick event
     LaunchedEffect(Unit) {
         while (true) {
