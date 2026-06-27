@@ -50,7 +50,14 @@ dependencies {
     // Arc
     implementation("org.eclipse.lmos:arc-azure-client:$arcVersion")
     implementation("org.eclipse.lmos:arc-langchain4j-client:$arcVersion")
-    implementation("org.eclipse.lmos:arc-spring-boot-starter:$arcVersion")
+    // arc-spring-boot-starter transitively pulls org.eclipse.lmos:arc-mcp -> io.modelcontextprotocol.sdk:mcp,
+    // a Model Context Protocol server stack the TUI never uses. Excluded so no MCP autoconfig/beans can
+    // load (the silent context-start failure under web-application-type=none that PR #61 fixed) and to
+    // keep the MCP SDK off the classpath entirely.
+    implementation("org.eclipse.lmos:arc-spring-boot-starter:$arcVersion") {
+        exclude(group = "org.eclipse.lmos", module = "arc-mcp")
+        exclude(group = "io.modelcontextprotocol.sdk")
+    }
     implementation("org.eclipse.lmos:arc-assistants:$arcVersion")
     implementation("org.eclipse.lmos:arc-readers:$arcVersion")
     implementation("org.eclipse.lmos:arc-api:$arcVersion")
@@ -68,7 +75,8 @@ dependencies {
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webflux:1.1.1")
+    // Kept for spring-web: the @RestController endpoints in taxonomy.controller need it to compile
+    // (the unused spring-ai-starter-mcp-server-webflux was removed in PR #61).
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // Langchain4j
