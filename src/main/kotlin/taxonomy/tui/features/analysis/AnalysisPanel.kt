@@ -22,6 +22,7 @@ import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.take
 import taxonomy.tui.features.arena.ArenaPanel
 import taxonomy.tui.features.benchmark.BenchmarkPanel
+import taxonomy.tui.features.benchmark.EvalCatalogPicker
 import taxonomy.tui.features.progress.JudgeProgressPanel
 import taxonomy.tui.features.trickle.TricklePanel
 import taxonomy.tui.state.ArenaUiState
@@ -79,12 +80,18 @@ fun AnalysisPanel(
             val bodyH = (height - 2 - bannerH).coerceAtLeast(1)
             val bodyW = width - 2
 
-            when (mode) {
-                AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState)
-                AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
-                AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState)
-                AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
-                AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
+            when {
+                // The eval-catalog ingestion picker is a modal overlay shared by Arena and
+                // Benchmark; render it in place of the normal sub-panel while it's open.
+                (mode == AnalysisMode.ARENA || mode == AnalysisMode.BENCHMARK) &&
+                    benchmarkState.isPickingEvalCatalog ->
+                    EvalCatalogPicker(bodyW, bodyH, benchmarkState)
+
+                mode == AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState, benchmarkState)
+                mode == AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
+                mode == AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState)
+                mode == AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
+                mode == AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 else -> MetricsOrInspectorPanel(
                     width = bodyW,
                     height = bodyH,

@@ -66,6 +66,64 @@ private fun BenchmarkTypeSelector(benchmarkState: BenchmarkUiState) {
     }
 }
 
+/**
+ * Per-model ingestion picker overlay (the [O] hotkey). Lists each eval source in the cache with a
+ * checkbox, ingested marker, and size, so the user ingests only the models they pick rather than
+ * parsing the whole directory. Shared by the Arena and Benchmark hub views.
+ */
+@Composable
+fun EvalCatalogPicker(
+    width: Int,
+    height: Int,
+    benchmarkState: BenchmarkUiState,
+) {
+    Column {
+        Text("SELECT EVAL_RESULTS TO INGEST", color = Cyan, textStyle = Bold)
+        Spacer()
+        val catalog = benchmarkState.evalCatalog
+        if (catalog.isEmpty()) {
+            Text("No eval_results found in the cache directory.", color = Yellow)
+            Spacer()
+            Text("Press D to download the MMLU-Pro eval_results, or Q to cancel.", color = Cyan)
+            return@Column
+        }
+        val selectedCount = benchmarkState.evalCatalogSelection.size
+        Text("$selectedCount selected · ${catalog.size} available", color = White)
+        Spacer()
+        val rows = (height - 5).coerceAtLeast(1)
+        // Keep the cursor row visible by scrolling the window when it runs past the bottom.
+        val start = (benchmarkState.evalCatalogCursor - rows + 1).coerceAtLeast(0)
+        catalog.drop(start).take(rows).forEachIndexed { offset, entry ->
+            val idx = start + offset
+            val isCursor = idx == benchmarkState.evalCatalogCursor
+            val checked = entry.modelName in benchmarkState.evalCatalogSelection
+            val sizeMb = entry.sizeBytes.toDouble() / (1024 * 1024)
+            val ingested = if (entry.alreadyIngested) " (ingested)" else ""
+            Text(
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = Yellow, textStyle = Bold)) {
+                        append(if (isCursor) "❯ " else "  ")
+                    }
+                    withStyle(SpanStyle(color = if (checked) Green else White)) {
+                        append(if (checked) "[x] " else "[ ] ")
+                    }
+                    withStyle(
+                        SpanStyle(
+                            color = if (isCursor) Cyan else White,
+                            textStyle = if (isCursor) Bold else Unspecified
+                        )
+                    ) { append(entry.modelName) }
+                    withStyle(SpanStyle(color = White)) {
+                        append(" · ${"%.1f MB".format(sizeMb)}$ingested")
+                    }
+                }
+            )
+        }
+        Spacer()
+        Text("W/S move · Space toggle · A all-new · Enter ingest · D download · Q cancel", color = Cyan)
+    }
+}
+
 /** Existing Arena benchmark (MMLU-Pro pairwise eval) view. */
 @Composable
 private fun ArenaBenchmarkView(
@@ -113,7 +171,15 @@ private fun ArenaBenchmarkView(
 
             benchmarkState.evalLoaderIsRunning -> {
                 Text("Loading eval results...", color = White)
-                if (benchmarkState.evalLoaderStatus.isNotBlank()) {
+                if (benchmarkState.evalLoadingModelCount > 0) {
+                    val i = benchmarkState.evalLoadingModelIdx + 1
+                    val n = benchmarkState.evalLoadingModelCount
+                    val cur = benchmarkState.evalLoadingCurrentModel.ifBlank { "…" }
+                    val items = if (benchmarkState.evalLoadingItemTotal > 0)
+                        " · items ${benchmarkState.evalLoadingItem}/${benchmarkState.evalLoadingItemTotal}"
+                    else ""
+                    Text("$cur  $i/$n$items", color = White)
+                } else if (benchmarkState.evalLoaderStatus.isNotBlank()) {
                     Text(benchmarkState.evalLoaderStatus, color = White)
                 }
             }

@@ -136,13 +136,24 @@ class CommandController(
             }
 
             TuiEvent.EvalDownloadComplete -> {
-                // Re-parse the freshly downloaded eval_results into the eval store.
-                dispatch(TuiEvent.SetEvalLoaderRunning(true))
-                effects.loadEval(
-                    path = "",
-                    modelName = "",
-                    dispatch = dispatch
-                )
+                // The cache is now populated; re-scan the catalog so the picker reflects the
+                // freshly downloaded files. Ingestion is deferred until the user picks models.
+                dispatch(TuiEvent.RefreshEvalCatalog)
+            }
+
+            // Open the per-model ingestion picker: scan the cache (no parsing) then show it.
+            TuiEvent.OpenEvalCatalogPicker -> {
+                effects.refreshEvalCatalog(dispatch)
+            }
+
+            TuiEvent.RefreshEvalCatalog -> {
+                effects.refreshEvalCatalog(dispatch)
+            }
+
+            TuiEvent.ConfirmEvalCatalogSelection -> {
+                val selected = state.benchmark.evalCatalog
+                    .filter { it.modelName in state.benchmark.evalCatalogSelection }
+                effects.loadEvalSelected(selected, dispatch)
             }
 
             TuiEvent.RunEvalLoad -> {

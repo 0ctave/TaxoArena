@@ -37,6 +37,10 @@ interface TuiEffects {
         dispatch: (TuiEvent) -> Unit
     )
     fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit)
+    /** Scan the eval_results cache (no parsing) and dispatch [TuiEvent.EvalCatalogLoaded]. */
+    fun refreshEvalCatalog(dispatch: (TuiEvent) -> Unit)
+    /** Ingest only the selected catalog entries, streaming per-model progress. */
+    fun loadEvalSelected(entries: List<taxonomy.dataset.EvalCatalogEntry>, dispatch: (TuiEvent) -> Unit)
     fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit)
     fun regenerateLabels()
     fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit)
@@ -238,6 +242,37 @@ class DefaultTuiEffects(
         }
     }
 
+    override fun refreshEvalCatalog(dispatch: (TuiEvent) -> Unit) {
+        scope.launch { dispatch(TuiEvent.EvalCatalogLoaded(gateway.scanEvalCatalog())) }
+    }
+
+    override fun loadEvalSelected(
+        entries: List<taxonomy.dataset.EvalCatalogEntry>,
+        dispatch: (TuiEvent) -> Unit
+    ) {
+        if (entries.isEmpty()) {
+            dispatch(TuiEvent.CloseEvalCatalogPicker)
+            return
+        }
+        activeJob = scope.launch {
+            try {
+                gateway.loadEvalSelected(entries) { modelIdx, modelCount, modelName, item, itemTotal ->
+                    dispatch(
+                        TuiEvent.EvalIngestionProgress(modelIdx, modelCount, modelName, item, itemTotal)
+                    )
+                }
+            } catch (c: CancellationException) {
+                throw c
+            } catch (t: Throwable) {
+                dispatch(TuiEvent.SetEvalLoaderStatus("Ingestion failed: ${t.message}"))
+            } finally {
+                dispatch(TuiEvent.EvalIngestionComplete)
+                dispatch(TuiEvent.BenchmarkModelsLoaded(gateway.loadedModels()))
+                dispatch(TuiEvent.ArenaModelsLoaded(gateway.loadedModels()))
+            }
+        }
+    }
+
     override fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit) {
         scope.launch { dispatch(TuiEvent.BenchmarkModelsLoaded(gateway.loadedModels())) }
     }
@@ -308,6 +343,11 @@ interface TuiGateway {
         onLive: (taxonomy.model.BenchmarkLiveStats) -> Unit
     )
     suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String
+    suspend fun scanEvalCatalog(): List<taxonomy.dataset.EvalCatalogEntry>
+    suspend fun loadEvalSelected(
+        entries: List<taxonomy.dataset.EvalCatalogEntry>,
+        onProgress: (modelIdx: Int, modelCount: Int, modelName: String, item: Int, itemTotal: Int) -> Unit
+    )
     suspend fun regenerateLabels()
     suspend fun regenerateJudgeForCurrentNode()
     fun inspectNode(node: GraphNode?)

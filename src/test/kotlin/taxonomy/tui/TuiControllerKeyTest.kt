@@ -68,6 +68,11 @@ private class FakeEffects(private val datasetDownloaded: Boolean) : TuiEffects {
         dispatch: (TuiEvent) -> Unit
     ) {}
     override fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit) {}
+    override fun refreshEvalCatalog(dispatch: (TuiEvent) -> Unit) {}
+    override fun loadEvalSelected(
+        entries: List<taxonomy.dataset.EvalCatalogEntry>,
+        dispatch: (TuiEvent) -> Unit
+    ) {}
     override fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit) {}
     override fun regenerateLabels() {}
     override fun setAnalysisMode(mode: AnalysisMode) {}

@@ -769,6 +769,90 @@ object TuiReducer {
                     benchmark = state.benchmark.copy(isDownloadingEval = false)
                 )
 
+            // ── Per-model eval ingestion picker ──
+            // Side-effect-only triggers (scan/ingest run in the CommandController).
+            TuiEvent.RefreshEvalCatalog,
+            TuiEvent.ConfirmEvalCatalogSelection ->
+                state
+
+            TuiEvent.OpenEvalCatalogPicker ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        isPickingEvalCatalog = true,
+                        evalCatalogCursor = 0
+                    )
+                )
+
+            TuiEvent.CloseEvalCatalogPicker ->
+                state.copy(
+                    benchmark = state.benchmark.copy(isPickingEvalCatalog = false)
+                )
+
+            is TuiEvent.EvalCatalogLoaded ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        evalCatalog = event.entries,
+                        // Default-select every model not yet ingested.
+                        evalCatalogSelection = event.entries
+                            .filterNot { it.alreadyIngested }
+                            .map { it.modelName }
+                            .toSet(),
+                        evalCatalogCursor = state.benchmark.evalCatalogCursor
+                            .coerceIn(0, (event.entries.size - 1).coerceAtLeast(0))
+                    )
+                )
+
+            is TuiEvent.MoveEvalCatalogCursor -> {
+                val maxIdx = (state.benchmark.evalCatalog.size - 1).coerceAtLeast(0)
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        evalCatalogCursor =
+                            (state.benchmark.evalCatalogCursor + event.delta).coerceIn(0, maxIdx)
+                    )
+                )
+            }
+
+            TuiEvent.ToggleEvalCatalogSelection -> {
+                val entry = state.benchmark.evalCatalog.getOrNull(state.benchmark.evalCatalogCursor)
+                    ?: return state
+                val sel = state.benchmark.evalCatalogSelection
+                val next = if (entry.modelName in sel) sel - entry.modelName else sel + entry.modelName
+                state.copy(benchmark = state.benchmark.copy(evalCatalogSelection = next))
+            }
+
+            TuiEvent.SelectAllNonIngestedEntries ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        evalCatalogSelection = state.benchmark.evalCatalog
+                            .filterNot { it.alreadyIngested }
+                            .map { it.modelName }
+                            .toSet()
+                    )
+                )
+
+            is TuiEvent.EvalIngestionProgress ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        // Confirming the picker closes it; progress then shows in the Arena view.
+                        isPickingEvalCatalog = false,
+                        evalLoaderIsRunning = true,
+                        evalLoadingModelIdx = event.modelIdx,
+                        evalLoadingModelCount = event.modelCount,
+                        evalLoadingCurrentModel = event.modelName,
+                        evalLoadingItem = event.item,
+                        evalLoadingItemTotal = event.itemTotal
+                    )
+                )
+
+            TuiEvent.EvalIngestionComplete ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        evalLoaderIsRunning = false,
+                        evalLoadingModelCount = 0,
+                        evalLoadingCurrentModel = ""
+                    )
+                )
+
             TuiEvent.ToggleLeaderboard -> {
                 val nowOpen = !state.arena.isViewingLeaderboard
                 state.copy(

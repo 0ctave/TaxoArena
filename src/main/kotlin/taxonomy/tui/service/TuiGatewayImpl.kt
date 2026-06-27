@@ -351,6 +351,27 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 "${stats.errors} errors"
         }
 
+    private val evalCatalog by lazy { taxonomy.dataset.EvalCatalog(deps.evalStore) }
+
+    override suspend fun scanEvalCatalog(): List<taxonomy.dataset.EvalCatalogEntry> =
+        withContext(Dispatchers.IO) {
+            evalCatalog.scan(deps.config.dataset.evalResultsDir)
+        }
+
+    override suspend fun loadEvalSelected(
+        entries: List<taxonomy.dataset.EvalCatalogEntry>,
+        onProgress: (modelIdx: Int, modelCount: Int, modelName: String, item: Int, itemTotal: Int) -> Unit
+    ) {
+        withContext(Dispatchers.IO) {
+            deps.log.info("Ingesting ${entries.size} selected eval model(s): ${entries.joinToString { it.modelName }}")
+            deps.evalLoader.loadEntries(
+                entries,
+                onModelStart = { idx, count, model -> onProgress(idx, count, model, 0, 0) },
+                onItemProgress = { idx, count, model, cur, total -> onProgress(idx, count, model, cur, total) }
+            )
+        }
+    }
+
     override suspend fun regenerateLabels() {
         val root = deps.taxonomyService.rootNodeFlow.value ?: run {
             deps.log.warn("Regenerate labels: no active DAG.")

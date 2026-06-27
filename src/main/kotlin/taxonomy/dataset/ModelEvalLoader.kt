@@ -74,6 +74,25 @@ class ModelEvalLoader(
     }
 
     /**
+     * Ingest only the explicitly-selected catalog entries, one model at a time. Reports
+     * per-model lifecycle ([onModelStart]) and per-item progress ([onItemProgress]) so the TUI
+     * can show "Ingesting <model> (i/N) · rows X/Y". Returns the per-model load stats in order.
+     */
+    suspend fun loadEntries(
+        entries: List<EvalCatalogEntry>,
+        onModelStart: ((modelIdx: Int, modelCount: Int, modelName: String) -> Unit)? = null,
+        onItemProgress: ((modelIdx: Int, modelCount: Int, modelName: String, current: Int, total: Int) -> Unit)? = null
+    ): List<EvalLoadStats> = withContext(Dispatchers.IO) {
+        val count = entries.size
+        entries.mapIndexed { idx, entry ->
+            onModelStart?.invoke(idx, count, entry.modelName)
+            loadFromPath(entry.sourcePath, entry.modelName) { cur, total ->
+                onItemProgress?.invoke(idx, count, entry.modelName, cur, total)
+            }
+        }
+    }
+
+    /**
      * Load all model results from a zip file produced by TIGER-AI-Lab eval scripts.
      * Resolves cross-links to mmlu_pro and embeddings_cache tables.
      * Idempotent — safe to call multiple times.
