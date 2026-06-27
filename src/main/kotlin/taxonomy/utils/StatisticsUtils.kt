@@ -38,15 +38,16 @@ object StatisticsUtils {
      */
     fun biasCorrectKappa(kappaMle: Double, meanResultantLength: Double, dim: Int, n: Int): Double {
         if (n <= 0) return kappaMle
-        val rBar = meanResultantLength
         val d = dim.toDouble()
         val ratio = d / n
         if (ratio > 10.0) {
             log.warn("[VMF] d/N=${"%.2f".format(ratio)} > 10 — κ estimate unreliable, NiW prior dominates")
         }
-        return if (ratio > 5.0 && rBar > 0.0 && rBar < 1.0) {
-            // Hornik & Grün (2014) Eq. (9) — asymptotic best approximation for large d.
-            rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
+        return if (ratio > 5.0) {
+            // Hornik & Grün (2014) Eq. (9): apply shrinkage factor ON TOP of the input kappaMle,
+            // never recompute from rBar — correctedKappa already ran the Banerjee approximation.
+            val shrinkage = (n - 1).toDouble() / (n + dim - 2).toDouble().coerceAtLeast(1.0)
+            (kappaMle * shrinkage).coerceIn(1e-3, 1e4)
         } else {
             kappaMle
         }
@@ -169,9 +170,9 @@ object StatisticsUtils {
             normTotal2 += t * t
         }
 
-        val wL = nL * nL - normL2
-        val wR = nR * nR - normR2
-        val wTotal = n * n - normTotal2
+        val wL     = (normL2     - nL) / 2.0   // ½(‖sumL‖² − N_L)  — correct cosine W
+        val wR     = (normR2     - nR) / 2.0
+        val wTotal = (normTotal2 - n)  / 2.0
 
         if (wTotal <= 1e-10) return 0.0
 
@@ -199,7 +200,7 @@ object StatisticsUtils {
         for (v in allPts) for (i in 0 until d) sumTotal[i] += v[i]
         var normTotal2 = 0.0
         for (i in 0 until d) normTotal2 += sumTotal[i] * sumTotal[i]
-        val wTotal = n * n - normTotal2
+        val wTotal = (normTotal2 - n) / 2.0
         if (wTotal <= 1e-10) return 0.0
 
         var cAfter = 0.0
@@ -210,7 +211,7 @@ object StatisticsUtils {
             for (v in cluster) for (i in 0 until d) sumC[i] += v[i]
             var normC2 = 0.0
             for (i in 0 until d) normC2 += sumC[i] * sumC[i]
-            val wC = nc * nc - normC2
+            val wC = (normC2 - nc) / 2.0
             cAfter += (n - nc) * wC
         }
         return 1.0 - cAfter / (n * wTotal)
@@ -396,7 +397,7 @@ object StatisticsUtils {
                 norm = sqrt(norm)
                 mus[c] = if (norm > 0.0) DoubleArray(d) { nextMus[c][it] / norm } else DoubleArray(d)
                 val rBar = norm / sumR[c].coerceAtLeast(1e-9)
-                kappas[c]   = correctedKappa(rBar, d, sumR[c].toInt().coerceAtLeast(2))
+                kappas[c] = correctedKappa(rBar, d, sumR[c].roundToInt().coerceAtLeast(2))
                 logNorms[c] = logVmfNormalizer(d, kappas[c])
             }
         }

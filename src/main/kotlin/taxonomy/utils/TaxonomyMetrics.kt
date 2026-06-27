@@ -218,7 +218,16 @@ class TaxonomyMetrics(
         // NMI is standard Shannon NMI over two flat hard partitions of the same query
         // set: predicted primary-leaf id vs. ground-truth category name. The earlier
         // overlapping-cover NMI compared disjoint node-id spaces and collapsed to ~0.
-        val nmi               = ShannonNmi.compute(gtSimple, predSimple)
+        val groundTruthCover: Map<String, Map<String, Double>> = groundTruthMap.mapValues { (_, cats) ->
+            cats.associateWith { 1.0 }
+        }
+// Use DAG-compatible overlapping NMI (Lancichinetti et al. 2009).
+// Falls back gracefully to 0.0 when groundTruthMap is empty.
+        val nmi = if (groundTruthCover.isEmpty() || predictedCover.isEmpty()) {
+            ShannonNmi.compute(gtSimple, predSimple)   // keep Shannon as fallback when GT is flat/absent
+        } else {
+            OverlappingNmi.compute(predictedCover, groundTruthCover)
+        }
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)
         // DAG-compatible Dendrogram Purity (Monath et al. 2021): uses the
