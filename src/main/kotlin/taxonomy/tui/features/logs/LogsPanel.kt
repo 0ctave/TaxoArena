@@ -39,6 +39,9 @@ fun LogsPanel(
     val logs = remember(TuiLogAppender.logsVersion.value) {
         synchronized(TuiLogAppender.logs) { ArrayList(TuiLogAppender.logs) }
     }
+    // Queried once (Logback wiring doesn't change at runtime) so an empty panel can explain
+    // *why* — a detached appender or a non-INFO `taxonomy` level both silence the logs.
+    val diag = remember { TuiLogAppender.diagnostics() }
     val visible = height.coerceAtLeast(1)
     val end = (logs.size - scrollOffset).coerceIn(0, logs.size)
     val start = (end - visible).coerceAtLeast(0)
@@ -46,7 +49,10 @@ fun LogsPanel(
 
     Column {
         if (lines.isEmpty()) {
-            Text("No logs yet.", color = White)
+            Text(
+                "no logs yet (taxonomy: INFO active=${diag.infoActive}, appender attached=${diag.appenderAttached})",
+                color = White,
+            )
             return@Column
         }
         lines.forEach { raw ->

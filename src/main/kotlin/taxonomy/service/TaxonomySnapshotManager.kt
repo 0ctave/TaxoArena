@@ -190,7 +190,11 @@ data class DagSnapshot(
     val reservedQueries: Map<String, List<String>> = emptyMap(),
     // Full effective config that travels with the snapshot. Null for legacy
     // snapshots saved before config embedding; callers fall back to [settings].
-    val config: EffectiveConfig? = null
+    val config: EffectiveConfig? = null,
+    // Tail of the TUI log buffer captured at save time (bounded to the last
+    // MAX_LOG_TRACE lines). Defaulted to empty so snapshots written before this
+    // field still deserialize cleanly.
+    val logTrace: List<String> = emptyList()
 )
 
 @Serializable
@@ -204,6 +208,9 @@ data class DagSnapshotMetadata(
     val reservedQueries: Map<String, List<String>> = emptyMap(),
     val config: EffectiveConfig? = null
 )
+
+/** Upper bound on the number of log lines carried inside a [DagSnapshot.logTrace]. */
+private const val MAX_LOG_TRACE = 5000
 
 @Component
 class TaxonomySnapshotManager(
@@ -460,6 +467,8 @@ class TaxonomySnapshotManager(
         val uuid = "$datasetName/${timestampFileStr}_${java.util.UUID.randomUUID()}"
         val logs = logsToSave ?: synchronized(TuiLogAppender.logs) { TuiLogAppender.logs.toList() }
         writeLogs(uuid, logs)
+        // Bound the in-object trace so a long-running session doesn't bloat the snapshot row.
+        val logTrace = logs.takeLast(MAX_LOG_TRACE)
         
         val reservedFile = File("reserved_test_queries.json")
         val reservedQueries = if (reservedFile.exists()) {
@@ -485,7 +494,8 @@ class TaxonomySnapshotManager(
             settings = settings,
             logUuid = uuid,
             reservedQueries = reservedQueries,
-            config = effectiveConfig
+            config = effectiveConfig,
+            logTrace = logTrace
         )
 
         try {
