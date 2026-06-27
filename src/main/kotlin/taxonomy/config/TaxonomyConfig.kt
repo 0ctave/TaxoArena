@@ -28,22 +28,6 @@ class TaxonomyConfig {
         var enableLiveLabeling: Boolean = false
 
         /**
-         * While the TUI owns the screen, funnel stray writes into the log instead of letting them
-         * corrupt the alt-screen. By default only System.err is redirected: replacing System.out
-         * breaks Mosaic's tty capability detection (jansi/jline inspect the live System.out chain),
-         * so stdout is left pointing at the real terminal and logback-spring.xml keeps it quiet by
-         * having no console appender. Flip to false to disable the redirect entirely.
-         */
-        var redirectStdStreams: Boolean = true
-
-        /**
-         * Also redirect System.out into the log (with a passthrough to the real terminal). On by
-         * default to match the PR #58 behavior that rendered correctly on Windows / JDK 23. Flip to
-         * false to redirect only System.err if a future environment needs stdout left untouched.
-         */
-        var redirectStdoutAlso: Boolean = true
-
-        /**
          * Kill-switch for the pre-flight TTY probe done before the TUI enters the alt-screen.
          * The probe reflectively calls Mosaic's internal `Tty.tryBind()` to fail fast (and loudly)
          * when there is no controlling terminal. Set true to skip it entirely if the probe itself

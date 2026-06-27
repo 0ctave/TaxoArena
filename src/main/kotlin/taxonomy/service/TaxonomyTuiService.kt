@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.delay
-import org.fusesource.jansi.AnsiConsole
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.core.annotation.Order
@@ -28,7 +27,6 @@ import taxonomy.operations.TaxonomyTrickler
 import taxonomy.tui.app.TuiApp
 import taxonomy.tui.app.toTuiDependencies
 import taxonomy.utils.GenerationMonitor
-import java.io.PrintStream
 import java.lang.reflect.InvocationTargetException
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -102,43 +100,9 @@ class TaxonomyTuiService(
     internal val tuiScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     internal val tuiVersion = "v2.0.0"
 
-    /** Original streams saved before the TUI redirect so they can be restored on exit. */
-    private var originalOut: PrintStream? = null
-    private var originalErr: PrintStream? = null
-
-    /**
-     * Funnel stray writes into the log for the TUI's lifetime. Restored to the PR #58 behavior:
-     * BOTH System.out and System.err are redirected by default ([ExecutionConfig.redirectStdoutAlso]
-     * defaults to true). The redirected stdout keeps a passthrough to the real terminal so Mosaic's
-     * ANSI frames still reach the screen while stray library writes are funneled into the log.
-     *
-     * Runs BEFORE [AnsiConsole.systemInstall] (the PR #58 ordering that renders correctly on
-     * Windows / JDK 23); the explicit UTF-8 System.out re-wrap in run() happens after jansi installs.
-     */
-    private fun redirectStdStreams() {
-        if (!config.execution.redirectStdStreams) return
-        if (originalOut != null) return // already redirected
-        val realOut = System.out
-        originalOut = realOut
-        originalErr = System.err
-        val errLog = LoggerFactory.getLogger("stderr")
-        System.setErr(PrintStream(taxonomy.utils.SlfBufferStream(errLog, isError = true, passthrough = null), true, "UTF-8"))
-        if (config.execution.redirectStdoutAlso) {
-            val outLog = LoggerFactory.getLogger("stdout")
-            System.setOut(PrintStream(taxonomy.utils.SlfBufferStream(outLog, isError = false, passthrough = realOut), true, "UTF-8"))
-        }
-    }
-
-    private fun restoreStdStreams() {
-        originalOut?.let { System.setOut(it) }
-        originalErr?.let { System.setErr(it) }
-        originalOut = null
-        originalErr = null
-    }
-
     /**
      * Pre-flight: ask Mosaic's internal native binding whether a real TTY is attached, BEFORE we
-     * enter the alt-screen or redirect streams. Returns:
+     * hand the terminal to Mosaic. Returns:
      *  - `true`  — a TTY was bound (and immediately released so [runWithTerminal] can re-bind),
      *  - `false` — Mosaic reports no controlling terminal (pipe / IDE / non-interactive shell),
      *  - `null`  — the probe itself could not run (internal API changed); caller proceeds optimistically.
@@ -210,27 +174,33 @@ class TaxonomyTuiService(
         }
     }
 
-    /** Restore the terminal out of the alternate screen / re-enable the cursor. */
+    /**
+     * Best-effort terminal restore via Mosaic's own [com.jakewharton.mosaic.tty.Tty.reset] — no
+     * jansi, no manual escape sequences. Mosaic owns the terminal end-to-end and normally restores
+     * it on its own; this is only a safety net before a hard [Runtime.halt] (which skips Mosaic's
+     * shutdown). Reached by reflection because `Tty` is an internal Mosaic class. If `reset()` is
+     * unavailable, this is a no-op and Mosaic's own teardown handles restoration.
+     */
     private fun restoreTerminal() {
-        try {
-            // Leave alt-screen, show cursor, reset attributes.
-            print("\u001b[?1049l\u001b[?25h\u001b[0m")
-            System.out.flush()
-            // Put real stdout/stderr back so post-TUI output (errors, shell) is visible again.
-            restoreStdStreams()
-            AnsiConsole.systemUninstall()
-        } catch (_: Throwable) {
+        runCatching {
+            val ttyClass = Class.forName("com.jakewharton.mosaic.tty.Tty")
+            val handle = ttyClass.getMethod("tryBind").invoke(null) ?: return
+            try {
+                ttyClass.getMethod("reset").invoke(handle)
+            } finally {
+                (handle as AutoCloseable).close()
+            }
         }
     }
 
     override fun run(vararg args: String?) = runBlocking {
         if (!config.execution.enableTui) return@runBlocking
 
-        System.setProperty("jline.terminal.color", "true")
-        System.setProperty("jline.terminal.type", "xterm-256color")
-        // 1) Pre-flight TTY probe FIRST, before ANY terminal mutation (no jansi, no redirect, no
-        //    alt-screen yet), so if there's no tty we bail cleanly without leaving the terminal in
-        //    a half-mutated state.
+        // Pre-flight TTY probe: fail fast (and loudly) when there is no controlling terminal, before
+        // we hand control to Mosaic. Mosaic owns terminal I/O end-to-end (its own JNI/Panama Tty and
+        // VT processing); we deliberately do NOT install jansi, redirect System.out/err, or print
+        // manual alt-screen escapes here — all of that interferes with Mosaic's terminal acquisition
+        // and is what broke the TUI on Windows PowerShell 7 (PR #58 root cause).
         if (!config.execution.skipTtyPrecheck) {
             when (probeTty()) {
                 false -> {
@@ -246,25 +216,8 @@ class TaxonomyTuiService(
             }
         }
 
-        // 2) PR #58 working order: redirect streams BEFORE jansi. This is the ordering that worked
-        //    on Windows / JDK 23; PR #59's jansi-first reorder is what broke TUI rendering there.
-        log.info("TUI bootstrap: redirecting std streams (PR #58 working order)")
-        redirectStdStreams()
-
-        // 3) Install jansi so it can enable ANSI processing.
-        log.info("TUI bootstrap: installing jansi (enableTui={})", config.execution.enableTui)
-        AnsiConsole.systemInstall()
-        log.info("TUI bootstrap: jansi systemInstall complete")
-
-        // 4) Re-wrap System.out with explicit UTF-8 — load-bearing on Windows where the default
-        //    console charset is not UTF-8 and would mangle the Mosaic frame bytes.
-        System.setOut(java.io.PrintStream(System.out, true, "UTF-8"))
-
-        // 5) Enter the alt-screen.
-        print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
-
-        // Ctrl-C / SIGTERM: always restore the terminal and exit hard so the app never
-        // appears frozen in the alternate screen buffer.
+        // Ctrl-C / SIGTERM: best-effort terminal restore then exit hard so the app never appears
+        // frozen. restoreTerminal() uses Mosaic's own Tty.reset(); no jansi/manual escapes.
         val shutdownHook = Thread {
             restoreTerminal()
             Runtime.getRuntime().halt(0)
@@ -322,25 +275,21 @@ class TaxonomyTuiService(
             val started = runWithTerminal(NonInteractivePolicy.Exit, block)
             log.info("Mosaic TUI session ended (started={})", started)
         } catch (e: Throwable) {
-            // Capture the real stderr BEFORE restoreTerminal() nulls originalErr, so the diagnostic
-            // below lands on the user's terminal rather than the redirected log sink.
-            val savedErr = originalErr
             restoreTerminal()
             val real = if (e is InvocationTargetException) e.cause ?: e else e
-            val sink = savedErr ?: System.err
             val nonInteractive = real.message?.contains("non-interactive", ignoreCase = true) == true
             if (nonInteractive) {
                 log.warn("Mosaic refused to run interactively: {}", real.message)
-                sink.println("\n[TUI] Mosaic could not enter interactive mode: ${real.message}")
-                sink.println(
+                System.err.println("\n[TUI] Mosaic could not enter interactive mode: ${real.message}")
+                System.err.println(
                     "      No usable TTY (pipe / IDE / non-interactive shell). " +
                         "Set taxoadapt.execution.enable-tui=false to run headless."
                 )
             } else {
                 log.warn("Mosaic TUI failed to start/render: {}", real.message)
-                sink.println("\n[TUI RECOVERY] Layout failure.")
-                sink.println("Cause: ${real.message ?: "Unknown failure"}")
-                real.printStackTrace(sink)
+                System.err.println("\n[TUI RECOVERY] Layout failure.")
+                System.err.println("Cause: ${real.message ?: "Unknown failure"}")
+                real.printStackTrace(System.err)
             }
             delay(15_000.milliseconds)
         } finally {
