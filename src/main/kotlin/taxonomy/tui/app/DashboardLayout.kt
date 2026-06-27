@@ -49,8 +49,11 @@ object DashboardLayout {
         val bodyH = (height - 5).coerceAtLeast(9)
         val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
         val bottomH = (bodyH - topH).coerceAtLeast(4)
-        val dagW = 60.coerceAtMost(width - 20)
-        val arenaW = (width - dagW - 1).coerceAtLeast(20)
+        // Keep both panels + the 1-col gap within the terminal: cap dagW so the right panel
+        // keeps its minimum width without overflowing on narrow terminals.
+        val arenaMin = 20
+        val dagW = 60.coerceAtMost((width - 1 - arenaMin).coerceAtLeast(10))
+        val arenaW = (width - dagW - 1).coerceAtLeast(arenaMin)
         // SHELL_TOP_ROWS (2) + panel top (2) + the AsciiTreeTable column-header row (1).
         val treeFirstRowY = SHELL_TOP_ROWS + PANEL_CONTENT_TOP + 1
         return Dashboard(width, height, bodyH, topH, bottomH, dagW, arenaW, treeFirstRowY)

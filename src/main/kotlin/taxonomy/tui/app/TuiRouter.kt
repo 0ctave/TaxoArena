@@ -596,45 +596,8 @@ private fun dashboardHotkeys(
     hasDag: Boolean,
     focused: FocusPanel,
     isRegenerating: Boolean,
-): List<HotkeyAction> {
-    // While the DAG is still building, the analysis actions (Metrics/Arena/Benchmark/Trickle)
-    // are not usable yet, so we only advertise navigation + quit.
-    if (isRegenerating) {
-        return listOf(
-            HotkeyAction("\u25cc", "Building DAG", TuiTheme.RUNNING),
-            HotkeyAction("Tab", "Switch Panels"),
-            HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
-        )
-    }
-    if (!hasDag) {
-        return listOf(
-            HotkeyAction("X", "Welcome / New DAG", TuiTheme.ACCENT, isPrimary = true),
-            HotkeyAction("Tab", "Switch Panels"),
-            HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
-        )
-    }
-    // When the DAG navigator is focused, surface the tree-specific controls.
-    if (focused == FocusPanel.TOPOLOGY) {
-        return listOf(
-            HotkeyAction("W/S", "Navigate", TuiTheme.ACCENT),
-            HotkeyAction("\u2192/\u2190", "Expand/Collapse"),
-            HotkeyAction("Space", "Toggle"),
-            HotkeyAction("Enter", "Inspect"),
-            HotkeyAction("Tab", "Switch Panels"),
-            HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
-        )
-    }
-    return buildList {
-        add(HotkeyAction("Tab", "Switch Panels", TuiTheme.ACCENT))
-        add(HotkeyAction("M", "Metrics"))
-        add(HotkeyAction("A", "Arena"))
-        add(HotkeyAction("B", "Benchmark"))
-        add(HotkeyAction("T", "Trickle"))
-        add(HotkeyAction("N", "Save Snapshot"))
-        add(HotkeyAction("X", "Welcome", TuiTheme.ACCENT))
-        add(HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR))
-    }
-}
+): List<HotkeyAction> =
+    taxonomy.tui.components.DashboardHotkeys.forState(hasDag, focused, isRegenerating)
 
 private fun flattenNodes(rootNode: GraphNode?): List<GraphNode> {
     if (rootNode == null) return emptyList()

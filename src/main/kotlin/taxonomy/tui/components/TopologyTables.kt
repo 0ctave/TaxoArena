@@ -76,10 +76,10 @@ fun AsciiTreeTable(
         return
     }
 
-    // Layout: [caret 2][tree TREE_W][space][queries 6][space][judge 1]
-    val QCOL = 6
-    val treeW = (pWidth - 2 - 1 - QCOL - 1 - 1 - 1).coerceAtLeast(10)
-    val visible = (pHeight - 2).coerceAtLeast(1)
+    // Layout: [caret 2][tree TREE_W][space][queries 6][space][judge 1] (see TreeTableLayout).
+    val QCOL = TreeTableLayout.QUERY_COL
+    val treeW = TreeTableLayout.treeWidth(pWidth)
+    val visible = TreeTableLayout.visibleRows(pHeight)
     val start = offset.coerceIn(0, maxOf(0, lines.size - visible))
     val end = (start + visible).coerceAtMost(lines.size)
 
