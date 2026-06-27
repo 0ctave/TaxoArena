@@ -31,7 +31,14 @@ fun LogsPanel(
     scrollOffset: Int,
     title: String = "",
 ) {
-    val logs = remember(TuiLogAppender.logsVersion.value) { TuiLogAppender.logs.toList() }
+    // Reading logsVersion subscribes this composable to recomposition when the pump drains
+    // new lines. The snapshot copy MUST happen inside synchronized(logs): loadHistoricalLogs()
+    // clears and refills the same synchronized list from an IO coroutine, so an unguarded
+    // toList() can race it — throwing ConcurrentModificationException (which wedges the panel)
+    // or observing the list mid-clear as empty.
+    val logs = remember(TuiLogAppender.logsVersion.value) {
+        synchronized(TuiLogAppender.logs) { ArrayList(TuiLogAppender.logs) }
+    }
     val visible = height.coerceAtLeast(1)
     val end = (logs.size - scrollOffset).coerceIn(0, logs.size)
     val start = (end - visible).coerceAtLeast(0)
