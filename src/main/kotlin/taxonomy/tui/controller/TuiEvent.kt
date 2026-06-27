@@ -78,6 +78,9 @@ sealed interface TuiEvent {
     data object CancelSaveSnapshot : TuiEvent
     data class UpdateSnapshotDescInput(val value: String) : TuiEvent
 
+    /** Result of the automatic snapshot taken after a DAG generation completes. */
+    data class SnapshotAutoSaved(val success: Boolean, val description: String) : TuiEvent
+
     data object StartRenameSnapshot : TuiEvent
     data object ConfirmRenameSnapshot : TuiEvent
     data object CancelRenameSnapshot : TuiEvent

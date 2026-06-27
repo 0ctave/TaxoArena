@@ -27,5 +27,11 @@ import org.springframework.boot.runApplication
 class TaxoAdaptApplication
 
 fun main(args: Array<String>) {
+    // Spring's banner + bean-wiring logs print BEFORE the TUI service runs and would spill onto
+    // the terminal Mosaic is about to take over. Quiet them at the source, before the context
+    // (and logback) finish initialising, so the alternate screen starts clean.
+    System.setProperty("spring.main.log-startup-info", "false")
+    System.setProperty("logging.level.root", "WARN")
+    System.setProperty("logging.level.org.springframework", "WARN")
     runApplication<TaxoAdaptApplication>(*args)
 }

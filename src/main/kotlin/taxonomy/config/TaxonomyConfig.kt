@@ -26,6 +26,14 @@ class TaxonomyConfig {
         var enableTui: Boolean = true
         var enableLabeling: Boolean = false
         var enableLiveLabeling: Boolean = false
+
+        /**
+         * While the TUI owns the screen, funnel stray System.out/System.err writes (third-party
+         * println, stack traces) into the log instead of letting them corrupt the alt-screen.
+         * Mosaic's own ANSI frames are detected and passed straight through to the real terminal.
+         * Flip to false if a terminal ever fails to render with the redirect installed.
+         */
+        var redirectStdStreams: Boolean = true
         val llmParallelism: Int = 8
     }
 

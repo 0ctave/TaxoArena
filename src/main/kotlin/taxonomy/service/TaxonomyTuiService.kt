@@ -102,6 +102,34 @@ class TaxonomyTuiService(
     internal val tuiScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     internal val tuiVersion = "v2.0.0"
 
+    /** Original streams saved before the TUI redirect so they can be restored on exit. */
+    private var originalOut: PrintStream? = null
+    private var originalErr: PrintStream? = null
+
+    /**
+     * Funnel stray stdout/stderr writes into the log for the TUI's lifetime. Mosaic's ANSI
+     * frames (which it prints via System.out) are detected by [SlfBufferStream] and passed
+     * straight through to the real terminal, so rendering is unaffected.
+     */
+    private fun redirectStdStreams() {
+        if (!config.execution.redirectStdStreams) return
+        if (originalOut != null) return // already redirected
+        val realOut = System.out
+        originalOut = realOut
+        originalErr = System.err
+        val outLog = LoggerFactory.getLogger("stdout")
+        val errLog = LoggerFactory.getLogger("stderr")
+        System.setOut(PrintStream(taxonomy.utils.SlfBufferStream(outLog, isError = false, passthrough = realOut), true, "UTF-8"))
+        System.setErr(PrintStream(taxonomy.utils.SlfBufferStream(errLog, isError = true, passthrough = null), true, "UTF-8"))
+    }
+
+    private fun restoreStdStreams() {
+        originalOut?.let { System.setOut(it) }
+        originalErr?.let { System.setErr(it) }
+        originalOut = null
+        originalErr = null
+    }
+
     internal suspend fun startMosaicComposition(
         terminal: Terminal,
         content: @Composable () -> Unit
@@ -147,6 +175,8 @@ class TaxonomyTuiService(
             // Leave alt-screen, show cursor, reset attributes.
             print("\u001b[?1049l\u001b[?25h\u001b[0m")
             System.out.flush()
+            // Put real stdout/stderr back so post-TUI output (errors, shell) is visible again.
+            restoreStdStreams()
             AnsiConsole.systemUninstall()
         } catch (_: Throwable) {
         }
@@ -157,6 +187,9 @@ class TaxonomyTuiService(
 
         System.setProperty("jline.terminal.color", "true")
         System.setProperty("jline.terminal.type", "xterm-256color")
+        // Capture and replace stdout/stderr BEFORE jansi installs, so the real terminal is the
+        // passthrough target for Mosaic frames and everything else is funneled into the log.
+        redirectStdStreams()
         AnsiConsole.systemInstall()
         System.setOut(PrintStream(System.`out`, true, "UTF-8"))
         print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
