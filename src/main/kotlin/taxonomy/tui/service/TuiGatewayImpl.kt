@@ -66,12 +66,20 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit) {
         deps.datasetFetcher.onDownloadProgress = { current, total, name ->
-            val pct = if (total > 0) current.toFloat() / total else 0f
-            onProgress(
-                pct,
-                "$name \u00b7 ${"%,d".format(current)} / ${"%,d".format(total)} rows"
-            )
+            if (total > 0) {
+                onProgress(
+                    current.toFloat() / total,
+                    "$name \u00b7 ${"%,d".format(current)} / ${"%,d".format(total)} rows"
+                )
+            } else {
+                // Total unknown (full-dataset pull): keep the bar indeterminate (pct 0f) but
+                // tick the row count so the status text proves work is happening.
+                onProgress(0f, "$name \u00b7 Fetching\u2026 ${"%,d".format(current)} rows")
+            }
         }
+        // Surface a live status immediately so the panel never sits on a blank indeterminate
+        // bar while the first HTTP round-trip to Hugging Face is in flight.
+        onProgress(0f, "Connecting to Hugging Face\u2026")
         // maxQueries <= 0 means "full dataset"; the fetcher treats a very large cap as all.
         val cap = if (maxQueries <= 0) Int.MAX_VALUE else maxQueries
         withContext(Dispatchers.IO) { deps.datasetFetcher.downloadDataset(maxQueries = cap) }

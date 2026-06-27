@@ -26,7 +26,13 @@ fun ProgressBar(
     val barWidth = (width - label.length - 10).coerceAtLeast(5)
     val filled = (percent / 100.0 * barWidth).toInt().coerceIn(0, barWidth)
     val empty = barWidth - filled
-    val progressBar = "█".repeat(filled) + "░".repeat(empty)
+    // Leading-edge gradient: the last filled cell renders as ▓ for a soft tip, unless the bar
+    // is empty (no tip) or completely full (solid all the way).
+    val progressBar = when {
+        filled == 0 -> "░".repeat(empty)
+        filled == barWidth -> "█".repeat(barWidth)
+        else -> "█".repeat(filled - 1) + "▓" + "░".repeat(empty)
+    }
 
     Text(buildAnnotatedString {
         withStyle(SpanStyle(color = textColor, textStyle = Bold)) {

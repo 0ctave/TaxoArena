@@ -225,7 +225,8 @@ class TuiController(
                 }
                 dispatch(TuiEvent.ConfirmEditingSetting)
             }
-            "escape", "q" -> dispatch(TuiEvent.CancelEditingSetting)
+            // Only Esc cancels: 'q' must remain typable inside text/number value editors.
+            "escape" -> dispatch(TuiEvent.CancelEditingSetting)
             "backspace" -> dispatch(TuiEvent.UpdateEditingValue(state.config.editingValue.dropLast(1)))
             else -> {
                 if (key.length == 1) {
@@ -313,7 +314,7 @@ class TuiController(
             "arrowright", "l", "d" -> selectedTreeNode(state)?.let {
                 if (it.children.isNotEmpty()) dispatch(TuiEvent.SetNodeExpanded(it.id, true))
             }
-            "arrowleft", "h", "a" -> selectedTreeNode(state)?.let {
+            "arrowleft", "h" -> selectedTreeNode(state)?.let {
                 if (it.children.isNotEmpty()) dispatch(TuiEvent.SetNodeExpanded(it.id, false))
             }
             " ", "space" -> selectedTreeNode(state)?.let {

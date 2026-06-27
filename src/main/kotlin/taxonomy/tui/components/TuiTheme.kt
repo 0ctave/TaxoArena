@@ -31,7 +31,22 @@ object TuiTheme {
     /** Default foreground / informational. */
     val INFO: Color    = White
 
+    // ── Descriptive aliases (semantic intent for richer UI accents) ──
+    /** Node stats / counts. */
+    val GOLD: Color      = Yellow
+    /** Secondary accent / cross-links. */
+    val VIOLET: Color    = Magenta
+    /** Selection / highlight emphasis. */
+    val HIGHLIGHT: Color = Cyan
+
     fun depthColor(depth: Int): Color = DEPTH_COLORS[depth.coerceIn(0, DEPTH_COLORS.lastIndex)]
+
+    /**
+     * Intent-only "dim" helper. Mosaic terminals have no separate dim color, so this is a
+     * no-op pass-through that documents where secondary/muted text is desired (render the
+     * returned color without Bold to achieve the dim effect).
+     */
+    fun dimColor(color: Color): Color = color
 
     /** Border/title color for a panel given whether it currently holds focus. */
     fun panelAccent(focused: Boolean): Color = if (focused) ACCENT else INFO
@@ -54,11 +69,19 @@ fun AnnotatedString.Builder.header(text: String) {
 }
 
 /** In-line hotkey styler for AnnotatedString builders. */
-fun AnnotatedString.Builder.hotkey(key: String, label: String, color: Color = White) {
+fun AnnotatedString.Builder.hotkey(
+    key: String,
+    label: String,
+    color: Color = White,
+    primary: Boolean = false,
+) {
+    // Primary actions get the more distinct angle-bracket chip ❮Key❯; everything else uses [Key].
+    val open = if (primary) "❮" else "["
+    val close = if (primary) "❯" else "]"
     withStyle(SpanStyle(color = color, textStyle = Bold)) {
-        append("[")
+        append(open)
         append(key)
-        append("]")
+        append(close)
     }
     append(" ")
     withStyle(SpanStyle(color = White)) {

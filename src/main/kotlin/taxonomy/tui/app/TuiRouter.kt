@@ -53,9 +53,12 @@ fun TuiRouter(
     val width = state.shell.width.coerceAtLeast(1)
     val height = state.shell.height.coerceAtLeast(1)
 
-    val totalNodes = remember(subscriptions.rootNode, subscriptions.graphVersion) {
-        flattenNodes(subscriptions.rootNode).size
+    val headerNodes = remember(subscriptions.rootNode, subscriptions.graphVersion) {
+        flattenNodes(subscriptions.rootNode)
     }
+    val totalNodes = headerNodes.size
+    val maxDepth = remember(headerNodes) { headerNodes.maxOfOrNull { it.depth } ?: 0 }
+    val leafCount = remember(headerNodes) { headerNodes.count { it.isLeaf } }
 
     TuiShell(
         width = width,
@@ -64,6 +67,8 @@ fun TuiRouter(
         totalNodes = totalNodes,
         activeDatasetName = deps.config.dataset.datasetType.name,
         activeSnapshotName = state.snapshot.activeSnapshotDescription,
+        maxDepth = maxDepth,
+        leafCount = leafCount,
     ) {
         when (state.startup.state) {
             StartupState.WELCOME -> WelcomeRoute(width, height, state)
@@ -229,7 +234,8 @@ private fun ConfigRoute(
                     label = "Download Progress"
                 )
                 Spacer()
-                Text("Status ${state.config.datasetDownloadStatusText}", color = Cyan)
+                val spin = SPINNER[state.shell.spinnerTick % SPINNER.size]
+                Text("Status  $spin  ${state.config.datasetDownloadStatusText}", color = Cyan)
             }
         }
     } else {
@@ -443,16 +449,19 @@ private fun BottomLogsAndTraces(
 
         Spacer(Modifier.width(1).height(bottomH))
 
+        val procRows = deriveProcessRows(deps, state, subscriptions)
+        val runningCount = procRows.count { !it.done && !it.error }
         Panel(
             title = "PROCESSES",
             accentColor = TuiTheme.panelAccent(state.shell.focusedPanel == FocusPanel.PROCESSES),
             width = procW - 1,
-            height = bottomH
+            height = bottomH,
+            badge = if (runningCount > 0) "$runningCount RUNNING" else null,
         ) {
             ProcessesPanel(
                 width = procW - 4,
                 height = bottomH - 2,
-                rows = deriveProcessRows(deps, state, subscriptions),
+                rows = procRows,
                 spinnerTick = state.shell.spinnerTick,
             )
         }
