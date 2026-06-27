@@ -133,6 +133,12 @@ sealed interface TuiEvent {
     data class SetMetricsScroll(val offset: Int) : TuiEvent
     data class SetLogsScroll(val offset: Int) : TuiEvent
 
+    // 3-zone METRICS view navigation.
+    data class SetMetricsIterationIndex(val index: Int) : TuiEvent
+    data class SetMetricsZoneFocus(val focus: taxonomy.tui.state.MetricsZoneFocus) : TuiEvent
+    data object ToggleMetricsPerformance : TuiEvent
+    data class SetMetricsDetailScroll(val offset: Int) : TuiEvent
+
     data object StartBatchGeneralityInput : TuiEvent
     data class UpdateBatchGeneralityInput(val value: String) : TuiEvent
     data class SetBatchReplaceExisting(val value: Boolean) : TuiEvent

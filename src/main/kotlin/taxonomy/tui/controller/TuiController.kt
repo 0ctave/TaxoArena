@@ -12,6 +12,7 @@ import taxonomy.tui.components.StartupState
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
+import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.tui.state.TuiAppState
 
 class TuiController(
@@ -27,6 +28,9 @@ class TuiController(
     /** Rebuilds the DAG tree lines from the live graph + expand state, so key handlers can
      *  resolve the selected tree row to a node (expand/collapse, inspect). */
     private val treeLinesProvider: (Map<String, Boolean>) -> List<TreeLine> = { emptyList() },
+    /** Size of the live per-iteration metrics history, used to clamp table cursor navigation
+     *  in the METRICS view. */
+    private val metricsHistorySizeProvider: () -> Int = { 0 },
     /** Invoked when the user asks to quit (Ctrl-C / Ctrl-Q / quit hotkey). Restores the
      *  terminal and stops the process. */
     private val onQuit: () -> Unit = {},
@@ -382,16 +386,7 @@ class TuiController(
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
             }
 
-            AnalysisMode.METRICS -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetMetricsScroll((state.analysis.metricsScrollOffset - 1).coerceAtLeast(0)))
-
-                "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetMetricsScroll(state.analysis.metricsScrollOffset + 1))
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
+            AnalysisMode.METRICS -> handleMetricsKeys(state, key)
 
             AnalysisMode.ARENA -> when (key) {
                 "w", "z", "arrowup" ->
@@ -422,6 +417,51 @@ class TuiController(
             else -> when (key) {
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+            }
+        }
+    }
+
+    /**
+     * 3-zone METRICS view key handling. When the TABLE zone is focused, W/S move the
+     * iteration cursor (Home/End jump to first/Final); when the DETAIL zone is focused,
+     * W/S scroll the per-iteration detail. Tab toggles focus, P toggles the perf block.
+     */
+    private fun handleMetricsKeys(state: TuiAppState, key: String) {
+        val m = state.analysis
+        when (m.metricsZoneFocus) {
+            MetricsZoneFocus.TABLE -> when (key) {
+                "w", "z", "arrowup" ->
+                    dispatch(TuiEvent.SetMetricsIterationIndex(m.selectedIterationIndex - 1))
+
+                "s", "arrowdown" -> {
+                    val maxIdx = metricsHistorySizeProvider() - 1
+                    dispatch(TuiEvent.SetMetricsIterationIndex(
+                        (m.selectedIterationIndex + 1).coerceAtMost(maxIdx)
+                    ))
+                }
+
+                "tab" -> dispatch(TuiEvent.SetMetricsZoneFocus(MetricsZoneFocus.DETAIL))
+                "p" -> dispatch(TuiEvent.ToggleMetricsPerformance)
+                "home" -> dispatch(TuiEvent.SetMetricsIterationIndex(0))
+                "end" -> dispatch(TuiEvent.SetMetricsIterationIndex(-1))
+
+                "q", "escape", "arrowleft", "backspace" ->
+                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
+            }
+
+            MetricsZoneFocus.DETAIL -> when (key) {
+                "w", "z", "arrowup" ->
+                    dispatch(TuiEvent.SetMetricsDetailScroll((m.detailScrollOffset - 1).coerceAtLeast(0)))
+
+                "s", "arrowdown" ->
+                    dispatch(TuiEvent.SetMetricsDetailScroll(m.detailScrollOffset + 1))
+
+                "tab", "escape", "arrowleft", "backspace" ->
+                    dispatch(TuiEvent.SetMetricsZoneFocus(MetricsZoneFocus.TABLE))
+
+                "p" -> dispatch(TuiEvent.ToggleMetricsPerformance)
+
+                "q" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
             }
         }
     }

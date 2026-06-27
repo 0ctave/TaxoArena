@@ -48,6 +48,7 @@ fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
         treeLinesProvider = { expanded ->
             taxonomy.tui.components.buildTreeLines(taxonomyService.rootNodeFlow.value, expanded)
         },
+        metricsHistorySizeProvider = { taxonomyService.getMetricsHistory().size },
         onQuit = onQuit,
     )
 }

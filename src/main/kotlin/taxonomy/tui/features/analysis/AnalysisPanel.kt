@@ -38,7 +38,6 @@ fun AnalysisPanel(
     mode: AnalysisMode,
     controlState: AnalysisPanelState,
     inspectorScroll: Int,
-    metricsScroll: Int,
     benchmarkScroll: Int,
     trickleState: taxonomy.tui.state.TrickleUiState,
     snapshotState: SnapshotUiState,
@@ -46,6 +45,11 @@ fun AnalysisPanel(
     benchmarkState: BenchmarkUiState,
     latestMetrics: taxonomy.model.IterationMetrics? = null,
     metricsHistory: List<taxonomy.model.IterationMetrics> = emptyList(),
+    selectedIterationIndex: Int = -1,
+    metricsZoneFocus: taxonomy.tui.state.MetricsZoneFocus = taxonomy.tui.state.MetricsZoneFocus.TABLE,
+    showPerformanceBlock: Boolean = false,
+    detailScrollOffset: Int = 0,
+    performanceReport: Map<String, taxonomy.utils.PerformanceStats> = emptyMap(),
     /** Most relevant active process, or null when idle. Pinned at the top so a
      *  running process is always one keystroke away regardless of what the
      *  dashboard is currently showing (selection wins, process resumable). */
@@ -82,8 +86,19 @@ fun AnalysisPanel(
                 AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
                 AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 else -> MetricsOrInspectorPanel(
-                    bodyW, bodyH, mode, controlState, inspectorScroll, metricsScroll,
-                    latestMetrics, metricsHistory, arenaState.isGeneratingJudge
+                    width = bodyW,
+                    height = bodyH,
+                    mode = mode,
+                    controlState = controlState,
+                    inspectorScroll = inspectorScroll,
+                    latestMetrics = latestMetrics,
+                    metricsHistory = metricsHistory,
+                    isGeneratingJudge = arenaState.isGeneratingJudge,
+                    selectedIterationIndex = selectedIterationIndex,
+                    metricsZoneFocus = metricsZoneFocus,
+                    showPerformanceBlock = showPerformanceBlock,
+                    detailScrollOffset = detailScrollOffset,
+                    performanceReport = performanceReport,
                 )
             }
         }
