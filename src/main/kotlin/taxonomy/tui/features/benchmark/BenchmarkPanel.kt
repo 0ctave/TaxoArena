@@ -133,11 +133,15 @@ private fun ArenaBenchmarkView(
     scrollOffset: Int,
     benchmarkState: BenchmarkUiState,
 ) {
+    // Mosaic's TextSurface throws Check failed when a Text overflows its row. Truncate every
+    // dynamic line (loaded-model list, user input echoes) to the panel column to avoid the
+    // same crash class that hit ArenaPanel during benchmark configuration.
+    val w = (width - 1).coerceAtLeast(1)
     Column {
         if (benchmarkState.loadedModels.isNotEmpty()) {
-            Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}", color = Green)
+            Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}".take(w), color = Green)
         } else {
-            Text("No precomputed models loaded — press o to load eval_results.", color = Yellow)
+            Text("No precomputed models loaded — press o to load eval_results.".take(w), color = Yellow)
         }
         Spacer()
 
@@ -195,12 +199,12 @@ private fun ArenaBenchmarkView(
             }
 
             else -> {
-                Text("Models: ${benchmarkState.benchmarkModelsInput.ifBlank { "(all loaded)" }}", color = White)
-                Text("Query limit: ${benchmarkState.benchmarkQueryLimitInput.ifBlank { "0 (all)" }}", color = White)
-                Text("Category: ${benchmarkState.benchmarkCategoryInput.ifBlank { "—" }}", color = White)
-                Text("Confidence gate: ${benchmarkState.benchmarkConfidenceGateInput}", color = White)
-                Text("Parallelism: ${benchmarkState.benchmarkParallelismInput}", color = White)
-                Text("Update rankings: ${benchmarkState.benchmarkUpdateRankingsInput}", color = White)
+                Text("Models: ${benchmarkState.benchmarkModelsInput.ifBlank { "(all loaded)" }}".take(w), color = White)
+                Text("Query limit: ${benchmarkState.benchmarkQueryLimitInput.ifBlank { "0 (all)" }}".take(w), color = White)
+                Text("Category: ${benchmarkState.benchmarkCategoryInput.ifBlank { "—" }}".take(w), color = White)
+                Text("Confidence gate: ${benchmarkState.benchmarkConfidenceGateInput}".take(w), color = White)
+                Text("Parallelism: ${benchmarkState.benchmarkParallelismInput}".take(w), color = White)
+                Text("Update rankings: ${benchmarkState.benchmarkUpdateRankingsInput}".take(w), color = White)
             }
         }
 

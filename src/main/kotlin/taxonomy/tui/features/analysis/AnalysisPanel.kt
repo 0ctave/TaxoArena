@@ -136,12 +136,15 @@ private fun SnapshotHubPanel(
     height: Int,
     state: SnapshotUiState,
 ) {
+    // Same crash-class guard as ArenaPanel: input echoes grow with keystrokes, and an overflowing
+    // Text in Mosaic 0.18.0 throws TextSurface.Check failed.
+    val w = (width - 1).coerceAtLeast(1)
     Column {
         when {
             state.isSavingSnapshot ->
-                Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588", color = Cyan)
+                Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588".take(w), color = Cyan)
             state.isRenamingSnapshot ->
-                Text("Rename snapshot \u2014 new name: ${state.renameInput}\u2588", color = Cyan)
+                Text("Rename snapshot \u2014 new name: ${state.renameInput}\u2588".take(w), color = Cyan)
         }
         if (state.snapshotList.isEmpty()) {
             Text("No snapshots saved yet. Press N to save the active DAG.", color = White)
