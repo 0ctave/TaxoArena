@@ -45,9 +45,9 @@ fun LogsPanel(
         lines.forEach { raw ->
             val first = raw.split('\n', '\r').firstOrNull()?.trim() ?: ""
             val (glyph, color) = when {
-                first.contains(" ERROR ") || first.startsWith("ERROR") -> "\u2716 " to Red
-                first.contains(" WARN ") || first.startsWith("WARN") -> "\u26a0 " to Yellow
-                first.contains(" INFO ") || first.startsWith("INFO") -> "\u2139 " to Cyan
+                first.contains("ERROR") -> "\u2716 " to Red
+                first.contains("WARN") -> "\u26a0 " to Yellow
+                first.contains("INFO") || first.contains("DEBUG") -> "\u2139 " to Cyan
                 else -> "  " to White
             }
             val body = first.take((width - 4).coerceAtLeast(1))

@@ -57,7 +57,10 @@ class TuiLogAppender : AppenderBase<ILoggingEvent>() {
             .trim()
 
         if (cleanMsg.isNotBlank()) {
-            logQueue.add(cleanMsg)
+            // Prepend the logback level so downstream consumers (e.g. LogsPanel) can
+            // reliably colorize lines; the formattedMessage carries no level prefix.
+            val taggedMsg = "[${eventObject.level}] $cleanMsg"
+            logQueue.add(taggedMsg)
             while (logQueue.size > MAX_LOGS) {
                 logQueue.poll()
             }
@@ -65,7 +68,7 @@ class TuiLogAppender : AppenderBase<ILoggingEvent>() {
             // Capture session logs if recording
             synchronized(sessionLock) {
                 if (isRecording) {
-                    sessionLogs.add(cleanMsg)
+                    sessionLogs.add(taggedMsg)
                 }
             }
         }
