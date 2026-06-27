@@ -51,6 +51,10 @@ class CommandController(
                 effects.downloadDataset(event.maxQueries, dispatch)
             }
 
+            TuiEvent.CancelGeneration -> {
+                effects.cancelActiveJob()
+            }
+
             TuiEvent.StartGeneration -> {
                 effects.generateDag(dispatch)
             }
