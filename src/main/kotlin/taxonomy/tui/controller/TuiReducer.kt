@@ -458,6 +458,34 @@ object TuiReducer {
                     )
                 )
 
+            // -1 selects the Final/last entry; any non-negative value selects that iteration row.
+            is TuiEvent.SetMetricsIterationIndex ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        selectedIterationIndex = event.index.coerceAtLeast(-1),
+                        detailScrollOffset = 0
+                    )
+                )
+
+            is TuiEvent.SetMetricsZoneFocus ->
+                state.copy(
+                    analysis = state.analysis.copy(metricsZoneFocus = event.focus)
+                )
+
+            is TuiEvent.ToggleMetricsPerformance ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        showPerformanceBlock = !state.analysis.showPerformanceBlock
+                    )
+                )
+
+            is TuiEvent.SetMetricsDetailScroll ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        detailScrollOffset = event.offset.coerceAtLeast(0)
+                    )
+                )
+
             is TuiEvent.SetLogsScroll ->
                 state.copy(
                     logs = state.logs.copy(

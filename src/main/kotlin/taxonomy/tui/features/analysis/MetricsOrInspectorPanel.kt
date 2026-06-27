@@ -1,25 +1,40 @@
 package taxonomy.tui.features.analysis
 
 import androidx.compose.runtime.Composable
-import com.jakewharton.mosaic.layout.padding
+import com.jakewharton.mosaic.layout.height
+import com.jakewharton.mosaic.layout.width
 import com.jakewharton.mosaic.modifier.Modifier
+import com.jakewharton.mosaic.text.AnnotatedString
+import com.jakewharton.mosaic.text.SpanStyle
+import com.jakewharton.mosaic.text.buildAnnotatedString
+import com.jakewharton.mosaic.text.withStyle
+import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.Green
+import com.jakewharton.mosaic.ui.Color.Companion.Magenta
+import com.jakewharton.mosaic.ui.Color.Companion.Red
 import com.jakewharton.mosaic.ui.Color.Companion.White
 import com.jakewharton.mosaic.ui.Color.Companion.Yellow
 import com.jakewharton.mosaic.ui.Column
+import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
+import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.model.IterationMetrics
+import taxonomy.model.TaxonomyMetricsData
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.components.take
+import taxonomy.tui.state.MetricsZoneFocus
+import taxonomy.utils.PerformanceStats
 import java.util.Locale
 
 /**
  * Content-only metrics / node-inspector view. The parent [AnalysisPanel] owns the border
- * and the title; this switches on the MVI [mode]. METRICS renders the latest taxonomy
- * metrics report; NODE_DETAIL renders the selected node's stats.
+ * and the title; this switches on the MVI [mode]. METRICS renders the redesigned 3-zone
+ * layout (evolution table + pinned final metrics + per-iteration detail); NODE_DETAIL
+ * renders the selected node's stats.
  */
 @Composable
 fun MetricsOrInspectorPanel(
@@ -28,120 +43,326 @@ fun MetricsOrInspectorPanel(
     mode: AnalysisMode,
     controlState: AnalysisPanelState,
     inspectorScroll: Int,
-    metricsScroll: Int,
     latestMetrics: IterationMetrics? = null,
     metricsHistory: List<IterationMetrics> = emptyList(),
     isGeneratingJudge: Boolean = false,
+    selectedIterationIndex: Int = -1,
+    metricsZoneFocus: MetricsZoneFocus = MetricsZoneFocus.TABLE,
+    showPerformanceBlock: Boolean = false,
+    detailScrollOffset: Int = 0,
+    performanceReport: Map<String, PerformanceStats> = emptyMap(),
 ) {
-    Column {
-        when (mode) {
-            AnalysisMode.NODE_DETAIL -> {
-                val node = controlState.selectedNode
-                if (node == null) {
-                    Text("Select a node in the DAG (Enter) to inspect it.", color = White)
-                } else {
-                    Text(node.label ?: "(unlabeled)", color = Cyan, textStyle = Bold)
-                    Spacer()
-                    Text("Type           ${if (node.isLeaf) "leaf" else "internal"}", color = White)
-                    Text("Depth          ${node.depth}", color = White)
-                    Text("Direct queries ${node.queries.size}", color = White)
-                    Text("Total queries  ${node.getRecursiveQueryCount()}", color = White)
-                    Text("Parents        ${node.parents.size}", color = White)
-                    Text("Children       ${node.children.size}", color = White)
-                    if (node.crossLinkChildren.isNotEmpty())
-                        Text("Cross-links    ${node.crossLinkChildren.size}", color = Yellow)
-                    val judged = node.judgePrompt != null
-                    Spacer()
-                    when {
-                        isGeneratingJudge -> Text("\u29d6 Generating judge\u2026", color = Yellow, textStyle = Bold)
-                        judged -> {
-                            Text("Judge          \u2714 specialised", color = Green)
-                            Text("[R] Regenerate judge", color = White)
-                        }
-                        else -> {
-                            Text("\u250c\u2500 Generate Judge \u2500\u2510", color = Cyan, textStyle = Bold)
-                            Text("\u2502  [R] Generate  \u2502", color = Cyan, textStyle = Bold)
-                            Text("\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518", color = Cyan, textStyle = Bold)
-                        }
-                    }
-                    if (node.parents.size > 1) {
-                        Spacer()
-                        Text("Parents:", color = Cyan)
-                        node.parents.take(4).forEach {
-                            Text("  \u00b7 ${it.label ?: it.id}", color = White)
-                        }
-                    }
-                    if (node.crossLinkChildren.isNotEmpty()) {
-                        Spacer()
-                        Text("Cross-linked children:", color = Yellow)
-                        node.crossLinkChildren.take(4).forEach {
-                            Text("  \u21c4 ${it.label ?: it.id}", color = White)
-                        }
-                    }
-                    val samples = node.queries.take(3)
-                    if (samples.isNotEmpty()) {
-                        Spacer()
-                        Text("Sample queries:", color = Cyan)
-                        samples.forEach {
-                            Text("  \u00b7 ${it.rawText.take((width - 6).coerceAtLeast(8))}", color = White)
-                        }
-                    }
-                }
-            }
-
-            AnalysisMode.METRICS -> {
-                // Navigable per-iteration history: metricsScroll selects the iteration.
-                val history = metricsHistory.ifEmpty { listOfNotNull(latestMetrics) }
-                if (history.isEmpty()) {
-                    Text("No metrics yet \u2014 generate or load a DAG first.", color = Yellow)
-                    return@Column
-                }
-                val idx = metricsScroll.coerceIn(0, history.size - 1)
-                val entry = history[idx]
-                val m = entry.metrics
-                if (m == null) {
-                    Text("No metrics for this iteration.", color = Yellow)
-                } else {
-                    fun pct(d: Double) = String.format(Locale.US, "%.1f%%", d * 100.0)
-                    fun num(d: Double) = String.format(Locale.US, "%.3f", d)
-                    val nav = if (history.size > 1) "  (${idx + 1}/${history.size}  W/S)" else ""
-                    Text(
-                        (entry.iteration.takeIf { it.isNotBlank() } ?: "Iteration ${idx + 1}") + nav,
-                        color = Cyan, textStyle = Bold
-                    )
-                    Spacer()
-                    Text("Total nodes      ${m.totalNodes}", color = White)
-                    Text("Leaf nodes       ${m.leafNodes}", color = White)
-                    Text("Cross-domain     ${m.crossDomainNodes}", color = White)
-                    Text("Max depth        ${m.maxDepth}", color = White)
-                    Text("Avg leaf depth   ${num(m.avgLeafDepth)}", color = White)
-                    Text("Unique queries   ${m.totalUniqueQueries}", color = White)
-                    Text("Residual ratio   ${pct(m.residualRatio)}", color = White)
-                    Text("Avg match count  ${num(m.avgMatchCount)}", color = White)
-                    Text("Equilibrium      ${pct(m.equilibriumIndex)}", color = White)
-                    if (m.ancestorCorrectRate > 0.0)
-                        Text("Ancestor acc.    ${pct(m.ancestorCorrectRate)}", color = White)
-                    // Clustering-quality metrics (only when computed / non-zero).
-                    if (m.sphericalSilhouette != 0.0)
-                        Text("Silhouette       ${num(m.sphericalSilhouette)}", color = White)
-                    if (m.nmi > 0.0) Text("NMI              ${num(m.nmi)}", color = White)
-                    if (m.ari > 0.0) Text("ARI              ${num(m.ari)}", color = White)
-                    if (m.weightedLeafPurity > 0.0)
-                        Text("Leaf purity      ${pct(m.weightedLeafPurity)}", color = White)
-                    if (m.residualQueries > 0)
-                        Text("Residual queries ${m.residualQueries}", color = White)
-                }
-            }
-
-            AnalysisMode.SETTINGS ->
-                Text("Open the config screen (X \u2192 Load DAG \u2192 Create new) to edit settings.", color = White)
-
-            else -> {
-                Text("Analysis Hub", color = Cyan, textStyle = Bold)
+    when (mode) {
+        AnalysisMode.NODE_DETAIL -> Column {
+            val node = controlState.selectedNode
+            if (node == null) {
+                Text("Select a node in the DAG (Enter) to inspect it.", color = White)
+            } else {
+                Text(node.label ?: "(unlabeled)", color = Cyan, textStyle = Bold)
                 Spacer()
-                Text("M Metrics   A Arena   B Benchmark   T Trickle", color = White)
-                Text("Enter on a DAG node to inspect it.", color = White)
+                Text("Type           ${if (node.isLeaf) "leaf" else "internal"}", color = White)
+                Text("Depth          ${node.depth}", color = White)
+                Text("Direct queries ${node.queries.size}", color = White)
+                Text("Total queries  ${node.getRecursiveQueryCount()}", color = White)
+                Text("Parents        ${node.parents.size}", color = White)
+                Text("Children       ${node.children.size}", color = White)
+                if (node.crossLinkChildren.isNotEmpty())
+                    Text("Cross-links    ${node.crossLinkChildren.size}", color = Yellow)
+                val judged = node.judgePrompt != null
+                Spacer()
+                when {
+                    isGeneratingJudge -> Text("⧖ Generating judge…", color = Yellow, textStyle = Bold)
+                    judged -> {
+                        Text("Judge          ✔ specialised", color = Green)
+                        Text("[R] Regenerate judge", color = White)
+                    }
+                    else -> {
+                        Text("┌─ Generate Judge ─┐", color = Cyan, textStyle = Bold)
+                        Text("│  [R] Generate  │", color = Cyan, textStyle = Bold)
+                        Text("└────────────────┘", color = Cyan, textStyle = Bold)
+                    }
+                }
+                if (node.parents.size > 1) {
+                    Spacer()
+                    Text("Parents:", color = Cyan)
+                    node.parents.take(4).forEach {
+                        Text("  · ${it.label ?: it.id}", color = White)
+                    }
+                }
+                if (node.crossLinkChildren.isNotEmpty()) {
+                    Spacer()
+                    Text("Cross-linked children:", color = Yellow)
+                    node.crossLinkChildren.take(4).forEach {
+                        Text("  ⇄ ${it.label ?: it.id}", color = White)
+                    }
+                }
+                val samples = node.queries.take(3)
+                if (samples.isNotEmpty()) {
+                    Spacer()
+                    Text("Sample queries:", color = Cyan)
+                    samples.forEach {
+                        Text("  · ${it.rawText.take((width - 6).coerceAtLeast(8))}", color = White)
+                    }
+                }
+            }
+        }
+
+        AnalysisMode.METRICS -> {
+            val history = metricsHistory.ifEmpty { listOfNotNull(latestMetrics) }
+            if (history.isEmpty()) {
+                Column { Text("No metrics yet — generate or load a DAG first.", color = Yellow) }
+            } else {
+                MetricsThreeZone(
+                    width = width,
+                    height = height,
+                    history = history,
+                    selectedIterationIndex = selectedIterationIndex,
+                    focus = metricsZoneFocus,
+                    showPerformanceBlock = showPerformanceBlock,
+                    detailScrollOffset = detailScrollOffset,
+                    performanceReport = performanceReport,
+                )
+            }
+        }
+
+        AnalysisMode.SETTINGS -> Column {
+            Text("Open the config screen (X → Load DAG → Create new) to edit settings.", color = White)
+        }
+
+        else -> Column {
+            Text("Analysis Hub", color = Cyan, textStyle = Bold)
+            Spacer()
+            Text("M Metrics   A Arena   B Benchmark   T Trickle", color = White)
+            Text("Enter on a DAG node to inspect it.", color = White)
+        }
+    }
+}
+
+@Composable
+private fun MetricsThreeZone(
+    width: Int,
+    height: Int,
+    history: List<IterationMetrics>,
+    selectedIterationIndex: Int,
+    focus: MetricsZoneFocus,
+    showPerformanceBlock: Boolean,
+    detailScrollOffset: Int,
+    performanceReport: Map<String, PerformanceStats>,
+) {
+    val lastIdx = history.lastIndex
+    val selResolved = if (selectedIterationIndex in 0..lastIdx) selectedIterationIndex else lastIdx
+
+    val zone1H = (height * 0.4).toInt().coerceIn(4, (height - 4).coerceAtLeast(4))
+    val bottomH = (height - zone1H).coerceAtLeast(4)
+    val leftW = ((width - 1) / 2).coerceAtLeast(12)
+    val rightW = (width - leftW - 1).coerceAtLeast(12)
+
+    Column {
+        Column(modifier = Modifier.height(zone1H).width(width)) {
+            EvolutionTable(width, zone1H, history, selectedIterationIndex, focus)
+        }
+        Row(modifier = Modifier.height(bottomH)) {
+            Column(modifier = Modifier.width(leftW).height(bottomH)) {
+                FinalMetrics(leftW, bottomH, history[lastIdx])
+            }
+            Spacer(Modifier.width(1).height(bottomH))
+            Column(modifier = Modifier.width(rightW).height(bottomH)) {
+                IterationDetail(
+                    rightW, bottomH, history, selResolved, focus,
+                    showPerformanceBlock, detailScrollOffset, performanceReport,
+                )
             }
         }
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Zone 1 — Evolution table
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun EvolutionTable(
+    width: Int,
+    height: Int,
+    history: List<IterationMetrics>,
+    selectedIterationIndex: Int,
+    focus: MetricsZoneFocus,
+) {
+    val lastIdx = history.lastIndex
+    val tableFocused = focus == MetricsZoneFocus.TABLE
+
+    Text("◈ EVOLUTION  (${history.size} iters)", color = Cyan, textStyle = Bold)
+    Text(tableHeader().take(width), color = White, textStyle = Bold)
+
+    // Data rows are every iteration except the last, which is pinned as the Final row below.
+    val dataCount = lastIdx
+    // Reserve: title(1) header(1) divider(1) final(1) already; remaining for data rows.
+    val visible = (height - 4).coerceAtLeast(1)
+    val focusRow = (if (selectedIterationIndex in 0 until lastIdx) selectedIterationIndex else dataCount - 1)
+        .coerceAtLeast(0)
+    val start = (focusRow - visible + 1).coerceIn(0, (dataCount - visible).coerceAtLeast(0))
+    val end = (start + visible).coerceAtMost(dataCount)
+
+    for (i in start until end) {
+        val isSelected = i == selectedIterationIndex
+        Text(tableRow(history, i, isSelected, tableFocused, isFinal = false), color = White)
+    }
+
+    Text("─".repeat(width).take(width), color = Green)
+    val finalSelected = selectedIterationIndex == -1 || selectedIterationIndex == lastIdx
+    Text(tableRow(history, lastIdx, finalSelected, tableFocused, isFinal = true), color = Green)
+}
+
+private fun tableHeader(): String =
+    "  " + String.format(
+        Locale.US, "%-8s %5s %5s %7s %8s %7s %6s %8s",
+        "Iter", "Nodes", "Leaf", "Equil%", "AncCor%", "Silhou", "AvgM", "Δ"
+    )
+
+private fun tableRow(
+    history: List<IterationMetrics>,
+    index: Int,
+    isSelected: Boolean,
+    tableFocused: Boolean,
+    isFinal: Boolean,
+): AnnotatedString {
+    val m = history[index].metrics
+    val rawLabel = history[index].iteration.takeIf { it.isNotBlank() } ?: "Iter ${index + 1}"
+    val label = (if (isFinal) "★ " else "") + rawLabel
+    val rowColor = when {
+        isFinal -> Green
+        isSelected -> Cyan
+        else -> White
+    }
+    val cursor = if (isSelected && tableFocused) "> " else "  "
+    val main = String.format(
+        Locale.US, "%-8s %5d %5d %6.1f%% %7.1f%% %7.3f %6.2f ",
+        label.take(8),
+        m.totalNodes, m.leafNodes,
+        m.equilibriumIndex * 100.0,
+        m.ancestorCorrectRate * 100.0,
+        m.sphericalSilhouette,
+        m.avgMatchCount,
+    )
+
+    // Δ = change in ancestor-correct rate vs the previous iteration row.
+    val delta: Pair<String, Color> = if (index <= 0) {
+        "-" to rowColor
+    } else {
+        val d = (m.ancestorCorrectRate - history[index - 1].ancestorCorrectRate) * 100.0
+        if (d >= 0.0) String.format(Locale.US, "▲+%.1f%%", d) to Green
+        else String.format(Locale.US, "▼%.1f%%", d) to Red
+    }
+
+    return buildAnnotatedString {
+        val style = if (isSelected) Bold else Unspecified
+        withStyle(SpanStyle(color = rowColor, textStyle = style)) { append(cursor + main) }
+        withStyle(SpanStyle(color = delta.second, textStyle = style)) { append(delta.first) }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Zone 2 — Pinned final metrics
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun FinalMetrics(width: Int, height: Int, entry: IterationMetrics) {
+    Text("◈ FINAL RESULTS".take(width), color = Green, textStyle = Bold)
+    val lines = buildMetricLines(entry.metrics)
+    lines.take((height - 1).coerceAtLeast(0)).forEach { Text(it.take(width)) }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Zone 3 — Per-iteration detail (scrollable, optional performance block)
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun IterationDetail(
+    width: Int,
+    height: Int,
+    history: List<IterationMetrics>,
+    selResolved: Int,
+    focus: MetricsZoneFocus,
+    showPerformanceBlock: Boolean,
+    detailScrollOffset: Int,
+    performanceReport: Map<String, PerformanceStats>,
+) {
+    val entry = history[selResolved]
+    val isFinal = selResolved == history.lastIndex
+    val headerText = if (isFinal) "◈ FINAL DETAIL" else "◈ ITER ${selResolved + 1} DETAIL"
+    val headerColor = if (focus == MetricsZoneFocus.DETAIL) Cyan else White
+    Text(headerText.take(width), color = headerColor, textStyle = Bold)
+
+    val lines = buildMetricLines(entry.metrics).toMutableList()
+    if (showPerformanceBlock) lines += performanceLines(performanceReport)
+
+    val body = (height - 1).coerceAtLeast(1)
+    val maxStart = (lines.size - body).coerceAtLeast(0)
+    val start = detailScrollOffset.coerceIn(0, maxStart)
+    lines.subList(start, (start + body).coerceAtMost(lines.size)).forEach { Text(it.take(width)) }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared metric-group rendering
+// ─────────────────────────────────────────────────────────────────────────────
+
+private fun buildMetricLines(m: TaxonomyMetricsData): List<AnnotatedString> {
+    val out = mutableListOf<AnnotatedString>()
+    out += groupHeader("[Cluster Quality]", Magenta)
+    out += metricLine("NMI", num(m.nmi), qcolor(m.nmi, 0.6, 0.4))
+    out += metricLine("ARI", num(m.ari), qcolor(m.ari, 0.6, 0.4))
+    out += metricLine("Dendrogram Purity", num(m.dendrogramPurity), qcolor(m.dendrogramPurity, 0.8, 0.5))
+    out += metricLine("Wtd Leaf Purity", num(m.weightedLeafPurity), qcolor(m.weightedLeafPurity, 0.8, 0.5))
+    out += metricLine("Edge F1", num(m.edgeF1), qcolor(m.edgeF1, 0.6, 0.4))
+
+    out += groupHeader("[Routing]", Cyan)
+    out += metricLine("AncCorr", pct(m.ancestorCorrectRate), qcolor(m.ancestorCorrectRate, 0.8, 0.5))
+    out += metricLine("Residual", pct(m.residualRatio), qcolorLow(m.residualRatio))
+    out += metricLine("Avg Match", num(m.avgMatchCount), White)
+
+    out += groupHeader("[Structure]", Yellow)
+    out += metricLine("Equilibrium", pct(m.equilibriumIndex), White)
+    out += metricLine("Avg Leaf Depth", num(m.avgLeafDepth), White)
+    out += metricLine("Contamination", pct(m.contaminationRatio), qcolorLow(m.contaminationRatio))
+    out += metricLine("Cross-Domain", m.crossDomainNodes.toString(), White)
+    return out
+}
+
+private fun performanceLines(report: Map<String, PerformanceStats>): List<AnnotatedString> {
+    val out = mutableListOf<AnnotatedString>()
+    out += groupHeader("[Performance]", Cyan)
+    if (report.isEmpty()) {
+        out += metricLine("(no timings)", "-", White)
+        return out
+    }
+    report.entries.sortedByDescending { it.value.totalMs }.take(8).forEach { (phase, stats) ->
+        out += metricLine(phase.take(20), "${stats.totalMs}ms /${stats.calls}", White)
+    }
+    return out
+}
+
+private fun groupHeader(text: String, color: Color): AnnotatedString =
+    buildAnnotatedString { withStyle(SpanStyle(color = color, textStyle = Bold)) { append(text) } }
+
+private fun metricLine(label: String, value: String, valueColor: Color): AnnotatedString =
+    buildAnnotatedString {
+        withStyle(SpanStyle(color = White)) { append("  " + label.padEnd(18)) }
+        withStyle(SpanStyle(color = valueColor)) { append(value) }
+    }
+
+private fun pct(d: Double) = String.format(Locale.US, "%.1f%%", d * 100.0)
+private fun num(d: Double) = String.format(Locale.US, "%.4f", d)
+
+/** Higher is better: green above [good], yellow above [mid], red below. */
+private fun qcolor(v: Double, good: Double, mid: Double): Color = when {
+    v >= good -> Green
+    v >= mid -> Yellow
+    else -> Red
+}
+
+/** Lower is better (contamination / residual ratios). */
+private fun qcolorLow(ratio: Double): Color = when {
+    ratio < 0.05 -> Green
+    ratio < 0.15 -> Yellow
+    else -> Red
 }

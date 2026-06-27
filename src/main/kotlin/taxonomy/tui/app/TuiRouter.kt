@@ -398,7 +398,6 @@ private fun MainDashboardRoute(
             mode = state.analysis.mode,
             controlState = subscriptions.arenaControlState,
             inspectorScroll = state.analysis.inspectorScroll,
-            metricsScroll = state.analysis.metricsScrollOffset,
             benchmarkScroll = state.benchmark.benchmarkScrollOffset,
             trickleState = state.trickle,
             snapshotState = state.snapshot,
@@ -406,6 +405,12 @@ private fun MainDashboardRoute(
             benchmarkState = state.benchmark,
             latestMetrics = subscriptions.metricsHistory.lastOrNull() as? taxonomy.model.IterationMetrics,
             metricsHistory = subscriptions.metricsHistory.mapNotNull { it as? taxonomy.model.IterationMetrics },
+            selectedIterationIndex = state.analysis.selectedIterationIndex,
+            metricsZoneFocus = state.analysis.metricsZoneFocus,
+            showPerformanceBlock = state.analysis.showPerformanceBlock,
+            detailScrollOffset = state.analysis.detailScrollOffset,
+            performanceReport = if (state.analysis.mode == taxonomy.service.AnalysisMode.METRICS && state.analysis.showPerformanceBlock)
+                deps.taxonomyService.getPerformanceReport() else emptyMap(),
             activeProcess = activeProcess,
         )
     }
@@ -414,10 +419,9 @@ private fun MainDashboardRoute(
 
     BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
 
+    val inAnalysisHub = state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB
     val hotkeys =
-        if (state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB &&
-            state.analysis.mode == taxonomy.service.AnalysisMode.NODE_DETAIL
-        ) {
+        if (inAnalysisHub && state.analysis.mode == taxonomy.service.AnalysisMode.NODE_DETAIL) {
             val hasJudge = subscriptions.arenaControlState.selectedNode?.judgePrompt != null
             listOf(
                 HotkeyAction("R", if (hasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
@@ -425,6 +429,22 @@ private fun MainDashboardRoute(
                 HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
                 HotkeyAction("M", "Metrics"),
             )
+        } else if (inAnalysisHub && state.analysis.mode == taxonomy.service.AnalysisMode.METRICS) {
+            if (state.analysis.metricsZoneFocus == taxonomy.tui.state.MetricsZoneFocus.DETAIL)
+                listOf(
+                    HotkeyAction("W/S", "Scroll", isPrimary = true),
+                    HotkeyAction("TAB", "Table"),
+                    HotkeyAction("P", "Perf"),
+                    HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                )
+            else
+                listOf(
+                    HotkeyAction("W/S", "Select", isPrimary = true),
+                    HotkeyAction("TAB", "Detail"),
+                    HotkeyAction("P", "Perf"),
+                    HotkeyAction("Home/End", "First/Last"),
+                    HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                )
         } else {
             dashboardHotkeys(
                 hasDag = hasDag,
