@@ -139,6 +139,19 @@ class DefaultTuiEffects(
                     dispatch(TuiEvent.GenerationProgress(progress, text))
                 }
                 dispatch(TuiEvent.GenerationCompleted)
+                // Persist the freshly generated DAG automatically so it survives restarts without
+                // the user having to remember to save. A save failure must not fail generation.
+                val desc = "Auto-saved after generation @ ${java.time.LocalDateTime.now()
+                    .truncatedTo(java.time.temporal.ChronoUnit.SECONDS)}"
+                try {
+                    gateway.saveSnapshot(desc)
+                    dispatch(TuiEvent.SnapshotAutoSaved(true, desc))
+                    dispatch(TuiEvent.RefreshSnapshots)
+                } catch (c: CancellationException) {
+                    throw c
+                } catch (t: Throwable) {
+                    dispatch(TuiEvent.SnapshotAutoSaved(false, t.message ?: "unknown error"))
+                }
                 dispatch(TuiEvent.IncrementSettingsVersion)
             } catch (c: CancellationException) {
                 dispatch(TuiEvent.GenerationFailed("Generation cancelled"))

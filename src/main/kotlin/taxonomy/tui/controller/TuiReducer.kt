@@ -441,6 +441,15 @@ object TuiReducer {
                     runtime = state.runtime.copy(isRegenerating = false, hasActiveGraph = true)
                 )
 
+            is TuiEvent.SnapshotAutoSaved ->
+                state.copy(
+                    snapshot = state.snapshot.copy(
+                        lastAutoSaveMessage =
+                            if (event.success) "Snapshot saved: ${event.description}"
+                            else "Auto-save failed: ${event.description}"
+                    )
+                )
+
             is TuiEvent.GenerationFailed ->
                 state.copy(
                     config = state.config.copy(

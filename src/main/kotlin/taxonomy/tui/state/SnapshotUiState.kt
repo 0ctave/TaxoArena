@@ -16,6 +16,9 @@ data class SnapshotUiState(
     val activeSnapshotId: String? = null,
     val activeSnapshotDescription: String? = null,
 
+    /** Transient banner text describing the last auto-save (set after generation completes). */
+    val lastAutoSaveMessage: String? = null,
+
     val snapshotVersion: Int = 0
 ) {
     val selectedSnapshotOrNull: DagSnapshot?
