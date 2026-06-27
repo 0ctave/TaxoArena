@@ -40,16 +40,34 @@ fun MetricsOrInspectorPanel(
                 } else {
                     Text(node.label ?: "(unlabeled)", color = Cyan, textStyle = Bold)
                     Spacer()
+                    Text("Type           ${if (node.isLeaf) "leaf" else "internal"}", color = White)
                     Text("Depth          ${node.depth}", color = White)
                     Text("Direct queries ${node.queries.size}", color = White)
                     Text("Total queries  ${node.getRecursiveQueryCount()}", color = White)
                     Text("Parents        ${node.parents.size}", color = White)
                     Text("Children       ${node.children.size}", color = White)
+                    if (node.crossLinkChildren.isNotEmpty())
+                        Text("Cross-links    ${node.crossLinkChildren.size}", color = Yellow)
                     val judged = node.judgePrompt != null
                     Text(
                         "Judge          ${if (judged) "\u2714 specialised" else "\u25cb none"}",
                         color = if (judged) Green else White
                     )
+                    if (node.parents.size > 1) {
+                        Spacer()
+                        Text("Parents:", color = Cyan)
+                        node.parents.take(3).forEach {
+                            Text("  \u00b7 ${it.label ?: it.id}", color = White)
+                        }
+                    }
+                    val samples = node.queries.take(3)
+                    if (samples.isNotEmpty()) {
+                        Spacer()
+                        Text("Sample queries:", color = Cyan)
+                        samples.forEach {
+                            Text("  \u00b7 ${it.rawText.take((width - 6).coerceAtLeast(8))}", color = White)
+                        }
+                    }
                 }
             }
 
@@ -73,9 +91,17 @@ fun MetricsOrInspectorPanel(
                     Text("Residual ratio   ${pct(m.residualRatio)}", color = White)
                     Text("Avg match count  ${num(m.avgMatchCount)}", color = White)
                     Text("Equilibrium      ${pct(m.equilibriumIndex)}", color = White)
-                    if (m.ancestorCorrectRate > 0.0) {
+                    if (m.ancestorCorrectRate > 0.0)
                         Text("Ancestor acc.    ${pct(m.ancestorCorrectRate)}", color = White)
-                    }
+                    // Clustering-quality metrics (only when computed / non-zero).
+                    if (m.sphericalSilhouette != 0.0)
+                        Text("Silhouette       ${num(m.sphericalSilhouette)}", color = White)
+                    if (m.nmi > 0.0) Text("NMI              ${num(m.nmi)}", color = White)
+                    if (m.ari > 0.0) Text("ARI              ${num(m.ari)}", color = White)
+                    if (m.weightedLeafPurity > 0.0)
+                        Text("Leaf purity      ${pct(m.weightedLeafPurity)}", color = White)
+                    if (m.residualQueries > 0)
+                        Text("Residual queries ${m.residualQueries}", color = White)
                 }
             }
 
