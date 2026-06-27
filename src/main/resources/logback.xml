@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  TaxoArena logging.
-
-  The app normally runs as a full-screen Mosaic TUI. Mosaic renders ANSI frames by writing
-  directly to System.out, so ANY other writer to stdout (a Logback ConsoleAppender, a stray
-  println, a third-party banner) lands at the cursor position Mosaic left and corrupts the
-  alternate screen — the "logs leaking onto the terminal / flicker" the user reported.
-
-  Therefore this configuration NEVER attaches a console appender. In TUI mode logs go to a
-  rolling file plus the in-app System Logs panel (the TUI appender is attached programmatically
-  by LogbackConfigurator). When the TUI is disabled (headless), LogbackConfigurator attaches a
-  console appender at runtime so normal stdout logging still works.
--->
 <configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{HH:mm:ss.SSS} [%-5level] %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/taxoarena.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -29,7 +23,6 @@
         </encoder>
     </appender>
 
-    <!-- Quiet levels so that even if an appender slips through, the screen stays uncorrupted. -->
     <logger name="taxonomy" level="INFO"/>
     <logger name="org.eclipse.lmos.arc" level="WARN"/>
     <logger name="org.springframework" level="WARN"/>
@@ -37,6 +30,7 @@
     <logger name="reactor" level="WARN"/>
 
     <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
 </configuration>

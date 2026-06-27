@@ -28,7 +28,6 @@ import taxonomy.operations.TaxonomyTrickler
 import taxonomy.tui.app.TuiApp
 import taxonomy.tui.app.toTuiDependencies
 import taxonomy.utils.GenerationMonitor
-import java.io.PrintStream
 import java.lang.reflect.InvocationTargetException
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -101,40 +100,6 @@ class TaxonomyTuiService(
     internal val log = LoggerFactory.getLogger("taxonomy.TuiService")
     internal val tuiScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     internal val tuiVersion = "v2.0.0"
-
-    /** Original streams saved before the TUI redirect so they can be restored on exit. */
-    private var originalOut: PrintStream? = null
-    private var originalErr: PrintStream? = null
-
-    /**
-     * Funnel stray writes into the log for the TUI's lifetime. Restored to the PR #58 behavior:
-     * BOTH System.out and System.err are redirected by default ([ExecutionConfig.redirectStdoutAlso]
-     * defaults to true). The redirected stdout keeps a passthrough to the real terminal so Mosaic's
-     * ANSI frames still reach the screen while stray library writes are funneled into the log.
-     *
-     * Runs BEFORE [AnsiConsole.systemInstall] (the PR #58 ordering that renders correctly on
-     * Windows / JDK 23); the explicit UTF-8 System.out re-wrap in run() happens after jansi installs.
-     */
-    private fun redirectStdStreams() {
-        if (!config.execution.redirectStdStreams) return
-        if (originalOut != null) return // already redirected
-        val realOut = System.out
-        originalOut = realOut
-        originalErr = System.err
-        val errLog = LoggerFactory.getLogger("stderr")
-        System.setErr(PrintStream(taxonomy.utils.SlfBufferStream(errLog, isError = true, passthrough = null), true, "UTF-8"))
-        if (config.execution.redirectStdoutAlso) {
-            val outLog = LoggerFactory.getLogger("stdout")
-            System.setOut(PrintStream(taxonomy.utils.SlfBufferStream(outLog, isError = false, passthrough = realOut), true, "UTF-8"))
-        }
-    }
-
-    private fun restoreStdStreams() {
-        originalOut?.let { System.setOut(it) }
-        originalErr?.let { System.setErr(it) }
-        originalOut = null
-        originalErr = null
-    }
 
     /**
      * Pre-flight: ask Mosaic's internal native binding whether a real TTY is attached, BEFORE we
@@ -216,8 +181,6 @@ class TaxonomyTuiService(
             // Leave alt-screen, show cursor, reset attributes.
             print("\u001b[?1049l\u001b[?25h\u001b[0m")
             System.out.flush()
-            // Put real stdout/stderr back so post-TUI output (errors, shell) is visible again.
-            restoreStdStreams()
             AnsiConsole.systemUninstall()
         } catch (_: Throwable) {
         }
@@ -246,22 +209,17 @@ class TaxonomyTuiService(
             }
         }
 
-        // 2) PR #58 working order: redirect streams BEFORE jansi. This is the ordering that worked
-        //    on Windows / JDK 23; PR #59's jansi-first reorder is what broke TUI rendering there.
-        log.info("TUI bootstrap: redirecting std streams (PR #58 working order)")
-        redirectStdStreams()
-
-        // 3) Install jansi so it can enable ANSI processing.
+        // 2) Install jansi so it owns System.out and handles Windows console VT translation. No
+        //    System.out/System.err replacement: Mosaic + jansi manage terminal I/O directly, and
+        //    LogbackConfigurator detaches the CONSOLE appender so log lines never hit the screen.
         log.info("TUI bootstrap: installing jansi (enableTui={})", config.execution.enableTui)
         AnsiConsole.systemInstall()
-        log.info("TUI bootstrap: jansi systemInstall complete")
+        log.info("TUI bootstrap: jansi systemInstall complete; entering alt-screen")
 
-        // 4) Re-wrap System.out with explicit UTF-8 — load-bearing on Windows where the default
-        //    console charset is not UTF-8 and would mangle the Mosaic frame bytes.
-        System.setOut(java.io.PrintStream(System.out, true, "UTF-8"))
-
-        // 5) Enter the alt-screen.
+        // 3) Enter the alt-screen. Any pre-TUI Spring console logs printed above are now hidden.
         print("\u001b[?1049h\u001b[0m\u001b[2J\u001b[H")
+
+        System.out.flush()
 
         // Ctrl-C / SIGTERM: always restore the terminal and exit hard so the app never
         // appears frozen in the alternate screen buffer.
@@ -322,12 +280,11 @@ class TaxonomyTuiService(
             val started = runWithTerminal(NonInteractivePolicy.Exit, block)
             log.info("Mosaic TUI session ended (started={})", started)
         } catch (e: Throwable) {
-            // Capture the real stderr BEFORE restoreTerminal() nulls originalErr, so the diagnostic
-            // below lands on the user's terminal rather than the redirected log sink.
-            val savedErr = originalErr
+            // restoreTerminal() leaves the alt-screen and uninstalls jansi, so System.err prints
+            // land back on the real PowerShell console where the user can see them.
             restoreTerminal()
             val real = if (e is InvocationTargetException) e.cause ?: e else e
-            val sink = savedErr ?: System.err
+            val sink = System.err
             val nonInteractive = real.message?.contains("non-interactive", ignoreCase = true) == true
             if (nonInteractive) {
                 log.warn("Mosaic refused to run interactively: {}", real.message)
