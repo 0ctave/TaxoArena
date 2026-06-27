@@ -347,11 +347,27 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         }
 
     override suspend fun regenerateLabels() {
-        deps.log.info("Label regeneration requested.")
+        val root = deps.taxonomyService.rootNodeFlow.value ?: run {
+            deps.log.warn("Regenerate labels: no active DAG.")
+            return
+        }
+        deps.log.info("Regenerating judges for all unlabelled nodes…")
+        // judgeService has no label-only entry point; generateJudgesForDag with
+        // replaceExisting = false induces judges only for nodes that lack one, which is the
+        // closest available "fill in the gaps" operation.
+        deps.judgeService.generateJudgesForDag(root, replaceExisting = false)
+        deps.log.info("Label regeneration complete.")
     }
 
     override suspend fun regenerateJudgeForCurrentNode() {
-        deps.log.info("Judge regeneration for current node requested.")
+        // The currently inspected node is tracked in the arena service's panel state.
+        val node = deps.arenaService.state.value.selectedNode ?: run {
+            deps.log.warn("Regenerate judge: no node currently inspected.")
+            return
+        }
+        deps.log.info("Regenerating judge for node '${node.label}'…")
+        deps.judgeService.generateJudgeForNode(node)
+        deps.log.info("Judge regenerated for '${node.label}'.")
     }
 
     override fun inspectNode(node: GraphNode?) {

@@ -15,6 +15,8 @@ data class BenchmarkUiState(
     val benchmarkParallelismInput: String = "4",
     val benchmarkUpdateRankingsInput: String = "true",
 
+    // Unused by the panel: BenchmarkPanel gates its display on arenaService's controlState
+    // (isRunningBenchmark / benchmarkReport), not this field. Kept to avoid a breaking change.
     val benchmarkSubScreen: BenchmarkSubScreen = BenchmarkSubScreen.CONFIG,
 
     val evalLoaderFieldIdx: Int = 0,

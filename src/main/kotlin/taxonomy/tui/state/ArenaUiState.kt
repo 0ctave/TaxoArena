@@ -20,5 +20,6 @@ data class ArenaUiState(
 
     // Leaderboard sub-view (toggled with "l" while in Arena mode).
     val isViewingLeaderboard: Boolean = false,
-    val leaderboard: List<taxonomy.service.LeaderboardGroup> = emptyList()
+    val leaderboard: List<taxonomy.service.LeaderboardGroup> = emptyList(),
+    val leaderboardScrollOffset: Int = 0
 )
