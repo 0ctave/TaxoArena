@@ -26,6 +26,8 @@ fun TuiShell(
     totalNodes: Int,
     activeDatasetName: String,
     activeSnapshotName: String?,
+    maxDepth: Int = 0,
+    leafCount: Int = 0,
     content: @Composable () -> Unit,
 ) {
     if (width < MIN_WIDTH || height < MIN_HEIGHT) {
@@ -48,7 +50,9 @@ fun TuiShell(
             time = time,
             totalNodes = totalNodes,
             activeDatasetName = activeDatasetName,
-            activeSnapshotName = activeSnapshotName
+            activeSnapshotName = activeSnapshotName,
+            maxDepth = maxDepth,
+            leafCount = leafCount,
         )
         HRule(width, Cyan, White, White)
         content()

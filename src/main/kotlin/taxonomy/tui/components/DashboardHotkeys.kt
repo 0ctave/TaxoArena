@@ -28,9 +28,12 @@ object DashboardHotkeys {
             )
         }
         if (focused == FocusPanel.TOPOLOGY) {
+            // Collapse is bound to \u2190/H only ('a' is consumed by the Arena shortcut at the
+            // dashboard level), so advertise H/L to match what actually works.
             return listOf(
                 HotkeyAction("W/S", "Navigate", TuiTheme.ACCENT),
-                HotkeyAction("\u2192/\u2190", "Expand/Collapse"),
+                HotkeyAction("\u2192/L", "Expand"),
+                HotkeyAction("\u2190/H", "Collapse"),
                 HotkeyAction("Space", "Toggle"),
                 HotkeyAction("Enter", "Inspect"),
                 HotkeyAction("Tab", "Switch Panels"),
@@ -43,6 +46,9 @@ object DashboardHotkeys {
             HotkeyAction("A", "Arena"),
             HotkeyAction("B", "Benchmark"),
             HotkeyAction("T", "Trickle"),
+            HotkeyAction("G", "Generate Judges", TuiTheme.OK),
+            HotkeyAction("F", "Force-Regen Judges", TuiTheme.RUNNING),
+            HotkeyAction("E", "Export ASCII"),
             HotkeyAction("N", "Save Snapshot"),
             HotkeyAction("X", "Welcome", TuiTheme.ACCENT),
             HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),

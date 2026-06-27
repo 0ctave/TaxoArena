@@ -3,7 +3,11 @@ package taxonomy.tui.features.analysis
 import androidx.compose.runtime.Composable
 import com.jakewharton.mosaic.layout.padding
 import com.jakewharton.mosaic.modifier.Modifier
+import com.jakewharton.mosaic.text.SpanStyle
+import com.jakewharton.mosaic.text.buildAnnotatedString
+import com.jakewharton.mosaic.text.withStyle
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
+import com.jakewharton.mosaic.ui.Color.Companion.Green
 import com.jakewharton.mosaic.ui.Color.Companion.White
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Spacer
@@ -16,6 +20,7 @@ import taxonomy.tui.BatchTrickleTestResults
 import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.TuiTheme
+import taxonomy.tui.components.take
 import taxonomy.tui.features.arena.ArenaPanel
 import taxonomy.tui.features.benchmark.BenchmarkPanel
 import taxonomy.tui.features.progress.JudgeProgressPanel
@@ -91,9 +96,18 @@ fun AnalysisPanel(
 @Composable
 private fun ProcessBanner(width: Int, p: ProcessRow) {
     val color = TuiTheme.statusColor(done = p.done, error = p.error)
-    val pct = p.percent?.let { " ${"%.0f".format(java.util.Locale.US, it)}%%" } ?: ""
-    val text = "▶ ${p.name}$pct — ${p.status}  [P] resume".take(width - 1)
-    Text(text, color = color, textStyle = Bold)
+    val pctText = p.percent?.let { "${"%.0f".format(java.util.Locale.US, it)}%" }
+    // Format: ▶ NAME  67%  status text  ·  press P
+    Text(
+        buildAnnotatedString {
+            withStyle(SpanStyle(color = color, textStyle = Bold)) { append("▶ ${p.name}  ") }
+            if (pctText != null) {
+                withStyle(SpanStyle(color = Green, textStyle = Bold)) { append("$pctText  ") }
+            }
+            withStyle(SpanStyle(color = White)) { append(p.status) }
+            withStyle(SpanStyle(color = color)) { append("  ·  press P") }
+        }.take(width - 1)
+    )
 }
 
 @Composable
@@ -112,13 +126,22 @@ private fun SnapshotHubPanel(
         if (state.snapshotList.isEmpty()) {
             Text("No snapshots saved yet. Press N to save the active DAG.", color = White)
         } else {
-            val visible = (height - 3).coerceAtLeast(1)
+            Text("SAVED SNAPSHOTS (${state.snapshotList.size})", color = Cyan, textStyle = Bold)
+            val visible = (height - 4).coerceAtLeast(1)
             state.snapshotList.take(visible).forEachIndexed { idx, snap ->
                 val selected = idx == state.selectedSnapshotIdx
                 Text(
-                    value = (if (selected) "\u276f " else "  ") + snap.description,
-                    color = if (selected) Cyan else White,
-                    textStyle = if (selected) Bold else Unspecified
+                    buildAnnotatedString {
+                        withStyle(
+                            SpanStyle(
+                                color = if (selected) Cyan else White,
+                                textStyle = if (selected) Bold else Unspecified
+                            )
+                        ) { append((if (selected) "\u276f " else "  ") + snap.description) }
+                        withStyle(SpanStyle(color = White)) {
+                            append("  (${snap.timestamp} \u00b7 ${snap.metrics.totalNodes} nodes)")
+                        }
+                    }
                 )
             }
             Spacer()

@@ -33,11 +33,14 @@ fun Panel(
     accentColor: Color,
     width: Int,
     height: Int,
+    badge: String? = null,
     content: @Composable () -> Unit
 ) {
     val w = width.coerceAtLeast(4)
     val h = height.coerceAtLeast(3)
     val innerW = w - 2
+    // A badge is appended to the inlaid title: ╭─ PROCESSES · 3 RUNNING ─╮
+    val titleText = if (!badge.isNullOrEmpty()) "$title · $badge" else title
 
     Column(modifier = Modifier.width(w).height(h)) {
         // Top border with the title inlaid: ╭─ TITLE ──────╮
@@ -46,12 +49,12 @@ fun Panel(
                 withStyle(SpanStyle(color = accentColor, textStyle = Bold)) {
                     append("╭─")
                 }
-                if (title.isNotEmpty()) {
+                if (titleText.isNotEmpty()) {
                     withStyle(SpanStyle(color = accentColor, textStyle = Bold)) {
-                        append(" ${title.uppercase()} ")
+                        append(" ${titleText.uppercase()} ")
                     }
                 }
-                val used = 2 + (if (title.isNotEmpty()) title.length + 2 else 0)
+                val used = 2 + (if (titleText.isNotEmpty()) titleText.length + 2 else 0)
                 val fill = (w - used - 1).coerceAtLeast(0)
                 withStyle(SpanStyle(color = accentColor, textStyle = Bold)) {
                     append("─".repeat(fill))

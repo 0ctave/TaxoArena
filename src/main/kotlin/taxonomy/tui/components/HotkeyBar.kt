@@ -37,7 +37,8 @@ fun HotkeyBar(
                 hotkey(
                     key = action.key,
                     label = action.label,
-                    color = action.color
+                    color = action.color,
+                    primary = action.isPrimary,
                 )
             }
         }
