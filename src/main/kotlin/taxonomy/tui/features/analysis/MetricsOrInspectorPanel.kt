@@ -314,18 +314,24 @@ private fun buildMetricLines(m: TaxonomyMetricsData): List<AnnotatedString> {
     out += metricLine("Dendrogram Purity", num(m.dendrogramPurity), qcolor(m.dendrogramPurity, 0.8, 0.5))
     out += metricLine("Wtd Leaf Purity", num(m.weightedLeafPurity), qcolor(m.weightedLeafPurity, 0.8, 0.5))
     out += metricLine("Edge F1", num(m.edgeF1), qcolor(m.edgeF1, 0.6, 0.4))
+    // Triplet accuracy: higher is better. Dasgupta cost: lower is better (no fixed scale → neutral).
+    out += metricLine("Triplet Acc", num(m.tripletAccuracy), qcolor(m.tripletAccuracy, 0.7, 0.5))
+    out += metricLine("Dasgupta Cost", big(m.totalDasguptaCost), White)
 
     out += groupHeader("[Routing]", Cyan)
     out += metricLine("AncCorr", pct(m.ancestorCorrectRate), qcolor(m.ancestorCorrectRate, 0.8, 0.5))
     out += metricLine("H-P", num(m.hPrecision), qcolor(m.hPrecision, 0.6, 0.4))
     out += metricLine("H-R", num(m.hRecall), qcolor(m.hRecall, 0.6, 0.4))
     out += metricLine("H-F1", num(m.hF1), qcolor(m.hF1, 0.6, 0.4))
+    out += metricLine("ECE", num(m.routingECE), qcolorLow(m.routingECE))
     out += metricLine("Residual", pct(m.residualRatio), qcolorLow(m.residualRatio))
     out += metricLine("Avg Match", num(m.avgMatchCount), White)
 
     out += groupHeader("[Structure]", Yellow)
     out += metricLine("Equilibrium", pct(m.equilibriumIndex), White)
     out += metricLine("Avg Leaf Depth", num(m.avgLeafDepth), White)
+    // Normalised Sackin index (Sackin 1972; Fischer et al. 2021) — mean root-to-leaf depth.
+    out += metricLine("Sackin (norm)", num(m.normalisedSackin), White)
     out += metricLine("Contamination", pct(m.contaminationRatio), qcolorLow(m.contaminationRatio))
     out += metricLine("Cross-Domain", m.crossDomainNodes.toString(), White)
     return out
@@ -355,6 +361,13 @@ private fun metricLine(label: String, value: String, valueColor: Color): Annotat
 
 private fun pct(d: Double) = String.format(Locale.US, "%.1f%%", d * 100.0)
 private fun num(d: Double) = String.format(Locale.US, "%.4f", d)
+
+/** Compact formatter for large unbounded magnitudes (e.g. total Dasgupta cost). */
+private fun big(d: Double): String = when {
+    d >= 1_000_000.0 -> String.format(Locale.US, "%.2fM", d / 1_000_000.0)
+    d >= 1_000.0     -> String.format(Locale.US, "%.2fk", d / 1_000.0)
+    else             -> String.format(Locale.US, "%.1f", d)
+}
 
 /** Higher is better: green above [good], yellow above [mid], red below. */
 private fun qcolor(v: Double, good: Double, mid: Double): Color = when {

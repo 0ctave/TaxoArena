@@ -55,6 +55,11 @@ class TaxonomyMetrics(
         /** Renamed from vmfKappaByDepth — average κ per depth level. */
         val kappaByDepth:          Map<Int, Double>,
         val leafDistribEntropy:    Double,
+        // Publication-grade metrics (PR #49)
+        val totalDasguptaCost:     Double = 0.0,
+        val routingECE:            Double = 0.0,
+        val tripletAccuracy:       Double = 0.0,
+        val normalisedSackin:      Double = 0.0,
     ) {
         /**
          * Backward-compat alias so any call-site still using `vmfKappaByDepth`
@@ -94,6 +99,10 @@ class TaxonomyMetrics(
             avgMatchCount         = avgMatchCount,
             kappaByDepth          = kappaByDepth,
             leafDistribEntropy    = leafDistribEntropy,
+            totalDasguptaCost     = totalDasguptaCost,
+            routingECE            = routingECE,
+            tripletAccuracy       = tripletAccuracy,
+            normalisedSackin      = normalisedSackin,
         )
     }
 
@@ -252,6 +261,18 @@ class TaxonomyMetrics(
         val ancestorCorrectRate = calculateAncestorCorrectRate(queryToLeavesList, gtSimple)
         val leafDistribEntropy  = calculateLeafDistributionEntropy(leaves)
 
+        // ── Publication-grade metrics (PR #49) ──
+        // Dasgupta cost, triplet accuracy and Sackin are intrinsic (embedding + tree).
+        val queryEmbeddings   = uniqueQueryTexts.mapNotNull { queryToEmbeddings[it] }
+        val totalDasguptaCost = computeTotalDasguptaCost(root, queryEmbeddings)
+        val tripletAccuracy   = computeTripletAccuracy(root, queryEmbeddings)
+        val normalisedSackin  = computeNormalisedSackin(root)
+        // ECE needs per-query true *leaf node* identity — the same plumbing gap as
+        // Hierarchical F₁ (see TODO above). Until that ground truth is wired,
+        // pass an empty map: the metric logs a WARN and reports 0.0 rather than
+        // fabricating calibration figures.
+        val routingECE        = computeRoutingECE(predictedCover, emptyMap())
+
         return Report(
             totalNodes            = allNodes.size,
             leafNodes             = leaves.size,
@@ -278,9 +299,12 @@ class TaxonomyMetrics(
             avgMatchCount         = avgMatchCount,
             kappaByDepth          = kappaByDepth,
             leafDistribEntropy    = leafDistribEntropy,
+            totalDasguptaCost     = totalDasguptaCost,
+            routingECE            = routingECE,
+            tripletAccuracy       = tripletAccuracy,
+            normalisedSackin      = normalisedSackin,
         )
     }
-
     // ─────────────────────────────────────────────────────────────────────────
     //  Topology helpers
     // ─────────────────────────────────────────────────────────────────────────
