@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import taxonomy.service.AnalysisMode
 import taxonomy.model.GraphNode
+import taxonomy.tui.app.DashboardLayout
 import taxonomy.tui.components.SettingItem
 import taxonomy.tui.components.TreeLine
 import taxonomy.tui.components.StartupState
@@ -592,17 +593,14 @@ class TuiController(
      * a second click on the same row = toggle/cycle/edit).
      */
     private fun handleDashboardMouse(state: TuiAppState, event: TuiEvent.MousePressed) {
-        val dagW = 60.coerceAtMost(state.shell.width - 20)
-        if (event.x >= dagW) {
+        val layout = DashboardLayout.dashboard(state.shell.width, state.shell.height)
+        if (DashboardLayout.dashboardRegion(layout, event.x) == DashboardLayout.Region.ANALYSIS_HUB) {
             dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
             return
         }
         dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
 
-        // Vertical layout above the first tree row: Header(1) + top HRule(1) +
-        // panel border top(1) + table header(1) = 4 rows. Mouse y is 0-indexed.
-        val firstRowY = 4
-        val rowIndex = event.y - firstRowY + state.topology.treeScrollOffset
+        val rowIndex = DashboardLayout.treeRowIndex(layout, event.y, state.topology.treeScrollOffset)
         if (rowIndex < 0) return
 
         val lines = treeLinesProvider(state.topology.expandedNodes)
@@ -626,13 +624,11 @@ class TuiController(
         dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
         if (state.config.isEditingSetting) return
 
-        // Header (2) + HRule (1) + panel title (1) + spacer (1) ≈ first content row at y=5.
-        val firstRowY = 5
-        val rowIndex = (event.y - firstRowY).coerceAtLeast(-1)
+        val layout = DashboardLayout.config(state.shell.width, state.shell.height)
+        val rowIndex = DashboardLayout.configRowIndex(layout, event.y)
         if (rowIndex < 0) return
 
-        val leftWidth = (state.shell.width * 0.35).toInt().coerceAtLeast(20)
-        if (event.x < leftWidth) {
+        if (DashboardLayout.configSide(layout, event.x) == DashboardLayout.ConfigSide.DOMAINS) {
             // DOMAINS sub-panel.
             if (state.config.activeSubPanel != ConfigSubPanel.DOMAINS) {
                 dispatch(TuiEvent.SetConfigSubPanel(ConfigSubPanel.DOMAINS))
@@ -663,17 +659,21 @@ class TuiController(
 
     private fun handleWelcomeMouse(event: TuiEvent.MousePressed) {
         val state = _state.value
-
-        if (event.y <= 8) {
-            dispatch(TuiEvent.SelectWelcomeIndex(0))
-            dispatch(TuiEvent.EnterConfigSetup)
-            return
-        }
-
-        val snapIndex = event.y - 12
-        if (snapIndex in state.snapshot.snapshotList.indices) {
-            dispatch(TuiEvent.SelectWelcomeIndex(snapIndex + 1))
-            dispatch(TuiEvent.RequestLoadSnapshot(state.snapshot.snapshotList[snapIndex].id))
+        val layout = DashboardLayout.welcome(state.shell.width, state.shell.height)
+        val menuIdx = DashboardLayout.welcomeMenuIndex(
+            layout, event.y, state.snapshot.snapshotList.size
+        )
+        when {
+            menuIdx < 0 -> Unit
+            menuIdx == 0 -> {
+                dispatch(TuiEvent.SelectWelcomeIndex(0))
+                dispatch(TuiEvent.EnterConfigSetup)
+            }
+            else -> {
+                val snapIndex = menuIdx - 1
+                dispatch(TuiEvent.SelectWelcomeIndex(menuIdx))
+                dispatch(TuiEvent.RequestLoadSnapshot(state.snapshot.snapshotList[snapIndex].id))
+            }
         }
     }
 
