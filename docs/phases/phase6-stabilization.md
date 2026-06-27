@@ -1,36 +1,75 @@
-# Phase 6: Stabilize (Convergence of the Mixture)
+# Phase 6: Stabilize (Convergence Assessment)
 
-## 1. Thermodynamic Convergence
-ArcTaxoAdapat runs an iterative adaptation loop (default 5 iterations) to refine the taxonomy's structure. Stability is achieved when the structural and statistical changes between iterations approach zero.
+*Implemented in `TaxonomyStabilizer.kt`*
 
-### 1.1 Thermodynamic Annealing
-The system applies an `annealingAlpha` (default 1.05) to its hyperparameters across iterations, cooling the "thermal motion" of the taxonomy as it settles into a stable configuration.
+Stabilize measures whether the taxonomy has reached a fixed point by combining a structural Graph Edit Distance (GED) criterion with a log-semantic-volume tracking signal. Early stopping fires only when both criteria are met for a required number of consecutive iterations.
 
-### 1.1 Centroid Stabilization (EMA)
-The system prevents radical shifts in semantic boundaries by applying an **Exponential Moving Average (EMA)** to the GMM centroids and weights during the fitting phase. This ensures that new data points gradually adapt the domain's statistical identity rather than causing volatile re-configurations.
-$$ \mu_{t} = (1 - \alpha) \mu_{t-1} + \alpha \mu_{new} $$
-Where $\alpha$ (default 0.7) controls the adaptation rate.
+---
 
-### 1.2 Persistence Bias (Conceptual Inertia)
-To eliminate query "oscillation" between highly similar nodes, the trickle phase incorporates a **Persistence Bias**. If a query was assigned to a specific node in the previous iteration, its Mahalanobis distance to that node is scaled by a stability factor (0.8), creating a mathematical "staying" preference.
+## 1. Structural GED
 
-## 2. Convergence Metrics
+The GED between iteration \(t\) and \(t-1\) counts symmetric differences in the DAG's node and relation sets:
 
-### 2.1 Graph Edit Distance (GED)
-Structural stability is measured by the delta in the number of nodes, parents, and children between iterations. When the relative GED error plateaus, the topology is considered converged.
+\[
+\text{GED}(t) = |V_t \triangle V_{t-1}| + |E_t \triangle E_{t-1}|
+\]
 
-### 2.2 Semantic Volume Minimization
-The system tracks the **Total Log-Semantic Volume** across all leaf nodes.
-$$ \mathcal{V} = \sum_{L \in \text{Leaves}} \sum_{k=1}^{K} \pi_k \log(\text{det}(\Sigma_{k})) $$
-Convergence is reached when the total volume reaches a local minimum, signifying that the semantic clusters have been tightly packed into the most granular and distinct sub-domains possible without losing coverage of the total query space.
+where \(V_t\) = set of node IDs and \(E_t\) = set of parent-child pairs at iteration \(t\). GED is normalized by total edge count to get a relative change:
 
-## 3. The Algorithmic Loop
-The complete orchestration cycle follows these steps:
-1.  **Extract**: Precompute embeddings and seed initial domains.
-2.  **Fit**: Bottom-Up GMM and OAS modeling.
-3.  **Bootstrap**: Initial splitting of ground-truth domains to discover internal structure.
-4.  **Trickle (Main Loop)**: Global reset and top-down routing of queries.
-5.  **Discover**: DBSCAN-driven centroid bifurcation in unmapped pools.
-6.  **Optimize**: Parenting, merging, and transitive reduction.
-7.  **Refit**: Final adjustments of boundaries.
-8.  **Terminate**: Final trickling and stabilization check.
+\[
+\widetilde{\text{GED}}(t) = \frac{\text{GED}(t)}{|E_t|}
+\]
+
+---
+
+## 2. Log-Semantic Volume
+
+For each leaf node \(\ell\), the log-semantic volume is computed as a function of its vMF and NiW parameters (see `StatisticsUtils.calculateLogSemanticVolume`). The total volume over all leaves is:
+
+\[
+\mathcal{V}(t) = \sum_{\ell \in \text{Leaves}(t)} \log\operatorname{SemanticVolume}(\ell)
+\]
+
+The absolute and relative volume changes are tracked:
+
+\[
+\Delta\mathcal{V}(t) = |\mathcal{V}(t) - \mathcal{V}(t-1)|, \qquad \delta\mathcal{V}(t) = \frac{\Delta\mathcal{V}(t)}{|\mathcal{V}(t-1)|}
+\]
+
+A decreasing \(\mathcal{V}\) over iterations corresponds to the vMF mixture tightening around its query set — the probabilistic analogue of inertia reduction in k-means.
+
+---
+
+## 3. Convergence Decision
+
+Early stopping is allowed only after a minimum number of iterations that scales with the breadth of the taxonomy:
+
+\[
+t_{\min} = \max\!\left(5,\, \lfloor 0.8 \cdot |\text{depth-1 nodes}| \rfloor\right)
+\]
+
+After \(t_{\min}\) iterations, the single-iteration convergence flag is set when:
+
+\[
+\widetilde{\text{GED}}(t) \leq \theta_{\text{GED}} \qquad (\text{config: `gedThreshold`})
+\]
+
+Early stopping fires only if `enableEarlyStopping = true` and the flag has been set for \(M = 5\) **consecutive** iterations:
+
+\[
+\text{converged} = \mathbb{1}\!\left[\sum_{s=t-M+1}^{t} \mathbb{1}[\widetilde{\text{GED}}(s) \leq \theta_{\text{GED}}] = M\right]
+\]
+
+The consecutive-count requirement prevents premature termination during transient lulls in structural change (e.g., a single iteration where no split passes the Dasgupta threshold by coincidence).
+
+---
+
+## 4. State Tracking
+
+The stabilizer maintains:
+- `prevNodes: Set<String>` — node IDs from the previous iteration.
+- `prevRelations: Set<Pair<String,String>>` — edges from the previous iteration.
+- `prevVolume: Double` — total log-semantic volume from the previous iteration.
+- `consecutiveConvergedCount: Int` — streak counter, reset to 0 whenever \(\widetilde{\text{GED}} > \theta_{\text{GED}}\).
+
+`reset()` must be called at the start of each new adaptation run to clear all tracking state.
