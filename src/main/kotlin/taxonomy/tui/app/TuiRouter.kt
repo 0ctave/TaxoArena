@@ -307,11 +307,14 @@ private fun MainDashboardRoute(
     state: TuiAppState,
     subscriptions: TuiSubscriptions,
 ) {
-    val bodyH = (height - 5).coerceAtLeast(9)
-    val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
-    val bottomH = (bodyH - topH).coerceAtLeast(4)
-    val dagW = 60.coerceAtMost(width - 20)
-    val arenaW = (width - dagW - 1).coerceAtLeast(20)
+    // Geometry comes from the shared DashboardLayout so the renderer and the controller's
+    // mouse hit-testing can never drift apart.
+    val layout = DashboardLayout.dashboard(width, height)
+    val bodyH = layout.bodyH
+    val topH = layout.topH
+    val bottomH = layout.bottomH
+    val dagW = layout.dagW
+    val arenaW = layout.arenaW
 
     val facade = remember(deps) { TuiConfigFacade(deps) }
     val availableDomains = remember(state.config.settingsVersion, state.runtime.availableDomainsVersion) {
