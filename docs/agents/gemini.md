@@ -6,31 +6,31 @@
 ## Core Architectural Implementation
 For a deep dive into the math and logic behind each part of the system, refer to the following documentation:
 
-### [1. Topological Paradigms](doc/TopologicalParadigms.md)
+### [1. Topological Paradigms](../architecture/topological-paradigms.md)
 *   **DAG Structure**: Support for polyhierarchical relationships.
 *   **Union-Based Domain Definition**: Eliminating the "semantic void" via composite GMMs.
 
-### [2. Phase 2: Fit (Context-Aware Distribution Modeling)](doc/Phase2_Fitting.md)
+### [2. Phase 2: Fit (Context-Aware Distribution Modeling)](../phases/phase2-fitting.md)
 *   **Hierarchical Mixture Modeling (HMM)**: Multi-centroid GMM representations.
 *   **Oracle Approximating Shrinkage (OAS)**: Well-conditioned 4096-D covariance estimation.
 *   **Simplified Isolation Kernel (SIK)**: Non-parametric leaf inclusion envelopes.
 
-### [3. Phase 3: Trickle (Top-Down Restrictive Routing)](doc/Phase3_Trickle.md)
+### [3. Phase 3: Trickle (Top-Down Restrictive Routing)](../phases/phase3-trickle.md)
 *   **Multi-Component GMM Routing**: Regularized Mahalanobis distance logic.
 *   **The Restrictive Funnel**: Depth-decayed confidence intervals and Chi-Square thresholding.
 *   **Outlier Retention**: Parent-level residual pools for emergent concept discovery.
 
-### [4. Phase 4: Discover (Adaptive Splitting)](doc/Phase4_Discovery.md)
+### [4. Phase 4: Discover (Adaptive Splitting)](../phases/phase4-discovery.md)
 *   **Angular DBSCAN**: Density-based clustering using Cosine distance.
 *   **Knee Detection**: Automated Epsilon tuning for high-dimensional clusters.
 *   **LLM Synthesis**: Recursive Thematic Partitioning (RTP) for label generation.
 
-### [5. Phase 5: Optimize (Structural Refinement)](doc/Phase5_Optimization.md)
+### [5. Phase 5: Optimize (Structural Refinement)](../phases/phase5-optimization.md)
 *   **Global Redundancy Merging**: Fusing overlapping domains across branches.
 *   **Polyhierarchical Reparenting**: Specificity-guarded cross-linking using Semantic Volume.
 *   **Transitive Reduction**: Enforcing DAG purity and eliminating topological shortcuts.
 
-### [6. Phase 6: Stabilize (Convergence of the Mixture)](doc/Phase6_Stabilization.md)
+### [6. Phase 6: Stabilize (Convergence of the Mixture)](../phases/phase6-stabilization.md)
 *   **Thermodynamic Annealing**: Iterative cooling of the taxonomy structure.
 *   **Convergence Metrics**: Semantic Volume minimization and GED error plateaus.
 
