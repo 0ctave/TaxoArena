@@ -109,16 +109,20 @@ class CommandController(
             }
 
             TuiEvent.RunBenchmark -> {
-                val models = state.benchmark.benchmarkModelsInput
-                    .split(",").map { it.trim() }.filter { it.isNotBlank() }
-                    .ifEmpty { state.benchmark.loadedModels }
+                val b = state.benchmark
+                val models = b.benchmarkSelectedModels.toList().ifEmpty { b.loadedModels }
+                // Single selected domain → restrict to that GT category; multiple/none → all.
+                // BenchmarkRequest filters by at most one category, so a multi-category subset
+                // currently runs the full set rather than touching the benchmark service.
+                val category = b.benchmarkSelectedDomains.singleOrNull()
                 effects.runBenchmarkConfigured(
                     models = models,
-                    queryLimit = state.benchmark.benchmarkQueryLimitInput.trim().toIntOrNull() ?: 0,
-                    category = state.benchmark.benchmarkCategoryInput.trim().ifBlank { null },
-                    confidenceGate = state.benchmark.benchmarkConfidenceGateInput.trim().toDoubleOrNull() ?: 0.65,
-                    parallelism = state.benchmark.benchmarkParallelismInput.trim().toIntOrNull() ?: 4,
-                    updateRankings = state.benchmark.benchmarkUpdateRankingsInput.trim().toBooleanStrictOrNull() ?: true,
+                    queryLimit = b.benchmarkQueryLimitInput.trim().toIntOrNull() ?: 0,
+                    category = category,
+                    confidenceGate = b.benchmarkConfidenceGateInput.trim().toDoubleOrNull() ?: 0.65,
+                    parallelism = b.benchmarkParallelismInput.trim().toIntOrNull() ?: 4,
+                    updateRankings = b.benchmarkUpdateRankingsInput.trim().toBooleanStrictOrNull() ?: true,
+                    reservedOnly = b.benchmarkReservedOnlyInput.trim().toBooleanStrictOrNull() ?: true,
                     dispatch = dispatch
                 )
             }

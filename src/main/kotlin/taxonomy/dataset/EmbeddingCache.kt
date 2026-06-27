@@ -211,7 +211,7 @@ class EmbeddingCache(
         }
         get(query)?.let { return it }
 
-        log.info("Generating new embedding for: ${if (query.length > 20) query.take(20) + "..." else query}")
+        log.debug("Generating new embedding for: ${if (query.length > 20) query.take(20) + "..." else query}")
         val vector = withContext(Dispatchers.IO) {
             embeddingModel.embed(query).content().vector()
         }

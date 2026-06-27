@@ -21,10 +21,12 @@ import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
+import taxonomy.model.GraphNode
 import taxonomy.model.IterationMetrics
 import taxonomy.model.TaxonomyMetricsData
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.tui.components.take
 import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.utils.PerformanceStats
@@ -53,55 +55,26 @@ fun MetricsOrInspectorPanel(
     performanceReport: Map<String, PerformanceStats> = emptyMap(),
 ) {
     when (mode) {
-        AnalysisMode.NODE_DETAIL -> Column {
+        AnalysisMode.NODE_DETAIL -> {
             val node = controlState.selectedNode
             if (node == null) {
-                Text("Select a node in the DAG (Enter) to inspect it.", color = White)
+                Column { Text("Select a node in the DAG (Enter) to inspect it.", color = White) }
             } else {
-                Text(node.label ?: "(unlabeled)", color = Cyan, textStyle = Bold)
-                Spacer()
-                Text("Type           ${if (node.isLeaf) "leaf" else "internal"}", color = White)
-                Text("Depth          ${node.depth}", color = White)
-                Text("Direct queries ${node.queries.size}", color = White)
-                Text("Total queries  ${node.getRecursiveQueryCount()}", color = White)
-                Text("Parents        ${node.parents.size}", color = White)
-                Text("Children       ${node.children.size}", color = White)
-                if (node.crossLinkChildren.isNotEmpty())
-                    Text("Cross-links    ${node.crossLinkChildren.size}", color = Yellow)
-                val judged = node.judgePrompt != null
-                Spacer()
-                when {
-                    isGeneratingJudge -> Text("⧖ Generating judge…", color = Yellow, textStyle = Bold)
-                    judged -> {
-                        Text("Judge          ✔ specialised", color = Green)
-                        Text("[R] Regenerate judge", color = White)
-                    }
-                    else -> {
-                        Text("┌─ Generate Judge ─┐", color = Cyan, textStyle = Bold)
-                        Text("│  [R] Generate  │", color = Cyan, textStyle = Bold)
-                        Text("└────────────────┘", color = Cyan, textStyle = Bold)
-                    }
-                }
-                if (node.parents.size > 1) {
-                    Spacer()
-                    Text("Parents:", color = Cyan)
-                    node.parents.take(4).forEach {
-                        Text("  · ${it.label ?: it.id}", color = White)
-                    }
-                }
-                if (node.crossLinkChildren.isNotEmpty()) {
-                    Spacer()
-                    Text("Cross-linked children:", color = Yellow)
-                    node.crossLinkChildren.take(4).forEach {
-                        Text("  ⇄ ${it.label ?: it.id}", color = White)
-                    }
-                }
-                val samples = node.queries.take(3)
-                if (samples.isNotEmpty()) {
-                    Spacer()
-                    Text("Sample queries:", color = Cyan)
-                    samples.forEach {
-                        Text("  · ${it.rawText.take((width - 6).coerceAtLeast(8))}", color = White)
+                val items = buildNodeDetailLines(node, width, isGeneratingJudge)
+                ScrollablePanelContent(
+                    pWidth = width,
+                    pHeight = height,
+                    itemCount = items.size,
+                    scrollOffset = inspectorScroll,
+                    hasPadding = false,
+                ) { visibleHeight, startIdx, _ ->
+                    items.drop(startIdx).take(visibleHeight).forEach { (text, color, bold) ->
+                        Text(
+                            text,
+                            color = color,
+                            textStyle = if (bold) Bold else Unspecified,
+                            modifier = Modifier.height(1),
+                        )
                     }
                 }
             }
@@ -136,6 +109,55 @@ fun MetricsOrInspectorPanel(
             Text("Enter on a DAG node to inspect it.", color = White)
         }
     }
+}
+
+private fun buildNodeDetailLines(
+    node: GraphNode,
+    width: Int,
+    isGeneratingJudge: Boolean,
+): List<Triple<String, Color, Boolean>> {
+    val out = mutableListOf<Triple<String, Color, Boolean>>()
+    fun add(t: String, c: Color = White, bold: Boolean = false) { out += Triple(t, c, bold) }
+    add(node.label ?: "(unlabeled)", Cyan, true)
+    add("")
+    add("Type           ${if (node.isLeaf) "leaf" else "internal"}")
+    add("Depth          ${node.depth}")
+    add("Direct queries ${node.queries.size}")
+    add("Total queries  ${node.getRecursiveQueryCount()}")
+    add("Parents        ${node.parents.size}")
+    add("Children       ${node.children.size}")
+    if (node.crossLinkChildren.isNotEmpty()) add("Cross-links    ${node.crossLinkChildren.size}", Yellow)
+    val judged = node.judgePrompt != null
+    add("")
+    when {
+        isGeneratingJudge -> add("⧖ Generating judge…", Yellow, true)
+        judged -> {
+            add("Judge          ✔ specialised", Green)
+            add("[R] Regenerate judge")
+        }
+        else -> {
+            add("┌─ Generate Judge ─┐", Cyan, true)
+            add("│  [R] Generate  │", Cyan, true)
+            add("└────────────────┘", Cyan, true)
+        }
+    }
+    if (node.parents.size > 1) {
+        add("")
+        add("Parents:", Cyan)
+        node.parents.take(4).forEach { add("  · ${it.label ?: it.id}") }
+    }
+    if (node.crossLinkChildren.isNotEmpty()) {
+        add("")
+        add("Cross-linked children:", Yellow)
+        node.crossLinkChildren.take(4).forEach { add("  ⇄ ${it.label ?: it.id}") }
+    }
+    val samples = node.queries.take(3)
+    if (samples.isNotEmpty()) {
+        add("")
+        add("Sample queries:", Cyan)
+        samples.forEach { add("  · ${it.rawText.take((width - 6).coerceAtLeast(8))}") }
+    }
+    return out
 }
 
 @Composable

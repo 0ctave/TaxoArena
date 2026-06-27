@@ -16,6 +16,8 @@ import java.sql.DriverManager
 import taxonomy.config.TaxonomyConfig
 import taxonomy.config.DatasetType
 
+private const val EXPECTED_MMLU_PRO_CATEGORIES = 14
+
 @Service
 class MMLUDatasetFetcher(
     private val config: TaxonomyConfig,
@@ -136,12 +138,13 @@ class MMLUDatasetFetcher(
             return finalizeData(allRows, "MMLU Pro")
         }
 
-        if (allRows.size >= 1000 || allRows.size >= maxQueries) {
-            log.info("Loaded MMLU Pro dataset from local cache (${allRows.size} queries).")
+        val cachedDistinctCategories = allRows.mapNotNull { it.category }.toSet().size
+        if (cachedDistinctCategories >= EXPECTED_MMLU_PRO_CATEGORIES && (allRows.size >= 1000 || allRows.size >= maxQueries)) {
+            log.info("Loaded MMLU Pro from cache: ${allRows.size} queries across $cachedDistinctCategories categories.")
             return finalizeData(allRows, "MMLU Pro")
         }
 
-        log.info("MMLU Pro Cache V2 insufficient (${allRows.size}/$maxQueries). Fetching remainder...")
+        log.info("MMLU Pro cache incomplete ($cachedDistinctCategories/$EXPECTED_MMLU_PRO_CATEGORIES categories, ${allRows.size} rows). Fetching remainder from offset ${getDbCount(table)}…")
 
         val client = HttpClient.newHttpClient()
         var hfOffset = totalInDb

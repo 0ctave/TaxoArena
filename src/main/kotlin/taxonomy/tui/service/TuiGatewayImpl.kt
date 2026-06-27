@@ -307,6 +307,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         confidenceGate: Double,
         parallelism: Int,
         updateRankings: Boolean,
+        reservedOnly: Boolean,
         onLive: (BenchmarkLiveStats) -> Unit
     ) {
         if (models.size < 2) {
@@ -319,7 +320,8 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             category = category?.takeIf { it.isNotBlank() },
             confidenceGate = confidenceGate,
             parallelism = parallelism.coerceAtLeast(1),
-            updateRankings = updateRankings
+            updateRankings = updateRankings,
+            reservedOnly = reservedOnly
         )
         deps.log.info(
             "Starting benchmark: ${models.size} models [${models.joinToString()}] · " +

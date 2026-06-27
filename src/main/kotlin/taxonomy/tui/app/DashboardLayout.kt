@@ -54,8 +54,11 @@ object DashboardLayout {
         val arenaMin = 20
         val dagW = 60.coerceAtMost((width - 1 - arenaMin).coerceAtLeast(10))
         val arenaW = (width - dagW - 1).coerceAtLeast(arenaMin)
-        // SHELL_TOP_ROWS (2) + panel top (2) + the AsciiTreeTable column-header row (1).
-        val treeFirstRowY = SHELL_TOP_ROWS + PANEL_CONTENT_TOP + 1
+        // SHELL_TOP_ROWS (2) + panel top (2) + the AsciiTreeTable column-header row (1) +
+        // the column-header's own trailing row before data (1). Mosaic 0.18.0 already delivers
+        // 0-based mouse coords (EventParser subtracts 1), so the off-by-one is corrected here on
+        // the layout side rather than by re-subtracting from event.y.
+        val treeFirstRowY = SHELL_TOP_ROWS + PANEL_CONTENT_TOP + 2
         return Dashboard(width, height, bodyH, topH, bottomH, dagW, arenaW, treeFirstRowY)
     }
 

@@ -65,6 +65,7 @@ private class FakeEffects(private val datasetDownloaded: Boolean) : TuiEffects {
         confidenceGate: Double,
         parallelism: Int,
         updateRankings: Boolean,
+        reservedOnly: Boolean,
         dispatch: (TuiEvent) -> Unit
     ) {}
     override fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit) {}

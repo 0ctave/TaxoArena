@@ -12,6 +12,12 @@ enum class BenchmarkType {
     TRICKLE  // Batch routing accuracy test (moved from the Trickle tab)
 }
 
+/** The four stacked sections of the Arena benchmark config dashboard (Tab cycles them). */
+enum class BenchmarkSection { MODELS, DOMAINS, OPTIONS, START }
+
+/** Live-run view toggled with V once a benchmark is running / finished. */
+enum class BenchmarkLiveView { SUMMARY, STREAM }
+
 data class BenchmarkUiState(
     val benchmarkType: BenchmarkType = BenchmarkType.NONE,
     // 0 = ARENA, 1 = TRICKLE (W/S navigation on the selection screen).
@@ -30,11 +36,26 @@ data class BenchmarkUiState(
     val isEnteringBenchmarkConfig: Boolean = false,
 
     val benchmarkModelsInput: String = "",
-    val benchmarkQueryLimitInput: String = "20",
+    val benchmarkQueryLimitInput: String = "0",
     val benchmarkCategoryInput: String = "",
     val benchmarkConfidenceGateInput: String = "0.65",
     val benchmarkParallelismInput: String = "4",
     val benchmarkUpdateRankingsInput: String = "true",
+    val benchmarkReservedOnlyInput: String = "true",
+
+    // ── Arena benchmark config-dashboard state ──
+    // Multi-select picks (the left Topology panel flips into a picker to edit these).
+    val benchmarkSelectedModels: Set<String> = emptySet(),
+    val benchmarkSelectedDomains: Set<String> = emptySet(),
+    val benchmarkActiveSection: BenchmarkSection = BenchmarkSection.MODELS,
+    val benchmarkIsPickingModels: Boolean = false,
+    val benchmarkIsPickingDomains: Boolean = false,
+    val benchmarkPickerCursor: Int = 0,
+    // Snapshot of selectable MMLU-Pro categories, captured when the domain picker opens
+    // (the live roster is derived in the router; the reducer needs the names for cursor/toggle).
+    val benchmarkDomainOptions: List<String> = emptyList(),
+    // SUMMARY vs STREAM live-run view (V toggles).
+    val benchmarkLiveView: BenchmarkLiveView = BenchmarkLiveView.SUMMARY,
 
     // Unused by the panel: BenchmarkPanel gates its display on arenaService's controlState
     // (isRunningBenchmark / benchmarkReport), not this field. Kept to avoid a breaking change.

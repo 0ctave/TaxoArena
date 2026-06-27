@@ -187,6 +187,24 @@ sealed interface TuiEvent {
     data object ResetBenchmarkType : TuiEvent
     data object RunBenchmark : TuiEvent
     data object RunEvalLoad : TuiEvent
+
+    // ── Arena benchmark config dashboard ──
+    /** Move the active section focus (MODELS / DOMAINS / OPTIONS / START). */
+    data class SetBenchmarkSection(val section: taxonomy.tui.state.BenchmarkSection) : TuiEvent
+    /** Flip the left Topology panel into the model/domain multi-select picker. */
+    data class OpenBenchmarkPicker(
+        val domains: Boolean,
+        val domainOptions: List<String> = emptyList()
+    ) : TuiEvent
+    /** Close the picker (selection persists either way). */
+    data object CloseBenchmarkPicker : TuiEvent
+    data class MoveBenchmarkPickerCursor(val delta: Int) : TuiEvent
+    /** Toggle the picker row under the cursor in/out of the active selection set. */
+    data object ToggleBenchmarkPickerItem : TuiEvent
+    data object ToggleBenchmarkReservedOnly : TuiEvent
+    data object ToggleBenchmarkUpdateRankings : TuiEvent
+    /** Flip the live-run view between the summary dashboard and the per-question stream. */
+    data object ToggleBenchmarkLiveView : TuiEvent
     /** Live per-question progress streamed from a running benchmark. */
     data class BenchmarkLiveUpdate(val stats: taxonomy.model.BenchmarkLiveStats) : TuiEvent
     /** Auto-download the MMLU-Pro eval_results cache from GitHub (the "d" key inside the picker). */
