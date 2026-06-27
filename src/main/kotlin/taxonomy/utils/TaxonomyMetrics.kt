@@ -203,11 +203,8 @@ class TaxonomyMetrics(
         // NMI/ARI use flat leaf identity (correct for clustering papers)
         val predSimple = queryToPrimaryLeaf.mapValues { (_, leaf) -> leaf.id }
 
-        // Overlapping NMI (Lancichinetti et al. 2009): queries may route to
-        // multiple leaves (soft routing / polyhierarchy), so the covering-aware
-        // formulation replaces the disjoint Shannon NMI. Predicted covering is
-        // the set of leaves each query is assigned to; ground-truth covering is
-        // the set of domain labels (possibly multiple) per query.
+        // Predicted covering: the set of leaves each query is assigned to.
+        // Kept for routing ECE (below); NMI no longer consumes it.
         val predictedCover = queryToLeavesList.mapValues { (_, ll) ->
             ll.associate { it.id to 1.0 }
         }
@@ -218,11 +215,10 @@ class TaxonomyMetrics(
         val categoryToNode    = buildCategoryToNode(allNodes)
         val groundTruthLeaves = buildGroundTruthLeaves(categoryToNode)
 
-        // Overlapping NMI compares the predicted leaf covering against the hard true-leaf
-        // covering ({ trueLeaf -> 1.0 }), so both sides share the node-id space and the score
-        // reaches 1.0 when routing matches ground truth exactly.
-        val groundTruthCover  = groundTruthLeaves.mapValues { (_, node) -> mapOf(node.id to 1.0) }
-        val nmi               = OverlappingNmi.compute(predictedCover, groundTruthCover)
+        // NMI is standard Shannon NMI over two flat hard partitions of the same query
+        // set: predicted primary-leaf id vs. ground-truth category name. The earlier
+        // overlapping-cover NMI compared disjoint node-id spaces and collapsed to ~0.
+        val nmi               = ShannonNmi.compute(gtSimple, predSimple)
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)
         // DAG-compatible Dendrogram Purity (Monath et al. 2021): uses the
