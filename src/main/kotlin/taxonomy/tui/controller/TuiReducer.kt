@@ -606,7 +606,39 @@ object TuiReducer {
 
             TuiEvent.ConfirmTrickleQueryInput ->
                 state.copy(
-                    trickle = state.trickle.copy(isEnteringTrickleQuery = false)
+                    trickle = state.trickle.copy(
+                        isEnteringTrickleQuery = false,
+                        trickleResultNodes = emptyList()
+                    )
+                )
+
+            is TuiEvent.TrickleResultReceived ->
+                state.copy(
+                    trickle = state.trickle.copy(trickleResultNodes = event.nodes)
+                )
+
+            TuiEvent.RunBatchTrickleTest ->
+                state.copy(
+                    trickle = state.trickle.copy(
+                        isRunningBatchTrickleTest = true,
+                        batchTrickleProgress = "Starting batch trickle test…",
+                        batchTrickleResults = null,
+                        isViewingBatchTrickleResults = false
+                    )
+                )
+
+            is TuiEvent.BatchTrickleProgress ->
+                state.copy(
+                    trickle = state.trickle.copy(batchTrickleProgress = event.text)
+                )
+
+            is TuiEvent.BatchTrickleCompleted ->
+                state.copy(
+                    trickle = state.trickle.copy(
+                        isRunningBatchTrickleTest = false,
+                        batchTrickleResults = event.results,
+                        isViewingBatchTrickleResults = true
+                    )
                 )
 
             TuiEvent.CancelTrickleInput ->
@@ -651,6 +683,47 @@ object TuiReducer {
                         benchmarkModelsInput = state.benchmark.benchmarkModelsInput
                             .ifBlank { event.models.take(2).joinToString(", ") }
                     )
+                )
+
+            is TuiEvent.BenchmarkLiveUpdate ->
+                state.copy(
+                    benchmark = state.benchmark.copy(liveStats = event.stats)
+                )
+
+            TuiEvent.DownloadEvalResults ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        isDownloadingEval = true,
+                        evalDownloadProgress = emptyMap()
+                    )
+                )
+
+            is TuiEvent.EvalDownloadProgress ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        evalDownloadProgress = state.benchmark.evalDownloadProgress + (
+                            event.fileName to if (event.totalBytes > 0)
+                                (event.bytesDownloaded.toFloat() / event.totalBytes).coerceIn(0f, 1f)
+                            else 1f
+                            )
+                    )
+                )
+
+            TuiEvent.EvalDownloadComplete ->
+                state.copy(
+                    benchmark = state.benchmark.copy(isDownloadingEval = false)
+                )
+
+            TuiEvent.ToggleLeaderboard ->
+                state.copy(
+                    arena = state.arena.copy(
+                        isViewingLeaderboard = !state.arena.isViewingLeaderboard
+                    )
+                )
+
+            is TuiEvent.LeaderboardLoaded ->
+                state.copy(
+                    arena = state.arena.copy(leaderboard = event.groups)
                 )
 
             TuiEvent.RunBenchmark ->

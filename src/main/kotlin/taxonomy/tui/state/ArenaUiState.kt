@@ -16,5 +16,9 @@ data class ArenaUiState(
     val arenaModelAInput: String = "",
 
     val isEnteringArenaModelB: Boolean = false,
-    val arenaModelBInput: String = ""
+    val arenaModelBInput: String = "",
+
+    // Leaderboard sub-view (toggled with "l" while in Arena mode).
+    val isViewingLeaderboard: Boolean = false,
+    val leaderboard: List<taxonomy.service.LeaderboardGroup> = emptyList()
 )

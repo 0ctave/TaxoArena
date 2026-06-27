@@ -49,7 +49,7 @@ data class LeaderboardGroup(
 @Service
 class TaxonomyRankingService {
     private val log = LoggerFactory.getLogger("RankingService")
-    private val dbUrl = "jdbc:sqlite:embeddings_cache.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val dbUrl = "jdbc:sqlite:ratings.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
     // Initial constant values matching standard OpenSkill (Weng-Lin) defaults
     private val initialMu = 25.0
@@ -57,10 +57,18 @@ class TaxonomyRankingService {
     private val beta = 4.167 // Game outcomes noise (gamma)
     private val drawMargin = 0.1
 
-    private val connection: Connection
-        get() = DriverManager.getConnection(dbUrl).also { conn ->
+    // Single held-open connection (WAL mode) guarded by a lock to avoid the cost
+    // and contention of opening a new SQLite connection on every call.
+    private val dbLock = Any()
+    private val connection: Connection by lazy {
+        DriverManager.getConnection(dbUrl).also { conn ->
             conn.autoCommit = true
         }
+    }
+
+    private inline fun <T> withConn(block: (Connection) -> T): T = synchronized(dbLock) {
+        block(connection)
+    }
 
     init {
         initDatabase()
@@ -68,7 +76,7 @@ class TaxonomyRankingService {
 
     private fun initDatabase() {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.createStatement().use { stmt ->
                     stmt.execute("""
                         CREATE TABLE IF NOT EXISTS agent_ratings (
@@ -101,7 +109,7 @@ class TaxonomyRankingService {
 
     fun getRating(agentName: String, domain: String): AgentRating {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("SELECT mu, sigma FROM agent_ratings WHERE agent_name = ? AND domain = ?").use { pstmt ->
                     pstmt.setString(1, agentName)
                     pstmt.setString(2, domain)
@@ -119,7 +127,7 @@ class TaxonomyRankingService {
 
     fun saveRating(rating: AgentRating) {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("INSERT OR REPLACE INTO agent_ratings (agent_name, domain, mu, sigma) VALUES (?, ?, ?, ?)").use { pstmt ->
                     pstmt.setString(1, rating.agentName)
                     pstmt.setString(2, rating.domain)
@@ -135,7 +143,7 @@ class TaxonomyRankingService {
 
     fun recordMatch(query: String, domain: String, winner: String, loser: String, isTie: Boolean, confidence: Double = 1.0) {
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("INSERT INTO match_history (query, domain, winner, loser, is_tie) VALUES (?, ?, ?, ?, ?)").use { pstmt ->
                     pstmt.setString(1, query)
                     pstmt.setString(2, domain)
@@ -270,7 +278,7 @@ class TaxonomyRankingService {
     private fun getAllRatingsInDomain(domain: String): List<AgentRating> {
         val list = mutableListOf<AgentRating>()
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 conn.prepareStatement("SELECT agent_name, mu, sigma FROM agent_ratings WHERE domain = ?").use { pstmt ->
                     pstmt.setString(1, domain)
                     val rs = pstmt.executeQuery()
@@ -291,7 +299,7 @@ class TaxonomyRankingService {
 
         // Fetch match counts between all pairs
         try {
-            connection.use { conn ->
+            withConn { conn ->
                 val query = """
                     SELECT winner, loser, COUNT(*) as count 
                     FROM match_history 

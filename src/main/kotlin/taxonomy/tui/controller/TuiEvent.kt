@@ -156,12 +156,31 @@ sealed interface TuiEvent {
     data class UpdateTrickleQueryInput(val value: String) : TuiEvent
     data object ConfirmTrickleQueryInput : TuiEvent
     data object CancelTrickleInput : TuiEvent
+    /** Run a single trickle query against the live taxonomy; results land via [TrickleResultReceived]. */
+    data class TrickleResultReceived(val nodes: List<taxonomy.service.QueryResponseNode>) : TuiEvent
+    /** Run the full batch trickle test (the "B" hotkey while in Trickle mode). */
+    data object RunBatchTrickleTest : TuiEvent
+    data class BatchTrickleProgress(val text: String) : TuiEvent
+    data class BatchTrickleCompleted(val results: taxonomy.tui.BatchTrickleTestResults) : TuiEvent
     data class SetViewingBatchTrickleResults(val value: Boolean) : TuiEvent
     data class SetBatchTrickleScrollOffset(val offset: Int) : TuiEvent
 
     data object StartBenchmarkFlow : TuiEvent
     data object RunBenchmark : TuiEvent
     data object RunEvalLoad : TuiEvent
+    /** Live per-question progress streamed from a running benchmark. */
+    data class BenchmarkLiveUpdate(val stats: taxonomy.model.BenchmarkLiveStats) : TuiEvent
+    /** Auto-download the MMLU-Pro eval_results cache from GitHub (the "o" hotkey). */
+    data object DownloadEvalResults : TuiEvent
+    data class EvalDownloadProgress(
+        val fileName: String,
+        val bytesDownloaded: Long,
+        val totalBytes: Long
+    ) : TuiEvent
+    data object EvalDownloadComplete : TuiEvent
+    /** Toggle the Arena leaderboard sub-view (the "l" hotkey while in Arena mode). */
+    data object ToggleLeaderboard : TuiEvent
+    data class LeaderboardLoaded(val groups: List<taxonomy.service.LeaderboardGroup>) : TuiEvent
     data class BenchmarkModelsLoaded(val models: List<String>) : TuiEvent
     data class SetSelectedBenchmarkField(val index: Int) : TuiEvent
     data object StartEditingBenchmarkField : TuiEvent

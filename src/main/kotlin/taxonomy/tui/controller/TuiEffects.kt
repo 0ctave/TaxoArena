@@ -23,14 +23,18 @@ interface TuiEffects {
     fun runArena(query: String, modelA: String, modelB: String)
     fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
     fun loadArenaModels(dispatch: (TuiEvent) -> Unit)
-    fun runTrickle(query: String)
+    fun runTrickle(query: String, dispatch: (TuiEvent) -> Unit)
+    fun runBatchTrickle(dispatch: (TuiEvent) -> Unit)
+    fun loadLeaderboard(dispatch: (TuiEvent) -> Unit)
+    fun downloadEvalResults(dispatch: (TuiEvent) -> Unit)
     fun runBenchmarkConfigured(
         models: List<String>,
         queryLimit: Int,
         category: String?,
         confidenceGate: Double,
         parallelism: Int,
-        updateRankings: Boolean
+        updateRankings: Boolean,
+        dispatch: (TuiEvent) -> Unit
     )
     fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit)
     fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit)
@@ -158,8 +162,46 @@ class DefaultTuiEffects(
         scope.launch { dispatch(TuiEvent.ArenaModelsLoaded(gateway.loadedModels())) }
     }
 
-    override fun runTrickle(query: String) {
-        scope.launch { gateway.runTrickle(query) }
+    override fun runTrickle(query: String, dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            val nodes = gateway.runTrickle(query)
+            dispatch(TuiEvent.TrickleResultReceived(nodes))
+        }
+    }
+
+    override fun runBatchTrickle(dispatch: (TuiEvent) -> Unit) {
+        activeJob = scope.launch {
+            try {
+                gateway.runBatchTrickle(
+                    onProgress = { text -> dispatch(TuiEvent.BatchTrickleProgress(text)) },
+                    onComplete = { results -> dispatch(TuiEvent.BatchTrickleCompleted(results)) }
+                )
+            } catch (c: CancellationException) {
+                throw c
+            } catch (t: Throwable) {
+                dispatch(TuiEvent.BatchTrickleProgress("Batch trickle failed: ${t.message}"))
+                dispatch(TuiEvent.BatchTrickleCompleted(taxonomy.tui.BatchTrickleTestResults()))
+            }
+        }
+    }
+
+    override fun loadLeaderboard(dispatch: (TuiEvent) -> Unit) {
+        scope.launch { dispatch(TuiEvent.LeaderboardLoaded(gateway.loadLeaderboard())) }
+    }
+
+    override fun downloadEvalResults(dispatch: (TuiEvent) -> Unit) {
+        activeJob = scope.launch {
+            try {
+                gateway.downloadEvalResults { fileName, downloaded, total ->
+                    dispatch(TuiEvent.EvalDownloadProgress(fileName, downloaded, total))
+                }
+            } catch (c: CancellationException) {
+                throw c
+            } catch (_: Throwable) {
+                // Best-effort; surfaced via logs.
+            }
+            dispatch(TuiEvent.EvalDownloadComplete)
+        }
     }
 
     override fun runBenchmarkConfigured(
@@ -168,12 +210,13 @@ class DefaultTuiEffects(
         category: String?,
         confidenceGate: Double,
         parallelism: Int,
-        updateRankings: Boolean
+        updateRankings: Boolean,
+        dispatch: (TuiEvent) -> Unit
     ) {
         scope.launch {
             gateway.runBenchmarkConfigured(
                 models, queryLimit, category, confidenceGate, parallelism, updateRankings
-            )
+            ) { stats -> dispatch(TuiEvent.BenchmarkLiveUpdate(stats)) }
         }
     }
 
@@ -247,14 +290,21 @@ interface TuiGateway {
     suspend fun runArena(query: String, modelA: String, modelB: String)
     suspend fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
     suspend fun loadedModels(): List<String>
-    suspend fun runTrickle(query: String)
+    suspend fun runTrickle(query: String): List<taxonomy.service.QueryResponseNode>
+    suspend fun runBatchTrickle(
+        onProgress: (String) -> Unit,
+        onComplete: (taxonomy.tui.BatchTrickleTestResults) -> Unit
+    )
+    suspend fun loadLeaderboard(): List<taxonomy.service.LeaderboardGroup>
+    suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit)
     suspend fun runBenchmarkConfigured(
         models: List<String>,
         queryLimit: Int,
         category: String?,
         confidenceGate: Double,
         parallelism: Int,
-        updateRankings: Boolean
+        updateRankings: Boolean,
+        onLive: (taxonomy.model.BenchmarkLiveStats) -> Unit
     )
     suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String
     suspend fun regenerateLabels()

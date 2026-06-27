@@ -1,13 +1,13 @@
 package taxonomy.tui.state
 
-import taxonomy.model.GraphNode
+import taxonomy.service.QueryResponseNode
 import taxonomy.tui.BatchTrickleTestResults
 
 data class TrickleUiState(
     val isEnteringTrickleQuery: Boolean = false,
     val trickleQueryInput: String = "",
 
-    val trickleResultNodes: List<GraphNode> = emptyList(),
+    val trickleResultNodes: List<QueryResponseNode> = emptyList(),
 
     val isRunningBatchTrickleTest: Boolean = false,
     val batchTrickleProgress: String = "",

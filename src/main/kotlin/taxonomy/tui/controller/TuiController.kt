@@ -129,10 +129,10 @@ class TuiController(
         if (state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS) {
             when (key) {
                 "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
+                    dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
 
                 "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
+                    dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
 
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
@@ -259,12 +259,30 @@ class TuiController(
             } else {
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
             }
-            "b" -> if (state.arena.loadedModels.isNotEmpty()) {
+            // In Trickle mode, "b" runs the batch trickle test (matching the panel hint);
+            // otherwise it enters/starts the Benchmark view as before.
+            "b" -> if (state.analysis.mode == AnalysisMode.TRICKLE_TEST) {
+                dispatch(TuiEvent.RunBatchTrickleTest)
+            } else if (state.arena.loadedModels.isNotEmpty()) {
                 commandController.startBenchmark(::dispatch)
             } else {
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.BENCHMARK))
             }
             "t" -> commandController.startTrickle(::dispatch)
+
+            // Global in their respective modes: "o" downloads MMLU-Pro eval_results while in
+            // Benchmark; "l" toggles the leaderboard while in Arena. Outside those modes the
+            // keys fall through to the focused panel's handler.
+            "o" -> if (state.analysis.mode == AnalysisMode.BENCHMARK) {
+                dispatch(TuiEvent.DownloadEvalResults)
+            } else {
+                routeByFocusedPanel(state, key)
+            }
+            "l" -> if (state.analysis.mode == AnalysisMode.ARENA) {
+                dispatch(TuiEvent.ToggleLeaderboard)
+            } else {
+                routeByFocusedPanel(state, key)
+            }
 
             "g" -> {
                 dispatch(TuiEvent.SetBatchReplaceExisting(false))
@@ -384,7 +402,7 @@ class TuiController(
                     dispatch(TuiEvent.SetBenchmarkScrollOffset(state.benchmark.benchmarkScrollOffset + 1))
 
                 "enter" -> dispatch(TuiEvent.RunBenchmark)
-                "o" -> dispatch(TuiEvent.RunEvalLoad)
+                "o" -> dispatch(TuiEvent.DownloadEvalResults)
 
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
@@ -451,10 +469,10 @@ class TuiController(
     private fun handleLogsKeys(state: TuiAppState, key: String) {
         when (key) {
             "w", "z", "arrowup" ->
-                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
+                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
 
             "s", "arrowdown" ->
-                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
+                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
 
             "q", "escape", "arrowleft", "backspace" ->
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))

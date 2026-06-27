@@ -31,9 +31,31 @@ fun BenchmarkPanel(
             Spacer()
 
             when {
+                benchmarkState.isDownloadingEval -> {
+                    Text("Downloading MMLU-Pro eval_results…", color = Yellow)
+                    val files = benchmarkState.evalDownloadProgress
+                    if (files.isEmpty()) {
+                        Text("Fetching file listing from GitHub…", color = White)
+                    } else {
+                        val done = files.values.count { it >= 1f }
+                        Text("Downloaded $done / ${files.size} files", color = White)
+                        files.entries.take((height - 4).coerceAtLeast(1)).forEach { (name, pct) ->
+                            Text("  ${name.take((width - 12).coerceAtLeast(1))}  ${"%.0f%%".format(pct * 100)}", color = White)
+                        }
+                    }
+                }
+
                 controlState.isRunningBenchmark -> {
                     Text("Running benchmark...", color = White)
                     Text(controlState.benchmarkProgress, color = White)
+                    benchmarkState.liveStats?.let { live ->
+                        Text(
+                            "Live: ${live.processed}/${live.total} · " +
+                                "agreement ${"%.2f".format(live.runningAgreement)} · " +
+                                "coverage ${"%.2f".format(live.runningCoverage)}",
+                            color = White
+                        )
+                    }
                 }
 
                 benchmarkState.evalLoaderIsRunning -> {
