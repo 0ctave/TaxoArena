@@ -21,7 +21,7 @@ fun ArenaPanel(
     controlState: AnalysisPanelState,
     arenaState: ArenaUiState,
 ) {
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
             val mode = if (arenaState.usePrecomputed) "PRECOMPUTED (no live generation)" else "LIVE"
             Text("Mode: $mode", color = Green)
 

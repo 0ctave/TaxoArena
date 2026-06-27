@@ -16,7 +16,7 @@ fun JudgeProgressPanel(
     height: Int,
     controlState: AnalysisPanelState,
 ) {
-        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+        Column {
             Text("Batch judge generation mode.", color = White)
             if (controlState.currentInductions.isEmpty()) {
                 Text("No active progress.", color = White)

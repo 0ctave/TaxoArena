@@ -120,13 +120,16 @@ class CommandController(
             }
 
             TuiEvent.RunEvalLoad -> {
-                if (state.benchmark.evalLoaderPathInput.isNotBlank()) {
-                    effects.loadEval(
-                        path = state.benchmark.evalLoaderPathInput.trim(),
-                        modelName = state.benchmark.evalLoaderModelInput.trim(),
-                        dispatch = dispatch
-                    )
-                }
+                // Blank path falls back to the configured eval_results directory so pressing
+                // [O] just works out of the box. Mark running so the panel/process row updates.
+                val path = state.benchmark.evalLoaderPathInput.trim()
+                dispatch(TuiEvent.SetEvalLoaderRunning(true))
+                dispatch(TuiEvent.SetEvalLoaderStatus("Loading eval_results\u2026"))
+                effects.loadEval(
+                    path = path,
+                    modelName = state.benchmark.evalLoaderModelInput.trim(),
+                    dispatch = dispatch
+                )
             }
 
             TuiEvent.ConfirmTrickleQueryInput -> {

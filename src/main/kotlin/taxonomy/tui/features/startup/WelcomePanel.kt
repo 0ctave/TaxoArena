@@ -22,7 +22,7 @@ fun WelcomePanel(
     snapshots: List<DagSnapshot>,
 ) {
     Panel("SETUP HUB", Cyan, width, height) {
-        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+        Column {
             Text("Select an option to initialize the taxonomic DAG.", color = White)
             Spacer()
 

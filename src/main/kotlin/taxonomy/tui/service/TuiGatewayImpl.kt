@@ -94,9 +94,15 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         withContext(Dispatchers.IO) { deps.evalStore.getLoadedModels() }
 
     override suspend fun runTrickle(query: String) {
-        // Single-query trickle routing is driven interactively from a precomputed
-        // query embedding; record the request as a sensible no-op equivalent.
-        deps.log.info("Trickle requested for query: {}", query)
+        // Route the query through the live DAG; queryTaxonomy logs the matched lineage,
+        // which surfaces in the System Logs panel.
+        withContext(Dispatchers.IO) {
+            try {
+                deps.taxonomyService.queryTaxonomy(query)
+            } catch (t: Throwable) {
+                deps.log.warn("Trickle routing failed: {}", t.message)
+            }
+        }
     }
 
     override suspend fun runBenchmarkConfigured(
@@ -141,7 +147,9 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         onProgress: (Int, Int) -> Unit,
     ): String =
         withContext(Dispatchers.IO) {
-            val stats = deps.evalLoader.loadFromPath(path, modelName.ifBlank { null }) { cur, total ->
+            // Blank path → the configured eval_results directory (default "eval_results").
+            val resolvedPath = path.ifBlank { deps.config.dataset.evalResultsDir }
+            val stats = deps.evalLoader.loadFromPath(resolvedPath, modelName.ifBlank { null }) { cur, total ->
                 onProgress(cur, total)
             }
             "Loaded '${stats.modelName}': ${"%,d".format(stats.inserted)} new, " +

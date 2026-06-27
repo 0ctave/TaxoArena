@@ -386,7 +386,7 @@ private fun MainDashboardRoute(
             metricsScroll = state.analysis.metricsScrollOffset,
             benchmarkScroll = state.benchmark.benchmarkScrollOffset,
             batchTrickleScroll = state.trickle.batchTrickleScrollOffset,
-            trickleResults = state.trickle.batchTrickleResults,
+            trickleState = state.trickle,
             snapshotState = state.snapshot,
             arenaState = state.arena,
             benchmarkState = state.benchmark,

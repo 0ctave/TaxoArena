@@ -35,7 +35,7 @@ fun DomainSelectorTable(
     val end = (start + visible).coerceAtMost(domains.size)
     val allSelected = selectedDomains.isEmpty()
 
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
         if (domains.isEmpty()) {
             Text("No domains available. Download the dataset first.", color = White)
             return@Column
@@ -69,7 +69,7 @@ fun AsciiTreeTable(
     selectedIdx: Int,
 ) {
     if (lines.isEmpty()) {
-        Column(modifier = Modifier.padding(left = 1)) {
+        Column {
             Text("\u25cc Awaiting taxonomy construction\u2026".take(pWidth - 1), color = Yellow)
             Text("Generate a DAG (R) or load a snapshot (X).".take(pWidth - 1), color = White)
         }
@@ -83,7 +83,7 @@ fun AsciiTreeTable(
     val start = offset.coerceIn(0, maxOf(0, lines.size - visible))
     val end = (start + visible).coerceAtMost(lines.size)
 
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
         // Column header.
         Text(
             buildAnnotatedString {
@@ -147,7 +147,7 @@ fun DagTable(
     val start = offset.coerceIn(0, maxOf(0, nodes.size - visible))
     val end = (start + visible).coerceAtMost(nodes.size)
 
-    Column(modifier = Modifier.padding(left = 1)) {
+    Column {
         if (nodes.isEmpty()) {
             Text("No taxonomy graph loaded.", color = White)
             return@Column
