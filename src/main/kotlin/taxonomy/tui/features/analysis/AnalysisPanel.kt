@@ -112,7 +112,7 @@ private fun SnapshotHubPanel(
         if (state.snapshotList.isEmpty()) {
             Text("No snapshots saved yet. Press N to save the active DAG.", color = White)
         } else {
-            val visible = (height - 2).coerceAtLeast(1)
+            val visible = (height - 3).coerceAtLeast(1)
             state.snapshotList.take(visible).forEachIndexed { idx, snap ->
                 val selected = idx == state.selectedSnapshotIdx
                 Text(
@@ -121,6 +121,8 @@ private fun SnapshotHubPanel(
                     textStyle = if (selected) Bold else Unspecified
                 )
             }
+            Spacer()
+            Text("L/Enter Load \u00b7 D Delete \u00b7 N Save \u00b7 Esc Back", color = White)
         }
     }
 }

@@ -400,7 +400,14 @@ private fun MainDashboardRoute(
 
     BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
 
-    HotkeyBar(width, dashboardHotkeys(hasDag = hasDag, focused = state.shell.focusedPanel))
+    HotkeyBar(
+        width,
+        dashboardHotkeys(
+            hasDag = hasDag,
+            focused = state.shell.focusedPanel,
+            isRegenerating = state.runtime.isRegenerating,
+        )
+    )
 }
 
 @Composable
@@ -582,7 +589,20 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
 }
 
 /** Contextual key hints for the main dashboard. */
-private fun dashboardHotkeys(hasDag: Boolean, focused: FocusPanel): List<HotkeyAction> {
+private fun dashboardHotkeys(
+    hasDag: Boolean,
+    focused: FocusPanel,
+    isRegenerating: Boolean,
+): List<HotkeyAction> {
+    // While the DAG is still building, the analysis actions (Metrics/Arena/Benchmark/Trickle)
+    // are not usable yet, so we only advertise navigation + quit.
+    if (isRegenerating) {
+        return listOf(
+            HotkeyAction("\u25cc", "Building DAG", TuiTheme.RUNNING),
+            HotkeyAction("Tab", "Switch Panels"),
+            HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
+        )
+    }
     if (!hasDag) {
         return listOf(
             HotkeyAction("X", "Welcome / New DAG", TuiTheme.ACCENT, isPrimary = true),
