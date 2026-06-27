@@ -317,6 +317,9 @@ private fun buildMetricLines(m: TaxonomyMetricsData): List<AnnotatedString> {
 
     out += groupHeader("[Routing]", Cyan)
     out += metricLine("AncCorr", pct(m.ancestorCorrectRate), qcolor(m.ancestorCorrectRate, 0.8, 0.5))
+    out += metricLine("H-P", num(m.hPrecision), qcolor(m.hPrecision, 0.6, 0.4))
+    out += metricLine("H-R", num(m.hRecall), qcolor(m.hRecall, 0.6, 0.4))
+    out += metricLine("H-F1", num(m.hF1), qcolor(m.hF1, 0.6, 0.4))
     out += metricLine("Residual", pct(m.residualRatio), qcolorLow(m.residualRatio))
     out += metricLine("Avg Match", num(m.avgMatchCount), White)
 

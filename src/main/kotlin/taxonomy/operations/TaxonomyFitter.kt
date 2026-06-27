@@ -80,7 +80,9 @@ class TaxonomyFitter(
         if (normVec == 0.0 && d > 0) mu[0] = 1.0f
 
         val rBar = normVec / n
-        val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
+        val mleKappa = StatisticsUtils.correctedKappa(rBar, d, n)
+        // Hornik & Grün (2014) Eq. (9) bias correction for high-dimensional vMF MLE.
+        val rawKappa = StatisticsUtils.biasCorrectKappa(mleKappa, rBar, d, n)
         val sampleWeight = (n / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
         val effectiveAlpha = config.formalism.emaAlpha * sampleWeight
         val oldKappa = node.vmfKappa.takeIf { it > 1e-3 } ?: rawKappa

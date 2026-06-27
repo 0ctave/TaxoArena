@@ -45,6 +45,10 @@ class TaxonomyMetrics(
         val edgeF1:                Double,
         val sphericalSilhouette:   Double,
         val ancestorCorrectRate:   Double,
+        // Hierarchical F₁ (Kosmopoulos et al. 2014)
+        val hPrecision:            Double,
+        val hRecall:               Double,
+        val hF1:                   Double,
         // Shannon entropy of leaf-size distribution (structural balance).
         // High = well-balanced tree. 0 = single-leaf collapse.
         val avgMatchCount:         Double,
@@ -84,6 +88,9 @@ class TaxonomyMetrics(
             edgeF1                = edgeF1,
             sphericalSilhouette   = sphericalSilhouette,
             ancestorCorrectRate   = ancestorCorrectRate,
+            hPrecision            = hPrecision,
+            hRecall               = hRecall,
+            hF1                   = hF1,
             avgMatchCount         = avgMatchCount,
             kappaByDepth          = kappaByDepth,
             leafDistribEntropy    = leafDistribEntropy,
@@ -187,11 +194,34 @@ class TaxonomyMetrics(
         // NMI/ARI use flat leaf identity (correct for clustering papers)
         val predSimple = queryToPrimaryLeaf.mapValues { (_, leaf) -> leaf.id }
 
-        val nmi               = calculateNmi(uniqueQueryTexts, gtSimple, predSimple)
+        // Overlapping NMI (Lancichinetti et al. 2009): queries may route to
+        // multiple leaves (soft routing / polyhierarchy), so the covering-aware
+        // formulation replaces the disjoint Shannon NMI. Predicted covering is
+        // the set of leaves each query is assigned to; ground-truth covering is
+        // the set of domain labels (possibly multiple) per query.
+        val predictedCover = queryToLeavesList.mapValues { (_, ll) ->
+            ll.associate { it.id to 1.0 }
+        }
+        val groundTruthCover = uniqueQueryTexts.mapNotNull { q ->
+            val domains = groundTruthMap[q]
+            if (domains.isNullOrEmpty()) null else q to domains.associate { it to 1.0 }
+        }.toMap()
+        // TODO: wire groundTruthMap from TaxonomyService — current ground-truth
+        // membership is derived from top-level domain labels rather than true
+        // per-query node memberships.
+        val nmi               = OverlappingNmi.compute(predictedCover, groundTruthCover)
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)
-        val dendrogramPurity  = calculateDendrogramPurity(queryToEmbeddings.values.toList(), gtSimple, queryToPrimaryLeaf)
+        // DAG-compatible Dendrogram Purity (Monath et al. 2021): uses the
+        // shallowest LCA, which is well-defined under polyhierarchy.
+        val dendrogramPurity  = dagDendrogramPurity(queryToPrimaryLeaf, gtSimple)
         val edgeF1            = calculateEdgeF1(allNodes, queryToLeavesList, gtSimple)
+
+        // Hierarchical F₁ (Kosmopoulos et al. 2014). Needs the true *leaf node*
+        // per query; only domain-label ground truth is plumbed to the metrics
+        // layer today, so the reported values stay at 0 until wired.
+        // TODO: wire groundTruthMap from TaxonomyService (per-query true leaf node).
+        val (hPrecision, hRecall, hF1) = Triple(0.0, 0.0, 0.0)
 
         val sphericalSilhouette = run {
             val byDepth    = leaves.filter { it.vmfMu.isNotEmpty() }.groupBy { it.depth }
@@ -242,6 +272,9 @@ class TaxonomyMetrics(
             edgeF1                = edgeF1,
             sphericalSilhouette   = sphericalSilhouette,
             ancestorCorrectRate   = ancestorCorrectRate,
+            hPrecision            = hPrecision,
+            hRecall               = hRecall,
+            hF1                   = hF1,
             avgMatchCount         = avgMatchCount,
             kappaByDepth          = kappaByDepth,
             leafDistribEntropy    = leafDistribEntropy,
@@ -264,42 +297,9 @@ class TaxonomyMetrics(
         return ancestors
     }
 
-    private fun findLca(nodeA: GraphNode, nodeB: GraphNode): GraphNode {
-        if (nodeA == nodeB) return nodeA
-        val ancestorsA = mutableSetOf<GraphNode>()
-        fun collectA(n: GraphNode) { if (ancestorsA.add(n)) n.parents.forEach { collectA(it) } }
-        collectA(nodeA)
-        val ancestorsB = mutableSetOf<GraphNode>()
-        fun collectB(n: GraphNode) { if (ancestorsB.add(n)) n.parents.forEach { collectB(it) } }
-        collectB(nodeB)
-        val common = ancestorsA.intersect(ancestorsB)
-        return if (common.isEmpty()) root else common.maxByOrNull { it.depth } ?: root
-    }
-
     // ─────────────────────────────────────────────────────────────────────────
     //  Clustering metric implementations
     // ─────────────────────────────────────────────────────────────────────────
-
-    private fun calculateNmi(
-        queries: List<String>, gt: Map<String, String>, pred: Map<String, String>
-    ): Double {
-        val n = queries.size.toDouble(); if (n == 0.0) return 0.0
-        val uC = mutableMapOf<String, Double>(); val vC = mutableMapOf<String, Double>()
-        val uvC = mutableMapOf<Pair<String, String>, Double>()
-        for (q in queries) {
-            val u = gt[q] ?: "Unknown"; val v = pred[q] ?: "Unknown"
-            uC[u] = (uC[u] ?: 0.0) + 1.0; vC[v] = (vC[v] ?: 0.0) + 1.0
-            val pair = u to v; uvC[pair] = (uvC[pair] ?: 0.0) + 1.0
-        }
-        var hU = 0.0; for ((_, c) in uC) { val p = c / n; hU -= p * Math.log(p) }
-        var hV = 0.0; for ((_, c) in vC) { val p = c / n; hV -= p * Math.log(p) }
-        var iUV = 0.0
-        for ((pair, c) in uvC) {
-            val pUV = c / n; val pU = (uC[pair.first] ?: 0.0) / n; val pV = (vC[pair.second] ?: 0.0) / n
-            if (pU > 0.0 && pV > 0.0) iUV += pUV * Math.log(pUV / (pU * pV))
-        }
-        val denom = hU + hV; return if (denom > 0.0) (2.0 * iUV) / denom else 0.0
-    }
 
     private fun calculateAri(
         queries: List<String>, gt: Map<String, String>, pred: Map<String, String>
@@ -335,37 +335,6 @@ class TaxonomyMetrics(
             totalN         += leaf.queries.size.toDouble()
         }
         return if (totalN > 0.0) totalIntersect / totalN else 0.0
-    }
-
-    private fun calculateDendrogramPurity(
-        queries:             List<Embedding>,
-        gt:                  Map<String, String>,
-        queryToPrimaryLeaf:  Map<String, GraphNode>,
-        sampleSize:          Int = 1000
-    ): Double {
-        val classToQ = queries.groupBy { gt[it.rawText] ?: "Unknown" }
-            .filter { it.key != "Unknown" && it.value.size >= 2 }
-        if (classToQ.isEmpty()) return 0.0
-
-        var totalPurity = 0.0; var count = 0
-        val rng = java.util.Random(42); val classes = classToQ.keys.toList()
-        repeat(sampleSize) {
-            val cls  = classes[rng.nextInt(classes.size)]
-            val list = classToQ[cls]!!
-            val i    = rng.nextInt(list.size); var j = rng.nextInt(list.size)
-            while (j == i) j = rng.nextInt(list.size)
-            val leafA = queryToPrimaryLeaf[list[i].rawText]; val leafB = queryToPrimaryLeaf[list[j].rawText]
-            if (leafA != null && leafB != null) {
-                val lca          = findLca(leafA, leafB)
-                val branchQ      = lca.getAllQueriesInBranch()
-                if (branchQ.isNotEmpty()) {
-                    val maxClassC = branchQ.map { gt[it.rawText] ?: "Unknown" }.groupBy { it }.values.maxOfOrNull { it.size } ?: 0
-                    totalPurity += maxClassC.toDouble() / branchQ.size.toDouble()
-                    count++
-                }
-            }
-        }
-        return if (count > 0) totalPurity / count else 0.0
     }
 
     private fun calculateEdgeF1(

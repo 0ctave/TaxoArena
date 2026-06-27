@@ -94,6 +94,10 @@ data class TaxonomyMetricsData(
     val edgeF1: Double = 0.0,
     val sphericalSilhouette: Double = 0.0,
     val ancestorCorrectRate: Double = 0.0,
+    // Hierarchical F₁ (Kosmopoulos et al. 2014) — ancestor-aware routing quality.
+    val hPrecision: Double = 0.0,
+    val hRecall: Double = 0.0,
+    val hF1: Double = 0.0,
     val avgMatchCount: Double = 1.0,
     /** Average vMF concentration (κ) per depth level. */
     val kappaByDepth: Map<Int, Double> = emptyMap(),
@@ -132,6 +136,9 @@ data class IterationMetrics(
     val edgeF1: Double                  get() = metrics.edgeF1
     val sphericalSilhouette: Double     get() = metrics.sphericalSilhouette
     val ancestorCorrectRate: Double     get() = metrics.ancestorCorrectRate
+    val hPrecision: Double              get() = metrics.hPrecision
+    val hRecall: Double                 get() = metrics.hRecall
+    val hF1: Double                     get() = metrics.hF1
     val avgMatchCount: Double           get() = metrics.avgMatchCount
     val kappaByDepth: Map<Int, Double>  get() = metrics.kappaByDepth
     val leafDistribEntropy: Double      get() = metrics.leafDistribEntropy
