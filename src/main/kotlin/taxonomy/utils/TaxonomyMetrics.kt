@@ -210,15 +210,15 @@ class TaxonomyMetrics(
         }
 
         // Per-query true-leaf ground truth: each query's MMLU-Pro category resolves to the
-        // deepest DAG node carrying that label (its domain subtree). Built from the categories
-        // already plumbed in via groundTruthMap; empty when no categories are known.
+        // depth-1 node whose originalCategory matches. originalCategory is frozen at bootstrap
+        // and survives LLM relabeling; label is used only as a fallback for old snapshots
+        // that predate the originalCategory field.
         val groundTruthLeaves: Map<String, GraphNode> = run {
-            // For each GT category, find the depth-1 node that represents it.
-            // Depth-1 nodes keep their original bootstrap labels (category names),
-            // so this match is stable across all iterations.
+            // Key depth-1 nodes by originalCategory first, then fall back to label.
+            // This ensures the lookup is stable even after post-pass LLM relabeling.
             val depth1ByCategory = allNodes
                 .filter { it.depth == 1 }
-                .associateBy { it.label?.lowercase() ?: "" }
+                .associateBy { (it.originalCategory ?: it.label)?.lowercase() ?: "" }
 
             val result = mutableMapOf<String, GraphNode>()
             leaves.forEach { leaf ->
@@ -226,8 +226,9 @@ class TaxonomyMetrics(
                     if (emb.groundTruthCategory.isNotBlank()) {
                         val gtNode = depth1ByCategory[emb.groundTruthCategory.lowercase()]
                         if (gtNode != null) result[emb.rawText] = gtNode
-                        // If the depth-1 label was renamed by LLM, fall back to
-                        // the leaf itself (marks it as "correct" for that query).
+                        // If no depth-1 anchor matches, fall back to the predicted leaf
+                        // (treats routing as correct for this query rather than penalising
+                        // it for a missing GT anchor).
                         else result.putIfAbsent(emb.rawText, leaf)
                     }
                 }
@@ -240,8 +241,8 @@ class TaxonomyMetrics(
         // overlapping-cover NMI compared disjoint node-id spaces and collapsed to ~0.
         val groundTruthCover: Map<String, Map<String, Double>> = groundTruthLeaves
             .mapValues { (_, gtNode) -> mapOf(gtNode.id to 1.0) }
-// Use DAG-compatible overlapping NMI (Lancichinetti et al. 2009).
-// Falls back gracefully to 0.0 when groundTruthMap is empty.
+        // Use DAG-compatible overlapping NMI (Lancichinetti et al. 2009).
+        // Falls back gracefully to 0.0 when groundTruthMap is empty.
         val nmi = if (groundTruthCover.isEmpty() || predictedCover.isEmpty()) {
             ShannonNmi.compute(gtSimple, predSimple)   // keep Shannon as fallback when GT is flat/absent
         } else {
@@ -295,10 +296,8 @@ class TaxonomyMetrics(
         val totalDasguptaCost = computeTotalDasguptaCost(root, queryEmbeddings)
         val tripletAccuracy   = computeTripletAccuracy(root, queryEmbeddings)
         val normalisedSackin  = computeNormalisedSackin(root)
-        // ECE needs per-query true *leaf node* identity — the same plumbing gap as
-        // Hierarchical F₁ (see TODO above). Until that ground truth is wired,
-        // pass an empty map: the metric logs a WARN and reports 0.0 rather than
-        // fabricating calibration figures.
+        // routingECE receives the same groundTruthLeaves map (node IDs) now that
+        // the GT plumbing is complete — no longer silently 0.0 after M1.
         val routingECE        = computeRoutingECE(predictedCover, groundTruthLeaves.mapValues { it.value.id })
 
         return Report(
@@ -342,12 +341,18 @@ class TaxonomyMetrics(
      * with that category (preferring leaves on a depth tie), which roots the category's domain
      * subtree. Categories with no matching node are dropped with a WARN and excluded from the
      * hierarchical ground truth (so the metrics degrade to 0 rather than throwing).
+     *
+     * NOTE: this helper is retained for contamination-ratio and edgeF1 which still use
+     * label-based matching. It is NOT used for groundTruthLeaves (which uses
+     * emb.groundTruthCategory + node.originalCategory instead).
      */
     private fun buildCategoryToNode(allNodes: Set<GraphNode>): Map<String, GraphNode> {
         val byCategory = HashMap<String, GraphNode>()
         for (category in groundTruthMap.values.flatten().toSet()) {
             val match = allNodes
-                .filter { it.label?.equals(category, ignoreCase = true) == true }
+                .filter {
+                    (it.originalCategory ?: it.label)?.equals(category, ignoreCase = true) == true
+                }
                 .maxWithOrNull(compareBy({ it.depth }, { if (it.isLeaf) 1 else 0 }))
             if (match != null) byCategory[category] = match
             else log.warn("No DAG node labeled '$category'; excluding category from hierarchical ground truth")
@@ -368,7 +373,10 @@ class TaxonomyMetrics(
         val visited   = mutableSetOf<String>()
         fun walk(n: GraphNode) {
             if (!visited.add(n.id)) return
-            if (n.depth == 1) n.label?.let { ancestors.add(it) }
+            if (n.depth == 1) {
+                // Prefer originalCategory (frozen at bootstrap) over label (may be LLM-renamed).
+                (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
+            }
             else n.parents.forEach { walk(it) }
         }
         walk(node)
