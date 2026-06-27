@@ -67,6 +67,7 @@ fun AsciiTreeTable(
     lines: List<TreeLine>,
     offset: Int,
     selectedIdx: Int,
+    queryCounts: Map<String, Int> = emptyMap(),
 ) {
     if (lines.isEmpty()) {
         Column {
@@ -101,7 +102,8 @@ fun AsciiTreeTable(
             val line = lines[i]
             val node = line.node
             val selected = i == selectedIdx
-            val totalQ = node.getRecursiveQueryCount()
+            // Use the memoized count (per graphVersion) to avoid an O(subtree) walk per row.
+            val totalQ = queryCounts[node.id] ?: node.getRecursiveQueryCount()
             val hasJudge = node.judgePrompt != null
             val qStr = totalQ.toString().padStart(QCOL)
             val judgeGlyph = if (hasJudge) "\u2714" else "\u25cb" // ✔ / ○
@@ -128,37 +130,6 @@ fun AsciiTreeTable(
             Text(
                 row.take(pWidth - 1),
                 modifier = Modifier.height(1),
-                textStyle = if (selected) Bold else Unspecified
-            )
-        }
-    }
-}
-
-/** Renders the flat node list (sorted by query volume) for the DAG topology. */
-@Composable
-fun DagTable(
-    pWidth: Int,
-    pHeight: Int,
-    nodes: List<GraphNode>,
-    offset: Int,
-    selectedIdx: Int,
-) {
-    val visible = (pHeight - 1).coerceAtLeast(1)
-    val start = offset.coerceIn(0, maxOf(0, nodes.size - visible))
-    val end = (start + visible).coerceAtMost(nodes.size)
-
-    Column {
-        if (nodes.isEmpty()) {
-            Text("No taxonomy graph loaded.", color = White)
-            return@Column
-        }
-        for (i in start until end) {
-            val node = nodes[i]
-            val selected = i == selectedIdx
-            val label = node.label ?: node.id
-            Text(
-                value = (if (selected) "> " else "  ") + "$label  (q:${node.queries.size}, d:${node.depth})",
-                color = if (selected) Cyan else White,
                 textStyle = if (selected) Bold else Unspecified
             )
         }

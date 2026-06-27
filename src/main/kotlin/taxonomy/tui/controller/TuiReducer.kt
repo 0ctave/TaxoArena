@@ -247,12 +247,6 @@ object TuiReducer {
             is TuiEvent.RequestDeleteSnapshot ->
                 state
 
-            TuiEvent.ToggleAsciiTree ->
-                state.copy(
-                    topology = state.topology.copy(
-                        showAsciiTree = !state.topology.showAsciiTree
-                    )
-                )
 
             TuiEvent.ToggleDomainSelector ->
                 state.copy(
@@ -793,17 +787,10 @@ object TuiReducer {
                     state.copy(
                         config = state.config.copy(domainScrollOffset = safe)
                     )
-                } else if (state.topology.showAsciiTree) {
-                    state.copy(
-                        topology = state.topology.copy(
-                            treeScrollOffset = safe,
-                            autoScroll = false
-                        )
-                    )
                 } else {
                     state.copy(
                         topology = state.topology.copy(
-                            scrollOffset = safe,
+                            treeScrollOffset = safe,
                             autoScroll = false
                         )
                     )
@@ -870,17 +857,10 @@ object TuiReducer {
                             domainScrollOffset = (state.config.domainScrollOffset + delta).coerceAtLeast(0)
                         )
                     )
-                } else if (state.topology.showAsciiTree) {
-                    state.copy(
-                        topology = state.topology.copy(
-                            treeScrollOffset = (state.topology.treeScrollOffset + delta).coerceAtLeast(0),
-                            autoScroll = false
-                        )
-                    )
                 } else {
                     state.copy(
                         topology = state.topology.copy(
-                            scrollOffset = (state.topology.scrollOffset + delta).coerceAtLeast(0),
+                            treeScrollOffset = (state.topology.treeScrollOffset + delta).coerceAtLeast(0),
                             autoScroll = false
                         )
                     )

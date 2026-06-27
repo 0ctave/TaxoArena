@@ -57,8 +57,15 @@ fun MetricsOrInspectorPanel(
                     if (node.parents.size > 1) {
                         Spacer()
                         Text("Parents:", color = Cyan)
-                        node.parents.take(3).forEach {
+                        node.parents.take(4).forEach {
                             Text("  \u00b7 ${it.label ?: it.id}", color = White)
+                        }
+                    }
+                    if (node.crossLinkChildren.isNotEmpty()) {
+                        Spacer()
+                        Text("Cross-linked children:", color = Yellow)
+                        node.crossLinkChildren.take(4).forEach {
+                            Text("  \u21c4 ${it.label ?: it.id}", color = White)
                         }
                     }
                     val samples = node.queries.take(3)

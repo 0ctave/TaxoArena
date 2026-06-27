@@ -80,7 +80,6 @@ sealed interface TuiEvent {
     data object CancelRenameSnapshot : TuiEvent
     data class UpdateRenameInput(val value: String) : TuiEvent
 
-    data object ToggleAsciiTree : TuiEvent
     data object ToggleDomainSelector : TuiEvent
     data class SetSelectedListIdx(val index: Int) : TuiEvent
     data class SetSelectedTreeIdx(val index: Int) : TuiEvent
