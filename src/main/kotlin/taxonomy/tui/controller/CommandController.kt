@@ -172,11 +172,13 @@ class CommandController(
                 // judge regeneration here.
                 if (state.startup.state == StartupState.MAINDASHBOARD) {
                     when (event.key.lowercase()) {
-                        "e" -> effects.exportAscii()
                         // In Arena mode "l" toggles the leaderboard (handled in the controller),
                         // so only treat it as label regeneration outside Arena.
                         "l" -> if (state.analysis.mode != AnalysisMode.ARENA) effects.regenerateLabels()
-                        "r" -> effects.regenerateJudgeForCurrentNode()
+                        "r" -> {
+                            dispatch(TuiEvent.SetGeneratingJudge(true))
+                            effects.regenerateJudgeForCurrentNode(dispatch)
+                        }
                         else -> Unit
                     }
                 }

@@ -18,6 +18,9 @@ data class ArenaUiState(
     val isEnteringArenaModelB: Boolean = false,
     val arenaModelBInput: String = "",
 
+    // True while a single-node judge generation (R in NODE_DETAIL) is in flight.
+    val isGeneratingJudge: Boolean = false,
+
     // Leaderboard sub-view (toggled with "l" while in Arena mode).
     val isViewingLeaderboard: Boolean = false,
     val leaderboard: List<taxonomy.service.LeaderboardGroup> = emptyList(),

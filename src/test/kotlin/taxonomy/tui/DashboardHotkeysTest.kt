@@ -32,7 +32,19 @@ class DashboardHotkeysTest {
         assertTrue(k.contains("A"))
         assertTrue(k.contains("B"))
         assertTrue(k.contains("T"))
-        assertTrue(k.contains("N"))
+        // Export ASCII and manual Save-Snapshot were removed; N (rename) only shows when viewing.
+        assertFalse(k.contains("E"))
+        assertFalse(k.contains("N"))
+    }
+
+    @Test
+    fun showsRenameSnapshotOnlyWhenViewingSnapshot() {
+        val viewing = keys(
+            DashboardHotkeys.forState(
+                hasDag = true, FocusPanel.ANALYSIS_HUB, isRegenerating = false, isViewingSnapshot = true
+            )
+        )
+        assertTrue(viewing.contains("N"))
     }
 
     @Test
