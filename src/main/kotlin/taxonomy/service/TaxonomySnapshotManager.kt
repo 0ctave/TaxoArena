@@ -62,7 +62,12 @@ data class SnapshotMetrics(
     val leafDistribEntropy: Double = 0.0,
     val medianLeafAssignments: Double = 0.0,
     /** Average vMF κ per depth level. Defaulted for backward compatibility. */
-    val kappaByDepth: Map<Int, Double> = emptyMap()
+    val kappaByDepth: Map<Int, Double> = emptyMap(),
+    // Publication-grade metrics (PR #49)
+    val totalDasguptaCost: Double = 0.0,
+    val routingECE: Double = 0.0,
+    val tripletAccuracy: Double = 0.0,
+    val normalisedSackin: Double = 0.0,
 ) {
     /** Project onto the canonical metrics payload (drops snapshot-only fields). */
     fun toData(): TaxonomyMetricsData = TaxonomyMetricsData(
@@ -91,6 +96,10 @@ data class SnapshotMetrics(
         avgMatchCount         = avgMatchCount,
         kappaByDepth          = kappaByDepth,
         leafDistribEntropy    = leafDistribEntropy,
+        totalDasguptaCost     = totalDasguptaCost,
+        routingECE            = routingECE,
+        tripletAccuracy       = tripletAccuracy,
+        normalisedSackin      = normalisedSackin,
     )
 
     companion object {
@@ -123,6 +132,10 @@ data class SnapshotMetrics(
                 leafDistribEntropy    = data.leafDistribEntropy,
                 medianLeafAssignments = data.medianLeafAssignments,
                 kappaByDepth          = data.kappaByDepth,
+                totalDasguptaCost     = data.totalDasguptaCost,
+                routingECE            = data.routingECE,
+                tripletAccuracy       = data.tripletAccuracy,
+                normalisedSackin      = data.normalisedSackin,
             )
 
         /** Single bridge from a freshly computed report to persisted snapshot metrics. */

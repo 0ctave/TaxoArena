@@ -102,6 +102,11 @@ data class TaxonomyMetricsData(
     /** Average vMF concentration (κ) per depth level. */
     val kappaByDepth: Map<Int, Double> = emptyMap(),
     val leafDistribEntropy: Double = 0.0,
+    // Publication-grade metrics (PR #49)
+    val totalDasguptaCost: Double = 0.0,
+    val routingECE: Double = 0.0,
+    val tripletAccuracy: Double = 0.0,
+    val normalisedSackin: Double = 0.0,
 )
 
 /**
@@ -142,6 +147,10 @@ data class IterationMetrics(
     val avgMatchCount: Double           get() = metrics.avgMatchCount
     val kappaByDepth: Map<Int, Double>  get() = metrics.kappaByDepth
     val leafDistribEntropy: Double      get() = metrics.leafDistribEntropy
+    val totalDasguptaCost: Double       get() = metrics.totalDasguptaCost
+    val routingECE: Double              get() = metrics.routingECE
+    val tripletAccuracy: Double         get() = metrics.tripletAccuracy
+    val normalisedSackin: Double        get() = metrics.normalisedSackin
 }
 
 fun Embedding.projectTo(targetDim: Int): DoubleArray {
