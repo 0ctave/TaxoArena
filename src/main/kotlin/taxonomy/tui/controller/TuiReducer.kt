@@ -405,11 +405,11 @@ object TuiReducer {
                         generationStatusText = "Cancelled"
                     ),
                     runtime = state.runtime.copy(isRegenerating = false),
-                    trickle = state.trickle.copy(
+                    benchmark = state.benchmark.copy(
                         isRunningBatchTrickleTest = false,
-                        batchTrickleProgress = "Cancelled"
-                    ),
-                    benchmark = state.benchmark.copy(isDownloadingEval = false)
+                        batchTrickleProgress = "Cancelled",
+                        isDownloadingEval = false
+                    )
                 )
 
             TuiEvent.StartGeneration ->
@@ -597,9 +597,7 @@ object TuiReducer {
                     analysis = state.analysis.copy(mode = AnalysisMode.TRICKLE_TEST),
                     trickle = state.trickle.copy(
                         isEnteringTrickleQuery = true,
-                        trickleQueryInput = "",
-                        isViewingBatchTrickleResults = false,
-                        batchTrickleScrollOffset = 0
+                        trickleQueryInput = ""
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
                 )
@@ -628,25 +626,23 @@ object TuiReducer {
 
             TuiEvent.RunBatchTrickleTest ->
                 state.copy(
-                    trickle = state.trickle.copy(
+                    benchmark = state.benchmark.copy(
                         isRunningBatchTrickleTest = true,
                         batchTrickleProgress = "Starting batch trickle test…",
-                        batchTrickleResults = null,
-                        isViewingBatchTrickleResults = false
+                        batchTrickleResults = null
                     )
                 )
 
             is TuiEvent.BatchTrickleProgress ->
                 state.copy(
-                    trickle = state.trickle.copy(batchTrickleProgress = event.text)
+                    benchmark = state.benchmark.copy(batchTrickleProgress = event.text)
                 )
 
             is TuiEvent.BatchTrickleCompleted ->
                 state.copy(
-                    trickle = state.trickle.copy(
+                    benchmark = state.benchmark.copy(
                         isRunningBatchTrickleTest = false,
-                        batchTrickleResults = event.results,
-                        isViewingBatchTrickleResults = true
+                        batchTrickleResults = event.results
                     )
                 )
 
@@ -659,30 +655,43 @@ object TuiReducer {
                     )
                 )
 
-            is TuiEvent.SetViewingBatchTrickleResults ->
-                state.copy(
-                    trickle = state.trickle.copy(
-                        isViewingBatchTrickleResults = event.value
-                    )
-                )
-
-            is TuiEvent.SetBatchTrickleScrollOffset ->
-                state.copy(
-                    trickle = state.trickle.copy(
-                        batchTrickleScrollOffset = event.offset.coerceAtLeast(0)
-                    )
-                )
-
             TuiEvent.StartBenchmarkFlow ->
                 state.copy(
                     analysis = state.analysis.copy(mode = AnalysisMode.BENCHMARK),
                     benchmark = state.benchmark.copy(
+                        // Always (re)enter on the type-selection screen.
+                        benchmarkType = taxonomy.tui.state.BenchmarkType.NONE,
+                        benchmarkTypeSelectionIndex = 0,
                         selectedBenchmarkField = 0,
                         isEditingBenchmarkField = false,
                         benchmarkEditingValue = "",
                         benchmarkScrollOffset = 0
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
+                )
+
+            is TuiEvent.SetBenchmarkType ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkType = event.type,
+                        benchmarkScrollOffset = 0
+                    )
+                )
+
+            is TuiEvent.SetBenchmarkTypeSelectionIndex ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkTypeSelectionIndex = event.index.coerceIn(0, 1)
+                    )
+                )
+
+            TuiEvent.ResetBenchmarkType ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        benchmarkType = taxonomy.tui.state.BenchmarkType.NONE,
+                        benchmarkTypeSelectionIndex = 0,
+                        benchmarkScrollOffset = 0
+                    )
                 )
 
             is TuiEvent.BenchmarkModelsLoaded ->
@@ -909,11 +918,6 @@ object TuiReducer {
                             analysis = state.analysis.copy(metricsScrollOffset = safe)
                         )
 
-                    AnalysisMode.TRICKLE_TEST ->
-                        state.copy(
-                            trickle = state.trickle.copy(batchTrickleScrollOffset = safe)
-                        )
-
                     AnalysisMode.BENCHMARK ->
                         state.copy(
                             benchmark = state.benchmark.copy(benchmarkScrollOffset = safe)
@@ -982,13 +986,6 @@ object TuiReducer {
                         state.copy(
                             analysis = state.analysis.copy(
                                 metricsScrollOffset = (state.analysis.metricsScrollOffset + delta).coerceAtLeast(0)
-                            )
-                        )
-
-                    AnalysisMode.TRICKLE_TEST ->
-                        state.copy(
-                            trickle = state.trickle.copy(
-                                batchTrickleScrollOffset = (state.trickle.batchTrickleScrollOffset + delta).coerceAtLeast(0)
                             )
                         )
 

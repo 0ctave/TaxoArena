@@ -400,7 +400,6 @@ private fun MainDashboardRoute(
             inspectorScroll = state.analysis.inspectorScroll,
             metricsScroll = state.analysis.metricsScrollOffset,
             benchmarkScroll = state.benchmark.benchmarkScrollOffset,
-            batchTrickleScroll = state.trickle.batchTrickleScrollOffset,
             trickleState = state.trickle,
             snapshotState = state.snapshot,
             arenaState = state.arena,

@@ -158,14 +158,18 @@ sealed interface TuiEvent {
     data object CancelTrickleInput : TuiEvent
     /** Run a single trickle query against the live taxonomy; results land via [TrickleResultReceived]. */
     data class TrickleResultReceived(val nodes: List<taxonomy.service.QueryResponseNode>) : TuiEvent
-    /** Run the full batch trickle test (the "B" hotkey while in Trickle mode). */
+    /** Run the full batch trickle test (the "B" hotkey under the TRICKLE benchmark type). */
     data object RunBatchTrickleTest : TuiEvent
     data class BatchTrickleProgress(val text: String) : TuiEvent
     data class BatchTrickleCompleted(val results: taxonomy.tui.BatchTrickleTestResults) : TuiEvent
-    data class SetViewingBatchTrickleResults(val value: Boolean) : TuiEvent
-    data class SetBatchTrickleScrollOffset(val offset: Int) : TuiEvent
 
     data object StartBenchmarkFlow : TuiEvent
+    /** Pick an evaluation type on the Benchmark hub selection screen. */
+    data class SetBenchmarkType(val type: taxonomy.tui.state.BenchmarkType) : TuiEvent
+    /** Move the W/S cursor on the Benchmark hub selection screen. */
+    data class SetBenchmarkTypeSelectionIndex(val index: Int) : TuiEvent
+    /** Return to the Benchmark hub selection screen (ESC from a chosen type). */
+    data object ResetBenchmarkType : TuiEvent
     data object RunBenchmark : TuiEvent
     data object RunEvalLoad : TuiEvent
     /** Live per-question progress streamed from a running benchmark. */
