@@ -1,30 +1,69 @@
 # Phase 3: Trickle (Top-Down Restrictive Routing)
 
-## 1. Multi-Component GMM Inclusion
-To trickle a query $x$ through the DAG, ArcTaxoAdapat evaluates it against the **Composite Distribution** of each node.
+*Implemented in `TaxonomyTrickler.kt`*
 
-### 1.1 Regularized Mahalanobis Distance
-A query $x$ is evaluated using the **Minimum Regularized Mahalanobis Distance** across all $K$ components of a node's GMM.
-$$ D_M(x | \mu_k, \Sigma_k) = \sqrt{(x - \mu_k)^T \hat{\Sigma}_k^{-1} (x - \mu_k)} $$
-The covariance is regularized using a $\lambda$ parameter (default 0.1) to align it with the properties of the Cosine embedding space, preventing singularities and ensuring stability.
+Trickle routes every embedding from the root down the DAG, accumulating log-probabilities at each level via a temperature-scaled vMF log-likelihood, and returns a set of destination leaves filtered by a margin criterion.
 
-### 1.2 Union Inclusion Logic
-A query is considered to reside within a node if it falls within the statistical boundary of **any** of its components.
-$$ \mathbb{I}(x \in P) = \bigvee_{k=1}^{K} D_M(x | \mu_k, \Sigma_k) \le \tau_{\text{threshold}} $$
+---
 
-## 2. The Restrictive Funnel Effect
-Knowledge routing becomes progressively more exclusive as queries move deeper into the hierarchy.
+## 1. DAG Walk and Log-Probability Accumulation
 
-### 2.1 Depth-Decayed Confidence ($\alpha$)
-The system applies an exponential decay to the confidence interval $\alpha$ based on the node's depth:
-$$ \alpha = \tau_{fit} \cdot e^{-\lambda \cdot depth} $$
-Where $\tau_{fit}$ is the baseline confidence (default 0.95) and $\lambda$ is the `depthDecayLambda` (default 0.6).
+The walk starts at the root with \(\log p = 0\) and recurses into every child. Because the DAG may have cross-link edges (a node reachable via multiple paths), the log-probability from all paths is combined with log-sum-exp:
 
-### 2.2 Chi-Square Thresholding
-The decayed $\alpha$ is converted to a distance threshold using a high-dimensional Chi-Square distribution approximation ($N(d, 2d)$ for $d=4096$). This ensures that macro-domains (shallow) are inclusive while leaf-domains (deep) are highly exclusive.
+\[
+\log p_{\text{acc}}(v) = \log\!\left(\sum_{\text{paths } \pi : \text{root} \to v} \exp\!\left(\sum_{e \in \pi} \log p_e\right)\right)
+\]
 
-## 3. Top-Down Routing Logic
-1.  **Start at Root**: All queries begin at the root node (depth 0).
-2.  **Evaluate Children**: For each node, the query is checked against all child distributions.
-3.  **Forking (Multi-Parent)**: If a query fits multiple children (within the `maxAssignmentsPerQuery` limit), it is "forked" and trickled down each matching branch.
-4.  **Outlier Retention**: If a query satisfies the parent's macro-domain threshold but fails to map to any child sub-domain, it is retained in the parent's **unmapped query pool**. These "outliers" are the raw material for the **Discover** phase.
+This ensures polyhierarchical assignments are treated correctly: if a leaf is reachable by two paths, both paths contribute to its total score.
+
+---
+
+## 2. Per-Level Scoring: vMF Log-Likelihood
+
+At each non-leaf node \(v\) with children \(\{c_1, \ldots, c_K\}\), the raw score for child \(c_k\) is the vMF log-density of the query \(\hat{\mathbf{x}}\) projected to the child's slice dimension \(d_k\):
+
+\[
+f_k = \log C_{d_k}(\kappa_{\text{sib}}) + \kappa_{\text{sib}}\, \boldsymbol{\mu}_{c_k}^\top \hat{\mathbf{x}}_{[1:d_k]}
+\]
+
+where \(\kappa_{\text{sib}} = \operatorname{clip}\!\left(\frac{1}{K}\sum_k \kappa_{c_k},\, 1,\, 100\right)\) is the sibling-average concentration used as a shared normalizer to make scores comparable across siblings with varying \(\kappa\).
+
+**Ground-truth bias (iteration 1 only):** when a query's original category matches a child label, the score is boosted by \(\log(1/0.7) \approx 0.357\) nats to guide early-stage routing before the vMF parameters have fully converged.
+
+---
+
+## 3. Temperature-Scaled Softmax
+
+The raw scores are divided by temperature \(\tau\) (config: `cosineTau`, default 0.5) and passed through a numerically stable log-softmax:
+
+\[
+\log q_k = \frac{f_k}{\tau} - \log\!\sum_{j=1}^{K} \exp\!\left(\frac{f_j}{\tau}\right)
+\]
+
+To prevent zero-probability mass at any child (important for the DAG log-sum-exp accumulation), Laplace smoothing with \(\varepsilon = 0.05/K\) is applied before taking logs:
+
+\[
+p_k^{\text{smooth}} = \frac{e^{\log q_k} + \varepsilon}{1 + K\varepsilon}, \qquad \log p_k = \log p_k^{\text{smooth}}
+\]
+
+---
+
+## 4. Assignment Margin Filter
+
+After the full DAG walk, only leaf nodes within `assignmentGap` (fractional, e.g. 0.05) of the best-scoring leaf are returned:
+
+\[
+\mathcal{A}(\hat{\mathbf{x}}) = \left\{\, v \in \text{Leaves} \;\Big|\; \exp\!\left(\log p_{\text{acc}}(v)\right) \geq (1 - \delta_{\text{gap}}) \cdot \max_{\ell}\, e^{\log p_{\text{acc}}(\ell)} \right\}
+\]
+
+This replaces the legacy hard cap on multi-assignments. The number of assigned leaves is now determined purely by the geometry of the embedding space:
+- At bootstrap (4 coarse leaves), well-separated domains produce \(|\mathcal{A}| = 1\) for the vast majority of queries.
+- At equilibrium with hundreds of fine-grained leaves, semantically ambiguous queries naturally land in 2–3 close-scoring leaves.
+
+If the filter returns an empty set (all leaves below the gap threshold, e.g. out-of-distribution query), the query falls back to the root.
+
+---
+
+## 5. Output Normalization
+
+The returned map \(\{v \to \log p_v\}\) is renormalized so that \(\sum_{v \in \mathcal{A}} \exp(\log p_v) = 1\), making the returned values proper log-probabilities suitable for downstream use in metrics (ECE, triplet accuracy).

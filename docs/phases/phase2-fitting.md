@@ -1,30 +1,96 @@
-# Phase 2: Fit (Context-Aware Distribution Modeling)
+# Phase 2: Fit (vMF + NiW Posterior Estimation)
 
-## 1. Hierarchical Mixture Modeling (HMM)
-ArcTaxoAdapat models each node in the DAG not as a single Gaussian, but as a **Gaussian Mixture Model (GMM)**. This multi-centroid representation allows each node to capture internal semantic variance and multi-modal identities.
+*Implemented in `TaxonomyFitter.kt`*
 
-### 1.1 Multi-Centroid Components
-A node $L$ is represented as a GMM with $K$ components:
-$$ P(x | L) = \sum_{k=1}^{K} \pi_k \mathcal{N}(x | \mu_k, \Sigma_k) $$
-Where $\pi_k$ is the mixture weight, $\mu_k$ is the component centroid, and $\Sigma_k$ is the diagonal covariance matrix.
+For every active node the fitter estimates two probabilistic models: a von Mises-Fisher (vMF) distribution that describes the directional mean and concentration of the node's query set on the unit hypersphere, and a Normal-inverse-Wishart (NiW) posterior that provides a Bayesian regularization envelope for that estimate.
 
-## 2. Leaf Node Fitting
-For terminal leaf nodes, the system utilizes two complementary models:
+---
 
-### 2.1 Multi-Centroid OAS
-To ensure well-conditioned covariance matrices in 4096-dimensional space, ArcTaxoAdapat employs **Oracle Approximating Shrinkage (OAS)**. OAS calculates a shrinkage intensity $\rho$ to pull the empirical covariance towards an isotropic average, preventing singularities when the number of samples $N$ is much smaller than the dimensionality $D$.
-$$ \Sigma_{OAS} = (1 - \rho) \Sigma_{emp} + \rho \frac{\text{Tr}(\Sigma_{emp})}{D} I $$
+## 1. MRL Dimension Schedule
 
-The system seeds up to `maxCentroidsPerNode` (default 3) by partitioning the data into dense clusters and fitting a separate OAS component to each.
+Embedding slices follow the Matryoshka Representation Learning schedule tied to node depth:
 
-### 2.2 Simplified Isolation Kernel (SIK)
-Leaf nodes also maintain a **Simplified Isolation Kernel (SIK)** model. SIK uses $T$ random partition centers and an inclusion radius $\psi$ (based on the `sikPercentile`). This provides a non-parametric "envelope" for strict leaf inclusion, preventing distant outliers from being assigned to high-precision leaf domains.
+| Depth | Slice dimension |
+|-------|----------------|
+| 0 (root) | 128 |
+| 1 | 256 |
+| 2 | 512 |
+| 3 + | 1024 |
 
-## 3. Parent Node Fitting: Recursive Union
-An internal parent node is fitted using a **Bottom-Up** traversal. Its distribution is the **Composite Union** of its children's already-fitted GMMs, plus its own residual query pool.
+Each slice is renormalized to the unit hypersphere before any distance or density computation: \(\hat{\mathbf{x}} = \mathbf{x}_{[1:d]} \;/\; \lVert \mathbf{x}_{[1:d]} \rVert_2\). Renormalization is mandatory because MRL prefix slices are not unit-norm by construction (Kusupati et al., NeurIPS 2022).
 
-### 3.1 Structural Simplification
-To prevent an exponential explosion of centroids in the root node, the system performs **GMM Simplification** after each union. Components with a `cosineSimilarity` higher than `tauMerge` (default 0.92) are fused into a single weighted average component.
+---
 
-### 3.2 Proportional Weighting
-The mixture weights $\pi_k$ for a parent node are adjusted proportionally based on the sample count of its children, ensuring that larger sub-domains have a stronger influence on the parent's macro-domain boundaries.
+## 2. vMF Parameter Estimation
+
+Each node is modelled as a single-component vMF distribution on \(\mathcal{S}^{d-1}\):
+
+\[
+p(\hat{\mathbf{x}} \mid \boldsymbol{\mu}, \kappa) = C_d(\kappa)\, \exp\!\left(\kappa\, \boldsymbol{\mu}^\top \hat{\mathbf{x}}\right)
+\]
+
+where \(C_d(\kappa) = \kappa^{d/2-1} \;/\; \bigl((2\pi)^{d/2} I_{d/2-1}(\kappa)\bigr)\) and \(I_\nu\) is the modified Bessel function of the first kind.
+
+### 2.1 Mean Direction MLE
+
+\[
+\hat{\boldsymbol{\mu}} = \frac{\sum_{i=1}^{N} \hat{\mathbf{x}}_i}{\left\lVert \sum_{i=1}^{N} \hat{\mathbf{x}}_i \right\rVert_2}, \qquad \bar{R} = \frac{\left\lVert \sum_{i=1}^{N} \hat{\mathbf{x}}_i \right\rVert_2}{N}
+\]
+
+### 2.2 Concentration MLE with Hornik–Grün Shrinkage
+
+The raw Banerjee closed-form approximation to the MLE (Banerjee et al., JMLR 2005) is:
+
+\[
+\hat{\kappa}_{\text{MLE}} = \frac{\bar{R}(d - \bar{R}^2)}{1 - \bar{R}^2}
+\]
+
+Because the bias of \(\hat{\kappa}_{\text{MLE}}\) is \(O(d/N)\), a multiplicative shrinkage correction (Hornik & Grün, JSS 2014, Eq. 9) is applied in `correctedKappa`:
+
+\[
+\hat{\kappa} = \hat{\kappa}_{\text{MLE}} \cdot \frac{N-1}{N+d-2}
+\]
+
+The correction is material at depth ≥ 2 where \(d/N \gg 1\) (e.g., \(d=1024\), \(N \approx 20\) → \(d/N \approx 51\)).
+
+### 2.3 EMA Stabilization Heuristic
+
+To prevent oscillation across iterations, a sample-weight-gated exponential moving average is applied to \(\kappa\):
+
+\[
+\alpha_{\text{eff}} = \alpha_{\text{EMA}} \cdot \min\!\left(1,\, \frac{N}{4 \cdot N_{\min}}\right), \qquad \kappa_{\text{new}} = (1 - \alpha_{\text{eff}})\,\hat{\kappa} + \alpha_{\text{eff}}\,\kappa_{\text{old}}
+\]
+
+This is a stabilization heuristic with no statistical derivation; it does not correspond to any vMF MLE and should be treated as an engineering choice.
+
+---
+
+## 3. NiW Posterior (Diagonal Approximation)
+
+At \(d \gg N\) the full \(d \times d\) NiW scale matrix is singular and infeasible to store. The fitter uses an **empirical-Bayes diagonal NiW** prior, initializing \(\mathbf{\Lambda}_0\) with the OAS-shrunk diagonal of the sample covariance (Chen et al., IEEE TSP 2010):
+
+\[
+\hat{\boldsymbol{\Sigma}}_{\text{OAS}} = (1 - \hat{\rho})\mathbf{S} + \hat{\rho}\,\frac{\operatorname{tr}(\mathbf{S})}{d}\mathbf{I}
+\]
+
+The prior mean direction \(\mathbf{m}_0\) is the spherical average of all parent vMF means (for DAG nodes with multiple parents, \(\mathbf{m}_0 = \text{normalize}(\sum_p \boldsymbol{\mu}_p / |\text{parents}|)\)).
+
+Diagonal NiW update equations:
+
+\[
+\kappa_N = \kappa_0 + N, \qquad \nu_N = \nu_0 + N
+\]
+\[
+\mathbf{m}_N = \frac{\kappa_0 \mathbf{m}_0 + N\bar{\mathbf{x}}}{\kappa_N}
+\]
+\[
+\lambda_{N,i} = \lambda_{0,i} + \sum_{j=1}^{N}(x_{ji} - \bar{x}_i)^2 + \frac{\kappa_0 N}{\kappa_N}(\bar{x}_i - m_{0,i})^2
+\]
+
+The posterior predictive is a Student-t distribution with \(\nu_N - d + 1\) degrees of freedom, which provides calibrated uncertainty estimates at leaf nodes where \(N\) is small.
+
+---
+
+## 4. Recursive Application
+
+`fitNodeRecursive` applies the vMF + NiW update to every node in the subtree (DFS), setting `PHASE_VMF_FIT` on each node. A node whose `sliceDim` changed due to a depth reassignment (passthrough collapse) has `PHASE_VMF_FIT` cleared and is re-fit at the correct dimension.
