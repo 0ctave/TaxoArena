@@ -13,19 +13,19 @@ object DashboardHotkeys {
         isRegenerating: Boolean,
         isViewingSnapshot: Boolean = false,
     ): List<HotkeyAction> {
+        // Globals (Tab / X / Ctrl-C / ?) are emitted by GlobalHotkeys, not here.
         // While the DAG is still building, the analysis actions are not usable yet.
         if (isRegenerating) {
             return listOf(
                 HotkeyAction("\u25cc", "Building DAG", TuiTheme.RUNNING),
                 HotkeyAction("Esc", "Cancel", TuiTheme.ERROR),
-                HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
             )
         }
         if (!hasDag) {
+            // No active graph yet, so GlobalHotkeys won't advertise X; surface it here as the
+            // primary "get started" action.
             return listOf(
                 HotkeyAction("X", "Load DAG / New DAG", TuiTheme.ACCENT, isPrimary = true),
-                HotkeyAction("Tab", "Switch Panels"),
-                HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
             )
         }
         if (focused == FocusPanel.TOPOLOGY) {
@@ -37,13 +37,11 @@ object DashboardHotkeys {
                 HotkeyAction("\u2190/H", "Collapse"),
                 HotkeyAction("Space", "Toggle"),
                 HotkeyAction("Enter", "Inspect"),
-                HotkeyAction("Tab", "Switch Panels"),
-                HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
+                HotkeyAction("R", "Gen Judge", TuiTheme.OK),
             )
         }
         return buildList {
-            add(HotkeyAction("Tab", "Switch Panels", TuiTheme.ACCENT))
-            add(HotkeyAction("M", "Metrics"))
+            add(HotkeyAction("M", "Metrics", TuiTheme.ACCENT))
             add(HotkeyAction("A", "Arena"))
             add(HotkeyAction("B", "Benchmark"))
             add(HotkeyAction("T", "Trickle"))
@@ -52,8 +50,6 @@ object DashboardHotkeys {
             // Renaming is only meaningful while viewing a saved snapshot; new snapshots
             // are auto-saved on generation, so there's no manual "save" action.
             if (isViewingSnapshot) add(HotkeyAction("N", "Rename Snap"))
-            add(HotkeyAction("X", "Load DAG", TuiTheme.ACCENT))
-            add(HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR))
         }
     }
 }
