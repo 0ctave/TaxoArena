@@ -202,13 +202,17 @@ class TaxonomyMetrics(
         val predictedCover = queryToLeavesList.mapValues { (_, ll) ->
             ll.associate { it.id to 1.0 }
         }
-        val groundTruthCover = uniqueQueryTexts.mapNotNull { q ->
-            val domains = groundTruthMap[q]
-            if (domains.isNullOrEmpty()) null else q to domains.associate { it to 1.0 }
-        }.toMap()
-        // TODO: wire groundTruthMap from TaxonomyService — current ground-truth
-        // membership is derived from top-level domain labels rather than true
-        // per-query node memberships.
+
+        // Per-query true-leaf ground truth: each query's MMLU-Pro category resolves to the
+        // deepest DAG node carrying that label (its domain subtree). Built from the categories
+        // already plumbed in via groundTruthMap; empty when no categories are known.
+        val categoryToNode    = buildCategoryToNode(allNodes)
+        val groundTruthLeaves = buildGroundTruthLeaves(categoryToNode)
+
+        // Overlapping NMI compares the predicted leaf covering against the hard true-leaf
+        // covering ({ trueLeaf -> 1.0 }), so both sides share the node-id space and the score
+        // reaches 1.0 when routing matches ground truth exactly.
+        val groundTruthCover  = groundTruthLeaves.mapValues { (_, node) -> mapOf(node.id to 1.0) }
         val nmi               = OverlappingNmi.compute(predictedCover, groundTruthCover)
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)
@@ -217,11 +221,10 @@ class TaxonomyMetrics(
         val dendrogramPurity  = dagDendrogramPurity(queryToPrimaryLeaf, gtSimple)
         val edgeF1            = calculateEdgeF1(allNodes, queryToLeavesList, gtSimple)
 
-        // Hierarchical F₁ (Kosmopoulos et al. 2014). Needs the true *leaf node*
-        // per query; only domain-label ground truth is plumbed to the metrics
-        // layer today, so the reported values stay at 0 until wired.
-        // TODO: wire groundTruthMap from TaxonomyService (per-query true leaf node).
-        val (hPrecision, hRecall, hF1) = Triple(0.0, 0.0, 0.0)
+        // Hierarchical F₁ (Kosmopoulos et al. 2014) over the real per-query true leaves;
+        // the predicted leaf is the argmax (max-κ) routed leaf computed above.
+        val (hPrecision, hRecall, hF1) =
+            computeHierarchicalF1(queryToPrimaryLeaf, groundTruthLeaves)
 
         val sphericalSilhouette = run {
             val byDepth    = leaves.filter { it.vmfMu.isNotEmpty() }.groupBy { it.depth }
@@ -284,6 +287,32 @@ class TaxonomyMetrics(
     // ─────────────────────────────────────────────────────────────────────────
     //  Topology helpers
     // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Map each ground-truth category to its representative DAG node: the deepest node labeled
+     * with that category (preferring leaves on a depth tie), which roots the category's domain
+     * subtree. Categories with no matching node are dropped with a WARN and excluded from the
+     * hierarchical ground truth (so the metrics degrade to 0 rather than throwing).
+     */
+    private fun buildCategoryToNode(allNodes: Set<GraphNode>): Map<String, GraphNode> {
+        val byCategory = HashMap<String, GraphNode>()
+        for (category in groundTruthMap.values.flatten().toSet()) {
+            val match = allNodes
+                .filter { it.label?.equals(category, ignoreCase = true) == true }
+                .maxWithOrNull(compareBy<GraphNode>({ it.depth }, { if (it.isLeaf) 1 else 0 }))
+            if (match != null) byCategory[category] = match
+            else log.warn("No DAG node labeled '$category'; excluding category from hierarchical ground truth")
+        }
+        return byCategory
+    }
+
+    /** Per-query true leaf: the representative node of the query's first ground-truth category. */
+    private fun buildGroundTruthLeaves(categoryToNode: Map<String, GraphNode>): Map<String, GraphNode> =
+        groundTruthMap.mapNotNull { (query, categories) ->
+            val category = categories.firstOrNull() ?: return@mapNotNull null
+            val node     = categoryToNode[category] ?: return@mapNotNull null
+            query to node
+        }.toMap()
 
     private fun getDepth1Ancestors(node: GraphNode): Set<String> {
         val ancestors = mutableSetOf<String>()
