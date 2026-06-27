@@ -1,7 +1,9 @@
 package taxonomy.tui.service
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -143,6 +145,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         onComplete: (BatchTrickleTestResults) -> Unit
     ) {
         withContext(Dispatchers.IO) {
+            val root = deps.taxonomyService.getGraph()
+            if (root == null) {
+                onProgress("No active DAG — generate or load one first.")
+                onComplete(BatchTrickleTestResults())
+                return@withContext
+            }
+
             val reservedFile = File("reserved_test_queries.json")
             if (!reservedFile.exists()) {
                 deps.log.warn("Batch trickle: reserved_test_queries.json not found.")
@@ -150,74 +159,78 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
-
-            val byDomain: Map<String, List<String>> = try {
+            val reservedByDomain: Map<String, List<String>> = try {
                 batchJson.decodeFromString(reservedFile.readText())
             } catch (t: Throwable) {
                 deps.log.error("Batch trickle: failed to parse reserved set", t)
+                onProgress("Failed to parse reserved test set.")
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
 
-            // Cap the sample so a full run stays interactive in the TUI.
+            // 1. Tag every leaf with the dominant domain of its TRAINING queries. The full dataset
+            //    comes from the local SQLite cache (no network); subtracting the reserved test texts
+            //    yields the train set, from which we build a rawText -> domain index.
+            onProgress("Loading training distribution from cache…")
+            val fullByDomain = deps.datasetFetcher.fetchDataset(
+                selectedDomains = deps.config.dataset.selectedDomains
+            )
+            val reservedTexts: Set<String> = reservedByDomain.values.flatten().toSet()
+            val textToDomain = HashMap<String, String>()
+            for ((domain, queries) in fullByDomain) {
+                for (q in queries) if (q !in reservedTexts) textToDomain[q] = domain
+            }
+
+            val leaves = BatchTrickleEvaluator.collectLeaves(root)
+            val profiles = BatchTrickleEvaluator.buildLeafProfiles(leaves, textToDomain)
+            onProgress("Indexing leaves: ${profiles.size} / ${leaves.size} leaves tagged with a domain.")
+            deps.log.info("Batch trickle: ${profiles.size}/${leaves.size} leaves tagged from ${textToDomain.size} train queries.")
+            if (profiles.isEmpty()) {
+                onProgress("No leaves could be tagged — DAG has no labeled training queries.")
+                onComplete(BatchTrickleTestResults())
+                return@withContext
+            }
+
+            // 2. Sample the reserved queries (capped for interactivity) and score routing.
             val sampleCap = 200
-            val pairs = byDomain.flatMap { (domain, queries) -> queries.map { domain to it } }
+            val testQueries = reservedByDomain
+                .flatMap { (domain, queries) -> queries.map { domain to it } }
                 .shuffled()
                 .take(sampleCap)
-
-            if (pairs.isEmpty()) {
+            if (testQueries.isEmpty()) {
                 onProgress("Reserved test set is empty.")
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
 
-            deps.log.info("Batch trickle: running ${pairs.size} reserved queries…")
-            var correct = 0
-            var ancestorCorrect = 0
-            var leafHits = 0
-            var processed = 0
-
-            for ((domain, query) in pairs) {
-                val results = try {
-                    deps.taxonomyService.queryTaxonomy(query)
-                } catch (t: Throwable) {
-                    deps.log.warn("Batch trickle query failed: {}", t.message)
-                    emptyList()
-                }
-                val best = flattenTrickle(results).maxByOrNull { it.confidence }
-                if (best != null) {
-                    val segments = best.fullPath.split(" > ").map { it.trim() }
-                    // Leaf-level accuracy: the best match's own label matches the source domain.
-                    if (best.label.equals(domain, ignoreCase = true)) correct++
-                    // Ancestor accuracy: the domain appears anywhere along the matched path.
-                    if (segments.any { it.equals(domain, ignoreCase = true) }) ancestorCorrect++
-                    if (best.children.isEmpty()) leafHits++
-                }
-                processed++
-                if (processed % 10 == 0 || processed == pairs.size) {
-                    onProgress("Tested $processed / ${pairs.size} reserved queries…")
-                }
-            }
-
-            val total = pairs.size.toDouble()
-            val out = BatchTrickleTestResults(
-                totalQueries = pairs.size,
-                overallAccuracy = correct / total,
-                overallAncestorAccuracy = ancestorCorrect / total,
-                leafRate = leafHits / total
+            deps.log.info("Batch trickle: routing ${testQueries.size} reserved queries…")
+            val out = BatchTrickleEvaluator.computeBatchTrickleMetrics(
+                perLeafDomains = profiles,
+                testQueries = testQueries,
+                routeFn = { text ->
+                    try {
+                        runBlocking {
+                            deps.taxonomyService.routeQueryToLeaves(text).map { it.first.id to it.second }
+                        }
+                    } catch (t: Throwable) {
+                        deps.log.warn("Batch trickle query failed: {}", t.message)
+                        emptyList()
+                    }
+                },
+                onProgress = { processed, total, runningTop1 ->
+                    if (processed % 10 == 0 || processed == total) {
+                        onProgress("Routing test queries: $processed / $total · running top1 acc=${"%.1f%%".format(runningTop1 * 100)}")
+                    }
+                },
             )
             deps.log.info(
-                "Batch trickle complete: ${pairs.size} queries · " +
-                    "accuracy ${"%.2f".format(out.overallAccuracy)} · " +
-                    "ancestor ${"%.2f".format(out.overallAncestorAccuracy)} · " +
-                    "leaf-rate ${"%.2f".format(out.leafRate)}"
+                "Batch trickle complete: ${out.totalQueries} queries · " +
+                    "top1 ${"%.2f".format(out.top1Accuracy)} · any ${"%.2f".format(out.anyMatchAccuracy)} · " +
+                    "macroF1 ${"%.2f".format(out.macroF1)} · no-match ${"%.2f".format(out.noMatchRate)}"
             )
             onComplete(out)
         }
     }
-
-    private fun flattenTrickle(nodes: List<QueryResponseNode>): List<QueryResponseNode> =
-        nodes.flatMap { listOf(it) + flattenTrickle(it.children) }
 
     override suspend fun loadLeaderboard(): List<LeaderboardGroup> =
         withContext(Dispatchers.IO) {
