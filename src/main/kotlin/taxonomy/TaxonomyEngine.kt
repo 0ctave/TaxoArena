@@ -92,8 +92,9 @@ class TaxonomyEngine(
                 val categoryGroups = distilledData.groupBy { it.first }
                 categoryGroups.forEach { (name, items) ->
                     val node = GraphNode(label = name, depth = 1)
+                    node.originalCategory = name
                     val embs = items.mapNotNull { (_, raw, keywords) ->
-                        embeddingCache.get(keywords)?.let { vec -> Embedding(raw, keywords, vec) }
+                        embeddingCache.get(keywords)?.let { vec -> Embedding(raw, keywords, vec, name) }
                     }
                     if (embs.isNotEmpty()) {
                         node.queries.addAll(embs)

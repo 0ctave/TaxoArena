@@ -14,6 +14,7 @@ import java.util.*
 data class GraphNode(
     val id: String = UUID.randomUUID().toString(),
     var label: String?,
+    var originalCategory: String? = null,
     var depth: Int,
 
     // --- Topology (DAG) ---

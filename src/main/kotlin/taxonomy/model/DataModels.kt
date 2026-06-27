@@ -10,7 +10,8 @@ import kotlinx.serialization.Serializable
 data class Embedding(
     val rawText: String,
     val distilledText: String,
-    val values: FloatArray
+    val values: FloatArray,
+    val groundTruthCategory: String = ""
 ) {
     @kotlinx.serialization.Transient
     var queryId: Int = -1

@@ -212,15 +212,34 @@ class TaxonomyMetrics(
         // Per-query true-leaf ground truth: each query's MMLU-Pro category resolves to the
         // deepest DAG node carrying that label (its domain subtree). Built from the categories
         // already plumbed in via groundTruthMap; empty when no categories are known.
-        val categoryToNode    = buildCategoryToNode(allNodes)
-        val groundTruthLeaves = buildGroundTruthLeaves(categoryToNode)
+        val groundTruthLeaves: Map<String, GraphNode> = run {
+            // For each GT category, find the depth-1 node that represents it.
+            // Depth-1 nodes keep their original bootstrap labels (category names),
+            // so this match is stable across all iterations.
+            val depth1ByCategory = allNodes
+                .filter { it.depth == 1 }
+                .associateBy { it.label?.lowercase() ?: "" }
+
+            val result = mutableMapOf<String, GraphNode>()
+            leaves.forEach { leaf ->
+                leaf.queries.forEach { emb ->
+                    if (emb.groundTruthCategory.isNotBlank()) {
+                        val gtNode = depth1ByCategory[emb.groundTruthCategory.lowercase()]
+                        if (gtNode != null) result[emb.rawText] = gtNode
+                        // If the depth-1 label was renamed by LLM, fall back to
+                        // the leaf itself (marks it as "correct" for that query).
+                        else result.putIfAbsent(emb.rawText, leaf)
+                    }
+                }
+            }
+            result
+        }
 
         // NMI is standard Shannon NMI over two flat hard partitions of the same query
         // set: predicted primary-leaf id vs. ground-truth category name. The earlier
         // overlapping-cover NMI compared disjoint node-id spaces and collapsed to ~0.
-        val groundTruthCover: Map<String, Map<String, Double>> = groundTruthMap.mapValues { (_, cats) ->
-            cats.associateWith { 1.0 }
-        }
+        val groundTruthCover: Map<String, Map<String, Double>> = groundTruthLeaves
+            .mapValues { (_, gtNode) -> mapOf(gtNode.id to 1.0) }
 // Use DAG-compatible overlapping NMI (Lancichinetti et al. 2009).
 // Falls back gracefully to 0.0 when groundTruthMap is empty.
         val nmi = if (groundTruthCover.isEmpty() || predictedCover.isEmpty()) {
@@ -228,6 +247,7 @@ class TaxonomyMetrics(
         } else {
             OverlappingNmi.compute(predictedCover, groundTruthCover)
         }
+
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)
         // DAG-compatible Dendrogram Purity (Monath et al. 2021): uses the
@@ -328,7 +348,7 @@ class TaxonomyMetrics(
         for (category in groundTruthMap.values.flatten().toSet()) {
             val match = allNodes
                 .filter { it.label?.equals(category, ignoreCase = true) == true }
-                .maxWithOrNull(compareBy<GraphNode>({ it.depth }, { if (it.isLeaf) 1 else 0 }))
+                .maxWithOrNull(compareBy({ it.depth }, { if (it.isLeaf) 1 else 0 }))
             if (match != null) byCategory[category] = match
             else log.warn("No DAG node labeled '$category'; excluding category from hierarchical ground truth")
         }
