@@ -274,7 +274,7 @@ class TaxonomyMetrics(
         // Hierarchical F₁ (see TODO above). Until that ground truth is wired,
         // pass an empty map: the metric logs a WARN and reports 0.0 rather than
         // fabricating calibration figures.
-        val routingECE        = computeRoutingECE(predictedCover, groundTruthLeaves)
+        val routingECE        = computeRoutingECE(predictedCover, groundTruthLeaves.mapValues { it.value.id })
 
         return Report(
             totalNodes            = allNodes.size,
