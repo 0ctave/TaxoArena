@@ -164,10 +164,37 @@ private fun TrickleBenchmarkView(
                 val r = benchmarkState.batchTrickleResults
                 Text("Batch trickle results", color = Cyan, textStyle = Bold)
                 Spacer()
-                Text("Total queries      ${r.totalQueries}", color = White)
-                Text("Primary accuracy   ${"%.1f%%".format(r.overallAccuracy * 100)}", color = White)
-                Text("Ancestor accuracy  ${"%.1f%%".format(r.overallAncestorAccuracy * 100)}", color = White)
-                Text("Leaf rate          ${"%.1f%%".format(r.leafRate * 100)}", color = White)
+                Text("Each DAG leaf is tagged with the dominant MMLU-Pro domain of its training", color = White)
+                Text("queries; reserved test queries are then routed and scored against those tags.", color = White)
+                Spacer()
+                Text("Total queries    ${r.totalQueries}", color = White)
+                Text("Top-1 accuracy   ${"%.1f%%".format(r.top1Accuracy * 100)}   highest-confidence leaf's domain == truth", color = White)
+                Text("Any-match acc    ${"%.1f%%".format(r.anyMatchAccuracy * 100)}   any matched leaf's domain == truth", color = White)
+                Text("Macro-F1         ${"%.3f".format(r.macroF1)}   domain-averaged F1 on the top-1 prediction", color = White)
+                Text("Mean leaf purity ${"%.3f".format(r.meanLeafPurity)}   dominant-domain share of top-1 leaf", color = White)
+                Text("Mean depth       ${"%.2f".format(r.meanRoutingDepth)}   tree depth of the top-1 matched leaf", color = White)
+                Text("No-match rate    ${"%.1f%%".format(r.noMatchRate * 100)}   queries that routed to no leaf", color = White)
+
+                if (r.perDomainF1.isNotEmpty()) {
+                    Spacer()
+                    Text("Per-domain F1 (top 10 by support)", color = Cyan, textStyle = Bold)
+                    Text(
+                        "%-22s %7s %6s %6s %6s".format("domain", "support", "P", "R", "F1"),
+                        color = Yellow,
+                    )
+                    r.perDomainF1.entries
+                        .sortedByDescending { it.value.support }
+                        .take(10)
+                        .forEach { (domain, f1) ->
+                            Text(
+                                "%-22s %7d %6.2f %6.2f %6.2f".format(
+                                    domain.take(22), f1.support, f1.precision, f1.recall, f1.f1
+                                ),
+                                color = White,
+                            )
+                        }
+                }
+
                 Spacer()
                 Text("Press B to re-run · Q to go back.", color = Cyan)
             }

@@ -117,6 +117,23 @@ class TaxonomyService(
         return@coroutineScope buildHierarchicalResponse(currentRoot, results.keys, results)
     }
 
+    /**
+     * Route a query directly to its matched LEAF nodes, bypassing the hierarchical-wrapper
+     * shaping that [queryTaxonomy] applies. Returns (leaf, confidence) pairs sorted by descending
+     * confidence, where confidence is exp(logProb) clamped to [0,1]. Used by the batch-trickle
+     * benchmark, which needs the concrete leaves (and their query distributions) rather than a
+     * presentation tree. Empty if the taxonomy is not loaded or nothing matched.
+     */
+    internal suspend fun routeQueryToLeaves(text: String): List<Pair<GraphNode, Double>> = coroutineScope {
+        val currentRoot = getGraph() ?: return@coroutineScope emptyList<Pair<GraphNode, Double>>()
+        val vector = embeddingCache.getOrCreate(text)
+        val emb = Embedding(text, text, vector)
+        ops.routeQuery(emb, currentRoot).entries
+            .filter { it.key.isLeaf }
+            .map { it.key to exp(it.value).coerceIn(0.0, 1.0) }
+            .sortedByDescending { it.second }
+    }
+
     private fun buildHierarchicalResponse(
         node: GraphNode,
         matchedNodes: Set<GraphNode>,
