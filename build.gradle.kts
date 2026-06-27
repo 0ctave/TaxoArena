@@ -64,17 +64,28 @@ dependencies {
     implementation("org.eclipse.lmos:arc-graphql-spring-boot-starter:$arcVersion")
     implementation("org.eclipse.lmos:arc-view-spring-boot-starter:$arcVersion")
 
-    // Tracing
-    implementation(platform("io.micrometer:micrometer-tracing-bom:1.4.5"))
-    implementation("io.micrometer:micrometer-tracing")
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
-    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    // Tracing/metrics/actuator deps removed in PR #65.
+    //
+    // Root cause (proven by jstack): with these on the classpath, Spring Boot's
+    // PrometheusExemplarsAutoConfiguration wires a Micrometer MetricsTurboFilter
+    // onto the Logback root logger. Every log.info(...) call then runs through
+    // ExemplarSampler -> LazyTracingSpanContext.currentSpan, which lazily
+    // resolves the Tracer bean from Spring. When a JVM GC notification fires
+    // during early bean construction (e.g. EmbeddingCache.init), the
+    // Notification Thread takes the same path concurrently with the main
+    // thread, and DefaultSingletonBeanRegistry's ReentrantLocks deadlock.
+    // Symptom: `[BOOT] TaxoAdapt starting` prints and the JVM hangs forever
+    // with the TUI never rendering.
+    //
+    // No source under src/ uses any micrometer / opentelemetry / actuator API,
+    // so removing these is purely subtractive. The TUI is headless
+    // (web-application-type=none) and serves no /actuator endpoints.
 
     // Azure
     implementation("com.azure:azure-identity:1.15.4")
 
     // Spring Boot
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    // spring-boot-starter-actuator removed in PR #65 (see deadlock note above).
     // Kept for spring-web: the @RestController endpoints in taxonomy.controller need it to compile
     // (the unused spring-ai-starter-mcp-server-webflux was removed in PR #61).
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -95,8 +106,7 @@ dependencies {
 
     implementation("org.xerial:sqlite-jdbc:3.51.3.0")
 
-    // Metrics
-    implementation("io.micrometer:micrometer-registry-prometheus")
+    // micrometer-registry-prometheus removed in PR #65 (see deadlock note above).
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-testcontainers")

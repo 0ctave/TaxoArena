@@ -5,8 +5,11 @@
 #   spring.main.web-application-type=none + arc.*.enabled=false  -> run headless, skip the Arc
 #     web/GraphQL/chat/script stack (the bulk of startup cost).
 #   logging.level.*  -> quiet noisy packages so nothing leaks onto the TUI alt-screen.
-# Removed in PR #59: the management/actuator block (no endpoints can be served when headless and
-# no code reads management.*).
+# Removed in PR #59: the management/actuator block. PR #65 then removed the
+# actuator/micrometer/opentelemetry/prometheus dependencies entirely from
+# build.gradle.kts — they were unused and their PrometheusExemplarsAutoConfiguration
+# wired a MetricsTurboFilter onto Logback root that deadlocked early bean init
+# against the JVM GC Notification thread (TUI hung at `[BOOT]`).
 spring:
   application:
     name: TaxoAdapt
@@ -51,5 +54,6 @@ logging:
     org.springframework: WARN
     io.netty: WARN
     reactor: WARN
-# NOTE: the `management:`/actuator block was removed — web-application-type=none means no
-# endpoints can be served, and no code reads management.*. See PR #59.
+# NOTE: no `management:` block — web-application-type=none means no endpoints can
+# be served, and as of PR #65 the actuator/micrometer/opentelemetry deps are also
+# gone from the build, so no autoconfig classes remain to read management.*.
