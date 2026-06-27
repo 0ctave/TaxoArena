@@ -57,3 +57,31 @@ logging:
 # NOTE: no `management:` block — web-application-type=none means no endpoints can
 # be served, and as of PR #65 the actuator/micrometer/opentelemetry deps are also
 # gone from the build, so no autoconfig classes remain to read management.*.
+
+# ── TaxoArena runtime flags (override in application-secret.yml or env vars) ───
+#
+# taxoadapt.execution.enable-labeling (default: false)
+#   Controls whether the LLM post-pass relabeling step runs after convergence.
+#
+#   false (default) — labels remain as the original MMLU-Pro category names
+#     set at bootstrap. All GT anchor lookups (H-F1, NMI, ECE, contamination)
+#     use node.originalCategory which is frozen at bootstrap and never changes.
+#     Recommended for reproducible experiment runs: metrics are directly
+#     comparable across reruns because depth-1 node identity is stable.
+#
+#   true — the LLM rewrites depth-1 labels post-convergence. node.label is
+#     updated but node.originalCategory remains frozen, so GT anchor lookups
+#     still resolve correctly (M2/M3 fix, commit 89df4be). Enable only when
+#     you need human-readable labels in the exported taxonomy_visualization.json
+#     or the TUI, and are not comparing NMI/H-F1 across runs with different
+#     label vocabularies.
+#
+# taxoadapt.execution.enable-live-labeling (default: false)
+#   When true, the LLM labels each new cluster immediately after splitting
+#   (inline, not post-pass). Higher quality labels but significantly slower
+#   iterations. Requires enable-labeling=true to take effect.
+#
+# taxoadapt:
+#   execution:
+#     enable-labeling: false
+#     enable-live-labeling: false

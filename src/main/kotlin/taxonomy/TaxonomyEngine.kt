@@ -73,6 +73,21 @@ class TaxonomyEngine(
             }
             perfTracker.recordTime("Phase 1: Precomputing Embeddings", phase1Time)
 
+            // ── Dimension fast-fail ──────────────────────────────────────────
+            // Validate that the embedding model actually produces vectors whose
+            // dimension matches dimForDepth(0) — the root-level MRL dimension.
+            // If they diverge, every cosine similarity and vMF kappa estimate is
+            // silently wrong. Fail loudly here rather than after 15 iterations.
+            val expectedDim = dimForDepth(0)
+            val actualDim   = embeddingCache.dimensionality
+            check(actualDim == expectedDim) {
+                "Embedding dimension mismatch: model produces $actualDim-dim vectors " +
+                "but dimForDepth(0) = $expectedDim. " +
+                "Update the MRL schedule in DataModels.kt or switch to a compatible model."
+            }
+            log.info("Dimension check passed: model dimension = $actualDim (expected $expectedDim)")
+            // ────────────────────────────────────────────────────────────────
+
             val root = GraphNode(label = rootLabel, depth = 0)
 
             // 2. Initial Structural Setup & Bootstrap Fitting
@@ -379,7 +394,8 @@ class TaxonomyEngine(
 
     private fun diffDagState(prev: Map<String, NodeState>, curr: Map<String, NodeState>, root: GraphNode): String {
         val sb = StringBuilder()
-        sb.append("┌── TAXONOMY CHANGES (WITH CONTEXT) ───────────────────────\n")
+        sb.append("┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
+")
 
         val addedIds = curr.keys - prev.keys
         val removedIds = prev.keys - curr.keys
@@ -452,7 +468,8 @@ class TaxonomyEngine(
 
         // If root has no changes in its subtree, return no changes
         if (!hasChangesInSubtree(root.id)) {
-            sb.append("│   (No structural changes in this iteration)\n")
+            sb.append("│   (No structural changes in this iteration)
+")
             sb.append("└──────────────────────────────────────────────────────────")
             return sb.toString()
         }
@@ -476,7 +493,8 @@ class TaxonomyEngine(
             }
 
             val connector = if (state.depth == 0) "" else if (isTail) "└── " else "├── "
-            sb.append(prefix).append(connector).append(nodeLabel).append(cross).append("\n")
+            sb.append(prefix).append(connector).append(nodeLabel).append(cross).append("
+")
 
             if (!visited.add(nodeId)) return
 
@@ -503,7 +521,8 @@ class TaxonomyEngine(
                     }
                     is PrintItem.Removed -> {
                         val rConnector = if (childIsTail) "└── " else "├── "
-                        sb.append(nextPrefix).append(rConnector).append("[REMOVED] \"${item.diff.label ?: item.diff.id}\"\n")
+                        sb.append(nextPrefix).append(rConnector).append("[REMOVED] \"${item.diff.label ?: item.diff.id}\"
+")
                     }
                 }
             }
