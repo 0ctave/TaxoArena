@@ -470,11 +470,13 @@ private fun deriveProcessRows(
 ): List<ProcessRow> {
     val rows = mutableListOf<ProcessRow>()
 
-    // Dataset download.
+    // Dataset download. A full-dataset download has no known total, so report indeterminate
+    // (percent=null -> animated track) until real progress (>0) arrives.
     if (state.config.downloadingDataset) {
+        val p = state.config.datasetDownloadProgress
         rows += ProcessRow(
             name = "Dataset download",
-            percent = state.config.datasetDownloadProgress * 100.0,
+            percent = if (p > 0.0) (p * 100.0) else null,
             status = state.config.datasetDownloadStatusText,
         )
     }

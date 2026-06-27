@@ -60,6 +60,14 @@ fun ProcessesPanel(
                     barColor = color,
                     textColor = color,
                 )
+            } else if (!row.done && !row.error) {
+                // Indeterminate: total unknown (e.g. full-dataset download, eval parse before
+                // the record count is known). Render a moving block instead of a fixed bar.
+                val pos = spinnerTick % barW
+                val track = buildString {
+                    for (i in 0 until barW) append(if (i == pos) '\u2588' else '\u2591')
+                }
+                Text("  $track", color = color)
             }
             val status = row.status.take((width - 3).coerceAtLeast(4))
             if (status.isNotBlank()) Text("  $status", color = TuiTheme.INFO)
