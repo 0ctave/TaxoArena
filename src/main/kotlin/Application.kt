@@ -45,6 +45,29 @@ fun main(args: Array<String>) {
     System.setProperty("logging.level.root", "WARN")
     System.setProperty("logging.level.org.springframework", "WARN")
 
+    // Force UTF-8 everywhere we can. Mosaic emits raw UTF-8 bytes for box-drawing (─│┌┐) and
+    // emoji-style icons (◆) straight to its own Tty. On Windows the *console output code page*
+    // defaults to the active OEM page (e.g. 437 / 850 / 1252), which interprets those bytes as
+    // garbage — the symptom the user reported was every glyph rendered as `?` or `◆`.
+    // `chcp 65001` switches the current console to UTF-8 for the lifetime of this process. We
+    // shell out *before* Mosaic binds the tty so the new code page is already active when the
+    // first frame is drawn.
+    System.setProperty("file.encoding", "UTF-8")
+    System.setProperty("stdout.encoding", "UTF-8")
+    System.setProperty("stderr.encoding", "UTF-8")
+    if (System.getProperty("os.name").orEmpty().lowercase().contains("windows")) {
+        runCatching {
+            // `chcp` is a built-in of cmd.exe, so we must spawn cmd /c. Inherit the parent
+            // console so the code-page change applies to *our* console, not a detached child.
+            ProcessBuilder("cmd", "/c", "chcp", "65001")
+                .inheritIO()
+                .start()
+                .waitFor()
+        }.onFailure {
+            System.err.println("[BOOT] chcp 65001 failed (${it.message}); TUI glyphs may render as ?")
+        }
+    }
+
     val app = SpringApplication(TaxoAdaptApplication::class.java)
     // Surface context-start failures loudly on the real stderr instead of exiting silently.
     app.addListeners(
