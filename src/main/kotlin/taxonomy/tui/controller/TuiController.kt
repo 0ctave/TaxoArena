@@ -15,6 +15,10 @@ import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.tui.state.TuiAppState
+import taxonomy.tui.state.ScrollbarTarget
+import taxonomy.tui.components.ScrollBarDragManager
+import taxonomy.utils.TuiLogAppender
+
 
 class TuiController(
     initialState: TuiAppState = TuiAppState(),
@@ -35,6 +39,9 @@ class TuiController(
     /** Invoked when the user asks to quit (Ctrl-C / Ctrl-Q / quit hotkey). Restores the
      *  terminal and stops the process. */
     private val onQuit: () -> Unit = {},
+    private val performanceReportSizeProvider: () -> Int = { 0 },
+    private val isProcessBannerActiveProvider: () -> Boolean = { false },
+    private val selectedNodeProvider: () -> GraphNode? = { null },
 ) {
 
     private val _state = MutableStateFlow(initialState)
@@ -823,6 +830,11 @@ class TuiController(
 
     private fun handleMousePressed(event: TuiEvent.MousePressed) {
         val state = _state.value
+        val scrollbarEvent = checkScrollbarClick(state, event.x, event.y)
+        if (scrollbarEvent != null) {
+            dispatch(scrollbarEvent)
+            return
+        }
         when (state.startup.state) {
             StartupState.LOAD_DAG -> handleWelcomeMouse(event)
             StartupState.CONFIGANDDOMAINS -> handleConfigMouse(state, event)
@@ -922,8 +934,259 @@ class TuiController(
     }
 
     private fun handleMouseDragged(event: TuiEvent.MouseDragged) {
-        val dragging = _state.value.shell.draggingScrollbar ?: return
-        dispatch(scrollController.dragTo(dragging, event.y))
+        val state = _state.value
+        val dragging = state.shell.draggingScrollbar ?: return
+        val targetOffset = calculateScrollTargetForTarget(dragging, state, event.y)
+        dispatch(TuiEvent.ScrollTo(dragging, targetOffset))
+    }
+
+    private fun checkScrollbarClick(state: TuiAppState, x: Int, y: Int): TuiEvent? {
+        val width = state.shell.width
+        val height = state.shell.height
+
+        // 1. System Logs scrollbar (bottom row, if logs are active in main dashboard or config setup)
+        val logsRendered = (state.startup.state == StartupState.MAINDASHBOARD || state.startup.state == StartupState.CONFIGANDDOMAINS) &&
+                !state.runtime.isRegenerating && !state.config.promptingDownloadCount
+        if (logsRendered) {
+            val bodyH = (height - 5).coerceAtLeast(9)
+            val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+            val bottomH = (bodyH - topH).coerceAtLeast(4)
+            val logsW = (width * 0.55).toInt().coerceAtLeast(20)
+            val bottomRowStartY = 3 + topH
+            val isLogsScrollbar = x in (logsW - 4)..(logsW - 3) &&
+                    y in (bottomRowStartY + 1)..(bottomRowStartY + bottomH - 2)
+            if (isLogsScrollbar) {
+                val totalItems = TuiLogAppender.logs.size
+                val visibleItems = bottomH - 2
+                val targetOffset = ScrollBarDragManager.calculateScrollTarget(
+                    clickY = y,
+                    trackStartY = bottomRowStartY + 1,
+                    visibleItems = visibleItems,
+                    totalItems = totalItems,
+                    reversed = true
+                )
+                dispatch(TuiEvent.StartDraggingScrollbar(ScrollbarTarget.LOGS))
+                return TuiEvent.ScrollTo(ScrollbarTarget.LOGS, targetOffset)
+            }
+        }
+
+        when (state.startup.state) {
+            StartupState.MAINDASHBOARD -> {
+                val layout = DashboardLayout.dashboard(width, height)
+
+                // 2. Topology / DomainSelector (left panel)
+                val benchmarkPicking = state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains
+                val hasDag = state.runtime.hasActiveGraph
+                val hasDagLoaded = state.topology.expandedNodes.isNotEmpty() || hasDag
+
+                if (hasDagLoaded || benchmarkPicking) {
+                    val isLeftScrollbar = x in (layout.dagW - 4)..(layout.dagW - 3) &&
+                            y in 4 until (4 + layout.topH - 2)
+                    if (isLeftScrollbar) {
+                        val target = if (state.topology.showDomainSelector || benchmarkPicking) {
+                            ScrollbarTarget.CONFIG_DOMAINS
+                        } else {
+                            ScrollbarTarget.TOPOLOGY
+                        }
+
+                        val totalItems = when {
+                            state.benchmark.benchmarkIsPickingModels -> state.benchmark.loadedModels.size
+                            state.benchmark.benchmarkIsPickingDomains -> availableDomainsProvider().size
+                            state.topology.showDomainSelector -> availableDomainsProvider().size
+                            else -> treeLinesProvider(state.topology.expandedNodes).size
+                        }
+
+                        val visibleItems = layout.topH - 2
+                        val targetOffset = ScrollBarDragManager.calculateScrollTarget(
+                            clickY = y,
+                            trackStartY = 4,
+                            visibleItems = visibleItems,
+                            totalItems = totalItems
+                        )
+                        dispatch(TuiEvent.StartDraggingScrollbar(target))
+                        return TuiEvent.ScrollTo(target, targetOffset)
+                    }
+                }
+
+                // 3. Analysis Hub scrollbar (right panel)
+                val activeProcess = isProcessBannerActive(state)
+                val bannerH = if (activeProcess) 1 else 0
+                val bodyH = (layout.topH - 2 - bannerH).coerceAtLeast(1)
+
+                val isAnalysisScrollbar = x in (width - 4)..(width - 3) &&
+                        y in (layout.treeFirstRowY - 2 + bannerH)..(layout.treeFirstRowY - 2 + bannerH + bodyH - 1)
+                if (isAnalysisScrollbar) {
+                    val totalItems = when (state.analysis.mode) {
+                        AnalysisMode.NODE_DETAIL -> {
+                            val node = selectedNodeProvider()
+                            if (node != null) getNodeDetailLinesCount(node, state.arena.isGeneratingJudge) else 0
+                        }
+                        AnalysisMode.METRICS -> {
+                            var count = 20
+                            if (state.analysis.showPerformanceBlock) {
+                                val perfSize = performanceReportSizeProvider()
+                                count += if (perfSize == 0) 2 else 1 + minOf(8, perfSize)
+                            }
+                            count
+                        }
+                        AnalysisMode.SNAPSHOTS -> state.snapshot.snapshotList.size
+                        else -> 0
+                    }
+                    val visibleItems = bodyH
+                    val targetOffset = ScrollBarDragManager.calculateScrollTarget(
+                        clickY = y,
+                        trackStartY = layout.treeFirstRowY - 2 + bannerH,
+                        visibleItems = visibleItems,
+                        totalItems = totalItems
+                    )
+                    dispatch(TuiEvent.StartDraggingScrollbar(ScrollbarTarget.ANALYSIS))
+                    return TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, targetOffset)
+                }
+            }
+            StartupState.CONFIGANDDOMAINS -> {
+                val layout = DashboardLayout.config(width, height)
+                val bodyH = (height - 5).coerceAtLeast(9)
+                val topHVal = (bodyH * 0.62).toInt().coerceAtLeast(8)
+
+                // 4. Config Domains scrollbar
+                val isConfigDomainsScrollbar = x in (layout.leftW - 4)..(layout.leftW - 3) &&
+                        y in (layout.firstRowY - 1)..(layout.firstRowY - 1 + topHVal - 2)
+                if (isConfigDomainsScrollbar) {
+                    val totalItems = availableDomainsProvider().size
+                    val visibleItems = topHVal - 2
+                    val targetOffset = ScrollBarDragManager.calculateScrollTarget(
+                        clickY = y,
+                        trackStartY = layout.firstRowY - 1,
+                        visibleItems = visibleItems,
+                        totalItems = totalItems
+                    )
+                    dispatch(TuiEvent.StartDraggingScrollbar(ScrollbarTarget.CONFIG_DOMAINS))
+                    return TuiEvent.ScrollTo(ScrollbarTarget.CONFIG_DOMAINS, targetOffset)
+                }
+            }
+            else -> Unit
+        }
+        return null
+    }
+
+    private fun calculateScrollTargetForTarget(target: ScrollbarTarget, state: TuiAppState, y: Int): Int {
+        val width = state.shell.width
+        val height = state.shell.height
+
+        return when (target) {
+            ScrollbarTarget.TOPOLOGY -> {
+                val layout = DashboardLayout.dashboard(width, height)
+                val totalItems = treeLinesProvider(state.topology.expandedNodes).size
+                val visibleItems = layout.topH - 2
+                ScrollBarDragManager.calculateScrollTarget(
+                    clickY = y,
+                    trackStartY = layout.treeFirstRowY - 2,
+                    visibleItems = visibleItems,
+                    totalItems = totalItems
+                )
+            }
+            ScrollbarTarget.CONFIG_DOMAINS -> {
+                if (state.startup.state == StartupState.CONFIGANDDOMAINS) {
+                    val layout = DashboardLayout.config(width, height)
+                    val bodyH = (height - 5).coerceAtLeast(9)
+                    val topHVal = (bodyH * 0.62).toInt().coerceAtLeast(8)
+                    ScrollBarDragManager.calculateScrollTarget(
+                        clickY = y,
+                        trackStartY = layout.firstRowY - 1,
+                        visibleItems = topHVal - 2,
+                        totalItems = availableDomainsProvider().size
+                    )
+                } else {
+                    // Left panel picker on Main Dashboard
+                    val layout = DashboardLayout.dashboard(width, height)
+                    val benchmarkPicking = state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains
+                    val totalItems = when {
+                        benchmarkPicking -> {
+                            if (state.benchmark.benchmarkIsPickingModels)
+                                state.benchmark.loadedModels.size
+                            else
+                                availableDomainsProvider().size
+                        }
+                        else -> availableDomainsProvider().size
+                    }
+                    ScrollBarDragManager.calculateScrollTarget(
+                        clickY = y,
+                        trackStartY = layout.treeFirstRowY - 2,
+                        visibleItems = layout.topH - 2,
+                        totalItems = totalItems
+                    )
+                }
+            }
+            ScrollbarTarget.ANALYSIS -> {
+                val layout = DashboardLayout.dashboard(width, height)
+                val activeProcess = isProcessBannerActive(state)
+                val bannerH = if (activeProcess) 1 else 0
+                val bodyH = (layout.topH - 2 - bannerH).coerceAtLeast(1)
+
+                val totalItems = when (state.analysis.mode) {
+                    AnalysisMode.NODE_DETAIL -> {
+                        val node = selectedNodeProvider()
+                        if (node != null) getNodeDetailLinesCount(node, state.arena.isGeneratingJudge) else 0
+                    }
+                    AnalysisMode.METRICS -> {
+                        var count = 20
+                        if (state.analysis.showPerformanceBlock) {
+                            val perfSize = performanceReportSizeProvider()
+                            count += if (perfSize == 0) 2 else 1 + minOf(8, perfSize)
+                        }
+                        count
+                    }
+                    AnalysisMode.SNAPSHOTS -> state.snapshot.snapshotList.size
+                    else -> 0
+                }
+                ScrollBarDragManager.calculateScrollTarget(
+                    clickY = y,
+                    trackStartY = layout.treeFirstRowY - 2 + bannerH,
+                    visibleItems = bodyH,
+                    totalItems = totalItems
+                )
+            }
+            ScrollbarTarget.LOGS -> {
+                val layout = DashboardLayout.dashboard(width, height)
+                val visibleItems = layout.bottomH - 2
+                val bottomRowStartY = 3 + layout.topH
+                ScrollBarDragManager.calculateScrollTarget(
+                    clickY = y,
+                    trackStartY = bottomRowStartY + 1,
+                    visibleItems = visibleItems,
+                    totalItems = TuiLogAppender.logs.size,
+                    reversed = true
+                )
+            }
+        }
+    }
+
+    private fun isProcessBannerActive(state: TuiAppState): Boolean {
+        return state.config.downloadingDataset ||
+                state.runtime.isRegenerating ||
+                state.benchmark.evalLoaderIsRunning ||
+                state.benchmark.isDownloadingEval ||
+                state.benchmark.isRunningBatchTrickleTest ||
+                isProcessBannerActiveProvider()
+    }
+
+    private fun getNodeDetailLinesCount(node: GraphNode, isGeneratingJudge: Boolean): Int {
+        var count = 9
+        if (node.crossLinkChildren.isNotEmpty()) count += 1
+        val judged = node.judgePrompt != null
+        if (isGeneratingJudge) count += 1
+        else if (judged) count += 2
+        else count += 3
+        if (node.parents.size > 1) {
+            count += 2 + minOf(4, node.parents.size)
+        }
+        if (node.crossLinkChildren.isNotEmpty()) {
+            count += 2 + minOf(4, node.crossLinkChildren.size)
+        }
+        if (node.queries.isNotEmpty()) {
+            count += 2 + minOf(3, node.queries.size)
+        }
+        return count
     }
 
     private fun isTextInputActive(state: TuiAppState): Boolean {

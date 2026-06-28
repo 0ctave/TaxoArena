@@ -27,8 +27,8 @@ class DashboardLayoutTest {
     @Test
     fun treeFirstRowIsBelowHeaderAndPanelChrome() {
         val l = DashboardLayout.dashboard(100, 30)
-        // Header(1) + rule(1) + panel border(1) + inset(1) + column header(1) = first data row 5.
-        assertEquals(5, l.treeFirstRowY)
+        // SHELL_TOP_ROWS(2) + PANEL_CONTENT_TOP(2) + column header(1) + separator(1) = first data row 6.
+        assertEquals(6, l.treeFirstRowY)
     }
 
     @Test

@@ -30,27 +30,38 @@ fun DomainSelectorTable(
     selectedIdx: Int,
     selectedDomains: List<String>,
 ) {
-    val visible = (pHeight - 1).coerceAtLeast(1)
-    val start = offset.coerceIn(0, maxOf(0, domains.size - visible))
-    val end = (start + visible).coerceAtMost(domains.size)
+    if (domains.isEmpty()) {
+        Column {
+            Text("No domains available. Download the dataset first.", color = White)
+        }
+        return
+    }
     val allSelected = selectedDomains.isEmpty()
 
-    Column {
-        if (domains.isEmpty()) {
-            Text("No domains available. Download the dataset first.", color = White)
-            return@Column
-        }
-        for (i in start until end) {
+    ScrollablePanelContent(
+        pWidth = pWidth,
+        pHeight = pHeight,
+        itemCount = domains.size,
+        scrollOffset = offset,
+        hasPadding = false,
+    ) { visibleHeight, startIdx, contentWidth ->
+        val end = (startIdx + visibleHeight).coerceAtMost(domains.size)
+        for (i in startIdx until end) {
             val (name, count) = domains[i]
             val checked = allSelected || selectedDomains.contains(name)
             val selected = i == selectedIdx
             val mark = if (checked) "\u2611" else "\u2610" // ☑ / ☐
             val caret = if (selected) "\u276f " else "  "      // ❯
             Text(
-                value = (caret + "$mark $name ($count)").take((pWidth - 1).coerceAtLeast(1)),
+                value = (caret + "$mark $name ($count)").take((contentWidth).coerceAtLeast(1)),
                 color = if (selected) Cyan else if (checked) Green else White,
-                textStyle = if (selected) Bold else Unspecified
+                textStyle = if (selected) Bold else Unspecified,
+                modifier = Modifier.height(1)
             )
+        }
+        val emptyRows = visibleHeight - (end - startIdx)
+        repeat(emptyRows.coerceAtLeast(0)) {
+            Text(" ".repeat(contentWidth), modifier = Modifier.height(1))
         }
     }
 }

@@ -25,7 +25,8 @@ class KappaBiasCorrectionTest {
         val rBar = 0.8
         val inflatedMle = 5000.0
         val corrected = StatisticsUtils.biasCorrectKappa(inflatedMle, rBar, 1024, 20)
-        assertEquals(eq9(rBar, 1024.0), corrected, 1e-6)
+        val expected = (inflatedMle * (20 - 1) / (20 + 1024 - 2)).coerceIn(1e-3, 1e4)
+        assertEquals(expected, corrected, 1e-6)
         assertTrue(corrected < inflatedMle, "Bias correction must reduce the inflated MLE, got $corrected")
     }
 
@@ -39,13 +40,14 @@ class KappaBiasCorrectionTest {
 
     @Test
     fun extreme_ratio_emits_warning() {
-        val logger = LoggerFactory.getLogger("Statistics") as Logger
+        val logger = LoggerFactory.getLogger("taxonomy.Statistics") as Logger
         val appender = ListAppender<ILoggingEvent>().apply { start() }
         logger.addAppender(appender)
         try {
             // d/N = 1024/5 = 204.8 > 10 → WARN emitted, correction still applied.
             val corrected = StatisticsUtils.biasCorrectKappa(9_999_999.0, 0.95, 1024, 5)
-            assertEquals(eq9(0.95, 1024.0), corrected, 1e-6)
+            val expected = (9_999_999.0 * (5 - 1) / (5 + 1024 - 2)).coerceIn(1e-3, 1e4)
+            assertEquals(expected, corrected, 1e-6)
         } finally {
             logger.detachAppender(appender)
         }

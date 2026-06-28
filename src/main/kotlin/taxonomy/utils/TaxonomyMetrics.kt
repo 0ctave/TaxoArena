@@ -223,8 +223,13 @@ class TaxonomyMetrics(
             val result = mutableMapOf<String, GraphNode>()
             leaves.forEach { leaf ->
                 leaf.queries.forEach { emb ->
-                    if (emb.groundTruthCategory.isNotBlank()) {
-                        val gtNode = depth1ByCategory[emb.groundTruthCategory.lowercase()]
+                    val category = if (emb.groundTruthCategory.isNotBlank()) {
+                        emb.groundTruthCategory
+                    } else {
+                        groundTruthMap[emb.rawText]?.firstOrNull() ?: ""
+                    }
+                    if (category.isNotBlank()) {
+                        val gtNode = depth1ByCategory[category.lowercase()]
                         if (gtNode != null) result[emb.rawText] = gtNode
                         // If no depth-1 anchor matches, fall back to the predicted leaf
                         // (treats routing as correct for this query rather than penalising

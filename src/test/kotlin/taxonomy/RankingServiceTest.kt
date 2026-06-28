@@ -16,7 +16,7 @@ class RankingServiceTest {
         rankingService = TaxonomyRankingService()
         // Clear ratings and match history from cache DB for testing
         try {
-            DriverManager.getConnection("jdbc:sqlite:embeddings_cache.db").use { conn ->
+            DriverManager.getConnection("jdbc:sqlite:ratings.db").use { conn ->
                 conn.createStatement().use { stmt ->
                     stmt.execute("DELETE FROM agent_ratings")
                     stmt.execute("DELETE FROM match_history")

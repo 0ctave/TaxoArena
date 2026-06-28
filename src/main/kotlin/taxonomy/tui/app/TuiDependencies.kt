@@ -50,5 +50,20 @@ fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
         },
         metricsHistorySizeProvider = { taxonomyService.getMetricsHistory().size },
         onQuit = onQuit,
+        performanceReportSizeProvider = { taxonomyService.getPerformanceReport().size },
+        isProcessBannerActiveProvider = {
+            val hostRegenerating = taxonomyService.generationProgressFlow.value != null
+            val hostEmbedding = (taxonomyService.embeddingProgressFlow.value as? Pair<*, *>)?.let { (cur, total) ->
+                val c = cur as? Int ?: 0; val t = total as? Int ?: 0
+                t > 0 && c < t
+            } ?: false
+            val hostLabeling = (taxonomyService.labelingProgressFlow.value as? Pair<*, *>)?.let { (cur, total) ->
+                val c = cur as? Int ?: 0; val t = total as? Int ?: 0
+                t > 0 && c < t
+            } ?: false
+            val hostArena = arenaService.state.value.isRunningBenchmark
+            hostRegenerating || hostEmbedding || hostLabeling || hostArena
+        },
+        selectedNodeProvider = { arenaService.state.value.selectedNode }
     )
 }

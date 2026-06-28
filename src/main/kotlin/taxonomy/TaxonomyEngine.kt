@@ -394,8 +394,7 @@ class TaxonomyEngine(
 
     private fun diffDagState(prev: Map<String, NodeState>, curr: Map<String, NodeState>, root: GraphNode): String {
         val sb = StringBuilder()
-        sb.append("┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
-")
+        sb.append("┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────\n")
 
         val addedIds = curr.keys - prev.keys
         val removedIds = prev.keys - curr.keys
@@ -468,8 +467,7 @@ class TaxonomyEngine(
 
         // If root has no changes in its subtree, return no changes
         if (!hasChangesInSubtree(root.id)) {
-            sb.append("│   (No structural changes in this iteration)
-")
+            sb.append("│   (No structural changes in this iteration)\n")
             sb.append("└──────────────────────────────────────────────────────────")
             return sb.toString()
         }
@@ -493,8 +491,7 @@ class TaxonomyEngine(
             }
 
             val connector = if (state.depth == 0) "" else if (isTail) "└── " else "├── "
-            sb.append(prefix).append(connector).append(nodeLabel).append(cross).append("
-")
+            sb.append(prefix).append(connector).append(nodeLabel).append(cross).append("\n")
 
             if (!visited.add(nodeId)) return
 
@@ -521,8 +518,7 @@ class TaxonomyEngine(
                     }
                     is PrintItem.Removed -> {
                         val rConnector = if (childIsTail) "└── " else "├── "
-                        sb.append(nextPrefix).append(rConnector).append("[REMOVED] \"${item.diff.label ?: item.diff.id}\"
-")
+                        sb.append(nextPrefix).append(rConnector).append("[REMOVED] \"${item.diff.label ?: item.diff.id}\"\n")
                     }
                 }
             }
