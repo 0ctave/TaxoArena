@@ -140,8 +140,6 @@ class DefaultTuiEffects(
                     dispatch(TuiEvent.GenerationProgress(progress, text))
                 }
                 dispatch(TuiEvent.GenerationCompleted)
-                // Persist the freshly generated DAG automatically so it survives restarts without
-                // the user having to remember to save. A save failure must not fail generation.
                 val desc = "Auto-saved after generation @ ${java.time.LocalDateTime.now()
                     .truncatedTo(java.time.temporal.ChronoUnit.SECONDS)}"
                 try {
@@ -293,13 +291,26 @@ class DefaultTuiEffects(
     }
 
     override fun regenerateLabels() {
-        scope.launch { gateway.regenerateLabels() }
+        scope.launch {
+            try {
+                gateway.regenerateLabels()
+            } catch (c: CancellationException) {
+                throw c
+            } catch (t: Throwable) {
+                // withJudgeRecording in the gateway already logs the error;
+                // catching here prevents a silent coroutine scope crash.
+            }
+        }
     }
 
     override fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit) {
         scope.launch {
             try {
                 gateway.regenerateJudgeForCurrentNode()
+            } catch (c: CancellationException) {
+                throw c
+            } catch (_: Throwable) {
+                // withJudgeRecording in the gateway already logs the error.
             } finally {
                 dispatch(TuiEvent.SetGeneratingJudge(false))
             }
