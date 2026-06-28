@@ -1,11 +1,8 @@
 package taxonomy.tui.features.logs
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.jakewharton.mosaic.layout.height
-import com.jakewharton.mosaic.layout.padding
 import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.text.SpanStyle
 import com.jakewharton.mosaic.text.buildAnnotatedString
@@ -24,6 +21,9 @@ import taxonomy.utils.TuiLogAppender
  * Renders the system-log tail as plain content. The caller (router) owns the bordered
  * [taxonomy.tui.components.Panel] frame, so this draws content only — no inner border.
  * Newest lines sit at the bottom; [scrollOffset] scrolls back into history.
+ *
+ * All bare Text() calls in the diagnostics empty-state block clip to (width-1) so that
+ * Mosaic never receives a draw call wider than the allocated column space.
  */
 @Composable
 fun LogsPanel(
@@ -32,40 +32,33 @@ fun LogsPanel(
     scrollOffset: Int,
     title: String = "",
 ) {
-    // Reading logsVersion subscribes this composable to recomposition when the pump drains
-    // new lines. The snapshot copy MUST happen inside synchronized(logs): loadHistoricalLogs()
-    // clears and refills the same synchronized list from an IO coroutine, so an unguarded
-    // toList() can race it — throwing ConcurrentModificationException (which wedges the panel)
-    // or observing the list mid-clear as empty.
+    val safeW = width.coerceAtLeast(1)
     val logs = remember(TuiLogAppender.logsVersion.value) {
         synchronized(TuiLogAppender.logs) { ArrayList(TuiLogAppender.logs) }
     }
-    // Re-queried whenever the buffer version changes (keyed on logsVersion) so the empty-state
-    // overlay reflects *live* pipeline health — appends seen, last-append time, attached appenders
-    // and the active LoggerContext — rather than a stale one-time snapshot. This is what lets a
-    // blank panel explain precisely why it is blank (root-level filtering, detached appender,
-    // split LoggerContext, or simply nothing logged yet).
     val diag = remember(TuiLogAppender.logsVersion.value) { TuiLogAppender.diagnostics() }
     val visible = height.coerceAtLeast(1)
 
     if (logs.isEmpty()) {
+        // Clip every line to (safeW - 1) so no Text overflows its allocated box.
+        val lim = (safeW - 1).coerceAtLeast(1)
         Column {
             val appenders = if (diag.attachedAppenderNames.isEmpty()) "none"
                 else diag.attachedAppenderNames.joinToString(",")
             val last = diag.lastAppendAt?.toString() ?: "never"
-            Text("no logs yet — pipeline diagnostics:", color = White)
-            Text("  taxonomy INFO active : ${diag.infoActive}", color = White)
-            Text("  TUI appender attached: ${diag.appenderAttached}  (root appenders: $appenders)", color = White)
-            Text("  buffer size          : ${diag.bufferSize}", color = White)
-            Text("  appends seen (life)  : ${diag.appendCount}", color = White)
-            Text("  last append at       : $last", color = White)
-            Text("  loggerContext hash   : ${diag.loggerContextIdentityHash}", color = White)
+            Text("no logs yet — pipeline diagnostics:".take(lim), color = White)
+            Text("  taxonomy INFO active : ${diag.infoActive}".take(lim), color = White)
+            Text("  TUI appender attached: ${diag.appenderAttached}  (root appenders: $appenders)".take(lim), color = White)
+            Text("  buffer size          : ${diag.bufferSize}".take(lim), color = White)
+            Text("  appends seen (life)  : ${diag.appendCount}".take(lim), color = White)
+            Text("  last append at       : $last".take(lim), color = White)
+            Text("  loggerContext hash   : ${diag.loggerContextIdentityHash}".take(lim), color = White)
         }
         return
     }
 
     ScrollablePanelContent(
-        pWidth = width,
+        pWidth = safeW,
         pHeight = visible,
         itemCount = logs.size,
         scrollOffset = scrollOffset,
@@ -78,9 +71,9 @@ fun LogsPanel(
         lines.forEach { raw ->
             val first = raw.split('\n', '\r').firstOrNull()?.trim() ?: ""
             val (glyph, color) = when {
-                first.contains("ERROR") -> "\u2716 " to Red
-                first.contains("WARN") -> "\u26a0 " to Yellow
-                first.contains("INFO") || first.contains("DEBUG") -> "\u2139 " to Cyan
+                first.contains("ERROR") -> "✖ " to Red
+                first.contains("WARN") -> "⚠ " to Yellow
+                first.contains("INFO") || first.contains("DEBUG") -> "ℹ " to Cyan
                 else -> "  " to White
             }
             val body = first.take((contentWidth - 2).coerceAtLeast(1))
