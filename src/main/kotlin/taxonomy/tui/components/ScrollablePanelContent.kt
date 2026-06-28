@@ -23,11 +23,15 @@ import com.jakewharton.mosaic.ui.Text
  * @param reversed If true, scrollbar thumb starts at the bottom
  * @param contentColumn Builder block for the visible items
  *
- * Width safety: innerWidth and contentW are floored at 1 so that Mosaic never
- * receives a zero-column Box. TextSurface.get asserts col >= 0 && col < width,
- * which throws IllegalStateException when width == 0 regardless of what Text
- * draws. This can happen on narrow terminals or when the app-level panel width
- * calculation subtracts borders down to ≤ 4.
+ * Width safety contract
+ * ---------------------
+ * The scrollbar is 2 columns wide. Rendering it when innerWidth < 3 would force Mosaic
+ * to draw the content column at width ≤ 0, which causes TextSurface.get to throw
+ * IllegalStateException ("Check failed"). We therefore suppress the scrollbar entirely
+ * when the available width is too narrow, giving all columns to content instead.
+ *
+ * Regardless, innerWidth and contentW are each floored at 1 so no child composable
+ * ever receives a non-positive width.
  */
 @Composable
 fun ScrollablePanelContent(
@@ -45,24 +49,31 @@ fun ScrollablePanelContent(
     val maxScroll = maxOf(0, itemCount - visible)
     val startIdx = scrollOffset.coerceIn(0, maxScroll)
 
-    // Guard against narrow terminals: subtracting padding/scrollbar from a small
-    // pWidth can produce zero or negative values, causing TextSurface to assert.
+    // Step 1: compute the total width available for this component.
     val innerWidth = (if (hasPadding) pWidth - 4 else pWidth).coerceAtLeast(1)
-    val contentW = (innerWidth - 2).coerceAtLeast(1) // leave 2 cols for scrollbar gutter
+
+    // Step 2: the scrollbar is a fixed 2-column gutter. Only reserve it when there is
+    // actually room (innerWidth >= 3 leaves at least 1 column for content). When the
+    // panel is narrower than 3 columns we drop the scrollbar entirely so the content
+    // column always receives a positive width.
+    val showScrollbar = innerWidth >= 3
+    val contentW = if (showScrollbar) (innerWidth - 2).coerceAtLeast(1) else innerWidth
 
     Row(modifier = Modifier.width(innerWidth).height(visible)) {
         val modifier = if (hasPadding) Modifier.width(contentW).padding(left = 2) else Modifier.width(contentW)
         Column(modifier = modifier) {
             contentColumn(visible, startIdx, contentW)
         }
-        TuiScrollbar(
-            visibleHeight = visible,
-            scrollOffset = startIdx,
-            maxScroll = maxScroll,
-            reversed = reversed,
-            activeColor = activeColor,
-            trackColor = trackColor
-        )
+        if (showScrollbar) {
+            TuiScrollbar(
+                visibleHeight = visible,
+                scrollOffset = startIdx,
+                maxScroll = maxScroll,
+                reversed = reversed,
+                activeColor = activeColor,
+                trackColor = trackColor
+            )
+        }
     }
 }
 
