@@ -14,6 +14,7 @@ import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
+import taxonomy.config.EffectiveConfig
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
 import taxonomy.tui.components.Panel
@@ -28,6 +29,7 @@ import taxonomy.tui.features.trickle.TricklePanel
 import taxonomy.tui.state.ArenaUiState
 import taxonomy.tui.state.BenchmarkUiState
 import taxonomy.tui.state.SnapshotUiState
+import java.util.Locale
 
 @Composable
 fun AnalysisPanel(
@@ -60,6 +62,7 @@ fun AnalysisPanel(
         AnalysisMode.NODE_DETAIL -> "NODE INSPECTOR"
         AnalysisMode.METRICS -> "METRICS"
         AnalysisMode.SETTINGS -> "SETTINGS"
+        AnalysisMode.CONFIG -> "SNAPSHOT CONFIG"
         else -> "ANALYSIS HUB"
     }
 
@@ -82,6 +85,12 @@ fun AnalysisPanel(
                 mode == AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState)
                 mode == AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
                 mode == AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
+                mode == AnalysisMode.CONFIG -> ConfigSnapshotPanel(
+                    width = bodyW,
+                    height = bodyH,
+                    config = snapshotState.activeSnapshotConfig,
+                    snapshotDescription = snapshotState.activeSnapshotDescription,
+                )
                 else -> MetricsOrInspectorPanel(
                     width = bodyW,
                     height = bodyH,
@@ -109,14 +118,81 @@ private fun ProcessBanner(width: Int, p: ProcessRow) {
     val pctText = p.percent?.let { "${"%.0f".format(java.util.Locale.US, it)}%" }
     Text(
         buildAnnotatedString {
-            withStyle(SpanStyle(color = color, textStyle = Bold)) { append("▶ ${p.name}  ") }
+            withStyle(SpanStyle(color = color, textStyle = Bold)) { append("\u25b6 ${p.name}  ") }
             if (pctText != null) {
                 withStyle(SpanStyle(color = Green, textStyle = Bold)) { append("$pctText  ") }
             }
             withStyle(SpanStyle(color = White)) { append(p.status) }
-            withStyle(SpanStyle(color = color)) { append("  ·  press P") }
+            withStyle(SpanStyle(color = color)) { append("  \u00b7  press P") }
         }.take(width - 1)
     )
+}
+
+/**
+ * CONFIG mode panel — shows the [EffectiveConfig] that was embedded in the currently
+ * loaded snapshot, so the user can audit the generation parameters without leaving
+ * the dashboard. Falls back gracefully when no snapshot is loaded.
+ */
+@Composable
+fun ConfigSnapshotPanel(
+    width: Int,
+    height: Int,
+    config: EffectiveConfig?,
+    snapshotDescription: String? = null,
+) {
+    val w = (width - 1).coerceAtLeast(1)
+    Column(modifier = Modifier.padding(left = 1, top = 1)) {
+        if (config == null) {
+            Text("No snapshot loaded — config unavailable.".take(w), color = TuiTheme.INFO)
+            Spacer()
+            Text("Load a snapshot via [X] Load DAG to see its generation config.".take(w), color = White)
+            return@Column
+        }
+
+        // Header
+        val header = buildString {
+            append("Config")
+            if (snapshotDescription != null) append(" \u00b7 $snapshotDescription")
+        }.take(w)
+        Text(header, color = Cyan, textStyle = Bold)
+        Spacer()
+
+        // ── Dataset ────────────────────────────────────────────────────────
+        Text("Dataset", color = Cyan, textStyle = Bold)
+        Text("  Type         ${config.dataset.datasetType.name}".take(w), color = White)
+        val domains = config.dataset.selectedDomains
+        val domainsText = if (domains.isEmpty()) "all" else domains.joinToString(", ")
+        Text("  Domains      $domainsText".take(w), color = White)
+        Text("  Split        ${if (config.dataset.splitDataset) "yes (${"%.0f".format(Locale.US, config.dataset.testSplitRatio * 100)}% test)" else "no"}".take(w), color = White)
+        Spacer()
+
+        // ── Execution ─────────────────────────────────────────────────────
+        Text("Execution", color = Cyan, textStyle = Bold)
+        Text("  Iterations   ${config.execution.numIterations}".take(w), color = White)
+        Text("  Early stop   ${config.execution.enableEarlyStopping}".take(w), color = White)
+        Text("  Labeling     ${config.execution.enableLabeling}".take(w), color = White)
+        Text("  Live label   ${config.execution.enableLiveLabeling}".take(w), color = White)
+        Spacer()
+
+        // ── LLM ───────────────────────────────────────────────────────────
+        Text("LLM", color = Cyan, textStyle = Bold)
+        Text("  Provider     ${config.llm.provider}".take(w), color = White)
+        Text("  Embed prov.  ${config.llm.embeddingProvider}".take(w), color = White)
+        Text("  Embed model  ${config.llm.embeddingModel}".take(w), color = White)
+        Text("  Judge model  ${config.llm.judgeModel}".take(w), color = White)
+        Text("  Label model  ${config.llm.labelingModel}".take(w), color = White)
+        Text("  Max general. ${config.llm.maxJudgeGenerality}".take(w), color = White)
+        Spacer()
+
+        // ── Formalism ─────────────────────────────────────────────────────
+        Text("Formalism", color = Cyan, textStyle = Bold)
+        Text("  Max depth    ${config.formalism.maxDepth}".take(w), color = White)
+        Text("  Min cluster  ${config.formalism.minClusterSize}".take(w), color = White)
+        Text("  Sep. epsilon ${config.formalism.separationEpsilon}".take(w), color = White)
+        Text("  Cosine tau   ${config.formalism.cosineTau}".take(w), color = White)
+        Text("  Assign. gap  ${config.formalism.assignmentGap}".take(w), color = White)
+        Text("  EMA alpha    ${config.formalism.emaAlpha}".take(w), color = White)
+    }
 }
 
 @Composable
@@ -129,9 +205,9 @@ private fun SnapshotHubPanel(
     Column {
         when {
             state.isSavingSnapshot ->
-                Text("Save snapshot — description: ${state.snapshotDescInput}█".take(w), color = Cyan)
+                Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588".take(w), color = Cyan)
             state.isRenamingSnapshot ->
-                Text("Rename snapshot — new name: ${state.renameInput}█".take(w), color = Cyan)
+                Text("Rename snapshot \u2014 new name: ${state.renameInput}\u2588".take(w), color = Cyan)
         }
         if (state.snapshotList.isEmpty()) {
             Text("No snapshots saved yet. Press N to save the active DAG.".take(w), color = White)
@@ -147,15 +223,15 @@ private fun SnapshotHubPanel(
                                 color = if (selected) Cyan else White,
                                 textStyle = if (selected) Bold else Unspecified
                             )
-                        ) { append((if (selected) "❯ " else "  ") + snap.description) }
+                        ) { append((if (selected) "\u276f " else "  ") + snap.description) }
                         withStyle(SpanStyle(color = White)) {
-                            append("  (${snap.timestamp} · ${snap.metrics.totalNodes} nodes)")
+                            append("  (${snap.timestamp} \u00b7 ${snap.metrics.totalNodes} nodes)")
                         }
                     }.take(w)
                 )
             }
             Spacer()
-            Text("L/Enter Load · D Delete · N Save · Esc Back".take(w), color = White)
+            Text("L/Enter Load \u00b7 D Delete \u00b7 N Save \u00b7 Esc Back".take(w), color = White)
         }
     }
 }
