@@ -81,10 +81,20 @@ class ArcTaxonomyLLMClient(
         return streamingModelCache[modelName] ?: withContext(Dispatchers.IO) {
             streamingModelCache.computeIfAbsent(modelName) { name ->
                 if (config.llm.provider == LlmProviderType.AZURE) {
-                    log.info("Initializing Azure OpenAI Streaming connection for deployment '$name' at ${config.llm.azure.endpoint}")
+                    val endpoint = config.llm.azure.endpoint
+                    val apiKey = config.llm.azure.apiKey
+                    require(endpoint.isNotBlank()) {
+                        "taxoadapt.llm.azure.endpoint is not configured. " +
+                            "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_ENDPOINT environment variable."
+                    }
+                    require(apiKey.isNotBlank()) {
+                        "taxoadapt.llm.azure.api-key is not configured. " +
+                            "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_API_KEY environment variable."
+                    }
+                    log.info("Initializing Azure OpenAI Streaming connection for deployment '$name' at $endpoint")
                     AzureOpenAiStreamingChatModel.builder()
-                        .endpoint(config.llm.azure.endpoint)
-                        .apiKey(config.llm.azure.apiKey)
+                        .endpoint(endpoint)
+                        .apiKey(apiKey)
                         .deploymentName(name)
                         .serviceVersion(config.llm.azure.apiVersion)
                         .timeout(java.time.Duration.ofMinutes(30))
