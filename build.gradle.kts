@@ -32,6 +32,16 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+// spring-dotenv resolves .env relative to the JVM working directory.
+// Without an explicit workingDir, Gradle uses whatever directory the
+// task was invoked from (often a module subdirectory in an IDE run config),
+// so the .env at the repo root is never found and all ${...} placeholders
+// stay blank. Pinning to rootDir makes `./gradlew bootRun` and IDE run
+// configurations behave identically.
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    workingDir = rootDir
+}
+
 dependencies {
     val arcVersion = "0.203.0"
     val langchain4jVersion = "1.8.0"
