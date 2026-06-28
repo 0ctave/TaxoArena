@@ -14,13 +14,20 @@ import com.jakewharton.mosaic.ui.Text
 
 /**
  * Generic virtualized rendering helper that handles the right-side scrollbar.
- * * @param pWidth Total panel width
+ *
+ * @param pWidth Total panel width
  * @param pHeight Total panel height
  * @param itemCount Total number of items in the list
  * @param scrollOffset Current index of the top-most visible item
  * @param hasPadding Whether to add horizontal padding to the content area
  * @param reversed If true, scrollbar thumb starts at the bottom
  * @param contentColumn Builder block for the visible items
+ *
+ * Width safety: innerWidth and contentW are floored at 1 so that Mosaic never
+ * receives a zero-column Box. TextSurface.get asserts col >= 0 && col < width,
+ * which throws IllegalStateException when width == 0 regardless of what Text
+ * draws. This can happen on narrow terminals or when the app-level panel width
+ * calculation subtracts borders down to ≤ 4.
  */
 @Composable
 fun ScrollablePanelContent(
@@ -34,14 +41,16 @@ fun ScrollablePanelContent(
     trackColor: Color = White,
     contentColumn: @Composable (visibleHeight: Int, startIdx: Int, innerWidth: Int) -> Unit
 ) {
-    val visible = pHeight
+    val visible = pHeight.coerceAtLeast(1)
     val maxScroll = maxOf(0, itemCount - visible)
     val startIdx = scrollOffset.coerceIn(0, maxScroll)
 
-    val innerWidth = if (hasPadding) pWidth - 4 else pWidth
-    val contentW = innerWidth - 2 // leave 2 for scrollbar gutter
+    // Guard against narrow terminals: subtracting padding/scrollbar from a small
+    // pWidth can produce zero or negative values, causing TextSurface to assert.
+    val innerWidth = (if (hasPadding) pWidth - 4 else pWidth).coerceAtLeast(1)
+    val contentW = (innerWidth - 2).coerceAtLeast(1) // leave 2 cols for scrollbar gutter
 
-    Row(modifier = Modifier.width(innerWidth).height(pHeight)) {
+    Row(modifier = Modifier.width(innerWidth).height(visible)) {
         val modifier = if (hasPadding) Modifier.width(contentW).padding(left = 2) else Modifier.width(contentW)
         Column(modifier = modifier) {
             contentColumn(visible, startIdx, contentW)
