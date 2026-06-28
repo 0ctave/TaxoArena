@@ -140,8 +140,22 @@ object StatisticsUtils {
     }
 
     /**
-     * Dasgupta Cost Delta for split validation in O(N) using vector sum identities.
-     * 2-cluster version kept for backward compatibility.
+     * Dasgupta Cost Delta for split validation in O(N) using vector-sum identities.
+     *
+     * W(S) proxy = N_S² − ‖sumS‖²
+     *
+     * For unit-norm vectors, this proxy is always ≥ 0 (since ‖sumS‖ ≤ N_S by
+     * Cauchy-Schwarz), is 0 when all vectors are identical, and grows with
+     * within-cluster dissimilarity — exactly the property needed to detect a
+     * beneficial split. The formula is self-consistent (same expression used for
+     * before and after), so the delta ratio is well-defined and monotone.
+     *
+     * Note: this is NOT the canonical Dasgupta off-diagonal sum Σ_{i≠j} xi·xj;
+     * the canonical form equals ‖sumS‖²−N_S (opposite sign, positive for
+     * coherent clusters). The proxy N_S²−‖sumS‖² behaves inversely — it is large
+     * for *incoherent* clusters — which is what the split oracle wants: high
+     * before-cost relative to after-cost. This was the working formula prior to
+     * commit c4c0658 and is restored here.
      */
     fun calculateDasguptaDelta(
         left: List<DoubleArray>,
@@ -170,23 +184,26 @@ object StatisticsUtils {
             normTotal2 += t * t
         }
 
-        val wL     = (normL2     - nL) / 2.0   // ½(‖sumL‖² − N_L)  — correct cosine W
-        val wR     = (normR2     - nR) / 2.0
-        val wTotal = (normTotal2 - n)  / 2.0
+        // Proxy: N² − ‖sum‖²  (always ≥ 0 for unit-norm vectors; large = incoherent)
+        val wL     = nL * nL - normL2
+        val wR     = nR * nR - normR2
+        val wTotal = n  * n  - normTotal2
 
         if (wTotal <= 1e-10) return 0.0
 
-        val cAfter = nR * wL + nL * wR
-        val cBefore = n * wTotal
+        val cAfter  = nR * wL + nL * wR
+        val cBefore = n  * wTotal
 
         return 1.0 - cAfter / cBefore
     }
 
     /**
      * Dasgupta Cost Delta for k >= 2 clusters (general form).
-     * C_after = sum_c [ (n - n_c) * (n_c^2 - ||sum_c||^2) ]
-     * C_before = n * (n^2 - ||sum_total||^2)
-     * Delta = 1 - C_after / C_before   (positive = split helps)
+     *
+     * Uses the same W proxy as calculateDasguptaDelta: W(S) = N_S² − ‖sumS‖².
+     * C_after  = Σ_c (n − n_c) · W(c)
+     * C_before = n · W(all)
+     * Delta    = 1 − C_after / C_before   (positive = split helps)
      *
      * Mathematically identical to calculateDasguptaDelta for k=2.
      */
@@ -200,7 +217,7 @@ object StatisticsUtils {
         for (v in allPts) for (i in 0 until d) sumTotal[i] += v[i]
         var normTotal2 = 0.0
         for (i in 0 until d) normTotal2 += sumTotal[i] * sumTotal[i]
-        val wTotal = (normTotal2 - n) / 2.0
+        val wTotal = n * n - normTotal2
         if (wTotal <= 1e-10) return 0.0
 
         var cAfter = 0.0
@@ -211,7 +228,7 @@ object StatisticsUtils {
             for (v in cluster) for (i in 0 until d) sumC[i] += v[i]
             var normC2 = 0.0
             for (i in 0 until d) normC2 += sumC[i] * sumC[i]
-            val wC = (normC2 - nc) / 2.0
+            val wC = nc * nc - normC2
             cAfter += (n - nc) * wC
         }
         return 1.0 - cAfter / (n * wTotal)

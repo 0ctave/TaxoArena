@@ -74,18 +74,22 @@ class TaxonomyEngine(
             perfTracker.recordTime("Phase 1: Precomputing Embeddings", phase1Time)
 
             // ── Dimension fast-fail ──────────────────────────────────────────
-            // Validate that the embedding model actually produces vectors whose
-            // dimension matches dimForDepth(0) — the root-level MRL dimension.
-            // If they diverge, every cosine similarity and vMF kappa estimate is
-            // silently wrong. Fail loudly here rather than after 15 iterations.
-            val expectedDim = dimForDepth(0)
+            // Validate that the embedding model produces vectors with enough
+            // dimensions to cover the deepest MRL level (dimForDepth(maxDepth)).
+            // The model stores full-size vectors; root-level slicing to
+            // dimForDepth(0)=128 is done later by projectTo(). Comparing against
+            // dimForDepth(0) was wrong — it always threw because the model
+            // produces e.g. 1024-dim vectors, not 128-dim ones.
+            val maxDepth    = config.execution.maxDepth
+            val minRequired = dimForDepth(maxDepth)
             val actualDim   = embeddingCache.dimensionality
-            check(actualDim == expectedDim) {
+            check(actualDim >= minRequired) {
                 "Embedding dimension mismatch: model produces $actualDim-dim vectors " +
-                "but dimForDepth(0) = $expectedDim. " +
-                "Update the MRL schedule in DataModels.kt or switch to a compatible model."
+                "but dimForDepth(maxDepth=$maxDepth) = $minRequired. " +
+                "Switch to a model that outputs at least $minRequired dimensions, " +
+                "or reduce maxDepth in application.yml."
             }
-            log.info("Dimension check passed: model dimension = $actualDim (expected $expectedDim)")
+            log.info("Dimension check passed: model=$actualDim dims, minRequired=$minRequired (maxDepth=$maxDepth)")
             // ────────────────────────────────────────────────────────────────
 
             val root = GraphNode(label = rootLabel, depth = 0)
@@ -394,8 +398,7 @@ class TaxonomyEngine(
 
     private fun diffDagState(prev: Map<String, NodeState>, curr: Map<String, NodeState>, root: GraphNode): String {
         val sb = StringBuilder()
-        sb.append("┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────
-")
+        sb.append("┌── TAXONOMY CHANGES (WITH CONTEXT) ────────────────────────────\n")
 
         val addedIds = curr.keys - prev.keys
         val removedIds = prev.keys - curr.keys
@@ -468,8 +471,7 @@ class TaxonomyEngine(
 
         // If root has no changes in its subtree, return no changes
         if (!hasChangesInSubtree(root.id)) {
-            sb.append("│   (No structural changes in this iteration)
-")
+            sb.append("│   (No structural changes in this iteration)\n")
             sb.append("└──────────────────────────────────────────────────────────")
             return sb.toString()
         }
@@ -493,8 +495,7 @@ class TaxonomyEngine(
             }
 
             val connector = if (state.depth == 0) "" else if (isTail) "└── " else "├── "
-            sb.append(prefix).append(connector).append(nodeLabel).append(cross).append("
-")
+            sb.append(prefix).append(connector).append(nodeLabel).append(cross).append("\n")
 
             if (!visited.add(nodeId)) return
 
@@ -521,8 +522,7 @@ class TaxonomyEngine(
                     }
                     is PrintItem.Removed -> {
                         val rConnector = if (childIsTail) "└── " else "├── "
-                        sb.append(nextPrefix).append(rConnector).append("[REMOVED] \"${item.diff.label ?: item.diff.id}\"
-")
+                        sb.append(nextPrefix).append(rConnector).append("[REMOVED] \"${item.diff.label ?: item.diff.id}\"\n")
                     }
                 }
             }
