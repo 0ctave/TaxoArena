@@ -14,6 +14,8 @@ import taxonomy.model.GraphNode
  *
  * All LLM calls use structured JSON output (JsonSchema ResponseFormat) to guarantee syntactically
  * valid, parseable responses without any post-hoc string cleanup.
+ * On Azure the structured-output path falls back to prompt-injected schema instructions, so the
+ * model may still wrap its response in markdown code fences. stripCodeFences() handles that.
  */
 @Service
 class TaxonomyValidator(
@@ -56,6 +58,20 @@ class TaxonomyValidator(
         val taxonomyScore: Double
     )
 
+    /**
+     * Strips markdown code fences that Azure models emit despite schema instructions.
+     * Mirrors the same helper in TaxoPrompts — kept local to avoid a cross-object dependency.
+     */
+    private fun stripCodeFences(raw: String): String {
+        val trimmed = raw.trim()
+        if (trimmed.startsWith("{") || trimmed.startsWith("[")) return trimmed
+        val afterOpen = trimmed
+            .removePrefix("```json")
+            .removePrefix("```")
+            .trimStart('\n', '\r', ' ')
+        return if (afterOpen.endsWith("```")) afterOpen.dropLast(3).trimEnd('\n', '\r', ' ') else afterOpen
+    }
+
     suspend fun validateTaxonomy(root: GraphNode): ValidationSummary {
         log.info("==========================================================")
         log.info("   LAUNCHING AUTOMATED LLM EVALUATION SUITE")
@@ -73,7 +89,6 @@ class TaxonomyValidator(
             val parent = node.parents.firstOrNull() ?: continue
             pathGranCount++
 
-            // Query LLM for Path Granularity — guaranteed JSON via schema
             val granularityPrompt = """
                 [Path Granularity Evaluation]
                 Parent Concept Label: ${parent.label}
@@ -85,14 +100,13 @@ class TaxonomyValidator(
 
             try {
                 val granRes = llmClient.queryModelStructured(config.llm.judgeModel, null, granularityPrompt, booleanSchema)
-                val isGranOk = json.parseToJsonElement(granRes).jsonObject["result"]?.jsonPrimitive?.intOrNull == 1
+                val isGranOk = json.parseToJsonElement(stripCodeFences(granRes)).jsonObject["result"]?.jsonPrimitive?.intOrNull == 1
                 if (isGranOk) pathGranSuccess++
                 log.info("  - Edge [${parent.label} -> ${node.label}] Granularity Preserved: $isGranOk")
             } catch (e: Exception) {
                 log.warn("Failed path granularity evaluation for [${parent.label} -> ${node.label}]: ${e.message}")
             }
 
-            // Query LLM for Dimension Alignment — guaranteed JSON via schema
             dimensionAlignCount++
             val alignPrompt = """
                 [Dimension Alignment Evaluation]
@@ -105,7 +119,7 @@ class TaxonomyValidator(
 
             try {
                 val alignRes = llmClient.queryModelStructured(config.llm.judgeModel, null, alignPrompt, booleanSchema)
-                val isAlignOk = json.parseToJsonElement(alignRes).jsonObject["result"]?.jsonPrimitive?.intOrNull == 1
+                val isAlignOk = json.parseToJsonElement(stripCodeFences(alignRes)).jsonObject["result"]?.jsonPrimitive?.intOrNull == 1
                 if (isAlignOk) dimensionAlignSuccess++
                 log.info("  - Node [${node.label}] Dimension Alignment: $isAlignOk")
             } catch (e: Exception) {
@@ -131,7 +145,7 @@ class TaxonomyValidator(
 
             try {
                 val cohRes = llmClient.queryModelStructured(config.llm.judgeModel, null, coherencePrompt, coherenceSchema)
-                val score = json.parseToJsonElement(cohRes).jsonObject["coherenceScore"]?.jsonPrimitive?.doubleOrNull ?: 0.0
+                val score = json.parseToJsonElement(stripCodeFences(cohRes)).jsonObject["coherenceScore"]?.jsonPrimitive?.doubleOrNull ?: 0.0
                 coherenceSum += score
                 log.info("  - Sibling Group under [${node.label}] Coherence Score: ${"%.2f".format(java.util.Locale.US, score)}")
             } catch (e: Exception) {
