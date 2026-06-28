@@ -85,3 +85,14 @@ logging:
 #   execution:
 #     enable-labeling: false
 #     enable-live-labeling: false
+
+# ── Azure OpenAI credentials ───────────────────────────────────────────────────
+# Read from environment variables so secrets never land in source control.
+# Set AZURE_AI_ENDPOINT and AZURE_AI_API_KEY in your .env / shell before
+# starting the app. The deployment name comes from taxoadapt.llm.judge-model
+# (or labeling-model) at runtime — no separate env var needed.
+taxoadapt:
+  llm:
+    azure:
+      endpoint: ${AZURE_AI_ENDPOINT:}
+      api-key: ${AZURE_AI_API_KEY:}
