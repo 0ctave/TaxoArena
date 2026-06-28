@@ -15,6 +15,29 @@ object TaxoPrompts {
     private const val JSON_STRICT = "IMPORTANT: Return ONLY raw JSON. No markdown. Output must start with { and end with }."
 
     /**
+     * Strips markdown code fences that some models (e.g. Mistral-Large-3 on Azure)
+     * emit despite being instructed not to. Handles both:
+     *   ```json\n{...}\n```
+     *   ```\n{...}\n```
+     * and bare {…} with no fences. Trims surrounding whitespace before returning.
+     */
+    private fun stripCodeFences(raw: String): String {
+        val trimmed = raw.trim()
+        // Fast path: already a bare JSON object or array
+        if (trimmed.startsWith("{") || trimmed.startsWith("[")) return trimmed
+        // Remove opening fence (```json or ``` alone on its own line)
+        val afterOpen = trimmed
+            .removePrefix("```json")
+            .removePrefix("```")
+            .trimStart('\n', '\r', ' ')
+        // Remove closing fence
+        val afterClose = if (afterOpen.endsWith("```")) {
+            afterOpen.dropLast(3).trimEnd('\n', '\r', ' ')
+        } else afterOpen
+        return afterClose.trim()
+    }
+
+    /**
      * Hardened prompt for distilling a raw query into a high-signal semantic signature.
      * Utilizes the initial domain context to ground the keyword extraction while remaining 
      * open to cross-disciplinary epistemic overlap.
@@ -60,7 +83,7 @@ object TaxoPrompts {
         return """Task: Synthesize a highly precise, professional taxonomic concept label for a newly identified semantic cluster.
 
 [Taxonomic Context & Domain Grounding]
-The cluster’s questions primarily come from the following expert-annotated subject domains:
+The cluster's questions primarily come from the following expert-annotated subject domains:
 - Ground Truth Domain Anchors: $anchors
 
 [Lineage Hierarchy Context]
@@ -91,7 +114,7 @@ $samples
 
 4. Granularity Matching (Depth $depth):
    - Match the specificity and technical complexity of the siblings at this depth.
-   - If siblings are very specialized (e.g., “Pricing Models”, “Capital Structure”), avoid generic labels (e.g., “Business Math”).
+   - If siblings are very specialized (e.g., "Pricing Models", "Capital Structure"), avoid generic labels (e.g., "Business Math").
 
 5. Constraints:
    - The label must be a clear, technical, concise noun phrase (1–4 words).
@@ -112,7 +135,8 @@ $JSON_STRICT
 
     fun parseClusterLabel(jsonResponse: String): String? {
         return try {
-            val root = Json.parseToJsonElement(jsonResponse).jsonObject
+            val cleaned = stripCodeFences(jsonResponse)
+            val root = Json { ignoreUnknownKeys = true }.parseToJsonElement(cleaned).jsonObject
             val label = root["label"]?.jsonPrimitive?.content
             if (label.isNullOrBlank()) {
                 log.warn("Malformed JSON: 'label' property is missing or empty. Raw input:\n$jsonResponse")
