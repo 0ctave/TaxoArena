@@ -62,7 +62,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         } ?: return false
 
         deps.taxonomyService.setGraph(root)
-        // Track the active snapshot so subsequent judge/benchmark runs know where to append logs.
         deps.taxonomyService.setActiveSnapshotId(snapshotId)
         deps.config.applyEffectiveConfig(snapshot.config ?: snapshot.settings.toEffectiveConfig())
 
@@ -86,7 +85,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         val snapshot = withContext(Dispatchers.IO) {
             deps.snapshotManager.saveSnapshot(root, description)
         }
-        // Track the active snapshot ID so future judge/benchmark appends land in this file.
         deps.taxonomyService.setActiveSnapshotId(snapshot.id)
     }
 
@@ -96,13 +94,12 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override suspend fun deleteSnapshot(snapshotId: String) {
         withContext(Dispatchers.IO) { deps.snapshotManager.deleteSnapshot(snapshotId) }
-        // Clear the active ID if the deleted snapshot was the active one.
         if (deps.taxonomyService.activeSnapshotId() == snapshotId) {
             deps.taxonomyService.setActiveSnapshotId(null)
         }
     }
 
-    // ── Dataset ──────────────────────────────────────────────────────────────────
+    // ── Dataset ─────────────────────────────────────────────────────────────────
 
     override suspend fun isDatasetDownloaded(): Boolean =
         withContext(Dispatchers.IO) { deps.datasetFetcher.isDatasetDownloaded() }
@@ -127,8 +124,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override suspend fun generateDag(onProgress: (Float, String) -> Unit) {
         withContext(Dispatchers.IO) {
-            // Bracket the whole generation so every log line is captured into a
-            // per-session trace; saveSnapshot() then persists exactly this slice.
             TuiLogAppender.startRecording()
             try {
                 deps.log.info("DAG generation started for dataset '${deps.config.dataset.datasetType.name}'.")
@@ -157,8 +152,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                     dataset = trainSet
                 )
                 deps.taxonomyService.setGraph(root)
-                // Clear the active snapshot ID: the new DAG has no snapshot yet until the
-                // auto-save in DefaultTuiEffects.generateDag() calls saveSnapshot().
                 deps.taxonomyService.setActiveSnapshotId(null)
                 deps.log.info("DAG generation complete: ${trainSet.values.sumOf { it.size }} train queries processed.")
             } finally {
@@ -169,11 +162,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     // ── Judge generation ─────────────────────────────────────────────────────────
 
-    /**
-     * Shared recording bracket for any operation that runs judges against the active DAG.
-     * Captures all log output, surfaces exceptions into the log panel, and appends the
-     * trace to the active snapshot log file so the snapshot remains a complete record.
-     */
     private suspend fun withJudgeRecording(label: String, block: suspend () -> Unit) {
         TuiLogAppender.startRecording()
         try {
@@ -197,9 +185,12 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.warn("Regenerate labels: no active DAG.")
             return
         }
-        deps.log.info("Regenerating judges for all unlabelled nodes\u2026")
+        deps.log.info("Regenerating all judges (replace=true)\u2026")
+        // replaceExisting=true: the 'l' key is an explicit force-regenerate,
+        // not a fill-missing. Without this, any DAG that already has judges
+        // silently does nothing.
         withJudgeRecording("Label regeneration") {
-            deps.judgeService.generateJudgesForDag(root, replaceExisting = false)
+            deps.judgeService.generateJudgesForDag(root, replaceExisting = true)
         }
         deps.log.info("Label regeneration complete.")
     }
@@ -247,9 +238,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 "confidenceGate=$confidenceGate \u00b7 parallelism=$parallelism \u00b7 updateRankings=$updateRankings"
         )
         deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models\u2026")
-        // Record benchmark logs so the full run is visible in both the TUI panel and
-        // the snapshot log file. Starts before runBenchmark so per-query warnings from
-        // BenchmarkService are captured too.
         TuiLogAppender.startRecording()
         try {
             val report = deps.benchmarkService.runBenchmark(request) { live ->
@@ -261,7 +249,6 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 onLive(live)
             }
             deps.arenaService.completeBenchmark(report)
-            // Emit the full summary to the TUI log panel.
             deps.log.info(
                 "Benchmark complete: ${report.totalQueries} queries \u00b7 ${report.totalModelPairs} pairs \u00b7 " +
                     "coverage ${"%,.3f".format(report.coverageRate)} \u00b7 " +
