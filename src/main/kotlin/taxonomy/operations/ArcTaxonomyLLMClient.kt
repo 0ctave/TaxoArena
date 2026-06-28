@@ -79,37 +79,45 @@ class ArcTaxonomyLLMClient(
 
     private suspend fun getStreamingModel(modelName: String): StreamingChatModel {
         return streamingModelCache[modelName] ?: withContext(Dispatchers.IO) {
-            streamingModelCache.computeIfAbsent(modelName) { name ->
-                if (config.llm.provider == LlmProviderType.AZURE) {
-                    val endpoint = config.llm.azure.endpoint
-                    val apiKey = config.llm.azure.apiKey
-                    require(endpoint.isNotBlank()) {
-                        "taxoadapt.llm.azure.endpoint is not configured. " +
-                            "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_ENDPOINT environment variable."
-                    }
-                    require(apiKey.isNotBlank()) {
-                        "taxoadapt.llm.azure.api-key is not configured. " +
-                            "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_API_KEY environment variable."
-                    }
-                    log.info("Initializing Azure OpenAI Streaming connection for deployment '$name' at $endpoint")
-                    AzureOpenAiStreamingChatModel.builder()
-                        .endpoint(endpoint)
-                        .apiKey(apiKey)
-                        .deploymentName(name)
-                        .serviceVersion(config.llm.azure.apiVersion)
-                        .timeout(java.time.Duration.ofMinutes(30))
-                        .build()
-                } else {
-                    val discoveredCtx = discoverModelContext(name)
-                    log.info("Initializing GPU Streaming connection for '$name' (ctx: $discoveredCtx)")
-                    OllamaStreamingChatModel.builder()
-                        .baseUrl(ollamaBaseUrl)
-                        .modelName(name)
-                        .timeout(java.time.Duration.ofMinutes(30))
-                        .numCtx(discoveredCtx)
-                        .build()
-                }
+            // Use a manual get-then-put pattern instead of computeIfAbsent so that a failed
+            // build attempt does NOT leave a poisoned entry in the cache — computeIfAbsent
+            // swallows the exception and stores nothing, but a subsequent concurrent call can
+            // still observe a partially-constructed value on some JVM implementations.
+            streamingModelCache.getOrPut(modelName) {
+                buildStreamingModel(modelName)
             }
+        }
+    }
+
+    private fun buildStreamingModel(name: String): StreamingChatModel {
+        return if (config.llm.provider == LlmProviderType.AZURE) {
+            val endpoint = config.llm.azure.endpoint
+            val apiKey = config.llm.azure.apiKey
+            require(endpoint.isNotBlank()) {
+                "taxoadapt.llm.azure.endpoint is not configured. " +
+                    "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_ENDPOINT environment variable."
+            }
+            require(apiKey.isNotBlank()) {
+                "taxoadapt.llm.azure.api-key is not configured. " +
+                    "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_API_KEY environment variable."
+            }
+            log.info("Initializing Azure OpenAI Streaming connection for deployment '$name' at $endpoint")
+            AzureOpenAiStreamingChatModel.builder()
+                .endpoint(endpoint)
+                .apiKey(apiKey)
+                .deploymentName(name)
+                .serviceVersion(config.llm.azure.apiVersion)
+                .timeout(java.time.Duration.ofMinutes(30))
+                .build()
+        } else {
+            val discoveredCtx = discoverModelContext(name)
+            log.info("Initializing GPU Streaming connection for '$name' (ctx: $discoveredCtx)")
+            OllamaStreamingChatModel.builder()
+                .baseUrl(ollamaBaseUrl)
+                .modelName(name)
+                .timeout(java.time.Duration.ofMinutes(30))
+                .numCtx(discoveredCtx)
+                .build()
         }
     }
 
@@ -140,17 +148,16 @@ class ArcTaxonomyLLMClient(
     override suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String {
         return semaphore.withPermit {
             val slot = monitor.acquireSlot(modelName)
-            
+
             try {
                 val model = getStreamingModel(modelName)
                 val messages = mutableListOf<ChatMessage>()
                 if (systemPrompt != null) messages.add(SystemMessage.from(systemPrompt))
                 messages.add(UserMessage.from(userPrompt))
 
-                // Idiomatic bridging of callbacks to Coroutines
                 val responseText = suspendCancellableCoroutine<String> { continuation ->
                     val accumulatedContent = StringBuilder()
-                    
+
                     model.chat(messages, object : StreamingChatResponseHandler {
                         override fun onPartialResponse(token: String) {
                             accumulatedContent.append(token)
@@ -160,22 +167,17 @@ class ArcTaxonomyLLMClient(
                         override fun onCompleteResponse(response: ChatResponse) {
                             log.debug("Stream completed for model '$modelName'")
                             monitor.releaseSlot(slot)
-                            if (continuation.isActive) {
-                                continuation.resume(accumulatedContent.toString())
-                            }
+                            if (continuation.isActive) continuation.resume(accumulatedContent.toString())
                         }
 
                         override fun onError(error: Throwable) {
                             log.error("Streaming error for model '$modelName': ${error.message}")
                             monitor.releaseSlot(slot)
-                            if (continuation.isActive) {
-                                continuation.resumeWithException(error)
-                            }
+                            if (continuation.isActive) continuation.resumeWithException(error)
                         }
                     })
                 }
-                
-                // Keep the slot visible for a few seconds if it's a TUI request
+
                 clientScope.launch {
                     delay(3000.milliseconds)
                     monitor.removeSlot(slot)
@@ -192,9 +194,10 @@ class ArcTaxonomyLLMClient(
     }
 
     /**
-     * Sends a ChatRequest with a strict [JsonSchema] ResponseFormat to the Ollama endpoint,
-     * forcing the model to emit syntactically valid JSON that exactly matches the schema.
-     * This completely eliminates the need for post-hoc string cleanup or bracket-scanning.
+     * Sends a ChatRequest with a strict [JsonSchema] ResponseFormat to the model,
+     * forcing syntactically valid JSON output that exactly matches the schema.
+     * Throws on any failure so callers can decide how to handle the error — returning
+     * an empty object silently was masking misconfiguration as a labeling glitch.
      */
     override suspend fun queryModelStructured(
         modelName: String,
@@ -233,22 +236,18 @@ class ArcTaxonomyLLMClient(
                         override fun onCompleteResponse(response: ChatResponse) {
                             log.debug("Structured stream completed for model '$modelName'")
                             monitor.releaseSlot(slot)
-                            if (continuation.isActive) {
-                                continuation.resume(accumulatedContent.toString())
-                            }
+                            if (continuation.isActive) continuation.resume(accumulatedContent.toString())
                         }
 
                         override fun onError(error: Throwable) {
                             log.error("Structured streaming error for model '$modelName': ${error.message}")
                             monitor.releaseSlot(slot)
-                            if (continuation.isActive) {
-                                continuation.resumeWithException(error)
-                            }
+                            if (continuation.isActive) continuation.resumeWithException(error)
                         }
                     })
                 }
 
-                GlobalScope.launch {
+                clientScope.launch {
                     delay(3000.milliseconds)
                     monitor.removeSlot(slot)
                 }
@@ -258,8 +257,10 @@ class ArcTaxonomyLLMClient(
             } catch (e: Exception) {
                 monitor.releaseSlot(slot)
                 monitor.removeSlot(slot)
-                log.error("Structured streaming failure for '$modelName'", e)
-                return@withPermit "{}"
+                // Evict any poisoned cache entry so the next call can retry cleanly
+                // (e.g. after the user fixes a missing Azure endpoint in config).
+                streamingModelCache.remove(modelName)
+                throw e
             }
         }
     }
@@ -269,7 +270,6 @@ class ArcTaxonomyLLMClient(
             ?: if (configuredModelName.isNotBlank() && configuredModelName != "ministral-3:14b") configuredModelName
             else config.llm.labelingModel
     }
-
 
     override suspend fun generateClusterLabel(prompt: String): String {
         return queryModel(getEffectiveModelName(), null, prompt)
