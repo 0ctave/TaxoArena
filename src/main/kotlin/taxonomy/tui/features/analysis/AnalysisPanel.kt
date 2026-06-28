@@ -34,8 +34,6 @@ fun AnalysisPanel(
     width: Int,
     height: Int,
     focused: Boolean = false,
-    /** The active hub mode, driven by MVI state (key presses). The panel switches on THIS,
-     *  not on the service's controlState.mode (which only changes when a run mutates it). */
     mode: AnalysisMode,
     controlState: AnalysisPanelState,
     inspectorScroll: Int,
@@ -51,13 +49,8 @@ fun AnalysisPanel(
     showPerformanceBlock: Boolean = false,
     detailScrollOffset: Int = 0,
     performanceReport: Map<String, taxonomy.utils.PerformanceStats> = emptyMap(),
-    /** Most relevant active process, or null when idle. Pinned at the top so a
-     *  running process is always one keystroke away regardless of what the
-     *  dashboard is currently showing (selection wins, process resumable). */
     activeProcess: ProcessRow? = null,
 ) {
-    // This panel owns the single bordered frame for the right-hand hub. The title reflects
-    // the active mode, and the sub-panels below render content only (no nested borders).
     val title = when (mode) {
         AnalysisMode.ARENA -> "MODEL ARENA"
         AnalysisMode.BENCHMARK -> "BENCHMARK"
@@ -72,7 +65,6 @@ fun AnalysisPanel(
 
     Panel(title, TuiTheme.panelAccent(focused), width, height) {
         Column {
-            // Pinned resumable-process banner: always visible while work is running.
             val bannerH = if (activeProcess != null) 1 else 0
             if (activeProcess != null) {
                 ProcessBanner(width - 2, activeProcess)
@@ -81,8 +73,6 @@ fun AnalysisPanel(
             val bodyW = width - 2
 
             when {
-                // The eval-catalog ingestion picker is a modal overlay shared by Arena and
-                // Benchmark; render it in place of the normal sub-panel while it's open.
                 (mode == AnalysisMode.ARENA || mode == AnalysisMode.BENCHMARK) &&
                     benchmarkState.isPickingEvalCatalog ->
                     EvalCatalogPicker(bodyW, bodyH, benchmarkState)
@@ -117,7 +107,6 @@ fun AnalysisPanel(
 private fun ProcessBanner(width: Int, p: ProcessRow) {
     val color = TuiTheme.statusColor(done = p.done, error = p.error)
     val pctText = p.percent?.let { "${"%.0f".format(java.util.Locale.US, it)}%" }
-    // Format: ▶ NAME  67%  status text  ·  press P
     Text(
         buildAnnotatedString {
             withStyle(SpanStyle(color = color, textStyle = Bold)) { append("▶ ${p.name}  ") }
@@ -136,20 +125,18 @@ private fun SnapshotHubPanel(
     height: Int,
     state: SnapshotUiState,
 ) {
-    // Same crash-class guard as ArenaPanel: input echoes grow with keystrokes, and an overflowing
-    // Text in Mosaic 0.18.0 throws TextSurface.Check failed.
     val w = (width - 1).coerceAtLeast(1)
     Column {
         when {
             state.isSavingSnapshot ->
-                Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588".take(w), color = Cyan)
+                Text("Save snapshot — description: ${state.snapshotDescInput}█".take(w), color = Cyan)
             state.isRenamingSnapshot ->
-                Text("Rename snapshot \u2014 new name: ${state.renameInput}\u2588".take(w), color = Cyan)
+                Text("Rename snapshot — new name: ${state.renameInput}█".take(w), color = Cyan)
         }
         if (state.snapshotList.isEmpty()) {
-            Text("No snapshots saved yet. Press N to save the active DAG.", color = White)
+            Text("No snapshots saved yet. Press N to save the active DAG.".take(w), color = White)
         } else {
-            Text("SAVED SNAPSHOTS (${state.snapshotList.size})", color = Cyan, textStyle = Bold)
+            Text("SAVED SNAPSHOTS (${state.snapshotList.size})".take(w), color = Cyan, textStyle = Bold)
             val visible = (height - 4).coerceAtLeast(1)
             state.snapshotList.take(visible).forEachIndexed { idx, snap ->
                 val selected = idx == state.selectedSnapshotIdx
@@ -160,15 +147,15 @@ private fun SnapshotHubPanel(
                                 color = if (selected) Cyan else White,
                                 textStyle = if (selected) Bold else Unspecified
                             )
-                        ) { append((if (selected) "\u276f " else "  ") + snap.description) }
+                        ) { append((if (selected) "❯ " else "  ") + snap.description) }
                         withStyle(SpanStyle(color = White)) {
-                            append("  (${snap.timestamp} \u00b7 ${snap.metrics.totalNodes} nodes)")
+                            append("  (${snap.timestamp} · ${snap.metrics.totalNodes} nodes)")
                         }
-                    }
+                    }.take(w)
                 )
             }
             Spacer()
-            Text("L/Enter Load \u00b7 D Delete \u00b7 N Save \u00b7 Esc Back", color = White)
+            Text("L/Enter Load · D Delete · N Save · Esc Back".take(w), color = White)
         }
     }
 }
