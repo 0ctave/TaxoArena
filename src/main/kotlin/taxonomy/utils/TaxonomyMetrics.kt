@@ -200,11 +200,16 @@ class TaxonomyMetrics(
             ll.maxByOrNull { it.vmfKappa } ?: ll.first()
         }
 
-        // NMI/ARI use flat leaf identity (correct for clustering papers)
-        val predSimple = queryToPrimaryLeaf.mapValues { (_, leaf) -> leaf.id }
+        // NMI/ARI: collapse predicted assignment to depth-1 ancestor label so both
+        // partitions have the same granularity as the 13 GT categories.
+        // Using raw leaf IDs (hundreds of distinct values) against 13 GT labels caused
+        // H(predicted) >> H(GT), making MI negligible → NMI ≈ 0 always.
+        val predSimple = queryToPrimaryLeaf.mapValues { (_, leaf) ->
+            getDepth1Ancestors(leaf).firstOrNull() ?: leaf.id
+        }
 
         // Predicted covering: the set of leaves each query is assigned to.
-        // Kept for routing ECE (below); NMI no longer consumes it.
+        // Used for routing ECE; overlapping NMI now uses groundTruthLeaves path.
         val predictedCover = queryToLeavesList.mapValues { (_, ll) ->
             ll.associate { it.id to 1.0 }
         }
@@ -236,17 +241,22 @@ class TaxonomyMetrics(
             result
         }
 
-        // NMI is standard Shannon NMI over two flat hard partitions of the same query
-        // set: predicted primary-leaf id vs. ground-truth category name. The earlier
-        // overlapping-cover NMI compared disjoint node-id spaces and collapsed to ~0.
+        // NMI selection:
+        // • groundTruthLeaves non-empty  → overlapping NMI (Lancichinetti et al. 2009)
+        //   comparing covering sets at leaf granularity. This is the correct path when
+        //   embeddings carry groundTruthCategory (post-PR-#48 caches).
+        // • groundTruthLeaves empty      → Shannon NMI over depth-1-collapsed partitions.
+        //   Both gtSimple and predSimple are now at the same 13-category granularity,
+        //   so MI is no longer dwarfed by H(predicted). Old embedding caches (blank
+        //   groundTruthCategory) take this path and will still produce meaningful scores.
         val groundTruthCover: Map<String, Map<String, Double>> = groundTruthLeaves
             .mapValues { (_, gtNode) -> mapOf(gtNode.id to 1.0) }
-        // Use DAG-compatible overlapping NMI (Lancichinetti et al. 2009).
-        // Falls back gracefully to 0.0 when groundTruthMap is empty.
-        val nmi = if (groundTruthCover.isEmpty() || predictedCover.isEmpty()) {
-            ShannonNmi.compute(gtSimple, predSimple)   // keep Shannon as fallback when GT is flat/absent
-        } else {
+
+        val nmi = if (groundTruthLeaves.isNotEmpty()) {
             OverlappingNmi.compute(predictedCover, groundTruthCover)
+        } else {
+            // Fallback: Shannon NMI over domain-collapsed partitions (same granularity).
+            ShannonNmi.compute(gtSimple, predSimple)
         }
 
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
