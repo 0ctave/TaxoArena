@@ -155,7 +155,13 @@ data class SnapshotSettings(
     val cosineTau: Double,
     val assignmentGap: Double,
     val emaAlpha: Double,
-    val datasetType: DatasetType = DatasetType.MMLU_PRO
+    val datasetType: DatasetType = DatasetType.MMLU_PRO,
+    /**
+     * Ground-truth category labels for the dataset used during this generation run.
+     * Populated at save time from the dataset loader; empty for legacy snapshots that
+     * predate this field. Used by the CONFIG panel and supervision metrics.
+     */
+    val groundTruthCategories: List<String> = emptyList()
 ) {
     /** Map the legacy persisted settings onto the effective config; unknown fields keep defaults. */
     fun toEffectiveConfig(): EffectiveConfig = EffectiveConfig(

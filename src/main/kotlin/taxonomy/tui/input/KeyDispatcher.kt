@@ -154,6 +154,7 @@ class KeyDispatcher(
                                 AnalysisModeLike.IDLE,
                                 AnalysisModeLike.NODE_DETAIL,
                                 AnalysisModeLike.SETTINGS,
+                                AnalysisModeLike.CONFIG_PANEL,
                                 AnalysisModeLike.LOGS_SCROLL,
                                 AnalysisModeLike.JUDGE_PROGRESS -> KeyContext.ANALYSIS_IDLE
 
@@ -213,6 +214,7 @@ enum class AnalysisModeLike {
     IDLE,
     NODE_DETAIL,
     SETTINGS,
+    CONFIG_PANEL,
     LOGS_SCROLL,
     SNAPSHOTS,
     METRICS,
