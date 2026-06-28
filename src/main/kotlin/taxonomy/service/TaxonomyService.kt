@@ -64,6 +64,17 @@ class TaxonomyService(
     private val _embeddingProgress = MutableStateFlow<Pair<Int, Int>?>(null)
     val embeddingProgressFlow: StateFlow<Pair<Int, Int>?> = _embeddingProgress.asStateFlow()
 
+    /**
+     * ID of the snapshot that is currently "active" — i.e. the one that was most recently saved
+     * or loaded. Gateway operations that append logs to the snapshot (judge generation, benchmark)
+     * read this so they know which row/file to extend without having to plumb the ID through every
+     * call site. Null when no snapshot is active (freshly started DAG not yet saved).
+     */
+    @Volatile private var _activeSnapshotId: String? = null
+
+    fun activeSnapshotId(): String? = _activeSnapshotId
+    fun setActiveSnapshotId(id: String?) { _activeSnapshotId = id }
+
     fun updateGenerationProgress(progress: GenerationProgress) {
         _generationProgress.value = progress
     }
