@@ -14,6 +14,7 @@ import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.components.take
 import taxonomy.tui.state.BenchmarkLiveView
 import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
