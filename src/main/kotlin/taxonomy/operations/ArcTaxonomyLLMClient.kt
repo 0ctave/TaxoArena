@@ -41,7 +41,12 @@ interface TaxonomyLlmClient {
      * Queries the model with a strict JSON schema constraint, guaranteeing syntactically
      * valid JSON output without requiring any post-hoc string cleanup.
      *
-     * @param modelName The Ollama model endpoint to use.
+     * For Ollama: uses the native ChatRequest + ResponseFormat JSON schema path.
+     * For Azure: AzureOpenAiStreamingChatModel does not support the chat(ChatRequest, handler)
+     * overload — it falls back to prompt-injected schema instructions which Mistral-Large-3
+     * follows reliably without a separate JSON mode flag.
+     *
+     * @param modelName The model deployment/endpoint name.
      * @param systemPrompt Optional system-level instruction.
      * @param userPrompt The user-facing prompt body.
      * @param schema A pre-built LangChain4j [JsonSchema] that the model must conform to.
@@ -80,9 +85,7 @@ class ArcTaxonomyLLMClient(
     private suspend fun getStreamingModel(modelName: String): StreamingChatModel {
         return streamingModelCache[modelName] ?: withContext(Dispatchers.IO) {
             // Use a manual get-then-put pattern instead of computeIfAbsent so that a failed
-            // build attempt does NOT leave a poisoned entry in the cache — computeIfAbsent
-            // swallows the exception and stores nothing, but a subsequent concurrent call can
-            // still observe a partially-constructed value on some JVM implementations.
+            // build attempt does NOT leave a poisoned entry in the cache.
             streamingModelCache.getOrPut(modelName) {
                 buildStreamingModel(modelName)
             }
@@ -95,11 +98,11 @@ class ArcTaxonomyLLMClient(
             val apiKey = config.llm.azure.apiKey
             require(endpoint.isNotBlank()) {
                 "taxoadapt.llm.azure.endpoint is not configured. " +
-                    "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_ENDPOINT environment variable."
+                    "Set it in application.yml or via the AZURE_AI_ENDPOINT environment variable."
             }
             require(apiKey.isNotBlank()) {
                 "taxoadapt.llm.azure.api-key is not configured. " +
-                    "Set it in application.yml or via the TAXOADAPT_LLM_AZURE_API_KEY environment variable."
+                    "Set it in application.yml or via the AZURE_AI_API_KEY environment variable."
             }
             log.info("Initializing Azure OpenAI Streaming connection for deployment '$name' at $endpoint")
             AzureOpenAiStreamingChatModel.builder()
@@ -194,10 +197,17 @@ class ArcTaxonomyLLMClient(
     }
 
     /**
-     * Sends a ChatRequest with a strict [JsonSchema] ResponseFormat to the model,
-     * forcing syntactically valid JSON output that exactly matches the schema.
-     * Throws on any failure so callers can decide how to handle the error — returning
-     * an empty object silently was masking misconfiguration as a labeling glitch.
+     * Sends a structured JSON request to the model.
+     *
+     * Ollama path: uses ChatRequest + ResponseFormat JSON schema — the model is constrained
+     * at the grammar level and guaranteed to emit valid JSON.
+     *
+     * Azure path: AzureOpenAiStreamingChatModel only exposes chat(List<ChatMessage>, handler)
+     * and does NOT implement the chat(ChatRequest, handler) overload. Calling it throws
+     * UnsupportedOperationException which propagates through every async{} coroutine in
+     * generateLabelsPostPass, causing awaitAll() to cancel the entire post-pass silently.
+     * Instead we inject the schema as a JSON instruction in the system prompt — Mistral-Large-3
+     * on Azure follows structured output instructions reliably without a native JSON mode flag.
      */
     override suspend fun queryModelStructured(
         modelName: String,
@@ -205,6 +215,15 @@ class ArcTaxonomyLLMClient(
         userPrompt: String,
         schema: JsonSchema
     ): String {
+        if (config.llm.provider == LlmProviderType.AZURE) {
+            // Build a schema description from the root element's properties so the model
+            // knows exactly what JSON object shape to produce.
+            val schemaInstruction = buildAzureSchemaInstruction(schema)
+            val augmentedSystem = listOfNotNull(systemPrompt, schemaInstruction).joinToString("\n\n")
+            return queryModel(modelName, augmentedSystem.ifBlank { null }, userPrompt)
+        }
+
+        // Ollama: native structured output via ChatRequest + ResponseFormat
         return semaphore.withPermit {
             val slot = monitor.acquireSlot(modelName)
 
@@ -257,11 +276,35 @@ class ArcTaxonomyLLMClient(
             } catch (e: Exception) {
                 monitor.releaseSlot(slot)
                 monitor.removeSlot(slot)
-                // Evict any poisoned cache entry so the next call can retry cleanly
-                // (e.g. after the user fixes a missing Azure endpoint in config).
                 streamingModelCache.remove(modelName)
                 throw e
             }
+        }
+    }
+
+    /**
+     * Builds a concise system-prompt instruction describing the required JSON shape,
+     * used as a fallback for providers that do not support the ChatRequest structured
+     * output API (currently Azure).
+     */
+    private fun buildAzureSchemaInstruction(schema: JsonSchema): String {
+        val rootEl = schema.rootElement()
+        val props = try {
+            (rootEl as? dev.langchain4j.model.chat.request.json.JsonObjectSchema)
+                ?.properties()
+                ?.entries
+                ?.joinToString(", ") { (k, v) ->
+                    val desc = (v as? dev.langchain4j.model.chat.request.json.JsonStringSchema)
+                        ?.description() ?: "string"
+                    "\"$k\": <$desc>"
+                } ?: ""
+        } catch (_: Throwable) { "" }
+
+        return if (props.isNotEmpty()) {
+            "You MUST respond with a single valid JSON object and nothing else. " +
+                "Required shape: { $props }"
+        } else {
+            "You MUST respond with a single valid JSON object and nothing else."
         }
     }
 
