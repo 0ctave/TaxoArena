@@ -3,9 +3,8 @@ package taxonomy.tui.components
 import taxonomy.tui.state.TuiAppState
 
 /**
- * Persistent, state-independent hotkeys shown on the right side of every [HotkeyBar]. These
- * are always available regardless of which panel or mode holds focus, so feature-specific
- * builders no longer advertise them (see [DashboardHotkeys]).
+ * Persistent, state-independent hotkeys shown in the global section of every [HotkeyBar].
+ * These are always available regardless of which panel or mode holds focus.
  */
 object GlobalHotkeys {
     fun forState(state: TuiAppState): List<HotkeyAction> = buildList {
@@ -16,4 +15,11 @@ object GlobalHotkeys {
         if (state.runtime.hasActiveGraph) add(HotkeyAction("X", "Load DAG"))
         add(HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR))
     }
+
+    /** Version that doesn't need app-state; used by screens with no active graph context. */
+    val always: List<HotkeyAction> = listOf(
+        HotkeyAction("Tab", "Switch Panels"),
+        HotkeyAction("?", "Help", TuiTheme.ACCENT),
+        HotkeyAction("Ctrl-C", "Quit", TuiTheme.ERROR),
+    )
 }

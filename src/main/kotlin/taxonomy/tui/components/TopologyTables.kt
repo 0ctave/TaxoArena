@@ -3,6 +3,7 @@ package taxonomy.tui.components
 import androidx.compose.runtime.Composable
 import com.jakewharton.mosaic.layout.height
 import com.jakewharton.mosaic.layout.padding
+import com.jakewharton.mosaic.layout.width
 import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.text.SpanStyle
 import com.jakewharton.mosaic.text.buildAnnotatedString
@@ -70,6 +71,18 @@ fun DomainSelectorTable(
  * Renders the DAG hierarchy: tree on the left (box-drawing connectors, depth colours,
  * fold markers, judge ★, poly ⇄) plus a right-aligned recursive query-count column and
  * a per-node judge column (✔ judged / ○ not). Mirrors the original dashboard table.
+ *
+ * ### TextSurface bounds contract
+ * Mosaic allocates a `TextSurface` whose width equals the `Modifier.width()` set on a
+ * `Text` composable (or the string's natural width when no width modifier is set).
+ * `TextSurface.get()` throws `IllegalStateException` ("Check failed") when `drawText`
+ * tries to write a glyph at a column index ≥ the surface width. This means every `Text`
+ * that lives inside a fixed-width container **must** carry a matching `Modifier.width()`
+ * so Mosaic never measures a wider natural size than the surface it draws into.
+ *
+ * All `Text` calls in this function therefore set `Modifier.width(contentWidth)` (passed
+ * in by `ScrollablePanelContent`'s lambda) so the surface is always exactly as wide as
+ * the column budget, regardless of the Unicode glyph stream produced by the row builder.
  */
 @Composable
 fun AsciiTreeTable(
@@ -94,17 +107,19 @@ fun AsciiTreeTable(
     val visible = TreeTableLayout.visibleRows(pHeight)
 
     Column {
-        // Column header.
+        // Column header — width-constrained so the header Text surface never overflows.
+        val headerStr = buildAnnotatedString {
+            withStyle(SpanStyle(color = White, textStyle = Bold)) {
+                append("  ")
+                append("Taxonomy DAG Hierarchy".take(treeW).padEnd(treeW))
+                append(" ")
+                append("Queries".padStart(QCOL))
+                append(" \u2714")
+            }
+        }
         Text(
-            buildAnnotatedString {
-                withStyle(SpanStyle(color = White, textStyle = Bold)) {
-                    append("  ")
-                    append("Taxonomy DAG Hierarchy".take(treeW).padEnd(treeW))
-                    append(" ")
-                    append("Queries".padStart(QCOL))
-                    append(" \u2714")
-                }
-            }.take(pWidth - 1)
+            headerStr.take(pWidth - 1),
+            modifier = Modifier.height(1).width((pWidth - 1).coerceAtLeast(1))
         )
 
         ScrollablePanelContent(
@@ -116,39 +131,45 @@ fun AsciiTreeTable(
         ) { visibleHeight, startIdx, contentWidth ->
             val end = (startIdx + visibleHeight).coerceAtMost(lines.size)
             for (i in startIdx until end) {
-            val line = lines[i]
-            val node = line.node
-            val selected = i == selectedIdx
-            // Use the memoized count (per graphVersion) to avoid an O(subtree) walk per row.
-            val totalQ = queryCounts[node.id] ?: node.getRecursiveQueryCount()
-            val hasJudge = node.judgePrompt != null
-            val qStr = totalQ.toString().padStart(QCOL)
-            val judgeGlyph = if (hasJudge) "\u2714" else "\u25cb" // ✔ / ○
+                val line = lines[i]
+                val node = line.node
+                val selected = i == selectedIdx
+                // Use the memoized count (per graphVersion) to avoid an O(subtree) walk per row.
+                val totalQ = queryCounts[node.id] ?: node.getRecursiveQueryCount()
+                val hasJudge = node.judgePrompt != null
+                val qStr = totalQ.toString().padStart(QCOL)
+                val judgeGlyph = if (hasJudge) "\u2714" else "\u25cb" // ✔ / ○
 
-            // The tree text is a colour-annotated string; pad/truncate to a fixed column.
-            val treeText = line.text.take(treeW)
-            val padCount = (treeW - treeText.length).coerceAtLeast(0)
+                // The tree text is a colour-annotated string; pad/truncate to a fixed column.
+                val treeText = line.text.take(treeW)
+                val padCount = (treeW - treeText.length).coerceAtLeast(0)
 
-            val row = buildAnnotatedString {
-                if (selected) {
-                    withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append("\u276f ") } // ❯
-                } else {
-                    append("  ")
+                val row = buildAnnotatedString {
+                    if (selected) {
+                        withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append("\u276f ") } // ❯
+                    } else {
+                        append("  ")
+                    }
+                    append(treeText)
+                    append(" ".repeat(padCount))
+                    append(" ")
+                    withStyle(SpanStyle(color = Cyan)) { append(qStr) }
+                    append(" ")
+                    withStyle(
+                        SpanStyle(color = if (hasJudge) Green else White, textStyle = Bold)
+                    ) { append(judgeGlyph) }
                 }
-                append(treeText)
-                append(" ".repeat(padCount))
-                append(" ")
-                withStyle(SpanStyle(color = Cyan)) { append(qStr) }
-                append(" ")
-                withStyle(
-                    SpanStyle(color = if (hasJudge) Green else White, textStyle = Bold)
-                ) { append(judgeGlyph) }
-            }
-            Text(
-                row.take(contentWidth),
-                modifier = Modifier.height(1),
-                textStyle = if (selected) Bold else Unspecified
-            )
+                // Modifier.width(contentWidth) is REQUIRED: it tells Mosaic to allocate a
+                // TextSurface of exactly contentWidth columns. Without it, Mosaic measures
+                // the AnnotatedString's natural width (which includes styled spans whose
+                // character count does not equal their terminal column count for multi-byte
+                // Unicode glyphs) and may allocate a surface narrower than what drawText
+                // expects, triggering the TextSurface.get() IllegalStateException crash.
+                Text(
+                    row.take(contentWidth),
+                    modifier = Modifier.height(1).width(contentWidth),
+                    textStyle = if (selected) Bold else Unspecified
+                )
             }
         }
     }
