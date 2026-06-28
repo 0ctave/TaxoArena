@@ -30,6 +30,22 @@ data class ProcessRow(
  * Live "running processes" panel: one colored row per active (or just-finished)
  * process with a progress bar and status text. Always renderable so unfinished
  * work is never hidden. UI-agnostic — caller derives [rows] from app state.
+ *
+ * Width-safety contract
+ * ---------------------
+ * Mosaic 0.18.0's TextSurface.get throws IllegalStateException("Check failed") when a
+ * Text composable draws past the end of its allocated row. Two distinct failure modes
+ * exist here:
+ *
+ * 1. Embedded newlines in row.status: the judge process sets its status to a raw LLM
+ *    response (multi-line JSON). String.take(n) counts *characters*, not lines, so a
+ *    300-char take still leaves \n chars inside the string. Mosaic then tries to draw
+ *    the newline continuation into a surface row that doesn't exist -> crash.
+ *    Fix: take only the first non-blank line of status before width-clipping.
+ *
+ * 2. Indeterminate progress track: Text("  $track") had no width guard, so on narrow
+ *    panels "  " + barW chars could exceed the available column.
+ *    Fix: take(width - 1) on the assembled track string.
  */
 @Composable
 fun ProcessesPanel(
@@ -45,7 +61,6 @@ fun ProcessesPanel(
             return@Column
         }
 
-        // Styled section header with the live count.
         Text(
             value = "  ACTIVE PROCESSES (${rows.size})".take(width - 1),
             color = Cyan,
@@ -53,8 +68,6 @@ fun ProcessesPanel(
         )
 
         val barW = (width - 18).coerceIn(8, 48)
-        // Each row needs name + (bar) + status; with separators that's ~4 lines. Drop the blank
-        // separator when vertical space is tight so rows are never clipped.
         val budget = (height - 2).coerceAtLeast(1)
         val withSeparators = budget >= rows.size * 4
         rows.take((budget / if (withSeparators) 4 else 3).coerceAtLeast(1)).forEachIndexed { idx, row ->
@@ -78,16 +91,22 @@ fun ProcessesPanel(
                     textColor = color,
                 )
             } else if (!row.done && !row.error) {
-                // Indeterminate: total unknown (e.g. full-dataset download, eval parse before
-                // the record count is known). Render a moving block instead of a fixed bar.
                 val pos = spinnerTick % barW
                 val track = buildString {
                     for (i in 0 until barW) append(if (i == pos) '\u2588' else '\u2591')
                 }
-                Text("  $track", color = color)
+                // Guard: "  " prefix + track must not exceed available width.
+                Text("  $track".take(width - 1), color = color)
             }
-            val status = row.status.take((width - 3).coerceAtLeast(4))
-            if (status.isNotBlank()) Text("  $status", color = TuiTheme.INFO)
+            // Extract the first non-blank line of status so that multi-line LLM responses
+            // (judge prompts, JSON blobs) never embed \n into a single-line Text draw call.
+            val statusLine = row.status
+                .lineSequence()
+                .firstOrNull { it.isNotBlank() }
+                ?.trim()
+                ?.take((width - 3).coerceAtLeast(4))
+                ?: ""
+            if (statusLine.isNotBlank()) Text("  $statusLine", color = TuiTheme.INFO)
             if (withSeparators && idx < rows.lastIndex) Text("", color = TuiTheme.INFO)
         }
     }
