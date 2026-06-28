@@ -74,18 +74,22 @@ class TaxonomyEngine(
             perfTracker.recordTime("Phase 1: Precomputing Embeddings", phase1Time)
 
             // ── Dimension fast-fail ──────────────────────────────────────────
-            // Validate that the embedding model actually produces vectors whose
-            // dimension matches dimForDepth(0) — the root-level MRL dimension.
-            // If they diverge, every cosine similarity and vMF kappa estimate is
-            // silently wrong. Fail loudly here rather than after 15 iterations.
-            val expectedDim = dimForDepth(0)
+            // Validate that the embedding model produces vectors with enough
+            // dimensions to cover the deepest MRL level (dimForDepth(maxDepth)).
+            // The model stores full-size vectors; root-level slicing to
+            // dimForDepth(0)=128 is done later by projectTo(). Comparing against
+            // dimForDepth(0) was wrong — it always threw because the model
+            // produces e.g. 1024-dim vectors, not 128-dim ones.
+            val maxDepth    = config.execution.maxDepth
+            val minRequired = dimForDepth(maxDepth)
             val actualDim   = embeddingCache.dimensionality
-            check(actualDim == expectedDim) {
+            check(actualDim >= minRequired) {
                 "Embedding dimension mismatch: model produces $actualDim-dim vectors " +
-                "but dimForDepth(0) = $expectedDim. " +
-                "Update the MRL schedule in DataModels.kt or switch to a compatible model."
+                "but dimForDepth(maxDepth=$maxDepth) = $minRequired. " +
+                "Switch to a model that outputs at least $minRequired dimensions, " +
+                "or reduce maxDepth in application.yml."
             }
-            log.info("Dimension check passed: model dimension = $actualDim (expected $expectedDim)")
+            log.info("Dimension check passed: model=$actualDim dims, minRequired=$minRequired (maxDepth=$maxDepth)")
             // ────────────────────────────────────────────────────────────────
 
             val root = GraphNode(label = rootLabel, depth = 0)
