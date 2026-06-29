@@ -62,7 +62,7 @@ class DefaultTuiEffects(
     private val gateway: TuiGateway
 ) : TuiEffects {
 
-    /** The long-running generation/download job, so it can be cancelled mid-flight. */
+    /** The long-running generation/download/judge job, so it can be cancelled mid-flight. */
     private var activeJob: Job? = null
 
     override fun cancelActiveJob() {
@@ -164,8 +164,19 @@ class DefaultTuiEffects(
         }
     }
 
+    // Bug 4 fix: assign the launched coroutine to activeJob so that cancelActiveJob() (Esc/C
+    // from the TUI) can interrupt a running batch-judge pass.  Previously this launched on scope
+    // without tracking the Job, making cancellation silently ineffective.
     override fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
-        scope.launch { gateway.runBatchJudge(generality, replaceExisting) }
+        activeJob = scope.launch {
+            try {
+                gateway.runBatchJudge(generality, replaceExisting)
+            } catch (c: CancellationException) {
+                throw c
+            } catch (t: Throwable) {
+                // withJudgeRecording in the gateway already logs the error.
+            }
+        }
     }
 
     override fun runArena(query: String, modelA: String, modelB: String) {
