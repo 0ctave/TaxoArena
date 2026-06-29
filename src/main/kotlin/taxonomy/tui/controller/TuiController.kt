@@ -68,8 +68,6 @@ class TuiController(
         val state = _state.value
         val key = event.key.lowercase()
 
-        // The help overlay is a global, state-independent toggle. While it's open it swallows
-        // every other key; '?' or Esc closes it.
         if (state.shell.helpOverlayOpen) {
             if (key == "?" || key == "escape") dispatch(TuiEvent.ToggleHelpOverlay)
             return
@@ -130,7 +128,6 @@ class TuiController(
                 if (state.snapshot.isViewingSnapshot) {
                     dispatch(TuiEvent.EnterMainDashboard)
                 } else {
-                    // Welcome is the top-level screen; q/Esc here exits the whole app.
                     dispatch(TuiEvent.QuitRequested)
                 }
             }
@@ -138,7 +135,6 @@ class TuiController(
     }
 
     private fun handleConfigKeys(state: TuiAppState, key: String) {
-        // While a dataset download is running, Esc/C cancels it.
         if (state.config.downloadingDataset && (key == "escape" || key == "c")) {
             dispatch(TuiEvent.CancelGeneration)
             return
@@ -162,7 +158,6 @@ class TuiController(
             return
         }
 
-        // Download-count prompt: type a number (blank = full dataset), Enter to start.
         if (state.config.promptingDownloadCount) {
             when (key) {
                 "enter" -> {
@@ -213,15 +208,11 @@ class TuiController(
                         dispatch(TuiEvent.ToggleSelectedDomain(name))
                     }
                 } else {
-                    // Settings: instant toggle/cycle for boolean/select, editor for number/text.
                     dispatch(TuiEvent.ActivateSelectedSetting)
                 }
             }
 
             "d" -> dispatch(TuiEvent.PromptDatasetDownload)
-            // R generates a new DAG, but only once the dataset is present locally. Domains are
-            // read from the downloaded data, so generation is gated on a download first. If the
-            // dataset is missing, R opens the download prompt instead.
             "r" -> when {
                 state.runtime.isRegenerating -> Unit
                 state.runtime.isDatasetDownloaded -> dispatch(TuiEvent.StartGeneration)
@@ -235,14 +226,12 @@ class TuiController(
     private fun handleSettingEditorKeys(state: TuiAppState, key: String) {
         when (key) {
             "enter" -> {
-                // Apply the typed value BEFORE the reducer clears editingValue, then close.
                 val item = settingItemsProvider().getOrNull(state.config.selectedSettingIdx)
                 if (item != null) {
                     dispatch(TuiEvent.ApplySetting(item.name, state.config.editingValue))
                 }
                 dispatch(TuiEvent.ConfirmEditingSetting)
             }
-            // Only Esc cancels: 'q' must remain typable inside text/number value editors.
             "escape" -> dispatch(TuiEvent.CancelEditingSetting)
             "backspace" -> dispatch(TuiEvent.UpdateEditingValue(state.config.editingValue.dropLast(1)))
             else -> {
@@ -254,13 +243,10 @@ class TuiController(
     }
 
     private fun handleMainDashboardKeys(state: TuiAppState, key: String) {
-        // The eval-catalog picker is a modal overlay: while open it swallows every other key.
         if (state.benchmark.isPickingEvalCatalog) {
             handleEvalCatalogPickerKeys(state, key)
             return
         }
-        // The Arena benchmark model/domain picker borrows the left Topology panel; while it's
-        // open it swallows keys the same way the eval-catalog picker does.
         if (state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains) {
             handleBenchmarkPickerKeys(state, key)
             return
@@ -269,7 +255,6 @@ class TuiController(
             handleActiveTextInput(state, key)
             return
         }
-        // Esc/C cancels any long-running job: DAG generation, batch trickle, or eval download.
         val canCancel = state.runtime.isRegenerating ||
                 state.benchmark.isRunningBatchTrickleTest ||
                 state.benchmark.isDownloadingEval
@@ -282,11 +267,7 @@ class TuiController(
             "tab" -> dispatch(focusController.cycleForward(state))
             "x" -> dispatch(TuiEvent.ReturnToWelcome)
             "m" -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.METRICS))
-            // Arena and Benchmark are gated on a loaded precomputed eval roster. Without it
-            // there are no model answers to judge, so we surface the metrics view (which shows
-            // the "load eval_results" hint) instead of dropping the user into an empty arena.
             "a" -> {
-                // Always refresh the model roster so Arena reflects newly downloaded eval results.
                 effects.loadArenaModels(::dispatch)
                 if (state.arena.loadedModels.isNotEmpty()) {
                     commandController.startArena(::dispatch)
@@ -294,24 +275,30 @@ class TuiController(
                     dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
                 }
             }
-            // "b" opens the Benchmark hub (always on the type-selection screen). Once the
-            // TRICKLE benchmark type is active, "b" instead starts the batch routing test —
-            // matching the panel hint. The roster gate now lives inside the ARENA sub-view
-            // (Trickle benchmark needs no precomputed models), so entry isn't gated on a roster.
+            // "b" on the TRICKLE type: if already entered the input screen, confirm and run.
+            // If not yet on the input screen, open it (resolving the pool size first).
             "b" -> if (state.analysis.mode == AnalysisMode.BENCHMARK &&
                 state.benchmark.benchmarkType == BenchmarkType.TRICKLE
             ) {
-                if (!state.benchmark.isRunningBatchTrickleTest) {
-                    dispatch(TuiEvent.RunBatchTrickleTest)
+                when {
+                    state.benchmark.isRunningBatchTrickleTest -> Unit
+                    state.benchmark.isEnteringTrickleQueryLimit -> {
+                        // Confirm with current input value.
+                        val maxQ = state.benchmark.trickleQueryLimitInput.toIntOrNull() ?: 0
+                        dispatch(TuiEvent.RunBatchTrickleTest(maxQ))
+                    }
+                    else -> {
+                        // Open the input panel pre-filled with the pool size.
+                        effects.resolveReservedPoolSize { poolSize ->
+                            dispatch(TuiEvent.StartTrickleBenchmarkInput(poolSize))
+                        }
+                    }
                 }
             } else {
                 commandController.startBenchmark(::dispatch)
             }
             "t" -> commandController.startTrickle(::dispatch)
 
-            // Global in their respective modes: "o" opens the per-model eval-results ingestion
-            // picker while in Arena or Benchmark; "l" toggles the leaderboard while in Arena.
-            // Outside those modes the keys fall through to the focused panel's handler.
             "o" -> if (state.analysis.mode == AnalysisMode.BENCHMARK ||
                 state.analysis.mode == AnalysisMode.ARENA
             ) {
@@ -335,8 +322,6 @@ class TuiController(
                 dispatch(TuiEvent.StartBatchGeneralityInput)
             }
 
-            // Snapshots are auto-saved on generation, so "N" only renames the snapshot
-            // currently being viewed (no manual save-new action).
             "n" -> {
                 if (state.snapshot.isViewingSnapshot && state.snapshot.activeSnapshotId != null) {
                     dispatch(TuiEvent.StartRenameSnapshot)
@@ -369,7 +354,6 @@ class TuiController(
                 dispatch(TuiEvent.SetTopologyAutoScroll(false))
             }
 
-            // Right / l expands the selected node; left / h collapses it. Space toggles.
             "arrowright", "l", "d" -> selectedTreeNode(state)?.let {
                 if (it.children.isNotEmpty()) dispatch(TuiEvent.SetNodeExpanded(it.id, true))
             }
@@ -381,15 +365,11 @@ class TuiController(
             }
 
             "enter" -> {
-                // Populate the inspector's node (service state) THEN switch the hub to the
-                // node-detail view (MVI mode) and focus it.
                 effects.inspectNode(selectedTreeNode(state))
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
 
-            // R on a highlighted node inspects it, opens the node-detail view, and regenerates
-            // its judge — so judge generation works straight from the tree, not only after Enter.
             "r" -> selectedTreeNode(state)?.let { node ->
                 effects.inspectNode(node)
                 dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
@@ -402,7 +382,6 @@ class TuiController(
         }
     }
 
-    /** The DAG node currently highlighted in the tree, if any. */
     private fun selectedTreeNode(state: TuiAppState): GraphNode? {
         val lines = treeLinesProvider(state.topology.expandedNodes)
         return lines.getOrNull(state.topology.selectedTreeIdx)?.node
@@ -417,525 +396,6 @@ class TuiController(
                 "s", "arrowdown" ->
                     dispatch(TuiEvent.SetInspectorScroll(state.analysis.inspectorScroll + 1))
 
-                // The inspected node is already the gateway's current node (set on Enter), so
-                // regenerate its specialised judge in place and flag the spinner.
                 "r" -> {
                     dispatch(TuiEvent.SetGeneratingJudge(true))
-                    effects.regenerateJudgeForCurrentNode(::dispatch)
-                }
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-
-            AnalysisMode.METRICS -> handleMetricsKeys(state, key)
-
-            AnalysisMode.ARENA -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetLeaderboardScrollOffset(
-                        (state.arena.leaderboardScrollOffset - 1).coerceAtLeast(0)
-                    ))
-
-                "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetLeaderboardScrollOffset(
-                        state.arena.leaderboardScrollOffset + 1
-                    ))
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-
-            AnalysisMode.SNAPSHOTS -> handleSnapshotKeys(state, key)
-
-            // Trickle mode is now a single-query routing diagnosis only; the batch test moved
-            // to the Benchmark hub's TRICKLE type. Single-query results aren't scrollable.
-            AnalysisMode.TRICKLE_TEST -> when (key) {
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-
-            AnalysisMode.BENCHMARK -> handleBenchmarkKeys(state, key)
-
-            else -> when (key) {
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-        }
-    }
-
-    /**
-     * 3-zone METRICS view key handling. When the TABLE zone is focused, W/S move the
-     * iteration cursor (Home/End jump to first/Final); when the DETAIL zone is focused,
-     * W/S scroll the per-iteration detail. Tab toggles focus, P toggles the perf block.
-     */
-    private fun handleMetricsKeys(state: TuiAppState, key: String) {
-        val m = state.analysis
-        when (m.metricsZoneFocus) {
-            MetricsZoneFocus.TABLE -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetMetricsIterationIndex(m.selectedIterationIndex - 1))
-
-                "s", "arrowdown" -> {
-                    val maxIdx = metricsHistorySizeProvider() - 1
-                    dispatch(TuiEvent.SetMetricsIterationIndex(
-                        (m.selectedIterationIndex + 1).coerceAtMost(maxIdx)
-                    ))
-                }
-
-                "tab" -> dispatch(TuiEvent.SetMetricsZoneFocus(MetricsZoneFocus.DETAIL))
-                "p" -> dispatch(TuiEvent.ToggleMetricsPerformance)
-                "home" -> dispatch(TuiEvent.SetMetricsIterationIndex(0))
-                "end" -> dispatch(TuiEvent.SetMetricsIterationIndex(-1))
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-
-            MetricsZoneFocus.DETAIL -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetMetricsDetailScroll((m.detailScrollOffset - 1).coerceAtLeast(0)))
-
-                "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetMetricsDetailScroll(m.detailScrollOffset + 1))
-
-                "tab", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.SetMetricsZoneFocus(MetricsZoneFocus.TABLE))
-
-                "p" -> dispatch(TuiEvent.ToggleMetricsPerformance)
-
-                "q" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-        }
-    }
-
-    /**
-     * Benchmark hub key handling, split across its three sub-states: the type-selection
-     * screen (NONE), the Arena benchmark (ARENA), and the batch Trickle benchmark (TRICKLE).
-     */
-    private fun handleBenchmarkKeys(state: TuiAppState, key: String) {
-        when (state.benchmark.benchmarkType) {
-            BenchmarkType.NONE -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetBenchmarkTypeSelectionIndex(
-                        state.benchmark.benchmarkTypeSelectionIndex - 1
-                    ))
-
-                "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetBenchmarkTypeSelectionIndex(
-                        state.benchmark.benchmarkTypeSelectionIndex + 1
-                    ))
-
-                "enter", " ", "space" -> {
-                    val selected =
-                        if (state.benchmark.benchmarkTypeSelectionIndex == 0) BenchmarkType.ARENA
-                        else BenchmarkType.TRICKLE
-                    dispatch(TuiEvent.SetBenchmarkType(selected))
-                }
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-            }
-
-            BenchmarkType.ARENA -> handleArenaBenchmarkKeys(state, key)
-
-            // "b" (start batch test) is handled at the dashboard level so it works regardless
-            // of which panel holds focus; here we only handle scrolling and going back.
-            BenchmarkType.TRICKLE -> when (key) {
-                "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetBenchmarkScrollOffset((state.benchmark.benchmarkScrollOffset - 1).coerceAtLeast(0)))
-
-                "s", "arrowdown" ->
-                    dispatch(TuiEvent.SetBenchmarkScrollOffset(state.benchmark.benchmarkScrollOffset + 1))
-
-                "q", "escape", "arrowleft", "backspace" ->
-                    if (!state.benchmark.isRunningBatchTrickleTest) {
-                        dispatch(TuiEvent.ResetBenchmarkType)
-                    }
-            }
-        }
-    }
-
-    /**
-     * Arena benchmark config dashboard. Tab cycles the MODELS / DOMAINS / OPTIONS / START
-     * sections; Enter activates the focused section (opens a picker, edits an option, or starts
-     * the run); V toggles the live SUMMARY/STREAM view. Within OPTIONS, W/S moves between the
-     * three fields and Enter edits/toggles the focused one.
-     */
-    private fun handleArenaBenchmarkKeys(state: TuiAppState, key: String) {
-        val b = state.benchmark
-        when (key) {
-            "v" -> dispatch(TuiEvent.ToggleBenchmarkLiveView)
-            "tab" -> dispatch(TuiEvent.SetBenchmarkSection(nextBenchmarkSection(b.benchmarkActiveSection)))
-            "o" -> dispatch(TuiEvent.OpenEvalCatalogPicker)
-            "q", "escape", "arrowleft", "backspace" -> dispatch(TuiEvent.ResetBenchmarkType)
-            else -> when (b.benchmarkActiveSection) {
-                BenchmarkSection.OPTIONS -> handleBenchmarkOptionsKeys(state, key)
-                BenchmarkSection.MODELS -> if (key == "enter" || key == " " || key == "space") {
-                    dispatch(TuiEvent.OpenBenchmarkPicker(domains = false))
-                }
-                BenchmarkSection.DOMAINS -> if (key == "enter" || key == " " || key == "space") {
-                    dispatch(TuiEvent.OpenBenchmarkPicker(
-                        domains = true,
-                        domainOptions = availableDomainsProvider().map { it.first }
-                    ))
-                }
-                BenchmarkSection.START -> if (key == "enter" || key == " " || key == "space") {
-                    if (b.benchmarkSelectedModels.size >= 2 && b.benchmarkSelectedDomains.isNotEmpty()) {
-                        dispatch(TuiEvent.RunBenchmark)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun nextBenchmarkSection(section: BenchmarkSection): BenchmarkSection = when (section) {
-        BenchmarkSection.MODELS -> BenchmarkSection.DOMAINS
-        BenchmarkSection.DOMAINS -> BenchmarkSection.OPTIONS
-        BenchmarkSection.OPTIONS -> BenchmarkSection.START
-        BenchmarkSection.START -> BenchmarkSection.MODELS
-    }
-
-    /** OPTIONS section: field 0 = query limit (text edit), 1 = reserved-only, 2 = update-rankings. */
-    private fun handleBenchmarkOptionsKeys(state: TuiAppState, key: String) {
-        val field = state.benchmark.selectedBenchmarkField
-        when (key) {
-            "w", "z", "arrowup" -> dispatch(TuiEvent.SetSelectedBenchmarkField((field - 1).coerceAtLeast(0)))
-            "s", "arrowdown" -> dispatch(TuiEvent.SetSelectedBenchmarkField((field + 1).coerceAtMost(2)))
-            "enter", " ", "space" -> when (field) {
-                0 -> dispatch(TuiEvent.StartEditingBenchmarkField)
-                1 -> dispatch(TuiEvent.ToggleBenchmarkReservedOnly)
-                2 -> dispatch(TuiEvent.ToggleBenchmarkUpdateRankings)
-            }
-        }
-    }
-
-    /**
-     * Arena benchmark model/domain picker overlay (borrows the left Topology panel). W/S move the
-     * cursor, Space toggles the highlighted row into the selection, Enter/Q/Esc close the picker.
-     */
-    private fun handleBenchmarkPickerKeys(state: TuiAppState, key: String) {
-        when (key) {
-            "w", "z", "arrowup" -> dispatch(TuiEvent.MoveBenchmarkPickerCursor(-1))
-            "s", "arrowdown" -> dispatch(TuiEvent.MoveBenchmarkPickerCursor(1))
-            " ", "space" -> dispatch(TuiEvent.ToggleBenchmarkPickerItem)
-            "enter", "q", "escape" -> dispatch(TuiEvent.CloseBenchmarkPicker)
-        }
-    }
-
-    /**
-     * Eval-results ingestion picker overlay. W/S move the cursor, Space toggles the highlighted
-     * model, A selects all not-yet-ingested models, D re-downloads the cache, Enter confirms (and
-     * starts ingestion), Q/Esc cancels.
-     */
-    private fun handleEvalCatalogPickerKeys(state: TuiAppState, key: String) {
-        when (key) {
-            "w", "z", "arrowup" -> dispatch(TuiEvent.MoveEvalCatalogCursor(-1))
-            "s", "arrowdown" -> dispatch(TuiEvent.MoveEvalCatalogCursor(1))
-            " ", "space" -> dispatch(TuiEvent.ToggleEvalCatalogSelection)
-            "a" -> dispatch(TuiEvent.SelectAllNonIngestedEntries)
-            "d" -> dispatch(TuiEvent.DownloadEvalResults)
-            "enter" -> dispatch(TuiEvent.ConfirmEvalCatalogSelection)
-            "q", "escape" -> dispatch(TuiEvent.CloseEvalCatalogPicker)
-        }
-    }
-
-    private fun handleSnapshotKeys(state: TuiAppState, key: String) {
-        if (state.snapshot.isRenamingSnapshot) {
-            when (key) {
-                "enter" -> dispatch(TuiEvent.ConfirmRenameSnapshot)
-                "escape", "q" -> dispatch(TuiEvent.CancelRenameSnapshot)
-                "backspace" -> dispatch(TuiEvent.UpdateRenameInput(state.snapshot.renameInput.dropLast(1)))
-                else -> {
-                    if (key.length == 1) {
-                        dispatch(TuiEvent.UpdateRenameInput(state.snapshot.renameInput + key))
-                    }
-                }
-            }
-            return
-        }
-
-        if (state.snapshot.isSavingSnapshot) {
-            when (key) {
-                "enter" -> dispatch(TuiEvent.ConfirmSaveSnapshot)
-                "escape", "q" -> dispatch(TuiEvent.CancelSaveSnapshot)
-                "backspace" -> dispatch(TuiEvent.UpdateSnapshotDescInput(state.snapshot.snapshotDescInput.dropLast(1)))
-                else -> {
-                    if (key.length == 1) {
-                        dispatch(TuiEvent.UpdateSnapshotDescInput(state.snapshot.snapshotDescInput + key))
-                    }
-                }
-            }
-            return
-        }
-
-        when (key) {
-            "w", "z", "arrowup" ->
-                dispatch(TuiEvent.SelectSnapshotIndex((state.snapshot.selectedSnapshotIdx - 1).coerceAtLeast(0)))
-
-            "s", "arrowdown" ->
-                dispatch(TuiEvent.SelectSnapshotIndex(state.snapshot.selectedSnapshotIdx + 1))
-
-            "l", "enter" -> {
-                val snap = state.snapshot.snapshotList.getOrNull(state.snapshot.selectedSnapshotIdx) ?: return
-                dispatch(TuiEvent.RequestLoadSnapshot(snap.id))
-            }
-
-            "d" -> {
-                val snap = state.snapshot.snapshotList.getOrNull(state.snapshot.selectedSnapshotIdx) ?: return
-                dispatch(TuiEvent.RequestDeleteSnapshot(snap.id))
-            }
-
-            "n" -> dispatch(TuiEvent.StartSaveSnapshot)
-            "q", "escape", "arrowleft", "backspace" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-        }
-    }
-
-    private fun handleLogsKeys(state: TuiAppState, key: String) {
-        when (key) {
-            "w", "z", "arrowup" ->
-                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
-
-            "s", "arrowdown" ->
-                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
-
-            "q", "escape", "arrowleft", "backspace" ->
-                dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-        }
-    }
-
-    private fun handleActiveTextInput(state: TuiAppState, key: String) {
-        when {
-            state.snapshot.isRenamingSnapshot -> handleSnapshotKeys(state, key)
-            state.snapshot.isSavingSnapshot -> handleSnapshotKeys(state, key)
-            state.config.isEditingSetting -> handleSettingEditorKeys(state, key)
-
-            state.analysis.isEnteringBatchGenerality -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmBatchGeneralityInput)
-                    "escape", "q" -> dispatch(TuiEvent.CancelBatchGeneralityInput)
-                    "backspace" -> dispatch(
-                        TuiEvent.UpdateBatchGeneralityInput(
-                            state.analysis.batchGeneralityInput.dropLast(1)
-                        )
-                    )
-                    else -> {
-                        if (key.all(Char::isDigit)) {
-                            dispatch(TuiEvent.UpdateBatchGeneralityInput(state.analysis.batchGeneralityInput + key))
-                        }
-                    }
-                }
-            }
-
-            state.arena.isEnteringArenaQuestionId -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmArenaQuestionIdInput)
-                    "escape", "q" -> dispatch(TuiEvent.CancelArenaInput)
-                    "backspace" -> dispatch(TuiEvent.UpdateArenaQuestionIdInput(state.arena.arenaQuestionIdInput.dropLast(1)))
-                    else -> {
-                        if (key.all(Char::isDigit) && key.isNotEmpty()) {
-                            dispatch(TuiEvent.UpdateArenaQuestionIdInput(state.arena.arenaQuestionIdInput + key))
-                        }
-                    }
-                }
-            }
-
-            state.arena.isEnteringArenaQuery -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmArenaQueryInput)
-                    "escape", "q" -> dispatch(TuiEvent.CancelArenaInput)
-                    "backspace" -> dispatch(TuiEvent.UpdateArenaQueryInput(state.arena.arenaQueryInput.dropLast(1)))
-                    else -> {
-                        if (key.length == 1) {
-                            dispatch(TuiEvent.UpdateArenaQueryInput(state.arena.arenaQueryInput + key))
-                        }
-                    }
-                }
-            }
-
-            state.arena.isEnteringArenaModelA -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmArenaModelAInput)
-                    "escape", "q" -> dispatch(TuiEvent.CancelArenaInput)
-                    "backspace" -> dispatch(TuiEvent.UpdateArenaModelAInput(state.arena.arenaModelAInput.dropLast(1)))
-                    else -> {
-                        if (key.length == 1) {
-                            dispatch(TuiEvent.UpdateArenaModelAInput(state.arena.arenaModelAInput + key))
-                        }
-                    }
-                }
-            }
-
-            state.arena.isEnteringArenaModelB -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmArenaModelBInput)
-                    "escape", "q" -> dispatch(TuiEvent.CancelArenaInput)
-                    "backspace" -> dispatch(TuiEvent.UpdateArenaModelBInput(state.arena.arenaModelBInput.dropLast(1)))
-                    else -> {
-                        if (key.length == 1) {
-                            dispatch(TuiEvent.UpdateArenaModelBInput(state.arena.arenaModelBInput + key))
-                        }
-                    }
-                }
-            }
-
-            state.trickle.isEnteringTrickleQuery -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmTrickleQueryInput)
-                    "escape", "q" -> dispatch(TuiEvent.CancelTrickleInput)
-                    "backspace" -> dispatch(TuiEvent.UpdateTrickleQueryInput(state.trickle.trickleQueryInput.dropLast(1)))
-                    else -> {
-                        if (key.length == 1) {
-                            dispatch(TuiEvent.UpdateTrickleQueryInput(state.trickle.trickleQueryInput + key))
-                        }
-                    }
-                }
-            }
-
-            state.benchmark.isEditingBenchmarkField -> {
-                when (key) {
-                    "enter" -> dispatch(TuiEvent.ConfirmEditingBenchmarkField)
-                    "escape", "q" -> dispatch(TuiEvent.CancelEditingBenchmarkField)
-                    "backspace" -> dispatch(
-                        TuiEvent.UpdateBenchmarkEditingValue(
-                            state.benchmark.benchmarkEditingValue.dropLast(1)
-                        )
-                    )
-                    else -> {
-                        if (key.length == 1) {
-                            dispatch(TuiEvent.UpdateBenchmarkEditingValue(state.benchmark.benchmarkEditingValue + key))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleMouseWheel(event: TuiEvent.MouseWheel) {
-        val state = _state.value
-        val scrollEvent = when (event.direction) {
-            WheelDirection.Up -> scrollController.scrollUp(state)
-            WheelDirection.Down -> scrollController.scrollDown(state)
-        }
-        if (scrollEvent != null) {
-            dispatch(scrollEvent)
-        }
-    }
-
-    private fun handleMousePressed(event: TuiEvent.MousePressed) {
-        val state = _state.value
-        when (state.startup.state) {
-            StartupState.LOAD_DAG -> handleWelcomeMouse(event)
-            StartupState.CONFIGANDDOMAINS -> handleConfigMouse(state, event)
-            StartupState.MAINDASHBOARD -> handleDashboardMouse(state, event)
-            StartupState.LOADING -> Unit
-        }
-    }
-
-    /**
-     * Mouse in the config screen: choose the DOMAINS or SETTINGS sub-panel by x,
-     * select the row under the cursor by y, and toggle/activate it (click = select,
-     * a second click on the same row = toggle/cycle/edit).
-     */
-    private fun handleDashboardMouse(state: TuiAppState, event: TuiEvent.MousePressed) {
-        val layout = DashboardLayout.dashboard(state.shell.width, state.shell.height)
-        if (DashboardLayout.dashboardRegion(layout, event.x) == DashboardLayout.Region.ANALYSIS_HUB) {
-            dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
-            return
-        }
-        dispatch(TuiEvent.FocusPanelRequested(FocusPanel.TOPOLOGY))
-
-        val rowIndex = DashboardLayout.treeRowIndex(layout, event.y, state.topology.treeScrollOffset)
-        if (rowIndex < 0) return
-
-        val lines = treeLinesProvider(state.topology.expandedNodes)
-        val node = lines.getOrNull(rowIndex)?.node ?: return
-        if (rowIndex == state.topology.selectedTreeIdx) {
-            // Second click on the same row toggles expand/collapse (or inspects a leaf).
-            if (node.children.isNotEmpty()) {
-                dispatch(TuiEvent.ToggleNodeExpanded(node.id))
-            } else {
-                effects.inspectNode(node)
-                dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
-                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
-            }
-        } else {
-            dispatch(TuiEvent.SetSelectedTreeIdx(rowIndex))
-            dispatch(TuiEvent.SetTopologyAutoScroll(false))
-        }
-    }
-
-    private fun handleConfigMouse(state: TuiAppState, event: TuiEvent.MousePressed) {
-        dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
-        if (state.config.isEditingSetting) return
-
-        val layout = DashboardLayout.config(state.shell.width, state.shell.height)
-        val rowIndex = DashboardLayout.configRowIndex(layout, event.y)
-        if (rowIndex < 0) return
-
-        if (DashboardLayout.configSide(layout, event.x) == DashboardLayout.ConfigSide.DOMAINS) {
-            // DOMAINS sub-panel.
-            if (state.config.activeSubPanel != ConfigSubPanel.DOMAINS) {
-                dispatch(TuiEvent.SetConfigSubPanel(ConfigSubPanel.DOMAINS))
-            }
-            val domains = availableDomainsProvider()
-            domains.getOrNull(rowIndex)?.let { (name, _) ->
-                if (rowIndex == state.config.selectedDomainIdx) {
-                    dispatch(TuiEvent.ToggleSelectedDomain(name))
-                } else {
-                    dispatch(TuiEvent.SetSelectedDomainIdx(rowIndex))
-                }
-            }
-        } else {
-            // SETTINGS sub-panel.
-            if (state.config.activeSubPanel != ConfigSubPanel.SETTINGS) {
-                dispatch(TuiEvent.SetConfigSubPanel(ConfigSubPanel.SETTINGS))
-            }
-            val items = settingItemsProvider()
-            if (rowIndex in items.indices) {
-                if (rowIndex == state.config.selectedSettingIdx) {
-                    dispatch(TuiEvent.ActivateSelectedSetting)
-                } else {
-                    dispatch(TuiEvent.SetSelectedSettingIdx(rowIndex))
-                }
-            }
-        }
-    }
-
-    private fun handleWelcomeMouse(event: TuiEvent.MousePressed) {
-        val state = _state.value
-        val layout = DashboardLayout.welcome(state.shell.width, state.shell.height)
-        val menuIdx = DashboardLayout.welcomeMenuIndex(
-            layout, event.y, state.snapshot.snapshotList.size
-        )
-        when {
-            menuIdx < 0 -> Unit
-            menuIdx == 0 -> {
-                dispatch(TuiEvent.SelectWelcomeIndex(0))
-                dispatch(TuiEvent.EnterConfigSetup)
-            }
-            else -> {
-                val snapIndex = menuIdx - 1
-                dispatch(TuiEvent.SelectWelcomeIndex(menuIdx))
-                dispatch(TuiEvent.RequestLoadSnapshot(state.snapshot.snapshotList[snapIndex].id))
-            }
-        }
-    }
-
-    private fun handleMouseDragged(event: TuiEvent.MouseDragged) {
-        val dragging = _state.value.shell.draggingScrollbar ?: return
-        dispatch(scrollController.dragTo(dragging, event.y))
-    }
-
-    private fun isTextInputActive(state: TuiAppState): Boolean {
-        return state.snapshot.isRenamingSnapshot ||
-                state.snapshot.isSavingSnapshot ||
-                state.config.isEditingSetting ||
-                state.analysis.isEnteringBatchGenerality ||
-                state.arena.isEnteringArenaQuestionId ||
-                state.arena.isEnteringArenaQuery ||
-                state.arena.isEnteringArenaModelA ||
-                state.arena.isEnteringArenaModelB ||
-                state.trickle.isEnteringTrickleQuery ||
-                state.benchmark.isEditingBenchmarkField
-    }
-}
+                    effects.regenerateJ

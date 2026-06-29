@@ -112,8 +112,6 @@ class CommandController(
                 val b = state.benchmark
                 val models = b.benchmarkSelectedModels.toList().ifEmpty { b.loadedModels }
                 // Single selected domain → restrict to that GT category; multiple/none → all.
-                // BenchmarkRequest filters by at most one category, so a multi-category subset
-                // currently runs the full set rather than touching the benchmark service.
                 val category = b.benchmarkSelectedDomains.singleOrNull()
                 effects.runBenchmarkConfigured(
                     models = models,
@@ -127,8 +125,8 @@ class CommandController(
                 )
             }
 
-            TuiEvent.RunBatchTrickleTest -> {
-                effects.runBatchTrickle(dispatch)
+            is TuiEvent.RunBatchTrickleTest -> {
+                effects.runBatchTrickle(event.maxQueries, dispatch)
             }
 
             TuiEvent.DownloadEvalResults -> {
@@ -161,11 +159,9 @@ class CommandController(
             }
 
             TuiEvent.RunEvalLoad -> {
-                // Blank path falls back to the configured eval_results directory so pressing
-                // [O] just works out of the box. Mark running so the panel/process row updates.
                 val path = state.benchmark.evalLoaderPathInput.trim()
                 dispatch(TuiEvent.SetEvalLoaderRunning(true))
-                dispatch(TuiEvent.SetEvalLoaderStatus("Loading eval_results\u2026"))
+                dispatch(TuiEvent.SetEvalLoaderStatus("Loading eval_results…"))
                 effects.loadEval(
                     path = path,
                     modelName = state.benchmark.evalLoaderModelInput.trim(),

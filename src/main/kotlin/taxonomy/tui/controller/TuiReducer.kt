@@ -679,9 +679,39 @@ object TuiReducer {
                     )
                 )
 
-            TuiEvent.RunBatchTrickleTest ->
+            // ── Trickle benchmark query-limit input ──
+            is TuiEvent.StartTrickleBenchmarkInput ->
+                state.copy(
+                    analysis = state.analysis.copy(mode = AnalysisMode.BENCHMARK),
+                    benchmark = state.benchmark.copy(
+                        isEnteringTrickleQueryLimit = true,
+                        // Pre-fill with the smaller of the current value and the pool size.
+                        trickleQueryLimitInput = minOf(
+                            state.benchmark.trickleQueryLimitInput.toIntOrNull() ?: 200,
+                            event.poolSize.coerceAtLeast(1)
+                        ).toString()
+                    ),
+                    shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
+                )
+
+            is TuiEvent.UpdateTrickleQueryLimitInput ->
                 state.copy(
                     benchmark = state.benchmark.copy(
+                        trickleQueryLimitInput = event.value.filter { it.isDigit() }.take(6)
+                    )
+                )
+
+            TuiEvent.CancelTrickleBenchmarkInput ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        isEnteringTrickleQueryLimit = false
+                    )
+                )
+
+            is TuiEvent.RunBatchTrickleTest ->
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        isEnteringTrickleQueryLimit = false,
                         isRunningBatchTrickleTest = true,
                         batchTrickleProgress = "Starting batch trickle test…",
                         batchTrickleResults = null
