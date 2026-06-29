@@ -28,6 +28,12 @@ data class BenchmarkUiState(
     val batchTrickleProgress: String = "",
     val batchTrickleResults: BatchTrickleTestResults? = null,
 
+    // ── Trickle query-limit input ──
+    // Shown as a pre-filled panel when BenchmarkType.TRICKLE is selected.
+    // The value is upper-bounded by the actual reserved pool size at run time.
+    val isEnteringTrickleQueryLimit: Boolean = false,
+    val trickleQueryLimitInput: String = "200",
+
     val selectedBenchmarkField: Int = 0,
     val isEditingBenchmarkField: Boolean = false,
     val benchmarkEditingValue: String = "",

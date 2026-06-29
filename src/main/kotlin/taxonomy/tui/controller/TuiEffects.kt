@@ -24,7 +24,10 @@ interface TuiEffects {
     fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
     fun loadArenaModels(dispatch: (TuiEvent) -> Unit)
     fun runTrickle(query: String, dispatch: (TuiEvent) -> Unit)
-    fun runBatchTrickle(dispatch: (TuiEvent) -> Unit)
+    /** @param maxQueries 0 = use full reserved pool, >0 = cap at that many queries. */
+    fun runBatchTrickle(maxQueries: Int, dispatch: (TuiEvent) -> Unit)
+    /** Resolve the size of the reserved test-query pool (reads reserved_test_queries.json). */
+    fun resolveReservedPoolSize(onResolved: (Int) -> Unit)
     fun loadLeaderboard(dispatch: (TuiEvent) -> Unit)
     fun downloadEvalResults(dispatch: (TuiEvent) -> Unit)
     fun runBenchmarkConfigured(
@@ -184,10 +187,11 @@ class DefaultTuiEffects(
         }
     }
 
-    override fun runBatchTrickle(dispatch: (TuiEvent) -> Unit) {
+    override fun runBatchTrickle(maxQueries: Int, dispatch: (TuiEvent) -> Unit) {
         activeJob = scope.launch {
             try {
                 gateway.runBatchTrickle(
+                    maxQueries = maxQueries,
                     onProgress = { text -> dispatch(TuiEvent.BatchTrickleProgress(text)) },
                     onComplete = { results -> dispatch(TuiEvent.BatchTrickleCompleted(results)) }
                 )
@@ -197,6 +201,12 @@ class DefaultTuiEffects(
                 dispatch(TuiEvent.BatchTrickleProgress("Batch trickle failed: ${t.message}"))
                 dispatch(TuiEvent.BatchTrickleCompleted(taxonomy.tui.BatchTrickleTestResults()))
             }
+        }
+    }
+
+    override fun resolveReservedPoolSize(onResolved: (Int) -> Unit) {
+        scope.launch {
+            onResolved(gateway.reservedPoolSize())
         }
     }
 
@@ -242,7 +252,7 @@ class DefaultTuiEffects(
                 gateway.loadEval(path, modelName) { cur, total ->
                     dispatch(
                         TuiEvent.SetEvalLoaderStatus(
-                            "Parsing ${"%,d".format(cur)} / ${"%,d".format(total)} records\u2026"
+                            "Parsing ${"%,d".format(cur)} / ${"%,d".format(total)} records…"
                         )
                     )
                 }
@@ -354,9 +364,12 @@ interface TuiGateway {
     suspend fun loadedModels(): List<String>
     suspend fun runTrickle(query: String): List<taxonomy.service.QueryResponseNode>
     suspend fun runBatchTrickle(
+        maxQueries: Int,
         onProgress: (String) -> Unit,
         onComplete: (taxonomy.tui.BatchTrickleTestResults) -> Unit
     )
+    /** Returns the total number of entries in the reserved test-query pool (0 if file absent). */
+    suspend fun reservedPoolSize(): Int
     suspend fun loadLeaderboard(): List<taxonomy.service.LeaderboardGroup>
     suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit)
     suspend fun runBenchmarkConfigured(

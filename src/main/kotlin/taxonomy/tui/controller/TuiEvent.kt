@@ -173,8 +173,14 @@ sealed interface TuiEvent {
     data object CancelTrickleInput : TuiEvent
     /** Run a single trickle query against the live taxonomy; results land via [TrickleResultReceived]. */
     data class TrickleResultReceived(val nodes: List<taxonomy.service.QueryResponseNode>) : TuiEvent
-    /** Run the full batch trickle test (the "B" hotkey under the TRICKLE benchmark type). */
-    data object RunBatchTrickleTest : TuiEvent
+
+    // ── Trickle benchmark query-limit input ──
+    /** Open the pre-filled query-limit input panel for the TRICKLE benchmark type. */
+    data class StartTrickleBenchmarkInput(val poolSize: Int) : TuiEvent
+    data class UpdateTrickleQueryLimitInput(val value: String) : TuiEvent
+    data object CancelTrickleBenchmarkInput : TuiEvent
+    /** Run the full batch trickle test. [maxQueries] ≤ reserved pool size (0 = all). */
+    data class RunBatchTrickleTest(val maxQueries: Int) : TuiEvent
     data class BatchTrickleProgress(val text: String) : TuiEvent
     data class BatchTrickleCompleted(val results: taxonomy.tui.BatchTrickleTestResults) : TuiEvent
 

@@ -301,15 +301,24 @@ class TuiController(
                     dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.ARENA))
                 }
             }
-            // "b" opens the Benchmark hub (always on the type-selection screen). Once the
-            // TRICKLE benchmark type is active, "b" instead starts the batch routing test —
-            // matching the panel hint. The roster gate now lives inside the ARENA sub-view
-            // (Trickle benchmark needs no precomputed models), so entry isn't gated on a roster.
+            // "b" on the TRICKLE type: if already entered the input screen, confirm and run.
+            // If not yet on the input screen, open it (resolving the pool size first).
             "b" -> if (state.analysis.mode == AnalysisMode.BENCHMARK &&
                 state.benchmark.benchmarkType == BenchmarkType.TRICKLE
             ) {
-                if (!state.benchmark.isRunningBatchTrickleTest) {
-                    dispatch(TuiEvent.RunBatchTrickleTest)
+                when {
+                    state.benchmark.isRunningBatchTrickleTest -> Unit
+                    state.benchmark.isEnteringTrickleQueryLimit -> {
+                        // Confirm with current input value.
+                        val maxQ = state.benchmark.trickleQueryLimitInput.toIntOrNull() ?: 0
+                        dispatch(TuiEvent.RunBatchTrickleTest(maxQ))
+                    }
+                    else -> {
+                        // Open the input panel pre-filled with the pool size.
+                        effects.resolveReservedPoolSize { poolSize ->
+                            dispatch(TuiEvent.StartTrickleBenchmarkInput(poolSize))
+                        }
+                    }
                 }
             } else {
                 commandController.startBenchmark(::dispatch)

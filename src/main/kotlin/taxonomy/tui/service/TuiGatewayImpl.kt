@@ -109,13 +109,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             if (total > 0) {
                 onProgress(
                     current.toFloat() / total,
-                    "$name \u00b7 ${"%,d".format(current)} / ${"%,d".format(total)} rows"
+                    "$name · ${"%,d".format(current)} / ${"%,d".format(total)} rows"
                 )
             } else {
-                onProgress(0f, "$name \u00b7 Fetching\u2026 ${"%,d".format(current)} rows")
+                onProgress(0f, "$name · Fetching… ${"%,d".format(current)} rows")
             }
         }
-        onProgress(0f, "Connecting to Hugging Face\u2026")
+        onProgress(0f, "Connecting to Hugging Face…")
         val cap = if (maxQueries <= 0) MMLUDatasetFetcher.UNBOUNDED_MAX_QUERIES else maxQueries
         withContext(Dispatchers.IO) { deps.datasetFetcher.downloadDataset(maxQueries = cap) }
     }
@@ -185,10 +185,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.warn("Regenerate labels: no active DAG.")
             return
         }
-        deps.log.info("Regenerating all judges (replace=true)\u2026")
-        // replaceExisting=true: the 'l' key is an explicit force-regenerate,
-        // not a fill-missing. Without this, any DAG that already has judges
-        // silently does nothing.
+        deps.log.info("Regenerating all judges (replace=true)…")
         withJudgeRecording("Label regeneration") {
             deps.judgeService.generateJudgesForDag(root, replaceExisting = true)
         }
@@ -200,7 +197,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.warn("Regenerate judge: no node currently inspected.")
             return
         }
-        deps.log.info("Regenerating judge for node '${node.label}'\u2026")
+        deps.log.info("Regenerating judge for node '${node.label}'…")
         withJudgeRecording("Single-node judge regeneration for '${node.label}'") {
             deps.judgeService.generateJudgeForNode(node)
         }
@@ -220,7 +217,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         onLive: (BenchmarkLiveStats) -> Unit
     ) {
         if (models.size < 2) {
-            deps.log.warn("Benchmark needs \u22652 models; got ${models.size}")
+            deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
             return
         }
         val request = BenchmarkRequest(
@@ -233,25 +230,25 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             reservedOnly = reservedOnly
         )
         deps.log.info(
-            "Starting benchmark: ${models.size} models [${models.joinToString()}] \u00b7 " +
-                "queryLimit=$queryLimit \u00b7 category=${category ?: "all"} \u00b7 " +
-                "confidenceGate=$confidenceGate \u00b7 parallelism=$parallelism \u00b7 updateRankings=$updateRankings"
+            "Starting benchmark: ${models.size} models [${models.joinToString()}] · " +
+                "queryLimit=$queryLimit · category=${category ?: "all"} · " +
+                "confidenceGate=$confidenceGate · parallelism=$parallelism · updateRankings=$updateRankings"
         )
-        deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models\u2026")
+        deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models…")
         TuiLogAppender.startRecording()
         try {
             val report = deps.benchmarkService.runBenchmark(request) { live ->
                 deps.arenaService.updateBenchmarkProgress(
-                    "Processed ${live.processed}/${live.total} \u00b7 " +
-                        "agreement ${"%,.2f".format(live.runningAgreement)} \u00b7 " +
+                    "Processed ${live.processed}/${live.total} · " +
+                        "agreement ${"%,.2f".format(live.runningAgreement)} · " +
                         "coverage ${"%,.2f".format(live.runningCoverage)}"
                 )
                 onLive(live)
             }
             deps.arenaService.completeBenchmark(report)
             deps.log.info(
-                "Benchmark complete: ${report.totalQueries} queries \u00b7 ${report.totalModelPairs} pairs \u00b7 " +
-                    "coverage ${"%,.3f".format(report.coverageRate)} \u00b7 " +
+                "Benchmark complete: ${report.totalQueries} queries · ${report.totalModelPairs} pairs · " +
+                    "coverage ${"%,.3f".format(report.coverageRate)} · " +
                     "judge-agreement ${"%,.3f".format(report.overallJudgeAccuracyAgreement)}"
             )
             report.perPairStats.forEach { pair ->
@@ -301,14 +298,25 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     private val batchJson = Json { ignoreUnknownKeys = true; isLenient = true }
 
+    /** Returns the total number of reserved test queries across all domains. */
+    override suspend fun reservedPoolSize(): Int = withContext(Dispatchers.IO) {
+        val file = File("reserved_test_queries.json")
+        if (!file.exists()) return@withContext 0
+        try {
+            val map: Map<String, List<String>> = batchJson.decodeFromString(file.readText())
+            map.values.sumOf { it.size }
+        } catch (_: Throwable) { 0 }
+    }
+
     override suspend fun runBatchTrickle(
+        maxQueries: Int,
         onProgress: (String) -> Unit,
         onComplete: (BatchTrickleTestResults) -> Unit
     ) {
         withContext(Dispatchers.IO) {
             val root = deps.taxonomyService.getGraph()
             if (root == null) {
-                onProgress("No active DAG \u2014 generate or load one first.")
+                onProgress("No active DAG — generate or load one first.")
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
@@ -329,7 +337,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 return@withContext
             }
 
-            onProgress("Loading training distribution from cache\u2026")
+            onProgress("Loading training distribution from cache…")
             val fullByDomain = deps.datasetFetcher.fetchDataset(
                 selectedDomains = deps.config.dataset.selectedDomains
             )
@@ -344,23 +352,24 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             onProgress("Indexing leaves: ${profiles.size} / ${leaves.size} leaves tagged with a domain.")
             deps.log.info("Batch trickle: ${profiles.size}/${leaves.size} leaves tagged from ${textToDomain.size} train queries.")
             if (profiles.isEmpty()) {
-                onProgress("No leaves could be tagged \u2014 DAG has no labeled training queries.")
+                onProgress("No leaves could be tagged — DAG has no labeled training queries.")
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
 
-            val sampleCap = 200
-            val testQueries = reservedByDomain
+            // Apply the user-supplied cap; 0 means "use all". Always >= 1.
+            val poolAll = reservedByDomain
                 .flatMap { (domain, queries) -> queries.map { domain to it } }
                 .shuffled()
-                .take(sampleCap)
+            val sampleCap = if (maxQueries > 0) maxQueries else poolAll.size
+            val testQueries = poolAll.take(sampleCap)
             if (testQueries.isEmpty()) {
                 onProgress("Reserved test set is empty.")
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
 
-            deps.log.info("Batch trickle: routing ${testQueries.size} reserved queries\u2026")
+            deps.log.info("Batch trickle: routing ${testQueries.size} reserved queries (cap=$sampleCap)…")
             val out = BatchTrickleEvaluator.computeBatchTrickleMetrics(
                 perLeafDomains = profiles,
                 testQueries = testQueries,
@@ -376,14 +385,14 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 },
                 onProgress = { processed, total, runningTop1 ->
                     if (processed % 10 == 0 || processed == total) {
-                        onProgress("Routing test queries: $processed / $total \u00b7 running top1 acc=${"%,.1f%%".format(runningTop1 * 100)}")
+                        onProgress("Routing test queries: $processed / $total · running top1 acc=${"%,.1f%%".format(runningTop1 * 100)}")
                     }
                 },
             )
             deps.log.info(
-                "Batch trickle complete: ${out.totalQueries} queries \u00b7 " +
-                    "top1 ${"%,.2f".format(out.top1Accuracy)} \u00b7 any ${"%,.2f".format(out.anyMatchAccuracy)} \u00b7 " +
-                    "macroF1 ${"%,.2f".format(out.macroF1)} \u00b7 no-match ${"%,.2f".format(out.noMatchRate)}"
+                "Batch trickle complete: ${out.totalQueries} queries · " +
+                    "top1 ${"%,.2f".format(out.top1Accuracy)} · any ${"%,.2f".format(out.anyMatchAccuracy)} · " +
+                    "macroF1 ${"%,.2f".format(out.macroF1)} · no-match ${"%,.2f".format(out.noMatchRate)}"
             )
             onComplete(out)
         }
@@ -414,7 +423,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             val client = HttpClient.newBuilder().build()
             val listingUrl =
                 "https://api.github.com/repos/TIGER-AI-Lab/MMLU-Pro/contents/eval_results"
-            deps.log.info("Downloading MMLU-Pro eval_results from GitHub\u2026")
+            deps.log.info("Downloading MMLU-Pro eval_results from GitHub…")
 
             val listingReq = HttpRequest.newBuilder()
                 .uri(URI.create(listingUrl))
