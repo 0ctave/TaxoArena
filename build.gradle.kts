@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
     id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.graalvm.buildtools.native") version "0.10.2"
+    id("org.graalvm.buildtools.native") version "1.1.3"
 }
 
 group = "org.eclipse.lmos.app"
