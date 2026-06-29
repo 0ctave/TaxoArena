@@ -22,6 +22,7 @@ import taxonomy.tui.components.buildTreeLines
 import taxonomy.tui.components.GlobalHotkeys
 import taxonomy.tui.components.HotkeyAction
 import taxonomy.tui.components.HotkeyBar
+import taxonomy.tui.components.HotkeyBarGrouped
 import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.ProcessesPanel
@@ -126,8 +127,8 @@ private fun HelpOverlay(
 
                 StartupState.MAINDASHBOARD -> {
                     Text("Dashboard", color = Cyan, textStyle = Bold)
-                    Text("  M Metrics   A Arena   B Benchmark   T Trickle", color = White)
-                    Text("  G Generate judges   F Force-regen judges", color = White)
+                    Text("  M Metrics   C Config   A Arena   B Benchmark   T Trickle", color = White)
+                    Text("  G Generate judges", color = White)
                     Spacer()
                     Text("DAG Explorer (topology focus)", color = Cyan, textStyle = Bold)
                     Text("  W/S        Navigate", color = White)
@@ -525,49 +526,76 @@ private fun MainDashboardRoute(
 
     BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
 
+    // ── Hotkey bar ────────────────────────────────────────────────────────────
+    // Modal sub-screens (node detail, metrics scroll, benchmark running) get a
+    // focused flat bar with just their own keys + globals.  The default dashboard
+    // view (DAG loaded, no modal active) renders the full grouped bar:
+    //
+    //   DAG : [M] Metrics [C] Config [T] Trickle
+    //       | Arena : [A] Arena [G] Generate Judges
+    //       | [B] Benchmark [Tab] Switch Panels [?] Help [X] Load DAG [Ctrl-C] Quit
+    //
     val inAnalysisHub = state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB
-    val hotkeys =
-        if (inAnalysisHub && state.analysis.mode == taxonomy.service.AnalysisMode.NODE_DETAIL) {
+    when {
+        inAnalysisHub && state.analysis.mode == taxonomy.service.AnalysisMode.NODE_DETAIL -> {
             val hasJudge = subscriptions.arenaControlState.selectedNode?.judgePrompt != null
-            listOf(
-                HotkeyAction("R", if (hasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
-                HotkeyAction("W/S", "Scroll"),
-                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-                HotkeyAction("M", "Metrics"),
+            HotkeyBar(
+                width,
+                contextual = listOf(
+                    HotkeyAction("R", if (hasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
+                    HotkeyAction("W/S", "Scroll"),
+                    HotkeyAction("\u2190/Q", "Back", TuiTheme.ERROR),
+                    HotkeyAction("M", "Metrics"),
+                ),
+                global = GlobalHotkeys.forState(state),
             )
-        } else if (inAnalysisHub && state.analysis.mode == taxonomy.service.AnalysisMode.METRICS) {
-            if (state.analysis.metricsZoneFocus == taxonomy.tui.state.MetricsZoneFocus.DETAIL)
+        }
+
+        inAnalysisHub && state.analysis.mode == taxonomy.service.AnalysisMode.METRICS -> {
+            val contextual = if (state.analysis.metricsZoneFocus == taxonomy.tui.state.MetricsZoneFocus.DETAIL)
                 listOf(
                     HotkeyAction("W/S", "Scroll", isPrimary = true),
                     HotkeyAction("P", "Perf"),
-                    HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                    HotkeyAction("\u2190/Q", "Back", TuiTheme.ERROR),
                 )
             else
                 listOf(
                     HotkeyAction("W/S", "Select", isPrimary = true),
                     HotkeyAction("P", "Perf"),
                     HotkeyAction("Home/End", "First/Last"),
-                    HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                    HotkeyAction("\u2190/Q", "Back", TuiTheme.ERROR),
                 )
-        } else if (inAnalysisHub &&
+            HotkeyBar(width, contextual = contextual, global = GlobalHotkeys.forState(state))
+        }
+
+        inAnalysisHub &&
             state.analysis.mode == taxonomy.service.AnalysisMode.BENCHMARK &&
             state.benchmark.benchmarkType == taxonomy.tui.state.BenchmarkType.ARENA &&
-            (subscriptions.arenaControlState.isRunningBenchmark || subscriptions.arenaControlState.benchmarkReport != null)
-        ) {
-            listOf(
-                HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
-                HotkeyAction("O", "Load eval_results"),
-                HotkeyAction("Q", "Back", TuiTheme.ERROR),
+            (subscriptions.arenaControlState.isRunningBenchmark ||
+                subscriptions.arenaControlState.benchmarkReport != null) -> {
+            HotkeyBar(
+                width,
+                contextual = listOf(
+                    HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+                    HotkeyAction("O", "Load eval_results"),
+                    HotkeyAction("Q", "Back", TuiTheme.ERROR),
+                ),
+                global = GlobalHotkeys.forState(state),
             )
-        } else {
-            dashboardHotkeys(
+        }
+
+        // ── Default: full grouped bar ─────────────────────────────────────────
+        else -> HotkeyBarGrouped(
+            width = width,
+            groups = taxonomy.tui.components.DashboardHotkeys.groups(
                 hasDag = hasDag,
                 focused = state.shell.focusedPanel,
                 isRegenerating = state.runtime.isRegenerating,
                 isViewingSnapshot = state.snapshot.isViewingSnapshot,
-            )
-        }
-    HotkeyBar(width, contextual = hotkeys, global = GlobalHotkeys.forState(state))
+                state = state,
+            ),
+        )
+    }
 }
 
 @Composable
@@ -674,7 +702,7 @@ private fun deriveProcessRows(
         rows += ProcessRow(
             name = "Eval download",
             percent = pct,
-            status = if (files.isEmpty()) "Fetching listing…" else "$done / ${files.size} files",
+            status = if (files.isEmpty()) "Fetching listing\u2026" else "$done / ${files.size} files",
         )
     }
 
@@ -685,7 +713,7 @@ private fun deriveProcessRows(
             rows += ProcessRow(
                 name = "Benchmark",
                 percent = pct,
-                status = "${live.processed} / ${live.total} · agreement ${"%.2f".format(live.runningAgreement)}",
+                status = "${live.processed} / ${live.total} \u00b7 agreement ${"%.2f".format(live.runningAgreement)}",
             )
         }
     }
@@ -758,15 +786,12 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
     }
     val inDomains = state.config.activeSubPanel == ConfigSubPanel.DOMAINS
     return buildList {
-        // Tab (switch sub-panel) is covered by the global hotkey bar.
         add(HotkeyAction("W/S", "Move", TuiTheme.ACCENT))
         if (inDomains) {
             add(HotkeyAction("Space", "Toggle Domain"))
         } else {
             add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
         }
-        // When the dataset is already present, R generates straight away and we don't clutter
-        // the bar with the download key. When it's missing, downloading is the headline action.
         if (state.runtime.isDatasetDownloaded) {
             add(HotkeyAction("R", "Generate DAG", TuiTheme.OK, isPrimary = true))
         } else {
@@ -776,15 +801,6 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
         add(HotkeyAction("Esc", "Back", TuiTheme.ERROR))
     }
 }
-
-/** Contextual key hints for the main dashboard. */
-private fun dashboardHotkeys(
-    hasDag: Boolean,
-    focused: FocusPanel,
-    isRegenerating: Boolean,
-    isViewingSnapshot: Boolean,
-): List<HotkeyAction> =
-    taxonomy.tui.components.DashboardHotkeys.forState(hasDag, focused, isRegenerating, isViewingSnapshot)
 
 private fun flattenNodes(rootNode: GraphNode?): List<GraphNode> {
     if (rootNode == null) return emptyList()

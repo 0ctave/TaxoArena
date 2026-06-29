@@ -4,10 +4,9 @@ import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.TuiAppState
 
 /**
- * Pure builder for the main-dashboard contextual hotkey hints. Extracted from the router so
- * the gating rules (which keys are advertised in which state) are unit-testable.
+ * Pure builder for the main-dashboard contextual hotkey hints.
  *
- * When a snapshot is loaded (or a fresh DAG is generated) the bar looks like:
+ * When a DAG is loaded (or a fresh DAG is generated) the bar looks like:
  *
  * ```
  * DAG : [M] Metrics [C] Config [T] Trickle | Arena : [A] Arena [G] Generate Judges | [B] Benchmark [Tab] Switch Panels [?] Help [X] Load DAG [Ctrl-C] Quit
@@ -18,8 +17,8 @@ import taxonomy.tui.state.TuiAppState
 object DashboardHotkeys {
 
     /**
-     * Returns the full [HotkeyGroup] list to pass to the grouped [HotkeyBar] overload.
-     * [globalState] supplies the state needed to build [GlobalHotkeys].
+     * Returns the full [HotkeyGroup] list to pass to [HotkeyBarGrouped].
+     * This is the single source of truth for the grouped dashboard layout.
      */
     fun groups(
         hasDag: Boolean,
@@ -79,11 +78,7 @@ object DashboardHotkeys {
             if (isViewingSnapshot) add(HotkeyAction("N", "Rename Snap"))
         }
         val arenaGroup = HotkeyGroup(label = "Arena", actions = arenaActions)
-
-        val utilActions = buildList<HotkeyAction> {
-            add(HotkeyAction("B", "Benchmark"))
-        }
-        val utilGroup = HotkeyGroup(label = "", actions = utilActions)
+        val utilGroup  = HotkeyGroup(label = "", actions = listOf(HotkeyAction("B", "Benchmark")))
 
         return listOf(
             dagGroup,
@@ -95,7 +90,8 @@ object DashboardHotkeys {
 
     /**
      * Legacy flat-list API kept for callers that already use the contextual/global split
-     * [HotkeyBar] overload.  New call-sites should prefer [groups].
+     * [HotkeyBar] overload. Delegates to [groups] and flattens the result so the rendering
+     * is consistent — the only difference is the absence of bold group labels.
      */
     fun forState(
         hasDag: Boolean,
