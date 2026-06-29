@@ -6,6 +6,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.slf4j.LoggerFactory
@@ -81,7 +82,7 @@ class TaxonomyArenaService(
     val state: StateFlow<AnalysisPanelState> = _state.asStateFlow()
 
     fun setMode(mode: AnalysisMode) {
-        _state.value = _state.value.copy(mode = mode)
+        _state.update { it.copy(mode = mode) }
     }
 
     /** Passthrough to the ranking service so the TUI gateway can render the Arena leaderboard. */
@@ -89,45 +90,52 @@ class TaxonomyArenaService(
         rankingService.getLeaderboard(domain)
 
     fun inspectNode(node: GraphNode?) {
-        _state.value = _state.value.copy(mode = AnalysisMode.NODE_DETAIL, selectedNode = node)
+        _state.update { it.copy(mode = AnalysisMode.NODE_DETAIL, selectedNode = node) }
     }
 
+    // Bug 3 fix: use MutableStateFlow.update{} (CAS loop) instead of the bare read-copy-write
+    // pattern.  generateJudgesForDag launches multiple async coroutines in the same chunk that
+    // all call updateJudgeProgress concurrently.  The old pattern:
+    //
+    //   val current = _state.value          // read
+    //   val newMap  = current.currentInductions.toMutableMap().apply { put(...) }
+    //   _state.value = current.copy(...)    // write
+    //
+    // is NOT atomic: two coroutines can both read the same "current", each add their own entry,
+    // and then the second write overwrites the first — one node's progress is silently lost.
+    // update{} retries the lambda until it wins the CAS, so concurrent callers are all serialised.
     fun updateJudgeProgress(label: String, processed: Int, total: Int, status: String = "INDUCTING") {
-        val current = _state.value
-        val newProgress = current.currentInductions.toMutableMap().apply {
-            put(label, JudgeProgress(label, processed, total, status))
+        _state.update { current ->
+            current.copy(
+                mode = AnalysisMode.JUDGE_PROGRESS,
+                currentInductions = current.currentInductions + (label to JudgeProgress(label, processed, total, status))
+            )
         }
-        _state.value = current.copy(mode = AnalysisMode.JUDGE_PROGRESS, currentInductions = newProgress)
     }
 
     fun startBenchmark(progress: String) {
-        val current = _state.value
-        _state.value = current.copy(
+        _state.update { it.copy(
             mode = AnalysisMode.BENCHMARK,
             isRunningBenchmark = true,
             benchmarkProgress = progress,
             benchmarkReport = null
-        )
+        ) }
     }
 
     fun updateBenchmarkProgress(progress: String) {
-        val current = _state.value
-        _state.value = current.copy(
-            benchmarkProgress = progress
-        )
+        _state.update { it.copy(benchmarkProgress = progress) }
     }
 
     fun completeBenchmark(report: BenchmarkReport) {
-        val current = _state.value
-        _state.value = current.copy(
+        _state.update { it.copy(
             isRunningBenchmark = false,
             benchmarkProgress = "Benchmark completed successfully!",
             benchmarkReport = report
-        )
+        ) }
     }
 
     fun setBenchmarkReport(report: BenchmarkReport?) {
-        _state.value = _state.value.copy(benchmarkReport = report)
+        _state.update { it.copy(benchmarkReport = report) }
     }
 
     suspend fun compareModels(query: String, modelA: String, modelB: String): ArenaResult = coroutineScope {
@@ -139,7 +147,7 @@ class TaxonomyArenaService(
         val initialStatus = allMatches.associate { node ->
             (node.label ?: node.id.toString()) to (if (node.judgePrompt != null) "PENDING" else "NO JUDGE")
         }
-        _state.value = _state.value.copy(domainStatus = initialStatus)
+        _state.update { it.copy(domainStatus = initialStatus) }
 
         val traceAJob = async { llmClient.queryModel(modelA, null, query) }
         val traceBJob = async { llmClient.queryModel(modelB, null, query) }
@@ -207,10 +215,11 @@ class TaxonomyArenaService(
     }
 
     private fun updateArenaDomainStatus(label: String, status: String) {
-        val current = _state.value
-        _state.value = current.copy(
-            domainStatus = current.domainStatus.toMutableMap().apply { put(label, status) }
-        )
+        _state.update { current ->
+            current.copy(
+                domainStatus = current.domainStatus + (label to status)
+            )
+        }
     }
 
     private suspend fun discoverDomainsAndJudges(text: String): Pair<List<GraphNode>, List<GraphNode>> {
@@ -333,9 +342,9 @@ class TaxonomyArenaService(
             traceB = resB.modelOutput
         )
 
-        _state.value = _state.value.copy(
+        _state.update { it.copy(
             domainStatus = evaluations.associate { (it.domainLabel) to it.winner }
-        )
+        ) }
 
         if (updateRankings) {
             evaluations.filter { it.confidence >= confidenceGate }.forEach { eval ->

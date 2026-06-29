@@ -173,10 +173,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         }
     }
 
+    // Bug 1 fix: forward generality as parallelismOverride into generateJudgesForDag so the
+    // value the user typed in the TUI prompt is actually used.  Previously generality was
+    // silently discarded and the service always used config.execution.llmParallelism.
     override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
         val root = deps.taxonomyService.rootNodeFlow.value ?: return
         withJudgeRecording("Batch judge generation") {
-            deps.judgeService.generateJudgesForDag(root, replaceExisting)
+            deps.judgeService.generateJudgesForDag(root, replaceExisting, parallelismOverride = generality)
         }
     }
 

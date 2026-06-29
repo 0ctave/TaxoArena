@@ -23,8 +23,21 @@ class TaxonomyJudgeService(
     private val log = LoggerFactory.getLogger("taxonomy.JudgeService")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    suspend fun generateJudgesForDag(root: GraphNode, replaceExisting: Boolean = false) = coroutineScope {
-        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting")
+    /**
+     * Generates judges for all qualifying nodes in the DAG.
+     *
+     * @param root           Root of the DAG.
+     * @param replaceExisting When true, regenerate judges even for nodes that already have one.
+     * @param parallelismOverride When > 0, overrides [TaxonomyConfig.ExecutionConfig.llmParallelism]
+     *   for this run only. The value is clamped to [1, llmParallelism] so it can never exceed the
+     *   configured ceiling. Use 0 (default) to keep the config value.
+     */
+    suspend fun generateJudgesForDag(
+        root: GraphNode,
+        replaceExisting: Boolean = false,
+        parallelismOverride: Int = 0,
+    ) = coroutineScope {
+        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting, parallelismOverride: $parallelismOverride)")
         val allNodes = mutableSetOf<GraphNode>()
         fun walk(n: GraphNode) { if (allNodes.add(n)) n.children.forEach { walk(it) } }
         walk(root)
@@ -38,7 +51,15 @@ class TaxonomyJudgeService(
             return@coroutineScope
         }
 
-        targetNodes.chunked(config.execution.llmParallelism).forEach { chunk ->
+        // Bug 1 fix: respect the caller-supplied parallelism (e.g. from the TUI generality prompt).
+        // Clamp to [1, llmParallelism] so we never exceed the configured ceiling.
+        val chunkSize = if (parallelismOverride > 0)
+            parallelismOverride.coerceIn(1, config.execution.llmParallelism)
+        else
+            config.execution.llmParallelism
+
+        log.info("Generating judges for ${targetNodes.size} leaf node(s) with parallelism=$chunkSize")
+        targetNodes.chunked(chunkSize).forEach { chunk ->
             chunk.map { node -> async { generateJudgeForNode(node) } }.awaitAll()
         }
         log.info("Agent Judge induction complete.")
@@ -85,8 +106,17 @@ class TaxonomyJudgeService(
     }
 
     suspend fun generateJudgeForNode(node: GraphNode) {
+        // Bug 2 fix: for leaf nodes, use getAllQueriesInRegion() instead of node.queries directly.
+        //
+        // After the merger's evaluateCrossLinks pass, some leaf nodes receive training queries
+        // exclusively via crossLinkChildren. Their node.queries list is empty in those cases,
+        // causing details.isEmpty() and an early return with no judge generated.
+        //
+        // getAllQueriesInRegion() walks both tree children AND cross-link children, so it captures
+        // the full corpus this leaf "covers" geometrically.  For non-leaf nodes we keep
+        // getAllQueriesInBranch() (tree-only) because branch semantics are intentional there.
         val corpusEmbeddings = if (node.isLeaf) {
-            node.queries
+            node.getAllQueriesInRegion()
         } else {
             node.getAllQueriesInBranch()
         }.filter {
@@ -95,7 +125,11 @@ class TaxonomyJudgeService(
         val detailsMap = datasetFetcher.getDetailsForQueries(corpusEmbeddings.map { it.rawText })
         val details = corpusEmbeddings.mapNotNull { detailsMap[it.rawText] }
 
-        if (details.isEmpty()) return
+        if (details.isEmpty()) {
+            log.warn("generateJudgeForNode: empty corpus for node '${node.label}' (id=${node.id}). " +
+                "queries=${node.queries.size}, crossLinkChildren=${node.crossLinkChildren.size}. Skipping.")
+            return
+        }
 
         val chunks = details.chunked(25)
         val chunksCount = chunks.size
