@@ -102,12 +102,14 @@ private sealed interface Token {
 /**
  * Tokenize a flat list of [HotkeyAction]s (no groups) into [Token]s.
  */
+@JvmName("tokenizeActions")
 private fun tokenize(actions: List<HotkeyAction>): List<Token> =
     actions.map { Token.Action(it) }
 
 /**
  * Tokenize a list of [HotkeyGroup]s into [Token]s, inserting separators between groups.
  */
+@JvmName("tokenizeGroups")
 private fun tokenize(groups: List<HotkeyGroup>): List<Token> = buildList {
     groups.forEachIndexed { idx, group ->
         if (idx > 0) add(Token.Separator)
