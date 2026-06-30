@@ -4,13 +4,9 @@ import taxonomy.service.AnalysisMode
 import taxonomy.tui.controller.CommandController
 import taxonomy.tui.controller.TuiEffects
 import taxonomy.tui.controller.TuiEvent
-import taxonomy.tui.state.AnalysisUiState
-import taxonomy.tui.state.ArenaUiState
 import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
-import taxonomy.tui.state.BenchmarkUiState
 import taxonomy.tui.state.MetricsZoneFocus
-import taxonomy.tui.state.TrickleUiState
 import taxonomy.tui.state.TuiAppState
 
 /**
@@ -24,7 +20,7 @@ internal class AnalysisKeyHandler(
     private val metricsHistorySizeProvider: () -> Int,
 ) {
 
-    // ── Public entry point ───────────────────────────────────────────────────
+    // ── Public entry point ────────────────────────────────────────────────────
 
     fun handle(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (state.analysis.mode) {
@@ -65,7 +61,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── NODE_DETAIL ──────────────────────────────────────────────────────────
+    // ── NODE_DETAIL ───────────────────────────────────────────────────────────
 
     private fun handleNodeDetail(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -83,7 +79,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── METRICS ──────────────────────────────────────────────────────────────
+    // ── METRICS ───────────────────────────────────────────────────────────────
 
     private fun handleMetrics(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         val focus = state.analysis.metricsZoneFocus
@@ -120,7 +116,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── ARENA ────────────────────────────────────────────────────────────────
+    // ── ARENA ─────────────────────────────────────────────────────────────────
 
     private fun handleArena(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -133,7 +129,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── TRICKLE_TEST ─────────────────────────────────────────────────────────
+    // ── TRICKLE_TEST ──────────────────────────────────────────────────────────
 
     private fun handleTrickle(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -141,7 +137,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── BENCHMARK ────────────────────────────────────────────────────────────
+    // ── BENCHMARK ─────────────────────────────────────────────────────────────
 
     private fun handleBenchmark(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         val bench = state.benchmark
@@ -190,18 +186,11 @@ internal class AnalysisKeyHandler(
                         dispatch(TuiEvent.SetBenchmarkType(type))
                         if (type == BenchmarkType.ARENA) effects.loadBenchmarkModels(dispatch)
                     }
-                    BenchmarkType.ARENA -> {
-                        if (bench.benchmarkActiveSection == BenchmarkSection.MODELS) {
-                            dispatch(TuiEvent.OpenBenchmarkPicker(domains = false))
-                        } else if (bench.benchmarkActiveSection == BenchmarkSection.DOMAINS) {
-                            effects.resolveBenchmarkDomains { domains ->
-                                dispatch(TuiEvent.OpenBenchmarkPicker(domains = true, domainOptions = domains))
-                            }
-                        } else if (bench.benchmarkActiveSection == BenchmarkSection.OPTIONS) {
-                            dispatch(TuiEvent.StartEditingBenchmarkField)
-                        } else if (bench.benchmarkActiveSection == BenchmarkSection.START) {
-                            dispatch(TuiEvent.RunBenchmark)
-                        }
+                    BenchmarkType.ARENA -> when (bench.benchmarkActiveSection) {
+                        BenchmarkSection.MODELS  -> dispatch(TuiEvent.OpenBenchmarkPicker(domains = false))
+                        BenchmarkSection.DOMAINS -> dispatch(TuiEvent.OpenBenchmarkPicker(domains = true))
+                        BenchmarkSection.OPTIONS -> dispatch(TuiEvent.StartEditingBenchmarkField)
+                        BenchmarkSection.START   -> dispatch(TuiEvent.RunBenchmark)
                     }
                     BenchmarkType.TRICKLE -> Unit
                 }
@@ -228,7 +217,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── SNAPSHOTS ────────────────────────────────────────────────────────────
+    // ── SNAPSHOTS ─────────────────────────────────────────────────────────────
 
     private fun handleSnapshots(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -236,7 +225,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── Benchmark multi-select picker (models / domains) ─────────────────────
+    // ── Benchmark multi-select picker (models / domains) ──────────────────────
 
     fun handleBenchmarkPickerKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -247,7 +236,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── Eval-catalog picker ──────────────────────────────────────────────────
+    // ── Eval-catalog picker ───────────────────────────────────────────────────
 
     fun handleEvalCatalogPickerKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -260,7 +249,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── Logs (SYSTEM_LOGS focus inside main dashboard) ───────────────────────
+    // ── Logs (SYSTEM_LOGS focus inside main dashboard) ─────────────────────────
 
     fun handleLogsKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -271,7 +260,7 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    // ── Text-input field handlers ────────────────────────────────────────────
+    // ── Text-input field handlers ─────────────────────────────────────────────
 
     private fun handleBatchGeneralityInput(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
@@ -328,23 +317,30 @@ internal class AnalysisKeyHandler(
         }
     }
 
-    private fun handleArenaModelInput(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit, model: String) {
+    private fun handleArenaModelInput(
+        state: TuiAppState,
+        key: String,
+        dispatch: (TuiEvent) -> Unit,
+        model: String,
+    ) {
         when (key) {
-            "enter" -> dispatch(if (model == "A") TuiEvent.ConfirmArenaModelAInput else TuiEvent.ConfirmArenaModelBInput)
+            "enter" -> dispatch(
+                if (model == "A") TuiEvent.ConfirmArenaModelAInput else TuiEvent.ConfirmArenaModelBInput
+            )
             "escape" -> dispatch(TuiEvent.CancelArenaInput)
             "backspace" -> {
                 val cur = if (model == "A") state.arena.arenaModelAInput else state.arena.arenaModelBInput
-                dispatch(if (model == "A")
-                    TuiEvent.UpdateArenaModelAInput(cur.dropLast(1))
-                else
-                    TuiEvent.UpdateArenaModelBInput(cur.dropLast(1)))
+                dispatch(
+                    if (model == "A") TuiEvent.UpdateArenaModelAInput(cur.dropLast(1))
+                    else              TuiEvent.UpdateArenaModelBInput(cur.dropLast(1))
+                )
             }
             else -> if (key.length == 1) {
                 val cur = if (model == "A") state.arena.arenaModelAInput else state.arena.arenaModelBInput
-                dispatch(if (model == "A")
-                    TuiEvent.UpdateArenaModelAInput(cur + key)
-                else
-                    TuiEvent.UpdateArenaModelBInput(cur + key))
+                dispatch(
+                    if (model == "A") TuiEvent.UpdateArenaModelAInput(cur + key)
+                    else              TuiEvent.UpdateArenaModelBInput(cur + key)
+                )
             }
         }
     }
