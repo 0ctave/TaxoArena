@@ -3,7 +3,6 @@ package taxonomy.tui.controller
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import taxonomy.model.GraphNode
 import taxonomy.tui.app.DashboardLayout
 import taxonomy.tui.components.SettingItem
 import taxonomy.tui.components.TreeLine
@@ -13,7 +12,6 @@ import taxonomy.tui.controller.keys.ConfigKeyHandler
 import taxonomy.tui.controller.keys.MainDashboardKeyHandler
 import taxonomy.tui.controller.keys.TopologyKeyHandler
 import taxonomy.tui.controller.keys.WelcomeKeyHandler
-import taxonomy.tui.state.ScrollbarTarget
 import taxonomy.tui.state.TuiAppState
 
 class TuiController(
@@ -40,7 +38,7 @@ class TuiController(
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<TuiAppState> = _state.asStateFlow()
 
-    // ── Key handler delegates ────────────────────────────────────────────────
+    // ── Key handler delegates ───────────────────────────────────────────────────
 
     private val welcomeHandler = WelcomeKeyHandler()
     private val configHandler = ConfigKeyHandler(
@@ -65,7 +63,7 @@ class TuiController(
         analysisHandler = analysisHandler,
     )
 
-    // ────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────────
 
     init {
         dispatch(TuiEvent.RefreshSnapshots)
@@ -82,16 +80,14 @@ class TuiController(
         commandController.handle(_state.value, event, ::dispatch)
 
         when (event) {
-            is TuiEvent.KeyPressed  -> handleKeyPressed(event)
-            is TuiEvent.MouseWheel  -> handleMouseWheel(event)
-            is TuiEvent.MousePressed -> handleMousePressed(event)
+            is TuiEvent.KeyPressed    -> handleKeyPressed(event)
+            is TuiEvent.MouseWheel    -> handleMouseWheel(event)
             is TuiEvent.MouseReleased -> dispatch(TuiEvent.StopDraggingScrollbar)
-            is TuiEvent.MouseDragged -> handleMouseDragged(event)
             else -> Unit
         }
     }
 
-    // ── Key routing ──────────────────────────────────────────────────────────
+    // ── Key routing ───────────────────────────────────────────────────────────
 
     private fun handleKeyPressed(event: TuiEvent.KeyPressed) {
         val state = _state.value
@@ -109,14 +105,14 @@ class TuiController(
         if (state.startup.state == StartupState.LOADING) return
 
         when (state.startup.state) {
-            StartupState.LOAD_DAG       -> welcomeHandler.handle(state, key, ::dispatch)
+            StartupState.LOAD_DAG         -> welcomeHandler.handle(state, key, ::dispatch)
             StartupState.CONFIGANDDOMAINS -> configHandler.handle(state, key, ::dispatch)
-            StartupState.MAINDASHBOARD  -> dashboardHandler.handle(state, key, ::dispatch)
-            StartupState.LOADING        -> Unit
+            StartupState.MAINDASHBOARD    -> dashboardHandler.handle(state, key, ::dispatch)
+            StartupState.LOADING          -> Unit
         }
     }
 
-    // ── Mouse ────────────────────────────────────────────────────────────────
+    // ── Mouse ──────────────────────────────────────────────────────────────────
 
     private fun handleMouseWheel(event: TuiEvent.MouseWheel) {
         val scrollEvent = when (event.direction) {
@@ -124,22 +120,5 @@ class TuiController(
             WheelDirection.Down -> scrollController.scrollDown(_state.value)
         }
         scrollEvent?.let { dispatch(it) }
-    }
-
-    private fun handleMousePressed(event: TuiEvent.MousePressed) {
-        val state  = _state.value
-        val layout = DashboardLayout.dashboard(state.shell.width, state.shell.height)
-        val target = layout.scrollbarTargetAt(event.x, event.y) ?: return
-        dispatch(TuiEvent.StartDraggingScrollbar(target))
-    }
-
-    private fun handleMouseDragged(event: TuiEvent.MouseDragged) {
-        val drag = _state.value.shell.draggingScrollbar ?: return
-        val layout = DashboardLayout.dashboard(
-            _state.value.shell.width,
-            _state.value.shell.height,
-        )
-        val offset = layout.scrollOffsetFor(drag, event.y)
-        dispatch(scrollController.dragTo(drag, offset))
     }
 }
