@@ -17,6 +17,7 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.config.EffectiveConfig
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.components.HotkeyAction
 import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.TuiTheme
@@ -52,6 +53,8 @@ fun AnalysisPanel(
     detailScrollOffset: Int = 0,
     performanceReport: Map<String, taxonomy.utils.PerformanceStats> = emptyMap(),
     activeProcess: ProcessRow? = null,
+    /** Context-sensitive key hints rendered inside the panel border, above the bottom edge. */
+    contextHints: List<HotkeyAction> = emptyList(),
 ) {
     val title = when (mode) {
         AnalysisMode.ARENA -> "MODEL ARENA"
@@ -66,7 +69,7 @@ fun AnalysisPanel(
         else -> "ANALYSIS HUB"
     }
 
-    Panel(title, TuiTheme.panelAccent(focused), width, height) {
+    Panel(title, TuiTheme.panelAccent(focused), width, height, contextHints = contextHints) {
         Column {
             val bannerH = if (activeProcess != null) 1 else 0
             if (activeProcess != null) {
@@ -118,21 +121,16 @@ private fun ProcessBanner(width: Int, p: ProcessRow) {
     val pctText = p.percent?.let { "${"%.0f".format(java.util.Locale.US, it)}%" }
     Text(
         buildAnnotatedString {
-            withStyle(SpanStyle(color = color, textStyle = Bold)) { append("\u25b6 ${p.name}  ") }
+            withStyle(SpanStyle(color = color, textStyle = Bold)) { append("▶ ${p.name}  ") }
             if (pctText != null) {
                 withStyle(SpanStyle(color = Green, textStyle = Bold)) { append("$pctText  ") }
             }
             withStyle(SpanStyle(color = White)) { append(p.status) }
-            withStyle(SpanStyle(color = color)) { append("  \u00b7  press P") }
+            withStyle(SpanStyle(color = color)) { append("  ·  press P") }
         }.take(width - 1)
     )
 }
 
-/**
- * CONFIG mode panel — shows the [EffectiveConfig] that was embedded in the currently
- * loaded snapshot, so the user can audit the generation parameters without leaving
- * the dashboard. Falls back gracefully when no snapshot is loaded.
- */
 @Composable
 fun ConfigSnapshotPanel(
     width: Int,
@@ -149,15 +147,13 @@ fun ConfigSnapshotPanel(
             return@Column
         }
 
-        // Header
         val header = buildString {
             append("Config")
-            if (snapshotDescription != null) append(" \u00b7 $snapshotDescription")
+            if (snapshotDescription != null) append(" · $snapshotDescription")
         }.take(w)
         Text(header, color = Cyan, textStyle = Bold)
         Spacer()
 
-        // ── Dataset ────────────────────────────────────────────────────────
         Text("Dataset", color = Cyan, textStyle = Bold)
         Text("  Type         ${config.dataset.datasetType.name}".take(w), color = White)
         val domains = config.dataset.selectedDomains
@@ -166,7 +162,6 @@ fun ConfigSnapshotPanel(
         Text("  Split        ${if (config.dataset.splitDataset) "yes (${"%.0f".format(Locale.US, config.dataset.testSplitRatio * 100)}% test)" else "no"}".take(w), color = White)
         Spacer()
 
-        // ── Execution ─────────────────────────────────────────────────────
         Text("Execution", color = Cyan, textStyle = Bold)
         Text("  Iterations   ${config.execution.numIterations}".take(w), color = White)
         Text("  Early stop   ${config.execution.enableEarlyStopping}".take(w), color = White)
@@ -174,7 +169,6 @@ fun ConfigSnapshotPanel(
         Text("  Live label   ${config.execution.enableLiveLabeling}".take(w), color = White)
         Spacer()
 
-        // ── LLM ───────────────────────────────────────────────────────────
         Text("LLM", color = Cyan, textStyle = Bold)
         Text("  Provider     ${config.llm.provider}".take(w), color = White)
         Text("  Embed prov.  ${config.llm.embeddingProvider}".take(w), color = White)
@@ -184,7 +178,6 @@ fun ConfigSnapshotPanel(
         Text("  Max general. ${config.llm.maxJudgeGenerality}".take(w), color = White)
         Spacer()
 
-        // ── Formalism ─────────────────────────────────────────────────────
         Text("Formalism", color = Cyan, textStyle = Bold)
         Text("  Max depth    ${config.formalism.maxDepth}".take(w), color = White)
         Text("  Min cluster  ${config.formalism.minClusterSize}".take(w), color = White)
@@ -205,9 +198,9 @@ private fun SnapshotHubPanel(
     Column {
         when {
             state.isSavingSnapshot ->
-                Text("Save snapshot \u2014 description: ${state.snapshotDescInput}\u2588".take(w), color = Cyan)
+                Text("Save snapshot — description: ${state.snapshotDescInput}█".take(w), color = Cyan)
             state.isRenamingSnapshot ->
-                Text("Rename snapshot \u2014 new name: ${state.renameInput}\u2588".take(w), color = Cyan)
+                Text("Rename snapshot — new name: ${state.renameInput}█".take(w), color = Cyan)
         }
         if (state.snapshotList.isEmpty()) {
             Text("No snapshots saved yet. Press N to save the active DAG.".take(w), color = White)
@@ -218,20 +211,16 @@ private fun SnapshotHubPanel(
                 val selected = idx == state.selectedSnapshotIdx
                 Text(
                     buildAnnotatedString {
-                        withStyle(
-                            SpanStyle(
-                                color = if (selected) Cyan else White,
-                                textStyle = if (selected) Bold else Unspecified
-                            )
-                        ) { append((if (selected) "\u276f " else "  ") + snap.description) }
+                        withStyle(SpanStyle(
+                            color = if (selected) Cyan else White,
+                            textStyle = if (selected) Bold else Unspecified
+                        )) { append((if (selected) "❯ " else "  ") + snap.description) }
                         withStyle(SpanStyle(color = White)) {
-                            append("  (${snap.timestamp} \u00b7 ${snap.metrics.totalNodes} nodes)")
+                            append("  (${snap.timestamp} · ${snap.metrics.totalNodes} nodes)")
                         }
                     }.take(w)
                 )
             }
-            Spacer()
-            Text("L/Enter Load \u00b7 D Delete \u00b7 N Save \u00b7 Esc Back".take(w), color = White)
         }
     }
 }
