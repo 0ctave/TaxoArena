@@ -31,7 +31,7 @@ data class GraphNode(
     // Unified Data Space:
     // If isLeaf == true: Holds the explicit data for this domain.
     // If isLeaf == false: Holds the residual "unmapped/outlier" queries that failed to trickle to children.
-    var queries: MutableList<Embedding> = java.util.Collections.synchronizedList(ArrayList()),
+    var queries: MutableList<Embedding> = Collections.synchronizedList(ArrayList()),
 
     // Immutable sliceDim based on depth
     var sliceDim: Int = dimForDepth(depth),
@@ -138,7 +138,7 @@ data class GraphNode(
      */
     fun getRecursiveQueryCount(): Int {
         val visited = mutableSetOf<String>()
-        val bitSet = java.util.BitSet()
+        val bitSet = BitSet()
         val fallbackSet = mutableSetOf<String>()
 
         fun walk(node: GraphNode) {

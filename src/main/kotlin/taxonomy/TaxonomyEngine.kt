@@ -80,7 +80,7 @@ class TaxonomyEngine(
             // dimForDepth(0)=128 is done later by projectTo(). Comparing against
             // dimForDepth(0) was wrong — it always threw because the model
             // produces e.g. 1024-dim vectors, not 128-dim ones.
-            val maxDepth    = config.execution.maxDepth
+            val maxDepth    = config.formalism.maxDepth
             val minRequired = dimForDepth(maxDepth)
             val actualDim   = embeddingCache.dimensionality
             check(actualDim >= minRequired) {

@@ -783,7 +783,7 @@ class TaxonomySnapshotManager(
                     }
                 }
             }
-            appendLogs(currentLogUuid!!, logsToAppend)
+            appendLogs(currentLogUuid, logsToAppend)
         } catch (e: Exception) {
             log.error("Failed to append logs to snapshot $snapshotId in DB", e)
         }

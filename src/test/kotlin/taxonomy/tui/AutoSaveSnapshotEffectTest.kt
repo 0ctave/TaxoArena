@@ -39,9 +39,11 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override suspend fun loadedModels(): List<String> = emptyList()
     override suspend fun runTrickle(query: String): List<taxonomy.service.QueryResponseNode> = emptyList()
     override suspend fun runBatchTrickle(
+        maxQueries: Int,
         onProgress: (String) -> Unit,
-        onComplete: (taxonomy.tui.BatchTrickleTestResults) -> Unit
+        onComplete: (BatchTrickleTestResults) -> Unit
     ) {}
+    override suspend fun reservedPoolSize(): Int = 0
     override suspend fun loadLeaderboard(): List<taxonomy.service.LeaderboardGroup> = emptyList()
     override suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit) {}
     override suspend fun runBenchmarkConfigured(
