@@ -47,11 +47,12 @@ internal class TopologyKeyHandler(
             }
 
             "r" -> selectedTreeNode(state)?.let { node ->
+                val d = dispatch
                 effects.inspectNode(node)
-                dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
-                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
-                dispatch(TuiEvent.SetGeneratingJudge(true))
-                effects.regenerateJudgeForCurrentNode(::dispatch)
+                d(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
+                d(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
+                d(TuiEvent.SetGeneratingJudge(true))
+                effects.regenerateJudgeForCurrentNode(d)
             }
 
             "q", "escape" -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
