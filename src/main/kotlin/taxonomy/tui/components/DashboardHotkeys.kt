@@ -6,13 +6,13 @@ import taxonomy.tui.state.TuiAppState
 /**
  * Pure builder for the main-dashboard contextual hotkey hints.
  *
- * When a DAG is loaded (or a fresh DAG is generated) the bar looks like:
+ * After a snapshot is loaded (or a fresh DAG is generated) the bar shows:
  *
  * ```
  * DAG : [M] Metrics [C] Config [T] Trickle | Arena : [A] Arena [G] Generate Judges | [B] Benchmark [Tab] Switch Panels [?] Help [X] Load DAG [Ctrl-C] Quit
  * ```
  *
- * On narrow terminals the bar wraps to additional rows automatically.
+ * On narrow terminals the [HotkeyBarGrouped] component wraps to additional rows automatically.
  */
 object DashboardHotkeys {
 
@@ -27,6 +27,7 @@ object DashboardHotkeys {
         isViewingSnapshot: Boolean = false,
         state: TuiAppState,
     ): List<HotkeyGroup> {
+
         // ── DAG is being built ───────────────────────────────────────────────
         if (isRegenerating) {
             return listOf(
@@ -63,7 +64,14 @@ object DashboardHotkeys {
             )
         }
 
-        // ── Analysis hub focused — full grouped layout ───────────────────────
+        // ── Analysis hub focused — full grouped layout (DAG loaded) ──────────
+        //
+        // Layout:
+        //   DAG : [M] Metrics [C] Config [T] Trickle
+        //       | Arena : [A] Arena [G] Generate Judges
+        //       | [B] Benchmark
+        //       | [Tab] Switch Panels [?] Help [X] Load DAG [Ctrl-C] Quit
+        //
         val dagGroup = HotkeyGroup(
             label = "DAG",
             actions = listOf(
@@ -72,26 +80,31 @@ object DashboardHotkeys {
                 HotkeyAction("T", "Trickle"),
             ),
         )
+
         val arenaActions = buildList {
             add(HotkeyAction("A", "Arena"))
             add(HotkeyAction("G", "Generate Judges", TuiTheme.OK))
             if (isViewingSnapshot) add(HotkeyAction("N", "Rename Snap"))
         }
         val arenaGroup = HotkeyGroup(label = "Arena", actions = arenaActions)
-        val utilGroup  = HotkeyGroup(label = "", actions = listOf(HotkeyAction("B", "Benchmark")))
+
+        val benchmarkGroup = HotkeyGroup(
+            label = "",
+            actions = listOf(HotkeyAction("B", "Benchmark")),
+        )
 
         return listOf(
             dagGroup,
             arenaGroup,
-            utilGroup,
+            benchmarkGroup,
             HotkeyGroup("", GlobalHotkeys.forState(state)),
         )
     }
 
     /**
-     * Legacy flat-list API kept for callers that already use the contextual/global split
-     * [HotkeyBar] overload. Delegates to [groups] and flattens the result so the rendering
-     * is consistent — the only difference is the absence of bold group labels.
+     * Legacy flat-list API kept for callers that use the contextual/global split
+     * [HotkeyBar] overload. Delegates to [groups] and flattens the result so the
+     * rendering is consistent — the only difference is the absence of bold group labels.
      */
     fun forState(
         hasDag: Boolean,
