@@ -43,7 +43,7 @@ fun Panel(
 ) {
     val w = width.coerceAtLeast(4)
     val h = height.coerceAtLeast(3)
-    val innerW = w - 2
+    val innerW = w - 2  // columns between the two border characters
     val titleText = if (!badge.isNullOrEmpty()) "$title · $badge" else title
 
     // When hints are supplied we steal 1 row from the body for the hint line.
@@ -97,15 +97,14 @@ fun Panel(
         }
 
         // Context hints row — single AnnotatedString, same pattern as body border rows.
-        // A Row+Spacer approach fails: the hint Text with explicit width consumes all
-        // remaining space and the right │ never renders inline.
+        // Layout: │ <space> <hints…> <padding> │
+        // Total = 1 + 1 + clipped.length + pad + 1 = w
+        // => pad = innerW - 1 - clipped.length
         if (hintRows > 0) {
             Text(
                 buildAnnotatedString {
-                    // Left border + 1-space indent (matches body content indent)
                     withStyle(SpanStyle(color = accentColor)) { append("│") }
-                    withStyle(SpanStyle(color = White)) { append(" ") }
-                    // Build hint tokens
+                    withStyle(SpanStyle(color = White)) { append(" ") }  // leading space
                     val hints = buildAnnotatedString {
                         contextHints.forEachIndexed { i, action ->
                             if (i > 0) withStyle(SpanStyle(color = TuiTheme.INFO)) { append("  ") }
@@ -117,15 +116,14 @@ fun Panel(
                             )
                         }
                     }
-                    // Clip to fit: innerW - 1 (leading space) - 1 (right border)
-                    val maxHintW = (innerW - 2).coerceAtLeast(0)
+                    val maxHintW = (innerW - 2).coerceAtLeast(0)  // innerW - space - right border
                     val clipped = if (hints.length <= maxHintW) hints
                                   else hints.subSequence(0, maxHintW)
                     append(clipped)
-                    // Pad with spaces so the right border sits flush at column w-1
-                    val pad = (innerW - 1 - clipped.length - 1).coerceAtLeast(0)
+                    // pad = innerW - 1 (leading space) - clipped.length
+                    // (right │ sits at w-1, outside innerW, so not subtracted here)
+                    val pad = (innerW - 1 - clipped.length).coerceAtLeast(0)
                     withStyle(SpanStyle(color = White)) { append(" ".repeat(pad)) }
-                    // Right border
                     withStyle(SpanStyle(color = accentColor)) { append("│") }
                 }.take(w),
                 modifier = Modifier.height(1)
