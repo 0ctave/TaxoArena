@@ -106,7 +106,7 @@ fun Panel(
                 // Hint tokens inline, clipped to available width
                 val hintStr = buildAnnotatedString {
                     contextHints.forEachIndexed { i, action ->
-                        if (i > 0) withStyle(SpanStyle(color = TuiTheme.MUTED)) { append("  ") }
+                        if (i > 0) withStyle(SpanStyle(color = TuiTheme.INFO)) { append("  ") }
                         hotkey(
                             key = action.key,
                             label = action.label,
@@ -128,6 +128,7 @@ fun Panel(
                     },
                     modifier = Modifier.width(1)
                 )
+                Spacer()
             }
         }
 

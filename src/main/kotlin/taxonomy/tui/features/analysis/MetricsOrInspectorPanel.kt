@@ -103,10 +103,7 @@ fun MetricsOrInspectorPanel(
         }
 
         else -> Column {
-            Text("Analysis Hub", color = Cyan, textStyle = Bold)
-            Spacer()
-            Text("M Metrics   A Arena   B Benchmark   T Trickle", color = White)
-            Text("Enter on a DAG node to inspect it.", color = White)
+            Text("No content do display", color = Cyan, textStyle = Bold)
         }
     }
 }
@@ -137,8 +134,8 @@ private fun buildNodeDetailLines(
         }
         else -> {
             add("┌─ Generate Judge ─┐", Cyan, true)
-            add("│  [R] Generate  │", Cyan, true)
-            add("└────────────────┘", Cyan, true)
+            add("│   [R] Generate   │", Cyan, true)
+            add("└──────────────────┘", Cyan, true)
         }
     }
     if (node.parents.size > 1) {

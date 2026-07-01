@@ -19,7 +19,7 @@ object TuiTheme {
 
     // ── Semantic palette (single source of truth for state colors) ──
     /** Primary accent: focus, selection, primary actions. */
-    val ACCENT: Color  = Cyan
+    val ACCENT: Color  = Yellow
     /** Secondary accent for distinct identities. */
     val ACCENT2: Color = Magenta
     /** Completed / success / healthy. */

@@ -106,7 +106,6 @@ private fun HelpOverlay(
             when (state.startup.state) {
                 StartupState.LOAD_DAG -> {
                     Text("Load / Welcome", color = Cyan, textStyle = Bold)
-                    Text("  W/S, ↑/↓   Move selection", color = White)
                     Text("  Enter      Create new DAG / load snapshot", color = White)
                     Text("  D          Delete selected snapshot", color = White)
                     Text("  Q / Esc    Quit", color = White)
@@ -114,7 +113,6 @@ private fun HelpOverlay(
                 StartupState.CONFIGANDDOMAINS -> {
                     Text("Config & Domains", color = Cyan, textStyle = Bold)
                     Text("  Tab        Switch Domains / Settings", color = White)
-                    Text("  W/S        Move", color = White)
                     Text("  Space      Toggle domain", color = White)
                     Text("  Enter      Toggle / cycle / edit setting", color = White)
                     Text("  D          Download dataset", color = White)
@@ -127,7 +125,6 @@ private fun HelpOverlay(
                     Text("  G Generate judges", color = White)
                     Spacer()
                     Text("DAG Explorer (topology focus)", color = Cyan, textStyle = Bold)
-                    Text("  W/S        Navigate", color = White)
                     Text("  →/L        Expand     ←/H  Collapse     Space  Toggle", color = White)
                     Text("  Enter      Inspect node", color = White)
                     Text("  R          Generate / regenerate node judge", color = White)
@@ -136,7 +133,6 @@ private fun HelpOverlay(
                     Text("  R          Regenerate judge     W/S  Scroll     ←/Q  Back", color = White)
                     Spacer()
                     Text("Metrics", color = Cyan, textStyle = Bold)
-                    Text("  W/S        Select iter / scroll     P  Perf     Home/End  First/Last", color = White)
                 }
                 StartupState.LOADING -> {
                     Text("Loading…", color = White)
@@ -191,7 +187,6 @@ private fun WelcomeRoute(
     HotkeyBar(
         width,
         contextual = listOf(
-            HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
             HotkeyAction("Enter", "Select", TuiTheme.ACCENT, isPrimary = true),
             HotkeyAction("D", "Delete Snapshot"),
             HotkeyAction("Q", "Quit", TuiTheme.ERROR),
@@ -397,14 +392,10 @@ private fun MainDashboardRoute(
 
     // ── Context hints for the DAG Explorer panel ────────────────────────────
     val dagHints: List<HotkeyAction> = if (hasDag && navFocused && !benchmarkPicking) listOf(
-        HotkeyAction("W/S", "Navigate", TuiTheme.ACCENT),
-        HotkeyAction("→/L", "Expand"),
-        HotkeyAction("←/H", "Collapse"),
         HotkeyAction("Space", "Toggle"),
         HotkeyAction("Enter", "Inspect"),
         HotkeyAction("R", "Gen Judge", TuiTheme.OK),
     ) else if (benchmarkPicking) listOf(
-        HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
         HotkeyAction("Space", "Toggle"),
         HotkeyAction("Enter", "Confirm", TuiTheme.OK, isPrimary = true),
     ) else emptyList()
@@ -419,18 +410,15 @@ private fun MainDashboardRoute(
             val hasJudge = subscriptions.arenaControlState.selectedNode?.judgePrompt != null
             listOf(
                 HotkeyAction("R", if (hasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
-                HotkeyAction("W/S", "Scroll"),
                 HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
             )
         }
 
         analysisMode == taxonomy.service.AnalysisMode.METRICS -> {
             if (state.analysis.metricsZoneFocus == MetricsZoneFocus.DETAIL) listOf(
-                HotkeyAction("W/S", "Scroll", TuiTheme.ACCENT, isPrimary = true),
                 HotkeyAction("P", "Perf"),
                 HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
             ) else listOf(
-                HotkeyAction("W/S", "Select", TuiTheme.ACCENT, isPrimary = true),
                 HotkeyAction("Tab", "Detail"),
                 HotkeyAction("P", "Perf"),
                 HotkeyAction("Home/End", "First/Last"),
@@ -439,7 +427,6 @@ private fun MainDashboardRoute(
         }
 
         analysisMode == taxonomy.service.AnalysisMode.ARENA -> listOf(
-            HotkeyAction("W/S", "Scroll", TuiTheme.ACCENT),
             HotkeyAction("L", "Leaderboard"),
             HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
         )
@@ -455,25 +442,22 @@ private fun MainDashboardRoute(
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
             state.benchmark.benchmarkType == BenchmarkType.TRICKLE -> listOf(
-            HotkeyAction("W/S", "Scroll", TuiTheme.ACCENT),
             HotkeyAction("B", "Run", TuiTheme.OK, isPrimary = true),
             HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
         )
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK -> listOf(
-            HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
             HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
             HotkeyAction("Tab", "Next section"),
+            HotkeyAction("O", "Load eval_results"),
             HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
         )
 
         analysisMode == taxonomy.service.AnalysisMode.TRICKLE_TEST -> listOf(
-            HotkeyAction("W/S", "Scroll", TuiTheme.ACCENT),
             HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
         )
 
         analysisMode == taxonomy.service.AnalysisMode.SNAPSHOTS -> listOf(
-            HotkeyAction("W/S", "Move", TuiTheme.ACCENT),
             HotkeyAction("L/Enter", "Load", TuiTheme.OK, isPrimary = true),
             HotkeyAction("D", "Delete"),
             HotkeyAction("N", "Save"),
@@ -760,7 +744,6 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
     }
     val inDomains = state.config.activeSubPanel == ConfigSubPanel.DOMAINS
     return buildList {
-        add(HotkeyAction("W/S", "Move", TuiTheme.ACCENT))
         if (inDomains) add(HotkeyAction("Space", "Toggle Domain"))
         else add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
         if (state.runtime.isDatasetDownloaded) {

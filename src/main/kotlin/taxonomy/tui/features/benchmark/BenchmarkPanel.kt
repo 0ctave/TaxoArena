@@ -65,8 +65,6 @@ private fun BenchmarkTypeSelector(width: Int, benchmarkState: BenchmarkUiState) 
                 }.take(w)
             )
         }
-        Spacer()
-        Text("W/S to select · Enter to confirm · Q/Esc to go back".take(w), color = Cyan)
     }
 }
 
@@ -87,7 +85,13 @@ fun EvalCatalogPicker(
         if (catalog.isEmpty()) {
             Text("No eval_results found in the cache directory.".take(w), color = Yellow)
             Spacer()
-            Text("Press D to download the MMLU-Pro eval_results, or Q to cancel.".take(w), color = Cyan)
+            Text("Press D to download the MMLU-Pro eval_results, or Q to Quit.".take(w), color = Cyan)
+            return@Column
+        }
+        if (catalog.filter { it.alreadyIngested }.size == catalog.size) {
+            Text("All eval_results are already ingested.".take(w), color = Yellow)
+            Spacer()
+            Text("Press Q to Quit.".take(w), color = Cyan)
             return@Column
         }
         val selectedCount = benchmarkState.evalCatalogSelection.size
@@ -122,7 +126,7 @@ fun EvalCatalogPicker(
             )
         }
         Spacer()
-        Text("W/S move · Space toggle · A all-new · Enter ingest · D download · Q cancel".take(w), color = Cyan)
+        Text("A all-new · Space toggle · Enter ingest · D download · Q Quit".take(w), color = Cyan)
     }
 }
 
@@ -140,7 +144,7 @@ private fun ArenaBenchmarkView(
         if (benchmarkState.loadedModels.isNotEmpty()) {
             Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}".take(w), color = Green)
         } else {
-            Text("No precomputed models loaded — press o to load eval_results.".take(w), color = Yellow)
+            Text("No precomputed models loaded — press o to load eval_res   ults.".take(w), color = Yellow)
         }
         Spacer()
 
