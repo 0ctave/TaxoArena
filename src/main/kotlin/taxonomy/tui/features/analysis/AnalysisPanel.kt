@@ -53,6 +53,9 @@ fun AnalysisPanel(
     detailScrollOffset: Int = 0,
     performanceReport: Map<String, taxonomy.utils.PerformanceStats> = emptyMap(),
     activeProcess: ProcessRow? = null,
+    isEnteringBatchGenerality: Boolean = false,
+    batchGeneralityInput: String = "1",
+    batchReplaceExisting: Boolean = false,
     /** Context-sensitive key hints rendered inside the panel border, above the bottom edge. */
     contextHints: List<HotkeyAction> = emptyList(),
 ) {
@@ -86,7 +89,14 @@ fun AnalysisPanel(
                 mode == AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState, benchmarkState)
                 mode == AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState)
                 mode == AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState)
-                mode == AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(bodyW, bodyH, controlState)
+                mode == AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(
+                    width = bodyW,
+                    height = bodyH,
+                    controlState = controlState,
+                    isEnteringBatchGenerality = isEnteringBatchGenerality,
+                    batchGeneralityInput = batchGeneralityInput,
+                    batchReplaceExisting = batchReplaceExisting,
+                )
                 mode == AnalysisMode.SNAPSHOTS -> SnapshotHubPanel(bodyW, bodyH, snapshotState)
                 mode == AnalysisMode.CONFIG -> ConfigSnapshotPanel(
                     width = bodyW,
