@@ -51,7 +51,7 @@ fun DomainSelectorTable(
             val (name, count) = domains[i]
             val checked = allSelected || selectedDomains.contains(name)
             val selected = i == selectedIdx
-            val mark = if (checked) "\u2611" else "\u2610" // ☑ / ☐
+            val mark = checkboxMark(checked)
             val caret = if (selected) "\u276f " else "  "      // ❯
             Text(
                 value = (caret + "$mark $name ($count)").take((contentWidth).coerceAtLeast(1)),
@@ -201,7 +201,7 @@ fun buildTreeLines(
             for (j in 0 until depth) {
                 append(
                     if (j == depth - 1) {
-                        if (ancestorHasMore[j]) "\u251c\u2500\u2500 " else "\u2514\u2500\u2500 " // ├── / └──
+                        if (ancestorHasMore[j]) "\u251c\u2500\u2500" else "\u2514\u2500\u2500" // ├── / └──
                     } else {
                         if (ancestorHasMore[j]) "\u2502   " else "    " // │
                     }
@@ -213,11 +213,7 @@ fun buildTreeLines(
         // Default view (no explicit expand state yet): auto-expand the root and the first
         // level so the domains are visible immediately; deeper levels stay collapsed.
         val isExpanded = expandedNodes[node.id] ?: (depth < 1)
-        val fold = when {
-            !hasChildren -> "  "
-            isExpanded -> "\u25be " // ▾
-            else -> "\u25b8 "        // ▸
-        }
+        val fold = " "
         val nodeCol = depthColor(node.depth)
         val label = node.label ?: node.id
 

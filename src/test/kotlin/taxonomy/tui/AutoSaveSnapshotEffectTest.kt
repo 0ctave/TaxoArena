@@ -68,6 +68,8 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override fun setAnalysisMode(mode: AnalysisMode) {}
     override fun toggleDomain(domainName: String) {}
     override fun applySetting(name: String, value: String): Boolean = false
+    override fun resetBenchmarkReport() {}
+    override fun clearLeaderboard() {}
 }
 
 class AutoSaveSnapshotEffectTest {

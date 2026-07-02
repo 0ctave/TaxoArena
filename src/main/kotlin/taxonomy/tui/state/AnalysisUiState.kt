@@ -9,6 +9,7 @@ data class AnalysisUiState(
     val mode: AnalysisMode = AnalysisMode.IDLE,
     val inspectorScroll: Int = 0,
     val metricsScrollOffset: Int = 0,
+    val configScrollOffset: Int = 0,
     val lastActiveProcessMode: AnalysisMode? = null,
 
     // 3-zone METRICS view state.
@@ -19,6 +20,16 @@ data class AnalysisUiState(
     val detailScrollOffset: Int = 0,
 
     val isEnteringBatchGenerality: Boolean = false,
-    val batchGeneralityInput: String = "1",
-    val batchReplaceExisting: Boolean = false
+    val batchGeneralityInput: String = "0",
+    val batchReplaceExisting: Boolean = false,
+    val batchDomainsInput: String = "",
+    val batchSelectedSettingIdx: Int = 0,
+    val isEditingBatchSetting: Boolean = false,
+    val batchEditingValue: String = "",
+
+    val isPickingBatchDomains: Boolean = false,
+    val batchDomainsPickerCursor: Int = 0,
+    val batchSelectedDomains: Set<String> = emptySet(),
+    val batchDomainOptions: List<String> = emptyList(),
+    val isJudgeGenerationRunning: Boolean = false
 )

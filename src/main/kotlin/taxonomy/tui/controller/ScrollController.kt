@@ -30,6 +30,8 @@ class ScrollController {
                 when (state.analysis.mode) {
                     AnalysisMode.NODE_DETAIL,
                     AnalysisMode.METRICS,
+                    AnalysisMode.CONFIG,
+                    AnalysisMode.LEADERBOARD,
                     AnalysisMode.TRICKLE_TEST,
                     AnalysisMode.BENCHMARK -> TuiEvent.ScrollBy(ScrollbarTarget.ANALYSIS, delta)
                     AnalysisMode.SNAPSHOTS -> null

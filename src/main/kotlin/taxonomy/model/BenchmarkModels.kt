@@ -10,7 +10,8 @@ data class BenchmarkLiveStats(
     val currentQuestion: String,
     val runningAgreement: Double,   // rolling judge-GT agreement
     val runningCoverage: Double,    // fraction with ≥1 leaf judge so far
-    val perCategoryProgress: Map<String, Int>  // category → matched so far
+    val perCategoryProgress: Map<String, Int>,  // category → matched so far
+    val pairStats: List<ModelPairStats> = emptyList()
 )
 
 @Serializable
@@ -39,6 +40,7 @@ data class QueryBenchmarkResult(
     val matchedLeafLabels: List<String>,     // leaves the query routed to (for coverage)
     val hadJudge: Boolean,
     val domainEvaluations: List<DomainEvaluation>,
+    val pairEvaluations: Map<String, List<DomainEvaluation>> = emptyMap(),
     // per-model-pair: judgeWinner agrees with accuracy-based winner?
     val judgeAccuracyAgreement: Map<String, Boolean>  // "A_vs_B" -> true/false
 )

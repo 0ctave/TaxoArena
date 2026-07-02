@@ -45,6 +45,7 @@ fun MetricsOrInspectorPanel(
     mode: AnalysisMode,
     controlState: AnalysisPanelState,
     inspectorScroll: Int,
+    metricsScrollOffset: Int = 0,
     latestMetrics: IterationMetrics? = null,
     metricsHistory: List<IterationMetrics> = emptyList(),
     isGeneratingJudge: Boolean = false,
@@ -93,6 +94,7 @@ fun MetricsOrInspectorPanel(
                     focus = metricsZoneFocus,
                     showPerformanceBlock = showPerformanceBlock,
                     detailScrollOffset = detailScrollOffset,
+                    metricsScrollOffset = metricsScrollOffset,
                     performanceReport = performanceReport,
                 )
             }
@@ -108,13 +110,17 @@ fun MetricsOrInspectorPanel(
     }
 }
 
-private fun buildNodeDetailLines(
+fun buildNodeDetailLines(
     node: GraphNode,
     width: Int,
     isGeneratingJudge: Boolean,
 ): List<Triple<String, Color, Boolean>> {
     val out = mutableListOf<Triple<String, Color, Boolean>>()
-    fun add(t: String, c: Color = White, bold: Boolean = false) { out += Triple(t, c, bold) }
+    fun add(t: String, c: Color = White, bold: Boolean = false) {
+        val limit = (width - 2).coerceAtLeast(0)
+        val truncated = if (t.length > limit) t.substring(0, limit) else t
+        out += Triple(truncated, c, bold)
+    }
     add(node.label ?: "(unlabeled)", Cyan, true)
     add("")
     add("Type           ${if (node.isLeaf) "leaf" else "internal"}")
@@ -152,10 +158,30 @@ private fun buildNodeDetailLines(
     if (samples.isNotEmpty()) {
         add("")
         add("Sample queries:", Cyan)
-        samples.forEach { add("  · ${it.rawText.take((width - 6).coerceAtLeast(8))}") }
+        samples.forEach { q ->
+            val wrapped = q.rawText.wrapText(width - 6)
+            wrapped.forEachIndexed { i, line ->
+                add(if (i == 0) "  · $line" else "    $line")
+            }
+        }
+    }
+    if (node.judgePrompt != null) {
+        add("")
+        add("Judge System Prompt:", Cyan, true)
+        node.judgePrompt!!.wrapText(width - 6).forEach { line ->
+            add("  $line")
+        }
+        if (node.judgeRubric != null) {
+            add("")
+            add("Judge Rubric:", Cyan, true)
+            node.judgeRubric!!.wrapText(width - 6).forEach { line ->
+                add("  $line")
+            }
+        }
     }
     return out
 }
+
 
 @Composable
 private fun MetricsThreeZone(
@@ -166,6 +192,7 @@ private fun MetricsThreeZone(
     focus: MetricsZoneFocus,
     showPerformanceBlock: Boolean,
     detailScrollOffset: Int,
+    metricsScrollOffset: Int,
     performanceReport: Map<String, PerformanceStats>,
 ) {
     val lastIdx = history.lastIndex
@@ -178,7 +205,7 @@ private fun MetricsThreeZone(
 
     Column {
         Column(modifier = Modifier.height(zone1H).width(width)) {
-            EvolutionTable(width, zone1H, history, selectedIterationIndex, focus)
+            EvolutionTable(width, zone1H, history, selectedIterationIndex, focus, metricsScrollOffset)
         }
         Row(modifier = Modifier.height(bottomH)) {
             Column(modifier = Modifier.width(leftW).height(bottomH)) {
@@ -206,6 +233,7 @@ private fun EvolutionTable(
     history: List<IterationMetrics>,
     selectedIterationIndex: Int,
     focus: MetricsZoneFocus,
+    metricsScrollOffset: Int,
 ) {
     val lastIdx = history.lastIndex
     val tableFocused = focus == MetricsZoneFocus.TABLE
@@ -217,19 +245,24 @@ private fun EvolutionTable(
     val dataCount = lastIdx
     // Reserve: title(1) header(1) divider(1) final(1) already; remaining for data rows.
     val visible = (height - 4).coerceAtLeast(1)
-    val focusRow = (if (selectedIterationIndex in 0 until lastIdx) selectedIterationIndex else dataCount - 1)
-        .coerceAtLeast(0)
-    val start = (focusRow - visible + 1).coerceIn(0, (dataCount - visible).coerceAtLeast(0))
-    val end = (start + visible).coerceAtMost(dataCount)
 
-    for (i in start until end) {
-        val isSelected = i == selectedIterationIndex
-        Text(tableRow(history, i, isSelected, tableFocused, isFinal = false), color = White)
+    ScrollablePanelContent(
+        pWidth = width,
+        pHeight = visible,
+        itemCount = dataCount,
+        scrollOffset = metricsScrollOffset,
+        hasPadding = false
+    ) { visibleHeight, startIdx, innerWidth ->
+        val endIdx = (startIdx + visibleHeight).coerceAtMost(dataCount)
+        for (i in startIdx until endIdx) {
+            val isSelected = i == selectedIterationIndex
+            Text(tableRow(history, i, isSelected, tableFocused, isFinal = false).take(innerWidth), color = White)
+        }
     }
 
     Text("─".repeat(width).take(width), color = Green)
     val finalSelected = selectedIterationIndex == -1 || selectedIterationIndex == lastIdx
-    Text(tableRow(history, lastIdx, finalSelected, tableFocused, isFinal = true), color = Green)
+    Text(tableRow(history, lastIdx, finalSelected, tableFocused, isFinal = true).take(width), color = Green)
 }
 
 private fun tableHeader(): String =
@@ -316,16 +349,24 @@ private fun IterationDetail(
     if (showPerformanceBlock) lines += performanceLines(performanceReport)
 
     val body = (height - 1).coerceAtLeast(1)
-    val maxStart = (lines.size - body).coerceAtLeast(0)
-    val start = detailScrollOffset.coerceIn(0, maxStart)
-    lines.subList(start, (start + body).coerceAtMost(lines.size)).forEach { Text(it.take(width)) }
+
+    ScrollablePanelContent(
+        pWidth = width,
+        pHeight = body,
+        itemCount = lines.size,
+        scrollOffset = detailScrollOffset,
+        hasPadding = false
+    ) { visibleHeight, startIdx, innerWidth ->
+        val sub = lines.subList(startIdx, (startIdx + visibleHeight).coerceAtMost(lines.size))
+        sub.forEach { Text(it.take(innerWidth)) }
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared metric-group rendering
 // ─────────────────────────────────────────────────────────────────────────────
 
-private fun buildMetricLines(m: TaxonomyMetricsData): List<AnnotatedString> {
+fun buildMetricLines(m: TaxonomyMetricsData): List<AnnotatedString> {
     val out = mutableListOf<AnnotatedString>()
     out += groupHeader("[Cluster Quality]", Magenta)
     out += metricLine("NMI", num(m.nmi), qcolor(m.nmi, 0.6, 0.4))
@@ -356,7 +397,7 @@ private fun buildMetricLines(m: TaxonomyMetricsData): List<AnnotatedString> {
     return out
 }
 
-private fun performanceLines(report: Map<String, PerformanceStats>): List<AnnotatedString> {
+fun performanceLines(report: Map<String, PerformanceStats>): List<AnnotatedString> {
     val out = mutableListOf<AnnotatedString>()
     out += groupHeader("[Performance]", Cyan)
     if (report.isEmpty()) {
@@ -401,3 +442,41 @@ private fun qcolorLow(ratio: Double): Color = when {
     ratio < 0.15 -> Yellow
     else -> Red
 }
+
+private fun String.wrapText(maxWidth: Int): List<String> {
+    val limit = maxWidth.coerceAtLeast(10)
+    val lines = mutableListOf<String>()
+    val paragraphs = this.split('\n', '\r')
+    for (paragraph in paragraphs) {
+        val words = paragraph.split(' ')
+        var currentLine = java.lang.StringBuilder()
+        for (word in words) {
+            if (word.length > limit) {
+                if (currentLine.isNotEmpty()) {
+                    lines.add(currentLine.toString())
+                    currentLine = java.lang.StringBuilder()
+                }
+                var start = 0
+                while (start < word.length) {
+                    val end = minOf(start + limit, word.length)
+                    lines.add(word.substring(start, end))
+                    start = end
+                }
+                continue
+            }
+            if (currentLine.isEmpty()) {
+                currentLine.append(word)
+            } else if (currentLine.length + 1 + word.length <= limit) {
+                currentLine.append(' ').append(word)
+            } else {
+                lines.add(currentLine.toString())
+                currentLine = java.lang.StringBuilder(word)
+            }
+        }
+        if (currentLine.isNotEmpty() || paragraph.isEmpty()) {
+            lines.add(currentLine.toString())
+        }
+    }
+    return lines
+}
+

@@ -156,6 +156,18 @@ class TuiConfigFacade(
             options = listOf("0", "1", "2")
         ),
         SettingItem(
+            name = "Judge Domains",
+            description = "Comma-separated domains to generate judges on (empty = all)",
+            category = "LLM Model Settings",
+            getValue = { deps.config.llm.judgeDomains.joinToString(", ").ifBlank { "(all)" } },
+            setValue = { s ->
+                deps.config.llm.judgeDomains =
+                    s.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                true
+            },
+            kind = SettingKind.TEXT
+        ),
+        SettingItem(
             name = "Max Hierarchy Depth",
             description = "Maximum DAG depth",
             category = "Mathematical Formalism",

@@ -55,6 +55,7 @@ class TaxonomyConfig {
         var labelingModel: String = "ministral-3:14b"
         var embeddingModel: String = "qwen3-embedding"
         var maxJudgeGenerality: Int = 1 // 0 = only leaves, 1 = leaves + parents, etc.
+        var judgeDomains: List<String> = emptyList()
         var gemini: GeminiConfig = GeminiConfig()
         var azure: AzureConfig = AzureConfig()
     }
@@ -162,7 +163,8 @@ class TaxonomyConfig {
             judgeModel = llm.judgeModel,
             labelingModel = llm.labelingModel,
             embeddingModel = llm.embeddingModel,
-            maxJudgeGenerality = llm.maxJudgeGenerality
+            maxJudgeGenerality = llm.maxJudgeGenerality,
+            judgeDomains = llm.judgeDomains
         ),
         formalism = EffectiveConfig.Formalism(
             maxDepth = formalism.maxDepth,
@@ -192,6 +194,7 @@ class TaxonomyConfig {
         llm.labelingModel = c.llm.labelingModel
         llm.embeddingModel = c.llm.embeddingModel
         llm.maxJudgeGenerality = c.llm.maxJudgeGenerality
+        llm.judgeDomains = c.llm.judgeDomains
 
         formalism.maxDepth = c.formalism.maxDepth
         formalism.minClusterSize = c.formalism.minClusterSize

@@ -1,72 +1,114 @@
 package taxonomy.tui
 
 import taxonomy.tui.components.DashboardHotkeys
+import taxonomy.tui.components.HotkeyGroup
 import taxonomy.tui.state.FocusPanel
+import taxonomy.tui.state.TuiAppState
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
 class DashboardHotkeysTest {
 
-    private fun keys(actions: List<taxonomy.tui.components.HotkeyAction>) = actions.map { it.key }
+    private fun keys(groups: List<HotkeyGroup>) = groups.flatMap { it.actions }.map { it.key }
 
     @Test
     fun hidesAnalysisActionsWhileBuilding() {
-        val k = keys(DashboardHotkeys.forState(hasDag = true, FocusPanel.ANALYSIS_HUB, isRegenerating = true))
+        val state = TuiAppState()
+        val groups = DashboardHotkeys.groups(
+            hasDag = true,
+            focused = FocusPanel.ANALYSIS_HUB,
+            isRegenerating = true,
+            state = state
+        )
+        val k = keys(groups)
         assertFalse(k.contains("M"), "Metrics must be hidden while building")
         assertFalse(k.contains("A"))
         assertFalse(k.contains("B"))
-        // Globals are emitted by GlobalHotkeys now, not by the contextual builder.
-        assertFalse(k.contains("Ctrl-C"))
+        // Globals are emitted by GlobalHotkeys and included in groups.
+        assertTrue(k.contains("Ctrl-C"), "Globals should be included in groups output")
     }
 
     @Test
     fun hidesAnalysisActionsWhenNoDag() {
-        val k = keys(DashboardHotkeys.forState(hasDag = false, FocusPanel.ANALYSIS_HUB, isRegenerating = false))
+        val state = TuiAppState()
+        val groups = DashboardHotkeys.groups(
+            hasDag = false,
+            focused = FocusPanel.ANALYSIS_HUB,
+            isRegenerating = false,
+            state = state
+        )
+        val k = keys(groups)
         assertFalse(k.contains("M"))
-        // When there's no active graph yet, X is surfaced contextually as the primary action.
         assertTrue(k.contains("X"))
     }
 
     @Test
-    fun contextualBuilderNeverEmitsGlobals() {
-        // The hub and topology bars (with a DAG present) must not duplicate the global keys.
-        val hub = keys(DashboardHotkeys.forState(hasDag = true, FocusPanel.ANALYSIS_HUB, isRegenerating = false))
-        val topo = keys(DashboardHotkeys.forState(hasDag = true, FocusPanel.TOPOLOGY, isRegenerating = false))
-        for (k in listOf(hub, topo)) {
-            assertFalse(k.contains("Tab"), "Tab is global")
-            assertFalse(k.contains("Ctrl-C"), "Ctrl-C is global")
-            assertFalse(k.contains("X"), "X is global when a DAG is active")
-            assertFalse(k.contains("?"), "? is global")
-        }
+    fun groupsContainGlobalsOnce() {
+        val state = TuiAppState()
+        val groups = DashboardHotkeys.groups(
+            hasDag = true,
+            focused = FocusPanel.ANALYSIS_HUB,
+            isRegenerating = false,
+            state = state
+        )
+        val k = keys(groups)
+        assertTrue(k.contains("Tab"))
+        assertTrue(k.contains("Ctrl-C"))
+        assertTrue(k.contains("?"))
+        assertEquals(k.size, k.distinct().size)
     }
 
     @Test
-    fun showsAnalysisActionsWhenDagReadyAndHubFocused() {
-        val k = keys(DashboardHotkeys.forState(hasDag = true, FocusPanel.ANALYSIS_HUB, isRegenerating = false))
+    fun showsAnalysisActionsWhenDagReady() {
+        val state = TuiAppState()
+        val groups = DashboardHotkeys.groups(
+            hasDag = true,
+            focused = FocusPanel.ANALYSIS_HUB,
+            isRegenerating = false,
+            state = state
+        )
+        val k = keys(groups)
         assertTrue(k.contains("M"))
         assertTrue(k.contains("A"))
         assertTrue(k.contains("B"))
         assertTrue(k.contains("T"))
-        // Export ASCII and manual Save-Snapshot were removed; N (rename) only shows when viewing.
-        assertFalse(k.contains("E"))
         assertFalse(k.contains("N"))
     }
 
     @Test
     fun showsRenameSnapshotOnlyWhenViewingSnapshot() {
+        val state = TuiAppState()
         val viewing = keys(
-            DashboardHotkeys.forState(
-                hasDag = true, FocusPanel.ANALYSIS_HUB, isRegenerating = false, isViewingSnapshot = true
+            DashboardHotkeys.groups(
+                hasDag = true,
+                focused = FocusPanel.ANALYSIS_HUB,
+                isRegenerating = false,
+                isViewingSnapshot = true,
+                state = state
             )
         )
         assertTrue(viewing.contains("N"))
     }
 
     @Test
-    fun topologyFocusShowsTreeControls() {
-        val k = keys(DashboardHotkeys.forState(hasDag = true, FocusPanel.TOPOLOGY, isRegenerating = false))
-        assertTrue(k.contains("Space"))
-        assertTrue(k.contains("Enter"))
-        assertFalse(k.contains("M"), "tree-focus bar shouldn't advertise hub actions")
+    fun bottomBarIsFixedRegardlessOfFocus() {
+        val state = TuiAppState()
+        val hub = keys(
+            DashboardHotkeys.groups(
+                hasDag = true,
+                focused = FocusPanel.ANALYSIS_HUB,
+                isRegenerating = false,
+                state = state
+            )
+        )
+        val topo = keys(
+            DashboardHotkeys.groups(
+                hasDag = true,
+                focused = FocusPanel.TOPOLOGY,
+                isRegenerating = false,
+                state = state
+            )
+        )
+        assertEquals(hub, topo, "Bottom hotkey bar must be identical across focused panels")
     }
 }

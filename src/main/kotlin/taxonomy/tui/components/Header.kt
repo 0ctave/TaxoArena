@@ -40,6 +40,7 @@ fun Header(
     activeSnapshotName: String?,
     maxDepth: Int = 0,
     leafCount: Int = 0,
+    judgesCount: Int = 0,
 ) {
     // Left badge is fixed: " ◈ TAXOARENA  v2.0 " = 19 visible chars.
     val leftWidth = 19
@@ -50,6 +51,7 @@ fun Header(
         append(" Nodes: $totalNodes")
         append("  Depth: $maxDepth")
         append("  Leaves: $leafCount")
+        append("  Judges: $judgesCount")
         append("  Dataset: $activeDatasetName")
         if (activeSnapshotName != null) append("   [ARCHIVE: $activeSnapshotName]")
         append("   $time ")
@@ -70,6 +72,7 @@ fun Header(
         val nodesStr = " Nodes: $totalNodes"
         val depthStr = "  Depth: $maxDepth"
         val leavesStr = "  Leaves: $leafCount"
+        val judgesStr = "  Judges: $judgesCount"
         val datasetStr = "  Dataset: $activeDatasetName"
         val archiveStr = if (activeSnapshotName != null) "   [ARCHIVE: $activeSnapshotName]" else null
         val timeStr = "   $time "
@@ -89,6 +92,11 @@ fun Header(
         withStyle(SpanStyle(color = White)) { append(leavesLabel) }
         val leavesVal = "$leafCount".take(remaining); remaining -= leavesVal.length
         withStyle(SpanStyle(color = Magenta, textStyle = Bold)) { append(leavesVal) }
+        // Judges
+        val judgesLabel = "  Judges: ".take(remaining); remaining -= judgesLabel.length
+        withStyle(SpanStyle(color = White)) { append(judgesLabel) }
+        val judgesVal = "$judgesCount".take(remaining); remaining -= judgesVal.length
+        withStyle(SpanStyle(color = Green, textStyle = Bold)) { append(judgesVal) }
         // Dataset
         val datasetLabel = "  Dataset: ".take(remaining); remaining -= datasetLabel.length
         withStyle(SpanStyle(color = White)) { append(datasetLabel) }

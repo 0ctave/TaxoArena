@@ -229,24 +229,67 @@ class ModelEvalStore(
         limit: Int = 0
     ): Map<Int, Map<String, ModelEvalResult>> {
         val modelPlaceholders = models.joinToString(",") { "?" }
-        val sb = StringBuilder("SELECT * FROM eval_results WHERE model_name IN ($modelPlaceholders)")
-        if (category != null) sb.append(" AND category = ?")
-        if (reservedOnly) sb.append(" AND is_reserved = 1")
-        if (limit > 0) sb.append(" LIMIT $limit")
-
+        val catLower = category?.lowercase()
         val matrix = mutableMapOf<Int, MutableMap<String, ModelEvalResult>>()
-        conn().use { c ->
-            c.prepareStatement(sb.toString()).use { ps ->
-                var idx = 1
-                models.forEach { ps.setString(idx++, it) }
-                if (category != null) ps.setString(idx++, category)
-                val rs = ps.executeQuery()
-                while (rs.next()) {
-                    val r = rs.toSingleEvalResult()
-                    matrix.getOrPut(r.questionId) { mutableMapOf() }[r.modelName] = r
+
+        if (limit > 0) {
+            val subQuery = buildString {
+                append("SELECT question_id FROM eval_results WHERE model_name IN ($modelPlaceholders)")
+                if (catLower != null) append(" AND category = ?")
+                if (reservedOnly) append(" AND is_reserved = 1")
+                append(" GROUP BY question_id HAVING COUNT(DISTINCT model_name) = ${models.size}")
+                append(" LIMIT $limit")
+            }
+
+            val questionIds = mutableListOf<Int>()
+            conn().use { c ->
+                c.prepareStatement(subQuery).use { ps ->
+                    var idx = 1
+                    models.forEach { ps.setString(idx++, it) }
+                    if (catLower != null) ps.setString(idx++, catLower)
+                    val rs = ps.executeQuery()
+                    while (rs.next()) {
+                        questionIds.add(rs.getInt(1))
+                    }
+                }
+            }
+
+            if (questionIds.isNotEmpty()) {
+                val qPlaceholders = questionIds.joinToString(",") { "?" }
+                val query = "SELECT * FROM eval_results WHERE question_id IN ($qPlaceholders) AND model_name IN ($modelPlaceholders)"
+                conn().use { c ->
+                    c.prepareStatement(query).use { ps ->
+                        var idx = 1
+                        questionIds.forEach { ps.setInt(idx++, it) }
+                        models.forEach { ps.setString(idx++, it) }
+                        val rs = ps.executeQuery()
+                        while (rs.next()) {
+                            val r = rs.toSingleEvalResult()
+                            matrix.getOrPut(r.questionId) { mutableMapOf() }[r.modelName] = r
+                        }
+                    }
+                }
+            }
+        } else {
+            val query = buildString {
+                append("SELECT * FROM eval_results WHERE model_name IN ($modelPlaceholders)")
+                if (catLower != null) append(" AND category = ?")
+                if (reservedOnly) append(" AND is_reserved = 1")
+            }
+            conn().use { c ->
+                c.prepareStatement(query).use { ps ->
+                    var idx = 1
+                    models.forEach { ps.setString(idx++, it) }
+                    if (catLower != null) ps.setString(idx++, catLower)
+                    val rs = ps.executeQuery()
+                    while (rs.next()) {
+                        val r = rs.toSingleEvalResult()
+                        matrix.getOrPut(r.questionId) { mutableMapOf() }[r.modelName] = r
+                    }
                 }
             }
         }
+
         // Only return rows where ALL requested models have an answer
         return matrix.filter { (_, byModel) -> models.all { it in byModel } }
     }

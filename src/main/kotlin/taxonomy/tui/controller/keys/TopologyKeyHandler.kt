@@ -42,7 +42,6 @@ internal class TopologyKeyHandler(
 
             "enter" -> {
                 effects.inspectNode(selectedTreeNode(state))
-                dispatch(TuiEvent.FocusPanelRequested(FocusPanel.ANALYSIS_HUB))
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
             }
 

@@ -14,6 +14,8 @@ import taxonomy.service.AnalysisPanelState
 import taxonomy.tui.state.ArenaUiState
 import taxonomy.tui.state.BenchmarkUiState
 
+import taxonomy.tui.components.ScrollablePanelContent
+
 /**
  * Truncating wrapper around [Text].
  *
@@ -53,20 +55,27 @@ fun ArenaPanel(
                     SafeText("No ratings recorded yet — run a benchmark or arena match.", w, Yellow)
                 } else {
                     SafeText("%-22s %-10s %6s %6s %5s".format("Model", "Domain", "μ", "σ", "Rank"), w, Yellow)
+                    val items = arenaState.leaderboard.flatMap { g -> g.agents.map { g.rank to it } }
                     val rows = (height - 4).coerceAtLeast(1)
-                    arenaState.leaderboard
-                        .flatMap { g -> g.agents.map { g.rank to it } }
-                        .drop(arenaState.leaderboardScrollOffset)
-                        .take(rows)
-                        .forEach { (rank, a) ->
+                    ScrollablePanelContent(
+                        pWidth = width,
+                        pHeight = rows,
+                        itemCount = items.size,
+                        scrollOffset = arenaState.leaderboardScrollOffset,
+                        hasPadding = false
+                    ) { visibleHeight, startIdx, innerWidth ->
+                        val endIdx = (startIdx + visibleHeight).coerceAtMost(items.size)
+                        for (i in startIdx until endIdx) {
+                            val (rank, a) = items[i]
                             SafeText(
                                 "%-22s %-10s %6.1f %6.1f %5d".format(
                                     a.agentName.take(22), a.domain.take(10), a.mu, a.sigma, rank
                                 ),
-                                w,
+                                innerWidth,
                                 White
                             )
                         }
+                    }
                 }
                 Spacer()
                 SafeText("W/S to scroll · L to close", w, Cyan)

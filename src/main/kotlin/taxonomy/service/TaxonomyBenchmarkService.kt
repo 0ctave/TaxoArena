@@ -69,13 +69,59 @@ class TaxonomyBenchmarkService(
                             val runningCoverage = if (completedResults.isNotEmpty()) completedResults.count { it.hadJudge }.toDouble() / completedResults.size else 0.0
                             val perCategoryProgress = completedResults.groupBy { it.gtCategory }.mapValues { it.value.size }
 
+                            val livePairStats = pairs.map { (modelA, modelB) ->
+                                val pairKey = "${modelA}_vs_${modelB}"
+                                val pairResults = completedResults.filter { pairKey in it.judgeAccuracyAgreement }
+                                var judgeWinsA = 0; var judgeWinsB = 0; var judgeTies = 0
+                                var accWinsA = 0; var accWinsB = 0; var accTies = 0
+                                var totalConf = 0.0; var confCount = 0
+
+                                pairResults.forEach { qr ->
+                                    val aCorrect = qr.modelCorrect[modelA] ?: false
+                                    val bCorrect = qr.modelCorrect[modelB] ?: false
+                                    when {
+                                        aCorrect && !bCorrect -> accWinsA++
+                                        bCorrect && !aCorrect -> accWinsB++
+                                        else -> accTies++
+                                    }
+                                    val evals = qr.pairEvaluations[pairKey] ?: qr.domainEvaluations
+                                    val primaryEval = evals
+                                        .filter { it.confidence >= req.confidenceGate }
+                                        .maxByOrNull { it.confidence }
+                                    primaryEval?.let { eval ->
+                                        when (eval.winner) {
+                                            "Model A" -> judgeWinsA++
+                                            "Model B" -> judgeWinsB++
+                                            else -> judgeTies++
+                                        }
+                                        totalConf += eval.confidence
+                                        confCount++
+                                    }
+                                }
+
+                                ModelPairStats(
+                                    modelA = modelA,
+                                    modelB = modelB,
+                                    totalMatches = pairResults.size,
+                                    judgeWinsA = judgeWinsA,
+                                    judgeWinsB = judgeWinsB,
+                                    judgeTies = judgeTies,
+                                    accuracyWinsA = accWinsA,
+                                    accuracyWinsB = accWinsB,
+                                    accuracyTies = accTies,
+                                    judgeAccuracyAgreementRate = pairResults.mapNotNull { it.judgeAccuracyAgreement[pairKey] }.let { l -> if (l.isEmpty()) 0.0 else l.count { it }.toDouble() / l.size },
+                                    avgConfidence = if (confCount > 0) totalConf / confCount else 0.0
+                                )
+                            }
+
                             val live = BenchmarkLiveStats(
                                 processed = currentProcessed,
                                 total = total,
                                 currentQuestion = res.query,
                                 runningAgreement = runningAgreement,
                                 runningCoverage = runningCoverage,
-                                perCategoryProgress = perCategoryProgress
+                                perCategoryProgress = perCategoryProgress,
+                                pairStats = livePairStats
                             )
                             onProgress.invoke(live)
                         }
@@ -101,6 +147,8 @@ class TaxonomyBenchmarkService(
         val gtAnswer = sample.gtAnswer      // e.g. "A"
         val gtCategory = sample.category
 
+        val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
+
         // Model correctness straight from pre-extracted pred
         val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
         val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
@@ -112,15 +160,39 @@ class TaxonomyBenchmarkService(
                 val outputB = modelResults[modelB] ?: return@async null
 
                 runCatching {
-                    // Route the question to leaf judges (no model calls — just routing + judging)
-                    val domainEvaluations = arenaService.evaluateWithPrecomputedTraces(
+                    val cached = rankingService.getRecordedMatch(
+                        snapshotId = snapshotId,
                         query = sample.questionText,
-                        options = sample.options,
                         modelA = modelA,
-                        traceA = outputA.modelOutput,
-                        modelB = modelB,
-                        traceB = outputB.modelOutput
+                        modelB = modelB
                     )
+
+                    // Route the question to leaf judges (no model calls — just routing + judging)
+                    val domainEvaluations = if (cached != null) {
+                        val cachedWinner = when {
+                            cached.isTie -> "Tie"
+                            cached.winner == modelA -> "Model A"
+                            cached.winner == modelB -> "Model B"
+                            else -> "Tie"
+                        }
+                        listOf(
+                            DomainEvaluation(
+                                domainLabel = cached.domain,
+                                winner = cachedWinner,
+                                rationale = "Cached match result",
+                                confidence = 1.0
+                            )
+                        )
+                    } else {
+                        arenaService.evaluateWithPrecomputedTraces(
+                            query = sample.questionText,
+                            options = sample.options,
+                            modelA = modelA,
+                            traceA = outputA.modelOutput,
+                            modelB = modelB,
+                            traceB = outputB.modelOutput
+                        )
+                    }
 
                     val primaryEval = domainEvaluations
                         .filter { it.confidence >= req.confidenceGate }
@@ -145,7 +217,7 @@ class TaxonomyBenchmarkService(
 
                     val agrees = judgeWinner != null && judgeWinner == gtWinner
 
-                    if (req.updateRankings && primaryEval != null) {
+                    if (req.updateRankings && primaryEval != null && cached == null) {
                         val isTie = judgeWinner == "tie"
                         rankingService.recordMatch(
                             query = sample.questionText,
@@ -153,7 +225,10 @@ class TaxonomyBenchmarkService(
                             winner = if (isTie) modelA else judgeWinner!!,
                             loser = if (isTie) modelB else if (judgeWinner == modelA) modelB else modelA,
                             isTie = isTie,
-                            confidence = primaryEval.confidence
+                            confidence = primaryEval.confidence,
+                            snapshotId = snapshotId,
+                            modelA = modelA,
+                            modelB = modelB
                         )
                     }
 
@@ -190,6 +265,7 @@ class TaxonomyBenchmarkService(
         }
 
         val domainEvaluations = pairResults.flatMap { pr -> pr.arenaResult.domainEvaluations }.distinctBy { it.domainLabel }
+        val pairEvaluations = pairResults.associate { pr -> pr.agreementKey.first to pr.arenaResult.domainEvaluations }
         val judgeAccuracyAgreement = pairResults.map { it.agreementKey }.toMap()
 
         QueryBenchmarkResult(
@@ -201,6 +277,7 @@ class TaxonomyBenchmarkService(
             matchedLeafLabels = leafLabels,
             hadJudge = hadJudge,
             domainEvaluations = domainEvaluations,
+            pairEvaluations = pairEvaluations,
             judgeAccuracyAgreement = judgeAccuracyAgreement
         )
     }
@@ -240,7 +317,8 @@ class TaxonomyBenchmarkService(
                     else -> accTies++
                 }
                 // Judge winner (from primary domain evaluation)
-                val primaryEval = qr.domainEvaluations
+                val evals = qr.pairEvaluations[pairKey] ?: qr.domainEvaluations
+                val primaryEval = evals
                     .filter { it.confidence >= req.confidenceGate }
                     .maxByOrNull { it.confidence }
                 primaryEval?.let { eval ->

@@ -19,7 +19,7 @@ interface TuiEffects {
     fun generateDag(dispatch: (TuiEvent) -> Unit)
     fun cancelActiveJob()
 
-    fun runBatchJudge(generality: Int, replaceExisting: Boolean)
+    fun runBatchJudge(generality: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit)
     fun runArena(query: String, modelA: String, modelB: String)
     fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
     fun loadArenaModels(dispatch: (TuiEvent) -> Unit)
@@ -29,6 +29,7 @@ interface TuiEffects {
     /** Resolve the size of the reserved test-query pool (reads reserved_test_queries.json). */
     fun resolveReservedPoolSize(onResolved: (Int) -> Unit)
     fun loadLeaderboard(dispatch: (TuiEvent) -> Unit)
+    fun clearLeaderboard(dispatch: (TuiEvent) -> Unit)
     fun downloadEvalResults(dispatch: (TuiEvent) -> Unit)
     fun runBenchmarkConfigured(
         models: List<String>,
@@ -46,7 +47,7 @@ interface TuiEffects {
     /** Ingest only the selected catalog entries, streaming per-model progress. */
     fun loadEvalSelected(entries: List<taxonomy.dataset.EvalCatalogEntry>, dispatch: (TuiEvent) -> Unit)
     fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit)
-    fun regenerateLabels()
+    fun regenerateLabels(dispatch: (TuiEvent) -> Unit)
     fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit)
     fun inspectNode(node: GraphNode?)
     fun setAnalysisMode(mode: AnalysisMode)
@@ -55,6 +56,7 @@ interface TuiEffects {
     fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit)
     /** Apply a setting value by item name (instant toggle or confirmed editor), then refresh. */
     fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit)
+    fun resetBenchmarkReport()
 }
 
 class DefaultTuiEffects(
@@ -167,7 +169,8 @@ class DefaultTuiEffects(
     // Bug 4 fix: assign the launched coroutine to activeJob so that cancelActiveJob() (Esc/C
     // from the TUI) can interrupt a running batch-judge pass.  Previously this launched on scope
     // without tracking the Job, making cancellation silently ineffective.
-    override fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
+    override fun runBatchJudge(generality: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit) {
+        dispatch(TuiEvent.SetJudgeGenerationRunning(true))
         activeJob = scope.launch {
             try {
                 gateway.runBatchJudge(generality, replaceExisting)
@@ -175,6 +178,8 @@ class DefaultTuiEffects(
                 throw c
             } catch (t: Throwable) {
                 // withJudgeRecording in the gateway already logs the error.
+            } finally {
+                dispatch(TuiEvent.SetJudgeGenerationRunning(false))
             }
         }
     }
@@ -223,6 +228,13 @@ class DefaultTuiEffects(
 
     override fun loadLeaderboard(dispatch: (TuiEvent) -> Unit) {
         scope.launch { dispatch(TuiEvent.LeaderboardLoaded(gateway.loadLeaderboard())) }
+    }
+
+    override fun clearLeaderboard(dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            gateway.clearLeaderboard()
+            dispatch(TuiEvent.LeaderboardLoaded(gateway.loadLeaderboard()))
+        }
     }
 
     override fun downloadEvalResults(dispatch: (TuiEvent) -> Unit) {
@@ -311,7 +323,8 @@ class DefaultTuiEffects(
         scope.launch { dispatch(TuiEvent.BenchmarkModelsLoaded(gateway.loadedModels())) }
     }
 
-    override fun regenerateLabels() {
+    override fun regenerateLabels(dispatch: (TuiEvent) -> Unit) {
+        dispatch(TuiEvent.SetJudgeGenerationRunning(true))
         scope.launch {
             try {
                 gateway.regenerateLabels()
@@ -320,11 +333,14 @@ class DefaultTuiEffects(
             } catch (t: Throwable) {
                 // withJudgeRecording in the gateway already logs the error;
                 // catching here prevents a silent coroutine scope crash.
+            } finally {
+                dispatch(TuiEvent.SetJudgeGenerationRunning(false))
             }
         }
     }
 
     override fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit) {
+        dispatch(TuiEvent.SetJudgeGenerationRunning(true))
         scope.launch {
             try {
                 gateway.regenerateJudgeForCurrentNode()
@@ -334,6 +350,7 @@ class DefaultTuiEffects(
                 // withJudgeRecording in the gateway already logs the error.
             } finally {
                 dispatch(TuiEvent.SetGeneratingJudge(false))
+                dispatch(TuiEvent.SetJudgeGenerationRunning(false))
             }
         }
     }
@@ -354,6 +371,10 @@ class DefaultTuiEffects(
     override fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit) {
         gateway.applySetting(name, value)
         dispatch(TuiEvent.IncrementSettingsVersion)
+    }
+
+    override fun resetBenchmarkReport() {
+        gateway.resetBenchmarkReport()
     }
 }
 
@@ -406,4 +427,6 @@ interface TuiGateway {
 
     fun toggleDomain(domainName: String)
     fun applySetting(name: String, value: String): Boolean
+    fun resetBenchmarkReport()
+    fun clearLeaderboard()
 }

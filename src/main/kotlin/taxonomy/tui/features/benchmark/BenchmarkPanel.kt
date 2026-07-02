@@ -1,6 +1,10 @@
 package taxonomy.tui.features.benchmark
 
 import androidx.compose.runtime.Composable
+import com.jakewharton.mosaic.layout.height
+import com.jakewharton.mosaic.layout.width
+import com.jakewharton.mosaic.layout.padding
+import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.text.SpanStyle
 import com.jakewharton.mosaic.text.buildAnnotatedString
 import com.jakewharton.mosaic.text.withStyle
@@ -9,12 +13,20 @@ import com.jakewharton.mosaic.ui.Color.Companion.Green
 import com.jakewharton.mosaic.ui.Color.Companion.White
 import com.jakewharton.mosaic.ui.Color.Companion.Yellow
 import com.jakewharton.mosaic.ui.Column
+import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.service.AnalysisPanelState
+import taxonomy.tui.components.DomainSelectorTable
+import taxonomy.tui.components.Panel
+import taxonomy.tui.components.SettingItem
+import taxonomy.tui.components.SettingKind
+import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.take
+import taxonomy.tui.components.checkboxMark
+import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.state.BenchmarkLiveView
 import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
@@ -27,10 +39,12 @@ fun BenchmarkPanel(
     controlState: AnalysisPanelState,
     scrollOffset: Int,
     benchmarkState: BenchmarkUiState,
+    availableDomains: List<Pair<String, Int>> = emptyList(),
+    dispatch: (TuiEvent) -> Unit,
 ) {
     when (benchmarkState.benchmarkType) {
         BenchmarkType.NONE -> BenchmarkTypeSelector(width, benchmarkState)
-        BenchmarkType.ARENA -> ArenaBenchmarkView(width, height, controlState, scrollOffset, benchmarkState)
+        BenchmarkType.ARENA -> ArenaBenchmarkView(width, height, controlState, scrollOffset, benchmarkState, availableDomains, dispatch)
         BenchmarkType.TRICKLE -> TrickleBenchmarkView(width, height, benchmarkState)
     }
 }
@@ -81,17 +95,11 @@ fun EvalCatalogPicker(
     Column {
         Text("SELECT EVAL_RESULTS TO INGEST".take(w), color = Cyan, textStyle = Bold)
         Spacer()
-        val catalog = benchmarkState.evalCatalog
+        val catalog = benchmarkState.evalCatalog.filter { !it.alreadyIngested }
         if (catalog.isEmpty()) {
             Text("No eval_results found in the cache directory.".take(w), color = Yellow)
             Spacer()
             Text("Press D to download the MMLU-Pro eval_results, or Q to Quit.".take(w), color = Cyan)
-            return@Column
-        }
-        if (catalog.filter { it.alreadyIngested }.size == catalog.size) {
-            Text("All eval_results are already ingested.".take(w), color = Yellow)
-            Spacer()
-            Text("Press Q to Quit.".take(w), color = Cyan)
             return@Column
         }
         val selectedCount = benchmarkState.evalCatalogSelection.size
@@ -111,7 +119,7 @@ fun EvalCatalogPicker(
                         append(if (isCursor) "❯ " else "  ")
                     }
                     withStyle(SpanStyle(color = if (checked) Green else White)) {
-                        append(if (checked) "[x] " else "[ ] ")
+                        append("${checkboxMark(checked)} ")
                     }
                     withStyle(
                         SpanStyle(
@@ -137,14 +145,16 @@ private fun ArenaBenchmarkView(
     controlState: AnalysisPanelState,
     scrollOffset: Int,
     benchmarkState: BenchmarkUiState,
+    availableDomains: List<Pair<String, Int>>,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val w = (width - 1).coerceAtLeast(1)
     val isLive = controlState.isRunningBenchmark || controlState.benchmarkReport != null
     Column {
         if (benchmarkState.loadedModels.isNotEmpty()) {
-            Text("Loaded models: ${benchmarkState.loadedModels.joinToString(", ")}".take(w), color = Green)
+            Text("Loaded models: ${benchmarkState.loadedModels.size} models eval results", color = Green)
         } else {
-            Text("No precomputed models loaded — press o to load eval_res   ults.".take(w), color = Yellow)
+            Text("No precomputed models loaded — press O to load eval_results.".take(w), color = Yellow)
         }
         Spacer()
 
@@ -180,66 +190,87 @@ private fun ArenaBenchmarkView(
 
             isLive -> ArenaBenchmarkLiveView(w, height, controlState, benchmarkState)
 
-            else -> ArenaBenchmarkConfig(w, benchmarkState)
+            else -> ArenaBenchmarkConfig(width, height - 3, benchmarkState, availableDomains, dispatch)
         }
 
         Spacer()
-        val hint = if (isLive) "V toggle view · o load eval_results · Q back"
-        else "Tab section · W/S move · Enter select/edit · o load eval_results · Q back"
-        Text(hint.take(w), color = Cyan)
     }
 }
 
 @Composable
-private fun ArenaBenchmarkConfig(w: Int, b: BenchmarkUiState) {
-    val active = b.benchmarkActiveSection
-    @Composable
-    fun header(section: BenchmarkSection, label: String) {
-        val on = section == active
-        Text(
-            ((if (on) "❯ " else "  ") + label).take(w),
-            color = if (on) Cyan else White,
-            textStyle = if (on) Bold else Unspecified,
-        )
+private fun ArenaBenchmarkConfig(
+    width: Int,
+    height: Int,
+    b: BenchmarkUiState,
+    availableDomains: List<Pair<String, Int>>,
+    dispatch: (TuiEvent) -> Unit,
+) {
+    val w = (width - 1).coerceAtLeast(1)
+    val domainsList = availableDomains.map { it.first }
+    val settingItems = buildArenaSettingItems(b, domainsList, dispatch)
+    Panel(
+        title = "ARENA BENCHMARK CONFIGURATION",
+        accentColor = TuiTheme.panelAccent(true),
+        width = width,
+        height = height
+    ) {
+        Column(modifier = Modifier.padding(left = 2, top = 1)) {
+            settingItems.forEachIndexed { idx, item ->
+                val selected = b.selectedBenchmarkField == idx
+                val caret = if (selected) "❯ " else "  "
+                val isRunBenchmark = item.name == "Run benchmark"
+                val color = if (selected) {
+                    if (isRunBenchmark) TuiTheme.RUNNING else TuiTheme.ACCENT
+                } else {
+                    if (isRunBenchmark) {
+                        val ready = b.benchmarkSelectedModels.size >= 2
+                        if (ready) Green else Yellow
+                    } else {
+                        White
+                    }
+                }
+                val textStyle = if (selected || isRunBenchmark) Bold else Unspecified
+
+                val displayValue = when (item.name) {
+                    "Query limit" -> {
+                        val ql = item.getValue().ifBlank { "0" }
+                        if (selected && b.isEditingBenchmarkField) {
+                            b.benchmarkEditingValue + "█"
+                        } else {
+                            "$ql${if (ql == "0") " (all)" else ""}"
+                        }
+                    }
+                    "Parallelism" -> {
+                        if (selected && b.isEditingBenchmarkField) {
+                            b.benchmarkEditingValue + "█"
+                        } else {
+                            item.getValue()
+                        }
+                    }
+                    "Select models" -> "${item.getValue()} selected"
+                    "Select domains" -> "${item.getValue()} selected"
+                    "Run benchmark" -> {
+                        val ready = b.benchmarkSelectedModels.size >= 2
+                        if (ready) "▶ Run benchmark" else "Select ≥2 models first"
+                    }
+                    else -> item.getValue()
+                }
+
+                val lineText = if (isRunBenchmark) {
+                    val ready = b.benchmarkSelectedModels.size >= 2
+                    if (ready) "${caret}▶ Run benchmark" else "${caret}Select ≥2 models first"
+                } else {
+                    "${caret}${item.name}: $displayValue"
+                }
+
+                Text(
+                    value = lineText.take(w - 4),
+                    color = color,
+                    textStyle = textStyle
+                )
+            }
+        }
     }
-
-    header(BenchmarkSection.MODELS, "MODELS")
-    val models = b.benchmarkSelectedModels
-    val modelsLine = if (models.size < 2) "(pick ≥2)"
-    else "${models.size} selected: ${models.joinToString(", ")}"
-    Text("    $modelsLine".take(w), color = if (models.size < 2) Yellow else Green)
-
-    header(BenchmarkSection.DOMAINS, "DOMAINS")
-    val domains = b.benchmarkSelectedDomains
-    val domainsLine = if (domains.isEmpty()) "(all)"
-    else "${domains.size} selected: ${domains.joinToString(", ")}"
-    Text("    $domainsLine".take(w), color = if (domains.isEmpty()) White else Green)
-
-    header(BenchmarkSection.OPTIONS, "OPTIONS")
-    val optActive = active == BenchmarkSection.OPTIONS
-    val ql = b.benchmarkQueryLimitInput.ifBlank { "0" }
-    val qlDisplay = if (optActive && b.selectedBenchmarkField == 0 && b.isEditingBenchmarkField)
-        b.benchmarkEditingValue + "█" else "$ql${if (ql == "0") " (all)" else ""}"
-    optionRow(w, "Query limit", qlDisplay, optActive && b.selectedBenchmarkField == 0)
-    optionRow(w, "Reserved-only", b.benchmarkReservedOnlyInput, optActive && b.selectedBenchmarkField == 1)
-    optionRow(w, "Update rankings", b.benchmarkUpdateRankingsInput, optActive && b.selectedBenchmarkField == 2)
-
-    header(BenchmarkSection.START, "START")
-    val ready = models.size >= 2 && domains.isNotEmpty()
-    if (ready) {
-        Text("    ▶ Run benchmark (Enter)".take(w), color = Green, textStyle = Bold)
-    } else {
-        Text("    Select ≥2 models and ≥1 domain first".take(w), color = Yellow)
-    }
-}
-
-@Composable
-private fun optionRow(w: Int, label: String, value: String, focused: Boolean) {
-    Text(
-        ("    " + (if (focused) "› " else "  ") + label.padEnd(16) + value).take(w),
-        color = if (focused) Cyan else White,
-        textStyle = if (focused) Bold else Unspecified,
-    )
 }
 
 @Composable
@@ -265,7 +296,30 @@ private fun ArenaBenchmarkLiveView(
                         "Coverage ${"%.2f".format(live.runningCoverage)}").take(w),
                     color = White,
                 )
-                if (live.perCategoryProgress.isNotEmpty()) {
+                if (live.pairStats.isNotEmpty()) {
+                    Spacer()
+                    Text("Pair Matchups Progress:".take(w), color = Yellow, textStyle = Bold)
+                    Text(
+                        "%-18s vs %-18s | %5s %5s %5s | %5s".format(
+                            "Model A", "Model B", "WinsA", "WinsB", "Ties", "Agree"
+                        ).take(w),
+                        color = Cyan
+                    )
+                    val rowsCount = (height - 9).coerceAtLeast(1)
+                    live.pairStats.take(rowsCount).forEach { ps ->
+                        Text(
+                            "%-18s vs %-18s | %5d %5d %5d | %5.0f%%".format(
+                                ps.modelA.take(18),
+                                ps.modelB.take(18),
+                                ps.judgeWinsA,
+                                ps.judgeWinsB,
+                                ps.judgeTies,
+                                ps.judgeAccuracyAgreementRate * 100
+                            ).take(w),
+                            color = White
+                        )
+                    }
+                } else if (live.perCategoryProgress.isNotEmpty()) {
                     Text("Per-category:".take(w), color = Yellow)
                     live.perCategoryProgress.entries.take((height - 7).coerceAtLeast(1)).forEach { (cat, n) ->
                         Text("  ${cat.take(20).padEnd(20)} $n".take(w), color = White)

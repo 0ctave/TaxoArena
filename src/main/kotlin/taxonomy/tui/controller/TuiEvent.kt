@@ -150,9 +150,23 @@ sealed interface TuiEvent {
     data class SetBatchReplaceExisting(val value: Boolean) : TuiEvent
     data object CancelBatchGeneralityInput : TuiEvent
     data object ConfirmBatchGeneralityInput : TuiEvent
+    data class SetBatchSelectedSettingIdx(val idx: Int) : TuiEvent
+    data class StartEditingBatchSetting(val initialValue: String) : TuiEvent
+    data class UpdateBatchEditingValue(val value: String) : TuiEvent
+    data object ConfirmBatchEditingSetting : TuiEvent
+    data object CancelBatchEditingSetting : TuiEvent
+    data class UpdateBatchDomainsInput(val value: String) : TuiEvent
+
+    data class StartPickingBatchDomains(val initialDomains: Set<String>, val availableDomains: List<String> = emptyList()) : TuiEvent
+    data class MoveBatchDomainsPickerCursor(val delta: Int) : TuiEvent
+    data object ToggleBatchDomainsPickerItem : TuiEvent
+    data object ConfirmBatchDomainsSelection : TuiEvent
+    data object CancelBatchDomainsSelection : TuiEvent
 
     /** Track in-flight single-node judge generation (R in NODE_DETAIL). */
     data class SetGeneratingJudge(val value: Boolean) : TuiEvent
+    data class SetJudgeGenerationRunning(val running: Boolean) : TuiEvent
+    data object ClearLeaderboard : TuiEvent
 
     data object StartArenaFlow : TuiEvent
     data class ArenaModelsLoaded(val models: List<String>) : TuiEvent
@@ -186,7 +200,7 @@ sealed interface TuiEvent {
 
     data object StartBenchmarkFlow : TuiEvent
     /** Pick an evaluation type on the Benchmark hub selection screen. */
-    data class SetBenchmarkType(val type: taxonomy.tui.state.BenchmarkType) : TuiEvent
+    data class SetBenchmarkType(val type: taxonomy.tui.state.BenchmarkType, val domainOptions: List<String> = emptyList()) : TuiEvent
     /** Move the W/S cursor on the Benchmark hub selection screen. */
     data class SetBenchmarkTypeSelectionIndex(val index: Int) : TuiEvent
     /** Return to the Benchmark hub selection screen (ESC from a chosen type). */

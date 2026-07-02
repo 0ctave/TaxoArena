@@ -14,17 +14,7 @@ class RankingServiceTest {
     @BeforeEach
     fun setUp() {
         rankingService = TaxonomyRankingService()
-        // Clear ratings and match history from cache DB for testing
-        try {
-            DriverManager.getConnection("jdbc:sqlite:ratings.db").use { conn ->
-                conn.createStatement().use { stmt ->
-                    stmt.execute("DELETE FROM agent_ratings")
-                    stmt.execute("DELETE FROM match_history")
-                }
-            }
-        } catch (e: Exception) {
-            // Table might not exist yet if db was not initialized
-        }
+        rankingService.clearDatabaseForTest()
     }
 
     @Test

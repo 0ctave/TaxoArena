@@ -20,6 +20,8 @@ import taxonomy.model.GraphNode
 import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.operations.TaxonomyOperations
 import kotlin.math.abs
+import dev.langchain4j.model.chat.request.json.JsonSchema
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 
 @Serializable
 data class ArenaResult(
@@ -39,7 +41,7 @@ data class DomainEvaluation(
     val confidence: Double
 )
 
-enum class AnalysisMode { IDLE, ARENA, JUDGE_PROGRESS, NODE_DETAIL, SETTINGS, LOGS_SCROLL, METRICS, SNAPSHOTS, TRICKLE_TEST, BENCHMARK, CONFIG }
+enum class AnalysisMode { IDLE, ARENA, JUDGE_PROGRESS, NODE_DETAIL, SETTINGS, LOGS_SCROLL, METRICS, SNAPSHOTS, TRICKLE_TEST, BENCHMARK, CONFIG, LEADERBOARD }
 
 data class JudgeProgress(
     val nodeLabel: String,
@@ -75,6 +77,18 @@ class TaxonomyArenaService(
     private val evalStore: ModelEvalStore,
     private val rankingService: TaxonomyRankingService,
 ) {
+    private val judgeSchema = JsonSchema.builder()
+        .name("JudgeResponse")
+        .rootElement(
+            JsonObjectSchema.builder()
+                .addStringProperty("winner", "The winner: Model A or Model B")
+                .addStringProperty("rationale", "Detailed reasoning explaining why the winner was chosen")
+                .addNumberProperty("confidence", "A confidence score between 0.0 and 1.0")
+                .required("winner", "rationale", "confidence")
+                .build()
+        )
+        .build()
+
     private val log = LoggerFactory.getLogger("taxonomy.ArenaService")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
@@ -87,7 +101,12 @@ class TaxonomyArenaService(
 
     /** Passthrough to the ranking service so the TUI gateway can render the Arena leaderboard. */
     fun getLeaderboard(domain: String = "global"): List<LeaderboardGroup> =
-        rankingService.getLeaderboard(domain)
+        rankingService.getLeaderboard(domain, taxonomyService.activeSnapshotId() ?: "global")
+
+    fun clearLeaderboard() {
+        val snapshotId = taxonomyService.activeSnapshotId() ?: "global"
+        rankingService.clearRatings(snapshotId)
+    }
 
     fun inspectNode(node: GraphNode?) {
         _state.update { it.copy(mode = AnalysisMode.NODE_DETAIL, selectedNode = node) }
@@ -111,6 +130,10 @@ class TaxonomyArenaService(
                 currentInductions = current.currentInductions + (label to JudgeProgress(label, processed, total, status))
             )
         }
+    }
+
+    fun clearJudgeProgress() {
+        _state.update { it.copy(currentInductions = emptyMap()) }
     }
 
     fun startBenchmark(progress: String) {
@@ -245,28 +268,47 @@ class TaxonomyArenaService(
     private suspend fun evaluatePairwise(node: GraphNode, query: String, nameA: String, nameB: String, traceA: String, traceB: String): DomainEvaluation = coroutineScope {
         val sys = node.judgePrompt!!
         val rub = formatRubricForPrompt(node.judgeRubric!!)
-        val p1 = async { llmClient.queryModel(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameA, nameB, traceA, traceB)) }
-        val p2 = async { llmClient.queryModel(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameB, nameA, traceB, traceA)) }
+
+        val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameA, nameB, traceA, traceB), judgeSchema) }
+        val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameB, nameA, traceB, traceA), judgeSchema) }
         val res1 = parseJudgeResponse(p1.await())
         val res2 = parseJudgeResponse(p2.await())
-        val winner = when {
-            res1.first == "Model A" && res2.first == "Model B" -> "Model A"
-            res1.first == "Model B" && res2.first == "Model A" -> "Model B"
-            else -> "Tie"
-        }
+
+        val win1 = res1.first.trim()
+        val win2 = res2.first.trim()
         val c1 = res1.third
         val c2 = res2.third
-        val correctedConf = if (winner != "Tie") {
-            (c1 + c2) / 2.0
-        } else {
-            1.0 - abs(c1 - c2) / 2.0
+
+        // Map Trial 2's local winner ("Model A" or "Model B") to global name:
+        // Trial 2: Model B was passed as Model A, and Model A was passed as Model B.
+        val vote1 = win1
+        val vote2 = if (win2 == "Model A") "Model B" else "Model A"
+
+        val winner = when {
+            vote1 == vote2 -> vote1
+            else -> {
+                // Split verdict (positional bias). Resolve using confidence.
+                if (c1 > c2) {
+                    vote1
+                } else if (c2 > c1) {
+                    vote2
+                } else {
+                    vote1 // equal confidence fallback
+                }
+            }
         }
-        val rationale = when (winner) {
-            "Model A" -> res1.second  // res1 said A won — use its rationale
-            "Model B" -> res2.second  // res2 said A lost → B won
-            else -> "Split verdict: ${res1.second.take(120)} / ${res2.second.take(120)}"
+
+        val trialRationale = when {
+            vote1 == vote2 -> {
+                if (winner == "Model A") res1.second else res2.second
+            }
+            else -> {
+                "Split verdict resolved by confidence ($c1 vs $c2). Trial 1 voted $vote1 (${res1.second.take(80)}...). Trial 2 voted $vote2 (${res2.second.take(80)}...)."
+            }
         }
-        DomainEvaluation(node.label ?: "Emergent Concept", winner, rationale, correctedConf)
+        val trialConfidence = (c1 + c2) / 2.0
+
+        DomainEvaluation(node.label ?: "Emergent Concept", winner, trialRationale, trialConfidence)
     }
 
     suspend fun evaluateWithPrecomputedTraces(
@@ -357,7 +399,8 @@ class TaxonomyArenaService(
                     winner = if (isTie) modelA else winner,
                     loser = if (isTie) modelB else loser,
                     isTie = isTie,
-                    confidence = eval.confidence
+                    confidence = eval.confidence,
+                    snapshotId = taxonomyService.activeSnapshotId() ?: "global"
                 )
             }
         }
@@ -371,8 +414,8 @@ class TaxonomyArenaService(
             else if (response.contains("{")) "{" + response.substringAfter("{").substringBeforeLast("}") + "}"
             else response
             val element = json.parseToJsonElement(cleanJson).jsonObject
-            Triple(element["winner"]?.jsonPrimitive?.content ?: "Tie", element["rationale"]?.jsonPrimitive?.content ?: response, element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.5)
-        } catch (e: Exception) { Triple("Tie", response, 0.5) }
+            Triple(element["winner"]?.jsonPrimitive?.content ?: "Model A", element["rationale"]?.jsonPrimitive?.content ?: response, element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.5)
+        } catch (e: Exception) { Triple("Model A", response, 0.5) }
     }
 
     private fun formatRubricForPrompt(rubricJson: String): String {
@@ -399,19 +442,23 @@ class TaxonomyArenaService(
         }
     }
 
-    private fun buildJudgeUserPrompt(query: String, rubric: String, nameA: String, nameB: String, traceA: String, traceB: String) = """
-        Evaluate responses for the query: "$query"
-        
-        $rubric
-        
-        <trace_model_a>
-        $traceA
-        </trace_model_a>
-        
-        <trace_model_b>
-        $traceB
-        </trace_model_b>
-        
-        Respond ONLY with a JSON object: { "winner": "Model A" | "Model B" | "Tie", "rationale": "...", "confidence": 0.95 }
-    """.trimIndent()
+    private fun buildJudgeUserPrompt(query: String, rubric: String, nameA: String, nameB: String, traceA: String, traceB: String): String {
+        return """
+            Evaluate responses for the query: "$query"
+            
+            $rubric
+            
+            <trace_model_a>
+            $traceA
+            </trace_model_a>
+            
+            <trace_model_b>
+            $traceB
+            </trace_model_b>
+            
+            You MUST compare both models and choose a winner. Ties are strictly forbidden.
+            Evaluate them strictly on technical correctness, soundness of logic, and leaf-node domain axioms.
+            Respond ONLY with a JSON object: { "winner": "Model A" | "Model B", "rationale": "...", "confidence": 0.95 }
+        """.trimIndent()
+    }
 }

@@ -50,13 +50,15 @@ private class FakeEffects(private val datasetDownloaded: Boolean) : TuiEffects {
     override fun deleteSnapshot(snapshotId: String, dispatch: (TuiEvent) -> Unit) {}
     override fun downloadDataset(maxQueries: Int, dispatch: (TuiEvent) -> Unit) {}
     override fun cancelActiveJob() {}
-    override fun runBatchJudge(generality: Int, replaceExisting: Boolean) {}
+    override fun runBatchJudge(generality: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit) {}
     override fun runArena(query: String, modelA: String, modelB: String) {}
     override fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String) {}
     override fun loadArenaModels(dispatch: (TuiEvent) -> Unit) {}
     override fun runTrickle(query: String, dispatch: (TuiEvent) -> Unit) {}
-    override fun runBatchTrickle(dispatch: (TuiEvent) -> Unit) {}
+    override fun runBatchTrickle(maxQueries: Int, dispatch: (TuiEvent) -> Unit) {}
+    override fun resolveReservedPoolSize(onResolved: (Int) -> Unit) {}
     override fun loadLeaderboard(dispatch: (TuiEvent) -> Unit) {}
+    override fun clearLeaderboard(dispatch: (TuiEvent) -> Unit) {}
     override fun downloadEvalResults(dispatch: (TuiEvent) -> Unit) {}
     override fun runBenchmarkConfigured(
         models: List<String>,
@@ -75,10 +77,11 @@ private class FakeEffects(private val datasetDownloaded: Boolean) : TuiEffects {
         dispatch: (TuiEvent) -> Unit
     ) {}
     override fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit) {}
-    override fun regenerateLabels() {}
+    override fun regenerateLabels(dispatch: (TuiEvent) -> Unit) {}
     override fun setAnalysisMode(mode: AnalysisMode) {}
     override fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit) {}
     override fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit) {}
+    override fun resetBenchmarkReport() {}
 }
 
 class TuiControllerKeyTest {

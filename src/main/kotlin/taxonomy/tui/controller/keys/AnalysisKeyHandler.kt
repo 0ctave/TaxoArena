@@ -8,6 +8,7 @@ import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.tui.state.TuiAppState
+import taxonomy.tui.features.benchmark.buildArenaSettingItems
 
 /**
  * Handles keyboard input for the ANALYSIS_HUB panel and all its sub-modes
@@ -18,6 +19,7 @@ internal class AnalysisKeyHandler(
     private val effects: TuiEffects,
     private val commandController: CommandController,
     private val metricsHistorySizeProvider: () -> Int,
+    private val availableDomainsProvider: () -> List<Pair<String, Int>>,
 ) {
 
     // ── Public entry point ────────────────────────────────────────────────────
@@ -30,6 +32,8 @@ internal class AnalysisKeyHandler(
             AnalysisMode.TRICKLE_TEST -> handleTrickle(state, key, dispatch)
             AnalysisMode.BENCHMARK    -> handleBenchmark(state, key, dispatch)
             AnalysisMode.SNAPSHOTS    -> handleSnapshots(state, key, dispatch)
+            AnalysisMode.JUDGE_PROGRESS -> handleJudgeProgress(state, key, dispatch)
+            AnalysisMode.LEADERBOARD  -> handleLeaderboard(state, key, dispatch)
             else                      -> Unit
         }
     }
@@ -37,6 +41,8 @@ internal class AnalysisKeyHandler(
     /** True when any text-input field is active in the analysis hub or global dashboard. */
     fun isTextInputActive(state: TuiAppState): Boolean =
         state.analysis.isEnteringBatchGenerality ||
+        state.analysis.isEditingBatchSetting ||
+        state.analysis.isPickingBatchDomains ||
         state.snapshot.isSavingSnapshot ||
         state.snapshot.isRenamingSnapshot ||
         state.arena.isEnteringArenaQuestionId ||
@@ -44,12 +50,14 @@ internal class AnalysisKeyHandler(
         state.arena.isEnteringArenaModelA ||
         state.arena.isEnteringArenaModelB ||
         state.trickle.isEnteringTrickleQuery ||
-        state.benchmark.isEnteringTrickleQueryLimit
+        state.benchmark.isEnteringTrickleQueryLimit ||
+        state.benchmark.isEditingBenchmarkField
 
     /** Routes a key to whichever text-input field is currently active. */
     fun handleActiveTextInput(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when {
-            state.analysis.isEnteringBatchGenerality    -> handleBatchGeneralityInput(state, key, dispatch)
+            state.analysis.isPickingBatchDomains        -> handleBatchDomainsPickerKeys(state, key, dispatch)
+            state.analysis.isEnteringBatchGenerality    -> handleBatchSettingsInput(state, key, dispatch)
             state.snapshot.isSavingSnapshot             -> handleSnapshotDescInput(state, key, dispatch)
             state.snapshot.isRenamingSnapshot           -> handleRenameInput(state, key, dispatch)
             state.arena.isEnteringArenaQuestionId       -> handleArenaQuestionIdInput(state, key, dispatch)
@@ -58,6 +66,7 @@ internal class AnalysisKeyHandler(
             state.arena.isEnteringArenaModelB           -> handleArenaModelInput(state, key, dispatch, model = "B")
             state.trickle.isEnteringTrickleQuery        -> handleTrickleQueryInput(state, key, dispatch)
             state.benchmark.isEnteringTrickleQueryLimit -> handleTrickleQueryLimitInput(state, key, dispatch)
+            state.benchmark.isEditingBenchmarkField     -> handleBenchmarkEditingFieldInput(state, key, dispatch)
         }
     }
 
@@ -150,12 +159,7 @@ internal class AnalysisKeyHandler(
                         )
                     )
                     BenchmarkType.ARENA -> dispatch(
-                        TuiEvent.SetBenchmarkSection(
-                            BenchmarkSection.entries[
-                                (BenchmarkSection.entries.indexOf(bench.benchmarkActiveSection) - 1)
-                                    .coerceAtLeast(0)
-                            ]
-                        )
+                        TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField - 1).coerceAtLeast(0))
                     )
                     BenchmarkType.TRICKLE -> Unit
                 }
@@ -168,14 +172,23 @@ internal class AnalysisKeyHandler(
                         )
                     )
                     BenchmarkType.ARENA -> dispatch(
-                        TuiEvent.SetBenchmarkSection(
-                            BenchmarkSection.entries[
-                                (BenchmarkSection.entries.indexOf(bench.benchmarkActiveSection) + 1)
-                                    .coerceAtMost(BenchmarkSection.entries.size - 1)
-                            ]
-                        )
+                        TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField + 1).coerceAtMost(6))
                     )
                     BenchmarkType.TRICKLE -> Unit
+                }
+            }
+            " ", "space" -> {
+                if (bench.benchmarkType == BenchmarkType.ARENA) {
+                    val items = buildArenaSettingItems(bench, availableDomainsProvider().map { it.first }, dispatch)
+                    val item = items.getOrNull(bench.selectedBenchmarkField)
+                    if (item != null) {
+                        if (item.name == "Query limit" || item.name == "Parallelism") {
+                            dispatch(TuiEvent.StartEditingBenchmarkField)
+                        } else {
+                            val next = item.nextValue() ?: ""
+                            item.setValue(next)
+                        }
+                    }
                 }
             }
             "enter" -> {
@@ -183,25 +196,22 @@ internal class AnalysisKeyHandler(
                     BenchmarkType.NONE -> {
                         val type = if (bench.benchmarkTypeSelectionIndex == 0)
                             BenchmarkType.ARENA else BenchmarkType.TRICKLE
-                        dispatch(TuiEvent.SetBenchmarkType(type))
+                        dispatch(TuiEvent.SetBenchmarkType(type, availableDomainsProvider().map { it.first }))
                         if (type == BenchmarkType.ARENA) effects.loadBenchmarkModels(dispatch)
                     }
-                    BenchmarkType.ARENA -> when (bench.benchmarkActiveSection) {
-                        BenchmarkSection.MODELS  -> dispatch(TuiEvent.OpenBenchmarkPicker(domains = false))
-                        BenchmarkSection.DOMAINS -> dispatch(TuiEvent.OpenBenchmarkPicker(domains = true))
-                        BenchmarkSection.OPTIONS -> dispatch(TuiEvent.StartEditingBenchmarkField)
-                        BenchmarkSection.START   -> dispatch(TuiEvent.RunBenchmark)
+                    BenchmarkType.ARENA -> {
+                        val items = buildArenaSettingItems(bench, availableDomainsProvider().map { it.first }, dispatch)
+                        val item = items.getOrNull(bench.selectedBenchmarkField)
+                        if (item != null) {
+                            if (item.name == "Query limit" || item.name == "Parallelism") {
+                                dispatch(TuiEvent.StartEditingBenchmarkField)
+                            } else {
+                                val next = item.nextValue() ?: ""
+                                item.setValue(next)
+                            }
+                        }
                     }
                     BenchmarkType.TRICKLE -> Unit
-                }
-            }
-            "tab" -> {
-                if (bench.benchmarkType == BenchmarkType.ARENA) {
-                    val next = BenchmarkSection.entries[
-                        (BenchmarkSection.entries.indexOf(bench.benchmarkActiveSection) + 1) %
-                            BenchmarkSection.entries.size
-                    ]
-                    dispatch(TuiEvent.SetBenchmarkSection(next))
                 }
             }
             "v" -> dispatch(TuiEvent.ToggleBenchmarkLiveView)
@@ -209,6 +219,7 @@ internal class AnalysisKeyHandler(
             "d" -> dispatch(TuiEvent.DownloadEvalResults)
             "q", "escape" -> {
                 if (bench.benchmarkType != BenchmarkType.NONE) {
+                    effects.resetBenchmarkReport()
                     dispatch(TuiEvent.ResetBenchmarkType)
                 } else {
                     dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
@@ -225,14 +236,37 @@ internal class AnalysisKeyHandler(
         }
     }
 
+    // ── JUDGE PROGRESS ────────────────────────────────────────────────────────
+
+    private fun handleJudgeProgress(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        when (key) {
+            "escape", "q" -> {
+                effects.cancelActiveJob()
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
+            }
+        }
+    }
+
     // ── Benchmark multi-select picker (models / domains) ──────────────────────
 
     fun handleBenchmarkPickerKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
             "w", "z", "arrowup"  -> dispatch(TuiEvent.MoveBenchmarkPickerCursor(-1))
             "s", "arrowdown"     -> dispatch(TuiEvent.MoveBenchmarkPickerCursor(+1))
-            " ", "space", "enter" -> dispatch(TuiEvent.ToggleBenchmarkPickerItem)
-            "escape", "q"        -> dispatch(TuiEvent.CloseBenchmarkPicker)
+            " ", "space"         -> dispatch(TuiEvent.ToggleBenchmarkPickerItem)
+            "escape", "q", "enter" -> dispatch(TuiEvent.CloseBenchmarkPicker)
+        }
+    }
+
+    // ── Batch domains picker key handler ──────────────────────────────────────
+
+    fun handleBatchDomainsPickerKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        when (key) {
+            "w", "z", "arrowup" -> dispatch(TuiEvent.MoveBatchDomainsPickerCursor(-1))
+            "s", "arrowdown" -> dispatch(TuiEvent.MoveBatchDomainsPickerCursor(1))
+            " ", "space" -> dispatch(TuiEvent.ToggleBatchDomainsPickerItem)
+            "enter" -> dispatch(TuiEvent.ConfirmBatchDomainsSelection)
+            "escape" -> dispatch(TuiEvent.CancelBatchDomainsSelection)
         }
     }
 
@@ -262,13 +296,47 @@ internal class AnalysisKeyHandler(
 
     // ── Text-input field handlers ─────────────────────────────────────────────
 
-    private fun handleBatchGeneralityInput(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
-        when (key) {
-            "enter"     -> dispatch(TuiEvent.ConfirmBatchGeneralityInput)
-            "escape"    -> dispatch(TuiEvent.CancelBatchGeneralityInput)
-            "backspace" -> dispatch(TuiEvent.UpdateBatchGeneralityInput(state.analysis.batchGeneralityInput.dropLast(1)))
-            else -> if (key.length == 1 && key[0].isDigit()) {
-                dispatch(TuiEvent.UpdateBatchGeneralityInput(state.analysis.batchGeneralityInput + key))
+    private fun handleBatchSettingsInput(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        val analysis = state.analysis
+        if (analysis.isEditingBatchSetting) {
+            when (key) {
+                "enter" -> dispatch(TuiEvent.ConfirmBatchEditingSetting)
+                "escape" -> dispatch(TuiEvent.CancelBatchEditingSetting)
+                "backspace" -> dispatch(TuiEvent.UpdateBatchEditingValue(analysis.batchEditingValue.dropLast(1)))
+                else -> {
+                    if (key.length == 1) {
+                        if (analysis.batchSelectedSettingIdx == 0) {
+                            if (key[0].isDigit()) {
+                                dispatch(TuiEvent.UpdateBatchEditingValue(analysis.batchEditingValue + key))
+                            }
+                        } else if (analysis.batchSelectedSettingIdx == 1) {
+                            dispatch(TuiEvent.UpdateBatchEditingValue(analysis.batchEditingValue + key))
+                        }
+                    }
+                }
+            }
+        } else {
+            val idx = analysis.batchSelectedSettingIdx
+            when (key) {
+                "w", "z", "arrowup" -> dispatch(TuiEvent.SetBatchSelectedSettingIdx((idx - 1).coerceAtLeast(0)))
+                "s", "arrowdown" -> dispatch(TuiEvent.SetBatchSelectedSettingIdx((idx + 1).coerceAtMost(3)))
+                "escape" -> dispatch(TuiEvent.CancelBatchGeneralityInput)
+                "enter" -> {
+                    when (idx) {
+                        0 -> dispatch(TuiEvent.StartEditingBatchSetting(analysis.batchGeneralityInput))
+                        1 -> {
+                            val currentDomains = analysis.batchDomainsInput
+                                .split(",")
+                                .map { it.trim() }
+                                .filter { it.isNotEmpty() }
+                                .toSet()
+                            val available = availableDomainsProvider().map { it.first }
+                            dispatch(TuiEvent.StartPickingBatchDomains(currentDomains, available))
+                        }
+                        2 -> dispatch(TuiEvent.SetBatchReplaceExisting(!analysis.batchReplaceExisting))
+                        3 -> dispatch(TuiEvent.ConfirmBatchGeneralityInput)
+                    }
+                }
             }
         }
     }
@@ -369,6 +437,32 @@ internal class AnalysisKeyHandler(
             else -> if (key.length == 1 && key[0].isDigit()) {
                 dispatch(TuiEvent.UpdateTrickleQueryLimitInput(state.benchmark.trickleQueryLimitInput + key))
             }
+        }
+    }
+
+    private fun handleBenchmarkEditingFieldInput(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        when (key) {
+            "enter"     -> dispatch(TuiEvent.ConfirmEditingBenchmarkField)
+            "escape"    -> dispatch(TuiEvent.CancelEditingBenchmarkField)
+            "backspace" -> dispatch(
+                TuiEvent.UpdateBenchmarkEditingValue(state.benchmark.benchmarkEditingValue.dropLast(1))
+            )
+            else -> if (key.length == 1 && key[0].isDigit()) {
+                dispatch(TuiEvent.UpdateBenchmarkEditingValue(state.benchmark.benchmarkEditingValue + key))
+            }
+        }
+    }
+
+    private fun handleLeaderboard(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        when (key) {
+            "w", "z", "arrowup" ->
+                dispatch(TuiEvent.SetLeaderboardScrollOffset((state.arena.leaderboardScrollOffset - 1).coerceAtLeast(0)))
+            "s", "arrowdown" ->
+                dispatch(TuiEvent.SetLeaderboardScrollOffset(state.arena.leaderboardScrollOffset + 1))
+            "k", "K" ->
+                dispatch(TuiEvent.ClearLeaderboard)
+            "l", "escape", "q" ->
+                dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
         }
     }
 }

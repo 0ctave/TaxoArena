@@ -2,8 +2,10 @@ package taxonomy.tui.controller
 
 import taxonomy.service.AnalysisMode
 import taxonomy.tui.components.StartupState
+import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
+import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.tui.state.ScrollbarTarget
 import taxonomy.tui.state.TuiAppState
 
@@ -522,7 +524,11 @@ object TuiReducer {
                     analysis = state.analysis.copy(
                         mode = AnalysisMode.JUDGE_PROGRESS,
                         isEnteringBatchGenerality = true,
-                        batchGeneralityInput = "1"
+                        batchGeneralityInput = "0",
+                        batchDomainsInput = state.snapshot.activeSnapshotConfig?.llm?.judgeDomains?.joinToString(", ").orEmpty(),
+                        batchSelectedSettingIdx = 0,
+                        isEditingBatchSetting = false,
+                        batchEditingValue = ""
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
                 )
@@ -541,7 +547,7 @@ object TuiReducer {
                 state.copy(
                     analysis = state.analysis.copy(
                         isEnteringBatchGenerality = false,
-                        batchGeneralityInput = "1",
+                        batchGeneralityInput = "0",
                         batchReplaceExisting = false
                     )
                 )
@@ -552,6 +558,105 @@ object TuiReducer {
                         isEnteringBatchGenerality = false
                     )
                 )
+
+            is TuiEvent.SetBatchSelectedSettingIdx ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        batchSelectedSettingIdx = event.idx
+                    )
+                )
+
+            is TuiEvent.StartEditingBatchSetting ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        isEditingBatchSetting = true,
+                        batchEditingValue = event.initialValue
+                    )
+                )
+
+            is TuiEvent.UpdateBatchEditingValue ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        batchEditingValue = event.value
+                    )
+                )
+
+            TuiEvent.ConfirmBatchEditingSetting -> {
+                val currentIdx = state.analysis.batchSelectedSettingIdx
+                state.copy(
+                    analysis = state.analysis.copy(
+                        isEditingBatchSetting = false,
+                        batchGeneralityInput = if (currentIdx == 0) state.analysis.batchEditingValue else state.analysis.batchGeneralityInput,
+                        batchDomainsInput = if (currentIdx == 1) state.analysis.batchEditingValue else state.analysis.batchDomainsInput,
+                        batchEditingValue = ""
+                    )
+                )
+            }
+
+            TuiEvent.CancelBatchEditingSetting ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        isEditingBatchSetting = false,
+                        batchEditingValue = ""
+                    )
+                )
+
+            is TuiEvent.UpdateBatchDomainsInput ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        batchDomainsInput = event.value
+                    )
+                )
+
+            is TuiEvent.StartPickingBatchDomains ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        isPickingBatchDomains = true,
+                        batchDomainsPickerCursor = 0,
+                        batchSelectedDomains = event.initialDomains,
+                        batchDomainOptions = event.availableDomains
+                    )
+                )
+
+            is TuiEvent.MoveBatchDomainsPickerCursor -> {
+                val size = state.analysis.batchDomainOptions.size
+                val maxIdx = (size - 1).coerceAtLeast(0)
+                state.copy(
+                    analysis = state.analysis.copy(
+                        batchDomainsPickerCursor =
+                            (state.analysis.batchDomainsPickerCursor + event.delta).coerceIn(0, maxIdx)
+                    )
+                )
+            }
+
+            TuiEvent.ToggleBatchDomainsPickerItem -> {
+                val name = state.analysis.batchDomainOptions
+                    .getOrNull(state.analysis.batchDomainsPickerCursor) ?: return state
+                val sel = state.analysis.batchSelectedDomains
+                val next = if (name in sel) sel - name else sel + name
+                state.copy(
+                    analysis = state.analysis.copy(
+                        batchSelectedDomains = next
+                    )
+                )
+            }
+
+            TuiEvent.ConfirmBatchDomainsSelection ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        isPickingBatchDomains = false,
+                        batchDomainsInput = state.analysis.batchSelectedDomains.joinToString(", ")
+                    )
+                )
+
+            TuiEvent.CancelBatchDomainsSelection ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        isPickingBatchDomains = false
+                    )
+                )
+
+            TuiEvent.ClearLeaderboard -> state
 
             TuiEvent.StartArenaFlow -> {
                 val roster = state.arena.loadedModels
@@ -764,7 +869,11 @@ object TuiReducer {
                 state.copy(
                     benchmark = state.benchmark.copy(
                         benchmarkType = event.type,
-                        benchmarkScrollOffset = 0
+                        benchmarkScrollOffset = 0,
+                        benchmarkDomainOptions = event.domainOptions,
+                        benchmarkActiveSection = BenchmarkSection.MODELS,
+                        benchmarkPickerCursor = 0,
+                        selectedBenchmarkField = 0
                     )
                 )
 
@@ -955,8 +1064,11 @@ object TuiReducer {
                 state.copy(
                     benchmark = state.benchmark.copy(
                         isEditingBenchmarkField = true,
-                        // The only text-editable option is the query limit; prefill it.
-                        benchmarkEditingValue = state.benchmark.benchmarkQueryLimitInput
+                        benchmarkEditingValue = if (state.benchmark.selectedBenchmarkField == 0) {
+                            state.benchmark.benchmarkQueryLimitInput
+                        } else {
+                            state.benchmark.benchmarkParallelismInput
+                        }
                     )
                 )
 
@@ -964,8 +1076,16 @@ object TuiReducer {
                 state.copy(
                     benchmark = state.benchmark.copy(
                         isEditingBenchmarkField = false,
-                        benchmarkQueryLimitInput =
+                        benchmarkQueryLimitInput = if (state.benchmark.selectedBenchmarkField == 0) {
                             state.benchmark.benchmarkEditingValue.trim().ifBlank { "0" }
+                        } else {
+                            state.benchmark.benchmarkQueryLimitInput
+                        },
+                        benchmarkParallelismInput = if (state.benchmark.selectedBenchmarkField == 1) {
+                            state.benchmark.benchmarkEditingValue.trim().ifBlank { "4" }
+                        } else {
+                            state.benchmark.benchmarkParallelismInput
+                        }
                     )
                 )
 
@@ -993,7 +1113,10 @@ object TuiReducer {
 
             is TuiEvent.SetBenchmarkSection ->
                 state.copy(
-                    benchmark = state.benchmark.copy(benchmarkActiveSection = event.section)
+                    benchmark = state.benchmark.copy(
+                        benchmarkActiveSection = event.section,
+                        benchmarkPickerCursor = 0
+                    )
                 )
 
             is TuiEvent.OpenBenchmarkPicker ->
@@ -1004,7 +1127,8 @@ object TuiReducer {
                         benchmarkPickerCursor = 0,
                         benchmarkDomainOptions =
                             if (event.domains) event.domainOptions else state.benchmark.benchmarkDomainOptions
-                    )
+                    ),
+                    shell = state.shell.copy(focusedPanel = FocusPanel.TOPOLOGY)
                 )
 
             TuiEvent.CloseBenchmarkPicker ->
@@ -1012,7 +1136,8 @@ object TuiReducer {
                     benchmark = state.benchmark.copy(
                         benchmarkIsPickingModels = false,
                         benchmarkIsPickingDomains = false
-                    )
+                    ),
+                    shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
                 )
 
             is TuiEvent.MoveBenchmarkPickerCursor -> {
@@ -1124,6 +1249,11 @@ object TuiReducer {
                     )
                 )
 
+            is TuiEvent.SetJudgeGenerationRunning ->
+                state.copy(
+                    analysis = state.analysis.copy(isJudgeGenerationRunning = event.running)
+                )
+
             is TuiEvent.KeyPressed,
             is TuiEvent.MousePressed,
             is TuiEvent.MouseReleased,
@@ -1169,8 +1299,24 @@ object TuiReducer {
                         )
 
                     AnalysisMode.METRICS ->
+                        if (state.analysis.metricsZoneFocus == MetricsZoneFocus.TABLE) {
+                            state.copy(
+                                analysis = state.analysis.copy(metricsScrollOffset = safe)
+                            )
+                        } else {
+                            state.copy(
+                                analysis = state.analysis.copy(detailScrollOffset = safe)
+                            )
+                        }
+
+                    AnalysisMode.CONFIG ->
                         state.copy(
-                            analysis = state.analysis.copy(metricsScrollOffset = safe)
+                            analysis = state.analysis.copy(configScrollOffset = safe)
+                        )
+
+                    AnalysisMode.LEADERBOARD ->
+                        state.copy(
+                            arena = state.arena.copy(leaderboardScrollOffset = safe)
                         )
 
                     AnalysisMode.BENCHMARK ->
@@ -1238,9 +1384,31 @@ object TuiReducer {
                         )
 
                     AnalysisMode.METRICS ->
+                        if (state.analysis.metricsZoneFocus == MetricsZoneFocus.TABLE) {
+                            state.copy(
+                                analysis = state.analysis.copy(
+                                    metricsScrollOffset = (state.analysis.metricsScrollOffset + delta).coerceAtLeast(0)
+                                )
+                            )
+                        } else {
+                            state.copy(
+                                analysis = state.analysis.copy(
+                                    detailScrollOffset = (state.analysis.detailScrollOffset + delta).coerceAtLeast(0)
+                                )
+                            )
+                        }
+
+                    AnalysisMode.CONFIG ->
                         state.copy(
                             analysis = state.analysis.copy(
-                                metricsScrollOffset = (state.analysis.metricsScrollOffset + delta).coerceAtLeast(0)
+                                configScrollOffset = (state.analysis.configScrollOffset + delta).coerceAtLeast(0)
+                            )
+                        )
+
+                    AnalysisMode.LEADERBOARD ->
+                        state.copy(
+                            arena = state.arena.copy(
+                                leaderboardScrollOffset = (state.arena.leaderboardScrollOffset + delta).coerceAtLeast(0)
                             )
                         )
 

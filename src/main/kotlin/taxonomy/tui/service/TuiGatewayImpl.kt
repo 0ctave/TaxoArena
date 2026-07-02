@@ -3,6 +3,8 @@ package taxonomy.tui.service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -31,6 +33,8 @@ import java.net.http.HttpResponse
 
 class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
+    private val dbWriteMutex = Mutex()
+
     // ── Snapshot helpers ────────────────────────────────────────────────────────
 
     /**
@@ -42,6 +46,16 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         val snapshotId = deps.taxonomyService.activeSnapshotId() ?: return
         withContext(Dispatchers.IO) {
             deps.snapshotManager.appendLogsToSnapshot(snapshotId, trace)
+        }
+    }
+
+    private suspend fun saveGraphToActiveSnapshot() {
+        val snapshotId = deps.taxonomyService.activeSnapshotId() ?: return
+        val root = deps.taxonomyService.rootNodeFlow.value ?: return
+        dbWriteMutex.withLock {
+            withContext(Dispatchers.IO) {
+                deps.snapshotManager.updateSnapshot(snapshotId, root)
+            }
         }
     }
 
@@ -178,8 +192,17 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
     // silently discarded and the service always used config.execution.llmParallelism.
     override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
         val root = deps.taxonomyService.rootNodeFlow.value ?: return
+        deps.arenaService.clearJudgeProgress()
         withJudgeRecording("Batch judge generation") {
-            deps.judgeService.generateJudgesForDag(root, replaceExisting, parallelismOverride = generality)
+            deps.judgeService.generateJudgesForDag(
+                root = root,
+                replaceExisting = replaceExisting,
+                maxGenerality = generality,
+                onNodeComplete = {
+                    saveGraphToActiveSnapshot()
+                    deps.taxonomyService.notifyGraphUpdated()
+                }
+            )
         }
     }
 
@@ -200,11 +223,14 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.warn("Regenerate judge: no node currently inspected.")
             return
         }
-        deps.log.info("Regenerating judge for node '${node.label}'…")
-        withJudgeRecording("Single-node judge regeneration for '${node.label}'") {
-            deps.judgeService.generateJudgeForNode(node)
+        deps.log.info("Regenerating judge for node '${node.label}' (id=${node.id})…")
+        withJudgeRecording("Node judge generation") {
+            deps.judgeService.generateJudgeForNode(node) {
+                saveGraphToActiveSnapshot()
+                deps.taxonomyService.notifyGraphUpdated()
+            }
         }
-        deps.log.info("Judge regenerated for '${node.label}'.")
+        deps.log.info("Node judge generation complete.")
     }
 
     // ── Benchmark ────────────────────────────────────────────────────────────────
@@ -413,6 +439,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             }
         }
 
+    override fun clearLeaderboard() {
+        deps.arenaService.clearLeaderboard()
+    }
+
     override suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit) {
         withContext(Dispatchers.IO) {
             val targetDir = File(deps.config.dataset.evalResultsDir)
@@ -524,4 +554,8 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     override fun applySetting(name: String, value: String): Boolean =
         configFacade.applySetting(name, value)
+
+    override fun resetBenchmarkReport() {
+        deps.arenaService.setBenchmarkReport(null)
+    }
 }

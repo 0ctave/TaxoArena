@@ -39,7 +39,11 @@ fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
     val gateway = TuiGatewayImpl(this)
     val effects = DefaultTuiEffects(tuiScope, gateway)
     val facade = TuiConfigFacade(this)
-    val commandController = CommandController(effects, settingItemsProvider = facade::buildSettingItems)
+    val commandController = CommandController(
+        effects = effects,
+        settingItemsProvider = facade::buildSettingItems,
+        configProvider = { config }
+    )
     return TuiController(
         effects = effects,
         commandController = commandController,
@@ -49,6 +53,9 @@ fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
             taxonomy.tui.components.buildTreeLines(taxonomyService.rootNodeFlow.value, expanded)
         },
         metricsHistorySizeProvider = { taxonomyService.getMetricsHistory().size },
+        selectedNodeProvider = { arenaService.state.value.selectedNode },
+        metricsHistoryProvider = { taxonomyService.getMetricsHistory().mapNotNull { it as? taxonomy.model.IterationMetrics } },
+        performanceReportProvider = { taxonomyService.getPerformanceReport() },
         onQuit = onQuit,
     )
 }

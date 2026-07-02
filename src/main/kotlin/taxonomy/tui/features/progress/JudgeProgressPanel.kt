@@ -21,39 +21,94 @@ fun JudgeProgressPanel(
     isEnteringBatchGenerality: Boolean = false,
     batchGeneralityInput: String = "1",
     batchReplaceExisting: Boolean = false,
+    batchDomainsInput: String = "",
+    batchSelectedSettingIdx: Int = 0,
+    isEditingBatchSetting: Boolean = false,
+    batchEditingValue: String = "",
 ) {
     val w = (width - 1).coerceAtLeast(1)
     Column {
         if (isEnteringBatchGenerality) {
-            // ── Generality input prompt ──────────────────────────────────────
-            Text("Batch judge generation".take(w), color = Cyan, textStyle = Bold)
+            // ── Generality settings menu ──────────────────────────────────────
+            Text("Batch Judge Settings".take(w), color = Cyan, textStyle = Bold)
             Text("".take(w), color = White)
-            Text("Max generality level? (1 = specific  ·  10 = very general)".take(w), color = White)
+
+            // Row 0: Max Generality Level
+            val isRow0Selected = batchSelectedSettingIdx == 0
+            val row0Val = if (isRow0Selected && isEditingBatchSetting) "${batchEditingValue}█" else batchGeneralityInput
             Text(
                 buildAnnotatedString {
-                    withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
-                    withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append(batchGeneralityInput) }
-                    withStyle(SpanStyle(color = White, textStyle = Bold)) { append("█") }
-                }.take(w)
-            )
-            Text("".take(w), color = White)
-            Text(
-                buildAnnotatedString {
-                    withStyle(SpanStyle(color = White)) { append("Replace existing judges: ") }
-                    withStyle(SpanStyle(
-                        color = if (batchReplaceExisting) TuiTheme.ERROR else TuiTheme.OK
-                    )) {
-                        append(if (batchReplaceExisting) "yes  [F to toggle]" else "no   [G to toggle]")
+                    if (isRow0Selected) {
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("Max Generality Level: ") }
+                        withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append(row0Val) }
+                    } else {
+                        append("   Max Generality Level: ")
+                        withStyle(SpanStyle(color = TuiTheme.MUTED)) { append(row0Val) }
                     }
                 }.take(w)
             )
+
+            // Row 1: Target Domains
+            val isRow1Selected = batchSelectedSettingIdx == 1
+            val row1Val = if (isRow1Selected && isEditingBatchSetting) "${batchEditingValue}█" else batchDomainsInput.ifBlank { "(all)" }
+            Text(
+                buildAnnotatedString {
+                    if (isRow1Selected) {
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("Target Domains: ") }
+                        withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append(row1Val) }
+                    } else {
+                        append("   Target Domains: ")
+                        withStyle(SpanStyle(color = TuiTheme.MUTED)) { append(row1Val) }
+                    }
+                }.take(w)
+            )
+
+            // Row 2: Replace Existing
+            val isRow2Selected = batchSelectedSettingIdx == 2
+            val row2Val = if (batchReplaceExisting) "yes" else "no"
+            Text(
+                buildAnnotatedString {
+                    if (isRow2Selected) {
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("Replace Existing: ") }
+                        withStyle(SpanStyle(
+                            color = if (batchReplaceExisting) TuiTheme.ERROR else TuiTheme.OK,
+                            textStyle = Bold
+                        )) { append(row2Val) }
+                    } else {
+                        append("   Replace Existing: ")
+                        withStyle(SpanStyle(
+                            color = if (batchReplaceExisting) TuiTheme.ERROR else TuiTheme.OK
+                        )) { append(row2Val) }
+                    }
+                }.take(w)
+            )
+
+            // Row 3: [Start Generation]
+            val isRow3Selected = batchSelectedSettingIdx == 3
+            Text(
+                buildAnnotatedString {
+                    if (isRow3Selected) {
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("[Start Generation]") }
+                    } else {
+                        append("   ")
+                        withStyle(SpanStyle(color = TuiTheme.OK, textStyle = Bold)) { append("[Start Generation]") }
+                    }
+                }.take(w)
+            )
+
             Text("".take(w), color = White)
             Text(
                 buildAnnotatedString {
+                    withStyle(SpanStyle(color = TuiTheme.INFO, textStyle = Bold)) { append("[W/S]") }
+                    withStyle(SpanStyle(color = White)) { append(" Navigate  ") }
                     withStyle(SpanStyle(color = TuiTheme.OK, textStyle = Bold)) { append("[Enter]") }
-                    withStyle(SpanStyle(color = White)) { append(" Confirm  ") }
+                    withStyle(SpanStyle(color = White)) { append(if (isEditingBatchSetting) " Confirm  " else " Edit/Toggle/Execute  ") }
                     withStyle(SpanStyle(color = TuiTheme.ERROR, textStyle = Bold)) { append("[Esc]") }
-                    withStyle(SpanStyle(color = White)) { append(" Cancel") }
+                    withStyle(SpanStyle(color = White)) { append(if (isEditingBatchSetting) " Cancel Edit" else " Cancel") }
                 }.take(w)
             )
         } else {
@@ -63,7 +118,23 @@ fun JudgeProgressPanel(
             if (controlState.currentInductions.isEmpty()) {
                 Text("Waiting for nodes to process…".take(w), color = TuiTheme.INFO)
             } else {
-                controlState.currentInductions.values.forEach { p ->
+                val sortedList = controlState.currentInductions.values.sortedWith(
+                    compareBy<taxonomy.service.JudgeProgress> { p ->
+                        when (p.status) {
+                            "INDUCTING", "SYNTHESIZING", "SAVING", "REPAIRING" -> 0
+                            "ERROR" -> 1
+                            "READY", "SKIPPED" -> 2
+                            else -> 3
+                        }
+                    }.thenBy { it.nodeLabel }
+                )
+
+                val maxEntries = (height - 4).coerceAtLeast(1)
+                val showSummary = sortedList.size > maxEntries
+                val displayCount = if (showSummary) (height - 5).coerceAtLeast(1) else maxEntries
+                val toDisplay = sortedList.take(displayCount)
+
+                toDisplay.forEach { p ->
                     Text(
                         buildAnnotatedString {
                             withStyle(SpanStyle(color = White)) { append(p.nodeLabel.take(w / 2)) }
@@ -75,6 +146,16 @@ fun JudgeProgressPanel(
                                 append("  [${p.status}]")
                             }
                         }.take(w)
+                    )
+                }
+
+                if (showSummary) {
+                    val remaining = sortedList.size - displayCount
+                    val readyCount = sortedList.count { it.status == "READY" || it.status == "SKIPPED" }
+                    val totalCount = sortedList.size
+                    Text(
+                        "... and $remaining more nodes ($readyCount/$totalCount finished)".take(w),
+                        color = TuiTheme.ACCENT
                     )
                 }
             }

@@ -70,16 +70,15 @@ fun LogsPanel(
         val lines = logs.subList(start, end)
         lines.forEach { raw ->
             val first = raw.split('\n', '\r').firstOrNull()?.trim() ?: ""
-            val (glyph, color) = when {
-                first.contains("ERROR") -> "✖ " to Red
-                first.contains("WARN") -> "⚠ " to Yellow
-                first.contains("INFO") || first.contains("DEBUG") -> "ℹ " to Cyan
-                else -> "  " to White
+            val color = when {
+                first.contains("ERROR") -> Red
+                first.contains("WARN") -> Yellow
+                first.contains("INFO") || first.contains("DEBUG") -> Cyan
+                else -> White
             }
             val body = first.take((contentWidth - 2).coerceAtLeast(1))
             Text(
                 buildAnnotatedString {
-                    withStyle(SpanStyle(color = color, textStyle = Bold)) { append(glyph) }
                     withStyle(SpanStyle(color = color)) { append(body) }
                 },
                 modifier = Modifier.height(1)

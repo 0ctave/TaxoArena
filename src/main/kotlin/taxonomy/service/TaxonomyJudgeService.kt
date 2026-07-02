@@ -35,32 +35,43 @@ class TaxonomyJudgeService(
     suspend fun generateJudgesForDag(
         root: GraphNode,
         replaceExisting: Boolean = false,
-        parallelismOverride: Int = 0,
+        maxGenerality: Int = 0,
+        onNodeComplete: (suspend (GraphNode) -> Unit)? = null
     ) = coroutineScope {
-        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting, parallelismOverride: $parallelismOverride)")
+        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting, maxGenerality: $maxGenerality)")
         val allNodes = mutableSetOf<GraphNode>()
         fun walk(n: GraphNode) { if (allNodes.add(n)) n.children.forEach { walk(it) } }
         walk(root)
 
+        val distances = calculateDistancesFromLeaves(allNodes)
+
         val targetNodes = allNodes.filter { node ->
-            node.isLeaf && (replaceExisting || node.judgePrompt == null)
+            val dist = distances[node.id] ?: 0.0
+            dist <= maxGenerality &&
+                (replaceExisting || node.judgePrompt == null) &&
+                belongsToAnyDomain(node, config.llm.judgeDomains)
         }.sortedBy { it.depth }
 
         if (targetNodes.isEmpty()) {
             log.info("No nodes require judge generation.")
+            arenaService.updateJudgeProgress("All Judges", 1, 1, "UP-TO-DATE")
             return@coroutineScope
         }
 
-        // Bug 1 fix: respect the caller-supplied parallelism (e.g. from the TUI generality prompt).
-        // Clamp to [1, llmParallelism] so we never exceed the configured ceiling.
-        val chunkSize = if (parallelismOverride > 0)
-            parallelismOverride.coerceIn(1, config.execution.llmParallelism)
-        else
-            config.execution.llmParallelism
+        val chunkSize = config.execution.llmParallelism
 
-        log.info("Generating judges for ${targetNodes.size} leaf node(s) with parallelism=$chunkSize")
+        log.info("Generating judges for ${targetNodes.size} node(s) with parallelism=$chunkSize")
         targetNodes.chunked(chunkSize).forEach { chunk ->
-            chunk.map { node -> async { generateJudgeForNode(node) } }.awaitAll()
+            chunk.map { node ->
+                async {
+                    try {
+                        generateJudgeForNode(node, onNodeComplete)
+                    } catch (t: Throwable) {
+                        log.error("Failed to generate judge for node '${node.label}' (id=${node.id}): ${t.message}", t)
+                        arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", 0, 1, "ERROR")
+                    }
+                }
+            }.awaitAll()
         }
         log.info("Agent Judge induction complete.")
     }
@@ -72,6 +83,20 @@ class TaxonomyJudgeService(
         
         val node = allNodes.find { it.id == nodeId } ?: throw IllegalArgumentException("Node $nodeId not found")
         generateJudgeForNode(node)
+    }
+
+    private fun belongsToAnyDomain(node: GraphNode, domains: List<String>): Boolean {
+        if (domains.isEmpty()) return true
+        val visited = mutableSetOf<String>()
+        fun walkUp(n: GraphNode): Boolean {
+            if (!visited.add(n.id)) return false
+            val label = n.label
+            if (label != null && domains.any { it.equals(label, ignoreCase = true) }) {
+                return true
+            }
+            return n.parents.any { walkUp(it) }
+        }
+        return walkUp(node)
     }
 
     private fun calculateDistancesFromLeaves(allNodes: Set<GraphNode>): Map<String, Double> {
@@ -105,7 +130,10 @@ class TaxonomyJudgeService(
         return distances
     }
 
-    suspend fun generateJudgeForNode(node: GraphNode) {
+    suspend fun generateJudgeForNode(
+        node: GraphNode,
+        onComplete: (suspend (GraphNode) -> Unit)? = null
+    ) {
         // Bug 2 fix: for leaf nodes, use getAllQueriesInRegion() instead of node.queries directly.
         //
         // After the merger's evaluateCrossLinks pass, some leaf nodes receive training queries
@@ -128,6 +156,7 @@ class TaxonomyJudgeService(
         if (details.isEmpty()) {
             log.warn("generateJudgeForNode: empty corpus for node '${node.label}' (id=${node.id}). " +
                 "queries=${node.queries.size}, crossLinkChildren=${node.crossLinkChildren.size}. Skipping.")
+            arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", 0, 1, "SKIPPED")
             return
         }
 
@@ -147,7 +176,13 @@ class TaxonomyJudgeService(
                     val letter = ('A' + i)
                     if (i == answerIndex) "$letter) $opt ✓" else "$letter) $opt"
                 }.joinToString(" | ")
-                "Q: ${item.question}\n$choices"
+                val cot = item.cot_content?.trim() ?: ""
+                buildString {
+                    append("Q: ${item.question}\nChoices: $choices")
+                    if (cot.isNotEmpty()) {
+                        append("\nCorrect Reasoning: $cot")
+                    }
+                }
             }
 
             val result = llmClient.queryModel(
@@ -181,6 +216,7 @@ class TaxonomyJudgeService(
         
         if (validateAndSaveJudge(node, rawSynthesis)) {
             arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", finalSteps, finalSteps, "READY")
+            onComplete?.invoke(node)
         } else {
             // PHASE 3: AUTOMATED REPAIR
             log.warn("Judge JSON for '${node.label}' is malformed. Attempting LLM repair...")
@@ -194,6 +230,7 @@ class TaxonomyJudgeService(
             if (validateAndSaveJudge(node, repairedJson)) {
                 log.info("Successfully repaired judge JSON for '${node.label}'.")
                 arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", repairSteps, repairSteps, "READY")
+                onComplete?.invoke(node)
             } else {
                 log.error("Failed to repair judge JSON for '${node.label}' after LLM assistance.")
                 arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", repairSteps, repairSteps, "ERROR")

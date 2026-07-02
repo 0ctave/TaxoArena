@@ -33,17 +33,7 @@ class TournamentSimulatorTest {
 
     @BeforeEach
     fun setUp() {
-        // Clean database tables for testing
-        try {
-            DriverManager.getConnection("jdbc:sqlite:ratings.db").use { conn ->
-                conn.createStatement().use { stmt ->
-                    stmt.execute("DELETE FROM agent_ratings")
-                    stmt.execute("DELETE FROM match_history")
-                }
-            }
-        } catch (e: Exception) {
-            // Might not exist yet
-        }
+        rankingService.clearDatabaseForTest()
     }
 
     @Test

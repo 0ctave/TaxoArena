@@ -41,6 +41,14 @@ data class MatchRecord(
 )
 
 @Serializable
+data class CachedMatchResult(
+    val winner: String,
+    val loser: String,
+    val isTie: Boolean,
+    val domain: String
+)
+
+@Serializable
 data class LeaderboardGroup(
     val rank: Int,
     val agents: List<AgentRating>
@@ -79,19 +87,34 @@ class TaxonomyRankingService {
             withConn { conn ->
                 conn.createStatement().use { stmt ->
                     stmt.execute("""
-                        CREATE TABLE IF NOT EXISTS agent_ratings (
-                            agent_name TEXT,
-                            domain TEXT,
+                        CREATE TABLE IF NOT EXISTS agent_ratings_v2 (
+                            snapshot_id TEXT NOT NULL,
+                            agent_name TEXT NOT NULL,
+                            domain TEXT NOT NULL,
                             mu REAL,
                             sigma REAL,
-                            PRIMARY KEY (agent_name, domain)
+                            PRIMARY KEY (snapshot_id, agent_name, domain)
                         )
                     """.trimIndent())
+
+                    // Migrate data if old table exists
+                    val rsTables = conn.metaData.getTables(null, null, "agent_ratings", null)
+                    if (rsTables.next()) {
+                        stmt.execute("""
+                            INSERT OR IGNORE INTO agent_ratings_v2 (snapshot_id, agent_name, domain, mu, sigma)
+                            SELECT 'global', agent_name, domain, mu, sigma FROM agent_ratings
+                        """.trimIndent())
+                        stmt.execute("DROP TABLE agent_ratings")
+                        log.info("Migrated agent_ratings to agent_ratings_v2 and dropped old table.")
+                    }
 
                     stmt.execute("""
                         CREATE TABLE IF NOT EXISTS match_history (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            snapshot_id TEXT,
                             query TEXT,
+                            model_a TEXT,
+                            model_b TEXT,
                             domain TEXT,
                             winner TEXT,
                             loser TEXT,
@@ -101,18 +124,54 @@ class TaxonomyRankingService {
                     """.trimIndent())
                 }
             }
-            log.info("SQLite Agent Ratings and Match History schema initialized.")
+            log.info("SQLite Agent Ratings V2 and Match History schema initialized.")
         } catch (e: Exception) {
             log.error("Failed to initialize database tables for ranking.", e)
         }
+
+        // Migrate existing databases safely by adding new columns if they do not exist
+        for (col in listOf("snapshot_id", "model_a", "model_b")) {
+            try {
+                withConn { conn ->
+                    conn.createStatement().use { stmt ->
+                        stmt.execute("ALTER TABLE match_history ADD COLUMN $col TEXT")
+                    }
+                }
+            } catch (e: Exception) {
+                // Column might already exist, safe to ignore
+            }
+        }
     }
 
-    fun getRating(agentName: String, domain: String): AgentRating {
+    fun clearDatabaseForTest() {
+        withConn { conn ->
+            conn.createStatement().use { stmt ->
+                try { stmt.execute("DELETE FROM agent_ratings_v2") } catch (_: Exception) {}
+                try { stmt.execute("DELETE FROM match_history") } catch (_: Exception) {}
+            }
+        }
+    }
+
+    fun clearRatings(snapshotId: String) {
+        withConn { conn ->
+            conn.prepareStatement("DELETE FROM agent_ratings_v2 WHERE snapshot_id = ?").use { pstmt ->
+                pstmt.setString(1, snapshotId)
+                pstmt.executeUpdate()
+            }
+            conn.prepareStatement("DELETE FROM match_history WHERE snapshot_id = ?").use { pstmt ->
+                pstmt.setString(1, snapshotId)
+                pstmt.executeUpdate()
+            }
+        }
+    }
+
+    fun getRating(agentName: String, domain: String, snapshotId: String = "global"): AgentRating {
         try {
             withConn { conn ->
-                conn.prepareStatement("SELECT mu, sigma FROM agent_ratings WHERE agent_name = ? AND domain = ?").use { pstmt ->
-                    pstmt.setString(1, agentName)
-                    pstmt.setString(2, domain)
+                conn.prepareStatement("SELECT mu, sigma FROM agent_ratings_v2 WHERE snapshot_id = ? AND agent_name = ? AND domain = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, agentName)
+                    pstmt.setString(3, domain)
                     val rs = pstmt.executeQuery()
                     if (rs.next()) {
                         return AgentRating(agentName, domain, rs.getDouble("mu"), rs.getDouble("sigma"))
@@ -120,43 +179,129 @@ class TaxonomyRankingService {
                 }
             }
         } catch (e: Exception) {
-            log.error("Failed to fetch rating for $agentName in $domain", e)
+            log.error("Failed to fetch rating for $agentName in $domain (snapshot: $snapshotId)", e)
         }
         return AgentRating(agentName, domain, initialMu, initialSigma)
     }
 
-    fun saveRating(rating: AgentRating) {
+    fun saveRating(rating: AgentRating, snapshotId: String = "global") {
         try {
             withConn { conn ->
-                conn.prepareStatement("INSERT OR REPLACE INTO agent_ratings (agent_name, domain, mu, sigma) VALUES (?, ?, ?, ?)").use { pstmt ->
-                    pstmt.setString(1, rating.agentName)
-                    pstmt.setString(2, rating.domain)
-                    pstmt.setDouble(3, rating.mu)
-                    pstmt.setDouble(4, rating.sigma)
+                conn.prepareStatement("INSERT OR REPLACE INTO agent_ratings_v2 (snapshot_id, agent_name, domain, mu, sigma) VALUES (?, ?, ?, ?, ?)").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, rating.agentName)
+                    pstmt.setString(3, rating.domain)
+                    pstmt.setDouble(4, rating.mu)
+                    pstmt.setDouble(5, rating.sigma)
                     pstmt.executeUpdate()
                 }
             }
         } catch (e: Exception) {
-            log.error("Failed to save rating for ${rating.agentName} in ${rating.domain}", e)
+            log.error("Failed to save rating for ${rating.agentName} in ${rating.domain} (snapshot: $snapshotId)", e)
         }
     }
 
-    fun recordMatch(query: String, domain: String, winner: String, loser: String, isTie: Boolean, confidence: Double = 1.0) {
+    fun getRecordedMatch(snapshotId: String, query: String, modelA: String, modelB: String): CachedMatchResult? {
         try {
-            withConn { conn ->
-                conn.prepareStatement("INSERT INTO match_history (query, domain, winner, loser, is_tie) VALUES (?, ?, ?, ?, ?)").use { pstmt ->
-                    pstmt.setString(1, query)
-                    pstmt.setString(2, domain)
-                    pstmt.setString(3, winner)
-                    pstmt.setString(4, loser)
-                    pstmt.setInt(5, if (isTie) 1 else 0)
-                    pstmt.executeUpdate()
+            return withConn { conn ->
+                val sql = """
+                    SELECT winner, loser, is_tie, domain 
+                    FROM match_history 
+                    WHERE snapshot_id = ? AND query = ? 
+                      AND ((model_a = ? AND model_b = ?) OR (model_a = ? AND model_b = ?))
+                    LIMIT 1
+                """.trimIndent()
+                conn.prepareStatement(sql).use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, query)
+                    pstmt.setString(3, modelA)
+                    pstmt.setString(4, modelB)
+                    pstmt.setString(5, modelB)
+                    pstmt.setString(6, modelA)
+                    val rs = pstmt.executeQuery()
+                    if (rs.next()) {
+                        CachedMatchResult(
+                            winner = rs.getString("winner"),
+                            loser = rs.getString("loser"),
+                            isTie = rs.getInt("is_tie") == 1,
+                            domain = rs.getString("domain")
+                        )
+                    } else {
+                        null
+                    }
                 }
             }
-            
-            // Perform Weng-Lin updates
-            updateRatings(winner, loser, domain, isTie, confidence)
-            
+        } catch (e: Exception) {
+            log.error("Failed to get recorded match for snapshot $snapshotId, query: $query, models: $modelA vs $modelB", e)
+            return null
+        }
+    }
+
+    fun recordMatch(
+        query: String,
+        domain: String,
+        winner: String,
+        loser: String,
+        isTie: Boolean,
+        confidence: Double = 1.0,
+        snapshotId: String = "global",
+        modelA: String = winner,
+        modelB: String = loser
+    ) {
+        try {
+            val existing = getRecordedMatch(snapshotId, query, modelA, modelB)
+            if (existing != null) {
+                if (existing.winner == winner && existing.loser == loser && existing.isTie == isTie && existing.domain == domain) {
+                    // If identical, do nothing (return)
+                    return
+                } else {
+                    // Update existing record
+                    withConn { conn ->
+                        val sql = """
+                            UPDATE match_history 
+                            SET winner = ?, loser = ?, is_tie = ?, domain = ? 
+                            WHERE snapshot_id = ? AND query = ? 
+                              AND ((model_a = ? AND model_b = ?) OR (model_a = ? AND model_b = ?))
+                        """.trimIndent()
+                        conn.prepareStatement(sql).use { pstmt ->
+                            pstmt.setString(1, winner)
+                            pstmt.setString(2, loser)
+                            pstmt.setInt(3, if (isTie) 1 else 0)
+                            pstmt.setString(4, domain)
+                            pstmt.setString(5, snapshotId)
+                            pstmt.setString(6, query)
+                            pstmt.setString(7, modelA)
+                            pstmt.setString(8, modelB)
+                            pstmt.setString(9, modelB)
+                            pstmt.setString(10, modelA)
+                            pstmt.executeUpdate()
+                        }
+                    }
+                    // Update ratings
+                    updateRatings(winner, loser, domain, isTie, confidence, snapshotId)
+                }
+            } else {
+                // Insert new record
+                withConn { conn ->
+                    val sql = """
+                        INSERT INTO match_history (snapshot_id, query, model_a, model_b, domain, winner, loser, is_tie) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """.trimIndent()
+                    conn.prepareStatement(sql).use { pstmt ->
+                        pstmt.setString(1, snapshotId)
+                        pstmt.setString(2, query)
+                        pstmt.setString(3, modelA)
+                        pstmt.setString(4, modelB)
+                        pstmt.setString(5, domain)
+                        pstmt.setString(6, winner)
+                        pstmt.setString(7, loser)
+                        pstmt.setInt(8, if (isTie) 1 else 0)
+                        pstmt.executeUpdate()
+                    }
+                }
+                // Update ratings
+                updateRatings(winner, loser, domain, isTie, confidence, snapshotId)
+            }
         } catch (e: Exception) {
             log.error("Failed to record match outcome in SQL", e)
         }
@@ -165,9 +310,9 @@ class TaxonomyRankingService {
     /**
      * Weng-Lin Bayesian updates for pairwise outcomes with confidence weighting.
      */
-    private fun updateRatings(winner: String, loser: String, domain: String, isTie: Boolean, confidence: Double) {
-        val rW = getRating(winner, domain)
-        val rL = getRating(loser, domain)
+    private fun updateRatings(winner: String, loser: String, domain: String, isTie: Boolean, confidence: Double, snapshotId: String = "global") {
+        val rW = getRating(winner, domain, snapshotId)
+        val rL = getRating(loser, domain, snapshotId)
 
         val varW = rW.sigma * rW.sigma
         val varL = rL.sigma * rL.sigma
@@ -206,12 +351,12 @@ class TaxonomyRankingService {
         val nextSigmaW = rW.sigma + confidence * (rawNextSigmaW - rW.sigma)
         val nextSigmaL = rL.sigma + confidence * (rawNextSigmaL - rL.sigma)
 
-        saveRating(AgentRating(winner, domain, nextMuW, nextSigmaW))
-        saveRating(AgentRating(loser, domain, nextMuL, nextSigmaL))
+        saveRating(AgentRating(winner, domain, nextMuW, nextSigmaW), snapshotId)
+        saveRating(AgentRating(loser, domain, nextMuL, nextSigmaL), snapshotId)
 
         // Also propagate a fraction of the update to the "global" domain if not already global
         if (domain != "global") {
-            updateGlobalAnchorRating(winner, loser, isTie, v, w, c, c2, varW, varL, confidence)
+            updateGlobalAnchorRating(winner, loser, isTie, v, w, c, c2, varW, varL, confidence, snapshotId)
         }
     }
 
@@ -225,10 +370,11 @@ class TaxonomyRankingService {
         c2: Double,
         varW: Double,
         varL: Double,
-        confidence: Double
+        confidence: Double,
+        snapshotId: String = "global"
     ) {
-        val rW = getRating(winner, "global")
-        val rL = getRating(loser, "global")
+        val rW = getRating(winner, "global", snapshotId)
+        val rL = getRating(loser, "global", snapshotId)
 
         // Propagate updates with a decay factor to simulate global transfer
         val decay = 0.3
@@ -242,21 +388,21 @@ class TaxonomyRankingService {
         val nextSigmaW = rW.sigma + confidence * (rawNextSigmaW - rW.sigma)
         val nextSigmaL = rL.sigma + confidence * (rawNextSigmaL - rL.sigma)
 
-        saveRating(AgentRating(winner, "global", nextMuW, nextSigmaW))
-        saveRating(AgentRating(loser, "global", nextMuL, nextSigmaL))
+        saveRating(AgentRating(winner, "global", nextMuW, nextSigmaW), snapshotId)
+        saveRating(AgentRating(loser, "global", nextMuL, nextSigmaL), snapshotId)
     }
 
     /**
      * Reconstructs the pairwise dominance relation using Tarjan's SCC to identify equivalence classes,
      * and performs a topological sort on the condensation graph to yield the rank list.
      */
-    fun getLeaderboard(domain: String): List<LeaderboardGroup> {
-        val ratings = getAllRatingsInDomain(domain)
+    fun getLeaderboard(domain: String, snapshotId: String = "global"): List<LeaderboardGroup> {
+        val ratings = getAllRatingsInDomain(domain, snapshotId)
         val agents = ratings.map { it.agentName }.distinct()
         if (agents.isEmpty()) return emptyList()
 
         // 1. Build dominance graph based on match history
-        val dominanceAdjacency = buildDominanceGraph(agents, domain)
+        val dominanceAdjacency = buildDominanceGraph(agents, domain, snapshotId)
 
         // 2. Tarjan's Strongly Connected Components
         val sccs = runTarjanScc(agents, dominanceAdjacency)
@@ -267,7 +413,7 @@ class TaxonomyRankingService {
         // 4. Map back to ratings sorted within each equivalence class by ordinal
         var currentRank = 1
         return sortedSccs.map { scc ->
-            val groupRatings = scc.map { agent -> getRating(agent, domain) }
+            val groupRatings = scc.map { agent -> getRating(agent, domain, snapshotId) }
                 .sortedByDescending { it.ordinal }
             val group = LeaderboardGroup(currentRank, groupRatings)
             currentRank += scc.size
@@ -275,12 +421,13 @@ class TaxonomyRankingService {
         }
     }
 
-    private fun getAllRatingsInDomain(domain: String): List<AgentRating> {
+    private fun getAllRatingsInDomain(domain: String, snapshotId: String = "global"): List<AgentRating> {
         val list = mutableListOf<AgentRating>()
         try {
             withConn { conn ->
-                conn.prepareStatement("SELECT agent_name, mu, sigma FROM agent_ratings WHERE domain = ?").use { pstmt ->
-                    pstmt.setString(1, domain)
+                conn.prepareStatement("SELECT agent_name, mu, sigma FROM agent_ratings_v2 WHERE snapshot_id = ? AND domain = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, domain)
                     val rs = pstmt.executeQuery()
                     while (rs.next()) {
                         list.add(AgentRating(rs.getString("agent_name"), domain, rs.getDouble("mu"), rs.getDouble("sigma")))
@@ -293,7 +440,7 @@ class TaxonomyRankingService {
         return list
     }
 
-    private fun buildDominanceGraph(agents: List<String>, domain: String): Map<String, List<String>> {
+    private fun buildDominanceGraph(agents: List<String>, domain: String, snapshotId: String = "global"): Map<String, List<String>> {
         val dominanceMap = mutableMapOf<String, MutableList<String>>()
         agents.forEach { dominanceMap[it] = mutableListOf() }
 
@@ -303,11 +450,12 @@ class TaxonomyRankingService {
                 val query = """
                     SELECT winner, loser, COUNT(*) as count 
                     FROM match_history 
-                    WHERE domain = ? AND is_tie = 0
+                    WHERE snapshot_id = ? AND domain = ? AND is_tie = 0
                     GROUP BY winner, loser
                 """.trimIndent()
                 conn.prepareStatement(query).use { pstmt ->
-                    pstmt.setString(1, domain)
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, domain)
                     val rs = pstmt.executeQuery()
                     val matchCounts = mutableMapOf<Pair<String, String>, Int>()
                     while (rs.next()) {

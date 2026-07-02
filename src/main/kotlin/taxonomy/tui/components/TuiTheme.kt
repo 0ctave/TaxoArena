@@ -30,6 +30,8 @@ object TuiTheme {
     val ERROR: Color   = Red
     /** Default foreground / informational. */
     val INFO: Color    = White
+    /** Muted text color. */
+    val MUTED: Color   = White
 
     // ── Descriptive aliases (semantic intent for richer UI accents) ──
     /** Node stats / counts. */
@@ -118,3 +120,6 @@ fun String.center(width: Int): String {
     val padding = (target - this.length) / 2
     return " ".repeat(padding) + this + " ".repeat(target - this.length - padding)
 }
+
+/** Global checkbox helper for coherent checked/unchecked rendering. */
+fun checkboxMark(checked: Boolean): String = if (checked) "[x]" else "[ ]"

@@ -31,6 +31,7 @@ import taxonomy.tui.components.SettingKind
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.TuiTheme.SPINNER
+import taxonomy.tui.components.checkboxMark
 import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.features.analysis.AnalysisPanel
 import taxonomy.tui.features.logs.LogsPanel
@@ -63,6 +64,7 @@ fun TuiRouter(
     val totalNodes = headerNodes.size
     val maxDepth = remember(headerNodes) { headerNodes.maxOfOrNull { it.depth } ?: 0 }
     val leafCount = remember(headerNodes) { headerNodes.count { it.isLeaf } }
+    val judgesCount = remember(headerNodes) { headerNodes.count { it.judgePrompt != null } }
 
     TuiShell(
         width = width,
@@ -73,6 +75,7 @@ fun TuiRouter(
         activeSnapshotName = state.snapshot.activeSnapshotDescription,
         maxDepth = maxDepth,
         leafCount = leafCount,
+        judgesCount = judgesCount,
     ) {
         if (state.shell.helpOverlayOpen) {
             HelpOverlay(width, height, state)
@@ -81,7 +84,7 @@ fun TuiRouter(
                 StartupState.LOAD_DAG -> WelcomeRoute(width, height, state)
                 StartupState.LOADING -> LoadingRoute(width, height, state)
                 StartupState.CONFIGANDDOMAINS -> ConfigRoute(width, height, deps, state, subscriptions)
-                StartupState.MAINDASHBOARD -> MainDashboardRoute(width, height, deps, state, subscriptions)
+                StartupState.MAINDASHBOARD -> MainDashboardRoute(width, height, deps, state, subscriptions, dispatch)
             }
         }
     }
@@ -321,7 +324,7 @@ private fun ConfigRoute(
                         val rendered = when {
                             editing -> state.config.editingValue + "█"
                             item.kind == SettingKind.BOOLEAN ->
-                                if (item.getValue().toBooleanStrictOrNull() == true) "☑ on" else "☐ off"
+                                if (item.getValue().toBooleanStrictOrNull() == true) "${checkboxMark(true)} on" else "${checkboxMark(false)} off"
                             item.kind == SettingKind.SELECT -> "‹ ${item.getValue()} ›"
                             else -> item.getValue()
                         }
@@ -358,6 +361,7 @@ private fun MainDashboardRoute(
     deps: TuiDependencies,
     state: TuiAppState,
     subscriptions: TuiSubscriptions,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val layout = DashboardLayout.dashboard(width, height)
     val bodyH = layout.bodyH
@@ -387,85 +391,24 @@ private fun MainDashboardRoute(
     val hasDag = subscriptions.rootNode != null && allNodes.isNotEmpty()
     val navContext = deriveNavContext(hasDag = hasDag, choosingDomains = false)
     val navFocused = state.shell.focusedPanel == FocusPanel.TOPOLOGY
-    val benchmarkPicking = state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains
-    val pickerTitle = if (state.benchmark.benchmarkIsPickingModels) "SELECT MODELS" else "SELECT DOMAINS"
-
-    // ── Context hints for the DAG Explorer panel ────────────────────────────
-    val dagHints: List<HotkeyAction> = if (hasDag && navFocused && !benchmarkPicking) listOf(
-        HotkeyAction("Space", "Toggle"),
-        HotkeyAction("Enter", "Inspect"),
-        HotkeyAction("R", "Gen Judge", TuiTheme.OK),
-    ) else if (benchmarkPicking) listOf(
-        HotkeyAction("Space", "Toggle"),
-        HotkeyAction("Enter", "Confirm", TuiTheme.OK, isPrimary = true),
-    ) else emptyList()
-
-    // ── Context hints for the Analysis Hub panel ────────────────────────────
-    val analysisMode = state.analysis.mode
-    val hubFocused = state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB
-    val analysisHints: List<HotkeyAction> = when {
-        !hubFocused -> emptyList()
-
-        analysisMode == taxonomy.service.AnalysisMode.NODE_DETAIL -> {
-            val hasJudge = subscriptions.arenaControlState.selectedNode?.judgePrompt != null
-            listOf(
-                HotkeyAction("R", if (hasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
-                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-            )
-        }
-
-        analysisMode == taxonomy.service.AnalysisMode.METRICS -> {
-            if (state.analysis.metricsZoneFocus == MetricsZoneFocus.DETAIL) listOf(
-                HotkeyAction("P", "Perf"),
-                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-            ) else listOf(
-                HotkeyAction("Tab", "Detail"),
-                HotkeyAction("P", "Perf"),
-                HotkeyAction("Home/End", "First/Last"),
-                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-            )
-        }
-
-        analysisMode == taxonomy.service.AnalysisMode.ARENA -> listOf(
-            HotkeyAction("L", "Leaderboard"),
-            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-        )
-
-        analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
-            state.benchmark.benchmarkType == BenchmarkType.ARENA &&
-            (subscriptions.arenaControlState.isRunningBenchmark ||
-                subscriptions.arenaControlState.benchmarkReport != null) -> listOf(
-            HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
-            HotkeyAction("O", "Load eval_results"),
-            HotkeyAction("Q", "Back", TuiTheme.ERROR),
-        )
-
-        analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
-            state.benchmark.benchmarkType == BenchmarkType.TRICKLE -> listOf(
-            HotkeyAction("B", "Run", TuiTheme.OK, isPrimary = true),
-            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-        )
-
-        analysisMode == taxonomy.service.AnalysisMode.BENCHMARK -> listOf(
-            HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
-            HotkeyAction("Tab", "Next section"),
-            HotkeyAction("O", "Load eval_results"),
-            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-        )
-
-        analysisMode == taxonomy.service.AnalysisMode.TRICKLE_TEST -> listOf(
-            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-        )
-
-        analysisMode == taxonomy.service.AnalysisMode.SNAPSHOTS -> listOf(
-            HotkeyAction("L/Enter", "Load", TuiTheme.OK, isPrimary = true),
-            HotkeyAction("D", "Delete"),
-            HotkeyAction("N", "Save"),
-            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-        )
-
-        else -> emptyList()
+    val benchmarkPicking = state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains || state.analysis.isPickingBatchDomains
+    val pickerTitle = when {
+        state.analysis.isPickingBatchDomains -> "SELECT DOMAINS"
+        state.benchmark.benchmarkIsPickingModels -> "SELECT MODELS"
+        else -> "SELECT DOMAINS"
     }
+
+    val dagHints = deriveDagHints(hasDag, navFocused, benchmarkPicking)
+
+    val analysisHints = deriveAnalysisHints(
+        hubFocused = state.shell.focusedPanel == FocusPanel.ANALYSIS_HUB,
+        analysisMode = state.analysis.mode,
+        selectedNodeHasJudge = subscriptions.arenaControlState.selectedNode?.judgePrompt != null,
+        isRunningBenchmark = subscriptions.arenaControlState.isRunningBenchmark,
+        hasBenchmarkReport = subscriptions.arenaControlState.benchmarkReport != null,
+        benchmarkType = state.benchmark.benchmarkType,
+        metricsZoneFocus = state.analysis.metricsZoneFocus
+    )
 
     Row(modifier = Modifier.height(topH)) {
         Panel(
@@ -480,24 +423,7 @@ private fun MainDashboardRoute(
             contextHints = dagHints,
         ) {
             if (benchmarkPicking) {
-                val domains = if (state.benchmark.benchmarkIsPickingModels)
-                    state.benchmark.loadedModels.map { it to 0 }
-                else
-                    availableDomains
-                val selected = if (state.benchmark.benchmarkIsPickingModels)
-                    state.benchmark.benchmarkSelectedModels.toList()
-                else
-                    state.benchmark.benchmarkSelectedDomains.toList()
-                val visibleRows = (topH - 3).coerceAtLeast(1)
-                val pickerOffset = (state.benchmark.benchmarkPickerCursor - visibleRows + 1).coerceAtLeast(0)
-                DomainSelectorTable(
-                    pWidth = dagW - 4,
-                    pHeight = topH - 2,
-                    domains = domains,
-                    offset = pickerOffset,
-                    selectedIdx = state.benchmark.benchmarkPickerCursor,
-                    selectedDomains = selected,
-                )
+                BenchmarkPickerContent(topH, dagW, state, availableDomains)
                 return@Panel
             }
             when (navContext) {
@@ -541,10 +467,12 @@ private fun MainDashboardRoute(
             controlState = subscriptions.arenaControlState,
             inspectorScroll = state.analysis.inspectorScroll,
             benchmarkScroll = state.benchmark.benchmarkScrollOffset,
+            configScrollOffset = state.analysis.configScrollOffset,
             trickleState = state.trickle,
             snapshotState = state.snapshot,
             arenaState = state.arena,
             benchmarkState = state.benchmark,
+            availableDomains = availableDomains,
             latestMetrics = subscriptions.metricsHistory.lastOrNull() as? taxonomy.model.IterationMetrics,
             metricsHistory = subscriptions.metricsHistory.mapNotNull { it as? taxonomy.model.IterationMetrics },
             selectedIterationIndex = state.analysis.selectedIterationIndex,
@@ -554,7 +482,15 @@ private fun MainDashboardRoute(
             performanceReport = if (state.analysis.mode == taxonomy.service.AnalysisMode.METRICS && state.analysis.showPerformanceBlock)
                 deps.taxonomyService.getPerformanceReport() else emptyMap(),
             activeProcess = activeProcess,
+            isEnteringBatchGenerality = state.analysis.isEnteringBatchGenerality,
+            batchGeneralityInput = state.analysis.batchGeneralityInput,
+            batchReplaceExisting = state.analysis.batchReplaceExisting,
+            batchDomainsInput = state.analysis.batchDomainsInput,
+            batchSelectedSettingIdx = state.analysis.batchSelectedSettingIdx,
+            isEditingBatchSetting = state.analysis.isEditingBatchSetting,
+            batchEditingValue = state.analysis.batchEditingValue,
             contextHints = analysisHints,
+            dispatch = dispatch,
         )
     }
 
@@ -587,13 +523,19 @@ private fun BottomLogsAndTraces(
         val logsW = (width * 0.55).toInt().coerceAtLeast(20)
         val procW = (width - logsW - 1).coerceAtLeast(16)
 
+        val logsHints = if (state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS) listOf(
+            HotkeyAction("W/S", "Scroll"),
+            HotkeyAction("Q", "Back to DAG", TuiTheme.ERROR),
+        ) else emptyList()
+        val logsBodyH = (bottomH - 2 - (if (logsHints.isNotEmpty()) 1 else 0)).coerceAtLeast(1)
         Panel(
             title = "SYSTEM LOGS",
             accentColor = TuiTheme.panelAccent(state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS),
             width = logsW,
-            height = bottomH
+            height = bottomH,
+            contextHints = logsHints
         ) {
-            LogsPanel(logsW - 4, bottomH - 2, state.logs.logScrollOffset)
+            LogsPanel(logsW - 4, logsBodyH, state.logs.logScrollOffset)
         }
 
         Spacer(Modifier.width(1).height(bottomH))
@@ -767,4 +709,135 @@ private fun flattenNodes(rootNode: GraphNode?): List<GraphNode> {
     }
     walk(rootNode)
     return out.sortedByDescending { it.queries.size }
+}
+
+private fun deriveDagHints(
+    hasDag: Boolean,
+    navFocused: Boolean,
+    benchmarkPicking: Boolean
+): List<HotkeyAction> = when {
+    hasDag && navFocused && !benchmarkPicking -> listOf(
+        HotkeyAction("Space", "Toggle"),
+        HotkeyAction("Enter", "Inspect"),
+        HotkeyAction("R", "Gen Judge", TuiTheme.OK),
+    )
+    benchmarkPicking -> listOf(
+        HotkeyAction("Space", "Toggle"),
+        HotkeyAction("Enter", "Confirm", TuiTheme.OK, isPrimary = true),
+    )
+    else -> emptyList()
+}
+
+private fun deriveAnalysisHints(
+    hubFocused: Boolean,
+    analysisMode: taxonomy.service.AnalysisMode,
+    selectedNodeHasJudge: Boolean,
+    isRunningBenchmark: Boolean,
+    hasBenchmarkReport: Boolean,
+    benchmarkType: BenchmarkType,
+    metricsZoneFocus: MetricsZoneFocus
+): List<HotkeyAction> {
+    if (!hubFocused) return emptyList()
+    return when {
+        analysisMode == taxonomy.service.AnalysisMode.NODE_DETAIL -> {
+            listOf(
+                HotkeyAction("R", if (selectedNodeHasJudge) "Regen Judge" else "Gen Judge", TuiTheme.OK, isPrimary = true),
+                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+            )
+        }
+
+        analysisMode == taxonomy.service.AnalysisMode.METRICS -> {
+            if (metricsZoneFocus == MetricsZoneFocus.DETAIL) listOf(
+                HotkeyAction("P", "Perf"),
+                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+            ) else listOf(
+                HotkeyAction("Tab", "Detail"),
+                HotkeyAction("P", "Perf"),
+                HotkeyAction("Home/End", "First/Last"),
+                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+            )
+        }
+
+        analysisMode == taxonomy.service.AnalysisMode.ARENA -> listOf(
+            HotkeyAction("L", "Leaderboard"),
+            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
+            benchmarkType == BenchmarkType.ARENA &&
+            (isRunningBenchmark || hasBenchmarkReport) -> listOf(
+            HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+            HotkeyAction("O", "Load eval_results"),
+            HotkeyAction("Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
+            benchmarkType == BenchmarkType.TRICKLE -> listOf(
+            HotkeyAction("B", "Run", TuiTheme.OK, isPrimary = true),
+            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.BENCHMARK -> listOf(
+            HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
+            HotkeyAction("Tab", "Next section"),
+            HotkeyAction("O", "Load eval_results"),
+            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.TRICKLE_TEST -> listOf(
+            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.SNAPSHOTS -> listOf(
+            HotkeyAction("L/Enter", "Load", TuiTheme.OK, isPrimary = true),
+            HotkeyAction("D", "Delete"),
+            HotkeyAction("N", "Save"),
+            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.CONFIG -> listOf(
+            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        analysisMode == taxonomy.service.AnalysisMode.LEADERBOARD -> listOf(
+            HotkeyAction("W/S", "Scroll"),
+            HotkeyAction("K", "Clear Ratings", TuiTheme.ACCENT2),
+            HotkeyAction("L/←/Q", "Back", TuiTheme.ERROR),
+        )
+
+        else -> emptyList()
+    }
+}
+
+@Composable
+private fun BenchmarkPickerContent(
+    topH: Int,
+    dagW: Int,
+    state: TuiAppState,
+    availableDomains: List<Pair<String, Int>>
+) {
+    val domains = when {
+        state.analysis.isPickingBatchDomains -> availableDomains
+        state.benchmark.benchmarkIsPickingModels -> state.benchmark.loadedModels.map { it to 0 }
+        else -> availableDomains
+    }
+    val selected = when {
+        state.analysis.isPickingBatchDomains -> state.analysis.batchSelectedDomains.toList()
+        state.benchmark.benchmarkIsPickingModels -> state.benchmark.benchmarkSelectedModels.toList()
+        else -> state.benchmark.benchmarkSelectedDomains.toList()
+    }
+    val cursor = when {
+        state.analysis.isPickingBatchDomains -> state.analysis.batchDomainsPickerCursor
+        else -> state.benchmark.benchmarkPickerCursor
+    }
+    val visibleRows = (topH - 3).coerceAtLeast(1)
+    val pickerOffset = (cursor - visibleRows + 1).coerceAtLeast(0)
+    DomainSelectorTable(
+        pWidth = dagW - 4,
+        pHeight = topH - 2,
+        domains = domains,
+        offset = pickerOffset,
+        selectedIdx = cursor,
+        selectedDomains = selected,
+    )
 }

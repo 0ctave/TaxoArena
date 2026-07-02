@@ -55,8 +55,8 @@ Task: Induce domain adjudication guidelines from a corpus of expert‑verified m
 $items
 
 [Instructions]
-Analyze the reasoning required to reach the correct answer for each item.
-Extract the implicit rules, conceptual foundations, and technical nuances that define this knowledge cluster.
+Analyze the reasoning and steps used in the Correct Reasoning to solve each item.
+Extract the implicit rules, conceptual foundations, core formulas/laws, and technical nuances that are necessary to solve these questions correctly.
 
 [Domain & Subdomain Context]
 Treat "$domainLabel" as a narrow, specialized topic within its broader academic field.
@@ -138,7 +138,7 @@ Output must start with [ and end with ].
      */
     fun synthesizeFinalJudge(masterGuidelines: String, domainLabel: String): String {
         return """
-Task: Synthesize a specialized AI judge for $domainLabel multiple‑choice questions.
+Task: Synthesize a highly specialized AI judge for $domainLabel multiple‑choice questions.
 
 [Master Domain Axioms]
 $masterGuidelines
@@ -148,29 +148,22 @@ Create an expert evaluative persona for $domainLabel.
 
 The judge’s job is to decide which of two AI‑generated reasoning traces (A or B) better answers a multiple‑choice question in this domain.
 
-Scope:
-- Assume $domainLabel is a narrow, specialized subtopic within a broader field (e.g., "Bayesian Inference" within "Statistics").
-- The judge should focus on criteria relevant to this subtopic and ignore stylistic or generic qualities that do not affect technical correctness in $domainLabel.
+Scope & leaf node specialization:
+- You must specialize the judge to the narrow, leaf-node subdomain "$domainLabel".
+- The judge should focus strictly on criteria, axioms, and edge cases relevant to "$domainLabel" and ignore generic qualities (e.g. style, formatting, token count) that do not affect technical correctness.
 
 Core behaviour:
-- Primary objective: choose the answer whose final conclusion is correct and whose reasoning is logically sound.
-- When both answers are correct, prefer the one with clearer, more direct reasoning that follows the domain axioms.
-- When both answers are wrong, prefer the one that shows better partial reasoning and fewer serious misconceptions, unless both are equally bad (then choose a tie).
-- Do NOT rely on memorized benchmark keys or question IDs. Judge only from the question, options, and the reasoning you see, using the axioms as your standard.
-- Penalize hallucinations, contradictions, misuse of formulas, or ignoring key constraints in the problem.
-- Penalize answers that state the correct letter without meaningful justification.
-- Do not reward verbosity: long reasoning is only better if it adds valid, relevant steps; otherwise, prefer concise, precise reasoning.
-- Do not penalize an answer for omitting knowledge outside the natural scope of $domainLabel, as long as it correctly solves the given question.
-
-Tie handling:
-- Return "winner": "tie" when both answers are equally correct and well‑reasoned, or equally incorrect.
-- Otherwise you must choose "A" or "B".
+- Primary objective: Evaluate and choose the response that has the most logically sound, technically correct, and well-justified reasoning leading to the correct answer.
+- TIES ARE STRICTLY FORBIDDEN. You must declare one model as the winner ("Model A" or "Model B"). If they are very close, look at the technical details, mathematical precision, or adherence to the master axioms to break the tie and declare a winner.
+- When both answers arrive at the correct option: Compare the quality of their explanations. Prefer the one that is more mathematically precise, follows the domain axioms, states clear intermediate steps, and is easier to verify.
+- When both answers are incorrect: Prefer the one that shows better partial reasoning, fewer conceptual errors, and is closer to the correct setup.
+- Penalize lazy responses: Heavily penalize answers that state the correct option letter without any reasoning or justification.
 
 Internal evaluation process (for your own behaviour):
 1. Critique A against the master axioms.
 2. Critique B against the master axioms.
 3. Compare A and B, focusing on correctness of conclusion, logical validity, and domain‑specific checks.
-4. Decide the winner: "A", "B", or "tie".
+4. Decide the winner: "Model A" or "Model B" (Tie is forbidden).
 
 [Output Format]
 $JSON_OBJECT_STRICT
@@ -182,13 +175,13 @@ Return ONLY a JSON object with exactly these two string keys — no other keys, 
   "rubric": ""
 }
 
-- system_prompt is a concise but complete system message that defines the judge persona and evaluation principles (you can summarise the instructions above).
+- system_prompt is a concise but complete system message that defines the judge persona, evaluation principles, and strict leaf-node guidelines (no ties, direct comparison of Model A and Model B).
 - rubric is a short, human‑readable bullet‑point checklist (using - bullets) that the judge should internally follow when comparing A and B. It should cover:
   - how to assess correctness of the final answer,
   - how to assess soundness of reasoning,
-  - how to apply the domain‑specific axioms,
-  - how to penalise common failure modes,
-  - how and when to choose a tie.
+  - how to apply the domain‑specific axioms for $domainLabel,
+  - how to penalise common failure modes in this specific leaf domain,
+  - how to compare the two models and break ties.
 
 Both values MUST be plain strings. No nested JSON or additional keys. Output must start with { and end with }.
 """.trimIndent()

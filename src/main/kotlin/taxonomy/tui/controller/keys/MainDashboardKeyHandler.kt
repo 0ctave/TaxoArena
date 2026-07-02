@@ -25,15 +25,18 @@ internal class MainDashboardKeyHandler(
 ) {
 
     fun handle(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        if ((state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains) &&
+            state.shell.focusedPanel == FocusPanel.TOPOLOGY) {
+            analysisHandler.handleBenchmarkPickerKeys(state, key, dispatch)
+            return
+        }
+
         // Modal overlays take priority.
         if (state.benchmark.isPickingEvalCatalog) {
             analysisHandler.handleEvalCatalogPickerKeys(state, key, dispatch)
             return
         }
-        if (state.benchmark.benchmarkIsPickingModels || state.benchmark.benchmarkIsPickingDomains) {
-            analysisHandler.handleBenchmarkPickerKeys(state, key, dispatch)
-            return
-        }
+
         if (analysisHandler.isTextInputActive(state)) {
             analysisHandler.handleActiveTextInput(state, key, dispatch)
             return
@@ -55,7 +58,10 @@ internal class MainDashboardKeyHandler(
 
             "m"   -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.METRICS))
 
-            "c"   -> dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE)) // config / back to idle
+            "c"   -> {
+                val nextMode = if (state.analysis.mode == AnalysisMode.CONFIG) AnalysisMode.IDLE else AnalysisMode.CONFIG
+                dispatch(TuiEvent.SetAnalysisMode(nextMode))
+            }
 
             "a"   -> {
                 effects.loadArenaModels(dispatch)
@@ -86,14 +92,26 @@ internal class MainDashboardKeyHandler(
 
             "t"   -> commandController.startTrickle(dispatch)
 
-            "g"   -> {
+            "g", "G" -> {
                 dispatch(TuiEvent.SetBatchReplaceExisting(false))
                 dispatch(TuiEvent.StartBatchGeneralityInput)
             }
 
-            "f"   -> {
+            "f", "F" -> {
                 dispatch(TuiEvent.SetBatchReplaceExisting(true))
                 dispatch(TuiEvent.StartBatchGeneralityInput)
+            }
+
+            "p", "P" -> {
+                val targetMode = when {
+                    state.analysis.isJudgeGenerationRunning -> AnalysisMode.JUDGE_PROGRESS
+                    state.benchmark.benchmarkType != BenchmarkType.NONE || state.benchmark.evalLoaderIsRunning -> AnalysisMode.BENCHMARK
+                    state.benchmark.isRunningBatchTrickleTest -> AnalysisMode.TRICKLE_TEST
+                    else -> null
+                }
+                if (targetMode != null) {
+                    dispatch(TuiEvent.SetAnalysisMode(targetMode))
+                }
             }
 
             "n"   -> {
@@ -111,10 +129,13 @@ internal class MainDashboardKeyHandler(
                 routeByPanel(state, key, dispatch)
             }
 
-            "l"   -> if (state.analysis.mode == AnalysisMode.ARENA) {
-                dispatch(TuiEvent.ToggleLeaderboard)
-            } else {
-                routeByPanel(state, key, dispatch)
+            "l"   -> {
+                if (state.analysis.mode == AnalysisMode.LEADERBOARD) {
+                    dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
+                } else {
+                    dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.LEADERBOARD))
+                    effects.loadLeaderboard(dispatch)
+                }
             }
 
             else  -> routeByPanel(state, key, dispatch)

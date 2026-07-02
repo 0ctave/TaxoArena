@@ -8,7 +8,8 @@ import taxonomy.tui.state.TuiAppState
 class CommandController(
     private val effects: TuiEffects,
     /** Provides the current setting items so instant toggles/edits resolve by index. */
-    private val settingItemsProvider: () -> List<SettingItem> = { emptyList() }
+    private val settingItemsProvider: () -> List<SettingItem> = { emptyList() },
+    private val configProvider: () -> taxonomy.config.TaxonomyConfig? = { null }
 ) {
 
     private fun selectedSetting(state: TuiAppState): SettingItem? =
@@ -82,7 +83,12 @@ class CommandController(
 
             TuiEvent.ConfirmBatchGeneralityInput -> {
                 val generality = state.analysis.batchGeneralityInput.toIntOrNull() ?: 1
-                effects.runBatchJudge(generality, state.analysis.batchReplaceExisting)
+                val domains = state.analysis.batchDomainsInput
+                    .split(",")
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+                configProvider()?.llm?.judgeDomains = domains
+                effects.runBatchJudge(generality, state.analysis.batchReplaceExisting, dispatch)
             }
 
             // Models-first flow: the run fires on the FINAL input. In precomputed mode that's
@@ -135,6 +141,10 @@ class CommandController(
 
             TuiEvent.ToggleLeaderboard -> {
                 effects.loadLeaderboard(dispatch)
+            }
+
+            TuiEvent.ClearLeaderboard -> {
+                effects.clearLeaderboard(dispatch)
             }
 
             TuiEvent.EvalDownloadComplete -> {
