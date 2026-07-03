@@ -26,7 +26,7 @@ object HitTesting {
         val height: Int,
         val isConfigMode: Boolean
     ) {
-        val dagWidth = 60
+        val dagWidth = 68.coerceAtMost((width - 1 - 20).coerceAtLeast(10))
         val arenaWidth = (width - dagWidth - 1).coerceAtLeast(20)
 
         val topHeight = ((height - 7) * 0.62).toInt().coerceAtLeast(10)

@@ -115,7 +115,6 @@ fun AsciiTreeTable(
                 append(" ")
                 append("Queries".padStart(QCOL))
                 append(" \u2714")
-                append("   Rankings")
             }
         }
         Text(
@@ -145,21 +144,6 @@ fun AsciiTreeTable(
                 val treeText = line.text.take(treeW)
                 val padCount = (treeW - treeText.length).coerceAtLeast(0)
 
-                val rankText = if (node.isLeaf) {
-                    val ranks = line.topTwoRanks
-                    if (ranks != null) {
-                        val t1 = shortModelName(ranks.first)
-                        val t2 = shortModelName(ranks.second)
-                        if (t2.isNotEmpty()) {
-                            "  [#1 $t1 \u00b7 #2 $t2]"
-                        } else {
-                            "  [#1 $t1]"
-                        }
-                    } else {
-                        "  [no data]"
-                    }
-                } else ""
-
                 val row = buildAnnotatedString {
                     if (selected) {
                         withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append("\u276f ") } // ❯
@@ -174,11 +158,6 @@ fun AsciiTreeTable(
                     withStyle(
                         SpanStyle(color = if (hasJudge) Green else White, textStyle = Bold)
                     ) { append(judgeGlyph) }
-                    if (rankText.isNotEmpty()) {
-                        withStyle(
-                            SpanStyle(color = if (rankText == "  [no data]") White else Green)
-                        ) { append(rankText) }
-                    }
                 }
                 // Modifier.width(contentWidth) is REQUIRED: it tells Mosaic to allocate a
                 // TextSurface of exactly contentWidth columns. Without it, Mosaic measures

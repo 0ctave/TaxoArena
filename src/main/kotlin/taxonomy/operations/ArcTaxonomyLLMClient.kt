@@ -156,49 +156,51 @@ class ArcTaxonomyLLMClient(
     }
 
     override suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String {
-        return semaphore.withPermit {
-            val slot = monitor.acquireSlot(modelName)
+        return runWithRetry(modelName) {
+            semaphore.withPermit {
+                val slot = monitor.acquireSlot(modelName)
 
-            try {
-                val model = getStreamingModel(modelName)
-                val messages = mutableListOf<ChatMessage>()
-                if (systemPrompt != null) messages.add(SystemMessage.from(systemPrompt))
-                messages.add(UserMessage.from(userPrompt))
+                try {
+                    val model = getStreamingModel(modelName)
+                    val messages = mutableListOf<ChatMessage>()
+                    if (systemPrompt != null) messages.add(SystemMessage.from(systemPrompt))
+                    messages.add(UserMessage.from(userPrompt))
 
-                val responseText = suspendCancellableCoroutine<String> { continuation ->
-                    val accumulatedContent = StringBuilder()
+                    val responseText = suspendCancellableCoroutine<String> { continuation ->
+                        val accumulatedContent = StringBuilder()
 
-                    model.chat(messages, object : StreamingChatResponseHandler {
-                        override fun onPartialResponse(token: String) {
-                            accumulatedContent.append(token)
-                            monitor.updateSlot(slot, token)
-                        }
+                        model.chat(messages, object : StreamingChatResponseHandler {
+                            override fun onPartialResponse(token: String) {
+                                accumulatedContent.append(token)
+                                monitor.updateSlot(slot, token)
+                            }
 
-                        override fun onCompleteResponse(response: ChatResponse) {
-                            log.debug("Stream completed for model '$modelName'")
-                            monitor.releaseSlot(slot)
-                            if (continuation.isActive) continuation.resume(accumulatedContent.toString())
-                        }
+                            override fun onCompleteResponse(response: ChatResponse) {
+                                log.debug("Stream completed for model '$modelName'")
+                                monitor.releaseSlot(slot)
+                                if (continuation.isActive) continuation.resume(accumulatedContent.toString())
+                            }
 
-                        override fun onError(error: Throwable) {
-                            log.error("Streaming error for model '$modelName': ${error.message}")
-                            monitor.releaseSlot(slot)
-                            if (continuation.isActive) continuation.resumeWithException(error)
-                        }
-                    })
-                }
+                            override fun onError(error: Throwable) {
+                                log.error("Streaming error for model '$modelName': ${error.message}")
+                                monitor.releaseSlot(slot)
+                                if (continuation.isActive) continuation.resumeWithException(error)
+                            }
+                        })
+                    }
 
-                clientScope.launch {
-                    delay(3000.milliseconds)
+                    clientScope.launch {
+                        delay(3000.milliseconds)
+                        monitor.removeSlot(slot)
+                    }
+
+                    return@withPermit responseText
+
+                } catch (e: Exception) {
+                    monitor.releaseSlot(slot)
                     monitor.removeSlot(slot)
+                    throw e
                 }
-
-                return@withPermit responseText
-
-            } catch (e: Exception) {
-                monitor.releaseSlot(slot)
-                monitor.removeSlot(slot)
-                throw e
             }
         }
     }
@@ -231,62 +233,113 @@ class ArcTaxonomyLLMClient(
         }
 
         // Ollama: native structured output via ChatRequest + ResponseFormat
-        return semaphore.withPermit {
-            val slot = monitor.acquireSlot(modelName)
+        return runWithRetry(modelName) {
+            semaphore.withPermit {
+                val slot = monitor.acquireSlot(modelName)
 
-            try {
-                val model = getStreamingModel(modelName)
-                val messages = mutableListOf<ChatMessage>()
-                if (systemPrompt != null) messages.add(SystemMessage.from(systemPrompt))
-                messages.add(UserMessage.from(userPrompt))
+                try {
+                    val model = getStreamingModel(modelName)
+                    val messages = mutableListOf<ChatMessage>()
+                    if (systemPrompt != null) messages.add(SystemMessage.from(systemPrompt))
+                    messages.add(UserMessage.from(userPrompt))
 
-                val responseFormat = ResponseFormat.builder()
-                    .type(ResponseFormatType.JSON)
-                    .jsonSchema(schema)
-                    .build()
+                    val responseFormat = ResponseFormat.builder()
+                        .type(ResponseFormatType.JSON)
+                        .jsonSchema(schema)
+                        .build()
 
-                val chatRequest = ChatRequest.builder()
-                    .messages(messages)
-                    .responseFormat(responseFormat)
-                    .build()
+                    val chatRequest = ChatRequest.builder()
+                        .messages(messages)
+                        .responseFormat(responseFormat)
+                        .build()
 
-                val responseText = suspendCancellableCoroutine<String> { continuation ->
-                    val accumulatedContent = StringBuilder()
+                    val responseText = suspendCancellableCoroutine<String> { continuation ->
+                        val accumulatedContent = StringBuilder()
 
-                    model.chat(chatRequest, object : StreamingChatResponseHandler {
-                        override fun onPartialResponse(token: String) {
-                            accumulatedContent.append(token)
-                            monitor.updateSlot(slot, token)
-                        }
+                        model.chat(chatRequest, object : StreamingChatResponseHandler {
+                            override fun onPartialResponse(token: String) {
+                                accumulatedContent.append(token)
+                                monitor.updateSlot(slot, token)
+                            }
 
-                        override fun onCompleteResponse(response: ChatResponse) {
-                            log.debug("Structured stream completed for model '$modelName'")
-                            monitor.releaseSlot(slot)
-                            if (continuation.isActive) continuation.resume(accumulatedContent.toString())
-                        }
+                            override fun onCompleteResponse(response: ChatResponse) {
+                                log.debug("Structured stream completed for model '$modelName'")
+                                monitor.releaseSlot(slot)
+                                if (continuation.isActive) continuation.resume(accumulatedContent.toString())
+                            }
 
-                        override fun onError(error: Throwable) {
-                            log.error("Structured streaming error for model '$modelName': ${error.message}")
-                            monitor.releaseSlot(slot)
-                            if (continuation.isActive) continuation.resumeWithException(error)
-                        }
-                    })
-                }
+                            override fun onError(error: Throwable) {
+                                log.error("Structured streaming error for model '$modelName': ${error.message}")
+                                monitor.releaseSlot(slot)
+                                if (continuation.isActive) continuation.resumeWithException(error)
+                            }
+                        })
+                    }
 
-                clientScope.launch {
-                    delay(3000.milliseconds)
+                    clientScope.launch {
+                        delay(3000.milliseconds)
+                        monitor.removeSlot(slot)
+                    }
+
+                    return@withPermit responseText
+
+                } catch (e: Exception) {
+                    monitor.releaseSlot(slot)
                     monitor.removeSlot(slot)
+                    streamingModelCache.remove(modelName)
+                    throw e
                 }
-
-                return@withPermit responseText
-
-            } catch (e: Exception) {
-                monitor.releaseSlot(slot)
-                monitor.removeSlot(slot)
-                streamingModelCache.remove(modelName)
-                throw e
             }
         }
+    }
+
+    private suspend fun <T> runWithRetry(
+        modelName: String,
+        maxRetries: Int = 3,
+        block: suspend () -> T
+    ): T {
+        var attempt = 0
+        var delayMs = 1000L
+        while (true) {
+            try {
+                return block()
+            } catch (t: Throwable) {
+                attempt++
+                val isTransient = isTransientError(t)
+                if (attempt >= maxRetries || !isTransient) {
+                    throw t
+                }
+                log.warn("Transient error on model '$modelName' (attempt $attempt/$maxRetries): ${t.message}. Retrying in ${delayMs}ms...")
+                delay(delayMs)
+                delayMs *= 2
+                if (t.message?.contains("Connection reset", ignoreCase = true) == true || 
+                    t.cause?.message?.contains("Connection reset", ignoreCase = true) == true) {
+                    streamingModelCache.remove(modelName)
+                }
+            }
+        }
+    }
+
+    private fun isTransientError(t: Throwable): Boolean {
+        val msg = t.message.orEmpty()
+        val causeMsg = t.cause?.message.orEmpty()
+        if (t is java.net.SocketException || t is java.io.IOException || t is java.util.concurrent.TimeoutException) {
+            return true
+        }
+        if (msg.contains("Connection reset", ignoreCase = true) || 
+            causeMsg.contains("Connection reset", ignoreCase = true) ||
+            msg.contains("timeout", ignoreCase = true) ||
+            msg.contains("rate limit", ignoreCase = true) ||
+            msg.contains("429", ignoreCase = true) ||
+            msg.contains("503", ignoreCase = true) ||
+            msg.contains("500", ignoreCase = true)) {
+            return true
+        }
+        val cause = t.cause
+        if (cause != null) {
+            return isTransientError(cause)
+        }
+        return false
     }
 
     /**

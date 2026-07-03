@@ -52,7 +52,7 @@ object DashboardLayout {
         // Keep both panels + the 1-col gap within the terminal: cap dagW so the right panel
         // keeps its minimum width without overflowing on narrow terminals.
         val arenaMin = 20
-        val dagW = 60.coerceAtMost((width - 1 - arenaMin).coerceAtLeast(10))
+        val dagW = 68.coerceAtMost((width - 1 - arenaMin).coerceAtLeast(10))
         val arenaW = (width - dagW - 1).coerceAtLeast(arenaMin)
         // SHELL_TOP_ROWS (2) + panel top (2) + the AsciiTreeTable column-header row (1) +
         // the column-header's own trailing row before data (1). Mosaic 0.18.0 already delivers

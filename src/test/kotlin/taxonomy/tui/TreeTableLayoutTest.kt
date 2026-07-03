@@ -51,18 +51,4 @@ class TreeTableLayoutTest {
         assertEquals(10, TreeTableLayout.treeWidth(5))
         assertTrue(TreeTableLayout.treeWidth(120) > 10)
     }
-
-    @Test
-    fun rowWithLeafRanksShowsRankings() {
-        val row = TreeTableLayout.rowText(
-            treeText = "LeafNode",
-            recursiveQueryCount = 10,
-            hasJudge = true,
-            selected = false,
-            pWidth = 80,
-            isLeaf = true,
-            topTwoRanks = Pair("claude-3.5-sonnet", "Meta-Llama-3-70B")
-        )
-        assertTrue(row.contains("[#1 claude \u00b7 #2 70B]"), "missing ranks: '$row'")
-    }
 }

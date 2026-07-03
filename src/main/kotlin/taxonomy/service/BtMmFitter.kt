@@ -23,8 +23,8 @@ object BtMmFitter {
         for (ps in pairStats) {
             val i = idx[ps.modelA] ?: continue
             val j = idx[ps.modelB] ?: continue
-            w[i][j] += ps.winsA
-            w[j][i] += ps.winsB
+            w[i][j] += ps.winsA + 0.5 * ps.ties
+            w[j][i] += ps.winsB + 0.5 * ps.ties
         }
 
         var s = DoubleArray(K) { 0.0 }
@@ -73,7 +73,7 @@ object BtMmFitter {
             val sj = scores[ps.modelB] ?: 0.0
             val denom = exp(si) + exp(sj)
             val pij = if (denom == 0.0) 0.5 else exp(si) / denom
-            val nij = ps.winsA + ps.winsB
+            val nij = ps.totalComparisons.toDouble()
             val info = nij * pij * (1.0 - pij)
             fisher[i] += info
             fisher[j] += info

@@ -420,7 +420,8 @@ class TaxonomyArenaService(
         modelB: String,
         traceB: String,
         expectedNodeId: String? = null,
-        frozenLeafIds: Set<String>? = null
+        frozenLeafIds: Set<String>? = null,
+        gtAnswer: String? = null
     ): List<DomainEvaluation> = coroutineScope {
         val leaves = routeToLeaves(query, frozenLeafIds)
         if (expectedNodeId != null && leaves.none { it.id == expectedNodeId }) {
@@ -434,7 +435,10 @@ class TaxonomyArenaService(
 
         // Build the MCQ context for judge prompts (question + options visible)
         val optionsBlock = options.mapIndexed { i, opt -> "${('A' + i)}) $opt" }.joinToString("\n")
-        val questionWithOptions = "$query\n\nOptions:\n$optionsBlock"
+        val questionWithOptions = buildString {
+            append("$query\n\nOptions:\n$optionsBlock")
+            if (gtAnswer != null) append("\n\n[Ground Truth Answer: $gtAnswer]")
+        }
 
         judges.map { node ->
             async {
@@ -489,7 +493,8 @@ class TaxonomyArenaService(
             modelA = modelA,
             traceA = resA.modelOutput,
             modelB = modelB,
-            traceB = resB.modelOutput
+            traceB = resB.modelOutput,
+            gtAnswer = resA.gtAnswer
         )
 
         _state.update { it.copy(
@@ -547,12 +552,9 @@ class TaxonomyArenaService(
             val comparisonText = (element["comparison"]?.jsonPrimitive?.content 
                 ?: element["rationale"]?.jsonPrimitive?.content 
                 ?: "").lowercase()
-            val impliesNoWinner = listOf(
-                "no decisive difference", "identical", "both arrive",
-                "neither surpasses", "same conclusion", "indistinguishable"
-            ).any { it in comparisonText }
-            val finalWinner = if (impliesNoWinner) "TIE" else cleanWinner
-            val finalConfidence = if (impliesNoWinner) minOf(0.5, confidence) else confidence
+            val impliesNoWinner = confidence <= 0.5 && cleanWinner == "TIE"
+            val finalWinner = cleanWinner
+            val finalConfidence = confidence
 
             log.debug("Judge parsed: winner=$finalWinner conf=${"%.2f".format(finalConfidence)}")
             log.trace("Judge raw response: $cleanJson")
@@ -613,14 +615,18 @@ Evaluation order — follow exactly:
 3. COMPARE: identify the decisive difference between A and B.
 4. DECIDE: declare the winner — either "Model A", "Model B", or "TIE".
 
-For responses that are both factually correct:
-• Prefer the response with more precise mechanistic explanation
-• Prefer the response that addresses edge cases or qualifications
-• Prefer the response that correctly scopes uncertainty
-• If still equivalent: output TIE, confidence ≤ 0.5
+For responses where BOTH models give factually correct answers:
+You MUST still choose the better model. A tie is only valid when responses are 
+word-for-word equivalent OR when one model's single factual error exactly 
+cancels the other model's structural advantage and you cannot determine a net winner.
 
-If both models demonstrate equivalent reasoning: output winner: "TIE", confidence ≤ 0.5.
-Only declare a decisive winner when one model has measurably stronger intermediate steps. Otherwise, if they are still indistinguishable, declare a "TIE".
+Ranking criteria when both are correct (apply in order):
+1. Mechanistic depth — prefer the response explaining the underlying mechanism, not just the result
+2. Edge-case handling — prefer the response that addresses boundary conditions or exceptions  
+3. Quantitative precision — prefer the response with correctly applied formulas/numbers
+4. Scope accuracy — prefer the response that correctly scopes uncertainty
+
+Reserve TIE for: identical responses, or responses where criterion 1–4 are all equal.
 Reserve confidence 0.95–1.0 only for cases with overwhelming evidence. Default to 0.7–0.85 for clear wins.
 
 Your rubric:
@@ -639,7 +645,7 @@ $traceA
 $traceB
 
 ────────────────────────────────────────
-You do not have access to the correct answer. Your task is to determine which model demonstrates
+If the ground truth answer is provided, use it to assess factual correctness. Your task is to determine
 superior reasoning quality based solely on the logical rigour and domain soundness of its response.
 
 If both models are genuinely equivalent, output winner: "TIE" with confidence ≤ 0.5.

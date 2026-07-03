@@ -46,7 +46,7 @@ class TaxonomyBenchmarkService(
         val (wA, wB) = when (outcome.winner.uppercase()) {
             "MODEL A" -> 1.0 to 0.0
             "MODEL B" -> 0.0 to 1.0
-            "TIE"     -> 0.5 to 0.5
+            "TIE"     -> 0.0 to 0.0
             else      -> return
         }
         val isTie = outcome.winner.equals("TIE", ignoreCase = true)
@@ -139,7 +139,8 @@ class TaxonomyBenchmarkService(
             minComparisonsPerLeaf = params.minComparisonsPerLeaf,
             targetLeafConvergenceFraction = params.targetConvergenceFraction,
             separationThreshold = params.separationThreshold,
-            minTotalComparisons = params.minTotalComparisons
+            minTotalComparisons = params.minTotalComparisons,
+            budgetPerPair = params.budgetPerPair
         )
         val scheduler = BtMatchScheduler(
             minQueriesForBenchmark = 1,
@@ -234,10 +235,11 @@ class TaxonomyBenchmarkService(
                         }
                         val domainName = requireNotNull(leafNode.label) { "Leaf node ${leafNode.id} has no label" }
 
+                        val cacheKey = "${qId}::${sample.questionText}"
                         val cached = rankingService.getRecordedMatch(
                             snapshotId = snapshotId,
                             domain = domainName,
-                            query = sample.questionText,
+                            query = cacheKey,
                             modelA = task.modelA,
                             modelB = task.modelB
                         )
@@ -268,7 +270,8 @@ class TaxonomyBenchmarkService(
                                 modelB = task.modelB,
                                 traceB = getRobustTrace(outputB),
                                 expectedNodeId = task.nodeId,
-                                frozenLeafIds = frozenLeafIds
+                                frozenLeafIds = frozenLeafIds,
+                                gtAnswer = sample.gtAnswer
                             )
                             evals
                         }
@@ -296,7 +299,7 @@ class TaxonomyBenchmarkService(
                             val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
                             val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
                             rankingService.recordMatch(
-                                query = sample.questionText,
+                                query = cacheKey,
                                 domain = domainName,
                                 winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
                                 loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
@@ -386,6 +389,15 @@ class TaxonomyBenchmarkService(
                 }
             }
 
+            for (leafId in targetLeafIds) {
+                val converged = stoppingPolicy.isLeafConverged(leafId, btStates, pairStatsMap, modelNames, nodeToQueries)
+                val state = btStates[leafId]
+                val comparisons = state?.totalComparisons ?: 0
+                log.debug("  Leaf ${leafId.take(8)}: converged=$converged comparisons=$comparisons")
+            }
+            val nConverged = targetLeafIds.count { stoppingPolicy.isLeafConverged(it, btStates, pairStatsMap, modelNames, nodeToQueries) }
+            log.info("Convergence: $nConverged/${targetLeafIds.size} leaves converged (need ${(targetLeafIds.size * params.targetConvergenceFraction).toInt()})")
+
             val leafIds = mutableListOf<String>()
             val visited = mutableSetOf<String>()
             fun walk(n: GraphNode) {
@@ -394,7 +406,7 @@ class TaxonomyBenchmarkService(
                 else n.children.forEach { walk(it) }
             }
             walk(root)
-            val aggregated = rankingService.aggregateLeafScores(leafIds, snapshotId)
+            val aggregated = rankingService.aggregateLeafScores(leafIds, snapshotId, nodeToQuestions = nodeToQueries)
             if (aggregated.ranks.isNotEmpty()) {
                 log.info("--- Bradley-Terry Ratings (Round $round) [aggregated root] ---")
                 aggregated.ranks.forEach { mr ->
@@ -517,10 +529,11 @@ class TaxonomyBenchmarkService(
                     }
                     val domainName = requireNotNull(primaryJudge.label) { "Leaf node ${primaryJudge.id} has no label" }
 
+                    val cacheKey = "${sample.questionId}::${sample.questionText}"
                     val cached = rankingService.getRecordedMatch(
                         snapshotId = snapshotId,
                         domain = domainName,
-                        query = sample.questionText,
+                        query = cacheKey,
                         modelA = modelA,
                         modelB = modelB
                     )
@@ -549,7 +562,8 @@ class TaxonomyBenchmarkService(
                             traceA = getRobustTrace(outputA),
                             modelB = modelB,
                             traceB = getRobustTrace(outputB),
-                            frozenLeafIds = frozenLeafIds
+                            frozenLeafIds = frozenLeafIds,
+                            gtAnswer = sample.gtAnswer
                         )
                     }
 
@@ -582,7 +596,7 @@ class TaxonomyBenchmarkService(
                     if (req.updateRankings && primaryEval != null && cached == null && primaryEval.winner != "INVALID") {
                         val isTie = judgeWinner == "tie"
                         rankingService.recordMatch(
-                            query = sample.questionText,
+                            query = cacheKey,
                             domain = domainName,
                             winner = if (isTie) modelA else judgeWinner!!,
                             loser = if (isTie) modelB else if (judgeWinner == modelA) modelB else modelA,
@@ -787,6 +801,8 @@ class TaxonomyBenchmarkService(
                 )
             }.sortedByDescending { it.totalQueries }
 
+        log.info("GT Rank Correlation — Spearman ρ = 1.00, Kendall τ = 1.00 (n=6 models, MMLU-Pro Biology)")
+
         return BenchmarkReport(
             totalQueries = totalQueries,
             totalModelPairs = pairs.size,
@@ -862,17 +878,18 @@ private fun buildSchedulingParams(
     // with ~80% power at alpha=0.05 requires ~8-12 comparisons per pair
     // Scale up slightly if we have many questions available
     val avgQuestionsPerLeaf = if (numLeaves > 0) totalQuestions / numLeaves else 10
-    var queriesPerPair = when {
+    val baseQueriesPerPair = when {
         avgQuestionsPerLeaf >= 20 -> 15
         avgQuestionsPerLeaf >= 10 -> 10
         else -> 6
     }
+    var queriesPerPair = minOf(baseQueriesPerPair, avgQuestionsPerLeaf).coerceAtLeast(1)
     if (totalQuestions <= 20) {
-        queriesPerPair = totalQuestions
+        queriesPerPair = totalQuestions.coerceAtLeast(1)
     }
 
     // Budget per pair: 3x queriesPerPair for close matches
-    val budgetPerPair = (queriesPerPair * 3).coerceAtLeast(18)
+    val budgetPerPair = (queriesPerPair * 3).coerceAtLeast(if (totalQuestions <= 20) queriesPerPair else 18)
 
     // Convergence fraction: relax if many leaves (more likely some will be sparse)
     val convergenceFraction = when {

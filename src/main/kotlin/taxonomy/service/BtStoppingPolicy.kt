@@ -9,7 +9,8 @@ class BtStoppingPolicy(
     val targetLeafConvergenceFraction: Double = 0.70,
     val stabilityRounds: Int = 3,
     val separationThreshold: Double = 1.5,
-    val minTotalComparisons: Int = 20
+    val minTotalComparisons: Int = 20,
+    val budgetPerPair: Int = 18
 ) {
     private val leafRankHistory = mutableMapOf<String, ArrayDeque<List<String>>>()
 
@@ -18,9 +19,23 @@ class BtStoppingPolicy(
         nodeId: String,
         btStates: Map<String, NodeBtState>,
         pairStats: Map<String, List<NodePairStats>>,
-        models: List<String>
+        models: List<String>,
+        nodeToQueries: Map<String, List<Int>> = emptyMap()
     ): Boolean {
         val state = btStates[nodeId] ?: return false
+
+        val numPairs = models.size * (models.size - 1) / 2
+        val available = nodeToQueries[nodeId]?.size ?: 0
+        val maxPossible = if (available > 0) available * numPairs else 0
+        val targetLimit = if (maxPossible > 0) {
+            minOf(budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
+        } else {
+            budgetPerPair * numPairs / 2
+        }
+
+        val dataExhausted = state.totalComparisons >= targetLimit
+        if (dataExhausted) return true
+
         if (state.totalComparisons < minComparisonsPerLeaf) return false
 
         // Every pair must have at least minComparisonsPerLeaf / K comparisons
@@ -50,7 +65,8 @@ class BtStoppingPolicy(
         targetLeafIds: Set<String>,
         models: List<String>,
         round: Int,
-        totalComparisons: Int
+        totalComparisons: Int,
+        nodeToQueries: Map<String, List<Int>> = emptyMap()
     ): Boolean {
         if (round >= maxRounds) return true
         if (totalComparisons < minTotalComparisons) return false
@@ -67,7 +83,7 @@ class BtStoppingPolicy(
             if (history.size > stabilityRounds) history.removeFirst()
 
             val rankStable = history.size >= stabilityRounds && history.all { it == currentRank }
-            val structurallyConverged = isLeafConverged(leafId, btStates, pairStats, models)
+            val structurallyConverged = isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries)
 
             if (rankStable && structurallyConverged) converged++
         }

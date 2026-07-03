@@ -451,7 +451,8 @@ data class AggregatedLeaderboard(
     fun aggregateLeafScores(
         leafNodeIds: List<String>,
         snapshotId: String = "global",
-        minComparisons: Int = 5
+        minComparisons: Int = 5,
+        nodeToQuestions: Map<String, List<Int>> = emptyMap()
     ): AggregatedLeaderboard {
         val allStates = leafNodeIds.mapNotNull { getBtState(it, snapshotId) }
         val eligible = allStates.filter { it.totalComparisons >= minComparisons }
@@ -465,10 +466,11 @@ data class AggregatedLeaderboard(
         val weightTotal = mutableMapOf<String, Double>()
 
         for (state in eligible) {
+            val leafWeight = nodeToQuestions[state.nodeId]?.size?.toDouble() ?: 1.0
             for (model in allModels) {
                 val score = state.btScores[model] ?: continue
                 val se = state.stdErrors[model]?.takeIf { it < 9.0 } ?: continue
-                val w = 1.0 / (se * se)
+                val w = (1.0 / (se * se)) * leafWeight
                 weightedSum[model] = (weightedSum[model] ?: 0.0) + w * score
                 weightTotal[model] = (weightTotal[model] ?: 0.0) + w
             }
@@ -507,7 +509,8 @@ data class AggregatedLeaderboard(
             val stdError = state.stdErrors[modelId] ?: Double.MAX_VALUE
             val winsA = pairStats.filter { it.modelA == modelId }.sumOf { it.winsA }
             val winsB = pairStats.filter { it.modelB == modelId }.sumOf { it.winsB }
-            val totalWins = winsA + winsB
+            val ties = pairStats.filter { it.modelA == modelId || it.modelB == modelId }.sumOf { it.ties }
+            val totalWins = winsA + winsB + 0.5 * ties
             val comps = pairStats.filter { it.modelA == modelId || it.modelB == modelId }.sumOf { it.totalComparisons }
             ModelRank(
                 modelId = modelId,
