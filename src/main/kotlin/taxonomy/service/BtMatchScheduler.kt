@@ -55,39 +55,7 @@ class BtMatchScheduler(
             val state = btStates[node.id]
             val nodePairs = pairStats[node.id] ?: emptyList()
 
-            val nodeQuestionIds = mutableListOf<Int>()
-            nodeQuestionIds.addAll(nodeToQueries[node.id] ?: emptyList())
-
-            if (nodeQuestionIds.size < queriesPerPair) {
-                val visited = mutableSetOf<String>(node.id)
-                val queue = java.util.ArrayDeque<GraphNode>()
-                queue.addAll(node.parents)
-                while (queue.isNotEmpty() && nodeQuestionIds.size < queriesPerPair) {
-                    val parent = queue.removeFirst()
-                    if (visited.add(parent.id)) {
-                        val descendants = mutableSetOf<GraphNode>()
-                        fun walkDescendants(n: GraphNode) {
-                            if (n.children.isEmpty()) {
-                                descendants.add(n)
-                            } else {
-                                n.children.forEach { walkDescendants(it) }
-                            }
-                        }
-                        walkDescendants(parent)
-                        
-                        for (desc in descendants) {
-                            val descQueries = nodeToQueries[desc.id] ?: emptyList()
-                            for (q in descQueries) {
-                                if (q !in nodeQuestionIds) {
-                                    nodeQuestionIds.add(q)
-                                }
-                            }
-                        }
-                        queue.addAll(parent.parents)
-                    }
-                }
-            }
-
+            val nodeQuestionIds = nodeToQueries[node.id] ?: emptyList()
             val availableQueries = resultsMatrix.filter { it.key in nodeQuestionIds }
             if (availableQueries.isEmpty()) continue
 
