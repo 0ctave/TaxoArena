@@ -110,15 +110,20 @@ class TaxonomyBenchmarkService(
 
         // Pre-route all questions to target nodes dynamically using the NiW routing engine
         val nodeToQueries = mutableMapOf<String, MutableList<Int>>()
+        var outlierCount = 0
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
-            val vector = arenaService.embeddingCache.getOrCreate(sample.questionText)
-            val emb = Embedding(sample.questionText, sample.questionText, vector)
-            val results = arenaService.ops.routeQuery(emb, root, currentIteration = 2)
-            results.keys.forEach { node ->
-                nodeToQueries.getOrPut(node.id) { mutableListOf() }.add(qId)
+            val leaves = arenaService.routeToLeaves(sample.questionText)
+            if (leaves.isEmpty()) {
+                outlierCount++
+                log.debug("qId=$qId is an outlier — no leaf match, skipping")
+                return@forEach
+            }
+            leaves.forEach { leaf ->
+                nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
             }
         }
+        log.info("Pre-routing complete: ${matrix.size - outlierCount} questions routed, $outlierCount outliers discarded")
 
         val numPairs = modelNames.size * (modelNames.size - 1) / 2
         val scheduler = BtMatchScheduler(
@@ -211,9 +216,14 @@ class TaxonomyBenchmarkService(
                             return@mapNotNull null
                         }
 
+                        checkNotNull(leafNode.judgePrompt) {
+                            "Attempted to record match for node ${leafNode.id} with no judgePrompt"
+                        }
+                        val domainName = requireNotNull(leafNode.label) { "Leaf node ${leafNode.id} has no label" }
+
                         val cached = rankingService.getRecordedMatch(
                             snapshotId = snapshotId,
-                            domain = leafNode.label ?: "Emergent Concept",
+                            domain = domainName,
                             query = sample.questionText,
                             modelA = task.modelA,
                             modelB = task.modelB
@@ -244,8 +254,7 @@ class TaxonomyBenchmarkService(
                                 traceA = getRobustTrace(outputA),
                                 modelB = task.modelB,
                                 traceB = getRobustTrace(outputB),
-                                targetNodeId = task.nodeId,
-                                category = req.category
+                                expectedNodeId = task.nodeId
                             )
                             evals
                         }
@@ -274,7 +283,7 @@ class TaxonomyBenchmarkService(
                             val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
                             rankingService.recordMatch(
                                 query = sample.questionText,
-                                domain = primaryEval.domain,
+                                domain = domainName,
                                 winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
                                 loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
                                 isTie = isTie,
@@ -483,9 +492,13 @@ class TaxonomyBenchmarkService(
                 val outputB = modelResults[modelB] ?: return@async null
 
                 runCatching {
-                    val (_, judges) = arenaService.discoverDomainsAndJudges(sample.questionText)
-                    val primaryJudge = judges.maxByOrNull { it.depth }
-                    val domainName = primaryJudge?.label ?: "Emergent Concept"
+                    val leaves = arenaService.routeToLeaves(sample.questionText)
+                    val judges = leaves.mapNotNull { arenaService.leafJudge(it) }
+                    val primaryJudge = judges.maxByOrNull { it.depth } ?: return@async null
+                    checkNotNull(primaryJudge.judgePrompt) {
+                        "Attempted to record match for node ${primaryJudge.id} with no judgePrompt"
+                    }
+                    val domainName = requireNotNull(primaryJudge.label) { "Leaf node ${primaryJudge.id} has no label" }
 
                     val cached = rankingService.getRecordedMatch(
                         snapshotId = snapshotId,
@@ -552,7 +565,7 @@ class TaxonomyBenchmarkService(
                         val isTie = judgeWinner == "tie"
                         rankingService.recordMatch(
                             query = sample.questionText,
-                            domain = primaryEval.domainLabel,
+                            domain = domainName,
                             winner = if (isTie) modelA else judgeWinner!!,
                             loser = if (isTie) modelB else if (judgeWinner == modelA) modelB else modelA,
                             isTie = isTie,

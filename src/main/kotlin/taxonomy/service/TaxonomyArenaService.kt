@@ -179,10 +179,13 @@ class TaxonomyArenaService(
     suspend fun compareModels(query: String, modelA: String, modelB: String): ArenaResult = coroutineScope {
         _state.value = AnalysisPanelState(mode = AnalysisMode.ARENA, query = query, modelA = modelA, modelB = modelB)
 
-        val discoveryJob = async { discoverDomainsAndJudges(query) }
-        val (allMatches, judges) = discoveryJob.await()
-        
-        val initialStatus = allMatches.associate { node ->
+        val leaves = routeToLeaves(query)
+        val judges = leaves.mapNotNull { leafJudge(it) }
+        if (judges.isEmpty()) {
+            return@coroutineScope ArenaResult(query, modelA, modelB, "", "", emptyList())
+        }
+
+        val initialStatus = leaves.associate { node ->
             (node.label ?: node.id) to (if (node.judgePrompt != null) "PENDING" else "NO JUDGE")
         }
         _state.update { it.copy(domainStatus = initialStatus) }
@@ -258,71 +261,21 @@ class TaxonomyArenaService(
                 domainStatus = current.domainStatus + (label to status)
             )
         }
-    }
-
-    private fun cosineSimilarity(a: DoubleArray, b: FloatArray): Double {
-        if (a.isEmpty() || b.isEmpty() || a.size != b.size) return 0.0
-        var dot = 0.0
-        var normA = 0.0
-        var normB = 0.0
-        for (i in a.indices) {
-            dot += a[i] * b[i]
-            normA += a[i] * a[i]
-            normB += b[i] * b[i]
-        }
-        if (normA <= 0.0 || normB <= 0.0) return 0.0
-        return dot / (Math.sqrt(normA) * Math.sqrt(normB))
-    }
-
-    private val CATEGORY_KEYWORDS = mapOf(
-        "biology" to listOf("biology", "genetic", "molecular", "cellular", "physiology",
-                            "evolution", "ecological", "viral", "anatomical", "metabol"),
-        "physics" to listOf("physics", "thermodynamic", "wave", "heat", "transport"),
-        "chemistry" to listOf("chem", "stoichiometry", "equilibrium", "acid", "base")
-    )
-
-    suspend fun discoverDomainsAndJudges(text: String, category: String? = null): Pair<List<GraphNode>, List<GraphNode>> {
-        val root = taxonomyService.getGraph() ?: return emptyList<GraphNode>() to emptyList()
+    }    // NEW: Pure routing — finds the leaf node(s) for a query.
+    // Returns empty if the query is an outlier (no leaf match). Discard it — done.
+    suspend fun routeToLeaves(text: String): List<GraphNode> {
+        val root = taxonomyService.getGraph() ?: return emptyList()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
-        val results = ops.routeQuery(emb, root, currentIteration = 2)
-
-        val candidatesWithScores = results.keys.map { node ->
-            if (node.vmfMu.isEmpty()) {
-                node to 1.0
-            } else {
-                val slicedX = emb.projectTo(node.sliceDim)
-                val sim = cosineSimilarity(slicedX, node.vmfMu)
-                log.trace("Routing sim '${node.label ?: node.id}': ${"%.4f".format(sim)}")
-                node to sim
-            }
-        }.sortedByDescending { it.second }
-
-        val candidates = candidatesWithScores.mapIndexedNotNull { index, (node, sim) ->
-            val threshold = if (index == 0) 0.65 else 0.75
-            if (sim >= threshold) node else null
-        }
-
-        val domainFilteredNodes = candidates.filter { node ->
-            val nodeCategory = node.label?.lowercase() ?: ""
-            val queryCategory = category?.lowercase() ?: ""
-            queryCategory.isBlank() || CATEGORY_KEYWORDS[queryCategory]?.any { it in nodeCategory } ?: true
-        }
-
-        val allMatchedNodes = mutableSetOf<GraphNode>()
-        val judges = mutableSetOf<GraphNode>()
-        fun collectLineage(node: GraphNode, visited: MutableSet<String>) {
-            if (!visited.add(node.id)) return
-            allMatchedNodes.add(node)
-            if (node.judgePrompt != null || node.isLeaf) judges.add(node)
-            node.parents.forEach { collectLineage(it, visited) }
-        }
-        val visited = mutableSetOf<String>()
-        domainFilteredNodes.forEach { collectLineage(it, visited) }
-        return allMatchedNodes.toList() to judges
-            .distinctBy { it.id }
-            .sortedByDescending { it.depth }
+        // routeQuery already walks the DAG and returns the best-fit leaves
+        return ops.routeQuery(emb, root, currentIteration = 2)
+            .keys
+            .filter { it.isLeaf }   // only leaves — ancestors are irrelevant for judging
     }
+
+    // NEW: Given a leaf node, return it as judge if it has a prompt. Null = discard.
+    fun leafJudge(node: GraphNode): GraphNode? =
+        if (node.judgePrompt != null) node else null
 
     private suspend fun evaluatePairwise(
         node: GraphNode,
@@ -392,20 +345,6 @@ class TaxonomyArenaService(
         )
     }
 
-    private fun findNodeById(root: GraphNode, targetId: String, visited: MutableSet<String> = mutableSetOf()): GraphNode? {
-        if (root.id == targetId) return root
-        if (!visited.add(root.id)) return null
-        for (child in root.children) {
-            val found = findNodeById(child, targetId, visited)
-            if (found != null) return found
-        }
-        for (child in root.crossLinkChildren) {
-            val found = findNodeById(child, targetId, visited)
-            if (found != null) return found
-        }
-        return null
-    }
-
     suspend fun evaluateWithPrecomputedTraces(
         query: String,
         options: List<String>,
@@ -413,19 +352,13 @@ class TaxonomyArenaService(
         traceA: String,
         modelB: String,
         traceB: String,
-        targetNodeId: String? = null,
-        category: String? = null
+        expectedNodeId: String? = null
     ): List<DomainEvaluation> = coroutineScope {
-        // Route the question to find relevant leaf judges
-        val root = taxonomyService.getGraph() ?: return@coroutineScope emptyList()
-        val (_, judgesList) = discoverDomainsAndJudges(query, category)
-        val judges = judgesList.toMutableList()
-        if (targetNodeId != null) {
-            val targetNode = findNodeById(root, targetNodeId)
-            if (targetNode != null && judges.none { it.id == targetNode.id }) {
-                judges.add(targetNode)
-            }
+        val leaves = routeToLeaves(query)
+        if (expectedNodeId != null && leaves.none { it.id == expectedNodeId }) {
+            log.info("Routing discrepancy: query \"${query.take(30)}...\" routed to leaves ${leaves.map { it.label ?: it.id }} but expected leaf $expectedNodeId")
         }
+        val judges = leaves.mapNotNull { leafJudge(it) }
         if (traceA.isBlank() || traceB.isBlank()) {
             log.warn("Empty trace for query=\"${query.take(30)}...\" model=$modelA/$modelB")
         }

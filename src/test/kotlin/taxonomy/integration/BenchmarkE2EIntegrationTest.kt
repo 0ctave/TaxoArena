@@ -108,8 +108,7 @@ class BenchmarkE2EIntegrationTest {
             traceA: String,
             modelB: String,
             traceB: String,
-            targetNodeId: String?,
-            category: String?
+            expectedNodeId: String?
         ): List<DomainEvaluation> = listOf(
             DomainEvaluation(
                 domain = "stub-leaf-judge",
@@ -175,7 +174,7 @@ class BenchmarkE2EIntegrationTest {
         }
         loader.syncReservedPool(reservedFile)
 
-        val dummyRoot = GraphNode(id = "root", label = "stub-leaf-judge", depth = 0)
+        val dummyRoot = GraphNode(id = "root", label = "stub-leaf-judge", depth = 0, judgePrompt = "stub prompt")
         mockTaxonomyService = mock(TaxonomyService::class.java)
         org.mockito.Mockito.`when`(mockTaxonomyService.getGraph()).thenReturn(dummyRoot)
         org.mockito.Mockito.`when`(mockTaxonomyService.activeSnapshotId()).thenReturn("stubbed-snapshot")
