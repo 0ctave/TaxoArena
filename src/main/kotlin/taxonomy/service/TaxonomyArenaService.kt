@@ -350,7 +350,7 @@ class TaxonomyArenaService(
             if (winner == "Model A") res1.second else if (winner == "Model B") res2.second else "Consistent tie verdict"
         }
 
-        val finalConfidence = if (positionFlip) avgConfidence * 0.5 else avgConfidence
+        val finalConfidence = (if (positionFlip) avgConfidence * 0.5 else avgConfidence).coerceAtMost(0.95)
 
         DomainEvaluation(
             domain      = node.label ?: "Emergent Concept",
@@ -508,15 +508,26 @@ class TaxonomyArenaService(
             val cleanWinner = when (rawWinner.uppercase()) {
                 "MODEL A" -> "Model A"
                 "MODEL B" -> "Model B"
+                "TIE", "DRAW", "EQUAL" -> "TIE"
                 else -> "INVALID"
             }
             val confidence = element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.0
-            log.debug("Judge parsed: winner=$cleanWinner conf=${"%.2f".format(confidence)}")
+            val comparisonText = (element["comparison"]?.jsonPrimitive?.content 
+                ?: element["rationale"]?.jsonPrimitive?.content 
+                ?: "").lowercase()
+            val impliesNoWinner = listOf(
+                "no decisive difference", "identical", "both arrive",
+                "neither surpasses", "same conclusion", "indistinguishable"
+            ).any { it in comparisonText }
+            val finalWinner = if (impliesNoWinner) "TIE" else cleanWinner
+            val finalConfidence = if (impliesNoWinner) minOf(0.5, confidence) else confidence
+
+            log.debug("Judge parsed: winner=$finalWinner conf=${"%.2f".format(finalConfidence)}")
             log.trace("Judge raw response: $cleanJson")
             Triple(
-                cleanWinner,
+                finalWinner,
                 element["rationale"]?.jsonPrimitive?.content ?: element["comparison"]?.jsonPrimitive?.content ?: response,
-                confidence
+                finalConfidence
             )
         } catch (e: Exception) { 
             log.warn("Failed to parse judge response: ${e.message}. Raw response was: $response", e)
@@ -567,15 +578,11 @@ Evaluation order — follow exactly:
 1. CRITIQUE Model A: assess its reasoning against the rubric. Identify correct steps, errors, gaps.
 2. CRITIQUE Model B: same process, independently of Model A.
 3. COMPARE: identify the decisive difference between A and B.
-4. DECIDE: declare one winner — see tie-break rules below.
+4. DECIDE: declare the winner — either "Model A", "Model B", or "TIE".
 
-Tie-break rules — you MUST output "Model A" or "Model B". Never "tie", "draw", or "equal":
-• If both reach the correct conclusion → prefer the one with more rigorous intermediate steps.
-• If both are incorrect → prefer the one with fewer conceptual errors and closer partial reasoning.
-• If still indistinguishable → apply in order:
-  (a) correctness of the final selected option,
-  (b) fewer logical fallacies,
-  (c) better alignment with CRITICAL-importance axioms.
+If both models demonstrate equivalent reasoning: output winner: "TIE", confidence ≤ 0.5.
+Only declare a decisive winner when one model has measurably stronger intermediate steps. Otherwise, if they are still indistinguishable, declare a "TIE".
+Reserve confidence 0.95–1.0 only for cases with overwhelming evidence. Default to 0.7–0.85 for clear wins.
 
 Your rubric:
 $rubric
@@ -596,7 +603,7 @@ $traceB
 You do not have access to the correct answer. Your task is to determine which model demonstrates
 superior reasoning quality based solely on the logical rigour and domain soundness of its response.
 
-You MUST compare both models and choose a winner. Ties are strictly forbidden.
+If both models are genuinely equivalent, output winner: "TIE" with confidence ≤ 0.5.
 
 Evaluate following the mandatory sequence:
 
@@ -611,8 +618,8 @@ Output ONLY the following JSON. No prose before or after. No markdown fences.
   "critique_a": "<your critique of Model A>",
   "critique_b": "<your critique of Model B>",
   "comparison": "<decisive difference in reasoning quality>",
-  "winner": "Model A or Model B",
-  "confidence": <0.0 to 1.0>
+  "winner": "Model A, Model B, or TIE",
+  "confidence": <0.0 to 1.0 (default to 0.7-0.85 for clear wins, reserve 0.95-1.0 only for overwhelming evidence)>
 }""".trimIndent()
     }
 }

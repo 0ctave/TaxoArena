@@ -643,7 +643,7 @@ class TaxonomyRankingService {
 
         // Also propagate a fraction of the update to the "global" domain if not already global
         if (domain != "global") {
-            updateGlobalAnchorRating(winner, loser, isTie, v, w, c, c2, varW, varL, confidence, snapshotId)
+            updateGlobalAnchorRating(winner, loser, isTie, confidence, snapshotId)
         }
     }
 
@@ -651,32 +651,11 @@ class TaxonomyRankingService {
         winner: String,
         loser: String,
         isTie: Boolean,
-        v: Double,
-        w: Double,
-        c: Double,
-        c2: Double,
-        varW: Double,
-        varL: Double,
         confidence: Double,
         snapshotId: String = "global"
     ) {
-        val rW = getRating(winner, "global", snapshotId)
-        val rL = getRating(loser, "global", snapshotId)
-
-        // Propagate updates with a decay factor to simulate global transfer
         val decay = 0.3
-        val rawNextMuW = rW.mu + (rW.sigma * rW.sigma / c) * v * decay
-        val rawNextMuL = rL.mu - (rL.sigma * rL.sigma / c) * v * decay
-        val rawNextSigmaW = Math.sqrt((rW.sigma * rW.sigma * (1.0 - (rW.sigma * rW.sigma / c2) * w * decay)).coerceAtLeast(1e-4))
-        val rawNextSigmaL = Math.sqrt((rL.sigma * rL.sigma * (1.0 - (rL.sigma * rL.sigma / c2) * w * decay)).coerceAtLeast(1e-4))
-
-        val nextMuW = rW.mu + confidence * (rawNextMuW - rW.mu)
-        val nextMuL = rL.mu + confidence * (rawNextMuL - rL.mu)
-        val nextSigmaW = rW.sigma + confidence * (rawNextSigmaW - rW.sigma)
-        val nextSigmaL = rL.sigma + confidence * (rawNextSigmaL - rL.sigma)
-
-        saveRating(AgentRating(winner, "global", nextMuW, nextSigmaW), snapshotId)
-        saveRating(AgentRating(loser, "global", nextMuL, nextSigmaL), snapshotId)
+        updateRatings(winner, loser, "global", isTie, confidence * decay, snapshotId)
     }
 
     /**

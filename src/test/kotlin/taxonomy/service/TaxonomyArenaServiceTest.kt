@@ -102,7 +102,7 @@ class TaxonomyArenaServiceTest {
         assertEquals(2, promptQueries.size)
 
         // Verify the instructions within prompt queries
-        assertTrue(promptQueries[0].contains("You MUST compare both models and choose a winner. Ties are strictly forbidden."))
+        assertTrue(promptQueries[0].contains("If both models are genuinely equivalent, output winner: \"TIE\" with confidence ≤ 0.5."))
     }
 
     @Test

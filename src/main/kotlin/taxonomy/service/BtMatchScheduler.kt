@@ -165,6 +165,16 @@ class BtMatchScheduler(
         }
         val nij = ps?.totalComparisons ?: 0
 
+        if (nij < 4) {
+            val base = 5000.0 + (4 - nij) * 100.0
+            val uncertainty = if (state != null) {
+                val sei = state.stdErrors[mA] ?: 10.0
+                val sej = state.stdErrors[mB] ?: 10.0
+                sei + sej
+            } else 10.0
+            return base + uncertainty
+        }
+
         // Closeness: highest when P(A beats B) is 0.5
         val closeness = if (state != null) {
             val si = state.btScores[mA] ?: 0.0
