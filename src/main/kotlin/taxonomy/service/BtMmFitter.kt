@@ -80,7 +80,7 @@ object BtMmFitter {
         }
 
         return models.mapIndexed { i, m ->
-            m to if (fisher[i] > 0.0) 1.0 / sqrt(fisher[i]) else Double.MAX_VALUE
+            m to if (fisher[i] > 0.0) 1.0 / sqrt(fisher[i]) else 10.0
         }.toMap()
     }
 }

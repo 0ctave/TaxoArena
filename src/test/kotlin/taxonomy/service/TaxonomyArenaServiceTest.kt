@@ -96,7 +96,7 @@ class TaxonomyArenaServiceTest {
         assertEquals("Test Concept", eval.domainLabel)
         assertEquals("TIE", eval.winner) // Position flip resolved as TIE
         assertTrue(eval.rationale.contains("Split verdict (position flip)"))
-        assertEquals(0.8, eval.confidence)
+        assertEquals(0.4, eval.confidence)
 
         // Should have called LLM exactly 2 times (both directions run once)
         assertEquals(2, promptQueries.size)

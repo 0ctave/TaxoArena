@@ -40,7 +40,7 @@ class BtMatchScheduler(
         resultsMatrix: Map<Int, Map<String, ModelEvalResult>>,
         nodeToQueries: Map<String, List<Int>>,
         batchSize: Int,
-        maxConcurrentPerModel: Int = 2
+        maxConcurrentPerModel: Int = maxOf(2, models.size - 1)
     ): List<BtMatchTask> {
         val tasks = mutableListOf<BtMatchTask>()
         val modelLoad = mutableMapOf<String, Int>()

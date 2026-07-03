@@ -17,6 +17,7 @@ import taxonomy.dataset.ModelEvalStore
 import taxonomy.model.BenchmarkReport
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
+import taxonomy.model.projectTo
 import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.operations.TaxonomyOperations
 import kotlin.math.abs
@@ -251,11 +252,37 @@ class TaxonomyArenaService(
         }
     }
 
+    private fun cosineSimilarity(a: DoubleArray, b: FloatArray): Double {
+        if (a.isEmpty() || b.isEmpty() || a.size != b.size) return 0.0
+        var dot = 0.0
+        var normA = 0.0
+        var normB = 0.0
+        for (i in a.indices) {
+            dot += a[i] * b[i]
+            normA += a[i] * a[i]
+            normB += b[i] * b[i]
+        }
+        if (normA <= 0.0 || normB <= 0.0) return 0.0
+        return dot / (Math.sqrt(normA) * Math.sqrt(normB))
+    }
+
     suspend fun discoverDomainsAndJudges(text: String): Pair<List<GraphNode>, List<GraphNode>> {
         val root = taxonomyService.getGraph() ?: return emptyList<GraphNode>() to emptyList()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
         val results = ops.routeQuery(emb, root, currentIteration = 2)
+
+        val candidates = results.keys.filter { node ->
+            if (node.vmfMu.isEmpty()) {
+                true
+            } else {
+                val slicedX = emb.projectTo(node.sliceDim)
+                val sim = cosineSimilarity(slicedX, node.vmfMu)
+                log.info("DEBUG: Node routing similarity for '${node.label ?: node.id}': $sim")
+                sim >= 0.65
+            }
+        }
+
         val allMatchedNodes = mutableSetOf<GraphNode>()
         val judges = mutableSetOf<GraphNode>()
         fun collectLineage(node: GraphNode, visited: MutableSet<String>) {
@@ -265,7 +292,7 @@ class TaxonomyArenaService(
             node.parents.forEach { collectLineage(it, visited) }
         }
         val visited = mutableSetOf<String>()
-        results.keys.forEach { collectLineage(it, visited) }
+        candidates.forEach { collectLineage(it, visited) }
         return allMatchedNodes.toList() to judges
             .distinctBy { it.id }
             .sortedByDescending { it.depth }
@@ -315,11 +342,13 @@ class TaxonomyArenaService(
             if (winner == "Model A") res1.second else if (winner == "Model B") res2.second else "Consistent tie verdict"
         }
 
+        val finalConfidence = if (positionFlip) avgConfidence * 0.5 else avgConfidence
+
         DomainEvaluation(
             domain      = node.label ?: "Emergent Concept",
             winner      = winner,           // "Model A", "Model B", or "TIE"
             rationale   = rationale,
-            confidence  = avgConfidence,
+            confidence  = finalConfidence,
             positionFlip = positionFlip,
             nodeId       = node.id
         )
