@@ -272,15 +272,20 @@ class TaxonomyArenaService(
         val emb = Embedding(text, text, vector)
         val results = ops.routeQuery(emb, root, currentIteration = 2)
 
-        val candidates = results.keys.filter { node ->
+        val candidatesWithScores = results.keys.map { node ->
             if (node.vmfMu.isEmpty()) {
-                true
+                node to 1.0
             } else {
                 val slicedX = emb.projectTo(node.sliceDim)
                 val sim = cosineSimilarity(slicedX, node.vmfMu)
-                log.info("DEBUG: Node routing similarity for '${node.label ?: node.id}': $sim")
-                sim >= 0.65
+                log.trace("Routing sim '${node.label ?: node.id}': ${"%.4f".format(sim)}")
+                node to sim
             }
+        }.sortedByDescending { it.second }
+
+        val candidates = candidatesWithScores.mapIndexedNotNull { index, (node, sim) ->
+            val threshold = if (index == 0) 0.65 else 0.75
+            if (sim >= threshold) node else null
         }
 
         val allMatchedNodes = mutableSetOf<GraphNode>()
@@ -325,6 +330,9 @@ class TaxonomyArenaService(
 
         val isInvalid = vote1 == "INVALID" || vote2 == "INVALID"
         val positionFlip = !isInvalid && vote1 != vote2
+        if (positionFlip) {
+            log.info("Position flip detected for pair $nameA vs $nameB on node ${node.label ?: node.id}")
+        }
 
         val winner = if (isInvalid) {
             "INVALID"
@@ -387,8 +395,9 @@ class TaxonomyArenaService(
                 judges.add(targetNode)
             }
         }
-        log.info("DEBUG: discoverDomainsAndJudges returned ${judges.size} judges for query: \"${query.take(50)}...\"")
-        log.info("DEBUG trace lengths: traceA=${traceA.length} traceB=${traceB.length} | traceA[:100]=${traceA.take(100).replace("\n", " ")} | traceB[:100]=${traceB.take(100).replace("\n", " ")}")
+        if (traceA.isBlank() || traceB.isBlank()) {
+            log.warn("Empty trace for query=\"${query.take(30)}...\" model=$modelA/$modelB")
+        }
         if (judges.isEmpty()) return@coroutineScope emptyList()
 
         // Build the MCQ context for judge prompts (question + options visible)
@@ -502,7 +511,8 @@ class TaxonomyArenaService(
                 else -> "INVALID"
             }
             val confidence = element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.0
-            log.info("DEBUG: parseJudgeResponse parsed winner=$cleanWinner, confidence=$confidence from response: $cleanJson")
+            log.debug("Judge parsed: winner=$cleanWinner conf=${"%.2f".format(confidence)}")
+            log.trace("Judge raw response: $cleanJson")
             Triple(
                 cleanWinner,
                 element["rationale"]?.jsonPrimitive?.content ?: element["comparison"]?.jsonPrimitive?.content ?: response,

@@ -159,13 +159,14 @@ class TaxonomyBenchmarkService(
             }
         }
 
+        val targetNodes = scheduler.selectTargetNodes(allNodes, btStates, nodeToQueries, maxNodes = 100)
+        log.info("Selected fixed targetNodes for the entire run: ${targetNodes.map { it.label ?: it.id }}")
+
         var round = 0
         val maxRounds = 20
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
 
         while (round < maxRounds && !stoppingPolicy.shouldStop(btStates, round, root.id)) {
-            val targetNodes = scheduler.selectTargetNodes(allNodes, btStates, nodeToQueries)
-            log.info("DEBUG: Round $round - targetNodes: ${targetNodes.map { it.id }}")
             if (targetNodes.isEmpty()) break
 
             val batch = scheduler.selectNextBatch(
@@ -177,7 +178,7 @@ class TaxonomyBenchmarkService(
                 nodeToQueries = nodeToQueries,
                 batchSize = req.parallelism
             )
-            log.info("DEBUG: Round $round - scheduled batch size: ${batch.size}")
+            log.debug("Round $round - scheduled batch size: ${batch.size}")
             if (batch.isEmpty()) break
 
             val roundResults = batch.map { task ->
@@ -186,27 +187,27 @@ class TaxonomyBenchmarkService(
 
                     task.queryIds.mapNotNull { queryIdStr ->
                         val qId = queryIdStr.toIntOrNull() ?: run {
-                            log.info("DEBUG: queryIdStr is not Int: $queryIdStr")
+                            log.warn("queryIdStr is not Int: $queryIdStr")
                             return@mapNotNull null
                         }
                         val modelResults = matrix[qId] ?: run {
-                            log.info("DEBUG: matrix[qId] is null for qId $qId")
+                            log.warn("matrix[qId] is null for qId $qId")
                             return@mapNotNull null
                         }
 
                         val sample = modelResults.values.firstOrNull() ?: run {
-                            log.info("DEBUG: modelResults has no values for qId $qId")
+                            log.warn("modelResults has no values for qId $qId")
                             return@mapNotNull null
                         }
                         val gtAnswer = sample.gtAnswer
                         val gtCategory = sample.category
 
                         val outputA = modelResults[task.modelA] ?: run {
-                            log.info("DEBUG: modelResults has no entry for modelA ${task.modelA} for qId $qId. Available models in results: ${modelResults.keys}")
+                            log.warn("modelResults has no entry for modelA ${task.modelA} for qId $qId. Available models in results: ${modelResults.keys}")
                             return@mapNotNull null
                         }
                         val outputB = modelResults[task.modelB] ?: run {
-                            log.info("DEBUG: modelResults has no entry for modelB ${task.modelB} for qId $qId. Available models in results: ${modelResults.keys}")
+                            log.warn("modelResults has no entry for modelB ${task.modelB} for qId $qId. Available models in results: ${modelResults.keys}")
                             return@mapNotNull null
                         }
 
@@ -245,18 +246,15 @@ class TaxonomyBenchmarkService(
                                 traceB = getRobustTrace(outputB),
                                 targetNodeId = task.nodeId
                             )
-                            log.info("DEBUG: evaluateWithPrecomputedTraces returned ${evals.size} evaluations for qId $qId")
                             evals
                         }
 
                         if (domainEvaluations.isEmpty()) {
-                            log.info("DEBUG: domainEvaluations is empty for qId $qId")
+                            log.trace("domainEvaluations is empty for qId $qId")
                             return@mapNotNull null
                         }
 
-                        if (domainEvaluations.size > 1) {
-                            log.info("DEBUG: Multi-judge query detected for qId $qId. Evaluations: ${domainEvaluations.map { "${it.domainLabel} (nodeId=${it.nodeId}, winner=${it.winner}, conf=${it.confidence})" }}")
-                        }
+                            log.debug("multi-judge qId=$qId: ${domainEvaluations.joinToString { "${it.domain.take(15)}->${it.winner}" }}")
 
                         val rawPrimaryEval = domainEvaluations.firstOrNull { it.nodeId == task.nodeId }
                             ?: domainEvaluations.maxByOrNull { it.confidence }
@@ -266,7 +264,7 @@ class TaxonomyBenchmarkService(
                         val primaryEval = if (satisfiesGate) {
                             rawPrimaryEval
                         } else {
-                            log.info("DEBUG: evaluation confidence ${rawPrimaryEval.confidence} is below confidenceGate ${req.confidenceGate} for qId $qId. Treating as LOW_CONFIDENCE_TIE.")
+                            log.warn("evaluation confidence ${rawPrimaryEval.confidence} is below confidenceGate ${req.confidenceGate} for qId $qId. Treating as LOW_CONFIDENCE_TIE.")
                             rawPrimaryEval.copy(winner = "TIE", rationale = "LOW_CONFIDENCE_TIE: Below confidence gate (${rawPrimaryEval.confidence} < ${req.confidenceGate}). Original: ${rawPrimaryEval.rationale}")
                         }
 
@@ -345,11 +343,11 @@ class TaxonomyBenchmarkService(
                 val node = allNodes.firstOrNull { it.id == eval.nodeId } ?: allNodes.firstOrNull { it.label == eval.domain } ?: return@flatMap emptyList<String>()
                 node.allAncestors()
             }.toSet()
-            log.info("DEBUG: Round $round - dirtyNodes: $dirtyNodes")
+            log.trace("Round $round - dirtyNodes: $dirtyNodes")
 
             for (nodeId in dirtyNodes) {
                 val nodePairs = rankingService.getNodePairStats(nodeId, snapshotId)
-                log.info("DEBUG: Round $round - updated nodePairs for $nodeId: ${nodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
+                log.trace("Round $round - updated nodePairs for $nodeId: ${nodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
                 pairStatsMap[nodeId] = nodePairs.toMutableList()
 
                 if (nodePairs.isNotEmpty()) {

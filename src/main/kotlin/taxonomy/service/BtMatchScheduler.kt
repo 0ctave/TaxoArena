@@ -122,7 +122,7 @@ class BtMatchScheduler(
                     // Take a slice of available queries
                     val evaluatedCount = ps?.totalComparisons ?: 0
                     val querySlice = availableQueries.keys.drop(evaluatedCount).take(minOf(needed, BATCH_STEP_SIZE))
-                    log.info("DEBUG: Scheduler at node ${node.label ?: node.id} for pair $mA vs $mB: evaluatedCount=$evaluatedCount, needed=$needed, limit=$limit, availableQueriesSize=${availableQueries.size}, querySlice=$querySlice")
+                    log.debug("Sched [${(node.label ?: node.id).take(20)}] $mA vs $mB: ec=$evaluatedCount qs=$querySlice")
                     if (querySlice.isEmpty()) return@forEach
 
                     tasks += BtMatchTask(
