@@ -5,7 +5,7 @@ import org.gradle.kotlin.dsl.kotlin
 // SPDX-License-Identifier: Apache-2.0
 
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.4.0"
     kotlin("plugin.serialization") version "2.1.10"
     kotlin("plugin.spring") version "2.1.10"
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
