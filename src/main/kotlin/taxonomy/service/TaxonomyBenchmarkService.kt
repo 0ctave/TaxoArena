@@ -108,12 +108,14 @@ class TaxonomyBenchmarkService(
         val root = taxonomyService.getGraph() ?: return@coroutineScope emptyReport()
         val allNodes = getAllNodes(root)
 
+        val frozenLeafIds = allNodes.filter { it.children.isEmpty() }.map { it.id }.toSet()
+
         // Pre-route all questions to target nodes dynamically using the NiW routing engine
         val nodeToQueries = mutableMapOf<String, MutableList<Int>>()
         var outlierCount = 0
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
-            val leaves = arenaService.routeToLeaves(sample.questionText)
+            val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds)
             if (leaves.isEmpty()) {
                 outlierCount++
                 log.debug("qId=$qId is an outlier — no leaf match, skipping")
@@ -254,7 +256,8 @@ class TaxonomyBenchmarkService(
                                 traceA = getRobustTrace(outputA),
                                 modelB = task.modelB,
                                 traceB = getRobustTrace(outputB),
-                                expectedNodeId = task.nodeId
+                                expectedNodeId = task.nodeId,
+                                frozenLeafIds = frozenLeafIds
                             )
                             evals
                         }
@@ -480,6 +483,7 @@ class TaxonomyBenchmarkService(
         val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
         val root = taxonomyService.getGraph() ?: return@coroutineScope null
         val allNodes = getAllNodes(root)
+        val frozenLeafIds = allNodes.filter { it.children.isEmpty() }.map { it.id }.toSet()
 
         // Model correctness straight from pre-extracted pred
         val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
@@ -492,7 +496,7 @@ class TaxonomyBenchmarkService(
                 val outputB = modelResults[modelB] ?: return@async null
 
                 runCatching {
-                    val leaves = arenaService.routeToLeaves(sample.questionText)
+                    val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds)
                     val judges = leaves.mapNotNull { arenaService.leafJudge(it) }
                     val primaryJudge = judges.maxByOrNull { it.depth } ?: return@async null
                     checkNotNull(primaryJudge.judgePrompt) {
@@ -531,7 +535,8 @@ class TaxonomyBenchmarkService(
                             modelA = modelA,
                             traceA = getRobustTrace(outputA),
                             modelB = modelB,
-                            traceB = getRobustTrace(outputB)
+                            traceB = getRobustTrace(outputB),
+                            frozenLeafIds = frozenLeafIds
                         )
                     }
 

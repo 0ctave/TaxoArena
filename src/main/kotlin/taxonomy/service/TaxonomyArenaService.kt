@@ -263,14 +263,17 @@ class TaxonomyArenaService(
         }
     }    // NEW: Pure routing — finds the leaf node(s) for a query.
     // Returns empty if the query is an outlier (no leaf match). Discard it — done.
-    suspend fun routeToLeaves(text: String): List<GraphNode> {
+    suspend fun routeToLeaves(text: String, frozenLeafIds: Set<String>? = null): List<GraphNode> {
         val root = taxonomyService.getGraph() ?: return emptyList()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
         // routeQuery already walks the DAG and returns the best-fit leaves
         return ops.routeQuery(emb, root, currentIteration = 2)
             .keys
-            .filter { it.isLeaf }   // only leaves — ancestors are irrelevant for judging
+            .filter { node ->
+                if (frozenLeafIds != null) node.id in frozenLeafIds
+                else node.isLeaf   // live check only for non-benchmark use
+            }
     }
 
     // NEW: Given a leaf node, return it as judge if it has a prompt. Null = discard.
@@ -352,9 +355,10 @@ class TaxonomyArenaService(
         traceA: String,
         modelB: String,
         traceB: String,
-        expectedNodeId: String? = null
+        expectedNodeId: String? = null,
+        frozenLeafIds: Set<String>? = null
     ): List<DomainEvaluation> = coroutineScope {
-        val leaves = routeToLeaves(query)
+        val leaves = routeToLeaves(query, frozenLeafIds)
         if (expectedNodeId != null && leaves.none { it.id == expectedNodeId }) {
             log.info("Routing discrepancy: query \"${query.take(30)}...\" routed to leaves ${leaves.map { it.label ?: it.id }} but expected leaf $expectedNodeId")
         }
