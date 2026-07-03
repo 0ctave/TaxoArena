@@ -91,11 +91,20 @@ class TaxonomyBenchmarkService(
         require(req.models.size >= 2) { "Need at least 2 models" }
         val modelNames = req.models.map { it.modelName }
 
+        val health = evalStore.verifyIngestion(modelNames)
+        health.forEach { h ->
+            if (h.reservedRows == 0) {
+                log.warn("Model '${h.modelName}' has 0 reserved rows — run syncReservedPool or re-ingest")
+            }
+            log.info("  ${h.modelName}: total=${h.totalRows} reserved=${h.reservedRows} math=${h.mathRows} reserved_math=${h.reservedMathRows}")
+        }
+
         val matrix = evalStore.getResultsMatrix(
             models = modelNames,
             category = req.category,
             reservedOnly = req.reservedOnly,
-            limit = req.queryLimit
+            limit = req.queryLimit,
+            minModelCount = 2
         )
 
         log.info("Benchmark: ${matrix.size} questions, ${modelNames.size} models")

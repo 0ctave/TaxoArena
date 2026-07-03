@@ -303,7 +303,7 @@ private fun ConfigRoute(
             ) {
                 DomainSelectorTable(
                     pWidth = leftW - 4,
-                    pHeight = topH - 2,
+                    pHeight = topH - 3,
                     domains = availableDomains,
                     offset = state.config.domainScrollOffset,
                     selectedIdx = state.config.selectedDomainIdx,
@@ -424,13 +424,13 @@ private fun MainDashboardRoute(
             contextHints = dagHints,
         ) {
             if (benchmarkPicking) {
-                BenchmarkPickerContent(topH, dagW, state, availableDomains)
+                BenchmarkPickerContent(topH - 4, dagW, state, availableDomains)
                 return@Panel
             }
             when (navContext) {
                 NavContext.DAG_EXPLORE -> TopologyPanel(
                     width = dagW - 4,
-                    height = topH - 2,
+                    height = topH - 4,
                     state = state.topology,
                     availableDomains = availableDomains,
                     selectedDomains = deps.config.dataset.selectedDomains,
@@ -818,6 +818,7 @@ private fun BenchmarkPickerContent(
     state: TuiAppState,
     availableDomains: List<Pair<String, Int>>
 ) {
+    val clientH = topH - 4
     val domains = when {
         state.analysis.isPickingBatchDomains -> availableDomains
         state.benchmark.benchmarkIsPickingModels -> state.benchmark.loadedModels.map { it to 0 }
@@ -832,11 +833,11 @@ private fun BenchmarkPickerContent(
         state.analysis.isPickingBatchDomains -> state.analysis.batchDomainsPickerCursor
         else -> state.benchmark.benchmarkPickerCursor
     }
-    val visibleRows = (topH - 3).coerceAtLeast(1)
+    val visibleRows = clientH.coerceAtLeast(1)
     val pickerOffset = (cursor - visibleRows + 1).coerceAtLeast(0)
     DomainSelectorTable(
         pWidth = dagW - 4,
-        pHeight = topH - 2,
+        pHeight = clientH,
         domains = domains,
         offset = pickerOffset,
         selectedIdx = cursor,

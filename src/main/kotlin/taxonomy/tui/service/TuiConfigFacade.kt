@@ -231,8 +231,19 @@ class TuiConfigFacade(
         )
     )
 
-    fun getAvailableDomains(): List<Pair<String, Int>> =
-        deps.datasetFetcher.getAvailableDomains()
+    fun getAvailableDomains(): List<Pair<String, Int>> {
+        val root = deps.taxonomyService.getGraph()
+        if (root != null) {
+            return root.children.map { child ->
+                val rawName = child.label ?: child.id
+                val prettyName = rawName.split("_", "-").joinToString(" ") { word ->
+                    word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                }
+                prettyName to child.getRecursiveQueryCount()
+            }.sortedBy { it.first }
+        }
+        return deps.datasetFetcher.getAvailableDomains()
+    }
 
     fun isDatasetDownloaded(): Boolean =
         deps.datasetFetcher.isDatasetDownloaded()

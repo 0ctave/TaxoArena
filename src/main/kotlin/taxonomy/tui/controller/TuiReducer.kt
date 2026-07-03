@@ -272,19 +272,51 @@ object TuiReducer {
                     )
                 )
 
-            is TuiEvent.SetSelectedListIdx ->
+            is TuiEvent.SetSelectedListIdx -> {
+                val index = event.index.coerceAtLeast(0)
+                val bodyH = (state.shell.height - 5).coerceAtLeast(9)
+                val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+                val visibleHeight = (topH - 4).coerceAtLeast(1)
+                
+                val scrollMargin = 2
+                var currentOffset = state.topology.scrollOffset
+                
+                if (index < currentOffset + scrollMargin) {
+                    currentOffset = (index - scrollMargin).coerceAtLeast(0)
+                } else if (index >= currentOffset + visibleHeight - scrollMargin) {
+                    currentOffset = (index - visibleHeight + 1 + scrollMargin).coerceAtLeast(0)
+                }
+                
                 state.copy(
                     topology = state.topology.copy(
-                        selectedListIdx = event.index.coerceAtLeast(0)
+                        selectedListIdx = index,
+                        scrollOffset = currentOffset
                     )
                 )
+            }
 
-            is TuiEvent.SetSelectedTreeIdx ->
+            is TuiEvent.SetSelectedTreeIdx -> {
+                val index = event.index.coerceAtLeast(0)
+                val bodyH = (state.shell.height - 5).coerceAtLeast(9)
+                val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+                val visibleHeight = (topH - 6).coerceAtLeast(1)
+                
+                val scrollMargin = 2
+                var currentOffset = state.topology.treeScrollOffset
+                
+                if (index < currentOffset + scrollMargin) {
+                    currentOffset = (index - scrollMargin).coerceAtLeast(0)
+                } else if (index >= currentOffset + visibleHeight - scrollMargin) {
+                    currentOffset = (index - visibleHeight + 1 + scrollMargin).coerceAtLeast(0)
+                }
+                
                 state.copy(
                     topology = state.topology.copy(
-                        selectedTreeIdx = event.index.coerceAtLeast(0)
+                        selectedTreeIdx = index,
+                        treeScrollOffset = currentOffset
                     )
                 )
+            }
 
             is TuiEvent.SetTopologyAutoScroll ->
                 state.copy(
@@ -307,12 +339,28 @@ object TuiReducer {
                     )
                 )
 
-            is TuiEvent.SetSelectedDomainIdx ->
+            is TuiEvent.SetSelectedDomainIdx -> {
+                val index = event.index.coerceAtLeast(0)
+                val bodyH = (state.shell.height - 5).coerceAtLeast(9)
+                val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+                val visibleHeight = (topH - 3).coerceAtLeast(1)
+                
+                val scrollMargin = 2
+                var currentOffset = state.config.domainScrollOffset
+                
+                if (index < currentOffset + scrollMargin) {
+                    currentOffset = (index - scrollMargin).coerceAtLeast(0)
+                } else if (index >= currentOffset + visibleHeight - scrollMargin) {
+                    currentOffset = (index - visibleHeight + 1 + scrollMargin).coerceAtLeast(0)
+                }
+                
                 state.copy(
                     config = state.config.copy(
-                        selectedDomainIdx = event.index.coerceAtLeast(0)
+                        selectedDomainIdx = index,
+                        domainScrollOffset = currentOffset
                     )
                 )
+            }
 
             is TuiEvent.SetSelectedSettingIdx ->
                 state.copy(

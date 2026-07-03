@@ -226,8 +226,10 @@ class ModelEvalStore(
         models: List<String>,
         category: String? = null,
         reservedOnly: Boolean = true,
-        limit: Int = 0
+        limit: Int = 0,
+        minModelCount: Int = 2
     ): Map<Int, Map<String, ModelEvalResult>> {
+        val effectiveMin = minModelCount.coerceIn(2, models.size.coerceAtLeast(2))
         val modelPlaceholders = models.joinToString(",") { "?" }
         val catLower = category?.lowercase()
         val matrix = mutableMapOf<Int, MutableMap<String, ModelEvalResult>>()
@@ -237,7 +239,7 @@ class ModelEvalStore(
                 append("SELECT question_id FROM eval_results WHERE model_name IN ($modelPlaceholders)")
                 if (catLower != null) append(" AND category = ?")
                 if (reservedOnly) append(" AND is_reserved = 1")
-                append(" GROUP BY question_id HAVING COUNT(DISTINCT model_name) = ${models.size}")
+                append(" GROUP BY question_id HAVING COUNT(DISTINCT model_name) >= $effectiveMin")
                 append(" LIMIT $limit")
             }
 
@@ -290,15 +292,19 @@ class ModelEvalStore(
             }
         }
 
-        // Only return rows where ALL requested models have an answer
-        return matrix.filter { (_, byModel) -> models.all { it in byModel } }
+        // Only return rows where at least minModelCount models have an answer
+        return matrix.filter { (_, byModel) ->
+            byModel.size >= effectiveMin &&
+            models.count { it in byModel } >= effectiveMin
+        }
     }
 
     /**
      * Returns question_ids from the reserved pool that have embeddings cached.
      * These are the "fully linked" questions ready for benchmark.
      */
-    fun getLinkedReservedQuestionIds(models: List<String>): Set<Int> {
+    fun getLinkedReservedQuestionIds(models: List<String>, minModelCount: Int = 2): Set<Int> {
+        val effectiveMin = minModelCount.coerceIn(2, models.size.coerceAtLeast(2))
         val modelPlaceholders = models.joinToString(",") { "?" }
         val sql = """
             SELECT DISTINCT l.question_id
@@ -309,7 +315,7 @@ class ModelEvalStore(
                   SELECT question_id FROM eval_results
                   WHERE is_reserved = 1 AND model_name IN ($modelPlaceholders)
                   GROUP BY question_id
-                  HAVING COUNT(DISTINCT model_name) = ${models.size}
+                  HAVING COUNT(DISTINCT model_name) >= $effectiveMin
               )
         """.trimIndent()
         val ids = mutableSetOf<Int>()
@@ -338,12 +344,13 @@ class ModelEvalStore(
     }
 
     /** Question ids shared by ALL given models (intersection), capped by limit (0 = all). */
-    fun getSharedQuestionIds(models: List<String>, limit: Int = 0): List<Int> {
+    fun getSharedQuestionIds(models: List<String>, limit: Int = 0, minModelCount: Int = 2): List<Int> {
         if (models.isEmpty()) return emptyList()
+        val effectiveMin = minModelCount.coerceIn(2, models.size.coerceAtLeast(2))
         val placeholders = models.joinToString(",") { "?" }
         val sql = buildString {
             append("SELECT question_id FROM eval_results WHERE model_name IN ($placeholders) ")
-            append("GROUP BY question_id HAVING COUNT(DISTINCT model_name) = ${models.size} ")
+            append("GROUP BY question_id HAVING COUNT(DISTINCT model_name) >= $effectiveMin ")
             append("ORDER BY question_id")
             if (limit > 0) append(" LIMIT $limit")
         }
@@ -400,7 +407,47 @@ class ModelEvalStore(
             buildList { while (rs.next()) add(rs.getString(1)) }
         }
     }
+
+    fun verifyIngestion(models: List<String>): List<IngestionHealth> = conn().use { c ->
+        models.map { model ->
+            var total = 0
+            var reserved = 0
+            var math = 0
+            var reservedMath = 0
+
+            c.prepareStatement("SELECT COUNT(*) FROM eval_results WHERE model_name=?").use { ps ->
+                ps.setString(1, model)
+                val rs = ps.executeQuery()
+                if (rs.next()) total = rs.getInt(1)
+            }
+            c.prepareStatement("SELECT COUNT(*) FROM eval_results WHERE model_name=? AND is_reserved=1").use { ps ->
+                ps.setString(1, model)
+                val rs = ps.executeQuery()
+                if (rs.next()) reserved = rs.getInt(1)
+            }
+            c.prepareStatement("SELECT COUNT(*) FROM eval_results WHERE model_name=? AND category='math'").use { ps ->
+                ps.setString(1, model)
+                val rs = ps.executeQuery()
+                if (rs.next()) math = rs.getInt(1)
+            }
+            c.prepareStatement("SELECT COUNT(*) FROM eval_results WHERE model_name=? AND category='math' AND is_reserved=1").use { ps ->
+                ps.setString(1, model)
+                val rs = ps.executeQuery()
+                if (rs.next()) reservedMath = rs.getInt(1)
+            }
+
+            IngestionHealth(model, total, reserved, math, reservedMath)
+        }
+    }
 }
+
+data class IngestionHealth(
+    val modelName: String,
+    val totalRows: Int,
+    val reservedRows: Int,
+    val mathRows: Int,
+    val reservedMathRows: Int
+)
 
 data class EvalQuestionLink(
     val questionId: Int,

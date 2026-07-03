@@ -226,7 +226,7 @@ class ModelEvalLoader(
                 results += ModelEvalResult(
                     questionId   = item.question_id,
                     modelName    = modelName,
-                    category     = item.category,
+                    category     = MMLUCategories.normaliseCategory(item.category),
                     questionText = item.question,
                     options      = item.options,
                     gtAnswer     = item.answer,
@@ -252,6 +252,13 @@ class ModelEvalLoader(
         // Batch write
         val (inserted, skipped) = store.saveBatch(results)
         store.saveLinks(links.distinctBy { it.questionId })
+
+        // Auto-sync reserved pool for newly inserted rows
+        val reservedFile = File(reservedFilePath)
+        if (reservedFile.exists()) {
+            syncReservedPool(reservedFile)
+            log.info("Auto-synced reserved pool after ingesting '$modelName'")
+        }
 
         onProgress?.invoke(total, total)
 
