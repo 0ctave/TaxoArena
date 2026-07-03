@@ -91,8 +91,16 @@ class TuiController(
             onQuit()
             return
         }
-        _state.value = TuiReducer.reduce(_state.value, event)
-        commandController.handle(_state.value, event, ::dispatch)
+        val mappedEvent = if (event is TuiEvent.StartBatchGeneralityInput) {
+            val defaultParallelism = settingItemsProvider()
+                .firstOrNull { it.name == "LLM Parallelism Limit" }
+                ?.getValue?.invoke()?.toIntOrNull() ?: 4
+            TuiEvent.StartBatchGeneralityInputWithDefault(defaultParallelism)
+        } else {
+            event
+        }
+        _state.value = TuiReducer.reduce(_state.value, mappedEvent)
+        commandController.handle(_state.value, mappedEvent, ::dispatch)
 
         when (event) {
             is TuiEvent.KeyPressed    -> handleKeyPressed(event)

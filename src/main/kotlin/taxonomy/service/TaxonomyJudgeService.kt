@@ -36,9 +36,10 @@ class TaxonomyJudgeService(
         root: GraphNode,
         replaceExisting: Boolean = false,
         maxGenerality: Int = 0,
+        parallelismOverride: Int = 0,
         onNodeComplete: (suspend (GraphNode) -> Unit)? = null
     ) = coroutineScope {
-        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting, maxGenerality: $maxGenerality)")
+        log.info("Starting Grounded Agent Judge Induction (Replace: $replaceExisting, maxGenerality: $maxGenerality, parallelismOverride: $parallelismOverride)")
         val allNodes = mutableSetOf<GraphNode>()
         fun walk(n: GraphNode) { if (allNodes.add(n)) n.children.forEach { walk(it) } }
         walk(root)
@@ -58,7 +59,11 @@ class TaxonomyJudgeService(
             return@coroutineScope
         }
 
-        val chunkSize = config.execution.llmParallelism
+        val chunkSize = if (parallelismOverride > 0) {
+            parallelismOverride.coerceAtLeast(1)
+        } else {
+            config.execution.llmParallelism
+        }
 
         log.info("Generating judges for ${targetNodes.size} node(s) with parallelism=$chunkSize")
         targetNodes.chunked(chunkSize).forEach { chunk ->

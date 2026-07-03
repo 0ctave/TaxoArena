@@ -487,6 +487,7 @@ private fun MainDashboardRoute(
             batchGeneralityInput = state.analysis.batchGeneralityInput,
             batchReplaceExisting = state.analysis.batchReplaceExisting,
             batchDomainsInput = state.analysis.batchDomainsInput,
+            batchParallelismInput = state.analysis.batchParallelismInput,
             batchSelectedSettingIdx = state.analysis.batchSelectedSettingIdx,
             isEditingBatchSetting = state.analysis.isEditingBatchSetting,
             batchEditingValue = state.analysis.batchEditingValue,

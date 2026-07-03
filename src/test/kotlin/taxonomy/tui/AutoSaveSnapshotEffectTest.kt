@@ -34,7 +34,7 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override suspend fun deleteSnapshot(snapshotId: String) {}
     override suspend fun isDatasetDownloaded(): Boolean = false
     override suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit) {}
-    override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) {}
+    override suspend fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean) {}
     override suspend fun runArena(query: String, modelA: String, modelB: String) {}
     override suspend fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String) {}
     override suspend fun loadedModels(): List<String> = emptyList()

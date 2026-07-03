@@ -191,19 +191,27 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
     // Bug 1 fix: forward generality as parallelismOverride into generateJudgesForDag so the
     // value the user typed in the TUI prompt is actually used.  Previously generality was
     // silently discarded and the service always used config.execution.llmParallelism.
-    override suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean) {
+    override suspend fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean) {
         val root = deps.taxonomyService.rootNodeFlow.value ?: return
         deps.arenaService.clearJudgeProgress()
-        withJudgeRecording("Batch judge generation") {
-            deps.judgeService.generateJudgesForDag(
-                root = root,
-                replaceExisting = replaceExisting,
-                maxGenerality = generality,
-                onNodeComplete = {
-                    saveGraphToActiveSnapshot()
-                    deps.taxonomyService.notifyGraphUpdated()
-                }
-            )
+        if (parallelism > 0) {
+            deps.arenaService.llmClient.setMaxParallel(parallelism)
+        }
+        try {
+            withJudgeRecording("Batch judge generation") {
+                deps.judgeService.generateJudgesForDag(
+                    root = root,
+                    replaceExisting = replaceExisting,
+                    maxGenerality = generality,
+                    parallelismOverride = parallelism,
+                    onNodeComplete = {
+                        saveGraphToActiveSnapshot()
+                        deps.taxonomyService.notifyGraphUpdated()
+                    }
+                )
+            }
+        } finally {
+            deps.arenaService.llmClient.setMaxParallel(deps.config.execution.llmParallelism)
         }
     }
 

@@ -9,33 +9,40 @@ import kotlin.math.exp
 class BtMatchScheduler(
     val minQueriesForBenchmark: Int = 1,
     val queriesPerPair: Int = 20,
-    val alpha: Double = 0.5,
-    val beta: Double = 0.4,
-    val gamma: Double = 0.1,
-    val budgetPerPair: Int = 100
+    val budgetPerPair: Int = 100,
+    val closeMatchThreshold: Double = 0.15,
+    val stoppingPolicy: BtStoppingPolicy      // injected — no convergence logic here
 ) {
-
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
+    private val pairQueryOffsets = mutableMapOf<String, Int>()
 
     fun selectTargetNodes(
         allNodes: List<GraphNode>,
         btStates: Map<String, NodeBtState>,
         nodeToQueries: Map<String, List<Int>>,
-        maxNodes: Int = 5
+        maxNodes: Int = 100
     ): List<GraphNode> {
         return allNodes
             .filter { it.children.isEmpty() && (nodeToQueries[it.id]?.size ?: 0) >= minQueriesForBenchmark }
-            .sortedByDescending { node ->
-                val state = btStates[node.id] ?: return@sortedByDescending Double.MAX_VALUE
-                state.stdErrors.values.average()
-            }
+            .sortedWith(
+                compareByDescending<GraphNode> { node ->
+                    val state = btStates[node.id]
+                    val started = (state?.totalComparisons ?: 0) > 0
+                    !started
+                }.thenByDescending { node ->
+                    nodeToQueries[node.id]?.size ?: 0
+                }.thenByDescending { node ->
+                    val state = btStates[node.id]
+                    state?.stdErrors?.values?.average() ?: 10.0
+                }
+            )
             .take(maxNodes)
     }
 
     fun selectNextBatch(
         targetNodes: List<GraphNode>,
         btStates: Map<String, NodeBtState>,
-        pairStats: Map<String, List<NodePairStats>>,   // nodeId -> pairs
+        pairStats: Map<String, List<NodePairStats>>,
         models: List<String>,
         resultsMatrix: Map<Int, Map<String, ModelEvalResult>>,
         nodeToQueries: Map<String, List<Int>>,
@@ -43,141 +50,111 @@ class BtMatchScheduler(
         maxConcurrentPerModel: Int = maxOf(2, models.size - 1)
     ): List<BtMatchTask> {
         val tasks = mutableListOf<BtMatchTask>()
-        val modelLoad = mutableMapOf<String, Int>()
-        val totalModelMatches = models.associateWith { model ->
-            pairStats.values.flatten()
-                .filter { it.modelA == model || it.modelB == model }
-                .sumOf { it.totalComparisons }
+        val batchModelLoad = mutableMapOf<String, Int>()
+
+        // Delegate convergence check entirely to the policy
+        val leafConverged = targetNodes.associate { node ->
+            node.id to stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models)
         }
 
-        for (node in targetNodes) {
-            if (tasks.size >= batchSize) break
-            val state = btStates[node.id]
-            val nodePairs = pairStats[node.id] ?: emptyList()
+        // Per-leaf match counts (leaf-local, not cross-leaf)
+        val leafModelMatches = targetNodes.associate { node ->
+            node.id to models.associateWith { model ->
+                (pairStats[node.id] ?: emptyList())
+                    .filter { it.modelA == model || it.modelB == model }
+                    .sumOf { it.totalComparisons }
+            }
+        }
 
-            val nodeQuestionIds = nodeToQueries[node.id] ?: emptyList()
-            val availableQueries = resultsMatrix.filter { it.key in nodeQuestionIds }
-            if (availableQueries.isEmpty()) continue
-
-            // Generate all candidate pairs
-            val candidates = models.flatMapIndexed { i, mA ->
-                models.drop(i + 1).map { mB -> mA to mB }
+        // Unconverged leaves first, sorted by mean SE descending
+        val prioritizedNodes = targetNodes
+            .filter { leafConverged[it.id] != true }
+            .sortedByDescending { node ->
+                btStates[node.id]?.stdErrors?.values?.average() ?: 10.0
             }
 
-            candidates
-                .sortedByDescending { (mA, mB) -> computeUtility(node.id, mA, mB, state, nodePairs, totalModelMatches) }
-                .forEach { (mA, mB) ->
-                    if (tasks.size >= batchSize) return@forEach
-                    if ((modelLoad[mA] ?: 0) >= maxConcurrentPerModel) return@forEach
-                    if ((modelLoad[mB] ?: 0) >= maxConcurrentPerModel) return@forEach
+        for (node in prioritizedNodes) {
+            if (tasks.size >= batchSize) break
 
-                    // Filter queries that haven't been fully compared yet for this pair
-                    val ps = nodePairs.firstOrNull { 
-                        (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) 
+            val state = btStates[node.id]
+            val nodePairs = pairStats[node.id] ?: emptyList()
+            val nodeQueryIds = (nodeToQueries[node.id] ?: emptyList()).sorted()
+            val available = resultsMatrix.keys.intersect(nodeQueryIds.toSet()).sorted()
+            if (available.isEmpty()) continue
+
+            val leafMatches = leafModelMatches[node.id] ?: emptyMap()
+            val candidates = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
+
+            candidates
+                .map { (mA, mB) -> Triple(mA, mB, computeUtility(mA, mB, state, nodePairs, leafMatches)) }
+                .sortedByDescending { it.third }
+                .forEach { (mA, mB, utility) ->
+                    if (tasks.size >= batchSize) return@forEach
+                    if ((batchModelLoad[mA] ?: 0) >= maxConcurrentPerModel) return@forEach
+                    if ((batchModelLoad[mB] ?: 0) >= maxConcurrentPerModel) return@forEach
+
+                    val ps = nodePairs.firstOrNull {
+                        (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                     }
-                    val isCloseMatch = state != null && run {
-                        val si = state.btScores[mA] ?: 0.0
-                        val sj = state.btScores[mB] ?: 0.0
-                        val denom = exp(si) + exp(sj)
-                        val pij = if (denom == 0.0) 0.5 else exp(si) / denom
-                        abs(pij - 0.5) < 0.15
-                    }
-                    val limit = when {
-                        ps == null || ps.totalComparisons < queriesPerPair -> queriesPerPair
-                        isCloseMatch -> (ps.totalComparisons + EXTENSION_QUESTIONS).coerceAtMost(MAX_QUESTIONS_PER_PAIR)
-                        else -> ps.totalComparisons
-                    }
-                    val needed = limit - (ps?.totalComparisons ?: 0)
+                    val budget = pairBudget(mA, mB, state, ps)
+                    val needed = budget - (ps?.totalComparisons ?: 0)
                     if (needed <= 0) return@forEach
 
-                    // Take a slice of available queries
-                    val evaluatedCount = ps?.totalComparisons ?: 0
-                    val querySlice = availableQueries.keys.drop(evaluatedCount).take(minOf(needed, BATCH_STEP_SIZE))
-                    log.debug("Sched [${(node.label ?: node.id).take(20)}] $mA vs $mB: ec=$evaluatedCount qs=$querySlice")
-                    if (querySlice.isEmpty()) return@forEach
+                    val pairKey = "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
+                    val offset = pairQueryOffsets.getOrDefault(pairKey, ps?.totalComparisons ?: 0)
+                    val slice = available.drop(offset).take(minOf(needed, BATCH_STEP_SIZE))
+                    if (slice.isEmpty()) return@forEach
 
+                    pairQueryOffsets[pairKey] = offset + slice.size
                     tasks += BtMatchTask(
-                        nodeId = node.id,
-                        modelA = mA,
-                        modelB = mB,
-                        queryIds = querySlice.map { it.toString() },
-                        priority = computeUtility(node.id, mA, mB, state, nodePairs, totalModelMatches),
-                        batchId = UUID.randomUUID().toString()
+                        nodeId = node.id, modelA = mA, modelB = mB,
+                        queryIds = slice.map { it.toString() },
+                        priority = utility, batchId = UUID.randomUUID().toString()
                     )
-                    modelLoad[mA] = (modelLoad[mA] ?: 0) + 1
-                    modelLoad[mB] = (modelLoad[mB] ?: 0) + 1
+                    batchModelLoad[mA] = (batchModelLoad[mA] ?: 0) + 1
+                    batchModelLoad[mB] = (batchModelLoad[mB] ?: 0) + 1
                 }
         }
-
         return tasks
     }
 
+    private fun pairBudget(mA: String, mB: String, state: NodeBtState?, ps: NodePairStats?): Int {
+        if (state == null || ps == null) return queriesPerPair
+        val si = state.btScores[mA] ?: 0.0
+        val sj = state.btScores[mB] ?: 0.0
+        val pij = exp(si) / (exp(si) + exp(sj)).coerceAtLeast(1e-300)
+        return if (abs(pij - 0.5) < closeMatchThreshold)
+            (queriesPerPair * 2).coerceAtMost(budgetPerPair)
+        else queriesPerPair
+    }
+
     fun computeUtility(
-        nodeId: String,
-        mA: String,
-        mB: String,
+        mA: String, mB: String,
         state: NodeBtState?,
         nodePairs: List<NodePairStats>,
-        totalModelMatches: Map<String, Int> = emptyMap()
+        leafModelMatches: Map<String, Int>
     ): Double {
-        val matchesA = totalModelMatches[mA] ?: 0
-        val matchesB = totalModelMatches[mB] ?: 0
-        if (matchesA == 0 || matchesB == 0) {
-            // Prioritize bootstrapping models with 0 matches
-            return 10000.0 + (if (state != null) {
-                val sei = state.stdErrors[mA] ?: 10.0
-                val sej = state.stdErrors[mB] ?: 10.0
-                sei + sej
-            } else 10.0)
-        }
+        if ((leafModelMatches[mA] ?: 0) == 0 || (leafModelMatches[mB] ?: 0) == 0)
+            return 10000.0 + ((state?.stdErrors?.get(mA) ?: 10.0) + (state?.stdErrors?.get(mB) ?: 10.0))
 
-        val ps = nodePairs.firstOrNull { 
-            (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) 
+        val ps = nodePairs.firstOrNull {
+            (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
         }
         val nij = ps?.totalComparisons ?: 0
+        if (nij < 4) return 5000.0 + (4 - nij) * 100.0
 
-        if (nij < 4) {
-            val base = 5000.0 + (4 - nij) * 100.0
-            val uncertainty = if (state != null) {
-                val sei = state.stdErrors[mA] ?: 10.0
-                val sej = state.stdErrors[mB] ?: 10.0
-                sei + sej
-            } else 10.0
-            return base + uncertainty
-        }
+        val si = state?.btScores?.get(mA) ?: 0.0
+        val sj = state?.btScores?.get(mB) ?: 0.0
+        val pij = exp(si) / (exp(si) + exp(sj)).coerceAtLeast(1e-300)
+        val fishInfo = pij * (1.0 - pij)   // maximised at 0.25 when p=0.5
+        val seSum = ((state?.stdErrors?.get(mA) ?: 1.0).coerceAtMost(9.0)) +
+                    ((state?.stdErrors?.get(mB) ?: 1.0).coerceAtMost(9.0))
+        val repeatPenalty = (nij.toDouble() / budgetPerPair).coerceAtMost(1.0)
 
-        // Closeness: highest when P(A beats B) is 0.5
-        val closeness = if (state != null) {
-            val si = state.btScores[mA] ?: 0.0
-            val sj = state.btScores[mB] ?: 0.0
-            val denom = exp(si) + exp(sj)
-            val pij = if (denom == 0.0) 0.5 else exp(si) / denom
-            1.0 - abs(pij - 0.5) * 2.0
-        } else 1.0
-
-        // Uncertainty: high when Standard Errors are high
-        val uncertainty = if (state != null) {
-            val sei = state.stdErrors[mA] ?: Double.MAX_VALUE
-            val sej = state.stdErrors[mB] ?: Double.MAX_VALUE
-            if (sei == Double.MAX_VALUE || sej == Double.MAX_VALUE) 10.0 else sei + sej
-        } else 10.0
-
-        val repeatPenalty = nij.toDouble() / budgetPerPair
-
-        return alpha * closeness + beta * uncertainty - gamma * repeatPenalty
+        return fishInfo * seSum - 0.1 * repeatPenalty
     }
 
     companion object {
         const val BATCH_STEP_SIZE = 5
-        const val EXTENSION_QUESTIONS = 2
-        const val MAX_QUESTIONS_PER_PAIR = 100
-
-        fun shouldExtendPair(ps: NodePairStats, scores: Map<String, Double>): Boolean {
-            val si = scores[ps.modelA] ?: return false
-            val sj = scores[ps.modelB] ?: return false
-            val denom = exp(si) + exp(sj)
-            val pij = if (denom == 0.0) 0.5 else exp(si) / denom
-            return abs(pij - 0.5) < 0.15 && ps.totalComparisons < MAX_QUESTIONS_PER_PAIR
-        }
     }
 }

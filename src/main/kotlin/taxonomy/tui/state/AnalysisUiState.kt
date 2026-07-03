@@ -23,6 +23,7 @@ data class AnalysisUiState(
     val batchGeneralityInput: String = "0",
     val batchReplaceExisting: Boolean = false,
     val batchDomainsInput: String = "",
+    val batchParallelismInput: String = "4",
     val batchSelectedSettingIdx: Int = 0,
     val isEditingBatchSetting: Boolean = false,
     val batchEditingValue: String = "",

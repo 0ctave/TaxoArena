@@ -57,7 +57,7 @@ sealed interface TuiEvent {
     data object EnterConfigSetup : TuiEvent
     data object EnterMainDashboard : TuiEvent
 
-    data class SetAnalysisMode(val mode: AnalysisMode) : TuiEvent
+    data class SetAnalysisMode(val mode: AnalysisMode, val requestFocus: Boolean = true) : TuiEvent
     data class SetConfigSubPanel(val panel: ConfigSubPanel) : TuiEvent
 
     data class StartDraggingScrollbar(val target: ScrollbarTarget) : TuiEvent
@@ -147,6 +147,7 @@ sealed interface TuiEvent {
     data class SetMetricsDetailScroll(val offset: Int) : TuiEvent
 
     data object StartBatchGeneralityInput : TuiEvent
+    data class StartBatchGeneralityInputWithDefault(val defaultParallelism: Int) : TuiEvent
     data class UpdateBatchGeneralityInput(val value: String) : TuiEvent
     data class SetBatchReplaceExisting(val value: Boolean) : TuiEvent
     data object CancelBatchGeneralityInput : TuiEvent

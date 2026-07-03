@@ -311,7 +311,7 @@ internal class AnalysisKeyHandler(
                 "backspace" -> dispatch(TuiEvent.UpdateBatchEditingValue(analysis.batchEditingValue.dropLast(1)))
                 else -> {
                     if (key.length == 1) {
-                        if (analysis.batchSelectedSettingIdx == 0) {
+                        if (analysis.batchSelectedSettingIdx == 0 || analysis.batchSelectedSettingIdx == 2) {
                             if (key[0].isDigit()) {
                                 dispatch(TuiEvent.UpdateBatchEditingValue(analysis.batchEditingValue + key))
                             }
@@ -325,7 +325,7 @@ internal class AnalysisKeyHandler(
             val idx = analysis.batchSelectedSettingIdx
             when (key) {
                 "w", "z", "arrowup" -> dispatch(TuiEvent.SetBatchSelectedSettingIdx((idx - 1).coerceAtLeast(0)))
-                "s", "arrowdown" -> dispatch(TuiEvent.SetBatchSelectedSettingIdx((idx + 1).coerceAtMost(3)))
+                "s", "arrowdown" -> dispatch(TuiEvent.SetBatchSelectedSettingIdx((idx + 1).coerceAtMost(4)))
                 "escape" -> dispatch(TuiEvent.CancelBatchGeneralityInput)
                 "enter" -> {
                     when (idx) {
@@ -339,8 +339,9 @@ internal class AnalysisKeyHandler(
                             val available = availableDomainsProvider().map { it.first }
                             dispatch(TuiEvent.StartPickingBatchDomains(currentDomains, available))
                         }
-                        2 -> dispatch(TuiEvent.SetBatchReplaceExisting(!analysis.batchReplaceExisting))
-                        3 -> dispatch(TuiEvent.ConfirmBatchGeneralityInput)
+                        2 -> dispatch(TuiEvent.StartEditingBatchSetting(analysis.batchParallelismInput))
+                        3 -> dispatch(TuiEvent.SetBatchReplaceExisting(!analysis.batchReplaceExisting))
+                        4 -> dispatch(TuiEvent.ConfirmBatchGeneralityInput)
                     }
                 }
             }

@@ -22,6 +22,7 @@ fun JudgeProgressPanel(
     batchGeneralityInput: String = "1",
     batchReplaceExisting: Boolean = false,
     batchDomainsInput: String = "",
+    batchParallelismInput: String = "4",
     batchSelectedSettingIdx: Int = 0,
     isEditingBatchSetting: Boolean = false,
     batchEditingValue: String = "",
@@ -65,32 +66,48 @@ fun JudgeProgressPanel(
                 }.take(w)
             )
 
-            // Row 2: Replace Existing
+            // Row 2: Parallelism
             val isRow2Selected = batchSelectedSettingIdx == 2
-            val row2Val = if (batchReplaceExisting) "yes" else "no"
+            val row2Val = if (isRow2Selected && isEditingBatchSetting) "${batchEditingValue}█" else batchParallelismInput
             Text(
                 buildAnnotatedString {
                     if (isRow2Selected) {
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
+                        withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("Parallelism: ") }
+                        withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append(row2Val) }
+                    } else {
+                        append("   Parallelism: ")
+                        withStyle(SpanStyle(color = TuiTheme.MUTED)) { append(row2Val) }
+                    }
+                }.take(w)
+            )
+
+            // Row 3: Replace Existing
+            val isRow3Selected = batchSelectedSettingIdx == 3
+            val row3Val = if (batchReplaceExisting) "yes" else "no"
+            Text(
+                buildAnnotatedString {
+                    if (isRow3Selected) {
                         withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
                         withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("Replace Existing: ") }
                         withStyle(SpanStyle(
                             color = if (batchReplaceExisting) TuiTheme.ERROR else TuiTheme.OK,
                             textStyle = Bold
-                        )) { append(row2Val) }
+                        )) { append(row3Val) }
                     } else {
                         append("   Replace Existing: ")
                         withStyle(SpanStyle(
                             color = if (batchReplaceExisting) TuiTheme.ERROR else TuiTheme.OK
-                        )) { append(row2Val) }
+                        )) { append(row3Val) }
                     }
                 }.take(w)
             )
 
-            // Row 3: [Start Generation]
-            val isRow3Selected = batchSelectedSettingIdx == 3
+            // Row 4: [Start Generation]
+            val isRow4Selected = batchSelectedSettingIdx == 4
             Text(
                 buildAnnotatedString {
-                    if (isRow3Selected) {
+                    if (isRow4Selected) {
                         withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append(" ❯ ") }
                         withStyle(SpanStyle(color = TuiTheme.ACCENT, textStyle = Bold)) { append("[Start Generation]") }
                     } else {

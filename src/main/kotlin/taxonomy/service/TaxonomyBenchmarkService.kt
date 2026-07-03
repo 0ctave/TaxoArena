@@ -10,6 +10,8 @@ import taxonomy.dataset.ModelEvalStore
 import taxonomy.dataset.ModelEvalResult
 import taxonomy.model.*
 import kotlin.collections.filter
+import kotlin.math.abs
+import kotlin.math.exp
 
 @Service
 class TaxonomyBenchmarkService(
@@ -124,17 +126,26 @@ class TaxonomyBenchmarkService(
         }
         log.info("Pre-routing complete: ${matrix.size - outlierCount} questions routed, $outlierCount outliers discarded")
 
-        val numPairs = modelNames.size * (modelNames.size - 1) / 2
+        val params = buildSchedulingParams(
+            numModels = modelNames.size,
+            numLeaves = nodeToQueries.size,
+            totalQuestions = matrix.size - outlierCount,
+            req = req
+        )
+        log.info("Scheduling params: $params")
+
+        val stoppingPolicy = BtStoppingPolicy(
+            maxRounds = params.maxRounds,
+            minComparisonsPerLeaf = params.minComparisonsPerLeaf,
+            targetLeafConvergenceFraction = params.targetConvergenceFraction,
+            separationThreshold = params.separationThreshold,
+            minTotalComparisons = params.minTotalComparisons
+        )
         val scheduler = BtMatchScheduler(
             minQueriesForBenchmark = 1,
-            queriesPerPair = 20,
-            budgetPerPair = 100
-        )
-        val stoppingPolicy = BtStoppingPolicy(
-            minComparisons = maxOf(30, numPairs * 8),
-            stabilityRounds = 3,
-            separationThreshold = 2.0,
-            maxRounds = 20
+            queriesPerPair = params.queriesPerPair,
+            budgetPerPair = params.budgetPerPair,
+            stoppingPolicy = stoppingPolicy
         )
 
         val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
@@ -165,12 +176,14 @@ class TaxonomyBenchmarkService(
 
         val targetNodes = scheduler.selectTargetNodes(allNodes, btStates, nodeToQueries, maxNodes = 100)
         log.info("Selected fixed targetNodes for the entire run: ${targetNodes.map { it.label ?: it.id }}")
+        val targetLeafIds = targetNodes.map { it.id }.toSet()
 
         var round = 0
-        val maxRounds = 20
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
 
-        while (round < maxRounds && !stoppingPolicy.shouldStop(btStates, round, root.id)) {
+        while (round < params.maxRounds && !stoppingPolicy.shouldStop(
+            btStates, pairStatsMap, targetLeafIds, modelNames, round, completedResults.size
+        )) {
             if (targetNodes.isEmpty()) break
 
             val batch = scheduler.selectNextBatch(
@@ -180,7 +193,8 @@ class TaxonomyBenchmarkService(
                 models = modelNames,
                 resultsMatrix = matrix,
                 nodeToQueries = nodeToQueries,
-                batchSize = req.questionsPerRound
+                batchSize = params.questionsPerRound,
+                maxConcurrentPerModel = params.maxConcurrentPerModel
             )
             log.debug("Round $round - scheduled batch size: ${batch.size}")
             if (batch.isEmpty()) break
@@ -442,7 +456,6 @@ class TaxonomyBenchmarkService(
                 }
 
                 val lastResult = completedResults.lastOrNull()
-                val rootState = btStates[root.id]
                 val activeTargetNames = targetNodes.mapNotNull { it.label }
                 val live = BenchmarkLiveStats(
                     processed = completedResults.size,
@@ -454,8 +467,8 @@ class TaxonomyBenchmarkService(
                     pairStats = livePairStats,
                     currentRound = round + 1,
                     activeTargets = activeTargetNames,
-                    btRatings = rootState?.btScores ?: emptyMap(),
-                    btErrors = rootState?.stdErrors ?: emptyMap()
+                    btRatings = aggregated.ranks.associate { it.modelId to it.btScore },
+                    btErrors = aggregated.ranks.associate { it.modelId to it.stdError }
                 )
                 onProgress.invoke(live)
             }
@@ -818,3 +831,88 @@ private data class PairResult(
     val gtWinner: String,
     val agreementKey: Pair<String, Boolean>
 )
+
+private data class SchedulingParams(
+    val minComparisonsPerLeaf: Int,
+    val targetConvergenceFraction: Double,
+    val separationThreshold: Double,
+    val queriesPerPair: Int,
+    val budgetPerPair: Int,
+    val maxRounds: Int,
+    val minTotalComparisons: Int,
+    val maxConcurrentPerModel: Int,
+    val questionsPerRound: Int
+)
+
+private fun buildSchedulingParams(
+    numModels: Int,
+    numLeaves: Int,
+    totalQuestions: Int,
+    req: BenchmarkRequest
+): SchedulingParams {
+    val K = numModels
+    val numPairs = K * (K - 1) / 2
+
+    // Minimum comparisons per leaf: enough for each pair to appear at least twice
+    // and for the BT fitter to have a non-degenerate solution
+    // Formula: max(K, 2*K) = 2K, floored at 6, capped at 30
+    val minCompsPerLeaf = (2 * K).coerceIn(6, 30)
+
+    // Queries per pair: enough to detect a medium effect (BT gap ~0.5 SE)
+    // with ~80% power at alpha=0.05 requires ~8-12 comparisons per pair
+    // Scale up slightly if we have many questions available
+    val avgQuestionsPerLeaf = if (numLeaves > 0) totalQuestions / numLeaves else 10
+    var queriesPerPair = when {
+        avgQuestionsPerLeaf >= 20 -> 15
+        avgQuestionsPerLeaf >= 10 -> 10
+        else -> 6
+    }
+    if (totalQuestions <= 20) {
+        queriesPerPair = totalQuestions
+    }
+
+    // Budget per pair: 3x queriesPerPair for close matches
+    val budgetPerPair = (queriesPerPair * 3).coerceAtLeast(18)
+
+    // Convergence fraction: relax if many leaves (more likely some will be sparse)
+    val convergenceFraction = when {
+        numLeaves <= 5  -> 0.80   // small run: require most to converge
+        numLeaves <= 20 -> 0.70   // medium
+        else            -> 0.60   // large: 40% sparse leaves acceptable
+    }
+
+    // Separation threshold: stricter with more questions (can afford higher confidence)
+    val separationThreshold = when {
+        avgQuestionsPerLeaf >= 15 -> 1.5
+        else                      -> 1.0   // relax if data is scarce
+    }
+
+    // Max rounds: enough for every leaf to reach minCompsPerLeaf at BATCH_STEP_SIZE per round
+    // Each round schedules batchSize / numLeaves queries per leaf approximately
+    val roundsNeeded = (minCompsPerLeaf * numPairs * numLeaves) /
+                       (req.questionsPerRound.coerceAtLeast(1)) + 5
+    val maxRounds = roundsNeeded.coerceIn(10, 40)
+
+    // Global minimum before any stopping: all models must have appeared at least once
+    val minTotalComparisons = numPairs * 2
+
+    // Max concurrent per model: allow more parallelism with more models
+    val maxConcurrent = (K - 1).coerceIn(2, 4)
+
+    // Questions per round: numPairs * BtMatchScheduler.BATCH_STEP_SIZE capped at available parallelism
+    val questionsPerRound = (numPairs * BtMatchScheduler.BATCH_STEP_SIZE)
+        .coerceAtMost(req.parallelism * 3)
+        .coerceAtLeast(req.questionsPerRound)
+
+    return SchedulingParams(
+        minComparisonsPerLeaf = minCompsPerLeaf,
+        targetConvergenceFraction = convergenceFraction,
+        separationThreshold = separationThreshold,
+        queriesPerPair = queriesPerPair,
+        budgetPerPair = budgetPerPair,
+        maxRounds = maxRounds,
+        minTotalComparisons = minTotalComparisons,
+        maxConcurrentPerModel = maxConcurrent,
+        questionsPerRound = questionsPerRound
+    )
+}

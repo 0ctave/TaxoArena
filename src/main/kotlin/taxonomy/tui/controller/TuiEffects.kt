@@ -20,7 +20,7 @@ interface TuiEffects {
     fun generateDag(dispatch: (TuiEvent) -> Unit)
     fun cancelActiveJob()
 
-    fun runBatchJudge(generality: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit)
+    fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit)
     fun runArena(query: String, modelA: String, modelB: String)
     fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
     fun loadArenaModels(dispatch: (TuiEvent) -> Unit)
@@ -173,11 +173,11 @@ class DefaultTuiEffects(
     // Bug 4 fix: assign the launched coroutine to activeJob so that cancelActiveJob() (Esc/C
     // from the TUI) can interrupt a running batch-judge pass.  Previously this launched on scope
     // without tracking the Job, making cancellation silently ineffective.
-    override fun runBatchJudge(generality: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit) {
+    override fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit) {
         dispatch(TuiEvent.SetJudgeGenerationRunning(true))
         activeJob = scope.launch {
             try {
-                gateway.runBatchJudge(generality, replaceExisting)
+                gateway.runBatchJudge(generality, parallelism, replaceExisting)
             } catch (c: CancellationException) {
                 throw c
             } catch (t: Throwable) {
@@ -411,7 +411,7 @@ interface TuiGateway {
     suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit)
     suspend fun generateDag(onProgress: (Float, String) -> Unit)
 
-    suspend fun runBatchJudge(generality: Int, replaceExisting: Boolean)
+    suspend fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean)
     suspend fun runArena(query: String, modelA: String, modelB: String)
     suspend fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String)
     suspend fun loadedModels(): List<String>

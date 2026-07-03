@@ -86,7 +86,7 @@ object TuiReducer {
             is TuiEvent.SetAnalysisMode ->
                 state.copy(
                     analysis = state.analysis.copy(mode = event.mode),
-                    shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
+                    shell = if (event.requestFocus) state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB) else state.shell
                 )
 
             is TuiEvent.SetConfigSubPanel ->
@@ -526,6 +526,22 @@ object TuiReducer {
                         isEnteringBatchGenerality = true,
                         batchGeneralityInput = "0",
                         batchDomainsInput = state.snapshot.activeSnapshotConfig?.llm?.judgeDomains?.joinToString(", ").orEmpty(),
+                        batchParallelismInput = "4",
+                        batchSelectedSettingIdx = 0,
+                        isEditingBatchSetting = false,
+                        batchEditingValue = ""
+                    ),
+                    shell = state.shell.copy(focusedPanel = FocusPanel.ANALYSIS_HUB)
+                )
+
+            is TuiEvent.StartBatchGeneralityInputWithDefault ->
+                state.copy(
+                    analysis = state.analysis.copy(
+                        mode = AnalysisMode.JUDGE_PROGRESS,
+                        isEnteringBatchGenerality = true,
+                        batchGeneralityInput = "0",
+                        batchDomainsInput = state.snapshot.activeSnapshotConfig?.llm?.judgeDomains?.joinToString(", ").orEmpty(),
+                        batchParallelismInput = event.defaultParallelism.toString(),
                         batchSelectedSettingIdx = 0,
                         isEditingBatchSetting = false,
                         batchEditingValue = ""
@@ -588,6 +604,7 @@ object TuiReducer {
                         isEditingBatchSetting = false,
                         batchGeneralityInput = if (currentIdx == 0) state.analysis.batchEditingValue else state.analysis.batchGeneralityInput,
                         batchDomainsInput = if (currentIdx == 1) state.analysis.batchEditingValue else state.analysis.batchDomainsInput,
+                        batchParallelismInput = if (currentIdx == 2) state.analysis.batchEditingValue else state.analysis.batchParallelismInput,
                         batchEditingValue = ""
                     )
                 )

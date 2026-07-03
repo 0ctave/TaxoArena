@@ -50,7 +50,7 @@ private class FakeEffects(private val datasetDownloaded: Boolean) : TuiEffects {
     override fun deleteSnapshot(snapshotId: String, dispatch: (TuiEvent) -> Unit) {}
     override fun downloadDataset(maxQueries: Int, dispatch: (TuiEvent) -> Unit) {}
     override fun cancelActiveJob() {}
-    override fun runBatchJudge(generality: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit) {}
+    override fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean, dispatch: (TuiEvent) -> Unit) {}
     override fun runArena(query: String, modelA: String, modelB: String) {}
     override fun runArenaPrecomputed(questionId: Int, modelA: String, modelB: String) {}
     override fun loadArenaModels(dispatch: (TuiEvent) -> Unit) {}

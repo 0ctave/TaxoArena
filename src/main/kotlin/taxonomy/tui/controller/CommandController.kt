@@ -83,12 +83,13 @@ class CommandController(
 
             TuiEvent.ConfirmBatchGeneralityInput -> {
                 val generality = state.analysis.batchGeneralityInput.toIntOrNull() ?: 1
+                val parallelism = state.analysis.batchParallelismInput.toIntOrNull() ?: 4
                 val domains = state.analysis.batchDomainsInput
                     .split(",")
                     .map { it.trim() }
                     .filter { it.isNotBlank() }
                 configProvider()?.llm?.judgeDomains = domains
-                effects.runBatchJudge(generality, state.analysis.batchReplaceExisting, dispatch)
+                effects.runBatchJudge(generality, parallelism, state.analysis.batchReplaceExisting, dispatch)
             }
 
             // Models-first flow: the run fires on the FINAL input. In precomputed mode that's
