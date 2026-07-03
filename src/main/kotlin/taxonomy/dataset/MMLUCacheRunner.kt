@@ -32,7 +32,7 @@ class MMLUCacheRunner(
         log.info("Extracted ${queries.size} total queries. Precomputing embeddings...")
 
         // 3. Precompute and cache in existing vector cache
-        embeddingCache.precompute(queries)
+        embeddingCache.precompute(queries.map { it.text })
 
         log.info("Finished MMLU Pro Cache job. Shutting down safely.")
     }

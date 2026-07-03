@@ -127,29 +127,35 @@ class ModelEvalLoader(
      */
     fun syncReservedPool(reservedQueriesJson: File = File(reservedFilePath)) {
         if (!reservedQueriesJson.exists()) {
-            log.warn("reserved_test_queries.json not found — skipping reserved sync")
-            return
+            log.warn("reserved_test_queries.json not found — skipping reserved sync"); return
         }
-        val reservedMap: Map<String, List<String>> = json.decodeFromString(reservedQueriesJson.readText())
-        val reservedTexts = reservedMap.values.flatten().toSet()
-        log.info("Syncing reserved pool: ${reservedTexts.size} reserved question texts")
+        val raw = reservedQueriesJson.readText()
+        // Support both new (List<Int>) and old (List<String>) formats during migration:
+        val reservedIds: Set<Int> = try {
+            json.decodeFromString<Map<String, List<Int>>>(raw).values.flatten().toSet()  // new
+        } catch (_: Exception) {
+            resolveTextsToIds(json.decodeFromString<Map<String, List<String>>>(raw))     // old fallback
+        }
+        store.markReserved(reservedIds)
+        log.info("Reserved sync: ${reservedIds.size} question_ids marked")
+    }
 
-        // Resolve question texts to question_ids via the link table
-        val reservedIds = mutableSetOf<Int>()
+    internal fun resolveTextsToIds(textMap: Map<String, List<String>>): Set<Int> {
+        val allTexts = textMap.values.flatten().toSet()
+        val ids = mutableSetOf<Int>()
         DriverManager.getConnection(datasetDbUrl).use { c ->
-            reservedTexts.chunked(900).forEach { chunk ->
-                val placeholders = chunk.joinToString(",") { "?" }
+            allTexts.chunked(900).forEach { chunk ->
+                val ph = chunk.joinToString(",") { "?" }
                 c.prepareStatement(
-                    "SELECT question_id FROM eval_question_link WHERE question_text IN ($placeholders)"
+                    "SELECT DISTINCT question_id FROM eval_results WHERE question_text IN ($ph)"
                 ).use { ps ->
                     chunk.forEachIndexed { i, t -> ps.setString(i + 1, t) }
                     val rs = ps.executeQuery()
-                    while (rs.next()) reservedIds.add(rs.getInt(1))
+                    while (rs.next()) ids.add(rs.getInt(1))
                 }
             }
         }
-        store.markReserved(reservedIds)
-        log.info("Reserved sync complete: ${reservedIds.size} question_ids marked.")
+        return ids
     }
 
     // ─── Parsing ──────────────────────────────────────────────────────────────

@@ -141,6 +141,13 @@ class TaxonomyRankingService {
             if (dbInitialized) return
             try {
                 val conn = connection
+                // Migration — run before all CREATE TABLE IF NOT EXISTS:
+                try {
+                    conn.createStatement().use { s ->
+                        s.execute("UPDATE match_history SET snapshot_id = 'global' WHERE snapshot_id IS NULL")
+                    }
+                } catch (_: Exception) {}  // table may not exist yet on first boot
+
                 conn.createStatement().use { stmt ->
                     stmt.execute("""
                         CREATE TABLE IF NOT EXISTS agent_ratings_v2 (
@@ -171,7 +178,7 @@ class TaxonomyRankingService {
                     stmt.execute("""
                         CREATE TABLE IF NOT EXISTS match_history (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            snapshot_id TEXT,
+                            snapshot_id TEXT NOT NULL DEFAULT 'global',
                             query TEXT,
                             model_a TEXT,
                             model_b TEXT,
@@ -181,6 +188,11 @@ class TaxonomyRankingService {
                             is_tie INTEGER,
                             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                         )
+                    """.trimIndent())
+
+                    stmt.execute("""
+                        CREATE INDEX IF NOT EXISTS idx_match_snapshot_domain_query
+                        ON match_history(snapshot_id, domain, query)
                     """.trimIndent())
 
                     stmt.execute("""
@@ -245,24 +257,34 @@ class TaxonomyRankingService {
 
     fun clearRatings(snapshotId: String) {
         withConn { conn ->
-            conn.prepareStatement("DELETE FROM agent_ratings_v2 WHERE snapshot_id = ?").use { pstmt ->
-                pstmt.setString(1, snapshotId)
-                pstmt.executeUpdate()
-            }
-            conn.prepareStatement("DELETE FROM match_history WHERE snapshot_id = ?").use { pstmt ->
-                pstmt.setString(1, snapshotId)
-                pstmt.executeUpdate()
-            }
+            val wasAutoCommit = conn.autoCommit
+            conn.autoCommit = false
             try {
-                conn.prepareStatement("DELETE FROM node_pair_stats WHERE snapshot_id = ?").use { pstmt ->
-                    pstmt.setString(1, snapshotId)
-                    pstmt.executeUpdate()
+                listOf(
+                    "DELETE FROM agent_ratings_v2 WHERE snapshot_id = ?",
+                    "DELETE FROM match_history WHERE snapshot_id = ?",
+                    "DELETE FROM node_pair_stats WHERE snapshot_id = ?",
+                    "DELETE FROM node_bt_states WHERE snapshot_id = ?"
+                ).forEach { sql ->
+                    try {
+                        conn.prepareStatement(sql).use { pstmt ->
+                            pstmt.setString(1, snapshotId)
+                            pstmt.executeUpdate()
+                        }
+                    } catch (e: Exception) {
+                        // Table node_pair_stats or node_bt_states might not exist yet, but ratings/match_history should
+                        if (sql.contains("agent_ratings_v2") || sql.contains("match_history")) {
+                            throw e
+                        }
+                    }
                 }
-                conn.prepareStatement("DELETE FROM node_bt_states WHERE snapshot_id = ?").use { pstmt ->
-                    pstmt.setString(1, snapshotId)
-                    pstmt.executeUpdate()
-                }
-            } catch (_: Exception) {}
+                conn.commit()
+            } catch (e: Exception) {
+                conn.rollback()
+                throw e
+            } finally {
+                conn.autoCommit = wasAutoCommit
+            }
         }
     }
 

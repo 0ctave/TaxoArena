@@ -52,6 +52,7 @@ class TournamentSimulatorTest {
     @BeforeEach
     fun setUp() {
         rankingService.clearDatabaseForTest()
+        taxonomyService.setGraph(null)
     }
 
     @Test

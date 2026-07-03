@@ -43,8 +43,8 @@ class TaxonomySnapshotTest {
         
         val testQueriesJson = """
             {
-                "domain_a": ["query 1", "query 2"],
-                "domain_b": ["query 3"]
+                "domain_a": [101, 102],
+                "domain_b": [201]
             }
         """.trimIndent()
         reservedFile.writeText(testQueriesJson)
@@ -71,15 +71,15 @@ class TaxonomySnapshotTest {
             assertEquals(2, snapshot.metrics.totalNodes)
             assertEquals(1, snapshot.metrics.leafNodes)
             assertEquals(2, snapshot.reservedQueries.size)
-            assertEquals(listOf("query 1", "query 2"), snapshot.reservedQueries["domain_a"])
-            assertEquals(listOf("query 3"), snapshot.reservedQueries["domain_b"])
+            assertEquals(listOf(101, 102), snapshot.reservedQueries["domain_a"])
+            assertEquals(listOf(201), snapshot.reservedQueries["domain_b"])
 
             // 3. List snapshots and verify our snapshot is present
             val list = snapshotManager.listSnapshots()
             val listMatch = list.find { it.id == snapshot.id }
             assertNotNull(listMatch)
             assertEquals(2, listMatch!!.reservedQueries.size)
-            assertEquals(listOf("query 1", "query 2"), listMatch.reservedQueries["domain_a"])
+            assertEquals(listOf(101, 102), listMatch.reservedQueries["domain_a"])
 
             // Delete local file to verify loading restores it
             reservedFile.delete()
@@ -101,7 +101,7 @@ class TaxonomySnapshotTest {
             assertTrue(reservedFile.exists())
             val restoredContent = reservedFile.readText()
             assertTrue(restoredContent.contains("domain_a"))
-            assertTrue(restoredContent.contains("query 1"))
+            assertTrue(restoredContent.contains("101"))
 
             // 5. Delete snapshot
             val deleted = snapshotManager.deleteSnapshot(snapshot.id)

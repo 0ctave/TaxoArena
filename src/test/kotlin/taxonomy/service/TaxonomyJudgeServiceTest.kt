@@ -78,12 +78,11 @@ class TaxonomyJudgeServiceTest {
             algebraNode.queries.add(q1)
             litNode.queries.add(q2)
 
-            // Stub details map from datasetFetcher
             `when`(mockDatasetFetcher.getDetailsForQueries(listOf("q1"))).thenReturn(
-                mapOf("q1" to HFProRowData("q1", options = listOf("A", "B"), answer = "A", cot_content = "reasoning"))
+                mapOf("q1" to HFProRowData(question = "q1", options = listOf("A", "B"), answer = "A", cot_content = "reasoning"))
             )
             `when`(mockDatasetFetcher.getDetailsForQueries(listOf("q2"))).thenReturn(
-                mapOf("q2" to HFProRowData("q2", options = listOf("A", "B"), answer = "A", cot_content = "reasoning"))
+                mapOf("q2" to HFProRowData(question = "q2", options = listOf("A", "B"), answer = "A", cot_content = "reasoning"))
             )
 
             // Run generateJudgesForDag

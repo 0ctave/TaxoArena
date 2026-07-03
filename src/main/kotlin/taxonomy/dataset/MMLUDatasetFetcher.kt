@@ -130,7 +130,7 @@ class MMLUDatasetFetcher(
         fetchDataset(maxQueries = maxQueries, selectedDomains = emptyList())
     }
 
-    suspend fun fetchDataset(maxQueries: Int = 12000, selectedDomains: List<String> = emptyList()): Map<String, List<String>> {
+    suspend fun fetchDataset(maxQueries: Int = 12000, selectedDomains: List<String> = emptyList()): Map<String, List<MMLUQuery>> {
         val type = config.dataset.datasetType
         return when (type) {
             DatasetType.MMLU_PRO -> fetchMmluPro(maxQueries, selectedDomains)
@@ -141,7 +141,7 @@ class MMLUDatasetFetcher(
         }
     }
 
-    private suspend fun fetchMmluPro(maxQueries: Int, selectedDomains: List<String>): Map<String, List<String>> {
+    private suspend fun fetchMmluPro(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {
         val table = "mmlu_pro"
         val limit = if (selectedDomains.isNotEmpty()) 100000 else maxQueries
         val totalInDb = getDbCount(table)
@@ -218,7 +218,7 @@ class MMLUDatasetFetcher(
         return finalizeData(allRows.take(maxQueries), "MMLU Pro")
     }
 
-    private suspend fun fetchMmluOriginal(maxQueries: Int, selectedDomains: List<String>): Map<String, List<String>> {
+    private suspend fun fetchMmluOriginal(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {
         val table = "mmlu_original"
         val limit = if (selectedDomains.isNotEmpty()) 100000 else maxQueries
         val allRows = loadFromDb(table, limit, selectedDomains)
@@ -301,7 +301,7 @@ class MMLUDatasetFetcher(
         return finalizeData(allRows.take(maxQueries), "MMLU Original")
     }
 
-    private suspend fun fetchArc(maxQueries: Int, selectedDomains: List<String>): Map<String, List<String>> {
+    private suspend fun fetchArc(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {
         val table = "arc"
         val limit = if (selectedDomains.isNotEmpty()) 100000 else maxQueries
         val allRows = loadFromDb(table, limit, selectedDomains)
@@ -377,11 +377,11 @@ class MMLUDatasetFetcher(
         try {
             connection.use { conn ->
                 val sql = if (selectedDomains.isEmpty()) {
-                    "SELECT question, category, cot_content, options, answer FROM $table ORDER BY id ASC LIMIT ?"
+                    "SELECT id, question, category, cot_content, options, answer FROM $table ORDER BY id ASC LIMIT ?"
                 } else {
                     val rawDomains = selectedDomains.map { it.trim().lowercase() }
                     val placeholders = rawDomains.joinToString(",") { "?" }
-                    "SELECT question, category, cot_content, options, answer FROM $table WHERE category IN ($placeholders) ORDER BY id ASC LIMIT ?"
+                    "SELECT id, question, category, cot_content, options, answer FROM $table WHERE category IN ($placeholders) ORDER BY id ASC LIMIT ?"
                 }
                 conn.prepareStatement(sql).use { pstmt ->
                     if (selectedDomains.isEmpty()) {
@@ -396,6 +396,7 @@ class MMLUDatasetFetcher(
                     val rs = pstmt.executeQuery()
                     while (rs.next()) {
                         rows.add(HFProRowData(
+                            id = rs.getInt("id"),
                             question = rs.getString("question"),
                             category = rs.getString("category"),
                             cot_content = rs.getString("cot_content"),
@@ -506,19 +507,24 @@ class MMLUDatasetFetcher(
         }
     }
 
-    private fun finalizeData(rows: List<HFProRowData>, datasetName: String): Map<String, List<String>> {
+    private fun finalizeData(rows: List<HFProRowData>, datasetName: String): Map<String, List<MMLUQuery>> {
         val formattedData = formatData(rows)
         log.info("Fetched ${rows.size} $datasetName queries across ${formattedData.keys.size} categories.")
         return formattedData
     }
 
-    private fun formatData(rows: List<HFProRowData>): Map<String, List<String>> {
+    private fun formatData(rows: List<HFProRowData>): Map<String, List<MMLUQuery>> {
         return rows.filter { it.question.isNotBlank() }.groupBy { row ->
             val cat = row.category ?: "Unknown"
             cat.split("_", "-").joinToString(" ") { word ->
                 word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
             }
-        }.mapValues { entry -> entry.value.map { it.question } }
+        }.mapValues { entry ->
+            entry.value.mapIndexed { idx, it ->
+                val finalId = if (it.id >= 0) it.id else idx
+                MMLUQuery(id = finalId, text = it.question, category = entry.key)
+            }
+        }
     }
 
     private fun printProgressBar(current: Int, total: Int, prefix: String) {
@@ -539,12 +545,12 @@ class MMLUDatasetFetcher(
      * it travels with the DAG snapshot and is never seen during generation.
      */
     fun splitTrainTest(
-        dataset: Map<String, List<String>>,
+        dataset: Map<String, List<MMLUQuery>>,
         testRatio: Double = 0.2,
         seed: Long = java.util.concurrent.ThreadLocalRandom.current().nextLong(),
-    ): Pair<Map<String, List<String>>, Map<String, List<String>>> {
-        val train = mutableMapOf<String, List<String>>()
-        val test = mutableMapOf<String, List<String>>()
+    ): Pair<Map<String, List<MMLUQuery>>, Map<String, List<MMLUQuery>>> {
+        val train = mutableMapOf<String, List<MMLUQuery>>()
+        val test = mutableMapOf<String, List<MMLUQuery>>()
         val rng = java.util.Random(seed)
         for ((category, queries) in dataset) {
             val total = queries.size
@@ -570,7 +576,8 @@ class MMLUDatasetFetcher(
         try {
             val file = java.io.File("reserved_test_queries.json")
             val prettyJson = Json { prettyPrint = true }
-            file.writeText(prettyJson.encodeToString(test))
+            val testIds: Map<String, List<Int>> = test.mapValues { (_, qs) -> qs.map { it.id } }
+            file.writeText(prettyJson.encodeToString(testIds))
             log.info("Successfully reserved ${test.values.flatten().size} test queries across ${test.size} domains to reserved_test_queries.json.")
         } catch (e: Exception) {
             log.error("Failed to save reserved test queries to file", e)
@@ -631,7 +638,7 @@ class MMLUDatasetFetcher(
         }
     }
 
-    private suspend fun fetchTwentyNewsgroups(maxQueries: Int, selectedDomains: List<String>): Map<String, List<String>> {
+    private suspend fun fetchTwentyNewsgroups(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {
         val table = "twenty_newsgroups"
         val limit = if (selectedDomains.isNotEmpty()) 100000 else maxQueries
         val allRows = loadFromDb(table, limit, selectedDomains)
@@ -697,7 +704,7 @@ class MMLUDatasetFetcher(
         return finalizeData(allRows.take(maxQueries), "20 Newsgroups")
     }
 
-    private suspend fun fetchAgNews(maxQueries: Int, selectedDomains: List<String>): Map<String, List<String>> {
+    private suspend fun fetchAgNews(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {
         val table = "ag_news"
         val limit = if (selectedDomains.isNotEmpty()) 100000 else maxQueries
         val allRows = loadFromDb(table, limit, selectedDomains)
@@ -780,6 +787,7 @@ private data class HFProRowItem(val row: HFProRowData)
 
 @Serializable
 data class HFProRowData(
+    val id: Int = -1,
     val question: String,
     val category: String? = null,
     val cot_content: String? = null,
@@ -843,4 +851,11 @@ private data class HFAgNewsRowData(
     val title: String,
     val description: String,
     val label: Int
+)
+
+@Serializable
+data class MMLUQuery(
+    val id: Int,
+    val text: String,
+    val category: String
 )

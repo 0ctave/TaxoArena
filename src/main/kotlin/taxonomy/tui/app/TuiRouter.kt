@@ -371,8 +371,15 @@ private fun MainDashboardRoute(
     val arenaW = layout.arenaW
 
     val facade = remember(deps) { TuiConfigFacade(deps) }
-    val availableDomains = remember(state.config.settingsVersion, state.runtime.availableDomainsVersion) {
-        facade.getAvailableDomains()
+    val reservedOnly = state.benchmark.benchmarkReservedOnlyInput.toBooleanStrictOrNull() ?: true
+    val availableDomains = remember(
+        state.config.settingsVersion,
+        state.runtime.availableDomainsVersion,
+        subscriptions.rootNode,
+        subscriptions.graphVersion,
+        reservedOnly
+    ) {
+        facade.getAvailableDomains(reservedOnly)
     }
     val allNodes = remember(subscriptions.rootNode, subscriptions.graphVersion) {
         flattenNodes(subscriptions.rootNode)

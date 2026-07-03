@@ -193,7 +193,7 @@ data class DagSnapshot(
     val metrics: SnapshotMetrics,
     val settings: SnapshotSettings,
     val logUuid: String? = null,
-    val reservedQueries: Map<String, List<String>> = emptyMap(),
+    val reservedQueries: Map<String, List<Int>> = emptyMap(),
     // Full effective config that travels with the snapshot. Null for legacy
     // snapshots saved before config embedding; callers fall back to [settings].
     val config: EffectiveConfig? = null,
@@ -211,7 +211,7 @@ data class DagSnapshotMetadata(
     val metrics: SnapshotMetrics,
     val settings: SnapshotSettings,
     val logUuid: String? = null,
-    val reservedQueries: Map<String, List<String>> = emptyMap(),
+    val reservedQueries: Map<String, List<Int>> = emptyMap(),
     val config: EffectiveConfig? = null
 )
 
@@ -221,7 +221,8 @@ private const val MAX_LOG_TRACE = 5000
 @Component
 class TaxonomySnapshotManager(
     private val config: TaxonomyConfig,
-    private val persistence: TaxonomyPersistence
+    private val persistence: TaxonomyPersistence,
+    private val evalLoader: ModelEvalLoader
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.SnapshotManager")
     private val json = Json { 
@@ -381,15 +382,7 @@ class TaxonomySnapshotManager(
 
                             val metrics = json.decodeFromString<SnapshotMetrics>(metricsStr)
                             val settings = json.decodeFromString<SnapshotSettings>(settingsStr)
-                            val reservedQueries = if (reservedQueriesStr.isNullOrEmpty()) {
-                                emptyMap()
-                            } else {
-                                try {
-                                    json.decodeFromString<Map<String, List<String>>>(reservedQueriesStr)
-                                } catch (e: Exception) {
-                                    emptyMap()
-                                }
-                            }
+                            val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
 
                             list.add(
                                 DagSnapshot(
@@ -486,7 +479,7 @@ class TaxonomySnapshotManager(
         val reservedQueries = if (reservedFile.exists()) {
             try {
                 val content = reservedFile.readText()
-                json.decodeFromString<Map<String, List<String>>>(content)
+                json.decodeFromString<Map<String, List<Int>>>(content)
             } catch (e: Exception) {
                 log.error("Failed to read/parse reserved_test_queries.json during save", e)
                 emptyMap()
@@ -551,15 +544,7 @@ class TaxonomySnapshotManager(
                             val settings = json.decodeFromString<SnapshotSettings>(rs.getString("settings"))
                             val logUuid = rs.getString("log_uuid")
                             val reservedQueriesStr = try { rs.getString("reserved_queries") } catch (e: Exception) { null }
-                            val reservedQueries = if (reservedQueriesStr.isNullOrEmpty()) {
-                                emptyMap()
-                            } else {
-                                try {
-                                    json.decodeFromString<Map<String, List<String>>>(reservedQueriesStr)
-                                } catch (e: Exception) {
-                                    emptyMap()
-                                }
-                            }
+                            val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
                             snapshot = DagSnapshot(snapshotId, timestamp, newDescription, SerializedGraph("", emptyList()), metrics, settings, logUuid, reservedQueries, readConfig(rs, settings))
                         }
                     }
@@ -595,15 +580,7 @@ class TaxonomySnapshotManager(
                             val settings = json.decodeFromString<SnapshotSettings>(rs.getString("settings"))
                             val logUuid = rs.getString("log_uuid")
                             val reservedQueriesStr = try { rs.getString("reserved_queries") } catch (e: Exception) { null }
-                            val reservedQueries = if (reservedQueriesStr.isNullOrEmpty()) {
-                                emptyMap()
-                            } else {
-                                try {
-                                    json.decodeFromString<Map<String, List<String>>>(reservedQueriesStr)
-                                } catch (e: Exception) {
-                                    emptyMap()
-                                }
-                            }
+                            val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
                             oldSnapshot = DagSnapshot(snapshotId, timestamp, description,
                                 SerializedGraph("", emptyList()),
                                 SnapshotMetrics(0, 0, 0, 0, 0),  // placeholder; real metrics recomputed below
@@ -670,10 +647,16 @@ class TaxonomySnapshotManager(
                 try {
                     val reservedFile = File("reserved_test_queries.json")
                     // Validate deserialization to make sure it's valid JSON map
-                    val reservedQueries = json.decodeFromString<Map<String, List<String>>>(reservedQueriesStr)
+                    val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
                     val prettyJson = Json { prettyPrint = true }
                     reservedFile.writeText(prettyJson.encodeToString(reservedQueries))
                     log.info("Successfully restored reserved_test_queries.json from snapshot $snapshotId with ${reservedQueries.size} domains.")
+                    try {
+                        evalLoader.syncReservedPool(reservedFile)
+                        log.info("Re-synced is_reserved flags for snapshot $snapshotId")
+                    } catch (e: Exception) {
+                        log.warn("syncReservedPool failed after loading snapshot $snapshotId: ${e.message}")
+                    }
                 } catch (e: Exception) {
                     log.error("Failed to restore reserved_test_queries.json from snapshot $snapshotId", e)
                 }
@@ -795,6 +778,23 @@ class TaxonomySnapshotManager(
             logFile.readLines()
         } else {
             emptyList()
+        }
+    }
+
+    private fun safeDecodeReservedIds(raw: String?): Map<String, List<Int>> {
+        if (raw.isNullOrEmpty()) return emptyMap()
+        return try {
+            json.decodeFromString<Map<String, List<Int>>>(raw)
+        } catch (_: Exception) {
+            // Old snapshot — texts. Resolve via evalLoader.
+            try {
+                val texts = json.decodeFromString<Map<String, List<String>>>(raw)
+                evalLoader.resolveTextsToIds(texts).let { ids ->
+                    mapOf("legacy" to ids.toList())  // flat, domain key lost — acceptable for old snapshots
+                }
+            } catch (_: Exception) {
+                emptyMap()
+            }
         }
     }
 }

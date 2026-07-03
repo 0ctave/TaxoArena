@@ -164,7 +164,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
                 val root = deps.taxonomyEngine.adaptTaxonomy(
                     rootLabel = deps.config.dataset.datasetType.name,
-                    dataset = trainSet
+                    dataset = trainSet.mapValues { (_, qs) -> qs.map { it.text } }
                 )
                 deps.taxonomyService.setGraph(root)
                 deps.taxonomyService.setActiveSnapshotId(null)
@@ -273,6 +273,15 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 "queryLimit=$queryLimit · category=${category ?: "all"} · " +
                 "confidenceGate=$confidenceGate · parallelism=$parallelism · updateRankings=$updateRankings"
         )
+        if (deps.taxonomyService.activeSnapshotId() == null) {
+            val root = deps.taxonomyService.getGraph()
+            if (root != null) {
+                val snap = deps.snapshotManager.saveSnapshot(root, "auto_pre_benchmark")
+                deps.taxonomyService.setActiveSnapshotId(snap.id)
+                deps.log.info("Auto-saved snapshot '${snap.id}' before benchmark")
+            }
+        }
+
         deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models…")
         TuiLogAppender.startRecording()
         try {
@@ -368,7 +377,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 onComplete(BatchTrickleTestResults())
                 return@withContext
             }
-            val reservedByDomain: Map<String, List<String>> = try {
+            val reservedByDomain: Map<String, List<Int>> = try {
                 batchJson.decodeFromString(reservedFile.readText())
             } catch (t: Throwable) {
                 deps.log.error("Batch trickle: failed to parse reserved set", t)
@@ -381,10 +390,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             val fullByDomain = deps.datasetFetcher.fetchDataset(
                 selectedDomains = deps.config.dataset.selectedDomains
             )
-            val reservedTexts: Set<String> = reservedByDomain.values.flatten().toSet()
+            val reservedIds: Set<Int> = reservedByDomain.values.flatten().toSet()
             val textToDomain = HashMap<String, String>()
             for ((domain, queries) in fullByDomain) {
-                for (q in queries) if (q !in reservedTexts) textToDomain[q] = domain
+                for (q in queries) if (q.id !in reservedIds) textToDomain[q.text] = domain
             }
 
             val leaves = BatchTrickleEvaluator.collectLeaves(root)
@@ -398,8 +407,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             }
 
             // Apply the user-supplied cap; 0 means "use all". Always >= 1.
+            val idToText = fullByDomain.values.flatten().associate { it.id to it.text }
             val poolAll = reservedByDomain
-                .flatMap { (domain, queries) -> queries.map { domain to it } }
+                .flatMap { (domain, ids) ->
+                    ids.mapNotNull { id ->
+                        idToText[id]?.let { text -> domain to text }
+                    }
+                }
                 .shuffled()
             val sampleCap = if (maxQueries > 0) maxQueries else poolAll.size
             val testQueries = poolAll.take(sampleCap)

@@ -231,15 +231,38 @@ class TuiConfigFacade(
         )
     )
 
-    fun getAvailableDomains(): List<Pair<String, Int>> {
+    fun getAvailableDomains(): List<Pair<String, Int>> = getAvailableDomains(false)
+
+    fun getAvailableDomains(reservedOnly: Boolean): List<Pair<String, Int>> {
         val root = deps.taxonomyService.getGraph()
         if (root != null) {
+            val reservedTexts = if (reservedOnly) {
+                val file = java.io.File("reserved_test_queries.json")
+                if (file.exists()) {
+                    try {
+                        val map: Map<String, List<String>> = kotlinx.serialization.json.Json.decodeFromString(file.readText())
+                        map.values.flatten().toSet()
+                    } catch (e: Exception) {
+                        emptySet()
+                    }
+                } else {
+                    emptySet()
+                }
+            } else {
+                emptySet()
+            }
+
             return root.children.map { child ->
                 val rawName = child.label ?: child.id
                 val prettyName = rawName.split("_", "-").joinToString(" ") { word ->
                     word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                 }
-                prettyName to child.getRecursiveQueryCount()
+                val count = if (reservedOnly) {
+                    child.getAllQueriesInBranch().count { it.rawText in reservedTexts }
+                } else {
+                    child.getRecursiveQueryCount()
+                }
+                prettyName to count
             }.sortedBy { it.first }
         }
         return deps.datasetFetcher.getAvailableDomains()
