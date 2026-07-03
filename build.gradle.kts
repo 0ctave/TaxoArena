@@ -44,7 +44,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 }
 
 dependencies {
-    val arcVersion = "0.203.0"
+    val arcVersion = "0.231.0"
     val langchain4jVersion = "1.8.0"
 
 
