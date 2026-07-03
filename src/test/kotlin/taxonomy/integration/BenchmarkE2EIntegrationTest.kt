@@ -8,6 +8,7 @@ import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
@@ -18,6 +19,8 @@ import taxonomy.dataset.ModelEvalLoader
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.model.BenchmarkRequest
 import taxonomy.model.ModelSource
+import taxonomy.model.GraphNode
+import taxonomy.model.Embedding
 import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.operations.TaxonomyOperations
 import taxonomy.service.DomainEvaluation
@@ -73,6 +76,11 @@ class BenchmarkE2EIntegrationTest {
 
     private lateinit var store: ModelEvalStore
     private lateinit var benchmarkService: TaxonomyBenchmarkService
+    private lateinit var tmp: File
+    private lateinit var mockOps: TaxonomyOperations
+    private lateinit var mockTaxonomyService: TaxonomyService
+    private lateinit var mockEmbeddingCache: EmbeddingCache
+    private lateinit var datasetFetcher: MMLUDatasetFetcher
 
     /**
      * Subclass of the real arena service that bypasses embedding/routing/LLM calls and
@@ -80,12 +88,16 @@ class BenchmarkE2EIntegrationTest {
      * mocked (Mockito bypasses their constructors), and the only overridden method is the
      * one the benchmark service calls.
      */
-    private class FakeArenaService : TaxonomyArenaService(
+    private class FakeArenaService(
+        ops: TaxonomyOperations,
+        taxService: TaxonomyService,
+        embCache: EmbeddingCache
+    ) : TaxonomyArenaService(
         mock(TaxonomyConfig::class.java),
-        mock(TaxonomyService::class.java),
+        taxService,
         mock(TaxonomyLlmClient::class.java),
-        mock(EmbeddingCache::class.java),
-        mock(TaxonomyOperations::class.java),
+        embCache,
+        ops,
         mock(ModelEvalStore::class.java),
         mock(TaxonomyRankingService::class.java),
     ) {
@@ -95,10 +107,11 @@ class BenchmarkE2EIntegrationTest {
             modelA: String,
             traceA: String,
             modelB: String,
-            traceB: String
+            traceB: String,
+            targetNodeId: String?
         ): List<DomainEvaluation> = listOf(
             DomainEvaluation(
-                domainLabel = "stub-leaf-judge",
+                domain = "stub-leaf-judge",
                 winner = "Model A",
                 rationale = "fixed verdict",
                 confidence = 0.95
@@ -108,7 +121,7 @@ class BenchmarkE2EIntegrationTest {
 
     @BeforeAll
     fun setup() {
-        val tmp = Files.createTempDirectory("benchmark-e2e").toFile()
+        tmp = Files.createTempDirectory("benchmark-e2e").toFile()
         val datasetDb = File(tmp, "dataset.db").absolutePath      // holds mmlu_pro + eval_results
         val embeddingDb = File(tmp, "embeddings.db").absolutePath // holds embeddings cache
         val reservedFile = File(tmp, "reserved_test_queries.json")
@@ -145,7 +158,7 @@ class BenchmarkE2EIntegrationTest {
         val zipB = buildEvalZip(tmp, "model_outputs_$modelB", predFor = { "B" })
 
         store = ModelEvalStore(dbPath = datasetDb)
-        val datasetFetcher = mock(MMLUDatasetFetcher::class.java)
+        datasetFetcher = mock(MMLUDatasetFetcher::class.java)
         val loader = ModelEvalLoader(
             store = store,
             datasetFetcher = datasetFetcher,
@@ -161,13 +174,44 @@ class BenchmarkE2EIntegrationTest {
         }
         loader.syncReservedPool(reservedFile)
 
+        val dummyRoot = GraphNode(id = "root", label = "stub-leaf-judge", depth = 0)
+        mockTaxonomyService = mock(TaxonomyService::class.java)
+        org.mockito.Mockito.`when`(mockTaxonomyService.getGraph()).thenReturn(dummyRoot)
+        org.mockito.Mockito.`when`(mockTaxonomyService.activeSnapshotId()).thenReturn("stubbed-snapshot")
+
+        mockEmbeddingCache = mock(EmbeddingCache::class.java)
+        runBlocking {
+            org.mockito.Mockito.`when`(mockEmbeddingCache.getOrCreate(org.mockito.ArgumentMatchers.anyString() ?: ""))
+                .thenReturn(floatArrayOf(0.1f, 0.2f))
+        }
+
+        mockOps = mock(TaxonomyOperations::class.java)
+        org.mockito.Mockito.`when`(mockOps.routeQuery(
+            org.mockito.ArgumentMatchers.any(Embedding::class.java) ?: Embedding("", "", floatArrayOf()),
+            org.mockito.ArgumentMatchers.any(GraphNode::class.java) ?: dummyRoot,
+            org.mockito.ArgumentMatchers.anyInt(),
+            org.mockito.ArgumentMatchers.any()
+        )).thenReturn(mapOf(dummyRoot to 1.0))
+    }
+
+    private fun recreateBenchmarkService() {
+        val rankingDb = File(tmp, "ratings_${System.nanoTime()}.db")
+        System.setProperty("ranking.db.path", rankingDb.absolutePath)
+        val rankingService = TaxonomyRankingService()
+        System.clearProperty("ranking.db.path")
+
         benchmarkService = TaxonomyBenchmarkService(
-            arenaService = FakeArenaService(),
-            rankingService = mock(TaxonomyRankingService::class.java),
+            arenaService = FakeArenaService(mockOps, mockTaxonomyService, mockEmbeddingCache),
+            rankingService = rankingService,
             datasetFetcher = datasetFetcher,
-            taxonomyService = mock(TaxonomyService::class.java),
+            taxonomyService = mockTaxonomyService,
             evalStore = store
         )
+    }
+
+    @BeforeEach
+    fun cleanDatabase() {
+        recreateBenchmarkService()
     }
 
     @Test
@@ -216,6 +260,7 @@ class BenchmarkE2EIntegrationTest {
         val allReq = reservedReq.copy(reservedOnly = false)
 
         val reservedReport = benchmarkService.runBenchmark(reservedReq)
+        recreateBenchmarkService()
         val allReport = benchmarkService.runBenchmark(allReq)
 
         assertEquals(reservedIds.size, reservedReport.queryResults.size)

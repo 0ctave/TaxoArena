@@ -282,77 +282,184 @@ private fun ArenaBenchmarkLiveView(
 ) {
     val running = controlState.isRunningBenchmark
     val report = controlState.benchmarkReport
-    Text(
-        "BENCHMARK · ${if (running) "running" else "complete"} · view: ${b.benchmarkLiveView}".take(w),
-        color = Cyan, textStyle = Bold,
-    )
-    when (b.benchmarkLiveView) {
-        BenchmarkLiveView.SUMMARY -> {
-            b.liveStats?.let { live ->
-                val pct = if (live.total > 0) live.processed * 100 / live.total else 0
-                Text("Progress: ${live.processed}/${live.total} ($pct%)".take(w), color = White)
-                Text(
-                    ("Agreement ${"%.2f".format(live.runningAgreement)} · " +
-                        "Coverage ${"%.2f".format(live.runningCoverage)}").take(w),
-                    color = White,
-                )
-                if (live.pairStats.isNotEmpty()) {
-                    Spacer()
-                    Text("Pair Matchups Progress:".take(w), color = Yellow, textStyle = Bold)
-                    Text(
-                        "%-18s vs %-18s | %5s %5s %5s | %5s".format(
-                            "Model A", "Model B", "WinsA", "WinsB", "Ties", "Agree"
-                        ).take(w),
-                        color = Cyan
-                    )
-                    val rowsCount = (height - 9).coerceAtLeast(1)
-                    live.pairStats.take(rowsCount).forEach { ps ->
-                        Text(
-                            "%-18s vs %-18s | %5d %5d %5d | %5.0f%%".format(
-                                ps.modelA.take(18),
-                                ps.modelB.take(18),
-                                ps.judgeWinsA,
-                                ps.judgeWinsB,
-                                ps.judgeTies,
-                                ps.judgeAccuracyAgreementRate * 100
-                            ).take(w),
-                            color = White
-                        )
-                    }
-                } else if (live.perCategoryProgress.isNotEmpty()) {
-                    Text("Per-category:".take(w), color = Yellow)
-                    live.perCategoryProgress.entries.take((height - 7).coerceAtLeast(1)).forEach { (cat, n) ->
-                        Text("  ${cat.take(20).padEnd(20)} $n".take(w), color = White)
-                    }
-                }
-            }
-            if (report != null) {
-                Text("Queries ${report.totalQueries} · pairs ${report.totalModelPairs}".take(w), color = White)
-                modelAccuracies(report).forEach { (model, acc) ->
-                    val bar = "█".repeat((acc * 20).toInt().coerceIn(0, 20))
-                    Text("  ${model.take(16).padEnd(16)} ${bar.padEnd(20)} ${"%.0f%%".format(acc * 100)}".take(w), color = Green)
-                }
-            } else if (running) {
-                Text("Model accuracy: streaming…".take(w), color = White)
-            }
-        }
+    val live = b.liveStats
 
-        BenchmarkLiveView.STREAM -> {
-            if (report != null) {
-                report.queryResults.takeLast(10).forEach { r ->
-                    val answers = r.modelAnswers.entries.joinToString(" ") { (m, a) ->
-                        val ok = r.modelCorrect[m] == true
-                        "${m.take(8)}:$a${if (ok) "✓" else "✗"}"
-                    }
-                    Text("• ${r.query.take(28)} | GT:${r.gtCorrectAnswer} | $answers".take(w), color = White)
-                }
+    if (report != null) {
+        // ─── COMPLETE STATE ──────────────────────────────────────────────────
+        Text("ARENA BENCHMARK · COMPLETE", color = Green, textStyle = Bold)
+        Spacer()
+        Text("Queries: ${report.totalQueries} · Pairs: ${report.totalModelPairs}".take(w), color = White)
+        Spacer()
+
+        if (w >= 90) {
+            val leftColW = 44
+            val rightColW = (w - leftColW - 3).coerceAtLeast(15)
+
+            // Headers
+            val titleLine = "%-${leftColW}s   %s".format("FINAL BT LEADERBOARD", "MODEL ACCURACY (MMLU-Pro GT)").take(w)
+            Text(titleLine, color = Yellow, textStyle = Bold)
+
+            val borderLine = "%-${leftColW}s   %s".format("-".repeat(leftColW), "-".repeat(rightColW)).take(w)
+            Text(borderLine, color = White)
+
+            val headerLine = "%-24s | %8s | %6s   %-20s | %s".format(
+                "Model", "BT Score", "StdErr", "Model", "Accuracy Bar"
+            ).take(w)
+            Text(headerLine, color = Cyan)
+
+            val colDividerLine = "%-${leftColW}s   %s".format(
+                "-------------------------+----------+------",
+                "---------------------+----------------------"
+            ).take(w)
+            Text(colDividerLine, color = White)
+
+            val sortedModels = if (live?.btRatings?.isNotEmpty() == true) {
+                live.btRatings.entries.sortedByDescending { it.value }
             } else {
-                b.liveStats?.let { live ->
-                    Text("Now: ${live.currentQuestion.take((w - 6).coerceAtLeast(1))}".take(w), color = White)
+                emptyList()
+            }
+            val accs = modelAccuracies(report)
+            val maxRows = maxOf(sortedModels.size, accs.size)
+            val rowsCount = (height - 9).coerceAtLeast(1)
+
+            for (i in 0 until minOf(maxRows, rowsCount)) {
+                val leftStr = if (i < sortedModels.size) {
+                    val entry = sortedModels[i]
+                    val model = entry.key
+                    val score = entry.value
+                    val se = live?.btErrors?.get(model) ?: 0.0
+                    "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
+                } else {
+                    " ".repeat(leftColW)
                 }
-                Text("Per-question results stream in on completion…".take(w), color = Yellow)
+
+                val rightStr = if (i < accs.size) {
+                    val (model, acc) = accs[i]
+                    val bar = "█".repeat((acc * 12).toInt().coerceIn(0, 12))
+                    "%-20s | %s %5.1f%%".format(model.take(20), bar.padEnd(12), acc * 100)
+                } else {
+                    ""
+                }
+
+                val rowStr = "%-${leftColW}s   %s".format(leftStr, rightStr).take(w)
+                Text(rowStr, color = White)
+            }
+        } else {
+            // Stacked for narrow screen
+            Text("FINAL BT LEADERBOARD:", color = Yellow, textStyle = Bold)
+            val sortedModels = live?.btRatings?.entries?.sortedByDescending { it.value } ?: emptyList()
+            sortedModels.take(5).forEach { (model, score) ->
+                val se = live?.btErrors?.get(model) ?: 0.0
+                Text("  • ${model.take(20)}: BT=${"%.2f".format(score)} (se=${"%.2f".format(se)})".take(w), color = White)
+            }
+            Spacer()
+            Text("MODEL ACCURACY:", color = Yellow, textStyle = Bold)
+            modelAccuracies(report).take(5).forEach { (model, acc) ->
+                Text("  • ${model.take(16)}: ${"%.1f%%".format(acc * 100)}".take(w), color = Green)
             }
         }
+    } else if (live != null) {
+        // ─── RUNNING STATE ───────────────────────────────────────────────────
+        Text("ARENA BENCHMARK · RUNNING", color = Cyan, textStyle = Bold)
+        Spacer()
+        val pct = if (live.total > 0) live.processed * 100 / live.total else 0
+        Text(
+            "Progress: ${live.processed}/${live.total} ($pct%) · Round: ${live.currentRound} · Agree: ${"%.1f%%".format(live.runningAgreement * 100)}".take(w),
+            color = White
+        )
+        if (live.activeTargets.isNotEmpty()) {
+            Text("Targeting Nodes: ${live.activeTargets.joinToString(", ").take(w - 18)}".take(w), color = Yellow)
+        }
+        Spacer()
+
+        // Render side-by-side if terminal is wide enough, else stack them
+        if (w >= 90) {
+            val leftColW = 44
+            val rightColW = (w - leftColW - 3).coerceAtLeast(15)
+
+            // Headers
+            val titleLine = "%-${leftColW}s   %s".format("LIVE BT LEADERBOARD (Log-Strength)", "MATCHUPS PAIRWISE PROGRESS").take(w)
+            Text(titleLine, color = Yellow, textStyle = Bold)
+
+            val borderLine = "%-${leftColW}s   %s".format("-".repeat(leftColW), "-".repeat(rightColW)).take(w)
+            Text(borderLine, color = White)
+
+            val headerLine = "%-24s | %8s | %6s   %-18s vs %-18s | %5s %5s %5s | %5s".format(
+                "Model", "BT Score", "StdErr", "Model A", "Model B", "WinsA", "WinsB", "Ties", "Agree"
+            ).take(w)
+            Text(headerLine, color = Cyan)
+
+            val colDividerLine = "%-${leftColW}s   %s".format(
+                "-------------------------+----------+------",
+                "---------------------+---------------------+-------------------+-------"
+            ).take(w)
+            Text(colDividerLine, color = White)
+
+            val sortedModels = if (live.btRatings.isNotEmpty()) {
+                live.btRatings.entries.sortedByDescending { it.value }
+            } else {
+                b.benchmarkSelectedModels.map { java.util.AbstractMap.SimpleEntry(it, 0.0) }
+            }
+            val pairStats = live.pairStats
+            val maxRows = maxOf(sortedModels.size, pairStats.size)
+            val rowsCount = (height - 11).coerceAtLeast(1)
+
+            for (i in 0 until minOf(maxRows, rowsCount)) {
+                val leftStr = if (i < sortedModels.size) {
+                    val entry = sortedModels[i]
+                    val model = entry.key
+                    val score = entry.value
+                    val se = live.btErrors[model] ?: 0.0
+                    "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
+                } else {
+                    " ".repeat(leftColW)
+                }
+
+                val rightStr = if (i < pairStats.size) {
+                    val ps = pairStats[i]
+                    "%-18s vs %-18s | %5d %5d %5d | %5.0f%%".format(
+                        ps.modelA.take(18),
+                        ps.modelB.take(18),
+                        ps.judgeWinsA,
+                        ps.judgeWinsB,
+                        ps.judgeTies,
+                        ps.judgeAccuracyAgreementRate * 100
+                    )
+                } else {
+                    ""
+                }
+
+                val rowStr = "%-${leftColW}s   %s".format(leftStr, rightStr).take(w)
+                Text(rowStr, color = White)
+            }
+        } else {
+            // Stacked layout for narrower terminals
+            if (live.btRatings.isNotEmpty()) {
+                Text("LIVE BT LEADERBOARD:", color = Yellow, textStyle = Bold)
+                live.btRatings.entries.sortedByDescending { it.value }.take(3).forEach { (model, score) ->
+                    val se = live.btErrors[model] ?: 0.0
+                    Text("  • ${model.take(20)}: BT=${"%.2f".format(score)} (se=${"%.2f".format(se)})".take(w), color = White)
+                }
+                Spacer()
+            }
+
+            Text("MATCHUPS PROGRESS:", color = Yellow, textStyle = Bold)
+            val rowsCount = (height - 12).coerceAtLeast(1)
+            live.pairStats.take(rowsCount).forEach { ps ->
+                Text(
+                    "%-14s vs %-14s | %4d/%4d/%4d".format(
+                        ps.modelA.take(14),
+                        ps.modelB.take(14),
+                        ps.judgeWinsA,
+                        ps.judgeWinsB,
+                        ps.judgeTies
+                    ).take(w),
+                    color = White
+                )
+            }
+        }
+    } else {
+        Text("Waiting for live benchmark stats…".take(w), color = Yellow)
     }
 }
 

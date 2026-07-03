@@ -1,6 +1,8 @@
 package taxonomy.service
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import taxonomy.*
@@ -57,7 +59,7 @@ data class LeaderboardGroup(
 @Service
 class TaxonomyRankingService {
     private val log = LoggerFactory.getLogger("taxonomy.RankingService")
-    private val dbUrl = "jdbc:sqlite:ratings.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val dbUrl = "jdbc:sqlite:${System.getProperty("ranking.db.path", "ratings.db")}?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
     // Initial constant values matching standard OpenSkill (Weng-Lin) defaults
     private val initialMu = 25.0
@@ -71,20 +73,48 @@ class TaxonomyRankingService {
     private val connection: Connection by lazy {
         DriverManager.getConnection(dbUrl).also { conn ->
             conn.autoCommit = true
+            try {
+                conn.createStatement().use { stmt ->
+                    stmt.execute("PRAGMA journal_mode=WAL;")
+                    stmt.execute("PRAGMA synchronous=NORMAL;")
+                    stmt.execute("PRAGMA busy_timeout=10000;")
+                }
+            } catch (e: Exception) {
+                log.warn("Failed to set SQLite PRAGMAs: ${e.message}")
+            }
         }
     }
 
+    @Volatile
+    private var dbInitialized = false
+
     private inline fun <T> withConn(block: (Connection) -> T): T = synchronized(dbLock) {
+        ensureDatabaseInitialized()
         block(connection)
     }
 
     init {
-        initDatabase()
+        ensureDatabaseInitialized()
+        try {
+            Runtime.getRuntime().addShutdownHook(Thread {
+                try {
+                    synchronized(dbLock) {
+                        if (!connection.isClosed) {
+                            connection.close()
+                            log.info("SQLite database connection closed cleanly via shutdown hook.")
+                        }
+                    }
+                } catch (_: Exception) {}
+            })
+        } catch (_: Exception) {}
     }
 
-    private fun initDatabase() {
-        try {
-            withConn { conn ->
+    private fun ensureDatabaseInitialized() {
+        if (dbInitialized) return
+        synchronized(dbLock) {
+            if (dbInitialized) return
+            try {
+                val conn = connection
                 conn.createStatement().use { stmt ->
                     stmt.execute("""
                         CREATE TABLE IF NOT EXISTS agent_ratings_v2 (
@@ -98,14 +128,18 @@ class TaxonomyRankingService {
                     """.trimIndent())
 
                     // Migrate data if old table exists
-                    val rsTables = conn.metaData.getTables(null, null, "agent_ratings", null)
-                    if (rsTables.next()) {
-                        stmt.execute("""
-                            INSERT OR IGNORE INTO agent_ratings_v2 (snapshot_id, agent_name, domain, mu, sigma)
-                            SELECT 'global', agent_name, domain, mu, sigma FROM agent_ratings
-                        """.trimIndent())
-                        stmt.execute("DROP TABLE agent_ratings")
-                        log.info("Migrated agent_ratings to agent_ratings_v2 and dropped old table.")
+                    try {
+                        val rsTables = conn.metaData.getTables(null, null, "agent_ratings", null)
+                        if (rsTables.next()) {
+                            stmt.execute("""
+                                INSERT OR IGNORE INTO agent_ratings_v2 (snapshot_id, agent_name, domain, mu, sigma)
+                                SELECT 'global', agent_name, domain, mu, sigma FROM agent_ratings
+                            """.trimIndent())
+                            stmt.execute("DROP TABLE agent_ratings")
+                            log.info("Migrated agent_ratings to agent_ratings_v2 and dropped old table.")
+                        }
+                    } catch (e: Exception) {
+                        log.warn("Failed to migrate or drop old agent_ratings table: ${e.message}")
                     }
 
                     stmt.execute("""
@@ -122,23 +156,52 @@ class TaxonomyRankingService {
                             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                         )
                     """.trimIndent())
-                }
-            }
-            log.info("SQLite Agent Ratings V2 and Match History schema initialized.")
-        } catch (e: Exception) {
-            log.error("Failed to initialize database tables for ranking.", e)
-        }
 
-        // Migrate existing databases safely by adding new columns if they do not exist
-        for (col in listOf("snapshot_id", "model_a", "model_b")) {
-            try {
-                withConn { conn ->
-                    conn.createStatement().use { stmt ->
-                        stmt.execute("ALTER TABLE match_history ADD COLUMN $col TEXT")
+                    stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS node_pair_stats (
+                            snapshot_id TEXT NOT NULL,
+                            node_id TEXT NOT NULL,
+                            model_a TEXT NOT NULL,
+                            model_b TEXT NOT NULL,
+                            wins_a REAL,
+                            wins_b REAL,
+                            ties INTEGER,
+                            total_comparisons INTEGER,
+                            position_flips INTEGER,
+                            last_updated INTEGER,
+                            PRIMARY KEY (snapshot_id, node_id, model_a, model_b)
+                        )
+                    """.trimIndent())
+
+                    stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS node_bt_states (
+                            snapshot_id TEXT NOT NULL,
+                            node_id TEXT NOT NULL,
+                            bt_scores TEXT NOT NULL,
+                            std_errors TEXT NOT NULL,
+                            fit_version INTEGER,
+                            total_comparisons INTEGER,
+                            last_fit_at INTEGER,
+                            PRIMARY KEY (snapshot_id, node_id)
+                        )
+                    """.trimIndent())
+                }
+
+                // Migrate existing databases safely by adding new columns if they do not exist
+                for (col in listOf("snapshot_id", "model_a", "model_b")) {
+                    try {
+                        conn.createStatement().use { stmt ->
+                            stmt.execute("ALTER TABLE match_history ADD COLUMN $col TEXT")
+                        }
+                    } catch (e: Exception) {
+                        // Column might already exist, safe to ignore
                     }
                 }
+
+                dbInitialized = true
+                log.info("SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.")
             } catch (e: Exception) {
-                // Column might already exist, safe to ignore
+                log.error("Failed to initialize database tables: ${e.message}", e)
             }
         }
     }
@@ -148,6 +211,8 @@ class TaxonomyRankingService {
             conn.createStatement().use { stmt ->
                 try { stmt.execute("DELETE FROM agent_ratings_v2") } catch (_: Exception) {}
                 try { stmt.execute("DELETE FROM match_history") } catch (_: Exception) {}
+                try { stmt.execute("DELETE FROM node_pair_stats") } catch (_: Exception) {}
+                try { stmt.execute("DELETE FROM node_bt_states") } catch (_: Exception) {}
             }
         }
     }
@@ -162,7 +227,228 @@ class TaxonomyRankingService {
                 pstmt.setString(1, snapshotId)
                 pstmt.executeUpdate()
             }
+            try {
+                conn.prepareStatement("DELETE FROM node_pair_stats WHERE snapshot_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.executeUpdate()
+                }
+                conn.prepareStatement("DELETE FROM node_bt_states WHERE snapshot_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.executeUpdate()
+                }
+            } catch (_: Exception) {}
         }
+    }
+
+    private val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+
+    fun saveNodePairStats(stats: NodePairStats, snapshotId: String = "global") {
+        try {
+            withConn { conn ->
+                val sql = """
+                    INSERT OR REPLACE INTO node_pair_stats 
+                    (snapshot_id, node_id, model_a, model_b, wins_a, wins_b, ties, total_comparisons, position_flips, last_updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """.trimIndent()
+                conn.prepareStatement(sql).use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, stats.nodeId)
+                    pstmt.setString(3, stats.modelA)
+                    pstmt.setString(4, stats.modelB)
+                    pstmt.setDouble(5, stats.winsA)
+                    pstmt.setDouble(6, stats.winsB)
+                    pstmt.setInt(7, stats.ties)
+                    pstmt.setInt(8, stats.totalComparisons)
+                    pstmt.setInt(9, stats.positionFlips)
+                    pstmt.setLong(10, stats.lastUpdated)
+                    pstmt.executeUpdate()
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to save node pair stats for ${stats.modelA} vs ${stats.modelB} on node ${stats.nodeId}", e)
+        }
+    }
+
+    fun getNodePairStats(nodeId: String, snapshotId: String = "global"): List<NodePairStats> {
+        val list = mutableListOf<NodePairStats>()
+        try {
+            withConn { conn ->
+                conn.prepareStatement("SELECT * FROM node_pair_stats WHERE snapshot_id = ? AND node_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, nodeId)
+                    val rs = pstmt.executeQuery()
+                    while (rs.next()) {
+                        list.add(
+                            NodePairStats(
+                                nodeId = rs.getString("node_id"),
+                                modelA = rs.getString("model_a"),
+                                modelB = rs.getString("model_b"),
+                                winsA = rs.getDouble("wins_a"),
+                                winsB = rs.getDouble("wins_b"),
+                                ties = rs.getInt("ties"),
+                                totalComparisons = rs.getInt("total_comparisons"),
+                                positionFlips = rs.getInt("position_flips"),
+                                lastUpdated = rs.getLong("last_updated")
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to get node pair stats for node $nodeId", e)
+        }
+        return list
+    }
+
+    fun getAllNodePairStats(snapshotId: String = "global"): Map<String, List<NodePairStats>> {
+        val map = mutableMapOf<String, MutableList<NodePairStats>>()
+        try {
+            withConn { conn ->
+                conn.prepareStatement("SELECT * FROM node_pair_stats WHERE snapshot_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    val rs = pstmt.executeQuery()
+                    while (rs.next()) {
+                        val nodeId = rs.getString("node_id")
+                        map.getOrPut(nodeId) { mutableListOf() }.add(
+                            NodePairStats(
+                                nodeId = nodeId,
+                                modelA = rs.getString("model_a"),
+                                modelB = rs.getString("model_b"),
+                                winsA = rs.getDouble("wins_a"),
+                                winsB = rs.getDouble("wins_b"),
+                                ties = rs.getInt("ties"),
+                                totalComparisons = rs.getInt("total_comparisons"),
+                                positionFlips = rs.getInt("position_flips"),
+                                lastUpdated = rs.getLong("last_updated")
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to get all node pair stats: ${e.message}", e)
+        }
+        return map
+    }
+
+    fun saveBtState(state: NodeBtState, snapshotId: String = "global") {
+        try {
+            val scoresJson = json.encodeToString(state.btScores)
+            val stdErrorsJson = json.encodeToString(state.stdErrors)
+            withConn { conn ->
+                val sql = """
+                    INSERT OR REPLACE INTO node_bt_states 
+                    (snapshot_id, node_id, bt_scores, std_errors, fit_version, total_comparisons, last_fit_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """.trimIndent()
+                conn.prepareStatement(sql).use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, state.nodeId)
+                    pstmt.setString(3, scoresJson)
+                    pstmt.setString(4, stdErrorsJson)
+                    pstmt.setInt(5, state.fitVersion)
+                    pstmt.setInt(6, state.totalComparisons)
+                    pstmt.setLong(7, state.lastFitAt)
+                    pstmt.executeUpdate()
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to save BT state for node ${state.nodeId}", e)
+        }
+    }
+
+    fun getBtState(nodeId: String, snapshotId: String = "global"): NodeBtState? {
+        try {
+            return withConn { conn ->
+                conn.prepareStatement("SELECT * FROM node_bt_states WHERE snapshot_id = ? AND node_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    pstmt.setString(2, nodeId)
+                    val rs = pstmt.executeQuery()
+                    if (rs.next()) {
+                        val scoresMap = json.decodeFromString<Map<String, Double>>(rs.getString("bt_scores"))
+                        val stdMap = json.decodeFromString<Map<String, Double>>(rs.getString("std_errors"))
+                        NodeBtState(
+                            nodeId = rs.getString("node_id"),
+                            btScores = scoresMap,
+                            stdErrors = stdMap,
+                            fitVersion = rs.getInt("fit_version"),
+                            totalComparisons = rs.getInt("total_comparisons"),
+                            lastFitAt = rs.getLong("last_fit_at")
+                        )
+                    } else {
+                        null
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to get BT state for node $nodeId", e)
+            return null
+        }
+    }
+
+    fun getAllBtStates(snapshotId: String = "global"): Map<String, NodeBtState> {
+        val map = mutableMapOf<String, NodeBtState>()
+        try {
+            withConn { conn ->
+                conn.prepareStatement("SELECT * FROM node_bt_states WHERE snapshot_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    val rs = pstmt.executeQuery()
+                    while (rs.next()) {
+                        val nodeId = rs.getString("node_id")
+                        val scoresMap = json.decodeFromString<Map<String, Double>>(rs.getString("bt_scores"))
+                        val stdMap = json.decodeFromString<Map<String, Double>>(rs.getString("std_errors"))
+                        map[nodeId] = NodeBtState(
+                            nodeId = nodeId,
+                            btScores = scoresMap,
+                            stdErrors = stdMap,
+                            fitVersion = rs.getInt("fit_version"),
+                            totalComparisons = rs.getInt("total_comparisons"),
+                            lastFitAt = rs.getLong("last_fit_at")
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to get all BT states: ${e.message}", e)
+        }
+        return map
+    }
+
+    fun getNodeLeaderboard(nodeId: String, snapshotId: String = "global"): List<ModelRank>? {
+        val state = getBtState(nodeId, snapshotId) ?: return null
+        val pairStats = getNodePairStats(nodeId, snapshotId)
+        val models = state.btScores.keys.toList()
+
+        return models.map { modelId ->
+            val btScore = state.btScores[modelId] ?: 0.0
+            val stdError = state.stdErrors[modelId] ?: Double.MAX_VALUE
+            val winsA = pairStats.filter { it.modelA == modelId }.sumOf { it.winsA }
+            val winsB = pairStats.filter { it.modelB == modelId }.sumOf { it.winsB }
+            val totalWins = winsA + winsB
+            val comps = pairStats.filter { it.modelA == modelId || it.modelB == modelId }.sumOf { it.totalComparisons }
+            ModelRank(
+                modelId = modelId,
+                btScore = btScore,
+                stdError = stdError,
+                rank = 0,
+                confidenceIntervalLow = btScore - 2.0 * stdError,
+                confidenceIntervalHigh = btScore + 2.0 * stdError,
+                winsTotal = totalWins,
+                comparisonsTotal = comps
+            )
+        }.sortedByDescending { it.btScore }
+         .mapIndexed { index, modelRank -> modelRank.copy(rank = index + 1) }
+    }
+
+    fun getDomainLeaderboard(domainLabel: String, snapshotId: String = "global"): List<ModelRank>? {
+        return getNodeLeaderboard(domainLabel, snapshotId)
+    }
+
+    fun getPositionFlipRate(nodeId: String, modelA: String, modelB: String, snapshotId: String = "global"): Double {
+        val stats = getNodePairStats(nodeId, snapshotId).firstOrNull { 
+            (it.modelA == modelA && it.modelB == modelB) || (it.modelA == modelB && it.modelB == modelA) 
+        } ?: return 0.0
+        return if (stats.totalComparisons > 0) stats.positionFlips.toDouble() / stats.totalComparisons else 0.0
     }
 
     fun getRating(agentName: String, domain: String, snapshotId: String = "global"): AgentRating {
@@ -201,23 +487,24 @@ class TaxonomyRankingService {
         }
     }
 
-    fun getRecordedMatch(snapshotId: String, query: String, modelA: String, modelB: String): CachedMatchResult? {
+    fun getRecordedMatch(snapshotId: String, domain: String, query: String, modelA: String, modelB: String): CachedMatchResult? {
         try {
             return withConn { conn ->
                 val sql = """
                     SELECT winner, loser, is_tie, domain 
                     FROM match_history 
-                    WHERE snapshot_id = ? AND query = ? 
+                    WHERE snapshot_id = ? AND domain = ? AND query = ? 
                       AND ((model_a = ? AND model_b = ?) OR (model_a = ? AND model_b = ?))
                     LIMIT 1
                 """.trimIndent()
                 conn.prepareStatement(sql).use { pstmt ->
                     pstmt.setString(1, snapshotId)
-                    pstmt.setString(2, query)
-                    pstmt.setString(3, modelA)
-                    pstmt.setString(4, modelB)
+                    pstmt.setString(2, domain)
+                    pstmt.setString(3, query)
+                    pstmt.setString(4, modelA)
                     pstmt.setString(5, modelB)
-                    pstmt.setString(6, modelA)
+                    pstmt.setString(6, modelB)
+                    pstmt.setString(7, modelA)
                     val rs = pstmt.executeQuery()
                     if (rs.next()) {
                         CachedMatchResult(
@@ -232,7 +519,7 @@ class TaxonomyRankingService {
                 }
             }
         } catch (e: Exception) {
-            log.error("Failed to get recorded match for snapshot $snapshotId, query: $query, models: $modelA vs $modelB", e)
+            log.error("Failed to get recorded match for snapshot $snapshotId, domain: $domain, query: $query, models: $modelA vs $modelB", e)
             return null
         }
     }
@@ -249,7 +536,7 @@ class TaxonomyRankingService {
         modelB: String = loser
     ) {
         try {
-            val existing = getRecordedMatch(snapshotId, query, modelA, modelB)
+            val existing = getRecordedMatch(snapshotId, domain, query, modelA, modelB)
             if (existing != null) {
                 if (existing.winner == winner && existing.loser == loser && existing.isTie == isTie && existing.domain == domain) {
                     // If identical, do nothing (return)
@@ -259,16 +546,16 @@ class TaxonomyRankingService {
                     withConn { conn ->
                         val sql = """
                             UPDATE match_history 
-                            SET winner = ?, loser = ?, is_tie = ?, domain = ? 
-                            WHERE snapshot_id = ? AND query = ? 
+                            SET winner = ?, loser = ?, is_tie = ? 
+                            WHERE snapshot_id = ? AND domain = ? AND query = ? 
                               AND ((model_a = ? AND model_b = ?) OR (model_a = ? AND model_b = ?))
                         """.trimIndent()
                         conn.prepareStatement(sql).use { pstmt ->
                             pstmt.setString(1, winner)
                             pstmt.setString(2, loser)
                             pstmt.setInt(3, if (isTie) 1 else 0)
-                            pstmt.setString(4, domain)
-                            pstmt.setString(5, snapshotId)
+                            pstmt.setString(4, snapshotId)
+                            pstmt.setString(5, domain)
                             pstmt.setString(6, query)
                             pstmt.setString(7, modelA)
                             pstmt.setString(8, modelB)

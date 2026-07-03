@@ -11,9 +11,14 @@ class RankingServiceTest {
 
     private lateinit var rankingService: TaxonomyRankingService
 
+    private lateinit var tmpDir: java.io.File
+
     @BeforeEach
     fun setUp() {
+        tmpDir = java.nio.file.Files.createTempDirectory("ranking-service-test").toFile()
+        System.setProperty("ranking.db.path", java.io.File(tmpDir, "ratings.db").absolutePath)
         rankingService = TaxonomyRankingService()
+        System.clearProperty("ranking.db.path")
         rankingService.clearDatabaseForTest()
     }
 

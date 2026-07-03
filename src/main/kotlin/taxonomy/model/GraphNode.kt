@@ -208,3 +208,16 @@ fun assignQueryIds(root: GraphNode) {
     }
     walkAssign(root)
 }
+
+fun GraphNode.allAncestors(): Set<String> {
+    val ancestors = mutableSetOf(this.id)
+    fun traverse(node: GraphNode) {
+        for (parent in node.parents) {
+            if (ancestors.add(parent.id)) {
+                traverse(parent)
+            }
+        }
+    }
+    traverse(this)
+    return ancestors
+}

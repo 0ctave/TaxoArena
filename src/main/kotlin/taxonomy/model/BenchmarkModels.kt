@@ -11,7 +11,11 @@ data class BenchmarkLiveStats(
     val runningAgreement: Double,   // rolling judge-GT agreement
     val runningCoverage: Double,    // fraction with ≥1 leaf judge so far
     val perCategoryProgress: Map<String, Int>,  // category → matched so far
-    val pairStats: List<ModelPairStats> = emptyList()
+    val pairStats: List<ModelPairStats> = emptyList(),
+    val currentRound: Int = 0,
+    val activeTargets: List<String> = emptyList(),
+    val btRatings: Map<String, Double> = emptyMap(),
+    val btErrors: Map<String, Double> = emptyMap()
 )
 
 @Serializable
@@ -57,7 +61,8 @@ data class ModelPairStats(
     val accuracyWinsB: Int,
     val accuracyTies: Int,
     val judgeAccuracyAgreementRate: Double,   // core validation metric
-    val avgConfidence: Double
+    val avgConfidence: Double,
+    val isExhausted: Boolean = false
 )
 
 @Serializable
@@ -79,4 +84,49 @@ data class BenchmarkReport(
     val perDomainStats: List<DomainStats>,
     val perCategoryStats: List<DomainStats>,  // grouped by MMLU-Pro GT category
     val queryResults: List<QueryBenchmarkResult>   // full per-query detail
+)
+
+@Serializable
+data class NodePairStats(
+    val nodeId: String,
+    val modelA: String,
+    val modelB: String,
+    var winsA: Double = 0.0,      // Double to support 0.5 for BT ties
+    var winsB: Double = 0.0,
+    var ties: Int = 0,             // raw tie count (position flips)
+    var totalComparisons: Int = 0,
+    var positionFlips: Int = 0,
+    var lastUpdated: Long = 0L
+)
+
+@Serializable
+data class NodeBtState(
+    val nodeId: String,
+    val btScores: Map<String, Double>,        // modelId -> strength
+    val stdErrors: Map<String, Double>,       // modelId -> std error
+    val fitVersion: Int,
+    val totalComparisons: Int,
+    val lastFitAt: Long
+)
+
+@Serializable
+data class BtMatchTask(
+    val nodeId: String,
+    val modelA: String,
+    val modelB: String,
+    val queryIds: List<String>,               // reserved queries routed to this node
+    val priority: Double,                     // computed utility score
+    val batchId: String
+)
+
+@Serializable
+data class ModelRank(
+    val modelId: String,
+    val btScore: Double,
+    val stdError: Double,
+    val rank: Int,
+    val confidenceIntervalLow: Double,   // btScore - 2*stdError
+    val confidenceIntervalHigh: Double,  // btScore + 2*stdError
+    val winsTotal: Double,
+    val comparisonsTotal: Int
 )

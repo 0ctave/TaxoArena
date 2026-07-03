@@ -30,6 +30,7 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    maxParallelForks = 1
 }
 
 // spring-dotenv resolves .env relative to the JVM working directory.

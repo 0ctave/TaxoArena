@@ -220,7 +220,6 @@ class TaxonomyTuiService(
         // frozen. restoreTerminal() uses Mosaic's own Tty.reset(); no jansi/manual escapes.
         val shutdownHook = Thread {
             restoreTerminal()
-            Runtime.getRuntime().halt(0)
         }
         runCatching { Runtime.getRuntime().addShutdownHook(shutdownHook) }
 

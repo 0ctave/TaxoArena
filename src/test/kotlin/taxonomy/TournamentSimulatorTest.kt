@@ -20,7 +20,25 @@ import java.sql.DriverManager
         "taxoadapt.execution.start-service=false"
     ]
 )
+@org.springframework.test.annotation.DirtiesContext
 class TournamentSimulatorTest {
+
+    companion object {
+        private lateinit var tmpDir: java.io.File
+
+        @org.junit.jupiter.api.BeforeAll
+        @JvmStatic
+        fun beforeAll() {
+            tmpDir = java.nio.file.Files.createTempDirectory("tournament-sim-test").toFile()
+            System.setProperty("ranking.db.path", java.io.File(tmpDir, "ratings.db").absolutePath)
+        }
+
+        @org.junit.jupiter.api.AfterAll
+        @JvmStatic
+        fun afterAll() {
+            System.clearProperty("ranking.db.path")
+        }
+    }
 
     @Autowired
     private lateinit var rankingService: TaxonomyRankingService
@@ -58,6 +76,7 @@ class TournamentSimulatorTest {
 
         // Ratings should have evolved away from the default 25.0 mu / 8.333 sigma values
         val ratingAlpha = rankingService.getRating("Model-Alpha", "global")
+        println("DEBUG: ratingAlpha mu=${ratingAlpha.mu}, sigma=${ratingAlpha.sigma}")
         assertTrue(ratingAlpha.sigma < 8.333)
     }
 

@@ -33,13 +33,19 @@ data class ArenaResult(
     val domainEvaluations: List<DomainEvaluation>
 )
 
+
+
 @Serializable
 data class DomainEvaluation(
-    val domainLabel: String,
-    val winner: String,
+    val domain: String,
+    val winner: String,        // "Model A", "Model B", or "TIE"
     val rationale: String,
-    val confidence: Double
-)
+    val confidence: Double,
+    val positionFlip: Boolean = false,
+    val nodeId: String? = null,
+) {
+    val domainLabel: String get() = domain
+}
 
 enum class AnalysisMode { IDLE, ARENA, JUDGE_PROGRESS, NODE_DETAIL, SETTINGS, LOGS_SCROLL, METRICS, SNAPSHOTS, TRICKLE_TEST, BENCHMARK, CONFIG, LEADERBOARD }
 
@@ -72,8 +78,8 @@ class TaxonomyArenaService(
     private val config: TaxonomyConfig,
     private val taxonomyService: TaxonomyService,
     private val llmClient: TaxonomyLlmClient,
-    private val embeddingCache: EmbeddingCache,
-    private val ops: TaxonomyOperations,
+    val embeddingCache: EmbeddingCache,
+    val ops: TaxonomyOperations,
     private val evalStore: ModelEvalStore,
     private val rankingService: TaxonomyRankingService,
 ) {
@@ -168,7 +174,7 @@ class TaxonomyArenaService(
         val (allMatches, judges) = discoveryJob.await()
         
         val initialStatus = allMatches.associate { node ->
-            (node.label ?: node.id.toString()) to (if (node.judgePrompt != null) "PENDING" else "NO JUDGE")
+            (node.label ?: node.id) to (if (node.judgePrompt != null) "PENDING" else "NO JUDGE")
         }
         _state.update { it.copy(domainStatus = initialStatus) }
 
@@ -179,7 +185,7 @@ class TaxonomyArenaService(
 
         val evaluations = judges.map { node ->
             async {
-                val label = node.label ?: node.id.toString()
+                val label = node.label ?: node.id
                 updateArenaDomainStatus(label, "JUDGING")
                 val eval = evaluatePairwise(node, query, modelA, modelB, traceA, traceB)
                 updateArenaDomainStatus(label, eval.winner)
@@ -245,7 +251,7 @@ class TaxonomyArenaService(
         }
     }
 
-    private suspend fun discoverDomainsAndJudges(text: String): Pair<List<GraphNode>, List<GraphNode>> {
+    suspend fun discoverDomainsAndJudges(text: String): Pair<List<GraphNode>, List<GraphNode>> {
         val root = taxonomyService.getGraph() ?: return emptyList<GraphNode>() to emptyList()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
@@ -255,7 +261,7 @@ class TaxonomyArenaService(
         fun collectLineage(node: GraphNode, visited: MutableSet<String>) {
             if (!visited.add(node.id)) return
             allMatchedNodes.add(node)
-            if (node.judgePrompt != null) judges.add(node)
+            if (node.judgePrompt != null || node.isLeaf) judges.add(node)
             node.parents.forEach { collectLineage(it, visited) }
         }
         val visited = mutableSetOf<String>()
@@ -265,50 +271,72 @@ class TaxonomyArenaService(
             .sortedByDescending { it.depth }
     }
 
-    private suspend fun evaluatePairwise(node: GraphNode, query: String, nameA: String, nameB: String, traceA: String, traceB: String): DomainEvaluation = coroutineScope {
-        val sys = node.judgePrompt!!
-        val rub = formatRubricForPrompt(node.judgeRubric!!)
+    private suspend fun evaluatePairwise(
+        node: GraphNode,
+        query: String,
+        nameA: String,
+        nameB: String,
+        traceA: String,
+        traceB: String,
+    ): DomainEvaluation = coroutineScope {
 
-        val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameA, nameB, traceA, traceB), judgeSchema) }
-        val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, sys, buildJudgeUserPrompt(query, rub, nameB, nameA, traceB, traceA), judgeSchema) }
+        val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node), buildJudgeUserPrompt(query, traceA, traceB), judgeSchema) }
+        val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node), buildJudgeUserPrompt(query, traceB, traceA), judgeSchema) }
+
         val res1 = parseJudgeResponse(p1.await())
         val res2 = parseJudgeResponse(p2.await())
 
-        val win1 = res1.first.trim()
-        val win2 = res2.first.trim()
+        val vote1 = res1.first
+        val vote2 = when (res2.first) {
+            "Model A" -> "Model B"
+            "Model B" -> "Model A"
+            else -> res2.first
+        }
         val c1 = res1.third
         val c2 = res2.third
+        val avgConfidence = (c1 + c2) / 2.0
 
-        // Map Trial 2's local winner ("Model A" or "Model B") to global name:
-        // Trial 2: Model B was passed as Model A, and Model A was passed as Model B.
-        val vote1 = win1
-        val vote2 = if (win2 == "Model A") "Model B" else "Model A"
+        val isInvalid = vote1 == "INVALID" || vote2 == "INVALID"
+        val positionFlip = !isInvalid && vote1 != vote2
 
-        val winner = when {
-            vote1 == vote2 -> vote1
-            else -> {
-                // Split verdict (positional bias). Resolve using confidence.
-                if (c1 > c2) {
-                    vote1
-                } else if (c2 > c1) {
-                    vote2
-                } else {
-                    vote1 // equal confidence fallback
-                }
-            }
+        val winner = if (isInvalid) {
+            "INVALID"
+        } else if (positionFlip) {
+            "TIE"
+        } else {
+            vote1
         }
 
-        val trialRationale = when {
-            vote1 == vote2 -> {
-                if (winner == "Model A") res1.second else res2.second
-            }
-            else -> {
-                "Split verdict resolved by confidence ($c1 vs $c2). Trial 1 voted $vote1 (${res1.second.take(80)}...). Trial 2 voted $vote2 (${res2.second.take(80)}...)."
-            }
+        val rationale = if (isInvalid) {
+            "Invalid judge response. Trial 1: ${res1.first} (rationale: ${res1.second}). Trial 2: ${res2.first} (rationale: ${res2.second})."
+        } else if (positionFlip) {
+            "POSITION_FLIP_TIE: Split verdict (position flip). Trial 1 voted $vote1 (conf $c1). Trial 2 voted $vote2 (conf $c2)."
+        } else {
+            if (winner == "Model A") res1.second else if (winner == "Model B") res2.second else "Consistent tie verdict"
         }
-        val trialConfidence = (c1 + c2) / 2.0
 
-        DomainEvaluation(node.label ?: "Emergent Concept", winner, trialRationale, trialConfidence)
+        DomainEvaluation(
+            domain      = node.label ?: "Emergent Concept",
+            winner      = winner,           // "Model A", "Model B", or "TIE"
+            rationale   = rationale,
+            confidence  = avgConfidence,
+            positionFlip = positionFlip,
+            nodeId       = node.id
+        )
+    }
+
+    private fun findNodeById(root: GraphNode, targetId: String, visited: MutableSet<String> = mutableSetOf()): GraphNode? {
+        if (root.id == targetId) return root
+        if (!visited.add(root.id)) return null
+        for (child in root.children) {
+            val found = findNodeById(child, targetId, visited)
+            if (found != null) return found
+        }
+        for (child in root.crossLinkChildren) {
+            val found = findNodeById(child, targetId, visited)
+            if (found != null) return found
+        }
+        return null
     }
 
     suspend fun evaluateWithPrecomputedTraces(
@@ -317,11 +345,21 @@ class TaxonomyArenaService(
         modelA: String,
         traceA: String,
         modelB: String,
-        traceB: String
+        traceB: String,
+        targetNodeId: String? = null
     ): List<DomainEvaluation> = coroutineScope {
         // Route the question to find relevant leaf judges
-        val (_, judges) = discoverDomainsAndJudges(query)
-
+        val root = taxonomyService.getGraph() ?: return@coroutineScope emptyList()
+        val (_, judgesList) = discoverDomainsAndJudges(query)
+        val judges = judgesList.toMutableList()
+        if (targetNodeId != null) {
+            val targetNode = findNodeById(root, targetNodeId)
+            if (targetNode != null && judges.none { it.id == targetNode.id }) {
+                judges.add(targetNode)
+            }
+        }
+        log.info("DEBUG: discoverDomainsAndJudges returned ${judges.size} judges for query: \"${query.take(50)}...\"")
+        log.info("DEBUG trace lengths: traceA=${traceA.length} traceB=${traceB.length} | traceA[:100]=${traceA.take(100).replace("\n", " ")} | traceB[:100]=${traceB.take(100).replace("\n", " ")}")
         if (judges.isEmpty()) return@coroutineScope emptyList()
 
         // Build the MCQ context for judge prompts (question + options visible)
@@ -385,17 +423,18 @@ class TaxonomyArenaService(
         )
 
         _state.update { it.copy(
-            domainStatus = evaluations.associate { (it.domainLabel) to it.winner }
+            domainStatus = evaluations.associate { (it.domain) to it.winner }
         ) }
 
         if (updateRankings) {
             evaluations.filter { it.confidence >= confidenceGate }.forEach { eval ->
-                val isTie = eval.winner == "Tie"
-                val winner = if (eval.winner == "Model B") modelB else modelA
-                val loser = if (eval.winner == "Model B") modelA else modelB
+                val isTie = eval.winner.equals("TIE", ignoreCase = true) || eval.winner.equals("Tie", ignoreCase = true)
+                val isModelB = eval.winner.equals("Model B", ignoreCase = true)
+                val winner = if (isModelB) modelB else modelA
+                val loser = if (isModelB) modelA else modelB
                 rankingService.recordMatch(
                     query = query,
-                    domain = eval.domainLabel,
+                    domain = eval.domain,
                     winner = if (isTie) modelA else winner,
                     loser = if (isTie) modelB else loser,
                     isTie = isTie,
@@ -410,12 +449,40 @@ class TaxonomyArenaService(
 
     private fun parseJudgeResponse(response: String): Triple<String, String, Double> {
         return try {
-            val cleanJson = if (response.contains("```json")) response.substringAfter("```json").substringBefore("```").trim() 
-            else if (response.contains("{")) "{" + response.substringAfter("{").substringBeforeLast("}") + "}"
-            else response
-            val element = json.parseToJsonElement(cleanJson).jsonObject
-            Triple(element["winner"]?.jsonPrimitive?.content ?: "Model A", element["rationale"]?.jsonPrimitive?.content ?: response, element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.5)
-        } catch (e: Exception) { Triple("Model A", response, 0.5) }
+            val cleanJson = response.trim()
+            val element = try {
+                json.parseToJsonElement(cleanJson).jsonObject
+            } catch (e: Exception) {
+                val extracted = if (response.contains("```json")) {
+                    response.substringAfter("```json").substringBefore("```").trim()
+                } else {
+                    val firstBrace = response.indexOf('{')
+                    val lastBrace = response.lastIndexOf('}')
+                    if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+                        response.substring(firstBrace, lastBrace + 1)
+                    } else {
+                        response
+                    }
+                }
+                json.parseToJsonElement(extracted).jsonObject
+            }
+            val rawWinner = element["winner"]?.jsonPrimitive?.content?.trim() ?: "INVALID"
+            val cleanWinner = when (rawWinner.uppercase()) {
+                "MODEL A" -> "Model A"
+                "MODEL B" -> "Model B"
+                else -> "INVALID"
+            }
+            val confidence = element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.0
+            log.info("DEBUG: parseJudgeResponse parsed winner=$cleanWinner, confidence=$confidence from response: $cleanJson")
+            Triple(
+                cleanWinner,
+                element["rationale"]?.jsonPrimitive?.content ?: element["comparison"]?.jsonPrimitive?.content ?: response,
+                confidence
+            )
+        } catch (e: Exception) { 
+            log.warn("Failed to parse judge response: ${e.message}. Raw response was: $response", e)
+            Triple("INVALID", response, 0.0) 
+        }
     }
 
     private fun formatRubricForPrompt(rubricJson: String): String {
@@ -442,23 +509,71 @@ class TaxonomyArenaService(
         }
     }
 
-    private fun buildJudgeUserPrompt(query: String, rubric: String, nameA: String, nameB: String, traceA: String, traceB: String): String {
-        return """
-            Evaluate responses for the query: "$query"
-            
-            $rubric
-            
-            <trace_model_a>
-            $traceA
-            </trace_model_a>
-            
-            <trace_model_b>
-            $traceB
-            </trace_model_b>
-            
-            You MUST compare both models and choose a winner. Ties are strictly forbidden.
-            Evaluate them strictly on technical correctness, soundness of logic, and leaf-node domain axioms.
-            Respond ONLY with a JSON object: { "winner": "Model A" | "Model B", "rationale": "...", "confidence": 0.95 }
-        """.trimIndent()
+    private fun buildJudgeSystemPrompt(node: GraphNode): String {
+        val systemPrompt = node.judgePrompt ?: "You are an expert academic evaluator in the domain: ${node.label ?: "General Science"}."
+        val rubric = node.judgeRubric ?: "Grade the response based on domain correctness, precision, and logical reasoning."
+
+        return """$systemPrompt
+
+────────────────────────────────────────
+EVALUATION MECHANICS (non-negotiable)
+────────────────────────────────────────
+Bias suppression — ignore completely:
+• Response length, verbosity, or token count
+• Formatting: markdown, LaTeX, bullet points, plain prose — all equal
+• Model name, model family, or any identity signal
+• Stylistic elegance or fluency unrelated to correctness
+
+Evaluation order — follow exactly:
+1. CRITIQUE Model A: assess its reasoning against the rubric. Identify correct steps, errors, gaps.
+2. CRITIQUE Model B: same process, independently of Model A.
+3. COMPARE: identify the decisive difference between A and B.
+4. DECIDE: declare one winner — see tie-break rules below.
+
+Tie-break rules — you MUST output "Model A" or "Model B". Never "tie", "draw", or "equal":
+• If both reach the correct conclusion → prefer the one with more rigorous intermediate steps.
+• If both are incorrect → prefer the one with fewer conceptual errors and closer partial reasoning.
+• If still indistinguishable → apply in order:
+  (a) correctness of the final selected option,
+  (b) fewer logical fallacies,
+  (c) better alignment with CRITICAL-importance axioms.
+
+Your rubric:
+$rubric
+""".trimIndent()
+    }
+
+    private fun buildJudgeUserPrompt(query: String, traceA: String, traceB: String): String {
+        return """[Question]
+$query
+
+[Model A's Response]
+$traceA
+
+[Model B's Response]
+$traceB
+
+────────────────────────────────────────
+You do not have access to the correct answer. Your task is to determine which model demonstrates
+superior reasoning quality based solely on the logical rigour and domain soundness of its response.
+
+You MUST compare both models and choose a winner. Ties are strictly forbidden.
+
+Evaluate following the mandatory sequence:
+
+Step 1 — Critique Model A (2–4 sentences referencing your rubric)
+Step 2 — Critique Model B (2–4 sentences referencing your rubric)
+Step 3 — Compare: what is the decisive difference in reasoning quality?
+Step 4 — Verdict
+
+Output ONLY the following JSON. No prose before or after. No markdown fences.
+
+{
+  "critique_a": "<your critique of Model A>",
+  "critique_b": "<your critique of Model B>",
+  "comparison": "<decisive difference in reasoning quality>",
+  "winner": "Model A or Model B",
+  "confidence": <0.0 to 1.0>
+}""".trimIndent()
     }
 }

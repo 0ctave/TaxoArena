@@ -44,7 +44,7 @@ data class BenchmarkUiState(
     val benchmarkModelsInput: String = "",
     val benchmarkQueryLimitInput: String = "0",
     val benchmarkCategoryInput: String = "",
-    val benchmarkConfidenceGateInput: String = "0.65",
+    val benchmarkConfidenceGateInput: String = "0.5",
     val benchmarkParallelismInput: String = "4",
     val benchmarkUpdateRankingsInput: String = "true",
     val benchmarkReservedOnlyInput: String = "true",

@@ -168,12 +168,7 @@ class TournamentSimulator(
 
     private fun resetDatabaseRatings() {
         try {
-            DriverManager.getConnection("jdbc:sqlite:embeddings_cache.db").use { conn ->
-                conn.createStatement().use { stmt ->
-                    stmt.execute("DELETE FROM agent_ratings")
-                    stmt.execute("DELETE FROM match_history")
-                }
-            }
+            rankingService.clearDatabaseForTest()
             agents.forEach { agent ->
                 rankingService.saveRating(AgentRating(agent, "global"))
             }
