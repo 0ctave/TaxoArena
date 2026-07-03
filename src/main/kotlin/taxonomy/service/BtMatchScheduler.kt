@@ -25,42 +25,6 @@ class BtMatchScheduler(
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
 
-    // Returns a flat priority queue of all schedulable (leaf, mA, mB) triples
-    private fun buildQueue(
-        targetNodes: List<GraphNode>,
-        btStates: Map<String, NodeBtState>,
-        pairStats: Map<String, List<NodePairStats>>,
-        models: List<String>,
-        leafModelMatches: Map<String, Map<String, Int>>
-    ): PriorityQueue<MatchCandidate> {
-        // Max-heap: highest utility first
-        val queue = PriorityQueue<MatchCandidate>(compareByDescending { it.utility })
-
-        for (node in targetNodes) {
-            // Converged leaves contribute no utility — skip entirely
-            if (stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models)) continue
-
-            val state = btStates[node.id]
-            val nodePairs = pairStats[node.id] ?: emptyList()
-            val leafMatches = leafModelMatches[node.id] ?: emptyMap()
-
-            val candidates = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
-            for ((mA, mB) in candidates) {
-                val ps = nodePairs.firstOrNull {
-                    (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
-                }
-                val budget = pairBudget(mA, mB, state, ps)
-                val already = ps?.totalComparisons ?: 0
-                if (already >= budget) continue  // exhausted
-
-                val u = computeEntropy(mA, mB, state, leafMatches, already)
-                val pairKey = "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
-                queue.add(MatchCandidate(node.id, mA, mB, u, pairKey))
-            }
-        }
-        return queue
-    }
-
     fun selectNextBatch(
         targetNodes: List<GraphNode>,
         btStates: Map<String, NodeBtState>,
@@ -71,7 +35,6 @@ class BtMatchScheduler(
         batchSize: Int,
         maxConcurrentPerModel: Int = maxOf(2, models.size - 1)
     ): List<BtMatchTask> {
-        // Leaf-local match counts (leaf-local, not cross-leaf)
         val leafModelMatches = targetNodes.associate { node ->
             node.id to models.associateWith { model ->
                 (pairStats[node.id] ?: emptyList())
@@ -80,53 +43,118 @@ class BtMatchScheduler(
             }
         }
 
-        val queue = buildQueue(targetNodes, btStates, pairStats, models, leafModelMatches)
+        // --- Phase 1: Pair coverage pass ---
+        // Any pair that has ZERO comparisons on ANY leaf gets one slot before queue runs.
+        // This guarantees every pair appears at least once per batch when budget allows.
+        val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
+        val globalPairCounts = allPairs.associateWith { (mA, mB) ->
+            targetNodes.sumOf { node ->
+                (pairStats[node.id] ?: emptyList()).firstOrNull {
+                    (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+                }?.totalComparisons ?: 0
+            }
+        }
 
         val tasks = mutableListOf<BtMatchTask>()
-        // Per-node model load: a model should appear at most once per leaf per batch
         val nodeModelLoad = mutableMapOf<String, MutableMap<String, Int>>()
-        // Global: a model should not dominate the entire batch
         val globalModelLoad = mutableMapOf<String, Int>()
-        val globalModelCap = targetNodes.size  // can appear on every leaf once
+        // Global cap: each pair gets AT MOST batchSize/numPairs slots → spread budget evenly
+        val numPairs = allPairs.size
+        val fairSharePerPair = (batchSize / numPairs).coerceAtLeast(1)
+        val pairBatchCount = mutableMapOf<String, Int>()
 
-        while (tasks.size < batchSize && queue.isNotEmpty()) {
-            val candidate = queue.poll()!!
-            val (nodeId, mA, mB) = Triple(candidate.nodeId, candidate.modelA, candidate.modelB)
+        fun pairKey(mA: String, mB: String) = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
 
-            // Per-node cap: each model appears at most once per leaf per batch
+        fun trySchedule(nodeId: String, mA: String, mB: String, utility: Double, ignoreFairShare: Boolean = false): Boolean {
+            if (tasks.size >= batchSize) return false
+            val pk = pairKey(mA, mB)
+            if (!ignoreFairShare && (pairBatchCount[pk] ?: 0) >= fairSharePerPair) return false
+
             val nodeLoad = nodeModelLoad.getOrPut(nodeId) { mutableMapOf() }
-            if ((nodeLoad[mA] ?: 0) >= 1) continue
-            if ((nodeLoad[mB] ?: 0) >= 1) continue
+            if ((nodeLoad[mA] ?: 0) >= 1) return false
+            if ((nodeLoad[mB] ?: 0) >= 1) return false
 
-            // Global cap: prevents one model from eating the whole batch
-            if ((globalModelLoad[mA] ?: 0) >= globalModelCap) continue
-            if ((globalModelLoad[mB] ?: 0) >= globalModelCap) continue
+            if ((globalModelLoad[mA] ?: 0) >= maxConcurrentPerModel) return false
+            if ((globalModelLoad[mB] ?: 0) >= maxConcurrentPerModel) return false
 
-            // Find the next unseen query slice for this pair
+            val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
+                (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+            }
+            val budget = pairBudget(mA, mB, btStates[nodeId], ps)
+            if ((ps?.totalComparisons ?: 0) >= budget) return false
+
             val nodeQueryIds = (nodeToQueries[nodeId] ?: emptyList()).sorted()
             val available = resultsMatrix.keys.intersect(nodeQueryIds.toSet()).sorted()
-            if (available.isEmpty()) continue
+            if (available.isEmpty()) return false
 
-            val offset = pairQueryOffsets.getOrDefault(candidate.pairKey,
-                (pairStats[nodeId]?.firstOrNull {
-                    (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
-                }?.totalComparisons ?: 0))
-
+            val offset = pairQueryOffsets.getOrDefault("$nodeId|$pk", ps?.totalComparisons ?: 0)
             val slice = available.drop(offset).take(BATCH_STEP_SIZE)
-            if (slice.isEmpty()) continue
+            if (slice.isEmpty()) return false
 
-            pairQueryOffsets[candidate.pairKey] = offset + slice.size
-
+            pairQueryOffsets["$nodeId|$pk"] = offset + slice.size
             tasks += BtMatchTask(
                 nodeId = nodeId, modelA = mA, modelB = mB,
                 queryIds = slice.map { it.toString() },
-                priority = candidate.utility,
-                batchId = UUID.randomUUID().toString()
+                priority = utility, batchId = UUID.randomUUID().toString()
             )
             nodeLoad[mA] = (nodeLoad[mA] ?: 0) + 1
             nodeLoad[mB] = (nodeLoad[mB] ?: 0) + 1
             globalModelLoad[mA] = (globalModelLoad[mA] ?: 0) + 1
             globalModelLoad[mB] = (globalModelLoad[mB] ?: 0) + 1
+            pairBatchCount[pk] = (pairBatchCount[pk] ?: 0) + 1
+            return true
+        }
+
+        // Coverage pass: pairs with fewest global comparisons go first (round-robin by deficit)
+        val unconvergedNodes = targetNodes.filter {
+            !stoppingPolicy.isLeafConverged(it.id, btStates, pairStats, models)
+        }
+        val pairsSortedByDeficit = allPairs.sortedBy { (mA, mB) -> globalPairCounts[mA to mB] ?: 0 }
+
+        // One slot per pair per node — iterate pairs in deficit order, nodes in SE-desc order
+        for ((mA, mB) in pairsSortedByDeficit) {
+            if (tasks.size >= batchSize) break
+            val nodesForPair = unconvergedNodes.sortedByDescending { node ->
+                btStates[node.id]?.stdErrors?.values?.average() ?: 10.0
+            }
+            for (node in nodesForPair) {
+                if (tasks.size >= batchSize) break
+                trySchedule(node.id, mA, mB, LN2 + 1.0, ignoreFairShare = false)
+            }
+        }
+
+        // --- Phase 2: Entropy queue for remaining budget ---
+        // Build heap only for remaining capacity, using true H(p) scores
+        if (tasks.size < batchSize) {
+            val heap = PriorityQueue<MatchCandidate>(compareByDescending { it.utility })
+            for (node in unconvergedNodes) {
+                val state = btStates[node.id]
+                val nodePairs = pairStats[node.id] ?: emptyList()
+                val leafMatches = leafModelMatches[node.id] ?: emptyMap()
+                for ((mA, mB) in allPairs) {
+                    val ps = nodePairs.firstOrNull {
+                        (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+                    }
+                    val nij = ps?.totalComparisons ?: 0
+                    val u = computeEntropy(mA, mB, state, leafMatches, nij)
+                    heap.add(MatchCandidate(node.id, mA, mB, u, "${node.id}|${pairKey(mA, mB)}"))
+                }
+            }
+
+            val remainingCandidates = mutableListOf<MatchCandidate>()
+            while (tasks.size < batchSize && heap.isNotEmpty()) {
+                val c = heap.poll()!!
+                val success = trySchedule(c.nodeId, c.modelA, c.modelB, c.utility, ignoreFairShare = false)
+                if (!success) {
+                    remainingCandidates.add(c)
+                }
+            }
+            if (tasks.size < batchSize) {
+                for (c in remainingCandidates) {
+                    if (tasks.size >= batchSize) break
+                    trySchedule(c.nodeId, c.modelA, c.modelB, c.utility, ignoreFairShare = true)
+                }
+            }
         }
 
         return tasks
