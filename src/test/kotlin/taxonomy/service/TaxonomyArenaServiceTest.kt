@@ -68,6 +68,8 @@ class TaxonomyArenaServiceTest {
                     """{"winner": "Model A", "rationale": "Beta is okay", "confidence": 0.7}"""
                 }
             }
+
+            override fun setMaxParallel(limit: Int) {}
         }
 
         val service = TaxonomyArenaService(
@@ -150,6 +152,8 @@ class TaxonomyArenaServiceTest {
                     """{"winner": "Model B", "rationale": "Alpha dominates", "confidence": 0.9}"""
                 }
             }
+
+            override fun setMaxParallel(limit: Int) {}
         }
 
         val service = TaxonomyArenaService(

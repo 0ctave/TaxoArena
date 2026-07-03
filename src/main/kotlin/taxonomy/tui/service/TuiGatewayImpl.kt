@@ -19,6 +19,7 @@ import taxonomy.model.ModelSource
 import taxonomy.service.DagSnapshot
 import taxonomy.service.LeaderboardGroup
 import taxonomy.service.QueryResponseNode
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.tui.BatchTrickleTestResults
 import taxonomy.tui.app.TuiDependencies
 import taxonomy.tui.controller.TuiGateway
@@ -249,6 +250,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
             return
         }
+        deps.arenaService.llmClient.setMaxParallel(parallelism)
         val request = BenchmarkRequest(
             models = models.map { ModelSource(it) },
             queryLimit = queryLimit,
@@ -292,6 +294,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.error("Benchmark failed: ${t.message}", t)
             deps.arenaService.updateBenchmarkProgress("Benchmark failed: ${t.message}")
         } finally {
+            deps.arenaService.llmClient.setMaxParallel(deps.config.execution.llmParallelism)
             appendTraceToActiveSnapshot(TuiLogAppender.stopAndGetRecording())
         }
     }
@@ -442,6 +445,52 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
     override fun clearLeaderboard() {
         deps.arenaService.clearLeaderboard()
     }
+
+    override suspend fun loadLeaderboardForNode(node: GraphNode): AggregatedLeaderboard =
+        withContext(Dispatchers.IO) {
+            val root = deps.taxonomyService.getGraph()
+            val allNodes = mutableListOf<GraphNode>()
+            if (root != null) {
+                val visited = mutableSetOf<String>()
+                fun walk(n: GraphNode) {
+                    if (!visited.add(n.id)) return
+                    allNodes.add(n)
+                    n.children.forEach { walk(it) }
+                }
+                walk(root)
+            }
+            val leaderboard = deps.arenaService.getLeaderboardForNode(
+                node, allNodes, deps.taxonomyService.activeSnapshotId() ?: "global"
+            )
+            deps.arenaService.setNodeLeaderboard(leaderboard)
+            leaderboard
+        }
+
+    override suspend fun loadLeafRanks(): Map<String, Pair<String, String>> =
+        withContext(Dispatchers.IO) {
+            val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
+            val root = deps.taxonomyService.getGraph()
+            if (root == null) return@withContext emptyMap()
+            val leaves = mutableListOf<GraphNode>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                if (n.children.isEmpty()) leaves.add(n)
+                else n.children.forEach { walk(it) }
+            }
+            walk(root)
+            leaves.associate { leaf ->
+                val ranks = deps.arenaService.rankingService.getNodeLeaderboard(leaf.id, snapshotId) ?: emptyList()
+                val top2 = if (ranks.size >= 2) {
+                    Pair(ranks[0].modelId, ranks[1].modelId)
+                } else if (ranks.size == 1) {
+                    Pair(ranks[0].modelId, "")
+                } else {
+                    null
+                }
+                leaf.id to top2
+            }.filterValues { it != null }.mapValues { it.value!! }
+        }
 
     override suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit) {
         withContext(Dispatchers.IO) {

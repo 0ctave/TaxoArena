@@ -115,6 +115,7 @@ fun AsciiTreeTable(
                 append(" ")
                 append("Queries".padStart(QCOL))
                 append(" \u2714")
+                append("   Rankings")
             }
         }
         Text(
@@ -144,6 +145,21 @@ fun AsciiTreeTable(
                 val treeText = line.text.take(treeW)
                 val padCount = (treeW - treeText.length).coerceAtLeast(0)
 
+                val rankText = if (node.isLeaf) {
+                    val ranks = line.topTwoRanks
+                    if (ranks != null) {
+                        val t1 = shortModelName(ranks.first)
+                        val t2 = shortModelName(ranks.second)
+                        if (t2.isNotEmpty()) {
+                            "  [#1 $t1 \u00b7 #2 $t2]"
+                        } else {
+                            "  [#1 $t1]"
+                        }
+                    } else {
+                        "  [no data]"
+                    }
+                } else ""
+
                 val row = buildAnnotatedString {
                     if (selected) {
                         withStyle(SpanStyle(color = Cyan, textStyle = Bold)) { append("\u276f ") } // ❯
@@ -158,6 +174,11 @@ fun AsciiTreeTable(
                     withStyle(
                         SpanStyle(color = if (hasJudge) Green else White, textStyle = Bold)
                     ) { append(judgeGlyph) }
+                    if (rankText.isNotEmpty()) {
+                        withStyle(
+                            SpanStyle(color = if (rankText == "  [no data]") White else Green)
+                        ) { append(rankText) }
+                    }
                 }
                 // Modifier.width(contentWidth) is REQUIRED: it tells Mosaic to allocate a
                 // TextSurface of exactly contentWidth columns. Without it, Mosaic measures
@@ -187,6 +208,7 @@ fun AsciiTreeTable(
 fun buildTreeLines(
     root: GraphNode?,
     expandedNodes: Map<String, Boolean> = emptyMap(),
+    leafRanks: Map<String, Pair<String, String>> = emptyMap(),
 ): List<TreeLine> {
     if (root == null) return emptyList()
     val out = mutableListOf<TreeLine>()
@@ -231,7 +253,7 @@ fun buildTreeLines(
             }
         }
 
-        out += TreeLine(node = node, text = text, isPoly = isPoly)
+        out += TreeLine(node = node, text = text, isPoly = isPoly, topTwoRanks = leafRanks[node.id])
 
         if (alreadyVisited || !isExpanded) return
         val sorted = node.children.sortedByDescending { it.getRecursiveQueryCount() }
@@ -242,4 +264,17 @@ fun buildTreeLines(
 
     walk(root, 0, emptyList())
     return out
+}
+
+fun shortModelName(name: String): String {
+    val clean = name.lowercase()
+    return when {
+        clean.contains("claude") -> "claude"
+        clean.contains("70b") -> "70B"
+        clean.contains("8b") -> "8B"
+        clean.contains("13b") -> "13B"
+        clean.contains("7b") -> "7B"
+        clean.contains("gpt-4") -> "gpt4"
+        else -> name.take(8)
+    }
 }

@@ -381,8 +381,9 @@ private fun MainDashboardRoute(
         subscriptions.rootNode,
         subscriptions.graphVersion,
         state.topology.expandedNodes,
+        state.topology.leafRanks,
     ) {
-        buildTreeLines(subscriptions.rootNode, state.topology.expandedNodes)
+        buildTreeLines(subscriptions.rootNode, state.topology.expandedNodes, state.topology.leafRanks)
     }
     val queryCounts = remember(subscriptions.rootNode, subscriptions.graphVersion) {
         allNodes.associate { it.id to it.getRecursiveQueryCount() }
@@ -773,7 +774,7 @@ private fun deriveAnalysisHints(
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
             benchmarkType == BenchmarkType.TRICKLE -> listOf(
-            HotkeyAction("B", "Run", TuiTheme.OK, isPrimary = true),
+            HotkeyAction("Enter", "Configure & Run", TuiTheme.OK, isPrimary = true),
             HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
         )
 

@@ -43,6 +43,20 @@ class TuiConfigFacade(
             kind = SettingKind.BOOLEAN
         ),
         SettingItem(
+            name = "LLM Parallelism Limit",
+            description = "Max parallel LLM requests limit for DAG generation & judge generation",
+            category = "Execution Settings",
+            getValue = { deps.config.execution.llmParallelism.toString() },
+            setValue = { s ->
+                s.toIntOrNull()?.let {
+                    deps.config.execution.llmParallelism = it
+                    deps.arenaService.llmClient.setMaxParallel(it)
+                    true
+                } ?: false
+            },
+            kind = SettingKind.NUMBER
+        ),
+        SettingItem(
             name = "Split Dataset",
             description = "Whether to split dataset into train/test",
             category = "Dataset Settings",

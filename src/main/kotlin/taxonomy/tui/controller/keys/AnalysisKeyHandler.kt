@@ -211,7 +211,13 @@ internal class AnalysisKeyHandler(
                             }
                         }
                     }
-                    BenchmarkType.TRICKLE -> Unit
+                    BenchmarkType.TRICKLE -> {
+                        if (!bench.isRunningBatchTrickleTest) {
+                            effects.resolveReservedPoolSize { poolSize ->
+                                dispatch(TuiEvent.StartTrickleBenchmarkInput(poolSize))
+                            }
+                        }
+                    }
                 }
             }
             "v" -> dispatch(TuiEvent.ToggleBenchmarkLiveView)

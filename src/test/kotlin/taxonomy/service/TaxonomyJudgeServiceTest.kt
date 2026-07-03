@@ -33,6 +33,8 @@ class TaxonomyJudgeServiceTest {
             userPrompt: String,
             schema: JsonSchema
         ): String = ""
+
+        override fun setMaxParallel(limit: Int) {}
     }
 
     @Test

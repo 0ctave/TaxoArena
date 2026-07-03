@@ -55,7 +55,8 @@ data class GraphNode(
 
     // Agent Judge Profiles
     var judgePrompt: String? = null,
-    var judgeRubric: String? = null
+    var judgeRubric: String? = null,
+    var judgeGtAgreement: Double? = null
 ) {
     // isLeaf is true iff this node has NO tree children.
     // Cross-link children are irrelevant to leaf status.

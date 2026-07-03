@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import taxonomy.model.GraphNode
 import taxonomy.service.AnalysisMode
 import taxonomy.service.DagSnapshot
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 
 interface TuiEffects {
     fun refreshSnapshots(dispatch: (TuiEvent) -> Unit)
@@ -50,6 +51,8 @@ interface TuiEffects {
     fun regenerateLabels(dispatch: (TuiEvent) -> Unit)
     fun regenerateJudgeForCurrentNode(dispatch: (TuiEvent) -> Unit)
     fun inspectNode(node: GraphNode?)
+    fun loadLeaderboardForNode(node: GraphNode, dispatch: (TuiEvent) -> Unit)
+    fun loadLeafRanks(dispatch: (TuiEvent) -> Unit)
     fun setAnalysisMode(mode: AnalysisMode)
 
     /** Toggle a dataset domain on/off, then refresh the settings view. */
@@ -86,6 +89,7 @@ class DefaultTuiEffects(
             if (ok) {
                 dispatch(TuiEvent.SnapshotLoaded(snapshotId, snapshot?.description))
                 dispatch(TuiEvent.RefreshSnapshots)
+                loadLeafRanks(dispatch)
             } else {
                 dispatch(TuiEvent.SnapshotLoadFailed(snapshotId))
             }
@@ -234,6 +238,7 @@ class DefaultTuiEffects(
         scope.launch {
             gateway.clearLeaderboard()
             dispatch(TuiEvent.LeaderboardLoaded(gateway.loadLeaderboard()))
+            loadLeafRanks(dispatch)
         }
     }
 
@@ -266,6 +271,7 @@ class DefaultTuiEffects(
             gateway.runBenchmarkConfigured(
                 models, queryLimit, category, confidenceGate, parallelism, updateRankings, reservedOnly
             ) { stats -> dispatch(TuiEvent.BenchmarkLiveUpdate(stats)) }
+            loadLeafRanks(dispatch)
         }
     }
 
@@ -359,6 +365,21 @@ class DefaultTuiEffects(
         gateway.inspectNode(node)
     }
 
+    override fun loadLeaderboardForNode(node: GraphNode, dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            dispatch(TuiEvent.NodeLeaderboardLoading)
+            val leaderboard = gateway.loadLeaderboardForNode(node)
+            dispatch(TuiEvent.NodeLeaderboardLoaded(leaderboard))
+        }
+    }
+
+    override fun loadLeafRanks(dispatch: (TuiEvent) -> Unit) {
+        scope.launch {
+            val ranks = gateway.loadLeafRanks()
+            dispatch(TuiEvent.LeafRanksLoaded(ranks))
+        }
+    }
+
     override fun setAnalysisMode(mode: AnalysisMode) {
         gateway.setAnalysisMode(mode)
     }
@@ -429,4 +450,6 @@ interface TuiGateway {
     fun applySetting(name: String, value: String): Boolean
     fun resetBenchmarkReport()
     fun clearLeaderboard()
+    suspend fun loadLeaderboardForNode(node: GraphNode): AggregatedLeaderboard
+    suspend fun loadLeafRanks(): Map<String, Pair<String, String>>
 }

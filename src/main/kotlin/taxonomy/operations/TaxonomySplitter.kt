@@ -29,7 +29,17 @@ class TaxonomySplitter(
     private val log = LoggerFactory.getLogger("taxonomy.Splitter")
     private val conceptCounter = java.util.concurrent.atomic.AtomicInteger(1)
 
-    private val llmSemaphore by lazy { Semaphore(config.execution.llmParallelism) }
+    private var currentLimit = config.execution.llmParallelism
+    private var llmSemaphore = Semaphore(currentLimit)
+
+    private fun checkAndSyncSemaphore() {
+        val limit = config.execution.llmParallelism
+        if (limit != currentLimit) {
+            log.info("Updating splitter semaphore capacity from $currentLimit to $limit")
+            currentLimit = limit
+            llmSemaphore = Semaphore(limit.coerceAtLeast(1))
+        }
+    }
 
     fun resetConceptCounter() {
         conceptCounter.set(1)
@@ -39,6 +49,7 @@ class TaxonomySplitter(
      * Parallel BFS level-by-level recursive splitting.
      */
     suspend fun splitNodesRecursive(root: GraphNode) = withContext(Dispatchers.Default) {
+        checkAndSyncSemaphore()
         log.info("Starting parallel split evaluation across the DAG...")
         val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
         val visited = mutableSetOf<String>()

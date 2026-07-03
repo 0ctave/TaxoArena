@@ -1040,6 +1040,15 @@ object TuiReducer {
                     arena = state.arena.copy(leaderboard = event.groups)
                 )
 
+            TuiEvent.NodeLeaderboardLoading -> state
+
+            is TuiEvent.NodeLeaderboardLoaded -> state
+
+            is TuiEvent.LeafRanksLoaded ->
+                state.copy(
+                    topology = state.topology.copy(leafRanks = event.ranks)
+                )
+
             TuiEvent.RunBenchmark ->
                 state.copy(
                     benchmark = state.benchmark.copy(benchmarkSubScreen = taxonomy.tui.state.BenchmarkSubScreen.RESULTS)

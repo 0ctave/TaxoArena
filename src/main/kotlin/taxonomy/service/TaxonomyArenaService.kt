@@ -18,6 +18,7 @@ import taxonomy.model.BenchmarkReport
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
 import taxonomy.model.projectTo
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.operations.TaxonomyOperations
 import kotlin.math.abs
@@ -79,19 +80,59 @@ data class AnalysisPanelState(
     // Benchmark Data
     val benchmarkReport: BenchmarkReport? = null,
     val benchmarkProgress: String = "",
-    val isRunningBenchmark: Boolean = false
+    val isRunningBenchmark: Boolean = false,
+    val nodeLeaderboard: AggregatedLeaderboard? = null,
+    val isLoadingLeaderboard: Boolean = false
 )
 
 @Service
 class TaxonomyArenaService(
     private val config: TaxonomyConfig,
     private val taxonomyService: TaxonomyService,
-    private val llmClient: TaxonomyLlmClient,
+    val llmClient: TaxonomyLlmClient,
     val embeddingCache: EmbeddingCache,
     val ops: TaxonomyOperations,
     private val evalStore: ModelEvalStore,
-    private val rankingService: TaxonomyRankingService,
+    val rankingService: TaxonomyRankingService,
 ) {
+    fun setNodeLeaderboard(leaderboard: AggregatedLeaderboard?) {
+        _state.update { it.copy(nodeLeaderboard = leaderboard) }
+    }
+
+    fun setNodeLeaderboardLoading(loading: Boolean) {
+        _state.update { it.copy(isLoadingLeaderboard = loading) }
+    }
+
+    fun getLeaderboardForNode(
+        node: GraphNode,
+        allNodes: List<GraphNode>,
+        snapshotId: String
+    ): AggregatedLeaderboard {
+        return if (node.isLeaf) {
+            // Leaf: direct BT state — no aggregation needed
+            val state = rankingService.getBtState(node.id, snapshotId)
+            val ranks = rankingService.getNodeLeaderboard(node.id, snapshotId) ?: emptyList()
+            val comps = state?.totalComparisons ?: 0
+            AggregatedLeaderboard(
+                ranks = ranks,
+                leafsEligible = if (comps > 0) 1 else 0,
+                leafsTotal = 1,
+                totalComparisons = comps,
+                isReliable = comps >= 5
+            )
+        } else {
+            // Internal node or root: aggregate all leaves in this subtree
+            val leafIds = mutableListOf<String>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                if (n.isLeaf) leafIds.add(n.id)
+                else n.children.forEach { walk(it) }
+            }
+            walk(node)
+            rankingService.aggregateLeafScores(leafIds, snapshotId)
+        }
+    }
     private val judgeSchema = JsonSchema.builder()
         .name("JudgeResponse")
         .rootElement(
@@ -115,8 +156,27 @@ class TaxonomyArenaService(
     }
 
     /** Passthrough to the ranking service so the TUI gateway can render the Arena leaderboard. */
-    fun getLeaderboard(domain: String = "global"): List<LeaderboardGroup> =
-        rankingService.getLeaderboard(domain, taxonomyService.activeSnapshotId() ?: "global")
+    fun getLeaderboard(domain: String = "global"): List<LeaderboardGroup> {
+        val snapshotId = taxonomyService.activeSnapshotId() ?: "global"
+        val rootId = taxonomyService.getGraph()?.id ?: "root"
+        val ranks = rankingService.getNodeLeaderboard(rootId, snapshotId)
+        if (!ranks.isNullOrEmpty()) {
+            return ranks.map { mr ->
+                LeaderboardGroup(
+                    rank = mr.rank,
+                    agents = listOf(
+                        AgentRating(
+                            agentName = mr.modelId,
+                            domain = domain,
+                            mu = mr.btScore,
+                            sigma = mr.stdError
+                        )
+                    )
+                )
+            }
+        }
+        return rankingService.getLeaderboard(domain, snapshotId)
+    }
 
     fun clearLeaderboard() {
         val snapshotId = taxonomyService.activeSnapshotId() ?: "global"
@@ -263,12 +323,16 @@ class TaxonomyArenaService(
         }
     }    // NEW: Pure routing — finds the leaf node(s) for a query.
     // Returns empty if the query is an outlier (no leaf match). Discard it — done.
-    suspend fun routeToLeaves(text: String, frozenLeafIds: Set<String>? = null): List<GraphNode> {
+    suspend fun routeToLeaves(
+        text: String,
+        frozenLeafIds: Set<String>? = null,
+        category: String? = null
+    ): List<GraphNode> {
         val root = taxonomyService.getGraph() ?: return emptyList()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
         // routeQuery already walks the DAG and returns the best-fit leaves
-        return ops.routeQuery(emb, root, currentIteration = 2)
+        return ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) })
             .keys
             .filter { node ->
                 if (frozenLeafIds != null) node.id in frozenLeafIds
@@ -548,6 +612,12 @@ Evaluation order — follow exactly:
 2. CRITIQUE Model B: same process, independently of Model A.
 3. COMPARE: identify the decisive difference between A and B.
 4. DECIDE: declare the winner — either "Model A", "Model B", or "TIE".
+
+For responses that are both factually correct:
+• Prefer the response with more precise mechanistic explanation
+• Prefer the response that addresses edge cases or qualifications
+• Prefer the response that correctly scopes uncertainty
+• If still equivalent: output TIE, confidence ≤ 0.5
 
 If both models demonstrate equivalent reasoning: output winner: "TIE", confidence ≤ 0.5.
 Only declare a decisive winner when one model has measurably stronger intermediate steps. Otherwise, if they are still indistinguishable, declare a "TIE".

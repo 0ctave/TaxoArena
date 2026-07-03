@@ -58,6 +58,8 @@ interface TaxonomyLlmClient {
         userPrompt: String,
         schema: JsonSchema
     ): String
+
+    fun setMaxParallel(limit: Int)
 }
 
 /**
@@ -77,7 +79,12 @@ class ArcTaxonomyLLMClient(
     private val httpClient = java.net.http.HttpClient.newHttpClient()
     private val json = Json { ignoreUnknownKeys = true }
 
-    private val semaphore = Semaphore(maxParallel)
+    private var semaphore = Semaphore(maxParallel)
+
+    override fun setMaxParallel(limit: Int) {
+        log.info("Updating LLM client semaphore capacity to $limit")
+        semaphore = Semaphore(limit.coerceAtLeast(1))
+    }
     private val streamingModelCache = ConcurrentHashMap<String, StreamingChatModel>()
 
     private val clientScope = CoroutineScope(Dispatchers.Default + SupervisorJob())

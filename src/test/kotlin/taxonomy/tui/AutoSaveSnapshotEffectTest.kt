@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import taxonomy.model.GraphNode
 import taxonomy.service.AnalysisMode
 import taxonomy.service.DagSnapshot
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.tui.controller.DefaultTuiEffects
 import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.controller.TuiGateway
@@ -70,6 +71,9 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override fun applySetting(name: String, value: String): Boolean = false
     override fun resetBenchmarkReport() {}
     override fun clearLeaderboard() {}
+    override suspend fun loadLeaderboardForNode(node: GraphNode): AggregatedLeaderboard =
+        AggregatedLeaderboard(emptyList(), 0, 1, 0, false)
+    override suspend fun loadLeafRanks(): Map<String, Pair<String, String>> = emptyMap()
 }
 
 class AutoSaveSnapshotEffectTest {

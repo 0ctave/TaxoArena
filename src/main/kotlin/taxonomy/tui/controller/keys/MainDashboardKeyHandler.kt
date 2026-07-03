@@ -72,23 +72,7 @@ internal class MainDashboardKeyHandler(
                 }
             }
 
-            "b"   -> if (
-                state.analysis.mode == AnalysisMode.BENCHMARK &&
-                state.benchmark.benchmarkType == BenchmarkType.TRICKLE
-            ) {
-                when {
-                    state.benchmark.isRunningBatchTrickleTest -> Unit
-                    state.benchmark.isEnteringTrickleQueryLimit -> {
-                        val maxQ = state.benchmark.trickleQueryLimitInput.toIntOrNull() ?: 0
-                        dispatch(TuiEvent.RunBatchTrickleTest(maxQ))
-                    }
-                    else -> effects.resolveReservedPoolSize { poolSize ->
-                        dispatch(TuiEvent.StartTrickleBenchmarkInput(poolSize))
-                    }
-                }
-            } else {
-                commandController.startBenchmark(dispatch)
-            }
+            "b"   -> commandController.startBenchmark(dispatch)
 
             "t"   -> commandController.startTrickle(dispatch)
 

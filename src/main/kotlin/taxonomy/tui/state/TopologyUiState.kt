@@ -10,5 +10,6 @@ data class TopologyUiState(
     val treeScrollOffset: Int = 0,
 
     val expandedNodes: Map<String, Boolean> = emptyMap(),
-    val autoScroll: Boolean = true
+    val autoScroll: Boolean = true,
+    val leafRanks: Map<String, Pair<String, String>> = emptyMap()
 )

@@ -115,7 +115,8 @@ class BenchmarkE2EIntegrationTest {
                 domain = "stub-leaf-judge",
                 winner = "Model A",
                 rationale = "fixed verdict",
-                confidence = 0.95
+                confidence = 0.95,
+                nodeId = expectedNodeId ?: "root"
             )
         )
     }

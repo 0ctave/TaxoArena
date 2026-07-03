@@ -320,7 +320,7 @@ fun LeaderboardPanel(
         if (arenaState.leaderboard.isEmpty()) {
             SafeText("No ratings recorded yet — run a benchmark or arena match.", w, Yellow)
         } else {
-            SafeText("%-22s %-10s %6s %6s %5s".format("Model", "Domain", "μ", "σ", "Rank"), w, Yellow)
+            SafeText("%-22s %-10s %8s %8s %5s".format("Model", "Domain", "Score", "StdErr", "Rank"), w, Yellow)
             val items = arenaState.leaderboard.flatMap { g -> g.agents.map { g.rank to it } }
             val rows = (height - 4).coerceAtLeast(1)
             ScrollablePanelContent(
@@ -334,7 +334,7 @@ fun LeaderboardPanel(
                 for (i in startIdx until endIdx) {
                     val (rank, a) = items[i]
                     SafeText(
-                        "%-22s %-10s %6.1f %6.1f %5d".format(
+                        "%-22s %-10s %8.3f %8.3f %5d".format(
                             a.agentName.take(22), a.domain.take(10), a.mu, a.sigma, rank
                         ),
                         innerWidth,

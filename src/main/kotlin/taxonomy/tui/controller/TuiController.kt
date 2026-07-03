@@ -83,6 +83,7 @@ class TuiController(
         dispatch(TuiEvent.RefreshSnapshots)
         dispatch(TuiEvent.RefreshDatasetStatus)
         dispatch(TuiEvent.RefreshArenaModels)
+        effects.loadLeafRanks(::dispatch)
     }
 
     fun dispatch(event: TuiEvent) {

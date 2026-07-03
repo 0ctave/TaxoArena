@@ -34,7 +34,7 @@ class TaxonomyConfig {
          * ever misbehaves (e.g. the internal API changes); the TUI then starts optimistically.
          */
         var skipTtyPrecheck: Boolean = false
-        val llmParallelism: Int = 8
+        var llmParallelism: Int = 8
     }
 
     class DatasetConfig {

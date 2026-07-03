@@ -486,33 +486,46 @@ private fun TrickleBenchmarkView(
     Column {
         when {
             benchmarkState.isRunningBatchTrickleTest -> {
-                Text("Running batch trickle test…".take(w), color = Yellow)
+                Text("Trickle Benchmark ❯ Executing".take(w), color = Yellow, textStyle = Bold)
+                Spacer()
+                Text("Running batch trickle test over reserved queries…".take(w), color = White)
                 if (benchmarkState.batchTrickleProgress.isNotBlank()) {
                     Spacer()
-                    Text(benchmarkState.batchTrickleProgress.take(w), color = White)
+                    Text(benchmarkState.batchTrickleProgress.take(w), color = Cyan)
                 }
+            }
+
+            benchmarkState.isEnteringTrickleQueryLimit -> {
+                Text("Trickle Benchmark Configuration".take(w), color = Cyan, textStyle = Bold)
+                Spacer()
+                Text("Enter the number of reserved test queries to evaluate:".take(w), color = White)
+                Spacer()
+                Text("Query Limit ❯ ${benchmarkState.trickleQueryLimitInput}█".take(w), color = Cyan)
+                Spacer()
+                Text("Press Enter to execute the test · Esc to cancel".take(w), color = Yellow)
             }
 
             benchmarkState.batchTrickleResults != null -> {
                 val r = benchmarkState.batchTrickleResults
-                Text("Batch trickle results".take(w), color = Cyan, textStyle = Bold)
+                Text("Batch Trickle Evaluation Results".take(w), color = Green, textStyle = Bold)
                 Spacer()
-                Text("Each DAG leaf is tagged with the dominant MMLU-Pro domain of its training".take(w), color = White)
-                Text("queries; reserved test queries are then routed and scored against those tags.".take(w), color = White)
+                Text("Each leaf is tagged with its training queries' dominant MMLU-Pro domain.".take(w), color = White)
+                Text("Reserved test queries are routed through the DAG and matched against tags.".take(w), color = White)
                 Spacer()
-                Text("Total queries    ${r.totalQueries}".take(w), color = White)
-                Text("Top-1 accuracy   ${"%.1f%%".format(r.top1Accuracy * 100)}   highest-confidence leaf's domain == truth".take(w), color = White)
-                Text("Any-match acc    ${"%.1f%%".format(r.anyMatchAccuracy * 100)}   any matched leaf's domain == truth".take(w), color = White)
-                Text("Macro-F1         ${"%.3f".format(r.macroF1)}   domain-averaged F1 on the top-1 prediction".take(w), color = White)
-                Text("Mean leaf purity ${"%.3f".format(r.meanLeafPurity)}   dominant-domain share of top-1 leaf".take(w), color = White)
-                Text("Mean depth       ${"%.2f".format(r.meanRoutingDepth)}   tree depth of the top-1 matched leaf".take(w), color = White)
-                Text("No-match rate    ${"%.1f%%".format(r.noMatchRate * 100)}   queries that routed to no leaf".take(w), color = White)
+                
+                Text("%-22s %s".format("Total Evaluated Queries", r.totalQueries).take(w), color = White)
+                Text("%-22s %.1f%%".format("Top-1 Match Accuracy", r.top1Accuracy * 100).take(w), color = White)
+                Text("%-22s %.1f%%".format("Any-Match Accuracy", r.anyMatchAccuracy * 100).take(w), color = White)
+                Text("%-22s %.3f".format("Macro-F1 Score", r.macroF1).take(w), color = White)
+                Text("%-22s %.3f".format("Mean Leaf Purity", r.meanLeafPurity).take(w), color = White)
+                Text("%-22s %.2f".format("Mean Routing Depth", r.meanRoutingDepth).take(w), color = White)
+                Text("%-22s %.1f%%".format("No-Match Rate", r.noMatchRate * 100).take(w), color = White)
 
                 if (r.perDomainF1.isNotEmpty()) {
                     Spacer()
-                    Text("Per-domain F1 (top 10 by support)".take(w), color = Cyan, textStyle = Bold)
+                    Text("Per-Domain F1 Metrics (Top 10 by support)".take(w), color = Cyan, textStyle = Bold)
                     Text(
-                        "%-22s %7s %6s %6s %6s".format("domain", "support", "P", "R", "F1").take(w),
+                        "%-22s %7s %6s %6s %6s".format("Domain", "Support", "P", "R", "F1").take(w),
                         color = Yellow,
                     )
                     r.perDomainF1.entries
@@ -529,16 +542,17 @@ private fun TrickleBenchmarkView(
                 }
 
                 Spacer()
-                Text("Press B to re-run · Q to go back.".take(w), color = Cyan)
+                Text("Press Enter to configure and re-run · Esc/Q to go back.".take(w), color = Yellow)
             }
 
             else -> {
-                Text("Trickle benchmark".take(w), color = Cyan, textStyle = Bold)
+                Text("Trickle Routing Benchmark".take(w), color = Cyan, textStyle = Bold)
                 Spacer()
-                Text("Batch routing accuracy test over the reserved test queries.".take(w), color = White)
+                Text("Runs a batch classification/routing accuracy test over reserved test queries".take(w), color = White)
+                Text("to evaluate tree structure quality and node-routing purity.".take(w), color = White)
                 Spacer()
-                Text("Press B to start the batch routing accuracy test.".take(w), color = White)
-                Text("Q/Esc to go back.".take(w), color = Cyan)
+                Text("Press Enter to configure and start the benchmark.".take(w), color = Yellow)
+                Text("Press Q/Esc to return to the menu.".take(w), color = Cyan)
             }
         }
     }

@@ -36,7 +36,6 @@ class TaxonomyBenchmarkService(
 
     private fun propagateOutcome(
         leafId: String,
-        ancestors: Set<String>,
         modelA: String,
         modelB: String,
         outcome: DomainEvaluation,
@@ -50,39 +49,37 @@ class TaxonomyBenchmarkService(
         }
         val isTie = outcome.winner.equals("TIE", ignoreCase = true)
 
-        for (nodeId in ancestors) {
-            val list = rankingService.getNodePairStats(nodeId, snapshotId)
-            val existing = list.firstOrNull { 
-                (it.modelA == modelA && it.modelB == modelB) || (it.modelA == modelB && it.modelB == modelA)
-            }
-            val stats = if (existing != null) {
-                if (existing.modelA == modelA) {
-                    existing.winsA += wA
-                    existing.winsB += wB
-                } else {
-                    existing.winsA += wB
-                    existing.winsB += wA
-                }
-                existing.ties += if (isTie) 1 else 0
-                existing.totalComparisons += 1
-                existing.positionFlips += if (outcome.positionFlip) 1 else 0
-                existing.lastUpdated = System.currentTimeMillis()
-                existing
-            } else {
-                NodePairStats(
-                    nodeId = nodeId,
-                    modelA = modelA,
-                    modelB = modelB,
-                    winsA = wA,
-                    winsB = wB,
-                    ties = if (isTie) 1 else 0,
-                    totalComparisons = 1,
-                    positionFlips = if (outcome.positionFlip) 1 else 0,
-                    lastUpdated = System.currentTimeMillis()
-                )
-            }
-            rankingService.saveNodePairStats(stats, snapshotId)
+        val list = rankingService.getNodePairStats(leafId, snapshotId)
+        val existing = list.firstOrNull { 
+            (it.modelA == modelA && it.modelB == modelB) || (it.modelA == modelB && it.modelB == modelA)
         }
+        val stats = if (existing != null) {
+            if (existing.modelA == modelA) {
+                existing.winsA += wA
+                existing.winsB += wB
+            } else {
+                existing.winsA += wB
+                existing.winsB += wA
+            }
+            existing.ties += if (isTie) 1 else 0
+            existing.totalComparisons += 1
+            existing.positionFlips += if (outcome.positionFlip) 1 else 0
+            existing.lastUpdated = System.currentTimeMillis()
+            existing
+        } else {
+            NodePairStats(
+                nodeId = leafId,
+                modelA = modelA,
+                modelB = modelB,
+                winsA = wA,
+                winsB = wB,
+                ties = if (isTie) 1 else 0,
+                totalComparisons = 1,
+                positionFlips = if (outcome.positionFlip) 1 else 0,
+                lastUpdated = System.currentTimeMillis()
+            )
+        }
+        rankingService.saveNodePairStats(stats, snapshotId)
     }
 
     suspend fun runBenchmark(
@@ -115,7 +112,7 @@ class TaxonomyBenchmarkService(
         var outlierCount = 0
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
-            val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds)
+            val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds, sample.category)
             if (leaves.isEmpty()) {
                 outlierCount++
                 log.debug("qId=$qId is an outlier — no leaf match, skipping")
@@ -297,10 +294,8 @@ class TaxonomyBenchmarkService(
                             )
                         }
 
-                        val ancestors = leafNode.allAncestors()
                         propagateOutcome(
                             leafId = leafNode.id,
-                            ancestors = ancestors,
                             modelA = task.modelA,
                             modelB = task.modelB,
                             outcome = primaryEval,
@@ -351,10 +346,8 @@ class TaxonomyBenchmarkService(
                 }
             }
 
-            val dirtyNodes = roundResults.flatMap { qr ->
-                val eval = qr.domainEvaluations.firstOrNull() ?: return@flatMap emptyList<String>()
-                val node = allNodes.firstOrNull { it.id == eval.nodeId } ?: allNodes.firstOrNull { it.label == eval.domain } ?: return@flatMap emptyList<String>()
-                node.allAncestors()
+            val dirtyNodes = roundResults.mapNotNull { qr ->
+                qr.domainEvaluations.firstOrNull()?.nodeId
             }.toSet()
             log.trace("Round $round - dirtyNodes: $dirtyNodes")
 
@@ -379,12 +372,19 @@ class TaxonomyBenchmarkService(
                 }
             }
 
-            val rootState = btStates[root.id]
-            if (rootState != null) {
-                log.info("--- Bradley-Terry Ratings (Round $round) ---")
-                rootState.btScores.entries.sortedByDescending { it.value }.forEach { (model, score) ->
-                    val stdErr = rootState.stdErrors[model] ?: 0.0
-                    log.info("  * $model: score = ${String.format("%.4f", score)} (± ${String.format("%.4f", stdErr)})")
+            val leafIds = mutableListOf<String>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                if (n.children.isEmpty()) leafIds.add(n.id)
+                else n.children.forEach { walk(it) }
+            }
+            walk(root)
+            val aggregated = rankingService.aggregateLeafScores(leafIds, snapshotId)
+            if (aggregated.ranks.isNotEmpty()) {
+                log.info("--- Bradley-Terry Ratings (Round $round) [aggregated root] ---")
+                aggregated.ranks.forEach { mr ->
+                    log.info("  * ${mr.modelId}: score = ${String.format("%.4f", mr.btScore)} (± ${String.format("%.4f", mr.stdError)})")
                 }
             }
 
@@ -638,6 +638,35 @@ class TaxonomyBenchmarkService(
         pairs: List<Pair<String, String>>,
         req: BenchmarkRequest
     ): BenchmarkReport {
+
+        // ─── Compute judge-GT agreement per leaf ───
+        val leafAgreement = results.groupBy { it.domainEvaluations.firstOrNull()?.nodeId }
+            .mapValues { (nodeId, resList) ->
+                if (nodeId == null) return@mapValues 0.0
+                val total = resList.size
+                val agreeing = resList.count { r ->
+                    val pairKey = r.judgeAccuracyAgreement.keys.firstOrNull() ?: ""
+                    r.judgeAccuracyAgreement[pairKey] == true
+                }
+                if (total > 0) agreeing.toDouble() / total else 0.0
+            }
+
+        val root = taxonomyService.getGraph()
+        if (root != null) {
+            val allNodes = mutableListOf<GraphNode>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                allNodes.add(n)
+                n.children.forEach { walk(it) }
+            }
+            walk(root)
+            leafAgreement.forEach { (nodeId, agreement) ->
+                allNodes.firstOrNull { it.id == nodeId }?.let { node ->
+                    node.judgeGtAgreement = agreement
+                }
+            }
+        }
 
         val totalQueries = results.size
         val coverageRate = if (totalQueries > 0) results.count { it.hadJudge }.toDouble() / totalQueries else 0.0

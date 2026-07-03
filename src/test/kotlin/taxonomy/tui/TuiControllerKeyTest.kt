@@ -79,6 +79,8 @@ private class FakeEffects(private val datasetDownloaded: Boolean) : TuiEffects {
     override fun loadBenchmarkModels(dispatch: (TuiEvent) -> Unit) {}
     override fun regenerateLabels(dispatch: (TuiEvent) -> Unit) {}
     override fun setAnalysisMode(mode: AnalysisMode) {}
+    override fun loadLeaderboardForNode(node: GraphNode, dispatch: (TuiEvent) -> Unit) {}
+    override fun loadLeafRanks(dispatch: (TuiEvent) -> Unit) {}
     override fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit) {}
     override fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit) {}
     override fun resetBenchmarkReport() {}

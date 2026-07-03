@@ -35,6 +35,7 @@ class LiveLabelingTest {
         ): String {
             return """{"label": "Mocked Post-Pass Concept"}"""
         }
+        override fun setMaxParallel(limit: Int) {}
     }
 
     @Test

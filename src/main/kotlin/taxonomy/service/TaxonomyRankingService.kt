@@ -88,9 +88,35 @@ class TaxonomyRankingService {
     @Volatile
     private var dbInitialized = false
 
-    private inline fun <T> withConn(block: (Connection) -> T): T = synchronized(dbLock) {
-        ensureDatabaseInitialized()
-        block(connection)
+    private inline fun <T> withConn(block: (Connection) -> T): T {
+        return synchronized(dbLock) {
+            ensureDatabaseInitialized()
+            var attempts = 0
+            val maxRetries = 10
+            val delayMs = 100L
+            var result: T? = null
+            var completed = false
+            while (!completed) {
+                try {
+                    result = block(connection)
+                    completed = true
+                } catch (e: java.sql.SQLException) {
+                    attempts++
+                    val msg = e.message ?: ""
+                    val isBusy = e.errorCode == 5 || 
+                                 msg.contains("busy", ignoreCase = true) ||
+                                 msg.contains("locked", ignoreCase = true)
+                    if (isBusy && attempts < maxRetries) {
+                        log.warn("Database busy/locked (attempt $attempts/$maxRetries). Retrying in ${delayMs}ms...")
+                        Thread.sleep(delayMs)
+                    } else {
+                        throw e
+                    }
+                }
+            }
+            @Suppress("UNCHECKED_CAST")
+            result as T
+        }
     }
 
     init {
@@ -412,6 +438,63 @@ class TaxonomyRankingService {
             log.error("Failed to get all BT states: ${e.message}", e)
         }
         return map
+    }
+
+data class AggregatedLeaderboard(
+    val ranks: List<ModelRank>,
+    val leafsEligible: Int,
+    val leafsTotal: Int,
+    val totalComparisons: Int,
+    val isReliable: Boolean   // leafsEligible / leafsTotal >= 0.30
+)
+
+    fun aggregateLeafScores(
+        leafNodeIds: List<String>,
+        snapshotId: String = "global",
+        minComparisons: Int = 5
+    ): AggregatedLeaderboard {
+        val allStates = leafNodeIds.mapNotNull { getBtState(it, snapshotId) }
+        val eligible = allStates.filter { it.totalComparisons >= minComparisons }
+
+        if (eligible.isEmpty()) return AggregatedLeaderboard(
+            emptyList(), 0, leafNodeIds.size, 0, false
+        )
+
+        val allModels = eligible.flatMap { it.btScores.keys }.toSet()
+        val weightedSum = mutableMapOf<String, Double>()
+        val weightTotal = mutableMapOf<String, Double>()
+
+        for (state in eligible) {
+            for (model in allModels) {
+                val score = state.btScores[model] ?: continue
+                val se = state.stdErrors[model]?.takeIf { it < 9.0 } ?: continue
+                val w = 1.0 / (se * se)
+                weightedSum[model] = (weightedSum[model] ?: 0.0) + w * score
+                weightTotal[model] = (weightTotal[model] ?: 0.0) + w
+            }
+        }
+
+        val raw = allModels.mapNotNull { model ->
+            val wSum = weightTotal[model] ?: return@mapNotNull null
+            if (wSum == 0.0) return@mapNotNull null
+            model to Pair(weightedSum[model]!! / wSum, 1.0 / kotlin.math.sqrt(wSum))
+        }.toMap()
+
+        val mean = if (raw.isNotEmpty()) raw.values.map { it.first }.average() else 0.0
+        val ranks = raw.entries
+            .map { (model, p) ->
+                val score = p.first - mean
+                val se = p.second
+                ModelRank(model, score, se, 0, score - 2*se, score + 2*se,
+                          winsTotal = 0.0,
+                          comparisonsTotal = eligible.sumOf { it.totalComparisons })
+            }
+            .sortedByDescending { it.btScore }
+            .mapIndexed { i, r -> r.copy(rank = i + 1) }
+
+        val coverage = eligible.size.toDouble() / leafNodeIds.size
+        return AggregatedLeaderboard(ranks, eligible.size, leafNodeIds.size,
+                                     eligible.sumOf { it.totalComparisons }, coverage >= 0.30)
     }
 
     fun getNodeLeaderboard(nodeId: String, snapshotId: String = "global"): List<ModelRank>? {

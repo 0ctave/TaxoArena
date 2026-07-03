@@ -41,8 +41,10 @@ internal class TopologyKeyHandler(
             }
 
             "enter" -> {
-                effects.inspectNode(selectedTreeNode(state))
+                val node = selectedTreeNode(state)
+                effects.inspectNode(node)
                 dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.NODE_DETAIL))
+                if (node != null) effects.loadLeaderboardForNode(node, dispatch)
             }
 
             "r" -> selectedTreeNode(state)?.let { node ->

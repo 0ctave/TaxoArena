@@ -26,6 +26,7 @@ import taxonomy.model.IterationMetrics
 import taxonomy.model.TaxonomyMetricsData
 import taxonomy.service.AnalysisMode
 import taxonomy.service.AnalysisPanelState
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.tui.components.take
 import taxonomy.tui.state.MetricsZoneFocus
@@ -61,7 +62,13 @@ fun MetricsOrInspectorPanel(
             if (node == null) {
                 Column { Text("Select a node in the DAG (Enter) to inspect it.", color = White) }
             } else {
-                val items = buildNodeDetailLines(node, width, isGeneratingJudge)
+                val items = buildNodeDetailLines(
+                    node = node,
+                    width = width,
+                    isGeneratingJudge = isGeneratingJudge,
+                    leaderboard = controlState.nodeLeaderboard,
+                    isLoadingLeaderboard = controlState.isLoadingLeaderboard
+                )
                 ScrollablePanelContent(
                     pWidth = width,
                     pHeight = height,
@@ -114,12 +121,26 @@ fun buildNodeDetailLines(
     node: GraphNode,
     width: Int,
     isGeneratingJudge: Boolean,
+    leaderboard: AggregatedLeaderboard? = null,
+    isLoadingLeaderboard: Boolean = false
 ): List<Triple<String, Color, Boolean>> {
     val out = mutableListOf<Triple<String, Color, Boolean>>()
     fun add(t: String, c: Color = White, bold: Boolean = false) {
         val limit = (width - 2).coerceAtLeast(0)
         val truncated = if (t.length > limit) t.substring(0, limit) else t
         out += Triple(truncated, c, bold)
+    }
+    fun shortModelName(name: String): String {
+        val clean = name.lowercase()
+        return when {
+            clean.contains("claude") -> "claude"
+            clean.contains("70b") -> "70B"
+            clean.contains("8b") -> "8B"
+            clean.contains("13b") -> "13B"
+            clean.contains("7b") -> "7B"
+            clean.contains("gpt-4") -> "gpt4"
+            else -> name.take(8)
+        }
     }
     add(node.label ?: "(unlabeled)", Cyan, true)
     add("")
@@ -176,6 +197,80 @@ fun buildNodeDetailLines(
             add("Judge Rubric:", Cyan, true)
             node.judgeRubric!!.wrapText(width - 6).forEach { line ->
                 add("  $line")
+            }
+        }
+    }
+    if (isLoadingLeaderboard) {
+        add("")
+        add("─── LEADERBOARD ─────────────────────────────", Cyan, true)
+        add("  Loading leaderboard data...", Yellow)
+    } else if (leaderboard != null) {
+        add("")
+        val isAgg = !node.isLeaf
+        val title = if (isAgg) "─── LEADERBOARD (aggregated) ─────────────────" else "─── LEADERBOARD ─────────────────────────────"
+        add(title, Cyan, true)
+        
+        val scopeText = "  Scope: ${node.label ?: node.id} (${if (node.isLeaf) "leaf" else "${leaderboard.leafsTotal} leaves"})"
+        add(scopeText, White)
+        
+        val relText = if (leaderboard.isReliable) "✔ reliable" else "⚠ unreliable"
+        val coveragePercent = "%.0f%%".format((leaderboard.leafsEligible.toDouble() / leaderboard.leafsTotal.coerceAtLeast(1)) * 100)
+        val covText = "  Coverage: ${leaderboard.leafsEligible}/${leaderboard.leafsTotal} leaves ($coveragePercent)  ·  ${leaderboard.totalComparisons} comparisons  ·  $relText"
+        add(covText, if (leaderboard.isReliable) Green else Yellow)
+        
+        if (node.isLeaf && node.judgeGtAgreement != null) {
+            val pct = "%.1f%%".format(node.judgeGtAgreement!! * 100)
+            val warn = if (node.judgeGtAgreement!! < 0.55) "  ⚠ poor agreement (<55%)" else ""
+            add("  Judge agreement: $pct$warn", if (node.judgeGtAgreement!! < 0.55) Red else Green)
+        }
+        
+        add("")
+        if (leaderboard.ranks.isEmpty()) {
+            add("  No evaluations available.", Yellow)
+        } else {
+            if (isAgg) {
+                // Header for aggregated: #  Model                    Score    SE     Weight
+                add("  %-2s  %-24s %7s %7s     Weight".format("#", "Model", "Score", "SE"), Yellow, true)
+                leaderboard.ranks.forEach { mr ->
+                    val scoreStr = "%+6.2f".format(mr.btScore)
+                    val seStr = "±%.2f".format(mr.stdError)
+                    val maxWeight = leaderboard.ranks.map { 1.0 / (it.stdError * it.stdError) }.maxOrNull() ?: 1.0
+                    val weight = 1.0 / (mr.stdError * mr.stdError)
+                    val blockCount = if (maxWeight > 0.0) ((weight / maxWeight) * 8).toInt().coerceIn(1, 8) else 1
+                    val bar = "█".repeat(blockCount).padEnd(8)
+                    add("  %-2d  %-24s %7s %7s    [%s]".format(mr.rank, mr.modelId.take(24), scoreStr, seStr, bar), White)
+                }
+                
+                if (!leaderboard.isReliable) {
+                    add("")
+                    add("  ℹ Coverage below 30% — run more benchmark rounds for reliable field ranking", Yellow)
+                }
+            } else {
+                // Header for leaf: #  Model                    Score    SE      95% CI
+                add("  %-2s  %-24s %7s %7s       95% CI".format("#", "Model", "Score", "SE"), Yellow, true)
+                leaderboard.ranks.forEach { mr ->
+                    val scoreStr = "%+6.2f".format(mr.btScore)
+                    val seStr = "±%.2f".format(mr.stdError)
+                    val ciStr = "[%+4.1f, %+4.1f]".format(mr.confidenceIntervalLow, mr.confidenceIntervalHigh)
+                    add("  %-2d  %-24s %7s %7s   %s".format(mr.rank, mr.modelId.take(24), scoreStr, seStr, ciStr), White)
+                }
+                
+                val warnings = mutableListOf<String>()
+                for (idx in 0 until leaderboard.ranks.size - 1) {
+                    val m1 = leaderboard.ranks[idx]
+                    val m2 = leaderboard.ranks[idx + 1]
+                    val gap = java.lang.Math.abs(m1.btScore - m2.btScore)
+                    val threshold = java.lang.Math.max(m1.stdError, m2.stdError)
+                    if (gap < threshold) {
+                        warnings.add("${shortModelName(m1.modelId)} and ${shortModelName(m2.modelId)} not separated (gap < 1 SE)")
+                    }
+                }
+                if (warnings.isNotEmpty()) {
+                    add("")
+                    warnings.take(2).forEach { warn ->
+                        add("  ⚠ $warn", Yellow)
+                    }
+                }
             }
         }
     }

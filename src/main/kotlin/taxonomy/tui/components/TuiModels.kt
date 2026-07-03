@@ -15,7 +15,8 @@ enum class StartupState {
 data class TreeLine(
     val node: GraphNode,
     val text: AnnotatedString,
-    val isPoly: Boolean
+    val isPoly: Boolean,
+    val topTwoRanks: Pair<String, String>? = null
 )
 
 /** The kind of input a [SettingItem] uses, which drives both rendering and editing. */

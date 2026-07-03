@@ -2,6 +2,7 @@ package taxonomy.tui.controller
 
 import taxonomy.service.AnalysisMode
 import taxonomy.service.DagSnapshot
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.state.BenchmarkSubScreen
 import taxonomy.tui.state.ConfigSubPanel
@@ -260,6 +261,9 @@ sealed interface TuiEvent {
     data object ToggleLeaderboard : TuiEvent
     data class SetLeaderboardScrollOffset(val offset: Int) : TuiEvent
     data class LeaderboardLoaded(val groups: List<taxonomy.service.LeaderboardGroup>) : TuiEvent
+    data object NodeLeaderboardLoading : TuiEvent
+    data class NodeLeaderboardLoaded(val leaderboard: AggregatedLeaderboard) : TuiEvent
+    data class LeafRanksLoaded(val ranks: Map<String, Pair<String, String>>) : TuiEvent
     data class BenchmarkModelsLoaded(val models: List<String>) : TuiEvent
     data class SetSelectedBenchmarkField(val index: Int) : TuiEvent
     data object StartEditingBenchmarkField : TuiEvent
