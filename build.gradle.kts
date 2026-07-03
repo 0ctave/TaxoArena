@@ -45,7 +45,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 
 dependencies {
     val arcVersion = "0.203.0"
-    val langchain4jVersion = "1.8.0"
+    val langchain4jVersion = "1.17.0"
 
 
     // Transparently loads a root-level `.env` file into the Spring Environment
