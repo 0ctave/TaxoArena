@@ -30,6 +30,7 @@ data class BenchmarkRequest(
     val category: String? = null,   // optional: restrict to one GT category
     val confidenceGate: Double = 0.65,
     val parallelism: Int = 6,
+    val questionsPerRound: Int = 12, // total queries per round (= numPairs * BATCH_STEP_SIZE)
     val updateRankings: Boolean = true,
     val reservedOnly: Boolean = true   // benchmark only the reserved test pool by default
 )

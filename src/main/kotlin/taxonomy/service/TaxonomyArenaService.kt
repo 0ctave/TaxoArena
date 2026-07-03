@@ -44,9 +44,17 @@ data class DomainEvaluation(
     val confidence: Double,
     val positionFlip: Boolean = false,
     val nodeId: String? = null,
+    val tieSource: String? = null
 ) {
     val domainLabel: String get() = domain
 }
+
+data class ParseResult(
+    val winner: String,
+    val rationale: String,
+    val confidence: Double,
+    val impliesNoWinner: Boolean
+)
 
 enum class AnalysisMode { IDLE, ARENA, JUDGE_PROGRESS, NODE_DETAIL, SETTINGS, LOGS_SCROLL, METRICS, SNAPSHOTS, TRICKLE_TEST, BENCHMARK, CONFIG, LEADERBOARD }
 
@@ -266,7 +274,14 @@ class TaxonomyArenaService(
         return dot / (Math.sqrt(normA) * Math.sqrt(normB))
     }
 
-    suspend fun discoverDomainsAndJudges(text: String): Pair<List<GraphNode>, List<GraphNode>> {
+    private val CATEGORY_KEYWORDS = mapOf(
+        "biology" to listOf("biology", "genetic", "molecular", "cellular", "physiology",
+                            "evolution", "ecological", "viral", "anatomical", "metabol"),
+        "physics" to listOf("physics", "thermodynamic", "wave", "heat", "transport"),
+        "chemistry" to listOf("chem", "stoichiometry", "equilibrium", "acid", "base")
+    )
+
+    suspend fun discoverDomainsAndJudges(text: String, category: String? = null): Pair<List<GraphNode>, List<GraphNode>> {
         val root = taxonomyService.getGraph() ?: return emptyList<GraphNode>() to emptyList()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
@@ -288,6 +303,12 @@ class TaxonomyArenaService(
             if (sim >= threshold) node else null
         }
 
+        val domainFilteredNodes = candidates.filter { node ->
+            val nodeCategory = node.label?.lowercase() ?: ""
+            val queryCategory = category?.lowercase() ?: ""
+            queryCategory.isBlank() || CATEGORY_KEYWORDS[queryCategory]?.any { it in nodeCategory } ?: true
+        }
+
         val allMatchedNodes = mutableSetOf<GraphNode>()
         val judges = mutableSetOf<GraphNode>()
         fun collectLineage(node: GraphNode, visited: MutableSet<String>) {
@@ -297,7 +318,7 @@ class TaxonomyArenaService(
             node.parents.forEach { collectLineage(it, visited) }
         }
         val visited = mutableSetOf<String>()
-        candidates.forEach { collectLineage(it, visited) }
+        domainFilteredNodes.forEach { collectLineage(it, visited) }
         return allMatchedNodes.toList() to judges
             .distinctBy { it.id }
             .sortedByDescending { it.depth }
@@ -318,14 +339,14 @@ class TaxonomyArenaService(
         val res1 = parseJudgeResponse(p1.await())
         val res2 = parseJudgeResponse(p2.await())
 
-        val vote1 = res1.first
-        val vote2 = when (res2.first) {
+        val vote1 = res1.winner
+        val vote2 = when (res2.winner) {
             "Model A" -> "Model B"
             "Model B" -> "Model A"
-            else -> res2.first
+            else -> res2.winner
         }
-        val c1 = res1.third
-        val c2 = res2.third
+        val c1 = res1.confidence
+        val c2 = res2.confidence
         val avgConfidence = (c1 + c2) / 2.0
 
         val isInvalid = vote1 == "INVALID" || vote2 == "INVALID"
@@ -342,12 +363,20 @@ class TaxonomyArenaService(
             vote1
         }
 
+        val impliesNoWinner = res1.impliesNoWinner || res2.impliesNoWinner
+        val tieSource = when {
+            winner != "TIE" -> null
+            positionFlip -> "POSITION_FLIP"
+            impliesNoWinner -> "SEMANTIC_OVERRIDE"
+            else -> "JUDGE_EMITTED"
+        }
+
         val rationale = if (isInvalid) {
-            "Invalid judge response. Trial 1: ${res1.first} (rationale: ${res1.second}). Trial 2: ${res2.first} (rationale: ${res2.second})."
+            "Invalid judge response. Trial 1: ${res1.winner} (rationale: ${res1.rationale}). Trial 2: ${res2.winner} (rationale: ${res2.rationale})."
         } else if (positionFlip) {
             "POSITION_FLIP_TIE: Split verdict (position flip). Trial 1 voted $vote1 (conf $c1). Trial 2 voted $vote2 (conf $c2)."
         } else {
-            if (winner == "Model A") res1.second else if (winner == "Model B") res2.second else "Consistent tie verdict"
+            if (winner == "Model A") res1.rationale else if (winner == "Model B") res2.rationale else "Consistent tie verdict"
         }
 
         val finalConfidence = (if (positionFlip) avgConfidence * 0.5 else avgConfidence).coerceAtMost(0.95)
@@ -358,7 +387,8 @@ class TaxonomyArenaService(
             rationale   = rationale,
             confidence  = finalConfidence,
             positionFlip = positionFlip,
-            nodeId       = node.id
+            nodeId       = node.id,
+            tieSource    = tieSource
         )
     }
 
@@ -383,11 +413,12 @@ class TaxonomyArenaService(
         traceA: String,
         modelB: String,
         traceB: String,
-        targetNodeId: String? = null
+        targetNodeId: String? = null,
+        category: String? = null
     ): List<DomainEvaluation> = coroutineScope {
         // Route the question to find relevant leaf judges
         val root = taxonomyService.getGraph() ?: return@coroutineScope emptyList()
-        val (_, judgesList) = discoverDomainsAndJudges(query)
+        val (_, judgesList) = discoverDomainsAndJudges(query, category)
         val judges = judgesList.toMutableList()
         if (targetNodeId != null) {
             val targetNode = findNodeById(root, targetNodeId)
@@ -485,7 +516,7 @@ class TaxonomyArenaService(
         ArenaResult(query, modelA, modelB, resA.modelOutput, resB.modelOutput, evaluations)
     }
 
-    private fun parseJudgeResponse(response: String): Triple<String, String, Double> {
+    private fun parseJudgeResponse(response: String): ParseResult {
         return try {
             val cleanJson = response.trim()
             val element = try {
@@ -524,14 +555,15 @@ class TaxonomyArenaService(
 
             log.debug("Judge parsed: winner=$finalWinner conf=${"%.2f".format(finalConfidence)}")
             log.trace("Judge raw response: $cleanJson")
-            Triple(
+            ParseResult(
                 finalWinner,
                 element["rationale"]?.jsonPrimitive?.content ?: element["comparison"]?.jsonPrimitive?.content ?: response,
-                finalConfidence
+                finalConfidence,
+                impliesNoWinner
             )
         } catch (e: Exception) { 
             log.warn("Failed to parse judge response: ${e.message}. Raw response was: $response", e)
-            Triple("INVALID", response, 0.0) 
+            ParseResult("INVALID", response, 0.0, false) 
         }
     }
 

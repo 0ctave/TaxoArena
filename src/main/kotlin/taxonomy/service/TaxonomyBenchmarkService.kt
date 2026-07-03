@@ -176,7 +176,7 @@ class TaxonomyBenchmarkService(
                 models = modelNames,
                 resultsMatrix = matrix,
                 nodeToQueries = nodeToQueries,
-                batchSize = req.parallelism
+                batchSize = req.questionsPerRound
             )
             log.debug("Round $round - scheduled batch size: ${batch.size}")
             if (batch.isEmpty()) break
@@ -244,7 +244,8 @@ class TaxonomyBenchmarkService(
                                 traceA = getRobustTrace(outputA),
                                 modelB = task.modelB,
                                 traceB = getRobustTrace(outputB),
-                                targetNodeId = task.nodeId
+                                targetNodeId = task.nodeId,
+                                category = req.category
                             )
                             evals
                         }
@@ -334,7 +335,7 @@ class TaxonomyBenchmarkService(
                 val primaryEval = qr.domainEvaluations.firstOrNull()
                 val pairKey = qr.pairEvaluations.keys.firstOrNull() ?: "unknown"
                 if (primaryEval != null) {
-                    log.info("  [$pairKey] Question: \"${qr.query.take(65)}...\" -> Judge Winner: ${primaryEval.winner} (confidence: ${primaryEval.confidence})")
+                    log.info("  [$pairKey] Question: \"${qr.query.take(65)}...\" -> Judge Winner: ${primaryEval.winner}${primaryEval.tieSource?.let { "[$it]" } ?: ""} (confidence: ${primaryEval.confidence})")
                 }
             }
 

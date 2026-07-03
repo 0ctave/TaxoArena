@@ -108,7 +108,8 @@ class BenchmarkE2EIntegrationTest {
             traceA: String,
             modelB: String,
             traceB: String,
-            targetNodeId: String?
+            targetNodeId: String?,
+            category: String?
         ): List<DomainEvaluation> = listOf(
             DomainEvaluation(
                 domain = "stub-leaf-judge",

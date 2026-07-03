@@ -107,14 +107,17 @@ class BtMatchScheduler(
                     val ps = nodePairs.firstOrNull { 
                         (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) 
                     }
-                    val limit = if (ps == null || ps.totalComparisons < queriesPerPair) {
-                        queriesPerPair
-                    } else {
-                        if (shouldExtendPair(ps, state?.btScores ?: emptyMap())) {
-                            (ps.totalComparisons + EXTENSION_QUESTIONS).coerceAtMost(MAX_QUESTIONS_PER_PAIR)
-                        } else {
-                            ps.totalComparisons
-                        }
+                    val isCloseMatch = state != null && run {
+                        val si = state.btScores[mA] ?: 0.0
+                        val sj = state.btScores[mB] ?: 0.0
+                        val denom = exp(si) + exp(sj)
+                        val pij = if (denom == 0.0) 0.5 else exp(si) / denom
+                        abs(pij - 0.5) < 0.15
+                    }
+                    val limit = when {
+                        ps == null || ps.totalComparisons < queriesPerPair -> queriesPerPair
+                        isCloseMatch -> (ps.totalComparisons + EXTENSION_QUESTIONS).coerceAtMost(MAX_QUESTIONS_PER_PAIR)
+                        else -> ps.totalComparisons
                     }
                     val needed = limit - (ps?.totalComparisons ?: 0)
                     if (needed <= 0) return@forEach
@@ -197,7 +200,7 @@ class BtMatchScheduler(
     }
 
     companion object {
-        const val BATCH_STEP_SIZE = 2
+        const val BATCH_STEP_SIZE = 5
         const val EXTENSION_QUESTIONS = 2
         const val MAX_QUESTIONS_PER_PAIR = 100
 
