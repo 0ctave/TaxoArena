@@ -119,6 +119,16 @@ class TaxonomyRankingService {
         }
     }
 
+    private fun safeRollback(conn: Connection) {
+        try {
+            if (!conn.autoCommit) {
+                conn.rollback()
+            }
+        } catch (e: java.sql.SQLException) {
+            log.debug("Rollback failed (possibly already rolled back by SQLite): ${e.message}")
+        }
+    }
+
     init {
         ensureDatabaseInitialized()
         try {
@@ -280,7 +290,7 @@ class TaxonomyRankingService {
                 }
                 conn.commit()
             } catch (e: Exception) {
-                conn.rollback()
+                safeRollback(conn)
                 throw e
             } finally {
                 conn.autoCommit = wasAutoCommit
@@ -697,7 +707,8 @@ data class AggregatedLeaderboard(
 
                     conn.commit()
                 } catch (e: Exception) {
-                    conn.rollback()
+                    log.warn("Error inside recordMatch transaction block: ${e.message}", e)
+                    safeRollback(conn)
                     throw e
                 } finally {
                     conn.autoCommit = wasAutoCommit

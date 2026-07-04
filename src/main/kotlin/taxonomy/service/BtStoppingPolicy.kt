@@ -39,24 +39,8 @@ class BtStoppingPolicy(
 
         if (state.totalComparisons < minComparisonsPerLeaf) return false
 
-        // Every pair must have at least minComparisonsPerLeaf / K comparisons
-        val minPerPair = (minComparisonsPerLeaf / models.size).coerceAtLeast(1)
-        val allPairsCovered = models.flatMapIndexed { i, mA ->
-            models.drop(i + 1).map { mB -> mA to mB }
-        }.all { (mA, mB) ->
-            val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
-                (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
-            }
-            (ps?.totalComparisons ?: 0) >= minPerPair
-        }
-        if (!allPairsCovered) return false
-
-        // Top-2 must be separated
-        val ranked = state.btScores.entries.sortedByDescending { it.value }
-        if (ranked.size < 2) return true
-
-        // If no informative pairs remain -> leaf is done
         val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
+
         val informativePairs = allPairs.filter { (mA, mB) ->
             val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
@@ -67,10 +51,25 @@ class BtStoppingPolicy(
             val sj = state.btScores[mB] ?: 0.0
             val seA = state.stdErrors[mA] ?: 10.0
             val seB = state.stdErrors[mB] ?: 10.0
-            abs(si - sj) < 3.0 * (seA + seB)  // only pairs still uncertain
+            abs(si - sj) < 3.0 * (seA + seB)
         }
+
+        // All remaining informative pairs resolved -> leaf is done
         if (informativePairs.isEmpty()) return true
 
+        // Coverage check only on informative pairs
+        val minPerPair = (minComparisonsPerLeaf / models.size).coerceAtLeast(1)
+        val informativePairsCovered = informativePairs.all { (mA, mB) ->
+            val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
+                (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+            }
+            (ps?.totalComparisons ?: 0) >= minPerPair
+        }
+        if (!informativePairsCovered) return false
+
+        // Top-2 separation
+        val ranked = state.btScores.entries.sortedByDescending { it.value }
+        if (ranked.size < 2) return true
         val gap = ranked[0].value - ranked[1].value
         val combinedSE = (state.stdErrors[ranked[0].key] ?: 10.0) +
                          (state.stdErrors[ranked[1].key] ?: 10.0)

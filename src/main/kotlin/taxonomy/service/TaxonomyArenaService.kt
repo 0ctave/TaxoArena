@@ -137,10 +137,12 @@ class TaxonomyArenaService(
         .name("JudgeResponse")
         .rootElement(
             JsonObjectSchema.builder()
-                .addStringProperty("winner", "The winner: Model A or Model B")
-                .addStringProperty("rationale", "Detailed reasoning explaining why the winner was chosen")
-                .addNumberProperty("confidence", "A confidence score between 0.0 and 1.0")
-                .required("winner", "rationale", "confidence")
+                .addStringProperty("critique_a", "Critique of Model A's response against the rubric")
+                .addStringProperty("critique_b", "Critique of Model B's response against the rubric")
+                .addStringProperty("comparison", "The decisive difference in reasoning quality between A and B")
+                .addStringProperty("winner", "The winner: Model A, Model B, or TIE")
+                .addNumberProperty("confidence", "Confidence score between 0.0 and 1.0")
+                .required("comparison", "winner", "confidence")  // critique_a/b optional
                 .build()
         )
         .build()
@@ -399,7 +401,11 @@ class TaxonomyArenaService(
             if (winner == "Model A") res1.rationale else if (winner == "Model B") res2.rationale else "Consistent tie verdict"
         }
 
-        val finalConfidence = (if (positionFlip) avgConfidence * 0.5 else avgConfidence).coerceAtMost(0.95)
+        val finalConfidence = when {
+            isInvalid   -> 0.0
+            positionFlip -> 0.5   // canonical: flip = no net signal = max binary entropy
+            else         -> avgConfidence.coerceIn(0.0, 0.95)
+        }
 
         DomainEvaluation(
             domain      = node.label ?: "Emergent Concept",
@@ -582,8 +588,9 @@ class TaxonomyArenaService(
                 else -> "INVALID"
             }
             confidence = element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.0
-            comparisonText = element["rationale"]?.jsonPrimitive?.content 
-                ?: element["comparison"]?.jsonPrimitive?.content 
+            comparisonText = element["comparison"]?.jsonPrimitive?.content 
+                ?: element["rationale"]?.jsonPrimitive?.content 
+                ?: element["critique_a"]?.jsonPrimitive?.content 
                 ?: ""
             impliesNoWinner = confidence <= 0.5 && cleanWinner == "TIE"
             parsedSuccessfully = true

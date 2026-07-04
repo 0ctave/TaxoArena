@@ -13,6 +13,7 @@ import kotlin.collections.filter
 import kotlin.math.abs
 import kotlin.math.exp
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Service
 class TaxonomyBenchmarkService(
     private val arenaService: TaxonomyArenaService,
@@ -22,6 +23,7 @@ class TaxonomyBenchmarkService(
     private val evalStore: ModelEvalStore
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.BenchmarkService")
+    private val dbWriteDispatcher = Dispatchers.IO.limitedParallelism(1)
 
     private fun getAllNodes(root: GraphNode): List<GraphNode> {
         val visited = mutableSetOf<String>()
@@ -294,7 +296,7 @@ class TaxonomyBenchmarkService(
         }
 
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
-            btStates, pairStatsMap, targetLeafIds, modelNames, round, completedResults.size
+            btStates, pairStatsMap, targetLeafIds, modelNames, round, completedResults.size, nodeToQueries
         )) {
             if (targetNodes.isEmpty()) break
 
@@ -398,6 +400,7 @@ class TaxonomyBenchmarkService(
                             ?: domainEvaluations.maxByOrNull { it.confidence }
                             ?: return@mapNotNull null
                         val satisfiesGate = rawPrimaryEval.confidence >= req.confidenceGate
+                            || rawPrimaryEval.tieSource == "POSITION_FLIP"  // flips always pass — they carry tie signal
 
                         val primaryEval = if (satisfiesGate) {
                             rawPrimaryEval
@@ -409,26 +412,30 @@ class TaxonomyBenchmarkService(
                         if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
                             val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
                             val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
-                            rankingService.recordMatch(
-                                query = cacheKey,
-                                domain = domainName,
-                                winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
-                                loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
-                                isTie = isTie,
-                                confidence = primaryEval.confidence,
-                                snapshotId = snapshotId,
-                                modelA = task.modelA,
-                                modelB = task.modelB
-                            )
+                            withContext(dbWriteDispatcher) {
+                                rankingService.recordMatch(
+                                    query = cacheKey,
+                                    domain = domainName,
+                                    winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
+                                    loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
+                                    isTie = isTie,
+                                    confidence = primaryEval.confidence,
+                                    snapshotId = snapshotId,
+                                    modelA = task.modelA,
+                                    modelB = task.modelB
+                                )
+                            }
                         }
 
-                        propagateOutcome(
-                            leafId = leafNode.id,
-                            modelA = task.modelA,
-                            modelB = task.modelB,
-                            outcome = primaryEval,
-                            snapshotId = snapshotId
-                        )
+                        withContext(dbWriteDispatcher) {
+                            propagateOutcome(
+                                leafId = leafNode.id,
+                                modelA = task.modelA,
+                                modelB = task.modelB,
+                                outcome = primaryEval,
+                                snapshotId = snapshotId
+                            )
+                        }
 
                         val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
                         val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
@@ -485,24 +492,26 @@ class TaxonomyBenchmarkService(
             }.toSet()
             log.trace("Round $round - dirtyNodes: $dirtyNodes")
 
-            for (nodeId in dirtyNodes) {
-                val nodePairs = rankingService.getNodePairStats(nodeId, snapshotId)
-                log.trace("Round $round - updated nodePairs for $nodeId: ${nodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
-                pairStatsMap[nodeId] = nodePairs.toMutableList()
+            withContext(dbWriteDispatcher) {
+                for (nodeId in dirtyNodes) {
+                    val nodePairs = rankingService.getNodePairStats(nodeId, snapshotId)
+                    log.trace("Round $round - updated nodePairs for $nodeId: ${nodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
+                    pairStatsMap[nodeId] = nodePairs.toMutableList()
 
-                if (nodePairs.isNotEmpty()) {
-                    val scores = BtMmFitter.fit(modelNames, nodePairs)
-                    val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
-                    val state = NodeBtState(
-                        nodeId = nodeId,
-                        btScores = scores,
-                        stdErrors = stdErrors,
-                        fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
-                        totalComparisons = nodePairs.sumOf { it.totalComparisons },
-                        lastFitAt = System.currentTimeMillis()
-                    )
-                    rankingService.saveBtState(state, snapshotId)
-                    btStates[nodeId] = state
+                    if (nodePairs.isNotEmpty()) {
+                        val scores = BtMmFitter.fit(modelNames, nodePairs)
+                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
+                        val state = NodeBtState(
+                            nodeId = nodeId,
+                            btScores = scores,
+                            stdErrors = stdErrors,
+                            fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
+                            totalComparisons = nodePairs.sumOf { it.totalComparisons },
+                            lastFitAt = System.currentTimeMillis()
+                        )
+                        rankingService.saveBtState(state, snapshotId)
+                        btStates[nodeId] = state
+                    }
                 }
             }
 
