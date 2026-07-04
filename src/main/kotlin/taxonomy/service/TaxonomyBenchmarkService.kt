@@ -164,6 +164,13 @@ class TaxonomyBenchmarkService(
         )
 
         val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
+        if (req.updateRankings) {
+            val savedOffsets = rankingService.getPairQueryOffsets(snapshotId)
+            if (savedOffsets.isNotEmpty()) {
+                scheduler.loadOffsets(savedOffsets)
+                log.info("Loaded ${savedOffsets.size} saved pair query offsets for snapshot '$snapshotId' to resume benchmark.")
+            }
+        }
         val btStates = mutableMapOf<String, NodeBtState>()
         val pairStatsMap = mutableMapOf<String, MutableList<NodePairStats>>()
 
@@ -200,7 +207,7 @@ class TaxonomyBenchmarkService(
             pairStats = pairStatsMap, models = modelNames, maxNodes = 100
         )
 
-        var round = 0
+        var round = btStates.values.map { it.fitVersion }.maxOrNull() ?: 0
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
         val completedAtStartOfRound = java.util.concurrent.atomic.AtomicInteger(0)
 
@@ -331,7 +338,9 @@ class TaxonomyBenchmarkService(
         }
 
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
-            btStates, pairStatsMap, targetLeafIds, modelNames, round, completedResults.size, nodeToQueries
+            btStates, pairStatsMap, targetLeafIds, modelNames, round,
+            pairStatsMap.values.flatten().sumOf { it.totalComparisons },
+            nodeToQueries
         )) {
             completedAtStartOfRound.set(completedResults.size)
             // Re-select each round: converged leaves are excluded, uncertain ones are promoted
@@ -587,6 +596,10 @@ class TaxonomyBenchmarkService(
                         rankingService.saveBtState(state, snapshotId)
                         btStates[nodeId] = state
                     }
+                }
+                if (req.updateRankings) {
+                    rankingService.savePairQueryOffsets(scheduler.getOffsets(), snapshotId)
+                    log.debug("Round $round - saved ${scheduler.getOffsets().size} pair query offsets for snapshot '$snapshotId'")
                 }
             }
 

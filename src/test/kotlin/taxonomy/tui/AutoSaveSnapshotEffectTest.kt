@@ -68,6 +68,8 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override fun inspectNode(node: GraphNode?) {}
     override fun setAnalysisMode(mode: AnalysisMode) {}
     override fun toggleDomain(domainName: String) {}
+    override fun selectAllDomains() {}
+    override fun clearAllDomains() {}
     override fun applySetting(name: String, value: String): Boolean = false
     override fun resetBenchmarkReport() {}
     override fun clearLeaderboard() {}

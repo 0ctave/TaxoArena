@@ -51,9 +51,53 @@ class ModelEvalStore(
 
     private val dbUrl = "jdbc:sqlite:$dbPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
-    private fun conn(): Connection = DriverManager.getConnection(dbUrl).also { it.autoCommit = true }
+    private val isTest = System.getProperty("org.gradle.test.worker") != null ||
+            System.getProperty("java.class.path")?.contains("junit") == true
 
-    init { initSchema() }
+    private val dbLock = Any()
+    private val sharedConnection: Connection by lazy {
+        DriverManager.getConnection(dbUrl).also { it.autoCommit = true }
+    }
+
+    private fun conn(): Connection {
+        if (isTest) {
+            return DriverManager.getConnection(dbUrl).also { it.autoCommit = true }
+        }
+        return java.lang.reflect.Proxy.newProxyInstance(
+            Connection::class.java.classLoader,
+            arrayOf(Connection::class.java)
+        ) { _, method, args ->
+            if (method.name == "close") {
+                null
+            } else {
+                synchronized(dbLock) {
+                    try {
+                        method.invoke(sharedConnection, *(args ?: emptyArray()))
+                    } catch (e: java.lang.reflect.InvocationTargetException) {
+                        throw e.cause ?: e
+                    }
+                }
+            }
+        } as Connection
+    }
+
+    init {
+        initSchema()
+        if (!isTest) {
+            try {
+                Runtime.getRuntime().addShutdownHook(Thread {
+                    runCatching {
+                        synchronized(dbLock) {
+                            if (!sharedConnection.isClosed) {
+                                sharedConnection.close()
+                                log.info("SQLite evaluation store database connection closed cleanly via shutdown hook.")
+                            }
+                        }
+                    }
+                })
+            } catch (_: Exception) {}
+        }
+    }
 
     // ─── Schema ──────────────────────────────────────────────────────────────
 

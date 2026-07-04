@@ -2,11 +2,13 @@ package taxonomy.tui.state
 
 data class ConfigUiState(
     val activeSubPanel: ConfigSubPanel = ConfigSubPanel.DOMAINS,
+    val isPickingDomains: Boolean = false,
 
     val selectedDomainIdx: Int = 0,
     val domainScrollOffset: Int = 0,
 
     val selectedSettingIdx: Int = 0,
+    val settingScrollOffset: Int = 0,
     val isEditingSetting: Boolean = false,
     val editingValue: String = "",
 

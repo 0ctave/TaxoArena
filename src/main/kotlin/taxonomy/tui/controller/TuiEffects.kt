@@ -57,6 +57,8 @@ interface TuiEffects {
 
     /** Toggle a dataset domain on/off, then refresh the settings view. */
     fun toggleDomain(domainName: String, dispatch: (TuiEvent) -> Unit)
+    fun selectAllDomains(dispatch: (TuiEvent) -> Unit)
+    fun clearAllDomains(dispatch: (TuiEvent) -> Unit)
     /** Apply a setting value by item name (instant toggle or confirmed editor), then refresh. */
     fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit)
     fun resetBenchmarkReport()
@@ -389,6 +391,16 @@ class DefaultTuiEffects(
         dispatch(TuiEvent.IncrementSettingsVersion)
     }
 
+    override fun selectAllDomains(dispatch: (TuiEvent) -> Unit) {
+        gateway.selectAllDomains()
+        dispatch(TuiEvent.IncrementSettingsVersion)
+    }
+
+    override fun clearAllDomains(dispatch: (TuiEvent) -> Unit) {
+        gateway.clearAllDomains()
+        dispatch(TuiEvent.IncrementSettingsVersion)
+    }
+
     override fun applySetting(name: String, value: String, dispatch: (TuiEvent) -> Unit) {
         gateway.applySetting(name, value)
         dispatch(TuiEvent.IncrementSettingsVersion)
@@ -447,6 +459,8 @@ interface TuiGateway {
     fun setAnalysisMode(mode: AnalysisMode)
 
     fun toggleDomain(domainName: String)
+    fun selectAllDomains()
+    fun clearAllDomains()
     fun applySetting(name: String, value: String): Boolean
     fun resetBenchmarkReport()
     fun clearLeaderboard()

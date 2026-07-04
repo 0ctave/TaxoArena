@@ -98,6 +98,10 @@ sealed interface TuiEvent {
     data class SetSelectedSettingIdx(val index: Int) : TuiEvent
     /** Toggle a dataset domain on/off (Space/Enter in the DOMAINS panel). */
     data class ToggleSelectedDomain(val domainName: String) : TuiEvent
+    data object SelectAllDomains : TuiEvent
+    data object ClearAllDomains : TuiEvent
+    data object StartPickingDomains : TuiEvent
+    data object ClosePickingDomains : TuiEvent
     /** Space/Enter on a setting: instant toggle/cycle, or open the editor pre-filled. */
     data object ActivateSelectedSetting : TuiEvent
     data class StartEditingSetting(val initialValue: String = "") : TuiEvent

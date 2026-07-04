@@ -30,6 +30,8 @@ class BtMatchScheduler(
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
     fun reset() { pairQueryOffsets.clear() }
+    fun loadOffsets(offsets: Map<String, Int>) { pairQueryOffsets.putAll(offsets) }
+    fun getOffsets(): Map<String, Int> = pairQueryOffsets.toMap()
 
     private fun isMatchInformative(
         mA: String, mB: String,

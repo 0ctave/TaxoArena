@@ -239,10 +239,59 @@ class TaxonomySnapshotManager(
         "jdbc:sqlite:snapshots.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
     }
 
-    private val connection: java.sql.Connection
-        get() = java.sql.DriverManager.getConnection(dbUrl).also { conn ->
+    private val isTest = System.getProperty("org.gradle.test.worker") != null ||
+            System.getProperty("java.class.path")?.contains("junit") == true
+
+    private val dbLock = Any()
+    private val sharedConnection: java.sql.Connection by lazy {
+        java.sql.DriverManager.getConnection(dbUrl).also { conn ->
             conn.autoCommit = true
         }
+    }
+
+    private val connection: java.sql.Connection
+        get() {
+            if (isTest) {
+                return java.sql.DriverManager.getConnection(dbUrl).also { conn ->
+                    conn.autoCommit = true
+                }
+            }
+            return java.lang.reflect.Proxy.newProxyInstance(
+                java.sql.Connection::class.java.classLoader,
+                arrayOf(java.sql.Connection::class.java)
+            ) { _, method, args ->
+                if (method.name == "close") {
+                    null
+                } else {
+                    synchronized(dbLock) {
+                        try {
+                            method.invoke(sharedConnection, *(args ?: emptyArray()))
+                        } catch (e: java.lang.reflect.InvocationTargetException) {
+                            throw e.cause ?: e
+                        }
+                    }
+                }
+            } as java.sql.Connection
+        }
+
+    init {
+        initDatabase()
+        migrateExistingJsonSnapshots()
+        if (!isTest) {
+            try {
+                Runtime.getRuntime().addShutdownHook(Thread {
+                    runCatching {
+                        synchronized(dbLock) {
+                            if (!sharedConnection.isClosed) {
+                                sharedConnection.close()
+                                log.info("SQLite snapshot database connection closed cleanly via shutdown hook.")
+                            }
+                        }
+                    }
+                })
+            } catch (_: Exception) {}
+        }
+    }
 
     /** Decode the embedded effective config, falling back to legacy [SnapshotSettings] for old rows. */
     private fun decodeConfig(configStr: String?, settings: SnapshotSettings): EffectiveConfig =
@@ -259,11 +308,6 @@ class TaxonomySnapshotManager(
     private fun readConfig(rs: java.sql.ResultSet, settings: SnapshotSettings): EffectiveConfig {
         val configStr = try { rs.getString("config") } catch (e: Exception) { null }
         return decodeConfig(configStr, settings)
-    }
-
-    init {
-        initDatabase()
-        migrateExistingJsonSnapshots()
     }
 
     private fun initDatabase() {

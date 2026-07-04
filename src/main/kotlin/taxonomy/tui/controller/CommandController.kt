@@ -63,9 +63,19 @@ class CommandController(
                 effects.toggleDomain(event.domainName, dispatch)
             }
 
+            TuiEvent.SelectAllDomains -> {
+                effects.selectAllDomains(dispatch)
+            }
+
+            TuiEvent.ClearAllDomains -> {
+                effects.clearAllDomains(dispatch)
+            }
+
             TuiEvent.ActivateSelectedSetting -> {
-                if (state.config.activeSubPanel == ConfigSubPanel.SETTINGS) {
-                    val item = selectedSetting(state) ?: return
+                val item = selectedSetting(state) ?: return
+                if (item.name == "Selected Domains") {
+                    dispatch(TuiEvent.StartPickingDomains)
+                } else {
                     val instantValue = item.nextValue()
                     if (item.isInstant && instantValue != null) {
                         // Boolean/Select: toggle/cycle in place, no text entry.
@@ -189,6 +199,7 @@ class CommandController(
             // Re-probe the on-disk dataset cache whenever the user enters the config screen, so
             // generation doesn't re-prompt for a download that's already present locally.
             TuiEvent.EnterConfigSetup -> {
+                effects.clearAllDomains(dispatch)
                 effects.refreshDatasetStatus(dispatch)
             }
 

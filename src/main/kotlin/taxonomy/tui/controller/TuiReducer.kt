@@ -37,18 +37,27 @@ object TuiReducer {
                     shell = state.shell.copy(helpOverlayOpen = !state.shell.helpOverlayOpen)
                 )
 
-            TuiEvent.CycleFocusForward ->
+            TuiEvent.CycleFocusForward -> {
+                val nextPanel = if (state.startup.state == StartupState.CONFIGANDDOMAINS) {
+                    when (state.shell.focusedPanel) {
+                        FocusPanel.CONFIG -> FocusPanel.SYSTEM_LOGS
+                        FocusPanel.SYSTEM_LOGS -> FocusPanel.PROCESSES
+                        FocusPanel.PROCESSES -> FocusPanel.CONFIG
+                        else -> FocusPanel.CONFIG
+                    }
+                } else {
+                    when (state.shell.focusedPanel) {
+                        FocusPanel.TOPOLOGY -> FocusPanel.ANALYSIS_HUB
+                        FocusPanel.ANALYSIS_HUB -> FocusPanel.SYSTEM_LOGS
+                        FocusPanel.SYSTEM_LOGS -> FocusPanel.PROCESSES
+                        FocusPanel.PROCESSES -> FocusPanel.TOPOLOGY
+                        else -> FocusPanel.TOPOLOGY
+                    }
+                }
                 state.copy(
-                    shell = state.shell.copy(
-                        focusedPanel = when (state.shell.focusedPanel) {
-                            FocusPanel.TOPOLOGY -> FocusPanel.ANALYSIS_HUB
-                            FocusPanel.ANALYSIS_HUB -> FocusPanel.SYSTEM_LOGS
-                            FocusPanel.SYSTEM_LOGS -> FocusPanel.PROCESSES
-                            FocusPanel.PROCESSES -> FocusPanel.TOPOLOGY
-                            FocusPanel.CONFIG -> FocusPanel.TOPOLOGY
-                        }
-                    )
+                    shell = state.shell.copy(focusedPanel = nextPanel)
                 )
+            }
 
             is TuiEvent.SetStartupState ->
                 state.copy(
@@ -71,8 +80,19 @@ object TuiReducer {
                     startup = state.startup.copy(state = StartupState.CONFIGANDDOMAINS),
                     config = state.config.copy(
                         activeSubPanel = ConfigSubPanel.DOMAINS,
+                        isPickingDomains = false,
                         selectedDomainIdx = 0,
-                        selectedSettingIdx = 0
+                        domainScrollOffset = 0,
+                        selectedSettingIdx = 0,
+                        settingScrollOffset = 0,
+                        isEditingSetting = false,
+                        editingValue = "",
+                        promptingDownloadCount = false,
+                        downloadCountInput = "",
+                        downloadingDataset = false,
+                        datasetDownloadProgress = 0f,
+                        datasetDownloadStatusText = "",
+                        settingsVersion = state.config.settingsVersion + 1
                     ),
                     shell = state.shell.copy(focusedPanel = FocusPanel.CONFIG)
                 )
@@ -117,6 +137,8 @@ object TuiReducer {
 
             // Side-effect-only config events (handled in CommandController).
             is TuiEvent.ToggleSelectedDomain,
+            TuiEvent.SelectAllDomains,
+            TuiEvent.ClearAllDomains,
             TuiEvent.ActivateSelectedSetting,
             is TuiEvent.ApplySetting ->
                 state
@@ -343,7 +365,7 @@ object TuiReducer {
                 val index = event.index.coerceAtLeast(0)
                 val bodyH = (state.shell.height - 5).coerceAtLeast(9)
                 val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
-                val visibleHeight = (topH - 3).coerceAtLeast(1)
+                val visibleHeight = (topH - 5).coerceAtLeast(1)
                 
                 val scrollMargin = 2
                 var currentOffset = state.config.domainScrollOffset
@@ -362,10 +384,52 @@ object TuiReducer {
                 )
             }
 
-            is TuiEvent.SetSelectedSettingIdx ->
+            is TuiEvent.SetSelectedSettingIdx -> {
+                val index = event.index.coerceAtLeast(0)
+                val bodyH = (state.shell.height - 5).coerceAtLeast(9)
+                val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
+                val visibleHeight = (topH - 5).coerceAtLeast(1)
+
+                val scrollMargin = 2
+                var currentOffset = state.config.settingScrollOffset
+
+                // Map settings item index (0..20) to renderRowIdx (0..25) containing category headers
+                val renderRowIdx = when (index) {
+                    in 0..4 -> index + 1
+                    in 5..8 -> index + 2
+                    in 9..13 -> index + 3
+                    in 14..16 -> index + 4
+                    in 17..20 -> index + 5
+                    else -> index
+                }
+
+                if (renderRowIdx < currentOffset + scrollMargin) {
+                    currentOffset = (renderRowIdx - scrollMargin).coerceAtLeast(0)
+                } else if (renderRowIdx >= currentOffset + visibleHeight - scrollMargin) {
+                    currentOffset = (renderRowIdx - visibleHeight + 1 + scrollMargin).coerceAtLeast(0)
+                }
+
                 state.copy(
                     config = state.config.copy(
-                        selectedSettingIdx = event.index.coerceAtLeast(0)
+                        selectedSettingIdx = index,
+                        settingScrollOffset = currentOffset
+                    )
+                )
+            }
+
+            TuiEvent.StartPickingDomains ->
+                state.copy(
+                    config = state.config.copy(
+                        isPickingDomains = true,
+                        selectedDomainIdx = 0,
+                        domainScrollOffset = 0
+                    )
+                )
+
+            TuiEvent.ClosePickingDomains ->
+                state.copy(
+                    config = state.config.copy(
+                        isPickingDomains = false
                     )
                 )
 

@@ -228,6 +228,15 @@ class TaxonomyRankingService {
                             PRIMARY KEY (snapshot_id, node_id)
                         )
                     """.trimIndent())
+
+                    stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS benchmark_query_offsets (
+                            snapshot_id TEXT NOT NULL,
+                            key_str TEXT NOT NULL,
+                            offset_val INTEGER NOT NULL,
+                            PRIMARY KEY (snapshot_id, key_str)
+                        )
+                    """.trimIndent())
                 }
 
                 // Migrate existing databases safely by adding new columns if they do not exist
@@ -957,6 +966,48 @@ data class AggregatedLeaderboard(
         val a5 = 1.061405429
         val ans = 1.0 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) * Math.exp(-z * z)
         return if (z >= 0) ans else -ans
+    }
+
+    fun savePairQueryOffsets(offsets: Map<String, Int>, snapshotId: String) {
+        synchronized(dbLock) {
+            try {
+                connection.prepareStatement("""
+                    INSERT OR REPLACE INTO benchmark_query_offsets (snapshot_id, key_str, offset_val)
+                    VALUES (?, ?, ?)
+                """).use { stmt ->
+                    offsets.forEach { (key, value) ->
+                        stmt.setString(1, snapshotId)
+                        stmt.setString(2, key)
+                        stmt.setInt(3, value)
+                        stmt.addBatch()
+                    }
+                    stmt.executeBatch()
+                }
+            } catch (e: java.sql.SQLException) {
+                log.error("Failed to save pair query offsets for snapshot $snapshotId", e)
+            }
+        }
+    }
+
+    fun getPairQueryOffsets(snapshotId: String): Map<String, Int> {
+        synchronized(dbLock) {
+            val result = mutableMapOf<String, Int>()
+            try {
+                connection.prepareStatement("""
+                    SELECT key_str, offset_val FROM benchmark_query_offsets WHERE snapshot_id = ?
+                """).use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    stmt.executeQuery().use { rs ->
+                        while (rs.next()) {
+                            result[rs.getString("key_str")] = rs.getInt("offset_val")
+                        }
+                    }
+                }
+            } catch (e: java.sql.SQLException) {
+                log.error("Failed to load pair query offsets for snapshot $snapshotId", e)
+            }
+            return result
+        }
     }
 }
 

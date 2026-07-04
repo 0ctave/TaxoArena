@@ -48,55 +48,56 @@ internal class ConfigKeyHandler(
             return
         }
 
-        when (key) {
-            "tab" -> {
-                val next = if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS)
-                    ConfigSubPanel.SETTINGS else ConfigSubPanel.DOMAINS
-                dispatch(TuiEvent.SetConfigSubPanel(next))
-            }
-
-            "w", "z", "arrowup" -> {
-                if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) {
+        if (state.config.isPickingDomains) {
+            when (key) {
+                "w", "z", "arrowup" -> {
                     dispatch(TuiEvent.SetSelectedDomainIdx((state.config.selectedDomainIdx - 1).coerceAtLeast(0)))
-                } else {
-                    dispatch(TuiEvent.SetSelectedSettingIdx((state.config.selectedSettingIdx - 1).coerceAtLeast(0)))
                 }
-            }
-
-            "s", "arrowdown" -> {
-                if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) {
+                "s", "arrowdown" -> {
                     val domains = availableDomainsProvider()
                     val maxIdx = (domains.size - 1).coerceAtLeast(0)
                     dispatch(TuiEvent.SetSelectedDomainIdx((state.config.selectedDomainIdx + 1).coerceAtMost(maxIdx)))
-                } else {
-                    val items = settingItemsProvider()
-                    val maxIdx = (items.size - 1).coerceAtLeast(0)
-                    dispatch(TuiEvent.SetSelectedSettingIdx((state.config.selectedSettingIdx + 1).coerceAtMost(maxIdx)))
                 }
-            }
-
-            "enter", " ", "space" -> {
-                if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) {
+                " ", "space" -> {
                     val domains = availableDomainsProvider()
                     domains.getOrNull(state.config.selectedDomainIdx)?.let { (name, _) ->
                         dispatch(TuiEvent.ToggleSelectedDomain(name))
                     }
-                } else {
-                    dispatch(TuiEvent.ActivateSelectedSetting)
+                }
+                "a" -> {
+                    dispatch(TuiEvent.SelectAllDomains)
+                }
+                "c" -> {
+                    dispatch(TuiEvent.ClearAllDomains)
+                }
+                "enter", "escape", "q" -> {
+                    dispatch(TuiEvent.ClosePickingDomains)
                 }
             }
-
-            "d" -> dispatch(TuiEvent.PromptDatasetDownload)
-
-            "r" -> when {
-                state.runtime.isRegenerating    -> Unit
-                state.runtime.isDatasetDownloaded -> dispatch(TuiEvent.StartGeneration)
-                else                             -> dispatch(TuiEvent.PromptDatasetDownload)
+        } else {
+            when (key) {
+                "w", "z", "arrowup" -> {
+                    dispatch(TuiEvent.SetSelectedSettingIdx((state.config.selectedSettingIdx - 1).coerceAtLeast(0)))
+                }
+                "s", "arrowdown" -> {
+                    val items = settingItemsProvider()
+                    val maxIdx = (items.size - 1).coerceAtLeast(0)
+                    dispatch(TuiEvent.SetSelectedSettingIdx((state.config.selectedSettingIdx + 1).coerceAtMost(maxIdx)))
+                }
+                "tab" -> {
+                    dispatch(TuiEvent.CycleFocusForward)
+                }
+                "enter", " ", "space" -> {
+                    dispatch(TuiEvent.ActivateSelectedSetting)
+                }
+                "d" -> dispatch(TuiEvent.PromptDatasetDownload)
+                "r" -> when {
+                    state.runtime.isRegenerating    -> Unit
+                    state.runtime.isDatasetDownloaded -> dispatch(TuiEvent.StartGeneration)
+                    else                             -> dispatch(TuiEvent.PromptDatasetDownload)
+                }
+                "escape", "q" -> dispatch(TuiEvent.ReturnToWelcome)
             }
-
-            "arrowdown", "arrowright" -> dispatch(TuiEvent.FocusPanelRequested(FocusPanel.SYSTEM_LOGS))
-
-            "escape", "q" -> dispatch(TuiEvent.ReturnToWelcome)
         }
     }
 

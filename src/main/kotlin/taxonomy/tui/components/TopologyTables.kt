@@ -38,8 +38,6 @@ fun DomainSelectorTable(
         }
         return
     }
-    val allSelected = selectedDomains.isEmpty()
-
     ScrollablePanelContent(
         pWidth = pWidth,
         pHeight = pHeight,
@@ -51,7 +49,7 @@ fun DomainSelectorTable(
         val end = (startIdx + visibleHeight).coerceAtMost(domains.size)
         for (i in startIdx until end) {
             val (name, count) = domains[i]
-            val checked = allSelected || selectedDomains.contains(name)
+            val checked = selectedDomains.contains(name)
             val selected = i == selectedIdx
             val mark = checkboxMark(checked)
             val caret = if (selected) "\u276f " else "  "      // ❯

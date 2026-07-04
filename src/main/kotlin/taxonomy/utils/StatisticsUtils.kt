@@ -208,13 +208,18 @@ object StatisticsUtils {
      * Mathematically identical to calculateDasguptaDelta for k=2.
      */
     fun calculateDasguptaDeltaK(clusters: List<List<DoubleArray>>): Double {
-        val allPts = clusters.flatten()
-        val n = allPts.size.toDouble()
+        val n = clusters.sumOf { it.size }.toDouble()
         if (n < 2.0 || clusters.isEmpty()) return 0.0
-        val d = allPts[0].size
+        val d = clusters.firstOrNull { it.isNotEmpty() }?.firstOrNull()?.size ?: return 0.0
 
         val sumTotal = DoubleArray(d)
-        for (v in allPts) for (i in 0 until d) sumTotal[i] += v[i]
+        for (cluster in clusters) {
+            for (v in cluster) {
+                for (i in 0 until d) {
+                    sumTotal[i] += v[i]
+                }
+            }
+        }
         var normTotal2 = 0.0
         for (i in 0 until d) normTotal2 += sumTotal[i] * sumTotal[i]
         val wTotal = n * n - normTotal2
@@ -225,7 +230,11 @@ object StatisticsUtils {
             val nc = cluster.size.toDouble()
             if (nc == 0.0) continue
             val sumC = DoubleArray(d)
-            for (v in cluster) for (i in 0 until d) sumC[i] += v[i]
+            for (v in cluster) {
+                for (i in 0 until d) {
+                    sumC[i] += v[i]
+                }
+            }
             var normC2 = 0.0
             for (i in 0 until d) normC2 += sumC[i] * sumC[i]
             val wC = nc * nc - normC2
@@ -331,7 +340,7 @@ object StatisticsUtils {
         if (n < k) return null
 
         // ── k-means++ initialization ──────────────────────────────────────────
-        val mus = mutableListOf<DoubleArray>()
+        val mus = Array(k) { DoubleArray(d) }
 
         // mu_1 = normalized centroid
         val centroid = DoubleArray(d)
@@ -339,17 +348,18 @@ object StatisticsUtils {
         var cNorm = 0.0
         for (i in 0 until d) cNorm += centroid[i] * centroid[i]
         cNorm = sqrt(cNorm)
-        mus.add(DoubleArray(d) { if (cNorm > 0.0) centroid[it] / cNorm else 0.0 })
+        mus[0] = DoubleArray(d) { if (cNorm > 0.0) centroid[it] / cNorm else 0.0 }
 
         // mu_2..k = maximin cosine distance from all existing centers
-        repeat(k - 1) {
+        for (c in 1 until k) {
             var bestScore = -Double.MAX_VALUE
             var bestIdx = 0
             for (idx in embeddings.indices) {
                 val x = embeddings[idx]
                 // Minimum cosine distance to any existing center
                 var minDist = Double.MAX_VALUE
-                for (mu in mus) {
+                for (prev in 0 until c) {
+                    val mu = mus[prev]
                     var dot = 0.0
                     for (i in 0 until d) dot += mu[i] * x[i]
                     val dist = 1.0 - dot.coerceIn(-1.0, 1.0)   // cosine distance ∈ [0, 2]
@@ -360,13 +370,13 @@ object StatisticsUtils {
                     bestIdx = idx
                 }
             }
-            mus.add(embeddings[bestIdx].copyOf())
+            mus[c] = embeddings[bestIdx].copyOf()
         }
 
         // ── EM ───────────────────────────────────────────────────────────────
-        val kappas   = MutableList(k) { 10.0 }
-        val logNorms = MutableList(k) { logVmfNormalizer(d, 10.0) }
-        val pis      = MutableList(k) { 1.0 / k }
+        val kappas   = DoubleArray(k) { 10.0 }
+        val logNorms = DoubleArray(k) { logVmfNormalizer(d, 10.0) }
+        val pis      = DoubleArray(k) { 1.0 / k }
 
         // responsibilities[i][c]
         val R = Array(n) { DoubleArray(k) }
@@ -434,7 +444,7 @@ object StatisticsUtils {
         }
         val responsibilities = (0 until n).map { i -> R[i].copyOf() }
 
-        return VmfMixture(pis.toDoubleArray(), components, responsibilities)
+        return VmfMixture(pis, components, responsibilities)
     }
 
     /**

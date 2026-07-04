@@ -42,13 +42,57 @@ class MMLUDatasetFetcher(
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
     private val dbUrl = "jdbc:sqlite:mmlu_pro_dataset_cache_v2.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
 
-    private val connection: java.sql.Connection
-        get() = DriverManager.getConnection(dbUrl).also { conn ->
+    private val isTest = System.getProperty("org.gradle.test.worker") != null ||
+            System.getProperty("java.class.path")?.contains("junit") == true
+
+    private val dbLock = Any()
+    private val sharedConnection: java.sql.Connection by lazy {
+        DriverManager.getConnection(dbUrl).also { conn ->
             conn.autoCommit = true
+        }
+    }
+
+    private val connection: java.sql.Connection
+        get() {
+            if (isTest) {
+                return DriverManager.getConnection(dbUrl).also { conn ->
+                    conn.autoCommit = true
+                }
+            }
+            return java.lang.reflect.Proxy.newProxyInstance(
+                java.sql.Connection::class.java.classLoader,
+                arrayOf(java.sql.Connection::class.java)
+            ) { _, method, args ->
+                if (method.name == "close") {
+                    null
+                } else {
+                    synchronized(dbLock) {
+                        try {
+                            method.invoke(sharedConnection, *(args ?: emptyArray()))
+                        } catch (e: java.lang.reflect.InvocationTargetException) {
+                            throw e.cause ?: e
+                        }
+                    }
+                }
+            } as java.sql.Connection
         }
 
     init {
         initDatabase()
+        if (!isTest) {
+            try {
+                Runtime.getRuntime().addShutdownHook(Thread {
+                    runCatching {
+                        synchronized(dbLock) {
+                            if (!sharedConnection.isClosed) {
+                                sharedConnection.close()
+                                log.info("SQLite dataset fetcher database connection closed cleanly via shutdown hook.")
+                            }
+                        }
+                    }
+                })
+            } catch (_: Exception) {}
+        }
     }
 
     private fun initDatabase() {

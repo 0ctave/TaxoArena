@@ -253,9 +253,9 @@ class TaxonomyTuiService(
                                     onQuit = {
                                         // Raw-mode terminals deliver Ctrl-C as a key, not SIGINT,
                                         // so quitting is driven explicitly: restore the screen and
-                                        // stop the JVM hard so we never hang in the alt-screen.
+                                        // stop the JVM cleanly so we never hang in the alt-screen.
                                         restoreTerminal()
-                                        Runtime.getRuntime().halt(0)
+                                        System.exit(0)
                                     },
                                 )
                             }
@@ -296,7 +296,7 @@ class TaxonomyTuiService(
             runCatching { Runtime.getRuntime().removeShutdownHook(shutdownHook) }
             // Exit the JVM so quitting the TUI fully stops the process.
             if (System.getProperty("org.gradle.test.worker") == null) {
-                Runtime.getRuntime().halt(0)
+                System.exit(0)
             }
         }
     }

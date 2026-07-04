@@ -57,34 +57,6 @@ class TuiConfigFacade(
             kind = SettingKind.NUMBER
         ),
         SettingItem(
-            name = "Split Dataset",
-            description = "Whether to split dataset into train/test",
-            category = "Dataset Settings",
-            getValue = { deps.config.dataset.splitDataset.toString() },
-            setValue = { s -> s.lowercase().toBooleanStrictOrNull()?.let { deps.config.dataset.splitDataset = it; true } ?: false },
-            kind = SettingKind.BOOLEAN
-        ),
-        SettingItem(
-            name = "Test Split Ratio",
-            description = "Ratio of reserved test queries",
-            category = "Dataset Settings",
-            getValue = { deps.config.dataset.testSplitRatio.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.dataset.testSplitRatio = it; true } ?: false },
-            kind = SettingKind.NUMBER
-        ),
-        SettingItem(
-            name = "Selected Domains",
-            description = "Comma-separated domains (use the DOMAINS panel to toggle)",
-            category = "Dataset Settings",
-            getValue = { deps.config.dataset.selectedDomains.joinToString(", ").ifBlank { "(all)" } },
-            setValue = { s ->
-                deps.config.dataset.selectedDomains =
-                    s.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                true
-            },
-            kind = SettingKind.TEXT
-        ),
-        SettingItem(
             name = "Dataset Type",
             description = "Active dataset to run",
             category = "Dataset Settings",
@@ -105,9 +77,36 @@ class TuiConfigFacade(
             options = DatasetType.entries.map { it.name }
         ),
         SettingItem(
+            name = "Selected Domains",
+            description = "Click/Enter to select which domains to generate",
+            category = "Dataset Settings",
+            getValue = {
+                val size = deps.config.dataset.selectedDomains.size
+                if (size == 0) "All domains selected" else "$size domains selected (${deps.config.dataset.selectedDomains.joinToString(", ")})"
+            },
+            setValue = { _ -> true },
+            kind = SettingKind.TEXT
+        ),
+        SettingItem(
+            name = "Split Dataset",
+            description = "Whether to split dataset into train/test",
+            category = "Dataset Settings",
+            getValue = { deps.config.dataset.splitDataset.toString() },
+            setValue = { s -> s.lowercase().toBooleanStrictOrNull()?.let { deps.config.dataset.splitDataset = it; true } ?: false },
+            kind = SettingKind.BOOLEAN
+        ),
+        SettingItem(
+            name = "Test Split Ratio",
+            description = "Ratio of reserved test queries",
+            category = "Dataset Settings",
+            getValue = { deps.config.dataset.testSplitRatio.toString() },
+            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.dataset.testSplitRatio = it; true } ?: false },
+            kind = SettingKind.NUMBER
+        ),
+        SettingItem(
             name = "LLM Provider",
             description = "Source for LLM model",
-            category = "LLM Model Settings",
+            category = "LLM & Embedding Models",
             getValue = { deps.config.llm.provider.name },
             setValue = { s ->
                 try {
@@ -121,9 +120,25 @@ class TuiConfigFacade(
             options = LlmProviderType.entries.map { it.name }
         ),
         SettingItem(
+            name = "Labeling Model",
+            description = "Node labeling model",
+            category = "LLM & Embedding Models",
+            getValue = { deps.config.llm.labelingModel },
+            setValue = { s -> if (s.isNotBlank()) { deps.config.llm.labelingModel = s; true } else false },
+            kind = SettingKind.TEXT
+        ),
+        SettingItem(
+            name = "Expert Judge Model",
+            description = "Pairwise judge model",
+            category = "LLM & Embedding Models",
+            getValue = { deps.config.llm.judgeModel },
+            setValue = { s -> if (s.isNotBlank()) { deps.config.llm.judgeModel = s; true } else false },
+            kind = SettingKind.TEXT
+        ),
+        SettingItem(
             name = "Embedding Provider",
             description = "Source for embedding model",
-            category = "LLM Model Settings",
+            category = "LLM & Embedding Models",
             getValue = { deps.config.llm.embeddingProvider.name },
             setValue = { s ->
                 try {
@@ -139,52 +154,15 @@ class TuiConfigFacade(
         SettingItem(
             name = "Embedding Model",
             description = "Embedding model name",
-            category = "LLM Model Settings",
+            category = "LLM & Embedding Models",
             getValue = { deps.config.llm.embeddingModel },
             setValue = { s -> if (s.isNotBlank()) { deps.config.llm.embeddingModel = s; true } else false },
             kind = SettingKind.TEXT
         ),
         SettingItem(
-            name = "Labeling Model",
-            description = "Node labeling model",
-            category = "LLM Model Settings",
-            getValue = { deps.config.llm.labelingModel },
-            setValue = { s -> if (s.isNotBlank()) { deps.config.llm.labelingModel = s; true } else false },
-            kind = SettingKind.TEXT
-        ),
-        SettingItem(
-            name = "Expert Judge Model",
-            description = "Pairwise judge model",
-            category = "LLM Model Settings",
-            getValue = { deps.config.llm.judgeModel },
-            setValue = { s -> if (s.isNotBlank()) { deps.config.llm.judgeModel = s; true } else false },
-            kind = SettingKind.TEXT
-        ),
-        SettingItem(
-            name = "Max Judge Generality",
-            description = "Judge induction scope (0=leaves, 1=+parents, 2=+grandparents)",
-            category = "LLM Model Settings",
-            getValue = { deps.config.llm.maxJudgeGenerality.toString() },
-            setValue = { s -> s.toIntOrNull()?.let { deps.config.llm.maxJudgeGenerality = it; true } ?: false },
-            kind = SettingKind.SELECT,
-            options = listOf("0", "1", "2")
-        ),
-        SettingItem(
-            name = "Judge Domains",
-            description = "Comma-separated domains to generate judges on (empty = all)",
-            category = "LLM Model Settings",
-            getValue = { deps.config.llm.judgeDomains.joinToString(", ").ifBlank { "(all)" } },
-            setValue = { s ->
-                deps.config.llm.judgeDomains =
-                    s.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                true
-            },
-            kind = SettingKind.TEXT
-        ),
-        SettingItem(
             name = "Max Hierarchy Depth",
             description = "Maximum DAG depth",
-            category = "Mathematical Formalism",
+            category = "Taxonomy Geometry",
             getValue = { deps.config.formalism.maxDepth.toString() },
             setValue = { s -> s.toIntOrNull()?.let { deps.config.formalism.maxDepth = it; true } ?: false },
             kind = SettingKind.NUMBER
@@ -192,15 +170,24 @@ class TuiConfigFacade(
         SettingItem(
             name = "Min Cluster Size",
             description = "Minimum split size",
-            category = "Mathematical Formalism",
+            category = "Taxonomy Geometry",
             getValue = { deps.config.formalism.minClusterSize.toString() },
             setValue = { s -> s.toIntOrNull()?.let { deps.config.formalism.minClusterSize = it; true } ?: false },
             kind = SettingKind.NUMBER
         ),
         SettingItem(
+            name = "Max Judge Generality",
+            description = "Judge induction scope (0=leaves, 1=+parents, 2=+grandparents)",
+            category = "Taxonomy Geometry",
+            getValue = { deps.config.llm.maxJudgeGenerality.toString() },
+            setValue = { s -> s.toIntOrNull()?.let { deps.config.llm.maxJudgeGenerality = it; true } ?: false },
+            kind = SettingKind.SELECT,
+            options = listOf("0", "1", "2")
+        ),
+        SettingItem(
             name = "Separation Epsilon",
             description = "Geometric distinctness threshold",
-            category = "Mathematical Formalism",
+            category = "Clustering & Routing (VMF)",
             getValue = { deps.config.formalism.separationEpsilon.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.separationEpsilon = it; true } ?: false },
             kind = SettingKind.NUMBER
@@ -208,7 +195,7 @@ class TuiConfigFacade(
         SettingItem(
             name = "Cosine Tau",
             description = "Cosine routing temperature",
-            category = "Mathematical Formalism",
+            category = "Clustering & Routing (VMF)",
             getValue = { deps.config.formalism.cosineTau.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.cosineTau = it; true } ?: false },
             kind = SettingKind.NUMBER
@@ -216,7 +203,7 @@ class TuiConfigFacade(
         SettingItem(
             name = "Assignment Gap",
             description = "Maximum leaf assignments",
-            category = "Mathematical Formalism",
+            category = "Clustering & Routing (VMF)",
             getValue = { deps.config.formalism.assignmentGap.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.assignmentGap = it; true } ?: false },
             kind = SettingKind.NUMBER
@@ -224,7 +211,7 @@ class TuiConfigFacade(
         SettingItem(
             name = "EMA Alpha",
             description = "Dynamic calibration factor",
-            category = "Mathematical Formalism",
+            category = "Clustering & Routing (VMF)",
             getValue = { deps.config.formalism.emaAlpha.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.emaAlpha = it; true } ?: false },
             kind = SettingKind.NUMBER
@@ -233,9 +220,9 @@ class TuiConfigFacade(
 
     fun getAvailableDomains(): List<Pair<String, Int>> = getAvailableDomains(false)
 
-    fun getAvailableDomains(reservedOnly: Boolean): List<Pair<String, Int>> {
+    fun getAvailableDomains(reservedOnly: Boolean = false, forceDataset: Boolean = false): List<Pair<String, Int>> {
         val root = deps.taxonomyService.getGraph()
-        if (root != null) {
+        if (root != null && !forceDataset) {
             val reservedTexts = if (reservedOnly) {
                 val file = java.io.File("reserved_test_queries.json")
                 if (file.exists()) {
@@ -280,16 +267,10 @@ class TuiConfigFacade(
         buildSettingItems().firstOrNull { it.name == name }?.setValue?.invoke(value) ?: false
 
     fun toggleDomain(domainName: String, availableDomains: List<Pair<String, Int>>) {
-        val current = if (deps.config.dataset.selectedDomains.isEmpty()) {
-            availableDomains.map { it.first }.toMutableList().apply { remove(domainName) }
-        } else {
-            deps.config.dataset.selectedDomains.toMutableList().apply {
-                if (contains(domainName)) remove(domainName) else add(domainName)
-            }
+        val current = deps.config.dataset.selectedDomains.toMutableList().apply {
+            if (contains(domainName)) remove(domainName) else add(domainName)
         }
-
-        deps.config.dataset.selectedDomains =
-            if (current.size == availableDomains.size) emptyList() else current
+        deps.config.dataset.selectedDomains = current
     }
 
     fun selectOnlyDomain(domainName: String) {

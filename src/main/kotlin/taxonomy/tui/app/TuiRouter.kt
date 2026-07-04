@@ -18,16 +18,18 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.model.GraphNode
 import taxonomy.tui.components.DomainSelectorTable
+import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.tui.components.buildTreeLines
 import taxonomy.tui.components.GlobalHotkeys
 import taxonomy.tui.components.HotkeyAction
 import taxonomy.tui.components.HotkeyBar
+import taxonomy.tui.components.SettingItem
+import taxonomy.tui.components.SettingKind
 import taxonomy.tui.components.HotkeyBarGrouped
 import taxonomy.tui.components.Panel
 import taxonomy.tui.components.ProcessRow
 import taxonomy.tui.components.ProcessesPanel
 import taxonomy.tui.components.ProgressBar
-import taxonomy.tui.components.SettingKind
 import taxonomy.tui.components.StartupState
 import taxonomy.tui.components.TuiTheme
 import taxonomy.tui.components.TuiTheme.SPINNER
@@ -214,6 +216,11 @@ private fun LoadingRoute(
     )
 }
 
+private sealed interface RenderableRow {
+    data class CategoryHeader(val title: String) : RenderableRow
+    data class Setting(val item: SettingItem, val idx: Int) : RenderableRow
+}
+
 @Composable
 private fun ConfigRoute(
     width: Int,
@@ -231,8 +238,20 @@ private fun ConfigRoute(
 
     val facade = remember(deps) { TuiConfigFacade(deps) }
     val settingItems = remember(state.config.settingsVersion) { facade.buildSettingItems() }
+    val renderableRows = remember(settingItems) {
+        buildList<RenderableRow> {
+            var lastCategory = ""
+            settingItems.forEachIndexed { idx, item ->
+                if (item.category != lastCategory) {
+                    lastCategory = item.category
+                    add(RenderableRow.CategoryHeader(lastCategory))
+                }
+                add(RenderableRow.Setting(item, idx))
+            }
+        }
+    }
     val availableDomains = remember(state.config.settingsVersion, state.runtime.availableDomainsVersion) {
-        facade.getAvailableDomains()
+        facade.getAvailableDomains(forceDataset = true)
     }
 
     if (state.config.promptingDownloadCount) {
@@ -296,16 +315,17 @@ private fun ConfigRoute(
             }
         }
     } else {
-        Row(modifier = Modifier.height(topH)) {
+        if (state.config.isPickingDomains) {
             Panel(
-                title = "DOMAINS",
-                accentColor = TuiTheme.panelAccent(state.config.activeSubPanel == ConfigSubPanel.DOMAINS),
-                width = leftW,
-                height = topH
+                title = "SELECT DOMAINS",
+                accentColor = TuiTheme.panelAccent(true),
+                width = width - 2,
+                height = topH,
+                contextHints = configHotkeys(state)
             ) {
                 DomainSelectorTable(
-                    pWidth = leftW - 4,
-                    pHeight = topH - 3,
+                    pWidth = width - 6,
+                    pHeight = topH - 5,
                     domains = availableDomains,
                     offset = state.config.domainScrollOffset,
                     selectedIdx = state.config.selectedDomainIdx,
@@ -313,44 +333,72 @@ private fun ConfigRoute(
                     dispatch = dispatch
                 )
             }
-            Spacer(Modifier.width(1).height(topH))
+        } else {
             Panel(
-                title = "SETTINGS",
-                accentColor = TuiTheme.panelAccent(state.config.activeSubPanel == ConfigSubPanel.SETTINGS),
-                width = rightW,
-                height = topH
+                title = "TAXONOMY EVOLUTION SETTINGS",
+                accentColor = TuiTheme.panelAccent(true),
+                width = width - 2,
+                height = topH,
+                contextHints = configHotkeys(state)
             ) {
-                Column(modifier = Modifier.padding(left = 2, top = 1)) {
-                    settingItems.forEachIndexed { idx, item ->
-                        val selected = idx == state.config.selectedSettingIdx
-                        val editing = selected && state.config.isEditingSetting
-                        val rendered = when {
-                            editing -> state.config.editingValue + "█"
-                            item.kind == SettingKind.BOOLEAN ->
-                                if (item.getValue().toBooleanStrictOrNull() == true) "${checkboxMark(true)} on" else "${checkboxMark(false)} off"
-                            item.kind == SettingKind.SELECT -> "‹ ${item.getValue()} ›"
-                            else -> item.getValue()
+                ScrollablePanelContent(
+                    pWidth = width - 6,
+                    pHeight = topH - 5,
+                    itemCount = renderableRows.size,
+                    scrollOffset = state.config.settingScrollOffset,
+                    hasPadding = false,
+                    onScrollClamp = { }
+                ) { visibleHeight, startIdx, contentWidth ->
+                    val end = (startIdx + visibleHeight).coerceAtMost(renderableRows.size)
+                    for (i in startIdx until end) {
+                        val row = renderableRows[i]
+                        when (row) {
+                            is RenderableRow.CategoryHeader -> {
+                                Text(
+                                    value = ("── " + row.title + " ──").take(contentWidth),
+                                    color = Cyan,
+                                    textStyle = Bold,
+                                    modifier = Modifier.height(1)
+                                )
+                            }
+                            is RenderableRow.Setting -> {
+                                val item = row.item
+                                val idx = row.idx
+                                val selected = idx == state.config.selectedSettingIdx
+                                val editing = selected && state.config.isEditingSetting
+                                val rendered = when {
+                                    editing -> state.config.editingValue + "█"
+                                    item.kind == SettingKind.BOOLEAN ->
+                                        if (item.getValue().toBooleanStrictOrNull() == true) "${checkboxMark(true)} on" else "${checkboxMark(false)} off"
+                                    item.kind == SettingKind.SELECT -> "‹ ${item.getValue()} ›"
+                                    else -> item.getValue()
+                                }
+                                val caret = if (selected) "❯ " else "  "
+                                val rowColor = when {
+                                    editing -> TuiTheme.RUNNING
+                                    selected -> TuiTheme.ACCENT
+                                    else -> TuiTheme.INFO
+                                }
+                                Text(
+                                    value = (caret + item.name + ": " + rendered).take(contentWidth),
+                                    color = rowColor,
+                                    textStyle = if (selected) Bold else Unspecified,
+                                    modifier = Modifier.height(1)
+                                )
+                            }
                         }
-                        val caret = if (selected) "❯ " else "  "
-                        val rowColor = when {
-                            editing -> TuiTheme.RUNNING
-                            selected -> TuiTheme.ACCENT
-                            else -> TuiTheme.INFO
-                        }
-                        Text(
-                            value = (caret + item.name + ": " + rendered).take(rightW - 4),
-                            color = rowColor,
-                            textStyle = if (selected) Bold else Unspecified
-                        )
+                    }
+                    val emptyRows = visibleHeight - (end - startIdx)
+                    repeat(emptyRows.coerceAtLeast(0)) {
+                        Text(" ".repeat(contentWidth), modifier = Modifier.height(1))
                     }
                 }
             }
         }
     }
 
-    Spacer()
-
     if (!state.runtime.isRegenerating && !state.config.promptingDownloadCount) {
+        Spacer(Modifier.height(1))
         BottomLogsAndTraces(width, bottomH, deps, state, dispatch = dispatch)
     }
 
@@ -539,7 +587,6 @@ private fun BottomLogsAndTraces(
         val procW = (width - logsW - 1).coerceAtLeast(16)
 
         val logsHints = if (state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS) listOf(
-            HotkeyAction("W/S", "Scroll"),
             HotkeyAction("Q", "Back to DAG", TuiTheme.ERROR),
         ) else emptyList()
         val logsBodyH = (bottomH - 2 - (if (logsHints.isNotEmpty()) 1 else 0)).coerceAtLeast(1)
@@ -699,10 +746,15 @@ private fun configHotkeys(state: TuiAppState): List<HotkeyAction> {
             HotkeyAction("Esc", "Cancel", TuiTheme.ERROR),
         )
     }
-    val inDomains = state.config.activeSubPanel == ConfigSubPanel.DOMAINS
+    val inDomains = state.config.isPickingDomains
     return buildList {
-        if (inDomains) add(HotkeyAction("Space", "Toggle Domain"))
-        else add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
+        if (inDomains) {
+            add(HotkeyAction("Space", "Toggle"))
+            add(HotkeyAction("A", "Select All"))
+            add(HotkeyAction("C", "Clear All"))
+        } else {
+            add(HotkeyAction("Enter", "Toggle/Cycle/Edit"))
+        }
         if (state.runtime.isDatasetDownloaded) {
             add(HotkeyAction("R", "Generate DAG", TuiTheme.OK, isPrimary = true))
         } else {
@@ -781,36 +833,35 @@ private fun deriveAnalysisHints(
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
             benchmarkType == BenchmarkType.ARENA -> {
-            when (benchmarkSubScreen) {
-                BenchmarkSubScreen.RESULTS -> listOf(
-                    HotkeyAction("▲/▼", "Scroll Lists", TuiTheme.INFO),
-                    HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
-                    HotkeyAction("Q", if (isRunningBenchmark) "Cancel" else "Back to Config", TuiTheme.ERROR),
-                )
-                BenchmarkSubScreen.CONFIG -> {
-                    if (isRunningBenchmark || hasBenchmarkReport) {
-                        listOf(
-                            HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
-                            HotkeyAction("O", "Load eval_results"),
-                            HotkeyAction("Q", "Back", TuiTheme.ERROR),
-                        )
-                    } else {
+                when (benchmarkSubScreen) {
+                    BenchmarkSubScreen.RESULTS -> listOf(
+                        HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+                        HotkeyAction("Q", if (isRunningBenchmark) "Cancel" else "Back to Config", TuiTheme.ERROR),
+                    )
+                    BenchmarkSubScreen.CONFIG -> {
+                        if (isRunningBenchmark || hasBenchmarkReport) {
+                            listOf(
+                                HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+                                HotkeyAction("O", "Load eval_results"),
+                                HotkeyAction("Q", "Back", TuiTheme.ERROR),
+                            )
+                        } else {
+                            listOf(
+                                HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
+                                HotkeyAction("Tab", "Next section"),
+                                HotkeyAction("O", "Load eval_results"),
+                                HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                            )
+                        }
+                    }
+                    else -> {
                         listOf(
                             HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
-                            HotkeyAction("Tab", "Next section"),
-                            HotkeyAction("O", "Load eval_results"),
                             HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
                         )
                     }
                 }
-                else -> {
-                    listOf(
-                        HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
-                        HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
-                    )
-                }
             }
-        }
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
             benchmarkType == BenchmarkType.TRICKLE -> listOf(
@@ -841,7 +892,6 @@ private fun deriveAnalysisHints(
         )
 
         analysisMode == taxonomy.service.AnalysisMode.LEADERBOARD -> listOf(
-            HotkeyAction("W/S", "Scroll"),
             HotkeyAction("K", "Clear Ratings", TuiTheme.ACCENT2),
             HotkeyAction("L/←/Q", "Back", TuiTheme.ERROR),
         )

@@ -1,6 +1,6 @@
 # Active Matchmaking & Information-Theoretic Scheduling
 
-This document details the scheduling and stopping algorithms used in **TaxoArena** to run efficient model evaluations. It formalizes matchmaking utility using binary entropy maximization, standard error scaling, and convergence policies.
+This document details the scheduling and stopping algorithms used in **TaxoArena** to run efficient model evaluations. It formalizes matchmaking utility using binary entropy maximization, KDE score-space valley detection, dual-maturity scheduling, and difficulty-weighted convergence.
 
 ---
 
@@ -12,72 +12,90 @@ $$ \text{Total Comparisons} = N \times \frac{M(M-1)}{2} $$
 
 As the number of models $M$ increases, this round-robin approach becomes computationally and financially prohibitive. Furthermore, evaluating pairs with highly divergent capabilities (e.g., a state-of-the-art model vs. a weak baseline) on every query yields no new information because the outcome is already certain.
 
-**TaxoArena** implements **Active Matchmaking**. The system schedules matches dynamically, targeting model pairs and taxonomy nodes with the highest rating uncertainty.
+**TaxoArena** implements **Active Matchmaking**. The system schedules matches dynamically, targeting model pairs and taxonomy nodes with the highest rating uncertainty, using a unified budget ceiling to prevent convergence deadlocks.
 
 ---
 
-## 2. Information-Theoretic Utility Optimization
+## 2. Pre-Arena Query Routing & Verdict Reuse
 
-Matchmaking is managed by [BtMatchScheduler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt). The scheduler evaluates the utility of comparing model $i$ and model $j$ at leaf node $L$ using binary entropy.
+To optimize judge call efficiency, TaxoArena decouples query routing from matchmaking evaluation:
 
-### Matchup Entropy
-Let $s_i, s_j$ be the current log-strength ratings of the models. The predicted probability of model $i$ winning is:
+1.  **Frozen Pre-Routing Pass**: Before the active matchmaking loop starts, all queries are routed to target leaves using the Von Mises-Fisher (vMF) projected similarity engine. The assignments are frozen in an inverse mapping `queryToLeaves: Map<QueryId, List<LeafId>>`.
+2.  **Verdict Propagation**: Sibling leaves frequently share boundary queries due to cross-links. When a judge verdict is computed for a query $q$ and model pair $(i, j)$ at leaf $L$, the outcome is automatically propagated to all sibling leaves in `queryToLeaves[q]`. This avoids duplicate LLM evaluations and reduces the total match budget by up to $10\%$.
 
-$$ P_{ij} = \frac{\exp(s_i)}{\exp(s_i) + \exp(s_j)} $$
+---
 
-The information entropy of the contest outcome is:
+## 3. Dual-Maturity Scheduling Utility
 
-$$ H(Y_{ij} \mid \hat{s}) = -P_{ij} \ln P_{ij} - (1.0 - P_{ij}) \ln(1.0 - P_{ij}) $$
+Matchmaking is managed by [BtMatchScheduler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt). Instead of purely optimizing rating uncertainty, the scheduler balances **global rank ordering** and **local rating resolution** via a composite utility:
 
-Entropy is maximized at $P_{ij} = 0.5$ (when ratings are identical, indicating maximum uncertainty) and approaches $0$ as $P_{ij} \to 0$ or $1.0$ (when one model is dominant).
-
-### Variance Scaling & Repetition Discount
-To prioritize pairs with high uncertainty and prevent over-sampling the same matchup, we scale the entropy by the sum of model rating variances and apply a repetition discount:
-
-$$ \text{Utility}(i, j) = \frac{H(Y_{ij} \mid \hat{s})}{SE_i^2 + SE_j^2} \times \left( 1.0 - 0.3 \times \frac{n_{ij}}{\text{budget}_{\text{pair}}} \right) $$
+$$ \text{Utility}(i, j, L) = \left( \alpha \cdot U_{\text{structure}}(i, j) + (1 - \alpha) \cdot U_{\text{resolve}}(i, j, L) \right) \times \left( 1.0 - 0.3 \times \frac{n_{ij}}{\text{budget}_{\text{pair}}} \right) $$
 
 where:
-*   $SE_i, SE_j$ are the rating standard errors computed via Fisher Information.
-*   $n_{ij}$ is the current number of times this pair has been compared.
-*   $\text{budget}_{\text{pair}}$ is the maximum comparisons allowed per pair (default $100$).
+*   $n_{ij}$ is the current number of times this pair has been compared on leaf $L$.
+*   $\text{budget}_{\text{pair}}$ is the unified maximum comparison ceiling (synchronized with the stopping policy).
 
-### Bootstrap Priority
-If model $i$ or model $j$ has zero comparisons on leaf $L$, the ratings cannot be fitted. The scheduler bypasses entropy calculation and assigns a maximum bootstrap utility:
+### Dual-Maturity Decay ($\alpha$)
+The mixing parameter $\alpha \in [0.2, 1.0]$ decays dynamically as rating maturity increases, transitioning from global rank structuring to local uncertainty resolution:
 
-$$ \text{Utility}_{\text{bootstrap}} = \ln 2 + 1.0 + (10 - \min(n_{ij}, 10)) \times 0.1 $$
+$$ \alpha = 0.20 + 0.80 \exp(-2.5 \cdot \text{maturity}) $$
+$$ \text{maturity} = 0.35 \cdot \text{maturity}_{\text{SE}} + 0.65 \cdot \text{maturity}_{\text{pairs}} $$
 
-This guarantees that all models are matched at least twice per leaf before entropy-driven matchmaking begins.
+where:
+*   $\text{maturity}_{\text{SE}} = \left(1.0 - \frac{\text{avgSE}}{\text{priorSE}}\right)$ measures standard error shrinkage relative to the prior standard error ($\text{priorSE} = 10.0$).
+*   $\text{maturity}_{\text{pairs}} = \frac{N_{\text{resolved pairs}}}{N_{\text{total pairs}}}$ measures the fraction of pairs already separated.
+
+### Term 1: Structure Score ($U_{\text{structure}}$)
+Focuses on binary search-like rating pivots by prioritizing matchups between models that are adjacent in the current log-strength ranking:
+
+$$ U_{\text{structure}}(i, j) = \exp(-|\text{rank}_i - \text{rank}_j|) $$
+
+### Term 2: Resolve Score & KDE Valley Boost ($U_{\text{resolve}}$)
+Focuses on rating boundary resolution by scaling the matchup entropy by the standard errors and boosting pairs located in score-density valleys:
+
+$$ U_{\text{resolve}}(i, j, L) = \frac{H(Y_{ij} \mid \hat{s})}{SE_i^2 + SE_j^2} \times w_{ij} $$
+
+The valley weight $w_{ij}$ is estimated using a Gaussian Kernel Density Estimator (KDE) with Silverman's rule bandwidth $h$:
+
+$$ h = 1.06 \cdot \hat{\sigma}_{\text{scores}} \cdot K^{-1/5} $$
+$$ \text{density}(x) = \frac{1}{K \cdot h} \sum_{k=1}^{K} K_{\text{Gauss}}\left(\frac{x - s_k}{h}\right) $$
+$$ w_{ij} = 1.0 - \frac{\text{density}\left(\frac{s_i + s_j}{2}\right)}{\max_x \text{density}(x)} $$
+
+This penalizes matchups inside dense score clusters (where models are statistically indistinguishable) and boosts matchups crossing rating boundaries (low-density valleys).
 
 ---
 
-## 3. Convergence & Stopping Rules
+## 4. Centroid-Proximal Query Selection
+
+For a scheduled pair $(i, j)$ at leaf $L$, the query scheduler selects the most representative queries from the pool. Available query embeddings $E_q$ are projected onto the node's slice dimension $D_L$ and sorted by **descending cosine similarity** (ascending distance) to the Von Mises-Fisher (vMF) centroid vector $\mu_L$:
+
+$$ \text{Similarity}(q) = \text{dot}\left( \text{project}(E_q, D_L), \mu_L \right) $$
+
+Queries with higher centroid similarity are scheduled first, ensuring that LLM judges evaluate pairs on queries that best represent the leaf's category core.
+
+---
+
+## 5. Difficulty-Weighted Stopping Policy
 
 The evaluation rounds run until the stopping criteria defined in [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt) are met.
 
 ### Leaf Node Convergence (`isLeafConverged`)
-A leaf node $L$ is marked as converged (no further matchmaking utility) if any of the following conditions hold:
-1.  **Data Exhaustion**: The total comparisons at the node reach the database query capacity.
-2.  **Informative Pair Resolution**: All pairs $(i, j)$ are resolved. A pair is considered resolved if the gap between their ratings exceeds three standard deviations:
-    
-    $$ |s_i - s_j| \ge 3.0 \times (SE_i + SE_j) $$
-    
-    Unresolved pairs that have exhausted their budget do not block convergence.
-3.  **Top-2 Separation**: The gap between the top-ranked model and the second-ranked model is statistically significant:
+A leaf node $L$ is marked as converged if:
+1.  **Data Exhaustion**: The live comparisons count exceeds the target data capacity.
+2.  **Informative Pair Resolution**: All informative pairs $(i, j)$ are resolved (either rating gap $|s_i - s_j| \ge 3.0 \cdot (SE_i + SE_j)$ or pair budget $n_{ij} \ge \text{budget}_{\text{pair}}$ is exhausted).
+3.  **Top-2 Separation**: The gap between the first and second ranked models exceeds a confidence threshold:
     
     $$ s_{(1)} - s_{(2)} > 1.5 \times (SE_{(1)} + SE_{(2)}) $$
 
-### Global Stopping (`shouldStop`)
-At the end of each benchmark round, the stopping policy checks for global convergence:
-*   For each leaf node, it stores the model leaderboard ranking.
-*   It monitors ranking stability over a window of rounds (default $3$ rounds).
-*   The benchmark terminates when the ratio of converged and stable leaves exceeds the target convergence fraction (default $70\%$):
-    
-    $$ \frac{N_{\text{converged & stable}}}{N_{\text{total leaves}}} \ge \text{targetLeafConvergenceFraction} $$
-    
-    or when the maximum rounds threshold is reached.
+### Difficulty-Weighted Global Stopping (`shouldStop`)
+Rather than counting converged leaves equally, the global stopping check weights each leaf's stability contribution by its routed query support size:
+
+$$ \frac{\sum_{L \in \text{converged \& stable}} |Q_L|}{\sum_{L \in \text{all leaves}} |Q_L|} \ge \text{targetLeafConvergenceFraction} $$
+
+where $|Q_L|$ is the size of the pre-routed query pool for leaf $L$. This prevents small boundary leaves (which exhaust data trivially) from inflating the convergence metric and stopping evaluation prematurely.
 
 ---
 
 ## 🔗 Related Code References
-*   [BtMatchScheduler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt): Implements entropy-based priority scheduling and batch selection.
-*   [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt): Computes leaf-level and global convergence.
+*   [BtMatchScheduler](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt): Implements entropy and KDE-based priority scheduling and query selection.
+*   [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt): Computes leaf-level and difficulty-weighted global convergence.

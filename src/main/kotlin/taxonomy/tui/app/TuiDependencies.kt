@@ -49,6 +49,7 @@ fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
         commandController = commandController,
         settingItemsProvider = facade::buildSettingItems,
         availableDomainsProvider = facade::getAvailableDomains,
+        datasetDomainsProvider = { facade.getAvailableDomains(forceDataset = true) },
         treeLinesProvider = { expanded ->
             taxonomy.tui.components.buildTreeLines(taxonomyService.rootNodeFlow.value, expanded)
         },

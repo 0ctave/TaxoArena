@@ -34,6 +34,7 @@ class TuiController(
     private val settingItemsProvider: () -> List<SettingItem> = { emptyList() },
     /** Available dataset domains (name, count), used to resolve domain toggles. */
     private val availableDomainsProvider: () -> List<Pair<String, Int>> = { emptyList() },
+    private val datasetDomainsProvider: () -> List<Pair<String, Int>> = { emptyList() },
     /** Rebuilds the DAG tree lines from the live graph + expand state, so key handlers can
      *  resolve the selected tree row to a node (expand/collapse, inspect). */
     private val treeLinesProvider: (Map<String, Boolean>) -> List<TreeLine> = { emptyList() },
@@ -56,7 +57,7 @@ class TuiController(
     private val welcomeHandler = WelcomeKeyHandler()
     private val configHandler = ConfigKeyHandler(
         settingItemsProvider = settingItemsProvider,
-        availableDomainsProvider = availableDomainsProvider,
+        availableDomainsProvider = datasetDomainsProvider,
     )
     private val topologyHandler = TopologyKeyHandler(
         treeLinesProvider = treeLinesProvider,

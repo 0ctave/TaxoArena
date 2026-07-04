@@ -1,6 +1,6 @@
 # Bradley-Terry Model Fitting & Log-Strength Optimization
 
-This document details the mathematical formulation and optimization techniques used in **TaxoArena** to fit model capabilities from pairwise win/loss/tie stats. It covers the Bradley-Terry (BT) model, the Minorization-Maximization (MM) algorithm, tie handling, and Fisher Information standard error estimation.
+This document details the mathematical formulation and optimization techniques used in **TaxoArena** to fit model capabilities from pairwise win/loss/tie stats. It covers the Bradley-Terry (BT) model, the Minorization-Maximization (MM) algorithm, tie handling, and full Fisher Information covariance estimation with constraint projection.
 
 ---
 
@@ -22,7 +22,6 @@ $$ \sum_{i=1}^{K} s_i = 0 $$
 Pairwise comparisons in TaxoArena can result in a tie (where the LLM judge declares no preference, or the position-reversed evaluations contradict each other). We handle ties using the standard half-win encoding. Let $w_{ij}$ be the total wins of model $i$ against $j$, and $t_{ij}$ be the tie count. The effective wins are updated as:
 
 $$ w'_{ij} = w_{ij} + 0.5 \cdot t_{ij} $$
-
 $$ w'_{ji} = w_{ji} + 0.5 \cdot t_{ij} $$
 
 The total matches between $i$ and $j$ is $n_{ij} = w'_{ij} + w'_{ji} = w_{ij} + w_{ji} + t_{ij}$.
@@ -54,22 +53,42 @@ $$ \max_{i} \left| s_i^{(t+1)} - s_i^{(t)} \right| < \epsilon_{\text{tol}} $$
 
 ---
 
-## 3. Variance & Standard Error Estimation
+## 3. Covariance & Standard Error Estimation
 
-To compute confidence intervals for the ratings, we estimate the standard error of $s_i$. The variance of the MLE is derived from the diagonal elements of the Fisher Information matrix:
+To compute confidence intervals for the ratings, we estimate the covariance matrix of $s$. Rather than using a diagonal approximation, TaxoArena estimates standard errors using the full Fisher Information matrix and projects it onto the sum-to-zero constraint space.
 
-$$ I_{ii}(s) = -\frac{\partial^2 \mathcal{L}}{\partial s_i^2} = \sum_{j \neq i} n_{ij} \frac{\exp(s_i) \exp(s_j)}{(\exp(s_i) + \exp(s_j))^2} $$
+### 1. Build the Full Fisher Information Matrix ($F$)
+The elements of the $K \times K$ Fisher Information matrix $F$ are defined by:
 
-The term $\frac{\exp(s_i) \exp(s_j)}{(\exp(s_i) + \exp(s_j))^2}$ is equal to $P(i \succ j) P(j \succ i)$, representing the Bernoulli variance of the match outcomes.
+$$ F_{ii} = \sum_{j \neq i} n_{ij} P(i \succ j) P(j \succ i) $$
+$$ F_{ij} = -n_{ij} P(i \succ j) P(j \succ i) \quad \text{for } i \neq j $$
 
-The standard error ($SE$) of the rating $s_i$ is computed in [BtMmFitter.estimateStdErrors](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt) as:
+where $P(i \succ j) P(j \succ i) = \frac{\exp(s_i) \exp(s_j)}{(\exp(s_i) + \exp(s_j))^2}$ represents the Bernoulli variance of the matchup outcomes.
 
-$$ SE_i = \frac{1}{\sqrt{I_{ii}(s)}} $$
+### 2. Constraint Projection via Ridge Rank-One Correction
+Because the log-strengths satisfy $\sum_{i=1}^K s_i = 0$, the Fisher matrix $F$ has rank $K-1$ and is singular. To project the covariance matrix onto the orthogonal complement of the all-ones vector $\mathbf{1}$, we add a rank-one correction of ones ($J = \mathbf{1}\mathbf{1}^T$):
 
-If a model has not participated in any matches ($I_{ii}(s) = 0$), the standard error defaults to a high value ($10.0$) to indicate complete uncertainty. These standard errors are used by the matchmaking scheduler to target high-variance pairs and by the stopping policy to detect convergence.
+$$ F_{\text{constrained}} = F + \mathbf{1}\mathbf{1}^T $$
+
+This matrix is non-singular and invertible as long as the comparison graph is connected.
+
+### 3. Matrix Inversion & Standard Error Extraction
+We compute the inverse covariance matrix $\Sigma = F_{\text{constrained}}^{-1}$ using Gauss-Jordan elimination. The covariance matrix under the zero-sum constraint is given by:
+
+$$ \text{Cov}(s_i, s_j) = \Sigma_{ij} - \frac{1}{K} $$
+
+The standard error ($SE$) of the log-strength rating $s_i$ is the square root of the diagonal variance:
+
+$$ SE_i = \sqrt{\Sigma_{ii} - \frac{1}{K}} $$
+
+If the comparison graph is disconnected and the matrix is singular (e.g. at round 0 before bootstrap completes), the estimator falls back to the diagonal approximation:
+
+$$ SE_i = \frac{1}{\sqrt{F_{ii}}} $$
+
+with a fallback value of $10.0$ if $F_{ii} = 0$.
 
 ---
 
 ## 🔗 Related Code References
-*   [BtMmFitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt): Implements the MM fitting algorithm and Fisher Information standard error estimator.
-*   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Handles saving and loading of `NodeBtState` objects from the SQLite database.
+*   [BtMmFitter](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt): Implements the MM fitting algorithm, Gauss-Jordan matrix inversion, and full Fisher Information standard error estimator.
+*   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Handles saving and loading of `NodeBtState` objects from the SQLite database.
