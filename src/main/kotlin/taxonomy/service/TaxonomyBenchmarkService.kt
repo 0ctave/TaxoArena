@@ -186,12 +186,20 @@ class TaxonomyBenchmarkService(
             }
         }
 
-        val targetNodes = scheduler.selectTargetNodes(allNodes, btStates, nodeToQueries, maxNodes = 100)
-        log.info("Selected fixed targetNodes for the entire run: ${targetNodes.map { it.label ?: it.id }}")
-        val targetLeafIds = targetNodes.map { it.id }.toSet()
+        // targetLeafIds is fixed — used by shouldStop to track full convergence across all eligible leaves
+        val targetLeafIds = allNodes
+            .filter { it.children.isEmpty() && (nodeToQueries[it.id]?.size ?: 0) >= scheduler.minQueriesForBenchmark }
+            .map { it.id }.toSet()
+        log.info("Benchmark scope: ${targetLeafIds.size} eligible leaf nodes")
+
+        var targetNodes = scheduler.selectTargetNodes(
+            allNodes, btStates, nodeToQueries,
+            pairStats = pairStatsMap, models = modelNames, maxNodes = 100
+        )
 
         var round = 0
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
+        val completedAtStartOfRound = java.util.concurrent.atomic.AtomicInteger(0)
 
         var currentAggregated: taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard? = null
         var lastUpdateAt = 0L
@@ -275,7 +283,20 @@ class TaxonomyBenchmarkService(
                             maxOf(0, targetLimit - comps)
                         }
                     }
-                    val estimatedTotal = minOf(matrix.size, resultsSnapshot.size + remainingQueries)
+                    val completedInCurrentRound = resultsSnapshot.size - completedAtStartOfRound.get()
+                    val activeRemaining = maxOf(0, remainingQueries - completedInCurrentRound)
+                    
+                    val maxTotalMatches = targetLeafIds.sumOf { leafId ->
+                        val numPairs = modelNames.size * (modelNames.size - 1) / 2
+                        val available = nodeToQueries[leafId]?.size ?: 0
+                        val maxPossible = if (available > 0) available * numPairs else 0
+                        if (maxPossible > 0) {
+                            minOf(params.budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
+                        } else {
+                            params.budgetPerPair * numPairs / 2
+                        }
+                    }
+                    val estimatedTotal = minOf(maxTotalMatches, resultsSnapshot.size + activeRemaining).coerceAtLeast(resultsSnapshot.size)
 
                     val live = BenchmarkLiveStats(
                         processed = resultsSnapshot.size,
@@ -298,7 +319,15 @@ class TaxonomyBenchmarkService(
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
             btStates, pairStatsMap, targetLeafIds, modelNames, round, completedResults.size, nodeToQueries
         )) {
+            completedAtStartOfRound.set(completedResults.size)
+            // Re-select each round: converged leaves are excluded, uncertain ones are promoted
+            targetNodes = scheduler.selectTargetNodes(
+                allNodes, btStates, nodeToQueries,
+                pairStats = pairStatsMap, models = modelNames, maxNodes = 100
+            )
             if (targetNodes.isEmpty()) break
+            log.debug("Round $round — active leaves: ${targetNodes.size} / ${targetLeafIds.size} " +
+                      "(converged: ${targetLeafIds.size - targetNodes.size})")
 
             val batch = scheduler.selectNextBatch(
                 targetNodes = targetNodes,

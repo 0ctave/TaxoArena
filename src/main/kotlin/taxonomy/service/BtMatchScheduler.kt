@@ -288,14 +288,23 @@ class BtMatchScheduler(
         allNodes: List<GraphNode>,
         btStates: Map<String, NodeBtState>,
         nodeToQueries: Map<String, List<Int>>,
+        pairStats: Map<String, List<NodePairStats>> = emptyMap(),
+        models: List<String> = emptyList(),
         maxNodes: Int = 100
     ): List<GraphNode> {
         return allNodes
-            .filter { it.children.isEmpty() && (nodeToQueries[it.id]?.size ?: 0) >= minQueriesForBenchmark }
+            .filter { node ->
+                node.children.isEmpty()
+                && (nodeToQueries[node.id]?.size ?: 0) >= minQueriesForBenchmark
+                && !stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries)
+            }
             .sortedWith(
+                // 1. Unseen leaves first (bootstrap — zero comparisons)
                 compareByDescending<GraphNode> { node -> (btStates[node.id]?.totalComparisons ?: 0) == 0 }
-                    .thenByDescending { node -> nodeToQueries[node.id]?.size ?: 0 }
-                    .thenByDescending { node -> btStates[node.id]?.stdErrors?.values?.average() ?: 10.0 }
+                // 2. Highest average std error = most uncertain BT fit = needs budget most
+                .thenByDescending { node -> btStates[node.id]?.stdErrors?.values?.average() ?: 10.0 }
+                // 3. Tiebreak: more available queries = more useful to schedule
+                .thenByDescending { node -> nodeToQueries[node.id]?.size ?: 0 }
             )
             .take(maxNodes)
     }
