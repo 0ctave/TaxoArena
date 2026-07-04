@@ -140,9 +140,9 @@ class TaxonomyArenaService(
                 .addStringProperty("critique_a", "Critique of Model A's response against the rubric")
                 .addStringProperty("critique_b", "Critique of Model B's response against the rubric")
                 .addStringProperty("comparison", "The decisive difference in reasoning quality between A and B")
-                .addStringProperty("winner", "The winner: Model A, Model B, or TIE")
-                .addNumberProperty("confidence", "Confidence score between 0.0 and 1.0")
-                .required("comparison", "winner", "confidence")  // critique_a/b optional
+                .addStringProperty("winner", "Model A, Model B, or TIE")
+                .addNumberProperty("confidence", "0.0 to 1.0")
+                .required("comparison", "winner", "confidence")
                 .build()
         )
         .build()
@@ -401,11 +401,7 @@ class TaxonomyArenaService(
             if (winner == "Model A") res1.rationale else if (winner == "Model B") res2.rationale else "Consistent tie verdict"
         }
 
-        val finalConfidence = when {
-            isInvalid   -> 0.0
-            positionFlip -> 0.5   // canonical: flip = no net signal = max binary entropy
-            else         -> avgConfidence.coerceIn(0.0, 0.95)
-        }
+        val finalConfidence = if (positionFlip) 0.5 else avgConfidence.coerceIn(0.0, 0.95)
 
         DomainEvaluation(
             domain      = node.label ?: "Emergent Concept",
