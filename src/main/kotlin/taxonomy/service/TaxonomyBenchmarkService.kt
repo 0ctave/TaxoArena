@@ -274,13 +274,19 @@ class TaxonomyBenchmarkService(
                             val numPairs = modelNames.size * (modelNames.size - 1) / 2
                             val available = nodeToQueries[leafId]?.size ?: 0
                             val maxPossible = if (available > 0) available * numPairs else 0
-                            val targetLimit = if (maxPossible > 0) {
+                            val mCap = if (maxPossible > 0) {
                                 minOf(params.budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
                             } else {
                                 params.budgetPerPair * numPairs / 2
                             }
+                            
+                            val minPerPair = (stoppingPolicy.minComparisonsPerLeaf / modelNames.size).coerceAtLeast(1)
+                            val mCoverage = numPairs * minPerPair
+                            val deltaSeparation = (0.75 * numPairs).toInt()
+                            val mLeaf = minOf(mCap, mCoverage + deltaSeparation)
+                            
                             val comps = state?.totalComparisons ?: 0
-                            maxOf(0, targetLimit - comps)
+                            maxOf(0, mLeaf - comps)
                         }
                     }
                     val completedInCurrentRound = resultsSnapshot.size - completedAtStartOfRound.get()
@@ -290,11 +296,16 @@ class TaxonomyBenchmarkService(
                         val numPairs = modelNames.size * (modelNames.size - 1) / 2
                         val available = nodeToQueries[leafId]?.size ?: 0
                         val maxPossible = if (available > 0) available * numPairs else 0
-                        if (maxPossible > 0) {
+                        val mCap = if (maxPossible > 0) {
                             minOf(params.budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
                         } else {
                             params.budgetPerPair * numPairs / 2
                         }
+                        
+                        val minPerPair = (stoppingPolicy.minComparisonsPerLeaf / modelNames.size).coerceAtLeast(1)
+                        val mCoverage = numPairs * minPerPair
+                        val deltaSeparation = (0.75 * numPairs).toInt()
+                        minOf(mCap, mCoverage + deltaSeparation)
                     }
                     val estimatedTotal = minOf(maxTotalMatches, resultsSnapshot.size + activeRemaining).coerceAtLeast(resultsSnapshot.size)
 
