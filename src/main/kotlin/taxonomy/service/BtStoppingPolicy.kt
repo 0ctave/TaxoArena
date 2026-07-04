@@ -7,9 +7,9 @@ import kotlin.math.abs
 class BtStoppingPolicy(
     val maxRounds: Int = 20,
     val minComparisonsPerLeaf: Int = 8,
-    val targetLeafConvergenceFraction: Double = 0.70,
-    val stabilityRounds: Int = 3,
-    val separationThreshold: Double = 1.5,
+    val targetLeafConvergenceFraction: Double = 0.65,
+    val stabilityRounds: Int = 2,
+    val separationThreshold: Double = 1.0,
     val minTotalComparisons: Int = 20,
     val budgetPerPair: Int = 18
 ) {
@@ -47,6 +47,11 @@ class BtStoppingPolicy(
             }
             val nij = ps?.totalComparisons ?: 0
             if (nij < 2) return@filter true  // bootstrap not done -> still informative
+
+            // NEW: if this pair has exhausted its budget, it's resolved regardless of gap
+            val budget = (budgetPerPair).coerceAtLeast(1)
+            if (nij >= budget) return@filter false  // budget-exhausted → accepted as resolved
+
             val si = state.btScores[mA] ?: 0.0
             val sj = state.btScores[mB] ?: 0.0
             val seA = state.stdErrors[mA] ?: 10.0
@@ -88,6 +93,15 @@ class BtStoppingPolicy(
         if (round >= maxRounds) return true
         if (totalComparisons < minTotalComparisons) return false
         if (targetLeafIds.isEmpty()) return false
+
+        if (round >= maxRounds - 3) {
+            // Last 3 rounds: stop if at least 50% are structurally converged
+            // (even without rank stability) — prevents infinite runs
+            val structConv = targetLeafIds.count { leafId ->
+                isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries)
+            }
+            if (structConv.toDouble() / targetLeafIds.size >= 0.50) return true
+        }
 
         var converged = 0
         for (leafId in targetLeafIds) {
