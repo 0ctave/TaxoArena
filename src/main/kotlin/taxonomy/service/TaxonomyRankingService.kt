@@ -71,18 +71,20 @@ class TaxonomyRankingService {
     // and contention of opening a new SQLite connection on every call.
     private val dbLock = Any()
     private val connection: Connection by lazy {
-        DriverManager.getConnection(dbUrl).also { conn ->
+        val conn = DriverManager.getConnection(dbUrl)
+        try {
             conn.autoCommit = true
-            try {
-                conn.createStatement().use { stmt ->
-                    stmt.execute("PRAGMA journal_mode=WAL;")
-                    stmt.execute("PRAGMA synchronous=NORMAL;")
-                    stmt.execute("PRAGMA busy_timeout=10000;")
-                }
-            } catch (e: Exception) {
-                log.warn("Failed to set SQLite PRAGMAs: ${e.message}")
+            conn.createStatement().use { stmt ->
+                stmt.execute("PRAGMA journal_mode=WAL;")
+                stmt.execute("PRAGMA synchronous=NORMAL;")
+                stmt.execute("PRAGMA busy_timeout=10000;")
             }
+        } catch (e: Exception) {
+            log.error("Failed to set SQLite PRAGMAs, closing connection: ${e.message}", e)
+            try { conn.close() } catch (_: Exception) {}
+            throw e
         }
+        conn
     }
 
     @Volatile
@@ -151,13 +153,6 @@ class TaxonomyRankingService {
             if (dbInitialized) return
             try {
                 val conn = connection
-                // Migration — run before all CREATE TABLE IF NOT EXISTS:
-                try {
-                    conn.createStatement().use { s ->
-                        s.execute("UPDATE match_history SET snapshot_id = 'global' WHERE snapshot_id IS NULL")
-                    }
-                } catch (_: Exception) {}  // table may not exist yet on first boot
-
                 conn.createStatement().use { stmt ->
                     stmt.execute("""
                         CREATE TABLE IF NOT EXISTS agent_ratings_v2 (
@@ -245,6 +240,13 @@ class TaxonomyRankingService {
                         // Column might already exist, safe to ignore
                     }
                 }
+
+                // Run migration to fill snapshot_id on older databases after alter table loop
+                try {
+                    conn.createStatement().use { s ->
+                        s.execute("UPDATE match_history SET snapshot_id = 'global' WHERE snapshot_id IS NULL")
+                    }
+                } catch (_: Exception) {}
 
                 dbInitialized = true
                 log.info("SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.")

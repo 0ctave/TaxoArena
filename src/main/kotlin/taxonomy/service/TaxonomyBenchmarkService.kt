@@ -201,7 +201,7 @@ class TaxonomyBenchmarkService(
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
         val completedAtStartOfRound = java.util.concurrent.atomic.AtomicInteger(0)
 
-        var currentAggregated: taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard? = null
+        var currentAggregated: TaxonomyRankingService.AggregatedLeaderboard? = null
         var lastUpdateAt = 0L
 
         val publishProgress: (Boolean) -> Unit = { force ->

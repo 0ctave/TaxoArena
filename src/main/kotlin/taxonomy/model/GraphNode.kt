@@ -182,9 +182,11 @@ fun assignQueryIds(root: GraphNode) {
 
     fun walk(node: GraphNode) {
         if (!visited.add(node.id)) return
-        node.queries.forEach { q ->
-            if (seenTexts.add(q.rawText)) {
-                uniqueQueries.add(q)
+        synchronized(node.queries) {
+            node.queries.forEach { q ->
+                if (seenTexts.add(q.rawText)) {
+                    uniqueQueries.add(q)
+                }
             }
         }
         node.children.forEach { walk(it) }
@@ -201,8 +203,10 @@ fun assignQueryIds(root: GraphNode) {
     val visitedAssign = mutableSetOf<String>()
     fun walkAssign(node: GraphNode) {
         if (!visitedAssign.add(node.id)) return
-        node.queries.forEach { q ->
-            q.queryId = textToId[q.rawText] ?: -1
+        synchronized(node.queries) {
+            node.queries.forEach { q ->
+                q.queryId = textToId[q.rawText] ?: -1
+            }
         }
         node.children.forEach { walkAssign(it) }
         node.crossLinkChildren.forEach { walkAssign(it) }

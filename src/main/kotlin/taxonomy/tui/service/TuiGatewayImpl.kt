@@ -540,7 +540,9 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             }
             targetDir.mkdirs()
 
-            val client = HttpClient.newBuilder().build()
+            val client = HttpClient.newBuilder()
+                .connectTimeout(java.time.Duration.ofSeconds(10))
+                .build()
             val listingUrl =
                 "https://api.github.com/repos/TIGER-AI-Lab/MMLU-Pro/contents/eval_results"
             deps.log.info("Downloading MMLU-Pro eval_results from GitHub…")
@@ -549,6 +551,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 .uri(URI.create(listingUrl))
                 .header("User-Agent", "TaxoArena-TUI")
                 .header("Accept", "application/vnd.github.v3+json")
+                .timeout(java.time.Duration.ofSeconds(15))
                 .GET()
                 .build()
             val listingResp = client.send(listingReq, HttpResponse.BodyHandlers.ofString())
@@ -573,6 +576,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                     val fileReq = HttpRequest.newBuilder()
                         .uri(URI.create(url))
                         .header("User-Agent", "TaxoArena-TUI")
+                        .timeout(java.time.Duration.ofSeconds(20))
                         .GET()
                         .build()
                     val bytes = client.send(fileReq, HttpResponse.BodyHandlers.ofByteArray()).body()

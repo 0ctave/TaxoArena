@@ -168,7 +168,9 @@ class MMLUDatasetFetcher(
 
         log.info("MMLU Pro cache incomplete ($cachedDistinctCategories/$EXPECTED_MMLU_PRO_CATEGORIES categories, ${allRows.size} rows). Fetching remainder from offset ${getDbCount(table)}…")
 
-        val client = HttpClient.newHttpClient()
+        val client = HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(10))
+            .build()
         var hfOffset = totalInDb
         val batchSize = 100
 
@@ -181,7 +183,10 @@ class MMLUDatasetFetcher(
             val limitVal = minOf(batchSize, maxQueries - allRows.size)
             val url = "https://datasets-server.huggingface.co/rows?dataset=TIGER-Lab%2FMMLU-Pro&config=default&split=test&offset=$hfOffset&length=$limitVal"
 
-            val requestBuilder = HttpRequest.newBuilder().uri(URI.create(url)).GET()
+            val requestBuilder = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(java.time.Duration.ofSeconds(15))
+                .GET()
             if (hfToken.isNotBlank()) {
                 requestBuilder.header("Authorization", "Bearer $hfToken")
             }

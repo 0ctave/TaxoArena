@@ -128,6 +128,11 @@ class TaxonomyPersistence(
         log.info("Loading Vector-Offloaded taxonomy from $path...")
         val serialized = json.decodeFromString<SerializedGraph>(file.readText())
 
+        val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
+        val queryRowMap: Map<String, Pair<String, String>> = embeddingCache.getQueriesBatch(allQueryIds)
+        val allDistilled = queryRowMap.values.map { it.second }.toSet()
+        val vectorMap = embeddingCache.getBatch(allDistilled)
+
         val nodeMap = serialized.nodes.associate { sNode ->
             sNode.id to GraphNode(
                 id = sNode.id,
@@ -152,12 +157,9 @@ class TaxonomyPersistence(
                 dasguptaDeltaNorm = sNode.dasguptaDeltaNorm
                 phaseCompleted = sNode.phaseCompleted
 
-                val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
-                val queryRowMap: Map<String, Pair<String, String>> = embeddingCache.getQueriesBatch(allQueryIds)
-
                 sNode.queryIds.forEach { qId ->
                     val (raw, distilled) = queryRowMap[qId] ?: return@forEach
-                    val vector = embeddingCache.get(distilled) ?: return@forEach
+                    val vector = vectorMap[distilled] ?: return@forEach
                     queries.add(Embedding(raw, distilled, vector))
                 }
             }

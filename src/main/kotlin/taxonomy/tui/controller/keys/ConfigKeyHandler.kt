@@ -65,9 +65,13 @@ internal class ConfigKeyHandler(
 
             "s", "arrowdown" -> {
                 if (state.config.activeSubPanel == ConfigSubPanel.DOMAINS) {
-                    dispatch(TuiEvent.SetSelectedDomainIdx(state.config.selectedDomainIdx + 1))
+                    val domains = availableDomainsProvider()
+                    val maxIdx = (domains.size - 1).coerceAtLeast(0)
+                    dispatch(TuiEvent.SetSelectedDomainIdx((state.config.selectedDomainIdx + 1).coerceAtMost(maxIdx)))
                 } else {
-                    dispatch(TuiEvent.SetSelectedSettingIdx(state.config.selectedSettingIdx + 1))
+                    val items = settingItemsProvider()
+                    val maxIdx = (items.size - 1).coerceAtLeast(0)
+                    dispatch(TuiEvent.SetSelectedSettingIdx((state.config.selectedSettingIdx + 1).coerceAtMost(maxIdx)))
                 }
             }
 

@@ -136,6 +136,7 @@ class ArcTaxonomyLLMClient(
             val request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create("$ollamaBaseUrl/api/show"))
                 .header("Content-Type", "application/json")
+                .timeout(java.time.Duration.ofSeconds(10))
                 .POST(java.net.http.HttpRequest.BodyPublishers.ofString("{\"name\": \"$modelName\"}"))
                 .build()
 

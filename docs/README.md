@@ -1,71 +1,64 @@
-<!--
-SPDX-FileCopyrightText: 2025 Deutsche Telekom AG and others
+# TaxoArena: Dynamic Hierarchical DAG Taxonomy for Model Evaluation
 
-SPDX-License-Identifier: CC0-1.0
--->
-# TaxoArena Documentation
+Welcome to the comprehensive documentation suite for **TaxoArena**, a self-organizing system that constructs a **Dynamic Hierarchical Directed Acyclic Graph (DAG)** taxonomy directly from MMLU-Pro evaluation queries. By leveraging high-dimensional embeddings and spherical statistical models, TaxoArena organizes semantic knowledge into a geometrically coherent hierarchy. Each terminal leaf node in this taxonomy acts as an independent evaluation arena, hosting LLM-judge pairwise comparisons and maintaining local model leaderboards fitted using the Bradley-Terry probabilistic model.
 
-## Overview
+---
 
-**TaxoArena** builds a **Dynamic Hierarchical Directed Acyclic Graph (DAG)** taxonomy
-directly from MMLU-Pro queries: questions are embedded with **Qwen3-Embedding**, clustered
-into polyhierarchical domains via **von Mises–Fisher (vMF)** statistical modeling, and the
-resulting leaf domains host **LLM-judge** pairwise comparisons whose verdicts feed an
-**OpenSkill** ranking of the evaluated models. The result is a self-organizing,
-geometrically coherent map of knowledge that doubles as a model-evaluation arena.
+## 📖 Table of Contents & Sitemap
 
-This directory is the single entry point for the full organized context of the project.
+The documentation is organized into five core functional areas, mapping directly to the underlying architecture of the project:
 
-## Quick navigation
+### 1. [Core Concepts](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/core-concepts/)
+Fundamental mathematical models, design paradigms, and data representation models.
+*   **[Taxonomy DAG Paradigm](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/core-concepts/taxonomy-dag.md)**: Details the union-based topological paradigm and polyhierarchy design.
+*   **[Data Representations](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/core-concepts/data-representations.md)**: Specifies the data models for nodes, embeddings, ratings, and execution configurations.
 
-| Document | Description |
-| --- | --- |
-| [architecture/algorithm-foundations.md](architecture/algorithm-foundations.md) | Mathematical and algorithmic foundations of the taxonomy engine. |
-| [architecture/clustering.md](architecture/clustering.md) | vMF clustering, splitting, and density-based domain discovery. |
-| [architecture/judge-design.md](architecture/judge-design.md) | LLM-judge design: rubrics, pairwise prompts, confidence gating. |
-| [architecture/topological-paradigms.md](architecture/topological-paradigms.md) | DAG topology, union-based domain definition, polyhierarchy. |
-| [phases/phase2-fitting.md](phases/phase2-fitting.md) | Phase 2 — Fit: context-aware distribution modeling. |
-| [phases/phase3-trickle.md](phases/phase3-trickle.md) | Phase 3 — Trickle: top-down restrictive routing. |
-| [phases/phase4-discovery.md](phases/phase4-discovery.md) | Phase 4 — Discover: adaptive splitting. |
-| [phases/phase5-optimization.md](phases/phase5-optimization.md) | Phase 5 — Optimize: structural refinement. |
-| [phases/phase6-stabilization.md](phases/phase6-stabilization.md) | Phase 6 — Stabilize: convergence of the mixture. |
-| [research/research-notes.md](research/research-notes.md) | Research notes and background literature pointers. |
-| [guides/tui-report-generation.md](guides/tui-report-generation.md) | Generating reports from the AI-agent TUI. |
-| [guides/eval-results-zip-schema.md](guides/eval-results-zip-schema.md) | Schema for precomputed MMLU-Pro eval-results ZIP/JSON (PR #50). |
-| [agents/gemini.md](agents/gemini.md) | AI-assistant project mandates & implementation hub. |
-| [reports/](reports/) | Placeholder for generated reports (empty for now). |
+### 2. [Evolutionary Pipeline](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/evolutionary-pipeline/)
+The lifecycle of the self-organizing taxonomy engine, divided into distinct execution phases.
+*   **[Pipeline Overview](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/evolutionary-pipeline/overview.md)**: The end-to-end flow from query distillation to snapshot convergence.
+*   **[von Mises–Fisher (vMF) Fitting](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/evolutionary-pipeline/fitting-vmf.md)**: Mathematical modeling on the unit sphere, concentration parameter estimation, and small-sample bias corrections.
+*   **[Trickle Routing](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/evolutionary-pipeline/trickle-routing.md)**: Top-down restrictive soft routing with log-space temperature-scaled softmax.
+*   **[Discovery & Optimization](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/evolutionary-pipeline/discovery-optimization.md)**: Sibling merging via JS-divergence, adaptive splitting via Dasgupta cost delta, and transitive reduction.
 
-## Recommended reading order for new contributors
+### 3. [Arena Evaluations](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/arena-evaluations/)
+Adjudication of agent outputs and statistical model ranking.
+*   **[Judge Design](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/arena-evaluations/judge-design.md)**: LLM pairwise judge prompting, contrastive rubric synthesis, and context-aware grading.
+*   **[Bradley-Terry Fit](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/arena-evaluations/bradley-terry-fit.md)**: Solving pairwise leaderboards via Minorization-Maximization (MM) and computing confidence intervals.
+*   **[Active Matchmaking](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/arena-evaluations/active-matchmaking.md)**: Information-theoretic scheduling using binary entropy maximization to minimize evaluation budget.
 
-1. [architecture/algorithm-foundations.md](architecture/algorithm-foundations.md)
-2. [architecture/clustering.md](architecture/clustering.md)
-3. [architecture/judge-design.md](architecture/judge-design.md)
-4. [architecture/topological-paradigms.md](architecture/topological-paradigms.md)
-5. Phases, in order:
-   [phase2-fitting](phases/phase2-fitting.md) →
-   [phase3-trickle](phases/phase3-trickle.md) →
-   [phase4-discovery](phases/phase4-discovery.md) →
-   [phase5-optimization](phases/phase5-optimization.md) →
-   [phase6-stabilization](phases/phase6-stabilization.md)
-6. [guides/tui-report-generation.md](guides/tui-report-generation.md)
-7. [guides/eval-results-zip-schema.md](guides/eval-results-zip-schema.md)
+### 4. [Metrics & Validation](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/metrics-validation/)
+Statistical checks to assess taxonomic quality, classification correctness, and structural balance.
+*   **[Clustering Metrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/metrics-validation/clustering-metrics.md)**: Cosine silhouette, NMI (fuzzy/overlapping LFK 2009), and Dasgupta cost.
+*   **[Classification Metrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/metrics-validation/classification-metrics.md)**: Hierarchical F1 (Kosmopoulos 2014) and Exact-Match Ancestor Rate (EMAR).
+*   **[Structural Metrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/metrics-validation/structural-metrics.md)**: Avg match count, contamination ratio, and Normalised Sackin Index.
 
-## External / Space documents
+### 5. [System Architecture](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/)
+Technical details of implementation, integration, and database operations.
+*   **[TUI Dashboard](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/tui-dashboard.md)**: Layout, terminal controls, and visualizer panel representation.
+*   **[Spring Integration](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/spring-integration.md)**: Component structure, dependency injection, and transaction layout.
+*   **[Database Concurrency](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/database-concurrency.md)**: Threading model, SQLite WAL (write-ahead log) operations, and connection pooling.
 
-Additional context is maintained **outside this repository** in the project's Perplexity
-Space and is not copied in here. These can be requested by their canonical filenames when
-needed:
+### 6. [Legacy Documentation Archive](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/docs-old/)
+Archive of old designs and development notes. See [docs/docs-old/old-README.md](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/docs-old/old-README.md) for details.
 
-- `taxoarena-mathematical-validation-updated.md` — mathematical validation report.
-- `taxoarena_literature_review.md` — literature review.
-- `taxoarena_publication_readiness_checklist.md` — publication-readiness checklist.
+---
 
-## Recent PRs
+## 🛠️ Codebase Quick Reference
 
-- [#46](https://github.com/0ctave/TaxoArena/pull/46) — Overlapping NMI, DAG Dendrogram Purity, κ bias correction, Hierarchical F₁.
-- [#47](https://github.com/0ctave/TaxoArena/pull/47) — TUI improvements: R-key judge, L-key expand, dataset-cache detection, hotkey bar split.
-- [#48](https://github.com/0ctave/TaxoArena/pull/48) — Plumb per-query true-leaf ground truth into NMI + Hierarchical F₁.
-- [#49](https://github.com/0ctave/TaxoArena/pull/49) — Publication-grade metrics: total Dasgupta cost, ECE, triplet accuracy, normalised Sackin.
-- [#50](https://github.com/0ctave/TaxoArena/pull/50) — Arena benchmark E2E test on reserved MMLU-Pro precomputed results + ZIP schema doc.
-- [#51](https://github.com/0ctave/TaxoArena/pull/51) — Restore LogsPanel live display + persist log trace in DAG snapshots.
-- [#52](https://github.com/0ctave/TaxoArena/pull/52) — Activate ECE with real ground truth (follow-up to #48/#49).
+For developers working directly with the implementation, these are the primary classes and services:
+
+*   **Taxonomy Pipeline**:
+    *   [TaxonomyEngine](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/TaxonomyEngine.kt): Orchestrates the lifecycle phases.
+    *   [TaxonomyFitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyFitter.kt): Fits single-component vMF and NiW posteriors.
+    *   [TaxonomyTrickler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyTrickler.kt): Performs trickle routing.
+    *   [TaxonomySplitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomySplitter.kt): Evaluates splits using k-ary vMF-k-Means.
+    *   [TaxonomyMerger](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Handles JS-divergence sibling merges, cross-links, and transitive reduction.
+*   **Arena & Benchmarking**:
+    *   [TaxonomyBenchmarkService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Handles active matchmaking and round evaluations.
+    *   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Interface for persisting ratings and match results.
+    *   [BtMatchScheduler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt): Schedules informative matches.
+    *   [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt): Decides when leaves or rounds have converged.
+    *   [BtMmFitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt): Runs MM updates for Bradley-Terry parameters.
+*   **Statistical Utilities**:
+    *   [StatisticsUtils](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt): vMF, log-Bessel ratios, Dasgupta delta, and PCA.
+    *   [TaxonomyMetrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Suite of classification, clustering, and structural metrics.

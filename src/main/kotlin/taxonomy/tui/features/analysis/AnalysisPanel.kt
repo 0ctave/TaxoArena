@@ -33,6 +33,7 @@ import taxonomy.tui.features.trickle.TricklePanel
 import taxonomy.tui.state.ArenaUiState
 import taxonomy.tui.state.BenchmarkUiState
 import taxonomy.tui.state.SnapshotUiState
+import taxonomy.tui.state.ScrollbarTarget
 import taxonomy.tui.controller.TuiEvent
 import java.util.Locale
 
@@ -100,7 +101,7 @@ fun AnalysisPanel(
                     benchmarkState.isPickingEvalCatalog ->
                     EvalCatalogPicker(bodyW, bodyH, benchmarkState)
 
-                mode == AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState, benchmarkState)
+                mode == AnalysisMode.ARENA -> ArenaPanel(bodyW, bodyH, controlState, arenaState, benchmarkState, dispatch)
                 mode == AnalysisMode.BENCHMARK -> BenchmarkPanel(bodyW, bodyH, controlState, benchmarkScroll, benchmarkState, availableDomains, dispatch)
                 mode == AnalysisMode.TRICKLE_TEST -> TricklePanel(bodyW, bodyH, trickleState)
                 mode == AnalysisMode.JUDGE_PROGRESS -> JudgeProgressPanel(
@@ -129,6 +130,7 @@ fun AnalysisPanel(
                     height = bodyH,
                     arenaState = arenaState,
                     snapshotDescription = snapshotState.activeSnapshotDescription,
+                    dispatch = dispatch
                 )
                 else -> MetricsOrInspectorPanel(
                     width = bodyW,
@@ -144,6 +146,7 @@ fun AnalysisPanel(
                     showPerformanceBlock = showPerformanceBlock,
                     detailScrollOffset = detailScrollOffset,
                     performanceReport = performanceReport,
+                    dispatch = dispatch
                 )
             }
         }
@@ -308,6 +311,7 @@ fun LeaderboardPanel(
     height: Int,
     arenaState: ArenaUiState,
     snapshotDescription: String? = null,
+    dispatch: (TuiEvent) -> Unit = {},
 ) {
     val w = (width - 1).coerceAtLeast(1)
     val header = if (snapshotDescription != null) {
@@ -330,7 +334,8 @@ fun LeaderboardPanel(
                 pHeight = rows,
                 itemCount = items.size,
                 scrollOffset = arenaState.leaderboardScrollOffset,
-                hasPadding = false
+                hasPadding = false,
+                onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
             ) { visibleHeight, startIdx, innerWidth ->
                 val endIdx = (startIdx + visibleHeight).coerceAtMost(items.size)
                 for (i in startIdx until endIdx) {

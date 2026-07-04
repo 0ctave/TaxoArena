@@ -205,6 +205,46 @@ class EmbeddingCache(
         return null
     }
 
+    fun getBatch(queries: Collection<String>): Map<String, FloatArray> {
+        if (queries.isEmpty()) return emptyMap()
+        val result = mutableMapOf<String, FloatArray>()
+        val missing = mutableListOf<String>()
+        for (q in queries) {
+            val memo = sessionCache[q]
+            if (memo != null) {
+                result[q] = memo
+            } else {
+                missing.add(q)
+            }
+        }
+        if (missing.isEmpty()) return result
+
+        try {
+            withConn { conn ->
+                missing.chunked(900).forEach { chunk ->
+                    val placeholders = chunk.joinToString(",") { "?" }
+                    conn.prepareStatement("SELECT query, vector FROM embeddings WHERE query IN ($placeholders)").use { pstmt ->
+                        chunk.forEachIndexed { idx, q -> pstmt.setString(idx + 1, q) }
+                        val rs = pstmt.executeQuery()
+                        while (rs.next()) {
+                            val q = rs.getString("query")
+                            val bytes = rs.getBytes("vector")
+                            if (bytes != null) {
+                                val buf = java.nio.ByteBuffer.wrap(bytes)
+                                val vector = FloatArray(bytes.size / 4) { buf.getFloat() }
+                                sessionCache[q] = vector
+                                result[q] = vector
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.warn("Failed to batch-retrieve embeddings from SQLite.", e)
+        }
+        return result
+    }
+
     suspend fun getOrCreate(query: String): FloatArray {
         if (query.isBlank()) {
             return FloatArray(4096)

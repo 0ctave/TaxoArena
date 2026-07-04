@@ -41,6 +41,7 @@ fun ArenaPanel(
     controlState: AnalysisPanelState,
     arenaState: ArenaUiState,
     benchmarkState: BenchmarkUiState,
+    dispatch: (taxonomy.tui.controller.TuiEvent) -> Unit = {},
 ) {
     // The inner column lives inside the bordered AnalysisPanel; available row width is the
     // panel's body width minus the column's own 1-cell safety margin so a stray trailing
@@ -62,7 +63,8 @@ fun ArenaPanel(
                         pHeight = rows,
                         itemCount = items.size,
                         scrollOffset = arenaState.leaderboardScrollOffset,
-                        hasPadding = false
+                        hasPadding = false,
+                        onScrollClamp = { dispatch(taxonomy.tui.controller.TuiEvent.ScrollTo(taxonomy.tui.state.ScrollbarTarget.ANALYSIS, it)) }
                     ) { visibleHeight, startIdx, innerWidth ->
                         val endIdx = (startIdx + visibleHeight).coerceAtMost(items.size)
                         for (i in startIdx until endIdx) {

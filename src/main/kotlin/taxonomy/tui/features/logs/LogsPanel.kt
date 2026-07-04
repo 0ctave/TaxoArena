@@ -31,6 +31,7 @@ fun LogsPanel(
     height: Int,
     scrollOffset: Int,
     title: String = "",
+    dispatch: (taxonomy.tui.controller.TuiEvent) -> Unit = {},
 ) {
     val safeW = width.coerceAtLeast(1)
     val logs = remember(TuiLogAppender.logsVersion.value) {
@@ -64,6 +65,7 @@ fun LogsPanel(
         scrollOffset = scrollOffset,
         hasPadding = false,
         reversed = true,
+        onScrollClamp = { dispatch(taxonomy.tui.controller.TuiEvent.ScrollTo(taxonomy.tui.state.ScrollbarTarget.LOGS, it)) }
     ) { visibleHeight, _, contentWidth ->
         val end = (logs.size - scrollOffset).coerceIn(0, logs.size)
         val start = (end - visibleHeight).coerceAtLeast(0)

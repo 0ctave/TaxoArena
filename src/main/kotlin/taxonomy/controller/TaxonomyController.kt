@@ -14,8 +14,8 @@ class TaxonomyController(
 ) {
 
     @PostMapping("/query")
-    fun queryTaxonomy(@RequestBody request: QueryRequest): Map<String, Any> = runBlocking {
-        try {
+    suspend fun queryTaxonomy(@RequestBody request: QueryRequest): Map<String, Any> {
+        return try {
             val hierarchy = taxonomyService.queryTaxonomy(request.text)
             mapOf(
                 "query" to request.text,

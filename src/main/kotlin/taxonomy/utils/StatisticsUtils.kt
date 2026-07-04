@@ -373,20 +373,30 @@ object StatisticsUtils {
         var lastLikelihood = -Double.MAX_VALUE
         val minSoftCount = minClusterFrac * n
 
+        val logPs = DoubleArray(k)
+        val exps  = DoubleArray(k)
         for (iter in 0 until 200) {
             // ── E-step ───────────────────────────────────────────────────────
             var totalLikelihood = 0.0
             for (i in 0 until n) {
                 val x = embeddings[i]
-                val logPs = DoubleArray(k) { c ->
+                for (c in 0 until k) {
                     var dot = 0.0
                     for (j in 0 until d) dot += mus[c][j] * x[j]
-                    ln(pis[c].coerceAtLeast(1e-10)) + logNorms[c] + kappas[c] * dot
+                    logPs[c] = ln(pis[c].coerceAtLeast(1e-10)) + logNorms[c] + kappas[c] * dot
                 }
-                val maxLP = logPs.max()
-                val exps  = DoubleArray(k) { exp(logPs[it] - maxLP) }
-                val sumExp = exps.sum()
-                for (c in 0 until k) R[i][c] = exps[c] / sumExp
+                var maxLP = logPs[0]
+                for (c in 1 until k) {
+                    if (logPs[c] > maxLP) maxLP = logPs[c]
+                }
+                var sumExp = 0.0
+                for (c in 0 until k) {
+                    exps[c] = exp(logPs[c] - maxLP)
+                    sumExp += exps[c]
+                }
+                for (c in 0 until k) {
+                    R[i][c] = exps[c] / sumExp
+                }
                 totalLikelihood += maxLP + ln(sumExp)
             }
 
@@ -514,7 +524,7 @@ object StatisticsUtils {
         var residual = centered.map { it.copyOf() }
 
         repeat(k) {
-            var vec = DoubleArray(d) { Math.random() - 0.5 }
+            var vec = DoubleArray(d) { java.util.concurrent.ThreadLocalRandom.current().nextDouble() - 0.5 }
             repeat(30) {
                 val proj = DoubleArray(d)
                 for (row in residual) {

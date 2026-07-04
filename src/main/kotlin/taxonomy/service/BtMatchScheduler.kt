@@ -292,21 +292,33 @@ class BtMatchScheduler(
         models: List<String> = emptyList(),
         maxNodes: Int = 100
     ): List<GraphNode> {
-        return allNodes
-            .filter { node ->
-                node.children.isEmpty()
-                && (nodeToQueries[node.id]?.size ?: 0) >= minQueriesForBenchmark
-                && !stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries)
-            }
-            .sortedWith(
-                // 1. Unseen leaves first (bootstrap — zero comparisons)
-                compareByDescending<GraphNode> { node -> (btStates[node.id]?.totalComparisons ?: 0) == 0 }
-                // 2. Highest average std error = most uncertain BT fit = needs budget most
-                .thenByDescending { node -> btStates[node.id]?.stdErrors?.values?.average() ?: 10.0 }
-                // 3. Tiebreak: more available queries = more useful to schedule
-                .thenByDescending { node -> nodeToQueries[node.id]?.size ?: 0 }
-            )
-            .take(maxNodes)
+        val candidates = allNodes.filter { node ->
+            node.children.isEmpty()
+            && (nodeToQueries[node.id]?.size ?: 0) >= minQueriesForBenchmark
+            && !stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries)
+        }
+
+        data class SortCandidate(
+            val node: GraphNode,
+            val isBootstrap: Boolean,
+            val avgStdError: Double,
+            val queryCount: Int
+        )
+
+        return candidates.map { node ->
+            val state = btStates[node.id]
+            val isBootstrap = (state?.totalComparisons ?: 0) == 0
+            val avgStdError = state?.stdErrors?.values?.let { if (it.isEmpty()) 10.0 else it.average() } ?: 10.0
+            val queryCount = nodeToQueries[node.id]?.size ?: 0
+            SortCandidate(node, isBootstrap, avgStdError, queryCount)
+        }
+        .sortedWith(
+            compareByDescending<SortCandidate> { it.isBootstrap }
+                .thenByDescending { it.avgStdError }
+                .thenByDescending { it.queryCount }
+        )
+        .map { it.node }
+        .take(maxNodes)
     }
 
     companion object {

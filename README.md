@@ -3,267 +3,76 @@ SPDX-FileCopyrightText: 2023 Deutsche Telekom AG
 
 SPDX-License-Identifier: CC0-1.0    
 -->
-# Welcome to the Arc Agent Init Project
+# 🌌 TaxoArena: Dynamic Hierarchical DAG Taxonomy for Model Evaluation
 
-The following project is a demo project for the Arc Agent Framework. 
-It can also be used to kickstart a new Spring Boot project that uses the Arc Agent Framework.
+**TaxoArena** builds a **Dynamic Hierarchical Directed Acyclic Graph (DAG)** taxonomy directly from MMLU-Pro query distributions. Questions are embedded, mapped, and clustered into polyhierarchical domains using spherical statistical modeling. Within this taxonomy, leaf nodes host **LLM-judge** pairwise matchups to maintain local model leaderboards fitted using the Bradley-Terry probabilistic model. The result is a self-organizing, geometrically coherent map of knowledge that doubles as an active model-evaluation arena.
 
-> **Documentation:** the full organized project context lives under [`docs/`](docs/README.md).
+---
 
-## Deterministic Build & Reproducibility
+## 🚀 Key Features
 
-The build is pinned to exact toolchain versions so that CI, agents, and contributors all
-produce the same artifacts.
+*   **Self-Organizing Polyhierarchy**: Iteratively groups query embeddings on the unit sphere via von Mises–Fisher (vMF) GMMs, performing PCA bisections validated by Dasgupta split criteria.
+*   **Active Dueling Matchmaker**: Prioritizes model comparisons using expected Shannon entropy and rating uncertainty (Fisher standard errors) to minimize evaluation query budget.
+*   **Bayesian Rating Engine**: Updates model strengths dynamically using confidence-gated Weng-Lin updates, propagating domain-specific wins/losses/ties to ancestor categories.
+*   **Interactive Terminal UI**: A real-time Compose-based TUI console featuring a live benchmark leaderboard, node-specific evaluations, metrics dashboard, and system logs.
+*   **Production-Grade Architecture**: Powered by Spring Boot WebFlux, thread-safe asynchronous Kotlin Coroutine dispatchers, and concurrent SQLite WAL database backends.
 
-- **JDK:** Temurin 21 — the build pins `java { languageVersion = JavaLanguageVersion.of(21) }`.
-  Bootstrap via Gradle toolchains; we ship JDK 21 under `~/.gradle/jdks/` for our CI / agents.
-  **Do not build with JDK ≥ 22 / 25** (the Mosaic / Compose plugin is currently incompatible).
+---
 
-  **JDK requirement:** Run with Temurin JDK 21. Higher JDKs (22+, 23) may work but trigger the
-  Mosaic Panama-FFI variant which has platform-specific quirks on Windows. If you must use JDK 22+,
-  set `taxoadapt.execution.skip-tty-precheck=true` to bypass the reflective TTY probe.
-- **Kotlin:** 2.1.10 (`kotlin("jvm")` and `plugin.compose` are both pinned to 2.1.10).
-- **Gradle:** 8.10 (from `gradle/wrapper/gradle-wrapper.properties`). Always invoke via `./gradlew`.
-- **Spring Boot:** 3.4.3 (WebFlux).
-- **Project version:** `0.1.0-SNAPSHOT` (`gradle.properties`).
+## 📖 Project Documentation
 
-**Build command** (verified by PR #46/#47/#48/#49/#50/#51/#52):
+The complete technical context and mathematical specifications live under the [`docs/`](docs/README.md) directory.
 
-```bash
-./gradlew compileKotlin compileTestKotlin
-```
+### Quick Sitemap
+*   **[Core Concepts](docs/core-concepts/README.md)**: [Taxonomy DAG Topology](docs/core-concepts/taxonomy-dag.md) & [Data Schemas](docs/core-concepts/data-representations.md)
+*   **[Evolutionary Pipeline](docs/evolutionary-pipeline/README.md)**: [vMF GMM Fitting](docs/evolutionary-pipeline/fitting-vmf.md), [Trickle Routing](docs/evolutionary-pipeline/trickle-routing.md), & [Discovery Splits](docs/evolutionary-pipeline/discovery-optimization.md)
+*   **[Arena Evaluations](docs/arena-evaluations/README.md)**: [Judge Design](docs/arena-evaluations/judge-design.md), [Bradley-Terry fit](docs/arena-evaluations/bradley-terry-fit.md), & [Active Matchmaking](docs/arena-evaluations/active-matchmaking.md)
+*   **[Validation Metrics](docs/metrics-validation/README.md)**: [Clustering](docs/metrics-validation/clustering-metrics.md), [Classification (ECE / H-F1)](docs/metrics-validation/classification-metrics.md), & [Structural Balance](docs/metrics-validation/structural-metrics.md)
+*   **[System Architecture](docs/system-architecture/README.md)**: [Compose TUI Dashboard](docs/system-architecture/tui-dashboard.md), [Spring Engine](docs/system-architecture/spring-integration.md), & [SQLite Concurrency](docs/system-architecture/database-concurrency.md)
 
-**Test command:**
+---
 
-```bash
-./gradlew test
-```
+## 🛠️ Getting Started
 
-### Dataset checksum
+### 1. Requirements & Toolchain
+The build is pinned to exact toolchain versions for deterministic execution:
+*   **JDK**: Temurin 21 (Compose-Mosaic layout terminal bindings require JDK 21). *Do not run with JDK ≥ 22*.
+*   **Kotlin**: 2.1.10
+*   **Gradle**: 8.10 (bootstrap via `./gradlew`)
+*   **Spring Boot**: 3.4.3 (WebFlux)
 
-```
-mmlu_pro_dataset_cache.db SHA-256: 380534531249c6db559d3fdfbd9b11849dd2b920d4467af4e218dbae787afbee
-```
-
-Regenerate with `sha256sum mmlu_pro_dataset_cache.db | head -c 64` (or `shasum -a 256` on macOS).
-
-The dataset DB is currently tracked in git. This will be addressed in a future
-framework-stability PR that moves it out of the repo behind a `./gradlew downloadDataset` task.
-
-### Reproducible-run table
-
-Each recent metrics PR maps to the build invocation used to verify it, so reviewers can
-reproduce the headline numbers:
-
-| PR | Verification command |
-|----|---------------------|
-| #46 | `./gradlew compileKotlin compileTestKotlin && ./gradlew test --tests "*Nmi*" --tests "*DendrogramPurity*" --tests "*Kappa*" --tests "*HierarchicalF1*"` |
-| #48 | `./gradlew test --tests "*MetricsGroundTruth*"` |
-| #49 | `./gradlew test --tests "*TotalDasgupta*" --tests "*RoutingECE*" --tests "*TripletAccuracy*" --tests "*NormalisedSackin*"` |
-| #50 | `./gradlew test --tests "*BenchmarkE2E*"` |
-| #51 | `./gradlew test --tests "*LogsPanel*" --tests "*SnapshotLog*"` |
-
-## How to run
-
-#### 0. Configure secrets via environment variables
-
-Secrets are **not** stored in `config/application.yml`. Copy the provided
-template and fill in your own credentials before starting the application:
-
+### 2. Configure Environment Secrets
+Create a `.env` file at the root of the project to set your credentials (read automatically by `spring-dotenv`):
 ```bash
 cp .env.example .env
-# then edit .env and set the values
 ```
-
-The root-level `.env` file is **loaded automatically** at startup (via
-[spring-dotenv](https://github.com/paulschwarz/spring-dotenv)), so its entries
-resolve the `${...}` placeholders in `config/application.yml` with no extra
-steps. `config/application.yml` reads the following variables (the `.env`
-file is git-ignored and must never be committed):
-
-| Variable | Purpose |
-| --- | --- |
-| `HUGGINGFACE_TOKEN` | HuggingFace access token |
-| `AZURE_AI_API_KEY` | Azure AI / OpenAI API key for the configured deployment |
-| `AZURE_AI_ENDPOINT` | Azure AI endpoint URL |
-| `GEMINI_API_KEY` | Google Gemini API key (only when `llm.provider` is `GEMINI`) |
-
-`AZURE_AI_API_KEY` and `AZURE_AI_ENDPOINT` are required when `taxoadapt.llm.provider`
-is `AZURE` (the default). If they are left blank the application no longer
-crashes — it logs a warning and falls back to the local Ollama chat/embedding
-model, so an Ollama-only setup boots without any Azure credentials.
-
-Real values belong in `.env`. You may also export them into your shell instead, e.g.:
-
-```bash
-export HUGGINGFACE_TOKEN=hf_...
-export AZURE_AI_API_KEY=...
-export AZURE_AI_ENDPOINT=https://<resource-name>.services.ai.azure.com/
+Fill in the values in your `.env` file:
+```env
+HUGGINGFACE_TOKEN=hf_your_huggingface_token
+AZURE_AI_API_KEY=your_azure_api_key
+AZURE_AI_ENDPOINT=https://your-resource.services.ai.azure.com/
+GEMINI_API_KEY=your_gemini_api_key
 ```
+*Note: If Azure credentials are left blank, the system automatically falls back to local Ollama endpoints.*
 
-#### 1. Add language model configuration
+### 3. Basic Commands
+*   **Build the codebase**:
+    ```bash
+    ./gradlew compileKotlin compileTestKotlin
+    ```
+*   **Execute tests**:
+    ```bash
+    ./gradlew test
+    ```
+*   **Run the application**:
+    ```bash
+    ./gradlew bootRun
+    ```
 
-Add an OpenAI API-KEY to `config/application.yml` or as the environment variable, `OPENAI_API_KEY`.
+---
 
-```
-arc:
-  ai:
-    clients:
-      - id: GPT-4o
-        model-name: GPT-4o
-        api-key: ${OPENAI_API_KEY}
-        client: openai
-      - id: llama3.3
-        modelName: llama3.3
-        client: ollama
-```
+## 🤝 Code of Conduct & Licensing
 
-Alternatively, you can run an LLM locally with the `ollama` client, see https://ollama.com/,
-and change the model in the agent `assistant.agent.kts` file accordingly.
+This project follows the [REUSE standard for software licensing](https://reuse.software/). Each file contains copyright and license information, and license texts can be found in the [./LICENSES](./LICENSES) folder.
 
-```kts
-agent {
-    name = "assistant-agent"
-    model = { "llama3.3" }
-    ...
-}
-```
-
-#### 2. Start the Application
-
-Start the Demo Application like a normal Spring Boot application.
-This requires the port 8080 to be available.
-
-```bash
-  ./gradlew bootRun
-```
-
-
-#### 3. Access the Agent
-
-You can chat with the Arc Agents using the [Arc View](http://github.com/eclipse-lmos/arc-view).
-
-Simply open http://localhost:8080/chat/index.html#/chat in your browser.
-
-Alternatively, the Graphiql interface is also available, under http://localhost:8080/graphiql?path=/graphql.
-
-Example Request:
-
-```graphql
-subscription {
-    agent(
-        agentName: "assistant-agent"
-        request: {
-            conversationContext: {
-                conversationId: "1"
-            }
-            systemContext: [],
-            userContext: {
-                userId: "1234",
-                profile: [{
-                    key: "name",
-                    value: "Pat"
-                }]
-            },
-            messages: [
-                {
-                    role: "user",
-                    content: "Hi",
-                    format: "text",
-                }
-            ]
-        }
-    ) {
-        messages {
-            content
-        }
-    }
-}
-```
-
-
-#### 4. Add new Agents
-
-New agents can be added to the `agents` folder located at the root of the project.
-The folder contains a default agent `assistant-agent` that can be used as a template.
-
-
-#### 5. Tracing
-
-The Arc Framework supports tracing with Micrometer Tracing. 
-See [Arc Tracing](https://eclipse.dev/lmos/docs/arc/tracing/) for more information.
-
-By default, tracing is disabled in the project. To enable it, update your application.yaml as follows:
-```yaml
-management:
-  tracing:
-    enabled: true
-```
-
-To use tracing with [Arize Phoenix](https://phoenix.arize.com/), start the Phoenix server using Docker:
-```shell
-docker run -p 6006:6006 -p 4317:4317 -i -t arizephoenix/phoenix:latest
-```
-
-Open the Phoenix UI in your browser at [http://localhost:6006/projects](http://localhost:9411/) to watch the traces of your Arc Agents in real time.
-
-
-#### 6. MCP
-
-The Arc Framework supports tools hosted on an MCP server.
-See [MCP Integration](https://eclipse.dev/lmos/docs/arc/mcp/) for the documentation and check out the 
-python based example in mcp-server folder.
-
-
-## In Production
-
-When deploying the application in production, you may not want to use kotlin scripts.
-
-For this purpose, we have the Arc Gradle Plugin that will transpile the kotlin scripts into kotlin classes.
-
-Simply add the following to your `build.gradle.kts` file:
-
-```kts
-plugins {
-  id("org.eclipse.lmos.arc.gradle.plugin") version "0.124.0"
-}
-```
-
-The transpiled classes will be generated in the `/build/arc/kotlin` folder.
-
-For these classes to be loaded, you will also need to disable the kotlin scripts in your `application.yml` file:
-
-```yml
-arc:
-  scripts:
-    enabled: false
-```
-
-This will also prevent any kotlin scripts from being loaded.
-
-
-## Code of Conduct
-
-This project has adopted the [Contributor Covenant](https://www.contributor-covenant.org/) in version 2.1 as our code of conduct. Please see the details in our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). All contributors must abide by the code of conduct.
-
-By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
-
-## Licensing
-
-This project follows the [REUSE standard for software licensing](https://reuse.software/).    
-Each file contains copyright and license information, and license texts can be found in the [./LICENSES](./LICENSES) folder. For more information visit https://reuse.software/.    
-You can find a guide for developers at https://telekom.github.io/reuse-template/.   
-
-
-
-
-
-
-
-
-
-• The Current State: In  TaxonomySplitter.kt  and  TaxonomyMerger.kt , the engine queries LLMs for JSON structures and uses string manipulation fallback methods ( cleanJson ) to find curly brackets  {}  before parsing with Kotlinx Serialization. This is fragile and can break if the model adds          
-conversational preambles.                                                                                                                                                                                                                                                                                      
-• Day-to-Day Improvement: Force native structured JSON generation:                                                                                                                                                                                                                                             
-• Configure  OllamaChatModel  or  OpenAiChatModel  to enforce  responseFormat(ResponseFormat.JSON)  schema constraints.                                                                                                                                                                                    
-• This guarantees 100% syntactically perfect JSON outputs from the LLM, eliminating custom string cleanup blocks and preventing JSON parsing exceptions on the host JVM.    
+All contributors must abide by the project's [Code of Conduct](./CODE_OF_CONDUCT.md).

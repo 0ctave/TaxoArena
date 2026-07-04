@@ -34,6 +34,7 @@ import taxonomy.tui.state.BenchmarkSubScreen
 import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.BenchmarkUiState
+import taxonomy.tui.state.ScrollbarTarget
 
 @Composable
 fun BenchmarkPanel(
@@ -191,7 +192,7 @@ private fun ArenaBenchmarkView(
                 }
             }
 
-            isLive -> ArenaBenchmarkLiveView(w, height, controlState, benchmarkState)
+            isLive -> ArenaBenchmarkLiveView(w, height, controlState, benchmarkState, dispatch)
 
             else -> ArenaBenchmarkConfig(width, height - 3, benchmarkState, availableDomains, dispatch)
         }
@@ -282,6 +283,7 @@ private fun ArenaBenchmarkLiveView(
     height: Int,
     controlState: AnalysisPanelState,
     b: BenchmarkUiState,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val running = controlState.isRunningBenchmark
     val report = controlState.benchmarkReport
@@ -388,7 +390,8 @@ private fun ArenaBenchmarkLiveView(
                             pHeight = leftBodyRows,
                             itemCount = sortedModels.size,
                             scrollOffset = b.benchmarkScrollOffset,
-                            hasPadding = false
+                            hasPadding = false,
+                            onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                         ) { visibleHeight, startIdx, innerW ->
                             sortedModels.drop(startIdx).take(visibleHeight).forEach { entry ->
                                 val model = entry.key
@@ -425,7 +428,8 @@ private fun ArenaBenchmarkLiveView(
                                 pHeight = rightBodyRows,
                                 itemCount = accs.size,
                                 scrollOffset = b.benchmarkScrollOffset,
-                                hasPadding = false
+                                hasPadding = false,
+                                onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                             ) { visibleHeight, startIdx, innerW ->
                                 accs.drop(startIdx).take(visibleHeight).forEach { (model, acc) ->
                                     val barLen = ((innerW - 28).coerceAtLeast(5) * acc).toInt()
@@ -454,7 +458,8 @@ private fun ArenaBenchmarkLiveView(
                                 pHeight = rightBodyRows,
                                 itemCount = pairStats.size,
                                 scrollOffset = b.benchmarkScrollOffset,
-                                hasPadding = false
+                                hasPadding = false,
+                                onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                             ) { visibleHeight, startIdx, innerW ->
                                 pairStats.drop(startIdx).take(visibleHeight).forEach { ps ->
                                     val rowStr = if (isWide) {
@@ -502,7 +507,8 @@ private fun ArenaBenchmarkLiveView(
                         pHeight = narrowBodyRows,
                         itemCount = accs.size,
                         scrollOffset = b.benchmarkScrollOffset,
-                        hasPadding = false
+                        hasPadding = false,
+                        onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                     ) { visibleHeight, startIdx, innerW ->
                         accs.drop(startIdx).take(visibleHeight).forEach { (model, acc) ->
                             Text("• ${model.take(20)}: ${"%.1f%%".format(acc * 100)}".take(innerW), color = Green)
@@ -515,7 +521,8 @@ private fun ArenaBenchmarkLiveView(
                         pHeight = narrowBodyRows,
                         itemCount = pairStats.size,
                         scrollOffset = b.benchmarkScrollOffset,
-                        hasPadding = false
+                        hasPadding = false,
+                        onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                     ) { visibleHeight, startIdx, innerW ->
                         pairStats.drop(startIdx).take(visibleHeight).forEach { ps ->
                             Text("${ps.modelA.take(12)} vs ${ps.modelB.take(12)} | ${ps.judgeWinsA}/${ps.judgeWinsB}/${ps.judgeTies}".take(innerW), color = White)

@@ -24,7 +24,9 @@ internal class TopologyKeyHandler(
             }
 
             "s", "arrowdown" -> {
-                dispatch(TuiEvent.SetSelectedTreeIdx(state.topology.selectedTreeIdx + 1))
+                val lines = treeLinesProvider(state.topology.expandedNodes)
+                val maxIdx = (lines.size - 1).coerceAtLeast(0)
+                dispatch(TuiEvent.SetSelectedTreeIdx((state.topology.selectedTreeIdx + 1).coerceAtMost(maxIdx)))
                 dispatch(TuiEvent.SetTopologyAutoScroll(false))
             }
 

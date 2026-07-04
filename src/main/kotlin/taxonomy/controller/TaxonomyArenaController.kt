@@ -30,7 +30,7 @@ class TaxonomyArenaController(
     }
 
     @PostMapping("/compare")
-    fun compareModels(@RequestBody request: ArenaRequest): ArenaResult = runBlocking {
+    suspend fun compareModels(@RequestBody request: ArenaRequest): ArenaResult {
         val result = arenaService.compareModels(request.query, request.modelA, request.modelB)
         
         // Propagate result to ranking service for all matched domains passing the confidence gate
@@ -59,7 +59,7 @@ class TaxonomyArenaController(
             }
         }
         
-        result
+        return result
     }
 
     @GetMapping("/leaderboard")
@@ -73,11 +73,11 @@ class TaxonomyArenaController(
     }
 
     @PostMapping("/simulate")
-    fun runSimulation(
+    suspend fun runSimulation(
         @RequestParam(defaultValue = "100") numMatches: Int,
         @RequestParam(defaultValue = "ig") strategy: String
-    ): SimulationResult = runBlocking {
-        tournamentSimulator.runSimulation(numMatches, strategy)
+    ): SimulationResult {
+        return tournamentSimulator.runSimulation(numMatches, strategy)
     }
 
     @GetMapping("/test-queries")

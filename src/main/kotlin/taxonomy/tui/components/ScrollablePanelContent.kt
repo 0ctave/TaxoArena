@@ -43,11 +43,18 @@ fun ScrollablePanelContent(
     reversed: Boolean = false,
     activeColor: Color = Cyan,
     trackColor: Color = White,
+    onScrollClamp: ((Int) -> Unit)? = null,
     contentColumn: @Composable (visibleHeight: Int, startIdx: Int, innerWidth: Int) -> Unit
 ) {
     val visible = pHeight.coerceAtLeast(1)
     val maxScroll = maxOf(0, itemCount - visible)
     val startIdx = scrollOffset.coerceIn(0, maxScroll)
+
+    if (scrollOffset > maxScroll && maxScroll >= 0 && onScrollClamp != null) {
+        androidx.compose.runtime.LaunchedEffect(scrollOffset, maxScroll) {
+            onScrollClamp(maxScroll)
+        }
+    }
 
     // Step 1: compute the total width available for this component.
     val innerWidth = (if (hasPadding) pWidth - 4 else pWidth).coerceAtLeast(1)

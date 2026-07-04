@@ -30,6 +30,7 @@ fun DomainSelectorTable(
     offset: Int,
     selectedIdx: Int,
     selectedDomains: List<String>,
+    dispatch: (taxonomy.tui.controller.TuiEvent) -> Unit = {},
 ) {
     if (domains.isEmpty()) {
         Column {
@@ -45,6 +46,7 @@ fun DomainSelectorTable(
         itemCount = domains.size,
         scrollOffset = offset,
         hasPadding = false,
+        onScrollClamp = { dispatch(taxonomy.tui.controller.TuiEvent.ScrollTo(taxonomy.tui.state.ScrollbarTarget.TOPOLOGY, it)) }
     ) { visibleHeight, startIdx, contentWidth ->
         val end = (startIdx + visibleHeight).coerceAtMost(domains.size)
         for (i in startIdx until end) {
@@ -92,6 +94,7 @@ fun AsciiTreeTable(
     offset: Int,
     selectedIdx: Int,
     queryCounts: Map<String, Int> = emptyMap(),
+    dispatch: (taxonomy.tui.controller.TuiEvent) -> Unit = {},
 ) {
     if (lines.isEmpty()) {
         Column {
@@ -128,6 +131,7 @@ fun AsciiTreeTable(
             itemCount = lines.size,
             scrollOffset = offset,
             hasPadding = false,
+            onScrollClamp = { dispatch(taxonomy.tui.controller.TuiEvent.ScrollTo(taxonomy.tui.state.ScrollbarTarget.TOPOLOGY, it)) }
         ) { visibleHeight, startIdx, contentWidth ->
             val end = (startIdx + visibleHeight).coerceAtMost(lines.size)
             for (i in startIdx until end) {

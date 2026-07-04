@@ -21,6 +21,7 @@ internal fun TopologyPanel(
     allNodes: List<GraphNode>,
     treeLines: List<TreeLine>,
     queryCounts: Map<String, Int> = emptyMap(),
+    dispatch: (taxonomy.tui.controller.TuiEvent) -> Unit = {}
 ) {
     when {
         state.showDomainSelector -> {
@@ -30,7 +31,8 @@ internal fun TopologyPanel(
                 domains = availableDomains,
                 offset = state.scrollOffset,
                 selectedIdx = state.selectedListIdx,
-                selectedDomains = selectedDomains
+                selectedDomains = selectedDomains,
+                dispatch = dispatch
             )
         }
         else -> {
@@ -42,6 +44,7 @@ internal fun TopologyPanel(
                 offset = state.treeScrollOffset,
                 selectedIdx = state.selectedTreeIdx,
                 queryCounts = queryCounts,
+                dispatch = dispatch
             )
         }
     }

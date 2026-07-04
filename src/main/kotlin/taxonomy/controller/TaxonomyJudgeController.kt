@@ -17,13 +17,13 @@ class TaxonomyJudgeController(
 ) {
 
     @PostMapping("/generate")
-    fun generateJudges(
+    suspend fun generateJudges(
         @RequestParam(required = false) nodeId: String?,
         @RequestParam(defaultValue = "false") replace: Boolean
-    ): Map<String, String> = runBlocking {
-        val root = taxonomyService.getGraph() ?: return@runBlocking mapOf("error" to "Taxonomy not loaded")
+    ): Map<String, String> {
+        val root = taxonomyService.getGraph() ?: return mapOf("error" to "Taxonomy not loaded")
         
-        try {
+        return try {
             if (nodeId != null) {
                 judgeService.generateJudgeForNodeById(root, nodeId)
             } else {

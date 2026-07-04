@@ -84,7 +84,7 @@ fun TuiRouter(
             when (state.startup.state) {
                 StartupState.LOAD_DAG -> WelcomeRoute(width, height, state)
                 StartupState.LOADING -> LoadingRoute(width, height, state)
-                StartupState.CONFIGANDDOMAINS -> ConfigRoute(width, height, deps, state, subscriptions)
+                StartupState.CONFIGANDDOMAINS -> ConfigRoute(width, height, deps, state, subscriptions, dispatch)
                 StartupState.MAINDASHBOARD -> MainDashboardRoute(width, height, deps, state, subscriptions, dispatch)
             }
         }
@@ -221,6 +221,7 @@ private fun ConfigRoute(
     deps: TuiDependencies,
     state: TuiAppState,
     subscriptions: TuiSubscriptions,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val bodyH = (height - 5).coerceAtLeast(9)
     val topH = (bodyH * 0.62).toInt().coerceAtLeast(8)
@@ -308,7 +309,8 @@ private fun ConfigRoute(
                     domains = availableDomains,
                     offset = state.config.domainScrollOffset,
                     selectedIdx = state.config.selectedDomainIdx,
-                    selectedDomains = deps.config.dataset.selectedDomains
+                    selectedDomains = deps.config.dataset.selectedDomains,
+                    dispatch = dispatch
                 )
             }
             Spacer(Modifier.width(1).height(topH))
@@ -349,7 +351,7 @@ private fun ConfigRoute(
     Spacer()
 
     if (!state.runtime.isRegenerating && !state.config.promptingDownloadCount) {
-        BottomLogsAndTraces(width, bottomH, deps, state)
+        BottomLogsAndTraces(width, bottomH, deps, state, dispatch = dispatch)
     }
 
     HotkeyBar(width, contextual = configHotkeys(state), global = GlobalHotkeys.forState(state))
@@ -446,6 +448,7 @@ private fun MainDashboardRoute(
                     allNodes = allNodes,
                     treeLines = treeLines,
                     queryCounts = queryCounts,
+                    dispatch = dispatch
                 )
                 else -> Column(modifier = Modifier.padding(left = 2, top = 1)) {
                     if (state.runtime.isRegenerating) {
@@ -507,7 +510,7 @@ private fun MainDashboardRoute(
 
     Spacer()
 
-    BottomLogsAndTraces(width, bottomH, deps, state, subscriptions)
+    BottomLogsAndTraces(width, bottomH, deps, state, subscriptions, dispatch)
 
     // ── Fixed hotkey bar — always the same grouped layout when a DAG is loaded
     HotkeyBarGrouped(
@@ -529,6 +532,7 @@ private fun BottomLogsAndTraces(
     deps: TuiDependencies,
     state: TuiAppState,
     subscriptions: TuiSubscriptions? = null,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     Row(modifier = Modifier.height(bottomH)) {
         val logsW = (width * 0.55).toInt().coerceAtLeast(20)
@@ -546,7 +550,7 @@ private fun BottomLogsAndTraces(
             height = bottomH,
             contextHints = logsHints
         ) {
-            LogsPanel(logsW - 4, logsBodyH, state.logs.logScrollOffset)
+            LogsPanel(logsW - 4, logsBodyH, state.logs.logScrollOffset, dispatch = dispatch)
         }
 
         Spacer(Modifier.width(1).height(bottomH))

@@ -30,13 +30,13 @@ class ModelEvalController(
 
     /** Load one model's eval zip or directory into the DB. */
     @PostMapping("/load")
-    fun loadModel(@RequestBody req: LoadRequest): LoadResponse = runBlocking {
+    suspend fun loadModel(@RequestBody req: LoadRequest): LoadResponse {
         require(req.zipPath != null || req.dirPath != null) { "Provide zipPath or dirPath" }
         val stats = when {
             req.zipPath != null -> loader.loadFromZip(req.zipPath, req.modelName)
             else -> loader.loadFromDirectory(req.dirPath!!, req.modelName)
         }
-        LoadResponse(stats = stats, totalModels = store.getLoadedModels())
+        return LoadResponse(stats = stats, totalModels = store.getLoadedModels())
     }
 
     /** Sync the is_reserved flag from reserved_test_queries.json. Call once after all models loaded. */

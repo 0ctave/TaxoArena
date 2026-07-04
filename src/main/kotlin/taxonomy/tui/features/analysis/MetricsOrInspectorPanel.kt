@@ -30,6 +30,8 @@ import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.tui.components.take
 import taxonomy.tui.state.MetricsZoneFocus
+import taxonomy.tui.state.ScrollbarTarget
+import taxonomy.tui.controller.TuiEvent
 import taxonomy.utils.PerformanceStats
 import java.util.Locale
 
@@ -55,6 +57,7 @@ fun MetricsOrInspectorPanel(
     showPerformanceBlock: Boolean = false,
     detailScrollOffset: Int = 0,
     performanceReport: Map<String, PerformanceStats> = emptyMap(),
+    dispatch: (TuiEvent) -> Unit = {}
 ) {
     when (mode) {
         AnalysisMode.NODE_DETAIL -> {
@@ -75,6 +78,7 @@ fun MetricsOrInspectorPanel(
                     itemCount = items.size,
                     scrollOffset = inspectorScroll,
                     hasPadding = false,
+                    onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                 ) { visibleHeight, startIdx, _ ->
                     items.drop(startIdx).take(visibleHeight).forEach { (text, color, bold) ->
                         Text(
@@ -103,6 +107,7 @@ fun MetricsOrInspectorPanel(
                     detailScrollOffset = detailScrollOffset,
                     metricsScrollOffset = metricsScrollOffset,
                     performanceReport = performanceReport,
+                    dispatch = dispatch
                 )
             }
         }
@@ -259,8 +264,8 @@ fun buildNodeDetailLines(
                 for (idx in 0 until leaderboard.ranks.size - 1) {
                     val m1 = leaderboard.ranks[idx]
                     val m2 = leaderboard.ranks[idx + 1]
-                    val gap = java.lang.Math.abs(m1.btScore - m2.btScore)
-                    val threshold = java.lang.Math.max(m1.stdError, m2.stdError)
+                    val gap = Math.abs(m1.btScore - m2.btScore)
+                    val threshold = Math.max(m1.stdError, m2.stdError)
                     if (gap < threshold) {
                         warnings.add("${shortModelName(m1.modelId)} and ${shortModelName(m2.modelId)} not separated (gap < 1 SE)")
                     }
@@ -289,6 +294,7 @@ private fun MetricsThreeZone(
     detailScrollOffset: Int,
     metricsScrollOffset: Int,
     performanceReport: Map<String, PerformanceStats>,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val lastIdx = history.lastIndex
     val selResolved = if (selectedIterationIndex in 0..lastIdx) selectedIterationIndex else lastIdx
@@ -300,7 +306,7 @@ private fun MetricsThreeZone(
 
     Column {
         Column(modifier = Modifier.height(zone1H).width(width)) {
-            EvolutionTable(width, zone1H, history, selectedIterationIndex, focus, metricsScrollOffset)
+            EvolutionTable(width, zone1H, history, selectedIterationIndex, focus, metricsScrollOffset, dispatch)
         }
         Row(modifier = Modifier.height(bottomH)) {
             Column(modifier = Modifier.width(leftW).height(bottomH)) {
@@ -311,6 +317,7 @@ private fun MetricsThreeZone(
                 IterationDetail(
                     rightW, bottomH, history, selResolved, focus,
                     showPerformanceBlock, detailScrollOffset, performanceReport,
+                    dispatch
                 )
             }
         }
@@ -329,6 +336,7 @@ private fun EvolutionTable(
     selectedIterationIndex: Int,
     focus: MetricsZoneFocus,
     metricsScrollOffset: Int,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val lastIdx = history.lastIndex
     val tableFocused = focus == MetricsZoneFocus.TABLE
@@ -346,7 +354,8 @@ private fun EvolutionTable(
         pHeight = visible,
         itemCount = dataCount,
         scrollOffset = metricsScrollOffset,
-        hasPadding = false
+        hasPadding = false,
+        onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
     ) { visibleHeight, startIdx, innerWidth ->
         val endIdx = (startIdx + visibleHeight).coerceAtMost(dataCount)
         for (i in startIdx until endIdx) {
@@ -433,6 +442,7 @@ private fun IterationDetail(
     showPerformanceBlock: Boolean,
     detailScrollOffset: Int,
     performanceReport: Map<String, PerformanceStats>,
+    dispatch: (TuiEvent) -> Unit,
 ) {
     val entry = history[selResolved]
     val isFinal = selResolved == history.lastIndex
@@ -450,7 +460,8 @@ private fun IterationDetail(
         pHeight = body,
         itemCount = lines.size,
         scrollOffset = detailScrollOffset,
-        hasPadding = false
+        hasPadding = false,
+        onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
     ) { visibleHeight, startIdx, innerWidth ->
         val sub = lines.subList(startIdx, (startIdx + visibleHeight).coerceAtMost(lines.size))
         sub.forEach { Text(it.take(innerWidth)) }

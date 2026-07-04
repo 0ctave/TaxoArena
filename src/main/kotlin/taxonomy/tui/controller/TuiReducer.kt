@@ -921,7 +921,7 @@ object TuiReducer {
                         isEditingBenchmarkField = false,
                         benchmarkEditingValue = "",
                         benchmarkScrollOffset = 0,
-                        benchmarkActiveSection = taxonomy.tui.state.BenchmarkSection.MODELS,
+                        benchmarkActiveSection = BenchmarkSection.MODELS,
                         benchmarkIsPickingModels = false,
                         benchmarkIsPickingDomains = false,
                         benchmarkPickerCursor = 0,
