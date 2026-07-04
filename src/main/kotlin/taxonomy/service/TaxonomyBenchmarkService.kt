@@ -122,6 +122,7 @@ class TaxonomyBenchmarkService(
 
         // Pre-route all questions to target nodes dynamically using the NiW routing engine
         val nodeToQueries = mutableMapOf<String, MutableList<Int>>()
+        val queryToLeaves = mutableMapOf<Int, MutableList<String>>()
         var outlierCount = 0
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
@@ -133,6 +134,7 @@ class TaxonomyBenchmarkService(
             }
             leaves.forEach { leaf ->
                 nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
+                queryToLeaves.getOrPut(qId) { mutableListOf() }.add(leaf.id)
             }
         }
         log.info("Pre-routing complete: ${matrix.size - outlierCount} questions routed, $outlierCount outliers discarded")
@@ -141,6 +143,7 @@ class TaxonomyBenchmarkService(
             numModels = modelNames.size,
             numLeaves = nodeToQueries.size,
             totalQuestions = matrix.size - outlierCount,
+            minQuestionsPerLeaf = nodeToQueries.values.map { it.size }.minOrNull() ?: 10,
             req = req
         )
         log.info("Scheduling params: $params")
@@ -424,7 +427,8 @@ class TaxonomyBenchmarkService(
                                 traceB = getRobustTrace(outputB),
                                 expectedNodeId = task.nodeId,
                                 frozenLeafIds = frozenLeafIds,
-                                gtAnswer = sample.gtAnswer
+                                gtAnswer = sample.gtAnswer,
+                                assignedLeafIds = queryToLeaves[qId]
                             )
                             evals
                         }
@@ -475,6 +479,37 @@ class TaxonomyBenchmarkService(
                                 outcome = primaryEval,
                                 snapshotId = snapshotId
                             )
+                        }
+
+                        val otherLeaves = queryToLeaves[qId]?.filter { it != task.nodeId } ?: emptyList()
+                        for (siblingLeafId in otherLeaves) {
+                            val siblingNode = allNodes.firstOrNull { it.id == siblingLeafId } ?: continue
+                            if (siblingNode.judgePrompt == null) continue
+                            withContext(dbWriteDispatcher) {
+                                propagateOutcome(
+                                    leafId = siblingLeafId,
+                                    modelA = task.modelA,
+                                    modelB = task.modelB,
+                                    outcome = primaryEval,
+                                    snapshotId = snapshotId
+                                )
+                                if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
+                                    val siblingDomain = siblingNode.label ?: siblingNode.id
+                                    val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
+                                    val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
+                                    rankingService.recordMatch(
+                                        query = cacheKey,
+                                        domain = siblingDomain,
+                                        winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
+                                        loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
+                                        isTie = isTie,
+                                        confidence = primaryEval.confidence,
+                                        snapshotId = snapshotId,
+                                        modelA = task.modelA,
+                                        modelB = task.modelB
+                                    )
+                                }
+                            }
                         }
 
                         val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
@@ -962,6 +997,7 @@ private fun buildSchedulingParams(
     numModels: Int,
     numLeaves: Int,
     totalQuestions: Int,
+    minQuestionsPerLeaf: Int,
     req: BenchmarkRequest
 ): SchedulingParams {
     val K = numModels
@@ -977,11 +1013,11 @@ private fun buildSchedulingParams(
     // Scale up slightly if we have many questions available
     val avgQuestionsPerLeaf = if (numLeaves > 0) totalQuestions / numLeaves else 10
     val baseQueriesPerPair = when {
-        avgQuestionsPerLeaf >= 20 -> 15
-        avgQuestionsPerLeaf >= 10 -> 10
+        minQuestionsPerLeaf >= 20 -> 15
+        minQuestionsPerLeaf >= 12 -> 10
         else -> 6
     }
-    var queriesPerPair = minOf(baseQueriesPerPair, avgQuestionsPerLeaf).coerceAtLeast(1)
+    var queriesPerPair = minOf(baseQueriesPerPair, minQuestionsPerLeaf).coerceAtLeast(1)
     if (totalQuestions <= 20) {
         queriesPerPair = totalQuestions.coerceAtLeast(1)
     }

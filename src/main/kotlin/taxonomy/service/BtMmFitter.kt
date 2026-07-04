@@ -57,6 +57,38 @@ object BtMmFitter {
         return models.zip(s.toList()).toMap()
     }
 
+    private fun invertMatrix(A: Array<DoubleArray>): Array<DoubleArray>? {
+        val n = A.size
+        val I = Array(n) { DoubleArray(n) { i -> if (i == it) 1.0 else 0.0 } }
+        val temp = Array(n) { i -> A[i].clone() }
+        for (i in 0 until n) {
+            var maxRow = i
+            for (j in i + 1 until n) {
+                if (abs(temp[j][i]) > abs(temp[maxRow][i])) {
+                    maxRow = j
+                }
+            }
+            if (abs(temp[maxRow][i]) < 1e-12) return null
+            val tRow = temp[i]; temp[i] = temp[maxRow]; temp[maxRow] = tRow
+            val iRow = I[i]; I[i] = I[maxRow]; I[maxRow] = iRow
+            val pivot = temp[i][i]
+            for (j in 0 until n) {
+                temp[i][j] /= pivot
+                I[i][j] /= pivot
+            }
+            for (j in 0 until n) {
+                if (j != i) {
+                    val factor = temp[j][i]
+                    for (k in 0 until n) {
+                        temp[j][k] -= factor * temp[i][k]
+                        I[j][k] -= factor * I[i][k]
+                    }
+                }
+            }
+        }
+        return I
+    }
+
     fun estimateStdErrors(
         models: List<String>,
         scores: Map<String, Double>,
@@ -64,8 +96,9 @@ object BtMmFitter {
     ): Map<String, Double> {
         val idx = models.withIndex().associate { (i, m) -> m to i }
         val K = models.size
-        val fisher = DoubleArray(K)
+        if (K == 0) return emptyMap()
 
+        val F = Array(K) { DoubleArray(K) }
         for (ps in pairStats) {
             val i = idx[ps.modelA] ?: continue
             val j = idx[ps.modelB] ?: continue
@@ -75,12 +108,32 @@ object BtMmFitter {
             val pij = if (denom == 0.0) 0.5 else exp(si) / denom
             val nij = ps.totalComparisons.toDouble()
             val info = nij * pij * (1.0 - pij)
-            fisher[i] += info
-            fisher[j] += info
+            F[i][i] += info
+            F[j][j] += info
+            F[i][j] -= info
+            F[j][i] -= info
+        }
+
+        // Add 1.0 to all elements to enforce mean-zero constraint ranking projection
+        val Fc = Array(K) { i -> DoubleArray(K) { j -> F[i][j] + 1.0 } }
+        val inv = invertMatrix(Fc)
+
+        val variances = DoubleArray(K)
+        if (inv != null) {
+            for (i in 0 until K) {
+                // Covariance under sum-to-zero constraint is diag(inv) - 1/K
+                val v = inv[i][i] - 1.0 / K
+                variances[i] = v.coerceAtLeast(1e-6)
+            }
+        } else {
+            for (i in 0 until K) {
+                val diag = F[i][i].coerceAtLeast(1e-6)
+                variances[i] = 1.0 / diag
+            }
         }
 
         return models.mapIndexed { i, m ->
-            m to if (fisher[i] > 0.0) 1.0 / sqrt(fisher[i]) else 10.0
+            m to sqrt(variances[i]).coerceAtLeast(0.01)
         }.toMap()
     }
 }

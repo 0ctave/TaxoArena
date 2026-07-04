@@ -34,10 +34,11 @@ class BtStoppingPolicy(
             budgetPerPair * numPairs / 2
         }
 
-        val dataExhausted = state.totalComparisons >= targetLimit
+        val liveTotalComparisons = (pairStats[nodeId] ?: emptyList()).sumOf { it.totalComparisons }
+        val dataExhausted = liveTotalComparisons >= targetLimit
         if (dataExhausted) return true
 
-        if (state.totalComparisons < minComparisonsPerLeaf) return false
+        if (liveTotalComparisons < minComparisonsPerLeaf) return false
 
         val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
 
@@ -103,7 +104,10 @@ class BtStoppingPolicy(
             if (structConv.toDouble() / targetLeafIds.size >= 0.50) return true
         }
 
-        var converged = 0
+        val totalWeight = targetLeafIds.sumOf { leafId ->
+            (nodeToQueries[leafId]?.size ?: 1).toDouble()
+        }
+        var weightedConverged = 0.0
         for (leafId in targetLeafIds) {
             val state = btStates[leafId] ?: continue
 
@@ -116,9 +120,12 @@ class BtStoppingPolicy(
             val rankStable = history.size >= stabilityRounds && history.all { it == currentRank }
             val structurallyConverged = isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries)
 
-            if (rankStable && structurallyConverged) converged++
+            val leafWeight = (nodeToQueries[leafId]?.size ?: 1).toDouble()
+            if (rankStable && structurallyConverged) {
+                weightedConverged += leafWeight
+            }
         }
 
-        return converged.toDouble() / targetLeafIds.size >= targetLeafConvergenceFraction
+        return if (totalWeight > 0.0) weightedConverged / totalWeight >= targetLeafConvergenceFraction else false
     }
 }

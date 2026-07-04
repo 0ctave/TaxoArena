@@ -423,9 +423,28 @@ class TaxonomyArenaService(
         traceB: String,
         expectedNodeId: String? = null,
         frozenLeafIds: Set<String>? = null,
-        gtAnswer: String? = null
+        gtAnswer: String? = null,
+        assignedLeafIds: List<String>? = null
     ): List<DomainEvaluation> = coroutineScope {
-        val leaves = routeToLeaves(query, frozenLeafIds)
+        val leaves = if (assignedLeafIds != null) {
+            val root = taxonomyService.getGraph()
+            if (root != null) {
+                val leafNodes = mutableListOf<GraphNode>()
+                fun collect(node: GraphNode) {
+                    if (node.id in assignedLeafIds) {
+                        leafNodes.add(node)
+                    }
+                    node.children.forEach { collect(it) }
+                    node.crossLinkChildren.forEach { collect(it) }
+                }
+                collect(root)
+                leafNodes.distinctBy { it.id }
+            } else {
+                emptyList()
+            }
+        } else {
+            routeToLeaves(query, frozenLeafIds)
+        }
         if (expectedNodeId != null && leaves.none { it.id == expectedNodeId }) {
             log.info("Routing discrepancy: query \"${query.take(30)}...\" routed to leaves ${leaves.map { it.label ?: it.id }} but expected leaf $expectedNodeId")
         }

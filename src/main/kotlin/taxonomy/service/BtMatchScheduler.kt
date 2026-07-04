@@ -29,6 +29,7 @@ class BtMatchScheduler(
     val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
+    fun reset() { pairQueryOffsets.clear() }
 
     private fun isMatchInformative(
         mA: String, mB: String,
@@ -171,15 +172,16 @@ class BtMatchScheduler(
         fun trySchedule(
             nodeId: String, mA: String, mB: String, utility: Double,
             ignoreFairShare: Boolean = false,
-            ignoreGlobalCap: Boolean = false
+            ignoreGlobalCap: Boolean = false,
+            ignoreNodeCap: Boolean = false
         ): Boolean {
             if (tasks.size >= batchSize) return false
             val pk = pairKey(mA, mB)
             if (!ignoreFairShare && (pairBatchCount[pk] ?: 0) >= fairSharePerPair) return false
 
             val nodeLoad = nodeModelLoad.getOrPut(nodeId) { mutableMapOf() }
-            if ((nodeLoad[mA] ?: 0) >= 1) return false
-            if ((nodeLoad[mB] ?: 0) >= 1) return false
+            if (!ignoreNodeCap && (nodeLoad[mA] ?: 0) >= 1) return false
+            if (!ignoreNodeCap && (nodeLoad[mB] ?: 0) >= 1) return false
 
             if (!ignoreGlobalCap) {
                 if ((globalModelLoad[mA] ?: 0) >= maxConcurrentPerModel) return false
@@ -202,9 +204,9 @@ class BtMatchScheduler(
                     val emb = node.queries.find { it.queryId == queryId }
                     if (emb != null) {
                         val slicedX = emb.projectTo(node.sliceDim)
-                        1.0 - StatisticsUtils.dotProduct(slicedX, node.vmfMu)
+                        StatisticsUtils.dotProduct(slicedX, node.vmfMu)
                     } else {
-                        0.5
+                        -1.0
                     }
                 }
             } else {
@@ -269,7 +271,8 @@ class BtMatchScheduler(
                     if (tasks.size >= batchSize) break
                     trySchedule(c.nodeId, c.modelA, c.modelB, c.utility,
                         ignoreFairShare = true,
-                        ignoreGlobalCap = false)
+                        ignoreGlobalCap = false,
+                        ignoreNodeCap = true)
                 }
             }
         }
@@ -286,21 +289,17 @@ class BtMatchScheduler(
      * return max entropy (ln 2) + bonus so bootstrap always wins.
      */
     private fun computeAlpha(state: NodeBtState?, models: List<String>, pairsResolved: Int): Double {
-        if (state == null) return 1.0  // no state: pure structure bootstrap
+        if (state == null) return 1.0
+        val bootstrapSE = 10.0   // prior SE at round 0
+        val currentAvgSE = state.stdErrors.values.average().coerceAtLeast(1e-6)
+        val seMaturity = (1.0 - currentAvgSE / bootstrapSE).coerceIn(0.0, 1.0)
 
-        // Signal 1: SE-based maturity (existing)
-        val avgSE = state.stdErrors.values.average().coerceAtLeast(1e-6)
-        val seMaturity = (1.0 - avgSE / 10.0).coerceIn(0.0, 1.0)
-
-        // Signal 2: Pair-resolution maturity — what fraction of pairs are already separated?
         val totalPairs = models.size * (models.size - 1) / 2
         val pairMaturity = if (totalPairs > 0) (pairsResolved.toDouble() / totalPairs).coerceIn(0.0, 1.0) else 0.0
 
-        // Combined maturity: pair resolution dominates early, SE dominates late
-        val combined = (seMaturity * 0.4 + pairMaturity * 0.6).coerceIn(0.0, 1.0)
-
-        // Slower decay: alpha stays >= 0.4 until 70% of pairs resolved
-        return 0.15 + 0.65 * exp(-2.0 * combined)
+        val combined = (seMaturity * 0.35 + pairMaturity * 0.65).coerceIn(0.0, 1.0)
+        // Slower decay: alpha stays > 0.5 until ~50% of pairs resolved
+        return 0.20 + 0.80 * exp(-2.5 * combined)
     }
 
     private fun structureScore(mA: String, mB: String, state: NodeBtState): Double {
@@ -412,13 +411,12 @@ class BtMatchScheduler(
     }
 
     private fun pairBudget(mA: String, mB: String, state: NodeBtState?, ps: NodePairStats?): Int {
-        if (state == null || ps == null) return queriesPerPair
+        if (state == null || ps == null) return budgetPerPair
         val si = state.btScores[mA] ?: 0.0
         val sj = state.btScores[mB] ?: 0.0
         val p = exp(si) / (exp(si) + exp(sj)).coerceAtLeast(1e-300)
-        return if (abs(p - 0.5) < 0.15)
-            (queriesPerPair * 2).coerceAtMost(budgetPerPair)
-        else queriesPerPair
+        // Close pair gets full budget; resolved pair gets minimum
+        return if (abs(p - 0.5) < 0.15) budgetPerPair else (budgetPerPair * 2 / 3).coerceAtLeast(queriesPerPair)
     }
 
     fun selectTargetNodes(
