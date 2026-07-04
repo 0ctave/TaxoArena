@@ -191,6 +191,108 @@ class TaxonomyBenchmarkService(
         var round = 0
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
 
+        var currentAggregated: taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard? = null
+        var lastUpdateAt = 0L
+
+        val publishProgress: (Boolean) -> Unit = { force ->
+            val now = System.currentTimeMillis()
+            if (force || now - lastUpdateAt >= 150L) {
+                lastUpdateAt = now
+                val resultsSnapshot = synchronized(completedResults) { completedResults.toList() }
+                if (onProgress != null && resultsSnapshot.isNotEmpty()) {
+                    val allAgreements = resultsSnapshot.flatMap { it.judgeAccuracyAgreement.values }
+                    val runningAgreement = if (allAgreements.isNotEmpty()) allAgreements.count { it }.toDouble() / allAgreements.size else 0.0
+                    val runningCoverage = 1.0
+                    val perCategoryProgress = resultsSnapshot.groupBy { it.gtCategory }.mapValues { it.value.size }
+
+                    val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
+                    val livePairStats = pairs.map { (modelA, modelB) ->
+                        val pairKey = "${modelA}_vs_${modelB}"
+                        val pairResults = resultsSnapshot.filter { pairKey in it.judgeAccuracyAgreement }
+                        var judgeWinsA = 0; var judgeWinsB = 0; var judgeTies = 0
+                        var accWinsA = 0; var accWinsB = 0; var accTies = 0
+                        var totalConf = 0.0; var confCount = 0
+
+                        pairResults.forEach { qr ->
+                            val aCorrect = qr.modelCorrect[modelA] ?: false
+                            val bCorrect = qr.modelCorrect[modelB] ?: false
+                            when {
+                                aCorrect && !bCorrect -> accWinsA++
+                                bCorrect && !aCorrect -> accWinsB++
+                                else -> accTies++
+                            }
+                            val evals = qr.pairEvaluations[pairKey] ?: qr.domainEvaluations
+                            val primaryEval = evals
+                                .filter { it.confidence >= req.confidenceGate }
+                                .maxByOrNull { it.confidence }
+                            primaryEval?.let { eval ->
+                                when (eval.winner.uppercase()) {
+                                    "MODEL A" -> judgeWinsA++
+                                    "MODEL B" -> judgeWinsB++
+                                    else -> judgeTies++
+                                }
+                                totalConf += eval.confidence
+                                confCount++
+                            }
+                        }
+
+                        ModelPairStats(
+                            modelA = modelA,
+                            modelB = modelB,
+                            totalMatches = pairResults.size,
+                            judgeWinsA = judgeWinsA,
+                            judgeWinsB = judgeWinsB,
+                            judgeTies = judgeTies,
+                            accuracyWinsA = accWinsA,
+                            accuracyWinsB = accWinsB,
+                            accuracyTies = accTies,
+                            judgeAccuracyAgreementRate = pairResults.mapNotNull { it.judgeAccuracyAgreement[pairKey] }.let { l -> if (l.isEmpty()) 0.0 else l.count { it }.toDouble() / l.size },
+                            avgConfidence = if (confCount > 0) totalConf / confCount else 0.0,
+                            isExhausted = false
+                        )
+                    }
+
+                    val lastResult = resultsSnapshot.lastOrNull()
+                    val activeTargetNames = targetNodes.mapNotNull { it.label }
+                    
+                    val remainingQueries = targetLeafIds.sumOf { leafId ->
+                        val isConverged = stoppingPolicy.isLeafConverged(leafId, btStates, pairStatsMap, modelNames, nodeToQueries)
+                        if (isConverged) {
+                            0
+                        } else {
+                            val state = btStates[leafId]
+                            val numPairs = modelNames.size * (modelNames.size - 1) / 2
+                            val available = nodeToQueries[leafId]?.size ?: 0
+                            val maxPossible = if (available > 0) available * numPairs else 0
+                            val targetLimit = if (maxPossible > 0) {
+                                minOf(params.budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
+                            } else {
+                                params.budgetPerPair * numPairs / 2
+                            }
+                            val comps = state?.totalComparisons ?: 0
+                            maxOf(0, targetLimit - comps)
+                        }
+                    }
+                    val estimatedTotal = minOf(matrix.size, resultsSnapshot.size + remainingQueries)
+
+                    val live = BenchmarkLiveStats(
+                        processed = resultsSnapshot.size,
+                        total = estimatedTotal,
+                        currentQuestion = lastResult?.query ?: "",
+                        runningAgreement = runningAgreement,
+                        runningCoverage = runningCoverage,
+                        perCategoryProgress = perCategoryProgress,
+                        pairStats = livePairStats,
+                        currentRound = round + 1,
+                        activeTargets = activeTargetNames,
+                        btRatings = currentAggregated?.ranks?.associate { it.modelId to it.btScore } ?: emptyMap(),
+                        btErrors = currentAggregated?.ranks?.associate { it.modelId to it.stdError } ?: emptyMap()
+                    )
+                    onProgress?.invoke(live)
+                }
+            }
+        }
+
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
             btStates, pairStatsMap, targetLeafIds, modelNames, round, completedResults.size
         )) {
@@ -213,7 +315,7 @@ class TaxonomyBenchmarkService(
                 async(Dispatchers.IO) {
                     val leafNode = allNodes.firstOrNull { it.id == task.nodeId } ?: return@async emptyList<QueryBenchmarkResult>()
 
-                    task.queryIds.mapNotNull { queryIdStr ->
+                    val taskResults = task.queryIds.mapNotNull { queryIdStr ->
                         val qId = queryIdStr.toIntOrNull() ?: run {
                             log.warn("queryIdStr is not Int: $queryIdStr")
                             return@mapNotNull null
@@ -358,10 +460,16 @@ class TaxonomyBenchmarkService(
                             judgeAccuracyAgreement = mapOf(pairKey to agrees)
                         )
                     }
+
+                    if (taskResults.isNotEmpty()) {
+                        synchronized(completedResults) {
+                            completedResults.addAll(taskResults)
+                        }
+                        publishProgress(false)
+                    }
+                    taskResults
                 }
             }.awaitAll().flatten()
-
-            completedResults.addAll(roundResults)
 
             log.info("--- Round $round Results Summary ---")
             roundResults.forEach { qr ->
@@ -423,76 +531,8 @@ class TaxonomyBenchmarkService(
                 }
             }
 
-            if (onProgress != null && completedResults.isNotEmpty()) {
-                val allAgreements = completedResults.flatMap { it.judgeAccuracyAgreement.values }
-                val runningAgreement = if (allAgreements.isNotEmpty()) allAgreements.count { it }.toDouble() / allAgreements.size else 0.0
-                val runningCoverage = 1.0
-                val perCategoryProgress = completedResults.groupBy { it.gtCategory }.mapValues { it.value.size }
-
-                val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
-                val livePairStats = pairs.map { (modelA, modelB) ->
-                    val pairKey = "${modelA}_vs_${modelB}"
-                    val pairResults = completedResults.filter { pairKey in it.judgeAccuracyAgreement }
-                    var judgeWinsA = 0; var judgeWinsB = 0; var judgeTies = 0
-                    var accWinsA = 0; var accWinsB = 0; var accTies = 0
-                    var totalConf = 0.0; var confCount = 0
-
-                    pairResults.forEach { qr ->
-                        val aCorrect = qr.modelCorrect[modelA] ?: false
-                        val bCorrect = qr.modelCorrect[modelB] ?: false
-                        when {
-                            aCorrect && !bCorrect -> accWinsA++
-                            bCorrect && !aCorrect -> accWinsB++
-                            else -> accTies++
-                        }
-                        val evals = qr.pairEvaluations[pairKey] ?: qr.domainEvaluations
-                        val primaryEval = evals
-                            .filter { it.confidence >= req.confidenceGate }
-                            .maxByOrNull { it.confidence }
-                        primaryEval?.let { eval ->
-                            when (eval.winner.uppercase()) {
-                                "MODEL A" -> judgeWinsA++
-                                "MODEL B" -> judgeWinsB++
-                                else -> judgeTies++
-                            }
-                            totalConf += eval.confidence
-                            confCount++
-                        }
-                    }
-
-                    ModelPairStats(
-                        modelA = modelA,
-                        modelB = modelB,
-                        totalMatches = pairResults.size,
-                        judgeWinsA = judgeWinsA,
-                        judgeWinsB = judgeWinsB,
-                        judgeTies = judgeTies,
-                        accuracyWinsA = accWinsA,
-                        accuracyWinsB = accWinsB,
-                        accuracyTies = accTies,
-                        judgeAccuracyAgreementRate = pairResults.mapNotNull { it.judgeAccuracyAgreement[pairKey] }.let { l -> if (l.isEmpty()) 0.0 else l.count { it }.toDouble() / l.size },
-                        avgConfidence = if (confCount > 0) totalConf / confCount else 0.0,
-                        isExhausted = false
-                    )
-                }
-
-                val lastResult = completedResults.lastOrNull()
-                val activeTargetNames = targetNodes.mapNotNull { it.label }
-                val live = BenchmarkLiveStats(
-                    processed = completedResults.size,
-                    total = matrix.size,
-                    currentQuestion = lastResult?.query ?: "",
-                    runningAgreement = runningAgreement,
-                    runningCoverage = runningCoverage,
-                    perCategoryProgress = perCategoryProgress,
-                    pairStats = livePairStats,
-                    currentRound = round + 1,
-                    activeTargets = activeTargetNames,
-                    btRatings = aggregated.ranks.associate { it.modelId to it.btScore },
-                    btErrors = aggregated.ranks.associate { it.modelId to it.stdError }
-                )
-                onProgress.invoke(live)
-            }
+            currentAggregated = aggregated
+            publishProgress(true)
 
             round++
         }

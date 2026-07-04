@@ -25,6 +25,32 @@ class BtMatchScheduler(
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
 
+    private fun isMatchInformative(
+        mA: String, mB: String,
+        state: NodeBtState?,
+        ps: NodePairStats?,
+        minMatches: Int = 2
+    ): Boolean {
+        // Always play if either model is unseen (bootstrap guarantee)
+        val nij = ps?.totalComparisons ?: 0
+        if (nij < minMatches) return true
+
+        // No BT state yet → informative by default
+        if (state == null) return true
+
+        val si = state.btScores[mA] ?: 0.0
+        val sj = state.btScores[mB] ?: 0.0
+        val seA = state.stdErrors[mA] ?: 10.0
+        val seB = state.stdErrors[mB] ?: 10.0
+        val gap = abs(si - sj)
+        val combinedSE = seA + seB
+
+        // Skip if the gap is > 3 combined SEs — outcome is already certain
+        // BT p_{ij} > 0.95 when gap > 3.0 logits → H(p) < 0.20 → negligible info
+        // Using 3*SE rather than 3.0 logits to adapt to current estimation uncertainty
+        return gap < 3.0 * combinedSE
+    }
+
     // Returns a flat priority queue of all schedulable (leaf, mA, mB) triples
     private fun buildQueue(
         targetNodes: List<GraphNode>,
@@ -50,6 +76,8 @@ class BtMatchScheduler(
                 val ps = nodePairs.firstOrNull {
                     (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                 }
+                if (!isMatchInformative(mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
+
                 val budget = pairBudget(mA, mB, state, ps)
                 val already = ps?.totalComparisons ?: 0
                 if (already >= budget) continue  // exhausted
@@ -157,6 +185,19 @@ class BtMatchScheduler(
         // One slot per pair per node — iterate pairs in deficit order, nodes in SE-desc order
         for ((mA, mB) in pairsSortedByDeficit) {
             if (tasks.size >= batchSize) break
+
+            // Skip uninformative pairs even in coverage pass (after bootstrap)
+            val globalPs = targetNodes.flatMap { pairStats[it.id] ?: emptyList() }
+                .firstOrNull { (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) }
+            val globalNij = globalPs?.totalComparisons ?: 0
+            if (globalNij >= 2) {  // bootstrap done — apply info filter
+                val anyState = btStates.values.firstOrNull { it.btScores.containsKey(mA) && it.btScores.containsKey(mB) }
+                    ?: btStates.values.firstOrNull()
+                val ps = targetNodes.flatMap { node -> (pairStats[node.id] ?: emptyList()) }
+                    .firstOrNull { (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) }
+                if (!isMatchInformative(mA, mB, anyState, ps, minMatches = 2)) continue
+            }
+
             val nodesForPair = unconvergedNodes.sortedByDescending { node ->
                 btStates[node.id]?.stdErrors?.values?.average() ?: 10.0
             }

@@ -59,7 +59,7 @@ data class LeaderboardGroup(
 @Service
 class TaxonomyRankingService {
     private val log = LoggerFactory.getLogger("taxonomy.RankingService")
-    private val dbUrl = "jdbc:sqlite:${System.getProperty("ranking.db.path", "ratings.db")}?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    private val dbUrl = "jdbc:sqlite:${System.getProperty("ranking.db.path", "ratings.db")}?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000&transaction_mode=IMMEDIATE"
 
     // Initial constant values matching standard OpenSkill (Weng-Lin) defaults
     private val initialMu = 25.0
@@ -644,58 +644,64 @@ data class AggregatedLeaderboard(
         modelB: String = loser
     ) {
         try {
-            val existing = getRecordedMatch(snapshotId, domain, query, modelA, modelB)
-            if (existing != null) {
-                if (existing.winner == winner && existing.loser == loser && existing.isTie == isTie && existing.domain == domain) {
-                    // If identical, do nothing (return)
-                    return
-                } else {
-                    // Update existing record
-                    withConn { conn ->
+            withConn { conn ->
+                val wasAutoCommit = conn.autoCommit
+                conn.autoCommit = false
+                try {
+                    val existing = getRecordedMatch(snapshotId, domain, query, modelA, modelB)
+                    if (existing != null) {
+                        if (existing.winner != winner || existing.loser != loser || existing.isTie != isTie || existing.domain != domain) {
+                            // Update existing record
+                            val sql = """
+                                UPDATE match_history 
+                                SET winner = ?, loser = ?, is_tie = ? 
+                                WHERE snapshot_id = ? AND domain = ? AND query = ? 
+                                  AND ((model_a = ? AND model_b = ?) OR (model_a = ? AND model_b = ?))
+                            """.trimIndent()
+                            conn.prepareStatement(sql).use { pstmt ->
+                                pstmt.setString(1, winner)
+                                pstmt.setString(2, loser)
+                                pstmt.setInt(3, if (isTie) 1 else 0)
+                                pstmt.setString(4, snapshotId)
+                                pstmt.setString(5, domain)
+                                pstmt.setString(6, query)
+                                pstmt.setString(7, modelA)
+                                pstmt.setString(8, modelB)
+                                pstmt.setString(9, modelB)
+                                pstmt.setString(10, modelA)
+                                pstmt.executeUpdate()
+                            }
+                            // Update ratings
+                            updateRatings(winner, loser, domain, isTie, confidence, snapshotId)
+                        }
+                    } else {
+                        // Insert new record
                         val sql = """
-                            UPDATE match_history 
-                            SET winner = ?, loser = ?, is_tie = ? 
-                            WHERE snapshot_id = ? AND domain = ? AND query = ? 
-                              AND ((model_a = ? AND model_b = ?) OR (model_a = ? AND model_b = ?))
+                            INSERT INTO match_history (snapshot_id, query, model_a, model_b, domain, winner, loser, is_tie) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                         """.trimIndent()
                         conn.prepareStatement(sql).use { pstmt ->
-                            pstmt.setString(1, winner)
-                            pstmt.setString(2, loser)
-                            pstmt.setInt(3, if (isTie) 1 else 0)
-                            pstmt.setString(4, snapshotId)
+                            pstmt.setString(1, snapshotId)
+                            pstmt.setString(2, query)
+                            pstmt.setString(3, modelA)
+                            pstmt.setString(4, modelB)
                             pstmt.setString(5, domain)
-                            pstmt.setString(6, query)
-                            pstmt.setString(7, modelA)
-                            pstmt.setString(8, modelB)
-                            pstmt.setString(9, modelB)
-                            pstmt.setString(10, modelA)
+                            pstmt.setString(6, winner)
+                            pstmt.setString(7, loser)
+                            pstmt.setInt(8, if (isTie) 1 else 0)
                             pstmt.executeUpdate()
                         }
+                        // Update ratings
+                        updateRatings(winner, loser, domain, isTie, confidence, snapshotId)
                     }
-                    // Update ratings
-                    updateRatings(winner, loser, domain, isTie, confidence, snapshotId)
+
+                    conn.commit()
+                } catch (e: Exception) {
+                    conn.rollback()
+                    throw e
+                } finally {
+                    conn.autoCommit = wasAutoCommit
                 }
-            } else {
-                // Insert new record
-                withConn { conn ->
-                    val sql = """
-                        INSERT INTO match_history (snapshot_id, query, model_a, model_b, domain, winner, loser, is_tie) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """.trimIndent()
-                    conn.prepareStatement(sql).use { pstmt ->
-                        pstmt.setString(1, snapshotId)
-                        pstmt.setString(2, query)
-                        pstmt.setString(3, modelA)
-                        pstmt.setString(4, modelB)
-                        pstmt.setString(5, domain)
-                        pstmt.setString(6, winner)
-                        pstmt.setString(7, loser)
-                        pstmt.setInt(8, if (isTie) 1 else 0)
-                        pstmt.executeUpdate()
-                    }
-                }
-                // Update ratings
-                updateRatings(winner, loser, domain, isTie, confidence, snapshotId)
             }
         } catch (e: Exception) {
             log.error("Failed to record match outcome in SQL", e)

@@ -155,8 +155,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                     selectedDomains = deps.config.dataset.selectedDomains
                 )
 
-                onProgress(0.34f, "Reserving a balanced random test set...")
                 val (trainSet, testSet) = deps.datasetFetcher.splitTrainTest(dataset, testRatio = 0.2)
+                try {
+                    deps.evalLoader.syncReservedPool()
+                    deps.log.info("Synced reserved pool for the newly generated DAG.")
+                } catch (e: Exception) {
+                    deps.log.warn("Failed to sync reserved pool after train/test split: ${e.message}")
+                }
                 onProgress(
                     0.36f,
                     "Train ${trainSet.values.sumOf { it.size }} / test ${testSet.values.sumOf { it.size }}"
@@ -254,6 +259,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         reservedOnly: Boolean,
         onLive: (BenchmarkLiveStats) -> Unit
     ) {
+        if (deps.arenaService.state.value.isRunningBenchmark) {
+            deps.log.warn("Benchmark is already running. Ignoring run request.")
+            return
+        }
         if (models.size < 2) {
             deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
             return
@@ -280,6 +289,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 deps.taxonomyService.setActiveSnapshotId(snap.id)
                 deps.log.info("Auto-saved snapshot '${snap.id}' before benchmark")
             }
+        }
+
+        try {
+            deps.evalLoader.syncReservedPool()
+            deps.log.info("Synced reserved pool before starting benchmark.")
+        } catch (e: Exception) {
+            deps.log.warn("Failed to sync reserved pool before benchmark: ${e.message}")
         }
 
         deps.arenaService.startBenchmark("Starting benchmark over ${models.size} models…")

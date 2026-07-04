@@ -40,6 +40,7 @@ import taxonomy.tui.features.startup.WelcomePanel
 import taxonomy.tui.features.topology.TopologyPanel
 import taxonomy.tui.service.TuiConfigFacade
 import taxonomy.tui.state.BenchmarkType
+import taxonomy.tui.state.BenchmarkSubScreen
 import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.MetricsZoneFocus
@@ -415,7 +416,8 @@ private fun MainDashboardRoute(
         isRunningBenchmark = subscriptions.arenaControlState.isRunningBenchmark,
         hasBenchmarkReport = subscriptions.arenaControlState.benchmarkReport != null,
         benchmarkType = state.benchmark.benchmarkType,
-        metricsZoneFocus = state.analysis.metricsZoneFocus
+        metricsZoneFocus = state.analysis.metricsZoneFocus,
+        benchmarkSubScreen = state.benchmark.benchmarkSubScreen
     )
 
     Row(modifier = Modifier.height(topH)) {
@@ -744,7 +746,8 @@ private fun deriveAnalysisHints(
     isRunningBenchmark: Boolean,
     hasBenchmarkReport: Boolean,
     benchmarkType: BenchmarkType,
-    metricsZoneFocus: MetricsZoneFocus
+    metricsZoneFocus: MetricsZoneFocus,
+    benchmarkSubScreen: BenchmarkSubScreen
 ): List<HotkeyAction> {
     if (!hubFocused) return emptyList()
     return when {
@@ -773,12 +776,37 @@ private fun deriveAnalysisHints(
         )
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
-            benchmarkType == BenchmarkType.ARENA &&
-            (isRunningBenchmark || hasBenchmarkReport) -> listOf(
-            HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
-            HotkeyAction("O", "Load eval_results"),
-            HotkeyAction("Q", "Back", TuiTheme.ERROR),
-        )
+            benchmarkType == BenchmarkType.ARENA -> {
+            when (benchmarkSubScreen) {
+                BenchmarkSubScreen.RESULTS -> listOf(
+                    HotkeyAction("▲/▼", "Scroll Lists", TuiTheme.INFO),
+                    HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+                    HotkeyAction("Q", if (isRunningBenchmark) "Cancel" else "Back to Config", TuiTheme.ERROR),
+                )
+                BenchmarkSubScreen.CONFIG -> {
+                    if (isRunningBenchmark || hasBenchmarkReport) {
+                        listOf(
+                            HotkeyAction("V", "Toggle View", TuiTheme.ACCENT, isPrimary = true),
+                            HotkeyAction("O", "Load eval_results"),
+                            HotkeyAction("Q", "Back", TuiTheme.ERROR),
+                        )
+                    } else {
+                        listOf(
+                            HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
+                            HotkeyAction("Tab", "Next section"),
+                            HotkeyAction("O", "Load eval_results"),
+                            HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                        )
+                    }
+                }
+                else -> {
+                    listOf(
+                        HotkeyAction("Enter", "Select", TuiTheme.OK, isPrimary = true),
+                        HotkeyAction("←/Q", "Back", TuiTheme.ERROR),
+                    )
+                }
+            }
+        }
 
         analysisMode == taxonomy.service.AnalysisMode.BENCHMARK &&
             benchmarkType == BenchmarkType.TRICKLE -> listOf(

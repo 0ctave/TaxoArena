@@ -7,6 +7,7 @@ import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.MetricsZoneFocus
+import taxonomy.tui.state.BenchmarkSubScreen
 import taxonomy.tui.state.TuiAppState
 import taxonomy.tui.features.benchmark.buildArenaSettingItems
 
@@ -158,9 +159,13 @@ internal class AnalysisKeyHandler(
                             (bench.benchmarkTypeSelectionIndex - 1).coerceAtLeast(0)
                         )
                     )
-                    BenchmarkType.ARENA -> dispatch(
-                        TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField - 1).coerceAtLeast(0))
-                    )
+                    BenchmarkType.ARENA -> {
+                        if (bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG) {
+                            dispatch(TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField - 1).coerceAtLeast(0)))
+                        } else if (bench.benchmarkSubScreen == BenchmarkSubScreen.RESULTS) {
+                            dispatch(TuiEvent.SetBenchmarkScrollOffset((bench.benchmarkScrollOffset - 1).coerceAtLeast(0)))
+                        }
+                    }
                     BenchmarkType.TRICKLE -> Unit
                 }
             }
@@ -171,14 +176,18 @@ internal class AnalysisKeyHandler(
                             (bench.benchmarkTypeSelectionIndex + 1).coerceAtMost(1)
                         )
                     )
-                    BenchmarkType.ARENA -> dispatch(
-                        TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField + 1).coerceAtMost(6))
-                    )
+                    BenchmarkType.ARENA -> {
+                        if (bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG) {
+                            dispatch(TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField + 1).coerceAtMost(6)))
+                        } else if (bench.benchmarkSubScreen == BenchmarkSubScreen.RESULTS) {
+                            dispatch(TuiEvent.SetBenchmarkScrollOffset(bench.benchmarkScrollOffset + 1))
+                        }
+                    }
                     BenchmarkType.TRICKLE -> Unit
                 }
             }
             " ", "space" -> {
-                if (bench.benchmarkType == BenchmarkType.ARENA) {
+                if (bench.benchmarkType == BenchmarkType.ARENA && bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG) {
                     val items = buildArenaSettingItems(bench, availableDomainsProvider().map { it.first }, dispatch)
                     val item = items.getOrNull(bench.selectedBenchmarkField)
                     if (item != null) {
@@ -200,14 +209,16 @@ internal class AnalysisKeyHandler(
                         if (type == BenchmarkType.ARENA) effects.loadBenchmarkModels(dispatch)
                     }
                     BenchmarkType.ARENA -> {
-                        val items = buildArenaSettingItems(bench, availableDomainsProvider().map { it.first }, dispatch)
-                        val item = items.getOrNull(bench.selectedBenchmarkField)
-                        if (item != null) {
-                            if (item.name == "Query limit" || item.name == "Parallelism") {
-                                dispatch(TuiEvent.StartEditingBenchmarkField)
-                            } else {
-                                val next = item.nextValue() ?: ""
-                                item.setValue(next)
+                        if (bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG) {
+                            val items = buildArenaSettingItems(bench, availableDomainsProvider().map { it.first }, dispatch)
+                            val item = items.getOrNull(bench.selectedBenchmarkField)
+                            if (item != null) {
+                                if (item.name == "Query limit" || item.name == "Parallelism") {
+                                    dispatch(TuiEvent.StartEditingBenchmarkField)
+                                } else {
+                                    val next = item.nextValue() ?: ""
+                                    item.setValue(next)
+                                }
                             }
                         }
                     }
@@ -220,11 +231,19 @@ internal class AnalysisKeyHandler(
                     }
                 }
             }
-            "v" -> dispatch(TuiEvent.ToggleBenchmarkLiveView)
+            "v" -> {
+                if (bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG) {
+                    dispatch(TuiEvent.SetBenchmarkSubScreen(BenchmarkSubScreen.RESULTS))
+                } else {
+                    dispatch(TuiEvent.ToggleBenchmarkLiveView)
+                }
+            }
             "o" -> dispatch(TuiEvent.OpenEvalCatalogPicker)
             "d" -> dispatch(TuiEvent.DownloadEvalResults)
             "q", "escape" -> {
-                if (bench.benchmarkType != BenchmarkType.NONE) {
+                if (bench.benchmarkSubScreen == BenchmarkSubScreen.RESULTS) {
+                    dispatch(TuiEvent.SetBenchmarkSubScreen(BenchmarkSubScreen.CONFIG))
+                } else if (bench.benchmarkType != BenchmarkType.NONE) {
                     effects.resetBenchmarkReport()
                     dispatch(TuiEvent.ResetBenchmarkType)
                 } else {

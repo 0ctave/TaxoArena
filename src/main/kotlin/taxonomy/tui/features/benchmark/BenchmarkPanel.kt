@@ -18,9 +18,11 @@ import com.jakewharton.mosaic.ui.Spacer
 import com.jakewharton.mosaic.ui.Text
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
+import taxonomy.tui.components.HotkeyAction
 import taxonomy.service.AnalysisPanelState
 import taxonomy.tui.components.DomainSelectorTable
 import taxonomy.tui.components.Panel
+import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.tui.components.SettingItem
 import taxonomy.tui.components.SettingKind
 import taxonomy.tui.components.TuiTheme
@@ -28,6 +30,7 @@ import taxonomy.tui.components.take
 import taxonomy.tui.components.checkboxMark
 import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.state.BenchmarkLiveView
+import taxonomy.tui.state.BenchmarkSubScreen
 import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.BenchmarkUiState
@@ -149,7 +152,7 @@ private fun ArenaBenchmarkView(
     dispatch: (TuiEvent) -> Unit,
 ) {
     val w = (width - 1).coerceAtLeast(1)
-    val isLive = controlState.isRunningBenchmark || controlState.benchmarkReport != null
+    val isLive = benchmarkState.benchmarkSubScreen == BenchmarkSubScreen.RESULTS
     Column {
         if (benchmarkState.loadedModels.isNotEmpty()) {
             Text("Loaded models: ${benchmarkState.loadedModels.size} models eval results", color = Green)
@@ -284,182 +287,245 @@ private fun ArenaBenchmarkLiveView(
     val report = controlState.benchmarkReport
     val live = b.liveStats
 
-    if (report != null) {
-        // ─── COMPLETE STATE ──────────────────────────────────────────────────
-        Text("ARENA BENCHMARK · COMPLETE", color = Green, textStyle = Bold)
-        Spacer()
-        Text("Queries: ${report.totalQueries} · Pairs: ${report.totalModelPairs}".take(w), color = White)
-        Spacer()
+    // Top Panel: STATUS
+    val topH = 5
+    val bottomH = (height - topH).coerceAtLeast(3)
 
-        if (w >= 90) {
-            val leftColW = 44
-            val rightColW = (w - leftColW - 3).coerceAtLeast(15)
-
-            // Headers
-            val titleLine = "%-${leftColW}s   %s".format("FINAL BT LEADERBOARD", "MODEL ACCURACY (MMLU-Pro GT)").take(w)
-            Text(titleLine, color = Yellow, textStyle = Bold)
-
-            val borderLine = "%-${leftColW}s   %s".format("-".repeat(leftColW), "-".repeat(rightColW)).take(w)
-            Text(borderLine, color = White)
-
-            val headerLine = "%-24s | %8s | %6s   %-20s | %s".format(
-                "Model", "BT Score", "StdErr", "Model", "Accuracy Bar"
-            ).take(w)
-            Text(headerLine, color = Cyan)
-
-            val colDividerLine = "%-${leftColW}s   %s".format(
-                "-------------------------+----------+------",
-                "---------------------+----------------------"
-            ).take(w)
-            Text(colDividerLine, color = White)
-
-            val sortedModels = if (live?.btRatings?.isNotEmpty() == true) {
-                live.btRatings.entries.sortedByDescending { it.value }
-            } else {
-                emptyList()
+    Column {
+        if (report != null) {
+            // COMPLETE STATUS PANEL
+            Panel(
+                title = "BENCHMARK STATUS · COMPLETE",
+                accentColor = TuiTheme.OK,
+                width = w,
+                height = topH
+            ) {
+                Column {
+                    val pct = 100
+                    val bar = "█".repeat(20)
+                    Text("Progress: ${live?.processed ?: report.totalQueries}/${live?.total ?: report.totalQueries} [$bar] $pct% · COMPLETE".take(w - 4), color = Green, textStyle = Bold)
+                    Text("Queries: ${report.totalQueries} · Pairs: ${report.totalModelPairs} · Coverage: ${"%.1f%%".format(report.coverageRate * 100)}".take(w - 4), color = White)
+                }
             }
-            val accs = modelAccuracies(report)
-            val maxRows = maxOf(sortedModels.size, accs.size)
-            val rowsCount = (height - 9).coerceAtLeast(1)
-
-            for (i in 0 until minOf(maxRows, rowsCount)) {
-                val leftStr = if (i < sortedModels.size) {
-                    val entry = sortedModels[i]
-                    val model = entry.key
-                    val score = entry.value
-                    val se = live?.btErrors?.get(model) ?: 0.0
-                    "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
-                } else {
-                    " ".repeat(leftColW)
+        } else if (live != null) {
+            // RUNNING STATUS PANEL
+            Panel(
+                title = "BENCHMARK STATUS · RUNNING",
+                accentColor = TuiTheme.RUNNING,
+                width = w,
+                height = topH
+            ) {
+                Column {
+                    val pct = if (live.total > 0) live.processed * 100 / live.total else 0
+                    val filled = (pct / 5).coerceIn(0, 20)
+                    val bar = "█".repeat(filled) + "░".repeat(20 - filled)
+                    Text("Progress: ${live.processed}/${live.total} [$bar] $pct% · Round: ${live.currentRound}".take(w - 4), color = Cyan, textStyle = Bold)
+                    val targetStr = if (live.activeTargets.isNotEmpty()) " · Targets: ${live.activeTargets.joinToString(", ")}" else ""
+                    Text("Agreement: ${"%.1f%%".format(live.runningAgreement * 100)}$targetStr".take(w - 4), color = White)
                 }
-
-                val rightStr = if (i < accs.size) {
-                    val (model, acc) = accs[i]
-                    val bar = "█".repeat((acc * 12).toInt().coerceIn(0, 12))
-                    "%-20s | %s %5.1f%%".format(model.take(20), bar.padEnd(12), acc * 100)
-                } else {
-                    ""
-                }
-
-                val rowStr = "%-${leftColW}s   %s".format(leftStr, rightStr).take(w)
-                Text(rowStr, color = White)
             }
         } else {
-            // Stacked for narrow screen
-            Text("FINAL BT LEADERBOARD:", color = Yellow, textStyle = Bold)
-            val sortedModels = live?.btRatings?.entries?.sortedByDescending { it.value } ?: emptyList()
-            sortedModels.take(5).forEach { (model, score) ->
-                val se = live?.btErrors?.get(model) ?: 0.0
-                Text("  • ${model.take(20)}: BT=${"%.2f".format(score)} (se=${"%.2f".format(se)})".take(w), color = White)
-            }
-            Spacer()
-            Text("MODEL ACCURACY:", color = Yellow, textStyle = Bold)
-            modelAccuracies(report).take(5).forEach { (model, acc) ->
-                Text("  • ${model.take(16)}: ${"%.1f%%".format(acc * 100)}".take(w), color = Green)
+            Panel(
+                title = "BENCHMARK STATUS · STARTING",
+                accentColor = TuiTheme.RUNNING,
+                width = w,
+                height = topH
+            ) {
+                Text("Waiting for live benchmark stats…".take(w - 4), color = Yellow)
             }
         }
-    } else if (live != null) {
-        // ─── RUNNING STATE ───────────────────────────────────────────────────
-        Text("ARENA BENCHMARK · RUNNING", color = Cyan, textStyle = Bold)
-        Spacer()
-        val pct = if (live.total > 0) live.processed * 100 / live.total else 0
-        Text(
-            "Progress: ${live.processed}/${live.total} ($pct%) · Round: ${live.currentRound} · Agree: ${"%.1f%%".format(live.runningAgreement * 100)}".take(w),
-            color = White
-        )
-        if (live.activeTargets.isNotEmpty()) {
-            Text("Targeting Nodes: ${live.activeTargets.joinToString(", ").take(w - 18)}".take(w), color = Yellow)
-        }
+
         Spacer()
 
-        // Render side-by-side if terminal is wide enough, else stack them
+        // Bottom panels
         if (w >= 90) {
-            val leftColW = 44
-            val rightColW = (w - leftColW - 3).coerceAtLeast(15)
-
-            // Headers
-            val titleLine = "%-${leftColW}s   %s".format("LIVE BT LEADERBOARD (Log-Strength)", "MATCHUPS PAIRWISE PROGRESS").take(w)
-            Text(titleLine, color = Yellow, textStyle = Bold)
-
-            val borderLine = "%-${leftColW}s   %s".format("-".repeat(leftColW), "-".repeat(rightColW)).take(w)
-            Text(borderLine, color = White)
-
-            val headerLine = "%-24s | %8s | %6s   %-18s vs %-18s | %5s %5s %5s | %5s".format(
-                "Model", "BT Score", "StdErr", "Model A", "Model B", "WinsA", "WinsB", "Ties", "Agree"
-            ).take(w)
-            Text(headerLine, color = Cyan)
-
-            val colDividerLine = "%-${leftColW}s   %s".format(
-                "-------------------------+----------+------",
-                "---------------------+---------------------+-------------------+-------"
-            ).take(w)
-            Text(colDividerLine, color = White)
-
-            val sortedModels = if (live.btRatings.isNotEmpty()) {
-                live.btRatings.entries.sortedByDescending { it.value }
+            val leftColW = 46
+            val rightColW = w - leftColW
+            
+            val showHeaders = bottomH >= 6
+            val leftBodyRows = if (showHeaders) {
+                (bottomH - 5).coerceAtLeast(1)
             } else {
-                b.benchmarkSelectedModels.map { java.util.AbstractMap.SimpleEntry(it, 0.0) }
+                (bottomH - 3).coerceAtLeast(1)
             }
-            val pairStats = live.pairStats
-            val maxRows = maxOf(sortedModels.size, pairStats.size)
-            val rowsCount = (height - 11).coerceAtLeast(1)
 
-            for (i in 0 until minOf(maxRows, rowsCount)) {
-                val leftStr = if (i < sortedModels.size) {
-                    val entry = sortedModels[i]
-                    val model = entry.key
-                    val score = entry.value
-                    val se = live.btErrors[model] ?: 0.0
-                    "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
-                } else {
-                    " ".repeat(leftColW)
-                }
-
-                val rightStr = if (i < pairStats.size) {
-                    val ps = pairStats[i]
-                    "%-18s vs %-18s | %5d %5d %5d | %5.0f%%".format(
-                        ps.modelA.take(18),
-                        ps.modelB.take(18),
-                        ps.judgeWinsA,
-                        ps.judgeWinsB,
-                        ps.judgeTies,
-                        ps.judgeAccuracyAgreementRate * 100
-                    )
-                } else {
-                    ""
-                }
-
-                val rowStr = "%-${leftColW}s   %s".format(leftStr, rightStr).take(w)
-                Text(rowStr, color = White)
+            val rightBodyRows = if (showHeaders) {
+                (bottomH - 5).coerceAtLeast(1)
+            } else {
+                (bottomH - 3).coerceAtLeast(1)
             }
-        } else {
-            // Stacked layout for narrower terminals
-            if (live.btRatings.isNotEmpty()) {
-                Text("LIVE BT LEADERBOARD:", color = Yellow, textStyle = Bold)
-                live.btRatings.entries.sortedByDescending { it.value }.take(3).forEach { (model, score) ->
-                    val se = live.btErrors[model] ?: 0.0
-                    Text("  • ${model.take(20)}: BT=${"%.2f".format(score)} (se=${"%.2f".format(se)})".take(w), color = White)
+
+            Row {
+                // Bottom Left: Leaderboard
+                val sortedModels = if (report != null) {
+                    val accs = modelAccuracies(report)
+                    if (live?.btRatings?.isNotEmpty() == true) {
+                        live.btRatings.entries.sortedByDescending { it.value }
+                    } else {
+                        accs.map { java.util.AbstractMap.SimpleEntry(it.first, 0.0) }
+                    }
+                } else if (live != null && live.btRatings.isNotEmpty()) {
+                    live.btRatings.entries.sortedByDescending { it.value }
+                } else {
+                    b.benchmarkSelectedModels.map { java.util.AbstractMap.SimpleEntry(it, 0.0) }
                 }
+
+                Panel(
+                    title = if (report != null) "FINAL BT LEADERBOARD" else "LIVE BT LEADERBOARD",
+                    accentColor = TuiTheme.panelAccent(true),
+                    width = leftColW,
+                    height = bottomH
+                ) {
+                    Column {
+                        if (showHeaders) {
+                            val headerLine = "%-24s | %8s | %6s".format("Model", "BT Score", "StdErr")
+                            Text(headerLine.take(leftColW - 4), color = Cyan, textStyle = Bold)
+                            Text("-".repeat((leftColW - 4).coerceAtLeast(1)), color = White)
+                        }
+
+                        ScrollablePanelContent(
+                            pWidth = leftColW - 4,
+                            pHeight = leftBodyRows,
+                            itemCount = sortedModels.size,
+                            scrollOffset = b.benchmarkScrollOffset,
+                            hasPadding = false
+                        ) { visibleHeight, startIdx, innerW ->
+                            sortedModels.drop(startIdx).take(visibleHeight).forEach { entry ->
+                                val model = entry.key
+                                val score = entry.value
+                                val se = live?.btErrors?.get(model) ?: 0.0
+                                val rowStr = "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
+                                Text(rowStr.take(innerW), color = White)
+                            }
+                        }
+                    }
+                }
+
                 Spacer()
-            }
 
-            Text("MATCHUPS PROGRESS:", color = Yellow, textStyle = Bold)
-            val rowsCount = (height - 12).coerceAtLeast(1)
-            live.pairStats.take(rowsCount).forEach { ps ->
-                Text(
-                    "%-14s vs %-14s | %4d/%4d/%4d".format(
-                        ps.modelA.take(14),
-                        ps.modelB.take(14),
-                        ps.judgeWinsA,
-                        ps.judgeWinsB,
-                        ps.judgeTies
-                    ).take(w),
-                    color = White
-                )
+                // Bottom Right: Matchups Progress or Accuracy
+                Panel(
+                    title = if (report != null) "MODEL ACCURACY (GT)" else "MATCHUPS PROGRESS",
+                    accentColor = TuiTheme.panelAccent(true),
+                    width = rightColW,
+                    height = bottomH
+                ) {
+                    Column {
+                        if (report != null) {
+                            val accs = modelAccuracies(report)
+                            
+                            if (showHeaders) {
+                                val headerLine = "%-20s | %s".format("Model", "Accuracy Bar")
+                                Text(headerLine.take(rightColW - 4), color = Cyan, textStyle = Bold)
+                                Text("-".repeat((rightColW - 4).coerceAtLeast(1)), color = White)
+                            }
+
+                            ScrollablePanelContent(
+                                pWidth = rightColW - 4,
+                                pHeight = rightBodyRows,
+                                itemCount = accs.size,
+                                scrollOffset = b.benchmarkScrollOffset,
+                                hasPadding = false
+                            ) { visibleHeight, startIdx, innerW ->
+                                accs.drop(startIdx).take(visibleHeight).forEach { (model, acc) ->
+                                    val barLen = ((innerW - 28).coerceAtLeast(5) * acc).toInt()
+                                    val bar = "█".repeat(barLen)
+                                    val rowStr = "%-20s | %s %5.1f%%".format(model.take(20), bar.padEnd((innerW - 28).coerceAtLeast(5)), acc * 100)
+                                    Text(rowStr.take(innerW), color = Green)
+                                }
+                            }
+                        } else if (live != null) {
+                            val pairStats = live.pairStats
+
+                            val innerRightW = rightColW - 4
+                            val isWide = innerRightW >= 56
+                            if (showHeaders) {
+                                val headerLine = if (isWide) {
+                                    "%-18s vs %-18s | %5s %5s %5s | %5s".format("Model A", "Model B", "WinsA", "WinsB", "Ties", "Agree")
+                                } else {
+                                    "%-12s vs %-12s | %s".format("Model A", "Model B", "W/L/T")
+                                }
+                                Text(headerLine.take(innerRightW), color = Cyan, textStyle = Bold)
+                                Text("-".repeat(innerRightW), color = White)
+                            }
+
+                            ScrollablePanelContent(
+                                pWidth = rightColW - 4,
+                                pHeight = rightBodyRows,
+                                itemCount = pairStats.size,
+                                scrollOffset = b.benchmarkScrollOffset,
+                                hasPadding = false
+                            ) { visibleHeight, startIdx, innerW ->
+                                pairStats.drop(startIdx).take(visibleHeight).forEach { ps ->
+                                    val rowStr = if (isWide) {
+                                        "%-18s vs %-18s | %5d %5d %5d | %5.0f%%".format(
+                                            ps.modelA.take(18),
+                                            ps.modelB.take(18),
+                                            ps.judgeWinsA,
+                                            ps.judgeWinsB,
+                                            ps.judgeTies,
+                                            ps.judgeAccuracyAgreementRate * 100
+                                        )
+                                    } else {
+                                        "%-12s vs %-12s | %d/%d/%d".format(
+                                            ps.modelA.take(12),
+                                            ps.modelB.take(12),
+                                            ps.judgeWinsA,
+                                            ps.judgeWinsB,
+                                            ps.judgeTies
+                                        )
+                                    }
+                                    Text(rowStr.take(innerW), color = White)
+                                }
+                            }
+                        } else {
+                            Text("No matchup progress available yet.", color = Yellow)
+                        }
+                    }
+                }
+            }
+        } else {
+            // Narrow Layout
+            val narrowInnerH = bottomH - 3
+            val narrowBodyRows = narrowInnerH.coerceAtLeast(1)
+
+            Panel(
+                title = if (report != null) "RESULTS" else "LIVE RESULTS",
+                accentColor = TuiTheme.panelAccent(true),
+                width = w,
+                height = bottomH
+            ) {
+                if (report != null) {
+                    val accs = modelAccuracies(report)
+                    ScrollablePanelContent(
+                        pWidth = w - 4,
+                        pHeight = narrowBodyRows,
+                        itemCount = accs.size,
+                        scrollOffset = b.benchmarkScrollOffset,
+                        hasPadding = false
+                    ) { visibleHeight, startIdx, innerW ->
+                        accs.drop(startIdx).take(visibleHeight).forEach { (model, acc) ->
+                            Text("• ${model.take(20)}: ${"%.1f%%".format(acc * 100)}".take(innerW), color = Green)
+                        }
+                    }
+                } else if (live != null) {
+                    val pairStats = live.pairStats
+                    ScrollablePanelContent(
+                        pWidth = w - 4,
+                        pHeight = narrowBodyRows,
+                        itemCount = pairStats.size,
+                        scrollOffset = b.benchmarkScrollOffset,
+                        hasPadding = false
+                    ) { visibleHeight, startIdx, innerW ->
+                        pairStats.drop(startIdx).take(visibleHeight).forEach { ps ->
+                            Text("${ps.modelA.take(12)} vs ${ps.modelB.take(12)} | ${ps.judgeWinsA}/${ps.judgeWinsB}/${ps.judgeTies}".take(innerW), color = White)
+                        }
+                    }
+                } else {
+                    Text("No progress stats yet.".take(w - 4), color = Yellow)
+                }
             }
         }
-    } else {
-        Text("Waiting for live benchmark stats…".take(w), color = Yellow)
     }
 }
 

@@ -105,6 +105,14 @@ class MMLUDatasetFetcher(
                             answer TEXT
                         )
                     """.trimIndent())
+                    stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS eval_question_link (
+                            question_id      INTEGER PRIMARY KEY,
+                            mmlu_pro_row_id  INTEGER,
+                            question_text    TEXT,
+                            has_embedding    INTEGER DEFAULT 0
+                        )
+                    """.trimIndent())
                 }
             }
             log.info("SQLite cache tables initialized successfully.")
@@ -377,11 +385,15 @@ class MMLUDatasetFetcher(
         try {
             connection.use { conn ->
                 val sql = if (selectedDomains.isEmpty()) {
-                    "SELECT id, question, category, cot_content, options, answer FROM $table ORDER BY id ASC LIMIT ?"
+                    "SELECT m.id, m.question, m.category, m.cot_content, m.options, m.answer, l.question_id " +
+                    "FROM $table m LEFT JOIN eval_question_link l ON m.id = l.mmlu_pro_row_id " +
+                    "ORDER BY m.id ASC LIMIT ?"
                 } else {
                     val rawDomains = selectedDomains.map { it.trim().lowercase() }
                     val placeholders = rawDomains.joinToString(",") { "?" }
-                    "SELECT id, question, category, cot_content, options, answer FROM $table WHERE category IN ($placeholders) ORDER BY id ASC LIMIT ?"
+                    "SELECT m.id, m.question, m.category, m.cot_content, m.options, m.answer, l.question_id " +
+                    "FROM $table m LEFT JOIN eval_question_link l ON m.id = l.mmlu_pro_row_id " +
+                    "WHERE m.category IN ($placeholders) ORDER BY m.id ASC LIMIT ?"
                 }
                 conn.prepareStatement(sql).use { pstmt ->
                     if (selectedDomains.isEmpty()) {
@@ -395,8 +407,10 @@ class MMLUDatasetFetcher(
                     }
                     val rs = pstmt.executeQuery()
                     while (rs.next()) {
+                        val upstreamId = rs.getInt("question_id")
+                        val finalId = if (rs.wasNull() || upstreamId <= 0) rs.getInt("id") else upstreamId
                         rows.add(HFProRowData(
-                            id = rs.getInt("id"),
+                            id = finalId,
                             question = rs.getString("question"),
                             category = rs.getString("category"),
                             cot_content = rs.getString("cot_content"),

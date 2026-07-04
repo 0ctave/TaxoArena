@@ -186,4 +186,154 @@ class TaxonomyArenaServiceTest {
         // Should have called LLM exactly 2 times
         assertEquals(2, promptQueries.size)
     }
+
+    @Test
+    fun testPairwiseJudgeParsingWithLatexEscapes() = runBlocking {
+        // Arrange
+        val config = TaxonomyConfig()
+        config.llm.judgeModel = "test-judge-model"
+
+        val node = GraphNode(id = "node-1", label = "Test Concept", depth = 0)
+        node.judgePrompt = "Judge this please"
+        node.judgeRubric = """{"criteria":[],"failure_modes":[]}"""
+
+        val mockTaxonomyService = mock(TaxonomyService::class.java)
+        `when`(mockTaxonomyService.getGraph()).thenReturn(node)
+
+        val mockEmbeddingCache = mock(EmbeddingCache::class.java)
+        val queryText = "Solve limits"
+        `when`(mockEmbeddingCache.getOrCreate(queryText)).thenReturn(floatArrayOf(0.1f, 0.2f))
+
+        val mockOps = mock(TaxonomyOperations::class.java)
+        val expectedEmb = Embedding(queryText, queryText, floatArrayOf(0.1f, 0.2f))
+        `when`(mockOps.routeQuery(expectedEmb, node, 2, null)).thenReturn(mapOf(node to 1.0))
+
+        val mockEvalStore = mock(ModelEvalStore::class.java)
+        val mockRankingService = mock(TaxonomyRankingService::class.java)
+
+        // Mock LLM Client returning LaTeX escaped chars in JSON
+        val mockLlmClient = object : TaxonomyLlmClient {
+            override suspend fun generateClusterLabel(prompt: String): String = ""
+            override suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String = ""
+
+            override suspend fun queryModelStructured(
+                modelName: String,
+                systemPrompt: String?,
+                userPrompt: String,
+                schema: JsonSchema
+            ): String {
+                val winner = if (isModelAAlpha(userPrompt)) "Model A" else "Model B"
+                return """
+                {
+                  "critique_a": "Model A correctly identifies potential limit \( L \) by assuming convergence.",
+                  "critique_b": "Model B concludes that the sequence does not converge.",
+                  "comparison": "The difference is \( L = 1/2 \) vs incorrect.",
+                  "winner": "$winner",
+                  "confidence": 0.8
+                }
+                """.trimIndent()
+            }
+
+            override fun setMaxParallel(limit: Int) {}
+        }
+
+        val service = TaxonomyArenaService(
+            config,
+            mockTaxonomyService,
+            mockLlmClient,
+            mockEmbeddingCache,
+            mockOps,
+            mockEvalStore,
+            mockRankingService
+        )
+
+        // Act & Assert (Should not throw JsonDecodingException)
+        val evaluations = service.evaluateWithPrecomputedTraces(
+            query = "Solve limits",
+            options = listOf("2", "3"),
+            modelA = "alpha",
+            traceA = "trace for A",
+            modelB = "beta",
+            traceB = "trace for B"
+        )
+
+        assertEquals(1, evaluations.size)
+        val eval = evaluations.first()
+        assertEquals("Model A", eval.winner)
+        assertEquals(0.8, eval.confidence)
+    }
+
+    @Test
+    fun testHardenedParsingWithRegexFallback() = runBlocking {
+        // Arrange
+        val config = TaxonomyConfig()
+        config.llm.judgeModel = "test-judge-model"
+
+        val node = GraphNode(id = "node-1", label = "Test Concept", depth = 0)
+        node.judgePrompt = "Judge this please"
+        node.judgeRubric = """{"criteria":[],"failure_modes":[]}"""
+
+        val mockTaxonomyService = mock(TaxonomyService::class.java)
+        `when`(mockTaxonomyService.getGraph()).thenReturn(node)
+
+        val mockEmbeddingCache = mock(EmbeddingCache::class.java)
+        val queryText = "Solve limits"
+        `when`(mockEmbeddingCache.getOrCreate(queryText)).thenReturn(floatArrayOf(0.1f, 0.2f))
+
+        val mockOps = mock(TaxonomyOperations::class.java)
+        val expectedEmb = Embedding(queryText, queryText, floatArrayOf(0.1f, 0.2f))
+        `when`(mockOps.routeQuery(expectedEmb, node, 2, null)).thenReturn(mapOf(node to 1.0))
+
+        val mockEvalStore = mock(ModelEvalStore::class.java)
+        val mockRankingService = mock(TaxonomyRankingService::class.java)
+
+        // Mock LLM Client returning malformed JSON (unescaped quotes inside double quotes)
+        val mockLlmClientMalformed = object : TaxonomyLlmClient {
+            override suspend fun generateClusterLabel(prompt: String): String = ""
+            override suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String = ""
+
+            override suspend fun queryModelStructured(
+                modelName: String,
+                systemPrompt: String?,
+                userPrompt: String,
+                schema: JsonSchema
+            ): String {
+                val winner = if (isModelAAlpha(userPrompt)) "Model A" else "Model B"
+                return """
+                {
+                  "comparison": "He said "yes" and won.",
+                  "winner": "$winner",
+                  "confidence": 0.95
+                }
+                """.trimIndent()
+            }
+
+            override fun setMaxParallel(limit: Int) {}
+        }
+
+        val service = TaxonomyArenaService(
+            config,
+            mockTaxonomyService,
+            mockLlmClientMalformed,
+            mockEmbeddingCache,
+            mockOps,
+            mockEvalStore,
+            mockRankingService
+        )
+
+        // Act & Assert (Should succeed using regex fallback)
+        val evaluations = service.evaluateWithPrecomputedTraces(
+            query = "Solve limits",
+            options = listOf("2", "3"),
+            modelA = "alpha",
+            traceA = "trace for A",
+            modelB = "beta",
+            traceB = "trace for B"
+        )
+
+        assertEquals(1, evaluations.size)
+        val eval = evaluations.first()
+        assertEquals("Model A", eval.winner)
+        assertEquals(0.95, eval.confidence)
+    }
 }

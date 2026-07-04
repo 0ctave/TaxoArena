@@ -2,6 +2,7 @@ package taxonomy.service
 
 import taxonomy.model.NodeBtState
 import taxonomy.model.NodePairStats
+import kotlin.math.abs
 
 class BtStoppingPolicy(
     val maxRounds: Int = 20,
@@ -53,6 +54,23 @@ class BtStoppingPolicy(
         // Top-2 must be separated
         val ranked = state.btScores.entries.sortedByDescending { it.value }
         if (ranked.size < 2) return true
+
+        // If no informative pairs remain -> leaf is done
+        val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
+        val informativePairs = allPairs.filter { (mA, mB) ->
+            val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
+                (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+            }
+            val nij = ps?.totalComparisons ?: 0
+            if (nij < 2) return@filter true  // bootstrap not done -> still informative
+            val si = state.btScores[mA] ?: 0.0
+            val sj = state.btScores[mB] ?: 0.0
+            val seA = state.stdErrors[mA] ?: 10.0
+            val seB = state.stdErrors[mB] ?: 10.0
+            abs(si - sj) < 3.0 * (seA + seB)  // only pairs still uncertain
+        }
+        if (informativePairs.isEmpty()) return true
+
         val gap = ranked[0].value - ranked[1].value
         val combinedSE = (state.stdErrors[ranked[0].key] ?: 10.0) +
                          (state.stdErrors[ranked[1].key] ?: 10.0)

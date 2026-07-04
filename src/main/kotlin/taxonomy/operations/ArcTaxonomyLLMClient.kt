@@ -293,6 +293,15 @@ class ArcTaxonomyLLMClient(
         }
     }
 
+    private fun isRateLimitError(t: Throwable): Boolean {
+        val msg = t.message.orEmpty()
+        val causeMsg = t.cause?.message.orEmpty()
+        return msg.contains("rate limit", ignoreCase = true) || 
+               causeMsg.contains("rate limit", ignoreCase = true) ||
+               msg.contains("429", ignoreCase = true) ||
+               causeMsg.contains("429", ignoreCase = true)
+    }
+
     private suspend fun <T> runWithRetry(
         modelName: String,
         maxRetries: Int = 3,
@@ -306,12 +315,24 @@ class ArcTaxonomyLLMClient(
             } catch (t: Throwable) {
                 attempt++
                 val isTransient = isTransientError(t)
-                if (attempt >= maxRetries || !isTransient) {
+                val isRateLimit = isRateLimitError(t)
+                val actualMaxRetries = if (isRateLimit) 6 else maxRetries
+                
+                if (attempt >= actualMaxRetries || !isTransient) {
                     throw t
                 }
-                log.warn("Transient error on model '$modelName' (attempt $attempt/$maxRetries): ${t.message}. Retrying in ${delayMs}ms...")
-                delay(delayMs)
-                delayMs *= 2
+                
+                // For rate limits, start with a minimum base delay of 2000ms
+                val baseDelay = if (isRateLimit) maxOf(delayMs, 2000L) else delayMs
+                // Jitter between 80% and 120% of baseDelay to prevent synchronised thread retries
+                val jitter = (0.8 + kotlin.random.Random.nextDouble() * 0.4)
+                val finalDelay = (baseDelay * jitter).toLong()
+                
+                log.warn("Transient error (rateLimit=$isRateLimit) on model '$modelName' (attempt $attempt/$actualMaxRetries): ${t.message}. Retrying in ${finalDelay}ms...")
+                delay(finalDelay)
+                
+                delayMs = baseDelay * 2
+                
                 if (t.message?.contains("Connection reset", ignoreCase = true) == true || 
                     t.cause?.message?.contains("Connection reset", ignoreCase = true) == true) {
                     streamingModelCache.remove(modelName)

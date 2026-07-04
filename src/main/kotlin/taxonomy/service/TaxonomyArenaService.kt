@@ -522,52 +522,121 @@ class TaxonomyArenaService(
         ArenaResult(query, modelA, modelB, resA.modelOutput, resB.modelOutput, evaluations)
     }
 
-    private fun parseJudgeResponse(response: String): ParseResult {
-        return try {
-            val cleanJson = response.trim()
-            val element = try {
-                json.parseToJsonElement(cleanJson).jsonObject
-            } catch (e: Exception) {
-                val extracted = if (response.contains("```json")) {
-                    response.substringAfter("```json").substringBefore("```").trim()
-                } else {
-                    val firstBrace = response.indexOf('{')
-                    val lastBrace = response.lastIndexOf('}')
-                    if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
-                        response.substring(firstBrace, lastBrace + 1)
-                    } else {
-                        response
+    private fun sanitizeJsonString(jsonStr: String): String {
+        val sb = StringBuilder()
+        var i = 0
+        val len = jsonStr.length
+        while (i < len) {
+            val c = jsonStr[i]
+            if (c == '\\') {
+                if (i + 1 < len) {
+                    val next = jsonStr[i + 1]
+                    val isValidEscape = next == '"' || next == '\\' || next == '/' || 
+                                        next == 'b' || next == 'f' || next == 'n' || 
+                                        next == 'r' || next == 't' ||
+                                        (next == 'u' && i + 5 < len && jsonStr.substring(i + 2, i + 6).all { it.isDigit() || it.lowercaseChar() in 'a'..'f' })
+                    if (isValidEscape) {
+                        sb.append(c)
+                        sb.append(next)
+                        i += 2
+                        continue
                     }
                 }
-                json.parseToJsonElement(extracted).jsonObject
+                sb.append("\\\\")
+                i++
+            } else {
+                sb.append(c)
+                i++
             }
+        }
+        return sb.toString()
+    }
+
+    private fun parseJudgeResponse(response: String): ParseResult {
+        var cleanWinner = "INVALID"
+        var confidence = 0.0
+        var comparisonText = ""
+        var impliesNoWinner = false
+        var parsedSuccessfully = false
+        val cleanJson = response.trim()
+
+        try {
+            val extracted = if (cleanJson.contains("```json")) {
+                cleanJson.substringAfter("```json").substringBefore("```").trim()
+            } else {
+                val firstBrace = cleanJson.indexOf('{')
+                val lastBrace = cleanJson.lastIndexOf('}')
+                if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+                    cleanJson.substring(firstBrace, lastBrace + 1)
+                } else {
+                    cleanJson
+                }
+            }
+            val sanitized = sanitizeJsonString(extracted)
+            val element = json.parseToJsonElement(sanitized).jsonObject
             val rawWinner = element["winner"]?.jsonPrimitive?.content?.trim() ?: "INVALID"
-            val cleanWinner = when (rawWinner.uppercase()) {
+            cleanWinner = when (rawWinner.uppercase()) {
                 "MODEL A" -> "Model A"
                 "MODEL B" -> "Model B"
                 "TIE", "DRAW", "EQUAL" -> "TIE"
                 else -> "INVALID"
             }
-            val confidence = element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.0
-            val comparisonText = (element["comparison"]?.jsonPrimitive?.content 
-                ?: element["rationale"]?.jsonPrimitive?.content 
-                ?: "").lowercase()
-            val impliesNoWinner = confidence <= 0.5 && cleanWinner == "TIE"
-            val finalWinner = cleanWinner
-            val finalConfidence = confidence
-
-            log.debug("Judge parsed: winner=$finalWinner conf=${"%.2f".format(finalConfidence)}")
-            log.trace("Judge raw response: $cleanJson")
-            ParseResult(
-                finalWinner,
-                element["rationale"]?.jsonPrimitive?.content ?: element["comparison"]?.jsonPrimitive?.content ?: response,
-                finalConfidence,
-                impliesNoWinner
-            )
-        } catch (e: Exception) { 
-            log.warn("Failed to parse judge response: ${e.message}. Raw response was: $response", e)
-            ParseResult("INVALID", response, 0.0, false) 
+            confidence = element["confidence"]?.jsonPrimitive?.doubleOrNull ?: 0.0
+            comparisonText = element["rationale"]?.jsonPrimitive?.content 
+                ?: element["comparison"]?.jsonPrimitive?.content 
+                ?: ""
+            impliesNoWinner = confidence <= 0.5 && cleanWinner == "TIE"
+            parsedSuccessfully = true
+        } catch (e: Exception) {
+            log.debug("Standard JSON parsing failed: ${e.message}. Falling back to regex extraction...")
         }
+
+        // If JSON parsing failed, use robust regex fallback
+        if (!parsedSuccessfully) {
+            try {
+                // Regex to find "winner" value
+                val winnerRegex = """"(?:winner)"\s*:\s*"([^"]+)"""".toRegex(RegexOption.IGNORE_CASE)
+                val winnerMatch = winnerRegex.find(cleanJson)
+                val rawWinner = winnerMatch?.groupValues?.get(1)?.trim() ?: "INVALID"
+                cleanWinner = when (rawWinner.uppercase()) {
+                    "MODEL A" -> "Model A"
+                    "MODEL B" -> "Model B"
+                    "TIE", "DRAW", "EQUAL" -> "TIE"
+                    else -> "INVALID"
+                }
+
+                // Regex to find "confidence" value
+                val confidenceRegex = """"(?:confidence)"\s*:\s*([0-9.]+)""".toRegex(RegexOption.IGNORE_CASE)
+                val confidenceMatch = confidenceRegex.find(cleanJson)
+                confidence = confidenceMatch?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
+
+                // Regex to find comparison/rationale
+                val comparisonRegex = """"(?:comparison|rationale|critique)"\s*:\s*"([^"]+)"""".toRegex(RegexOption.IGNORE_CASE)
+                val comparisonMatch = comparisonRegex.find(cleanJson)
+                comparisonText = comparisonMatch?.groupValues?.get(1) ?: ""
+
+                impliesNoWinner = confidence <= 0.5 && cleanWinner == "TIE"
+                
+                log.info("Regex fallback succeeded: winner=$cleanWinner confidence=$confidence")
+                parsedSuccessfully = true
+            } catch (ex: Exception) {
+                log.warn("Regex fallback also failed: ${ex.message}")
+            }
+        }
+
+        if (!parsedSuccessfully) {
+            val preview = response.replace("\n", " ").replace("\r", " ").trim().take(150)
+            log.warn("Failed to parse judge response: JSON & Regex extraction failed (preview: '$preview...')")
+            return ParseResult("INVALID", response, 0.0, false)
+        }
+
+        val finalWinner = cleanWinner
+        val finalConfidence = confidence
+        val finalComparison = if (comparisonText.isNotBlank()) comparisonText else response
+
+        log.debug("Judge parsed: winner=$finalWinner conf=${"%.2f".format(finalConfidence)}")
+        log.trace("Judge raw response: $cleanJson")
+        return ParseResult(finalWinner, finalComparison, finalConfidence, impliesNoWinner)
     }
 
     private fun formatRubricForPrompt(rubricJson: String): String {

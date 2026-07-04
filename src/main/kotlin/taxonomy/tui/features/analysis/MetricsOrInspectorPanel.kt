@@ -247,7 +247,7 @@ fun buildNodeDetailLines(
                 }
             } else {
                 // Header for leaf: #  Model                    Score    SE      95% CI
-                add("  %-2s  %-24s %7s %7s       95% CI".format("#", "Model", "Score", "SE"), Yellow, true)
+                add("  %-2s  %-24s %7s %7s       95%% CI".format("#", "Model", "Score", "SE"), Yellow, true)
                 leaderboard.ranks.forEach { mr ->
                     val scoreStr = "%+6.2f".format(mr.btScore)
                     val seStr = "±%.2f".format(mr.stdError)
