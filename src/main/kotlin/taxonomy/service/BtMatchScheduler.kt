@@ -9,6 +9,8 @@ import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.math.sqrt
+import kotlin.math.PI
 
 data class MatchCandidate(
     val nodeId: String,
@@ -21,9 +23,10 @@ data class MatchCandidate(
 class BtMatchScheduler(
     val minQueriesForBenchmark: Int = 1,
     val queriesPerPair: Int = 20,
-    val budgetPerPair: Int = 100,
+    budgetPerPair: Int? = null,
     val stoppingPolicy: BtStoppingPolicy
 ) {
+    val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
 
@@ -98,6 +101,9 @@ class BtMatchScheduler(
             val leafMatches = leafModelMatches[node.id] ?: emptyMap()
             val debt = leafConvergenceDebt(node.id, state, nodePairs, models, nodeToQueries)
 
+            val totalPairs = models.size * (models.size - 1) / 2
+            val pairsResolved = totalPairs - debt
+
             val candidates = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
             for ((mA, mB) in candidates) {
                 val ps = nodePairs.firstOrNull {
@@ -112,7 +118,7 @@ class BtMatchScheduler(
                 val isBlockingPair = isMatchInformative(mA, mB, state, ps) && already < (budgetPerPair - 5) // not near budget
                 val convergenceBonus = if (debt <= 5 && isBlockingPair) 1.5 else 1.0  // last-mile boost
 
-                val u = computeUtility(mA, mB, state, leafMatches, already) * convergenceBonus
+                val u = computeUtility(mA, mB, state, leafMatches, already, models, pairsResolved) * convergenceBonus
                 val pairKey = "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
                 queue.add(MatchCandidate(node.id, mA, mB, u, pairKey))
             }
@@ -155,9 +161,9 @@ class BtMatchScheduler(
         val tasks = mutableListOf<BtMatchTask>()
         val nodeModelLoad = mutableMapOf<String, MutableMap<String, Int>>()
         val globalModelLoad = mutableMapOf<String, Int>()
-        // Global cap: each pair gets AT MOST batchSize/numPairs slots → spread budget evenly
-        val numPairs = allPairs.size
-        val fairSharePerPair = (batchSize / numPairs).coerceAtLeast(1)
+        
+        // Disable fairSharePerPair for Phase 2: let utility heap decide all allocation
+        val fairSharePerPair = batchSize
         val pairBatchCount = mutableMapOf<String, Int>()
 
         fun pairKey(mA: String, mB: String) = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
@@ -223,36 +229,23 @@ class BtMatchScheduler(
             return true
         }
 
-        // Coverage pass: pairs with fewest global comparisons go first (round-robin by deficit)
+        // Phase 1: Bootstrap-only coverage — only pairs with zero global comparisons
         val unconvergedNodes = targetNodes.filter {
             !stoppingPolicy.isLeafConverged(it.id, btStates, pairStats, models, nodeToQueries)
         }
-        val pairsSortedByDeficit = allPairs.sortedBy { (mA, mB) -> globalPairCounts[mA to mB] ?: 0 }
+        val bootstrapPairs = allPairs.filter { (mA, mB) ->
+            (globalPairCounts[mA to mB] ?: 0) == 0
+        }
 
-        // One slot per pair per node — iterate pairs in deficit order, nodes in SE-desc order
-        for ((mA, mB) in pairsSortedByDeficit) {
+        for ((mA, mB) in bootstrapPairs) {
             if (tasks.size >= batchSize) break
-
-            // Skip uninformative pairs even in coverage pass (after bootstrap)
-            val globalPs = targetNodes.flatMap { pairStats[it.id] ?: emptyList() }
-                .firstOrNull { (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) }
-            val globalNij = globalPs?.totalComparisons ?: 0
-            if (globalNij >= 2) {  // bootstrap done — apply info filter
-                val anyState = btStates.values.firstOrNull { it.btScores.containsKey(mA) && it.btScores.containsKey(mB) }
-                    ?: btStates.values.firstOrNull()
-                val ps = targetNodes.flatMap { node -> (pairStats[node.id] ?: emptyList()) }
-                    .firstOrNull { (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) }
-                if (!isMatchInformative(mA, mB, anyState, ps, minMatches = 2)) continue
-            }
-
             val nodesForPair = unconvergedNodes.sortedByDescending { node ->
                 btStates[node.id]?.stdErrors?.values?.average() ?: 10.0
             }
             for (node in nodesForPair) {
                 if (tasks.size >= batchSize) break
                 trySchedule(node.id, mA, mB, LN2 + 1.0,
-                    ignoreFairShare = false,
-                    ignoreGlobalCap = true) // bootstrap/coverage always wins
+                    ignoreFairShare = true, ignoreGlobalCap = true) // bootstrap/coverage always wins
             }
         }
 
@@ -292,15 +285,22 @@ class BtMatchScheduler(
      * Bootstrap guard: if either model is unseen on this leaf,
      * return max entropy (ln 2) + bonus so bootstrap always wins.
      */
-    private fun computeAlpha(state: NodeBtState?, totalModels: Int): Double {
+    private fun computeAlpha(state: NodeBtState?, models: List<String>, pairsResolved: Int): Double {
         if (state == null) return 1.0  // no state: pure structure bootstrap
 
-        // Maturity: ratio of current avg SE to prior SE (10.0)
+        // Signal 1: SE-based maturity (existing)
         val avgSE = state.stdErrors.values.average().coerceAtLeast(1e-6)
-        val maturity = (1.0 - avgSE / 10.0).coerceIn(0.0, 1.0)
+        val seMaturity = (1.0 - avgSE / 10.0).coerceIn(0.0, 1.0)
 
-        // Alpha decays from 0.8 -> 0.15 as maturity grows
-        return 0.15 + 0.65 * exp(-3.0 * maturity)
+        // Signal 2: Pair-resolution maturity — what fraction of pairs are already separated?
+        val totalPairs = models.size * (models.size - 1) / 2
+        val pairMaturity = if (totalPairs > 0) (pairsResolved.toDouble() / totalPairs).coerceIn(0.0, 1.0) else 0.0
+
+        // Combined maturity: pair resolution dominates early, SE dominates late
+        val combined = (seMaturity * 0.4 + pairMaturity * 0.6).coerceIn(0.0, 1.0)
+
+        // Slower decay: alpha stays >= 0.4 until 70% of pairs resolved
+        return 0.15 + 0.65 * exp(-2.0 * combined)
     }
 
     private fun structureScore(mA: String, mB: String, state: NodeBtState): Double {
@@ -336,16 +336,39 @@ class BtMatchScheduler(
         val gap = abs(si - sj)
         val combinedSE = seA + seB
 
-        // Suppress if already separated beyond 4 SE
+        // Hard suppression: already certain or below noise floor (unchanged)
         if (gap >= 4.0 * combinedSE) return 0.0
-
-        // Suppress if the gap is below the noise floor (e.g. 0.15 * combinedSE)
         val noiseFloor = 0.15 * combinedSE
-        if (gap < noiseFloor) {
-            return if (noiseFloor > 0.0) gap / noiseFloor else 0.0
-        }
+        if (gap < noiseFloor) return (gap / noiseFloor).coerceIn(0.0, 1.0)
 
-        return 1.0
+        // --- New: KDE-based density penalty ---
+        val allScores = state.btScores.values.toDoubleArray()
+        val n = allScores.size
+        if (n < 3) return 1.0  // not enough data for density estimate
+
+        // Silverman's rule bandwidth on current score distribution
+        val mean = allScores.average()
+        val std = sqrt(allScores.sumOf { (it - mean).pow(2.0) } / n).coerceAtLeast(1e-6)
+        val h = (1.06 * std * n.toDouble().pow(-0.2)).coerceAtLeast(1e-4)
+
+        // KDE density at the midpoint of this pair
+        val mid = (si + sj) / 2.0
+        val density = allScores.sumOf { s ->
+            val z = (s - mid) / h
+            exp(-0.5 * z * z)
+        } / (n * h * sqrt(2.0 * PI))
+
+        // Normalise density relative to the max density in the full score distribution
+        val maxDensity = allScores.maxOf { s_ref ->
+            allScores.sumOf { s -> exp(-0.5 * ((s - s_ref) / h).pow(2.0)) } / (n * h * sqrt(2.0 * PI))
+        }.coerceAtLeast(1e-10)
+
+        // Valley boost: low density at midpoint → weight closer to 1.0
+        // Dense midpoint (all models clustered here) → weight close to 0
+        val valleyWeight = (1.0 - (density / maxDensity)).coerceIn(0.0, 1.0)
+
+        // Blend: keep gap-based filter but also reward valley pairs
+        return valleyWeight.coerceAtLeast(0.1)  // floor at 0.1 so no pair is fully suppressed
     }
 
     private fun resolveScore(mA: String, mB: String, state: NodeBtState, nij: Int): Double {
@@ -370,7 +393,9 @@ class BtMatchScheduler(
         mA: String, mB: String,
         state: NodeBtState?,
         leafModelMatches: Map<String, Int>,
-        nij: Int
+        nij: Int,
+        models: List<String>,
+        pairsResolved: Int
     ): Double {
         // Bootstrap: unseen model -> maximum priority
         if ((leafModelMatches[mA] ?: 0) == 0 || (leafModelMatches[mB] ?: 0) == 0)
@@ -378,7 +403,7 @@ class BtMatchScheduler(
 
         if (state == null) return LN2
 
-        val alpha = computeAlpha(state, state.btScores.size)
+        val alpha = computeAlpha(state, models, pairsResolved)
         val sScore = structureScore(mA, mB, state)
         val rScore = resolveScore(mA, mB, state, nij)
 

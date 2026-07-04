@@ -457,13 +457,29 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                     if (processed % 10 == 0 || processed == total) {
                         onProgress("Routing test queries: $processed / $total · running top1 acc=${"%,.1f%%".format(runningTop1 * 100)}")
                     }
-                },
+                }
             )
-            deps.log.info(
-                "Batch trickle complete: ${out.totalQueries} queries · " +
-                    "top1 ${"%,.2f".format(out.top1Accuracy)} · any ${"%,.2f".format(out.anyMatchAccuracy)} · " +
-                    "macroF1 ${"%,.2f".format(out.macroF1)} · no-match ${"%,.2f".format(out.noMatchRate)}"
-            )
+            val summary = StringBuilder().apply {
+                appendLine()
+                appendLine("=== Batch Trickle Routing Benchmark Results ===")
+                appendLine("Total Queries: ${out.totalQueries}")
+                appendLine("Top-1 Accuracy: ${"%,.2f%%".format(out.top1Accuracy * 100)}")
+                appendLine("Any-Match Accuracy: ${"%,.2f%%".format(out.anyMatchAccuracy * 100)}")
+                appendLine("Mean Leaf Purity: ${"%,.2f%%".format(out.meanLeafPurity * 100)}")
+                appendLine("Mean Routing Depth: ${"%,.2f".format(out.meanRoutingDepth)}")
+                appendLine("Macro F1: ${"%,.2f%%".format(out.macroF1 * 100)}")
+                appendLine("No-Match Rate: ${"%,.2f%%".format(out.noMatchRate * 100)}")
+                appendLine("----------------------------------------------------------------------")
+                appendLine("%-25s | %7s | %9s | %8s | %8s".format("Domain", "Support", "Precision", "Recall", "F1"))
+                appendLine("----------------------------------------------------------------------")
+                out.perDomainF1.entries.sortedByDescending { it.value.support }.forEach { (domain, f1) ->
+                    appendLine("%-25s | %7d | %8.1f%% | %7.1f%% | %7.1f%%".format(
+                        domain.take(25), f1.support, f1.precision * 100, f1.recall * 100, f1.f1 * 100
+                    ))
+                }
+                appendLine("======================================================================")
+            }.toString()
+            deps.log.info(summary)
             onComplete(out)
         }
     }
