@@ -269,12 +269,19 @@ class BtMatchScheduler(
                 }
             }
             if (tasks.size < batchSize) {
-                for (c in remainingCandidates) {
-                    if (tasks.size >= batchSize) break
-                    trySchedule(c.nodeId, c.modelA, c.modelB, c.utility,
-                        ignoreFairShare = true,
-                        ignoreGlobalCap = false,
-                        ignoreNodeCap = true)
+                var added = true
+                while (tasks.size < batchSize && added) {
+                    added = false
+                    for (c in remainingCandidates) {
+                        if (tasks.size >= batchSize) break
+                        val success = trySchedule(c.nodeId, c.modelA, c.modelB, c.utility,
+                            ignoreFairShare = true,
+                            ignoreGlobalCap = true,
+                            ignoreNodeCap = true)
+                        if (success) {
+                            added = true
+                        }
+                    }
                 }
             }
         }
@@ -413,12 +420,7 @@ class BtMatchScheduler(
     }
 
     private fun pairBudget(mA: String, mB: String, state: NodeBtState?, ps: NodePairStats?): Int {
-        if (state == null || ps == null) return budgetPerPair
-        val si = state.btScores[mA] ?: 0.0
-        val sj = state.btScores[mB] ?: 0.0
-        val p = exp(si) / (exp(si) + exp(sj)).coerceAtLeast(1e-300)
-        // Close pair gets full budget; resolved pair gets minimum
-        return if (abs(p - 0.5) < 0.15) budgetPerPair else (budgetPerPair * 2 / 3).coerceAtLeast(queriesPerPair)
+        return budgetPerPair
     }
 
     fun selectTargetNodes(
@@ -462,7 +464,7 @@ class BtMatchScheduler(
     }
 
     companion object {
-        const val BATCH_STEP_SIZE = 5
+        const val BATCH_STEP_SIZE = 3
         val LN2 = ln(2.0)
     }
 }

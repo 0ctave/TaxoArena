@@ -11,7 +11,7 @@ class BtStoppingPolicy(
     val stabilityRounds: Int = 2,
     val separationThreshold: Double = 1.0,
     val minTotalComparisons: Int = 20,
-    val budgetPerPair: Int = 18
+    val budgetPerPair: Int
 ) {
     private val leafRankHistory = mutableMapOf<String, ArrayDeque<List<String>>>()
 

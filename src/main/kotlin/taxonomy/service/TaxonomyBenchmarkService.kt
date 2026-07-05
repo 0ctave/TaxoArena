@@ -1097,17 +1097,20 @@ private fun buildSchedulingParams(
     // Scale up slightly if we have many questions available
     val avgQuestionsPerLeaf = if (numLeaves > 0) totalQuestions / numLeaves else 10
     val baseQueriesPerPair = when {
-        minQuestionsPerLeaf >= 20 -> 15
-        minQuestionsPerLeaf >= 12 -> 10
-        else -> 6
+        minQuestionsPerLeaf >= 40 -> 8
+        minQuestionsPerLeaf >= 20 -> 6
+        minQuestionsPerLeaf >= 12 -> 4
+        else -> 2
     }
     var queriesPerPair = minOf(baseQueriesPerPair, minQuestionsPerLeaf).coerceAtLeast(1)
     if (totalQuestions <= 20) {
         queriesPerPair = totalQuestions.coerceAtLeast(1)
     }
 
-    // Budget per pair: 3x queriesPerPair for close matches
-    val budgetPerPair = (queriesPerPair * 3).coerceAtLeast(if (totalQuestions <= 20) queriesPerPair else 18)
+    // Budget = enough for 2 full task-slot rotations per pair, floored at BATCH_STEP_SIZE*2
+    val budgetPerPair = (queriesPerPair * 2)
+        .coerceAtLeast(BtMatchScheduler.BATCH_STEP_SIZE * 2)
+        .coerceAtMost(maxOf(queriesPerPair, minQuestionsPerLeaf / 2))   // never exceed half the leaf pool unless it drops below queriesPerPair
 
     // Convergence fraction: relax if many leaves (more likely some will be sparse)
     val convergenceFraction = when {
@@ -1134,9 +1137,12 @@ private fun buildSchedulingParams(
     // Max concurrent per model: allow more parallelism with more models
     val maxConcurrent = (K - 1).coerceIn(2, 4)
 
-    // Questions per round: numPairs * BtMatchScheduler.BATCH_STEP_SIZE capped at available parallelism
-    val questionsPerRound = (numPairs * BtMatchScheduler.BATCH_STEP_SIZE)
-        .coerceAtMost(req.parallelism * 3)
+    // Must fit at least one task slot per pair per round.
+    // Use parallelism * 4 as cap (not *3), and floor at numPairs * BATCH_STEP_SIZE if parallelism allows.
+    val idealQPerRound = numPairs * BtMatchScheduler.BATCH_STEP_SIZE
+    val questionsPerRound = idealQPerRound
+        .coerceAtMost(req.parallelism * 4)         // was *3 → *4
+        .coerceAtLeast(numPairs * 2)               // at minimum 2 questions per pair per round
         .coerceAtLeast(req.questionsPerRound)
 
     return SchedulingParams(
