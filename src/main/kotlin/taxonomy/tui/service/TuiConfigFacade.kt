@@ -56,6 +56,7 @@ class TuiConfigFacade(
             },
             kind = SettingKind.NUMBER
         ),
+
         SettingItem(
             name = "Dataset Type",
             description = "Active dataset to run",

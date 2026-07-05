@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.EmbeddingCache
 import taxonomy.dataset.ModelEvalStore
+import taxonomy.model.BenchmarkLiveStats
 import taxonomy.model.BenchmarkReport
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
@@ -82,7 +83,8 @@ data class AnalysisPanelState(
     val benchmarkProgress: String = "",
     val isRunningBenchmark: Boolean = false,
     val nodeLeaderboard: AggregatedLeaderboard? = null,
-    val isLoadingLeaderboard: Boolean = false
+    val isLoadingLeaderboard: Boolean = false,
+    val benchmarkLiveStats: taxonomy.model.BenchmarkLiveStats? = null
 )
 
 @Service
@@ -160,9 +162,22 @@ class TaxonomyArenaService(
     /** Passthrough to the ranking service so the TUI gateway can render the Arena leaderboard. */
     fun getLeaderboard(domain: String = "global"): List<LeaderboardGroup> {
         val snapshotId = taxonomyService.activeSnapshotId() ?: "global"
-        val rootId = taxonomyService.getGraph()?.id ?: "root"
-        val ranks = rankingService.getNodeLeaderboard(rootId, snapshotId)
-        if (!ranks.isNullOrEmpty()) {
+        val root = taxonomyService.getGraph()
+        val ranks = if (root != null) {
+            val allNodes = mutableListOf<GraphNode>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                allNodes.add(n)
+                n.children.forEach { walk(it) }
+            }
+            walk(root)
+            getLeaderboardForNode(root, allNodes, snapshotId).ranks
+        } else {
+            emptyList()
+        }
+
+        if (ranks.isNotEmpty()) {
             return ranks.map { mr ->
                 LeaderboardGroup(
                     rank = mr.rank,
@@ -177,7 +192,7 @@ class TaxonomyArenaService(
                 )
             }
         }
-        return rankingService.getLeaderboard(domain, snapshotId)
+        return emptyList()
     }
 
     fun clearLeaderboard() {
@@ -218,7 +233,8 @@ class TaxonomyArenaService(
             mode = AnalysisMode.BENCHMARK,
             isRunningBenchmark = true,
             benchmarkProgress = progress,
-            benchmarkReport = null
+            benchmarkReport = null,
+            benchmarkLiveStats = null
         ) }
     }
 
@@ -226,11 +242,16 @@ class TaxonomyArenaService(
         _state.update { it.copy(benchmarkProgress = progress) }
     }
 
+    fun updateBenchmarkLiveStats(stats: BenchmarkLiveStats) {
+        _state.update { it.copy(benchmarkLiveStats = stats) }
+    }
+
     fun completeBenchmark(report: BenchmarkReport) {
         _state.update { it.copy(
             isRunningBenchmark = false,
             benchmarkProgress = "Benchmark completed successfully!",
-            benchmarkReport = report
+            benchmarkReport = report,
+            benchmarkLiveStats = null
         ) }
     }
 

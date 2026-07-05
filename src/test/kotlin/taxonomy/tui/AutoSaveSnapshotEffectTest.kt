@@ -55,6 +55,7 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
         parallelism: Int,
         updateRankings: Boolean,
         reservedOnly: Boolean,
+        resume: Boolean,
         onLive: (taxonomy.model.BenchmarkLiveStats) -> Unit
     ) {}
     override suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String = ""
@@ -76,6 +77,8 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override suspend fun loadLeaderboardForNode(node: GraphNode): AggregatedLeaderboard =
         AggregatedLeaderboard(emptyList(), 0, 1, 0, false)
     override suspend fun loadLeafRanks(): Map<String, Pair<String, String>> = emptyMap()
+    override suspend fun hasSavedBenchmark(): Boolean = false
+    override suspend fun getSavedBenchmarkMetadata(): taxonomy.service.SavedBenchmarkMetadata? = null
 }
 
 class AutoSaveSnapshotEffectTest {

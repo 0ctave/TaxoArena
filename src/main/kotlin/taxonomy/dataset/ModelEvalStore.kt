@@ -228,6 +228,8 @@ class ModelEvalStore(
         conn().use { c ->
             c.autoCommit = false
             try {
+                // Reset ALL existing reserved flags — ensures pool is an exact mirror of the snapshot
+                c.createStatement().executeUpdate("UPDATE eval_results SET is_reserved = 0")
                 questionIds.chunked(900).forEach { chunk ->
                     val placeholders = chunk.joinToString(",") { "?" }
                     c.prepareStatement(
@@ -240,7 +242,7 @@ class ModelEvalStore(
                 c.commit()
             } catch (e: Exception) { c.rollback(); throw e }
         }
-        log.info("Marked ${questionIds.size} questions as reserved in eval_results.")
+        log.info("Reserved pool reset: ${questionIds.size} questions marked as reserved.")
     }
 
     // ─── Read ─────────────────────────────────────────────────────────────────

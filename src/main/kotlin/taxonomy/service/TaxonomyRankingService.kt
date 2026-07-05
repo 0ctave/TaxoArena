@@ -51,9 +51,32 @@ data class CachedMatchResult(
 )
 
 @Serializable
+data class CachedMatchResultWithQuery(
+    val queryKey: String,
+    val modelA: String,
+    val modelB: String,
+    val domain: String,
+    val winner: String,
+    val loser: String,
+    val isTie: Boolean
+)
+
+@Serializable
 data class LeaderboardGroup(
     val rank: Int,
     val agents: List<AgentRating>
+)
+
+@Serializable
+data class SavedBenchmarkMetadata(
+    val snapshotId: String,
+    val models: List<String>,
+    val queryLimit: Int,
+    val category: String?,
+    val confidenceGate: Double,
+    val parallelism: Int,
+    val updateRankings: Boolean,
+    val reservedOnly: Boolean
 )
 
 @Service
@@ -237,6 +260,19 @@ class TaxonomyRankingService {
                             PRIMARY KEY (snapshot_id, key_str)
                         )
                     """.trimIndent())
+
+                    stmt.execute("""
+                        CREATE TABLE IF NOT EXISTS benchmark_metadata (
+                            snapshot_id TEXT PRIMARY KEY,
+                            models TEXT NOT NULL,
+                            query_limit INTEGER NOT NULL,
+                            category TEXT,
+                            confidence_gate REAL NOT NULL,
+                            parallelism INTEGER NOT NULL,
+                            update_rankings INTEGER NOT NULL,
+                            reserved_only INTEGER NOT NULL
+                        )
+                    """.trimIndent())
                 }
 
                 // Migrate existing databases safely by adding new columns if they do not exist
@@ -285,7 +321,9 @@ class TaxonomyRankingService {
                     "DELETE FROM agent_ratings_v2 WHERE snapshot_id = ?",
                     "DELETE FROM match_history WHERE snapshot_id = ?",
                     "DELETE FROM node_pair_stats WHERE snapshot_id = ?",
-                    "DELETE FROM node_bt_states WHERE snapshot_id = ?"
+                    "DELETE FROM node_bt_states WHERE snapshot_id = ?",
+                    "DELETE FROM benchmark_query_offsets WHERE snapshot_id = ?",
+                    "DELETE FROM benchmark_metadata WHERE snapshot_id = ?"
                 ).forEach { sql ->
                     try {
                         conn.prepareStatement(sql).use { pstmt ->
@@ -1007,6 +1045,100 @@ data class AggregatedLeaderboard(
                 log.error("Failed to load pair query offsets for snapshot $snapshotId", e)
             }
             return result
+        }
+    }
+
+    fun getAllRecordedMatches(snapshotId: String): List<CachedMatchResultWithQuery> {
+        val list = mutableListOf<CachedMatchResultWithQuery>()
+        try {
+            withConn { conn ->
+                val sql = """
+                    SELECT query, model_a, model_b, domain, winner, loser, is_tie 
+                    FROM match_history 
+                    WHERE snapshot_id = ?
+                """.trimIndent()
+                conn.prepareStatement(sql).use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    val rs = pstmt.executeQuery()
+                    while (rs.next()) {
+                        list.add(
+                            CachedMatchResultWithQuery(
+                                queryKey = rs.getString("query"),
+                                modelA = rs.getString("model_a"),
+                                modelB = rs.getString("model_b"),
+                                domain = rs.getString("domain"),
+                                winner = rs.getString("winner"),
+                                loser = rs.getString("loser"),
+                                isTie = rs.getInt("is_tie") == 1
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to read all recorded matches for snapshot $snapshotId", e)
+        }
+        return list
+    }
+
+    fun saveBenchmarkMetadata(meta: SavedBenchmarkMetadata) {
+        try {
+            withConn { conn ->
+                val sql = """
+                    INSERT OR REPLACE INTO benchmark_metadata (
+                        snapshot_id, models, query_limit, category, confidence_gate, parallelism, update_rankings, reserved_only
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """.trimIndent()
+                conn.prepareStatement(sql).use { pstmt ->
+                    pstmt.setString(1, meta.snapshotId)
+                    pstmt.setString(2, json.encodeToString(meta.models))
+                    pstmt.setInt(3, meta.queryLimit)
+                    pstmt.setString(4, meta.category)
+                    pstmt.setDouble(5, meta.confidenceGate)
+                    pstmt.setInt(6, meta.parallelism)
+                    pstmt.setInt(7, if (meta.updateRankings) 1 else 0)
+                    pstmt.setInt(8, if (meta.reservedOnly) 1 else 0)
+                    pstmt.executeUpdate()
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to save benchmark metadata for snapshot ${meta.snapshotId}", e)
+        }
+    }
+
+    fun getBenchmarkMetadata(snapshotId: String): SavedBenchmarkMetadata? {
+        try {
+            return withConn { conn ->
+                val sql = """
+                    SELECT models, query_limit, category, confidence_gate, parallelism, update_rankings, reserved_only 
+                    FROM benchmark_metadata 
+                    WHERE snapshot_id = ?
+                    LIMIT 1
+                """.trimIndent()
+                conn.prepareStatement(sql).use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    val rs = pstmt.executeQuery()
+                    if (rs.next()) {
+                        val modelsStr = rs.getString("models")
+                        val models = json.decodeFromString<List<String>>(modelsStr)
+                        SavedBenchmarkMetadata(
+                            snapshotId = snapshotId,
+                            models = models,
+                            queryLimit = rs.getInt("query_limit"),
+                            category = rs.getString("category"),
+                            confidenceGate = rs.getDouble("confidence_gate"),
+                            parallelism = rs.getInt("parallelism"),
+                            updateRankings = rs.getInt("update_rankings") == 1,
+                            reservedOnly = rs.getInt("reserved_only") == 1
+                        )
+                    } else {
+                        null
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to get benchmark metadata for snapshot $snapshotId", e)
+            return null
         }
     }
 }

@@ -153,7 +153,7 @@ private fun ArenaBenchmarkView(
     dispatch: (TuiEvent) -> Unit,
 ) {
     val w = (width - 1).coerceAtLeast(1)
-    val isLive = benchmarkState.benchmarkSubScreen == BenchmarkSubScreen.RESULTS
+    val isLive = benchmarkState.benchmarkSubScreen == BenchmarkSubScreen.RESULTS || controlState.isRunningBenchmark
     Column {
         if (benchmarkState.loadedModels.isNotEmpty()) {
             Text("Loaded models: ${benchmarkState.loadedModels.size} models eval results", color = Green)
@@ -194,7 +194,7 @@ private fun ArenaBenchmarkView(
 
             isLive -> ArenaBenchmarkLiveView(w, height, controlState, benchmarkState, dispatch)
 
-            else -> ArenaBenchmarkConfig(width, height - 3, benchmarkState, availableDomains, dispatch)
+            else -> ArenaBenchmarkConfig(width, height - 3, scrollOffset, benchmarkState, availableDomains, dispatch)
         }
 
         Spacer()
@@ -205,6 +205,7 @@ private fun ArenaBenchmarkView(
 private fun ArenaBenchmarkConfig(
     width: Int,
     height: Int,
+    scrollOffset: Int,
     b: BenchmarkUiState,
     availableDomains: List<Pair<String, Int>>,
     dispatch: (TuiEvent) -> Unit,
@@ -219,6 +220,8 @@ private fun ArenaBenchmarkConfig(
         height = height
     ) {
         Column(modifier = Modifier.padding(left = 2, top = 1)) {
+            val totalLines = mutableListOf<@Composable () -> Unit>()
+
             settingItems.forEachIndexed { idx, item ->
                 val selected = b.selectedBenchmarkField == idx
                 val caret = if (selected) "❯ " else "  "
@@ -267,12 +270,36 @@ private fun ArenaBenchmarkConfig(
                     "${caret}${item.name}: $displayValue"
                 }
 
-                Text(
-                    value = lineText.take(w - 4),
-                    color = color,
-                    textStyle = textStyle
-                )
+                totalLines.add {
+                    Text(
+                        value = lineText.take(w - 4),
+                        color = color,
+                        textStyle = textStyle
+                    )
+                }
             }
+
+            val meta = b.savedBenchmarkMetadata
+            if (b.hasSavedBenchmark && meta != null) {
+                totalLines.add { Spacer() }
+                totalLines.add { Text("".padEnd(w - 4, '─'), color = Yellow) }
+                totalLines.add { Spacer() }
+                totalLines.add { Text("⚠ Saved unfinished benchmark detected:".take(w - 4), color = Yellow, textStyle = Bold) }
+                totalLines.add { Text("  Models: ${meta.models.joinToString(", ")}".take(w - 4), color = Yellow) }
+                totalLines.add { Text("  Limit: ${meta.queryLimit} | Cat: ${meta.category ?: "all"} | Gate: ${meta.confidenceGate} | Par: ${meta.parallelism}".take(w - 4), color = Yellow) }
+                totalLines.add { Spacer() }
+                totalLines.add { Text("Press [R] to resume previous benchmark session".take(w - 4), color = Yellow, textStyle = Bold) }
+                totalLines.add { Text("Press [L] to copy/restore these settings to inputs above".take(w - 4), color = Yellow) }
+            } else if (b.hasSavedBenchmark) {
+                totalLines.add { Spacer() }
+                totalLines.add { Text("".padEnd(w - 4, '─'), color = Yellow) }
+                totalLines.add { Spacer() }
+                totalLines.add { Text("⚠ Saved unfinished benchmark detected from previous session!".take(w - 4), color = Yellow, textStyle = Bold) }
+                totalLines.add { Text("Press [R] to resume previous benchmark session (recover offsets & results)".take(w - 4), color = Yellow) }
+            }
+
+            val visibleHeight = (height - 2).coerceAtLeast(1)
+            totalLines.drop(scrollOffset).take(visibleHeight).forEach { it() }
         }
     }
 }
@@ -287,7 +314,7 @@ private fun ArenaBenchmarkLiveView(
 ) {
     val running = controlState.isRunningBenchmark
     val report = controlState.benchmarkReport
-    val live = b.liveStats
+    val live = controlState.benchmarkLiveStats ?: b.liveStats
 
     // Top Panel: STATUS
     val topH = 5
@@ -391,14 +418,20 @@ private fun ArenaBenchmarkLiveView(
                             itemCount = sortedModels.size,
                             scrollOffset = b.benchmarkScrollOffset,
                             hasPadding = false,
-                            onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
+                            onScrollClamp = null
                         ) { visibleHeight, startIdx, innerW ->
-                            sortedModels.drop(startIdx).take(visibleHeight).forEach { entry ->
+                            val end = (startIdx + visibleHeight).coerceAtMost(sortedModels.size)
+                            for (i in startIdx until end) {
+                                val entry = sortedModels[i]
                                 val model = entry.key
                                 val score = entry.value
                                 val se = live?.btErrors?.get(model) ?: 0.0
                                 val rowStr = "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
-                                Text(rowStr.take(innerW), color = White)
+                                Text(rowStr.take(innerW), color = White, modifier = Modifier.height(1))
+                            }
+                            val emptyRows = visibleHeight - (end - startIdx)
+                            repeat(emptyRows.coerceAtLeast(0)) {
+                                Text(" ".repeat(innerW), modifier = Modifier.height(1))
                             }
                         }
                     }
@@ -431,11 +464,17 @@ private fun ArenaBenchmarkLiveView(
                                 hasPadding = false,
                                 onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                             ) { visibleHeight, startIdx, innerW ->
-                                accs.drop(startIdx).take(visibleHeight).forEach { (model, acc) ->
+                                val end = (startIdx + visibleHeight).coerceAtMost(accs.size)
+                                for (i in startIdx until end) {
+                                    val (model, acc) = accs[i]
                                     val barLen = ((innerW - 28).coerceAtLeast(5) * acc).toInt()
                                     val bar = "█".repeat(barLen)
                                     val rowStr = "%-20s | %s %5.1f%%".format(model.take(20), bar.padEnd((innerW - 28).coerceAtLeast(5)), acc * 100)
-                                    Text(rowStr.take(innerW), color = Green)
+                                    Text(rowStr.take(innerW), color = Green, modifier = Modifier.height(1))
+                                }
+                                val emptyRows = visibleHeight - (end - startIdx)
+                                repeat(emptyRows.coerceAtLeast(0)) {
+                                    Text(" ".repeat(innerW), modifier = Modifier.height(1))
                                 }
                             }
                         } else if (live != null) {
@@ -461,7 +500,9 @@ private fun ArenaBenchmarkLiveView(
                                 hasPadding = false,
                                 onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                             ) { visibleHeight, startIdx, innerW ->
-                                pairStats.drop(startIdx).take(visibleHeight).forEach { ps ->
+                                val end = (startIdx + visibleHeight).coerceAtMost(pairStats.size)
+                                for (i in startIdx until end) {
+                                    val ps = pairStats[i]
                                     val rowStr = if (isWide) {
                                         "%-18s vs %-18s | %5d %5d %5d | %5.0f%%".format(
                                             ps.modelA.take(18),
@@ -480,7 +521,11 @@ private fun ArenaBenchmarkLiveView(
                                             ps.judgeTies
                                         )
                                     }
-                                    Text(rowStr.take(innerW), color = White)
+                                    Text(rowStr.take(innerW), color = White, modifier = Modifier.height(1))
+                                }
+                                val emptyRows = visibleHeight - (end - startIdx)
+                                repeat(emptyRows.coerceAtLeast(0)) {
+                                    Text(" ".repeat(innerW), modifier = Modifier.height(1))
                                 }
                             }
                         } else {
@@ -510,8 +555,14 @@ private fun ArenaBenchmarkLiveView(
                         hasPadding = false,
                         onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                     ) { visibleHeight, startIdx, innerW ->
-                        accs.drop(startIdx).take(visibleHeight).forEach { (model, acc) ->
-                            Text("• ${model.take(20)}: ${"%.1f%%".format(acc * 100)}".take(innerW), color = Green)
+                        val end = (startIdx + visibleHeight).coerceAtMost(accs.size)
+                        for (i in startIdx until end) {
+                            val (model, acc) = accs[i]
+                            Text("• ${model.take(20)}: ${"%.1f%%".format(acc * 100)}".take(innerW), color = Green, modifier = Modifier.height(1))
+                        }
+                        val emptyRows = visibleHeight - (end - startIdx)
+                        repeat(emptyRows.coerceAtLeast(0)) {
+                            Text(" ".repeat(innerW), modifier = Modifier.height(1))
                         }
                     }
                 } else if (live != null) {
@@ -524,8 +575,14 @@ private fun ArenaBenchmarkLiveView(
                         hasPadding = false,
                         onScrollClamp = { dispatch(TuiEvent.ScrollTo(ScrollbarTarget.ANALYSIS, it)) }
                     ) { visibleHeight, startIdx, innerW ->
-                        pairStats.drop(startIdx).take(visibleHeight).forEach { ps ->
-                            Text("${ps.modelA.take(12)} vs ${ps.modelB.take(12)} | ${ps.judgeWinsA}/${ps.judgeWinsB}/${ps.judgeTies}".take(innerW), color = White)
+                        val end = (startIdx + visibleHeight).coerceAtMost(pairStats.size)
+                        for (i in startIdx until end) {
+                            val ps = pairStats[i]
+                            Text("${ps.modelA.take(12)} vs ${ps.modelB.take(12)} | ${ps.judgeWinsA}/${ps.judgeWinsB}/${ps.judgeTies}".take(innerW), color = White, modifier = Modifier.height(1))
+                        }
+                        val emptyRows = visibleHeight - (end - startIdx)
+                        repeat(emptyRows.coerceAtLeast(0)) {
+                            Text(" ".repeat(innerW), modifier = Modifier.height(1))
                         }
                     }
                 } else {

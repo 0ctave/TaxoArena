@@ -178,7 +178,7 @@ internal class AnalysisKeyHandler(
                     )
                     BenchmarkType.ARENA -> {
                         if (bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG) {
-                            dispatch(TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField + 1).coerceAtMost(6)))
+                            dispatch(TuiEvent.SetSelectedBenchmarkField((bench.selectedBenchmarkField + 1).coerceAtMost(7)))
                         } else if (bench.benchmarkSubScreen == BenchmarkSubScreen.RESULTS) {
                             dispatch(TuiEvent.SetBenchmarkScrollOffset(bench.benchmarkScrollOffset + 1))
                         }
@@ -229,6 +229,25 @@ internal class AnalysisKeyHandler(
                             }
                         }
                     }
+                }
+            }
+            "r", "R" -> {
+                if (bench.benchmarkType == BenchmarkType.ARENA &&
+                    bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG &&
+                    bench.hasSavedBenchmark &&
+                    !state.runtime.isRegenerating
+                ) {
+                    dispatch(TuiEvent.ResumeBenchmark)
+                }
+            }
+            "l", "L" -> {
+                val meta = bench.savedBenchmarkMetadata
+                if (meta != null &&
+                    bench.benchmarkType == BenchmarkType.ARENA &&
+                    bench.benchmarkSubScreen == BenchmarkSubScreen.CONFIG &&
+                    !state.runtime.isRegenerating
+                ) {
+                    dispatch(TuiEvent.RestoreSavedBenchmarkSettings(meta))
                 }
             }
             "v" -> {

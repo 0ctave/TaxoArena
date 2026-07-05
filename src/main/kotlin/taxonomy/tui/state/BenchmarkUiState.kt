@@ -38,6 +38,8 @@ data class BenchmarkUiState(
     val isEditingBenchmarkField: Boolean = false,
     val benchmarkEditingValue: String = "",
     val benchmarkScrollOffset: Int = 0,
+    val hasSavedBenchmark: Boolean = false,
+    val savedBenchmarkMetadata: taxonomy.service.SavedBenchmarkMetadata? = null,
 
     val isEnteringBenchmarkConfig: Boolean = false,
 
@@ -48,6 +50,7 @@ data class BenchmarkUiState(
     val benchmarkParallelismInput: String = "4",
     val benchmarkUpdateRankingsInput: String = "true",
     val benchmarkReservedOnlyInput: String = "true",
+    val benchmarkResetRankingsInput: String = "false",
 
     // ── Arena benchmark config-dashboard state ──
     // Multi-select picks (the left Topology panel flips into a picker to edit these).

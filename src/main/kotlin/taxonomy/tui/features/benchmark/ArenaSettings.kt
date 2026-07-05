@@ -60,6 +60,17 @@ fun buildArenaSettingItems(
             kind = SettingKind.BOOLEAN
         ),
         SettingItem(
+            name = "Reset rankings",
+            description = "Reset model rankings on starting this run",
+            category = "Arena Settings",
+            getValue = { b.benchmarkResetRankingsInput },
+            setValue = { s ->
+                dispatch(TuiEvent.ToggleBenchmarkResetRankings)
+                true
+            },
+            kind = SettingKind.BOOLEAN
+        ),
+        SettingItem(
             name = "Select models",
             description = "Pick which models to evaluate",
             category = "Arena Settings",

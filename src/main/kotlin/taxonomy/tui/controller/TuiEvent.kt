@@ -213,6 +213,10 @@ sealed interface TuiEvent {
     data object ResetBenchmarkType : TuiEvent
     data object RunBenchmark : TuiEvent
     data object RunEvalLoad : TuiEvent
+    data object ResumeBenchmark : TuiEvent
+    data class SetHasSavedBenchmark(val hasSaved: Boolean) : TuiEvent
+    data class SetSavedBenchmarkMetadata(val metadata: taxonomy.service.SavedBenchmarkMetadata?) : TuiEvent
+    data class RestoreSavedBenchmarkSettings(val metadata: taxonomy.service.SavedBenchmarkMetadata) : TuiEvent
 
     // ── Arena benchmark config dashboard ──
     /** Move the active section focus (MODELS / DOMAINS / OPTIONS / START). */
@@ -229,6 +233,7 @@ sealed interface TuiEvent {
     data object ToggleBenchmarkPickerItem : TuiEvent
     data object ToggleBenchmarkReservedOnly : TuiEvent
     data object ToggleBenchmarkUpdateRankings : TuiEvent
+    data object ToggleBenchmarkResetRankings : TuiEvent
     /** Flip the live-run view between the summary dashboard and the per-question stream. */
     data object ToggleBenchmarkLiveView : TuiEvent
     /** Live per-question progress streamed from a running benchmark. */

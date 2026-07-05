@@ -95,10 +95,14 @@ class TaxonomyBenchmarkService(
 
         val health = evalStore.verifyIngestion(modelNames)
         health.forEach { h ->
-            if (h.reservedRows == 0) {
-                log.warn("Model '${h.modelName}' has 0 reserved rows — run syncReservedPool or re-ingest")
-            }
             log.info("  ${h.modelName}: total=${h.totalRows} reserved=${h.reservedRows} math=${h.mathRows} reserved_math=${h.reservedMathRows}")
+        }
+        if (req.reservedOnly) {
+            val empty = health.filter { it.reservedRows == 0 }
+            require(empty.isEmpty()) {
+                "Cannot run benchmark: ${empty.map { it.modelName }} have 0 reserved rows. " +
+                "Load a snapshot first or run syncReservedPool."
+            }
         }
 
         val matrix = evalStore.getResultsMatrix(
@@ -209,6 +213,62 @@ class TaxonomyBenchmarkService(
 
         var round = btStates.values.map { it.fitVersion }.maxOrNull() ?: 0
         val completedResults = java.util.Collections.synchronizedList(mutableListOf<QueryBenchmarkResult>())
+        
+        val cachedMatches = if (req.updateRankings) {
+            rankingService.getAllRecordedMatches(snapshotId)
+        } else {
+            emptyList()
+        }
+        if (cachedMatches.isNotEmpty()) {
+            val reconstructed = cachedMatches.mapNotNull { cm ->
+                val parts = cm.queryKey.split("::", limit = 2)
+                val qId = parts.firstOrNull()?.toIntOrNull() ?: return@mapNotNull null
+                val modelResults = matrix[qId] ?: return@mapNotNull null
+                val sample = modelResults.values.firstOrNull() ?: return@mapNotNull null
+
+                val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
+                val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
+                val aCorrect = modelCorrect[cm.modelA] ?: false
+                val bCorrect = modelCorrect[cm.modelB] ?: false
+                val gtWinner = when {
+                    aCorrect && !bCorrect -> cm.modelA
+                    bCorrect && !aCorrect -> cm.modelB
+                    else -> "tie"
+                }
+                val judgeWinner = when {
+                    cm.isTie -> "tie"
+                    cm.winner == cm.modelA -> cm.modelA
+                    else -> cm.modelB
+                }
+                val agrees = judgeWinner == gtWinner
+                val pairKey = "${cm.modelA}_vs_${cm.modelB}"
+
+                val primaryEval = DomainEvaluation(
+                    domain = cm.domain,
+                    winner = if (cm.isTie) "TIE" else if (cm.winner == cm.modelA) "Model A" else "Model B",
+                    rationale = "Reconstructed from database",
+                    confidence = 1.0,
+                    positionFlip = false,
+                    nodeId = allNodes.firstOrNull { it.label == cm.domain }?.id ?: "unknown"
+                )
+
+                QueryBenchmarkResult(
+                    query = sample.questionText,
+                    gtCategory = sample.category,
+                    gtCorrectAnswer = sample.gtAnswer,
+                    modelAnswers = modelAnswers,
+                    modelCorrect = modelCorrect,
+                    matchedLeafLabels = listOf(cm.domain),
+                    hadJudge = true,
+                    domainEvaluations = listOf(primaryEval),
+                    pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
+                    judgeAccuracyAgreement = mapOf(pairKey to agrees)
+                )
+            }
+            completedResults.addAll(reconstructed)
+            log.info("Reconstructed ${reconstructed.size} previous match results from database.")
+        }
+
         val completedAtStartOfRound = java.util.concurrent.atomic.AtomicInteger(0)
 
         var currentAggregated: TaxonomyRankingService.AggregatedLeaderboard? = null
@@ -336,6 +396,17 @@ class TaxonomyBenchmarkService(
                 }
             }
         }
+
+        val leafIds = mutableListOf<String>()
+        val visited = mutableSetOf<String>()
+        fun walk(n: GraphNode) {
+            if (!visited.add(n.id)) return
+            if (n.children.isEmpty()) leafIds.add(n.id)
+            else n.children.forEach { walk(it) }
+        }
+        walk(root)
+        currentAggregated = rankingService.aggregateLeafScores(leafIds, snapshotId, nodeToQuestions = nodeToQueries)
+        publishProgress(true)
 
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
             btStates, pairStatsMap, targetLeafIds, modelNames, round,

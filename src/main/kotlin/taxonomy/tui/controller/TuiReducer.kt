@@ -1183,6 +1183,11 @@ object TuiReducer {
                     benchmark = state.benchmark.copy(benchmarkSubScreen = taxonomy.tui.state.BenchmarkSubScreen.RESULTS)
                 )
 
+            TuiEvent.ResumeBenchmark ->
+                state.copy(
+                    benchmark = state.benchmark.copy(benchmarkSubScreen = taxonomy.tui.state.BenchmarkSubScreen.RESULTS)
+                )
+
             TuiEvent.RunEvalLoad ->
                 state.copy(
                     benchmark = state.benchmark.copy(
@@ -1191,12 +1196,51 @@ object TuiReducer {
                     )
                 )
 
-            is TuiEvent.SetSelectedBenchmarkField ->
+            is TuiEvent.SetHasSavedBenchmark ->
+                state.copy(
+                    benchmark = state.benchmark.copy(hasSavedBenchmark = event.hasSaved)
+                )
+
+            is TuiEvent.SetSavedBenchmarkMetadata ->
+                state.copy(
+                    benchmark = state.benchmark.copy(savedBenchmarkMetadata = event.metadata)
+                )
+
+            is TuiEvent.RestoreSavedBenchmarkSettings -> {
+                val meta = event.metadata
                 state.copy(
                     benchmark = state.benchmark.copy(
-                        selectedBenchmarkField = event.index.coerceAtLeast(0)
+                        benchmarkSelectedModels = meta.models.toSet(),
+                        benchmarkSelectedDomains = if (meta.category != null) setOf(meta.category) else emptySet(),
+                        benchmarkQueryLimitInput = meta.queryLimit.toString(),
+                        benchmarkParallelismInput = meta.parallelism.toString(),
+                        benchmarkConfidenceGateInput = meta.confidenceGate.toString(),
+                        benchmarkUpdateRankingsInput = meta.updateRankings.toString(),
+                        benchmarkReservedOnlyInput = meta.reservedOnly.toString()
+                    )
+                )}
+
+            is TuiEvent.SetSelectedBenchmarkField -> {
+                val index = event.index.coerceAtLeast(0)
+                val topH = ((state.shell.height - 3) * 0.62).toInt().coerceAtLeast(8)
+                val visibleHeight = (topH - 9).coerceAtLeast(1)
+
+                var currentOffset = state.benchmark.benchmarkScrollOffset
+                val scrollMargin = 1
+
+                if (index < currentOffset + scrollMargin) {
+                    currentOffset = (index - scrollMargin).coerceAtLeast(0)
+                } else if (index >= currentOffset + visibleHeight - scrollMargin) {
+                    currentOffset = (index - visibleHeight + 1 + scrollMargin).coerceAtLeast(0)
+                }
+
+                state.copy(
+                    benchmark = state.benchmark.copy(
+                        selectedBenchmarkField = index,
+                        benchmarkScrollOffset = currentOffset
                     )
                 )
+            }
 
             TuiEvent.StartEditingBenchmarkField ->
                 state.copy(
@@ -1318,6 +1362,13 @@ object TuiReducer {
                 val now = state.benchmark.benchmarkUpdateRankingsInput.toBooleanStrictOrNull() ?: true
                 state.copy(
                     benchmark = state.benchmark.copy(benchmarkUpdateRankingsInput = (!now).toString())
+                )
+            }
+
+            TuiEvent.ToggleBenchmarkResetRankings -> {
+                val now = state.benchmark.benchmarkResetRankingsInput.toBooleanStrictOrNull() ?: false
+                state.copy(
+                    benchmark = state.benchmark.copy(benchmarkResetRankingsInput = (!now).toString())
                 )
             }
 

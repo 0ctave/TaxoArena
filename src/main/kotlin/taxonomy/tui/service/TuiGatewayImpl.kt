@@ -18,6 +18,7 @@ import taxonomy.service.AnalysisMode
 import taxonomy.model.ModelSource
 import taxonomy.service.DagSnapshot
 import taxonomy.service.LeaderboardGroup
+import taxonomy.service.SavedBenchmarkMetadata
 import taxonomy.service.QueryResponseNode
 import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.tui.BatchTrickleTestResults
@@ -155,7 +156,10 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                     selectedDomains = deps.config.dataset.selectedDomains
                 )
 
-                val (trainSet, testSet) = deps.datasetFetcher.splitTrainTest(dataset, testRatio = 0.2)
+                val (trainSet, testSet) = deps.datasetFetcher.splitTrainTest(
+                    dataset,
+                    testRatio = deps.config.dataset.testSplitRatio
+                )
                 try {
                     deps.evalLoader.syncReservedPool()
                     deps.log.info("Synced reserved pool for the newly generated DAG.")
@@ -257,6 +261,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         parallelism: Int,
         updateRankings: Boolean,
         reservedOnly: Boolean,
+        resume: Boolean,
         onLive: (BenchmarkLiveStats) -> Unit
     ) {
         if (deps.arenaService.state.value.isRunningBenchmark) {
@@ -266,6 +271,11 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         if (models.size < 2) {
             deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
             return
+        }
+        if (!resume) {
+            val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
+            deps.arenaService.rankingService.clearRatings(snapshotId)
+            deps.log.info("Fresh run requested: Cleared existing ratings and offsets for snapshot '$snapshotId'.")
         }
         deps.arenaService.llmClient.setMaxParallel(parallelism)
         val request = BenchmarkRequest(
@@ -291,6 +301,20 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             }
         }
 
+        val snapId = deps.taxonomyService.activeSnapshotId() ?: "global"
+        deps.arenaService.rankingService.saveBenchmarkMetadata(
+            SavedBenchmarkMetadata(
+                snapshotId = snapId,
+                models = models,
+                queryLimit = queryLimit,
+                category = category,
+                confidenceGate = confidenceGate,
+                parallelism = parallelism,
+                updateRankings = updateRankings,
+                reservedOnly = reservedOnly
+            )
+        )
+
         try {
             deps.evalLoader.syncReservedPool()
             deps.log.info("Synced reserved pool before starting benchmark.")
@@ -307,6 +331,7 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                         "agreement ${"%,.2f".format(live.runningAgreement)} · " +
                         "coverage ${"%,.2f".format(live.runningCoverage)}"
                 )
+                deps.arenaService.updateBenchmarkLiveStats(live)
                 onLive(live)
             }
             deps.arenaService.completeBenchmark(report)
@@ -549,6 +574,18 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 }
                 leaf.id to top2
             }.filterValues { it != null }.mapValues { it.value!! }
+        }
+
+    override suspend fun hasSavedBenchmark(): Boolean =
+        withContext(Dispatchers.IO) {
+            val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
+            deps.arenaService.rankingService.getPairQueryOffsets(snapshotId).isNotEmpty()
+        }
+
+    override suspend fun getSavedBenchmarkMetadata(): SavedBenchmarkMetadata? =
+        withContext(Dispatchers.IO) {
+            val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
+            deps.arenaService.rankingService.getBenchmarkMetadata(snapshotId)
         }
 
     override suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit) {

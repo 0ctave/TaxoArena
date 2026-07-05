@@ -6,6 +6,7 @@ import taxonomy.tui.controller.FocusController
 import taxonomy.tui.controller.TuiEffects
 import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.state.BenchmarkType
+import taxonomy.tui.state.BenchmarkSubScreen
 import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.TuiAppState
 
@@ -113,12 +114,19 @@ internal class MainDashboardKeyHandler(
                 routeByPanel(state, key, dispatch)
             }
 
-            "l"   -> {
-                if (state.analysis.mode == AnalysisMode.LEADERBOARD) {
-                    dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
+            "l", "L"   -> {
+                if (state.analysis.mode == AnalysisMode.BENCHMARK &&
+                    state.benchmark.benchmarkType == BenchmarkType.ARENA &&
+                    state.benchmark.benchmarkSubScreen == BenchmarkSubScreen.CONFIG
+                ) {
+                    routeByPanel(state, key, dispatch)
                 } else {
-                    dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.LEADERBOARD))
-                    effects.loadLeaderboard(dispatch)
+                    if (state.analysis.mode == AnalysisMode.LEADERBOARD) {
+                        dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.IDLE))
+                    } else {
+                        dispatch(TuiEvent.SetAnalysisMode(AnalysisMode.LEADERBOARD))
+                        effects.loadLeaderboard(dispatch)
+                    }
                 }
             }
 

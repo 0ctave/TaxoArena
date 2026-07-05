@@ -40,6 +40,7 @@ interface TuiEffects {
         parallelism: Int,
         updateRankings: Boolean,
         reservedOnly: Boolean,
+        resume: Boolean,
         dispatch: (TuiEvent) -> Unit
     )
     fun loadEval(path: String, modelName: String, dispatch: (TuiEvent) -> Unit)
@@ -199,7 +200,17 @@ class DefaultTuiEffects(
     }
 
     override fun loadArenaModels(dispatch: (TuiEvent) -> Unit) {
-        scope.launch { dispatch(TuiEvent.ArenaModelsLoaded(gateway.loadedModels())) }
+        scope.launch {
+            dispatch(TuiEvent.ArenaModelsLoaded(gateway.loadedModels()))
+            val hasSaved = gateway.hasSavedBenchmark()
+            dispatch(TuiEvent.SetHasSavedBenchmark(hasSaved))
+            if (hasSaved) {
+                val metadata = gateway.getSavedBenchmarkMetadata()
+                dispatch(TuiEvent.SetSavedBenchmarkMetadata(metadata))
+            } else {
+                dispatch(TuiEvent.SetSavedBenchmarkMetadata(null))
+            }
+        }
     }
 
     override fun runTrickle(query: String, dispatch: (TuiEvent) -> Unit) {
@@ -267,11 +278,12 @@ class DefaultTuiEffects(
         parallelism: Int,
         updateRankings: Boolean,
         reservedOnly: Boolean,
+        resume: Boolean,
         dispatch: (TuiEvent) -> Unit
     ) {
         scope.launch {
             gateway.runBenchmarkConfigured(
-                models, queryLimit, category, confidenceGate, parallelism, updateRankings, reservedOnly
+                models, queryLimit, category, confidenceGate, parallelism, updateRankings, reservedOnly, resume
             ) { stats -> dispatch(TuiEvent.BenchmarkLiveUpdate(stats)) }
             loadLeafRanks(dispatch)
         }
@@ -445,6 +457,7 @@ interface TuiGateway {
         parallelism: Int,
         updateRankings: Boolean,
         reservedOnly: Boolean,
+        resume: Boolean,
         onLive: (taxonomy.model.BenchmarkLiveStats) -> Unit
     )
     suspend fun loadEval(path: String, modelName: String, onProgress: (Int, Int) -> Unit): String
@@ -466,4 +479,6 @@ interface TuiGateway {
     fun clearLeaderboard()
     suspend fun loadLeaderboardForNode(node: GraphNode): AggregatedLeaderboard
     suspend fun loadLeafRanks(): Map<String, Pair<String, String>>
+    suspend fun hasSavedBenchmark(): Boolean
+    suspend fun getSavedBenchmarkMetadata(): taxonomy.service.SavedBenchmarkMetadata?
 }
