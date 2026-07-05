@@ -12,6 +12,7 @@ import taxonomy.model.*
 import kotlin.collections.filter
 import kotlin.math.abs
 import kotlin.math.exp
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Service
@@ -433,11 +434,11 @@ class TaxonomyBenchmarkService(
                 batchSize = params.questionsPerRound,
                 maxConcurrentPerModel = params.maxConcurrentPerModel
             )
-            log.debug("Round $round - scheduled batch size: ${batch.size}")
-            if (batch.isEmpty()) break
+            val startTime = System.currentTimeMillis()
 
-            val roundResults = batch.map { task ->
+            val roundResults = batch.mapIndexed { i, task ->
                 async(Dispatchers.IO) {
+                    delay(i * 10L)
                     val leafNode = allNodes.firstOrNull { it.id == task.nodeId } ?: return@async emptyList<QueryBenchmarkResult>()
 
                     val taskResults = task.queryIds.mapNotNull { queryIdStr ->
@@ -633,14 +634,28 @@ class TaxonomyBenchmarkService(
                 }
             }.awaitAll().flatten()
 
-            log.info("--- Round $round Results Summary ---")
-            roundResults.forEach { qr ->
-                val primaryEval = qr.domainEvaluations.firstOrNull()
-                val pairKey = qr.pairEvaluations.keys.firstOrNull() ?: "unknown"
-                if (primaryEval != null) {
-                    log.info("  [$pairKey] Question: \"${qr.query.take(65)}...\" -> Judge Winner: ${primaryEval.winner}${primaryEval.tieSource?.let { "[$it]" } ?: ""} (confidence: ${primaryEval.confidence})")
+            val pairSummaries = roundResults.flatMap { qr ->
+                qr.pairEvaluations.entries.map { (pairKey, evals) ->
+                    pairKey to evals
                 }
-            }
+            }.groupBy { it.first }
+             .map { (pairKey, pairsList) ->
+                 val evals = pairsList.flatMap { it.second }
+                 val wins = evals.count { it.winner == "Model A" }
+                 val losses = evals.count { it.winner == "Model B" }
+                 val ties = evals.count { it.winner == "TIE" }
+                 val flips = evals.count { it.positionFlip }
+                 val avgConf = if (evals.isEmpty()) 0.0 else evals.map { it.confidence }.average()
+                 PairRoundSummary(
+                     pair = pairKey,
+                     wins = wins,
+                     losses = losses,
+                     ties = ties,
+                     posFlips = flips,
+                     avgConf = avgConf
+                 )
+             }
+            logRoundSummary(round, pairSummaries)
 
             val dirtyNodes = roundResults.mapNotNull { qr ->
                 qr.domainEvaluations.firstOrNull()?.nodeId
@@ -674,14 +689,19 @@ class TaxonomyBenchmarkService(
                 }
             }
 
-            for (leafId in targetLeafIds) {
-                val converged = stoppingPolicy.isLeafConverged(leafId, btStates, pairStatsMap, modelNames, nodeToQueries)
-                val state = btStates[leafId]
-                val comparisons = state?.totalComparisons ?: 0
-                log.debug("  Leaf ${leafId.take(8)}: converged=$converged comparisons=$comparisons")
+            targetLeafIds.forEach { nodeId ->
+                val nodeName = allNodes.firstOrNull { it.id == nodeId }?.label ?: nodeId
+                btStates[nodeId]?.let { state ->
+                    logLeafLeaderboard(nodeId, nodeName, state, round)
+                }
             }
+
+            val elapsedMs = System.currentTimeMillis() - startTime
             val nConverged = targetLeafIds.count { stoppingPolicy.isLeafConverged(it, btStates, pairStatsMap, modelNames, nodeToQueries) }
-            log.info("Convergence: $nConverged/${targetLeafIds.size} leaves converged (need ${(targetLeafIds.size * params.targetConvergenceFraction).toInt()})")
+            val matchesPerSec = if (elapsedMs > 0) (batch.size * 1000.0 / elapsedMs).roundToInt() else 0
+            log.info("=== Round $round | ${batch.size} matches | ${elapsedMs}ms | " +
+                     "$matchesPerSec matches/s | " +
+                     "converged: $nConverged/${targetLeafIds.size} leaves ===")
 
             val leafIds = mutableListOf<String>()
             val visited = mutableSetOf<String>()
@@ -1046,6 +1066,34 @@ class TaxonomyBenchmarkService(
         return "The model predicted: \"$pred\"."
     }
 
+    private fun logLeafLeaderboard(nodeId: String, nodeName: String, state: NodeBtState, round: Int) {
+        val sorted = state.btScores.entries.sortedByDescending { it.value }
+        val lines = StringBuilder()
+        lines.appendLine("  ┌── [$nodeName] (round $round, n=${state.totalComparisons}) ──")
+        sorted.forEachIndexed { rank, (model, score) ->
+            val se    = state.stdErrors[model]?.let { "±%.3f".format(it) } ?: "  n/a "
+            val short = model.replace("Meta-Llama-3_1-", "L3.1-")
+                            .replace("Llama-2-", "L2-")
+                            .replace("-Instruct", "-I")
+                            .replace("gemini-3.1-pro_5-shots", "gemini")
+                            .replace("claude-3-5-sonnet-20241022", "claude")
+                            .take(18).padEnd(18)
+            lines.appendLine("  │ %2d. %s %+.3f %s".format(rank+1, short, score, se))
+        }
+        lines.append("  └─────────────────────────────────")
+        log.info(lines.toString())
+    }
+
+    private fun logRoundSummary(round: Int, summaries: List<PairRoundSummary>) {
+        log.info("--- Round $round Pair Summary (${summaries.size} pairs) ---")
+        summaries
+            .sortedByDescending { abs(it.wins - it.losses) }  // most decisive first
+            .forEach { s ->
+                log.info("  ${s.pair.padEnd(55)} W:${s.wins} L:${s.losses} T:${s.ties}" +
+                         " flips:${s.posFlips} conf:${"%.2f".format(s.avgConf)}")
+            }
+    }
+
     private fun emptyReport() = BenchmarkReport(
         totalQueries = 0, totalModelPairs = 0,
         coverageRate = 0.0, overallJudgeAccuracyAgreement = 0.0,
@@ -1157,3 +1205,12 @@ private fun buildSchedulingParams(
         questionsPerRound = questionsPerRound
     )
 }
+
+data class PairRoundSummary(
+    val pair: String,
+    val wins: Int,
+    val losses: Int,
+    val ties: Int,
+    val posFlips: Int,
+    val avgConf: Double
+)

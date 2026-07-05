@@ -394,9 +394,6 @@ class TaxonomyArenaService(
 
         val isInvalid = vote1 == "INVALID" || vote2 == "INVALID"
         val positionFlip = !isInvalid && vote1 != vote2
-        if (positionFlip) {
-            log.info("Position flip detected for pair $nameA vs $nameB on node ${node.label ?: node.id}")
-        }
 
         val winner = if (isInvalid) {
             "INVALID"
