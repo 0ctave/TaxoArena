@@ -616,12 +616,14 @@ private fun BottomLogsAndTraces(
                 height = bottomH - 2,
                 rows = procRows,
                 spinnerTick = state.shell.spinnerTick,
+                scrollOffset = state.logs.processScrollOffset,
+                dispatch = dispatch,
             )
         }
     }
 }
 
-private fun deriveProcessRows(
+internal fun deriveProcessRows(
     deps: TuiDependencies,
     state: TuiAppState,
     subscriptions: TuiSubscriptions?,

@@ -268,29 +268,65 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             deps.log.warn("Benchmark is already running. Ignoring run request.")
             return
         }
-        if (models.size < 2) {
-            deps.log.warn("Benchmark needs ≥2 models; got ${models.size}")
-            return
-        }
-        if (!resume) {
+        var finalModels = models
+        var finalQueryLimit = queryLimit
+        var finalCategory = category
+        var finalConfidenceGate = confidenceGate
+        var finalParallelism = parallelism
+        var finalUpdateRankings = updateRankings
+        var finalReservedOnly = reservedOnly
+
+        if (resume) {
+            val savedSnapshotId = findLatestSavedBenchmarkSnapshotId()
+            if (savedSnapshotId != null) {
+                if (savedSnapshotId != deps.taxonomyService.activeSnapshotId() && savedSnapshotId != "global") {
+                    deps.log.info("Resuming benchmark: Automatically loading saved benchmark snapshot '$savedSnapshotId'")
+                    loadSnapshot(savedSnapshotId)
+                }
+                val metadata = deps.arenaService.rankingService.getBenchmarkMetadata(savedSnapshotId)
+                if (metadata != null) {
+                    finalModels = metadata.models
+                    finalQueryLimit = metadata.queryLimit
+                    finalCategory = metadata.category
+                    finalConfidenceGate = metadata.confidenceGate
+                    finalParallelism = metadata.parallelism
+                    finalUpdateRankings = metadata.updateRankings
+                    finalReservedOnly = metadata.reservedOnly
+
+                    val savedOffsets = deps.arenaService.rankingService.getPairQueryOffsets(savedSnapshotId)
+                    val matchCount = deps.arenaService.rankingService.getAllRecordedMatches(savedSnapshotId).size
+                    val totalOffset = savedOffsets.values.sum()
+                    deps.log.info(
+                        "Resuming benchmark: Restored snapshot '$savedSnapshotId' (settings: ${finalModels.size} models, " +
+                        "$matchCount matches recorded, offset sum = $totalOffset, limit = $finalQueryLimit, category = ${finalCategory ?: "all"})"
+                    )
+                }
+            }
+        } else {
             val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
             deps.arenaService.rankingService.clearRatings(snapshotId)
             deps.log.info("Fresh run requested: Cleared existing ratings and offsets for snapshot '$snapshotId'.")
         }
-        deps.arenaService.llmClient.setMaxParallel(parallelism)
+
+        if (finalModels.size < 2) {
+            deps.log.warn("Benchmark needs ≥2 models; got ${finalModels.size}")
+            return
+        }
+
+        deps.arenaService.llmClient.setMaxParallel(finalParallelism)
         val request = BenchmarkRequest(
-            models = models.map { ModelSource(it) },
-            queryLimit = queryLimit,
-            category = category?.takeIf { it.isNotBlank() },
-            confidenceGate = confidenceGate,
-            parallelism = parallelism.coerceAtLeast(1),
-            updateRankings = updateRankings,
-            reservedOnly = reservedOnly
+            models = finalModels.map { ModelSource(it) },
+            queryLimit = finalQueryLimit,
+            category = finalCategory?.takeIf { it.isNotBlank() },
+            confidenceGate = finalConfidenceGate,
+            parallelism = finalParallelism.coerceAtLeast(1),
+            updateRankings = finalUpdateRankings,
+            reservedOnly = finalReservedOnly
         )
         deps.log.info(
-            "Starting benchmark: ${models.size} models [${models.joinToString()}] · " +
-                "queryLimit=$queryLimit · category=${category ?: "all"} · " +
-                "confidenceGate=$confidenceGate · parallelism=$parallelism · updateRankings=$updateRankings"
+            "Starting benchmark: ${finalModels.size} models [${finalModels.joinToString()}] · " +
+                "queryLimit=$finalQueryLimit · category=${finalCategory ?: "all"} · " +
+                "confidenceGate=$finalConfidenceGate · parallelism=$finalParallelism · updateRankings=$finalUpdateRankings"
         )
         if (deps.taxonomyService.activeSnapshotId() == null) {
             val root = deps.taxonomyService.getGraph()
@@ -305,13 +341,13 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
         deps.arenaService.rankingService.saveBenchmarkMetadata(
             SavedBenchmarkMetadata(
                 snapshotId = snapId,
-                models = models,
-                queryLimit = queryLimit,
-                category = category,
-                confidenceGate = confidenceGate,
-                parallelism = parallelism,
-                updateRankings = updateRankings,
-                reservedOnly = reservedOnly
+                models = finalModels,
+                queryLimit = finalQueryLimit,
+                category = finalCategory,
+                confidenceGate = finalConfidenceGate,
+                parallelism = finalParallelism,
+                updateRankings = finalUpdateRankings,
+                reservedOnly = finalReservedOnly
             )
         )
 
@@ -576,16 +612,127 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
             }.filterValues { it != null }.mapValues { it.value!! }
         }
 
+    override suspend fun findLatestSavedBenchmarkSnapshotId(): String? {
+        val active = deps.taxonomyService.activeSnapshotId()
+        if (active != null) {
+            val hasOffsets = deps.arenaService.rankingService.getPairQueryOffsets(active).isNotEmpty()
+            if (hasOffsets) return active
+            return null
+        }
+
+        // If no snapshot is active (e.g. freshly generated DAG or startup)
+        val currentRoot = deps.taxonomyService.getGraph()
+
+        // Scan all snapshots sorted by timestamp descending
+        val snaps = deps.snapshotManager.listSnapshots().sortedByDescending { it.timestamp }
+        for (snap in snaps) {
+            if (currentRoot != null && snap.graph.rootId != currentRoot.id) continue
+
+            val hasOffsets = deps.arenaService.rankingService.getPairQueryOffsets(snap.id).isNotEmpty()
+            if (hasOffsets) {
+                return snap.id
+            }
+        }
+
+        return null
+    }
+
     override suspend fun hasSavedBenchmark(): Boolean =
         withContext(Dispatchers.IO) {
-            val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
-            deps.arenaService.rankingService.getPairQueryOffsets(snapshotId).isNotEmpty()
+            findLatestSavedBenchmarkSnapshotId() != null
         }
 
     override suspend fun getSavedBenchmarkMetadata(): SavedBenchmarkMetadata? =
         withContext(Dispatchers.IO) {
-            val snapshotId = deps.taxonomyService.activeSnapshotId() ?: "global"
-            deps.arenaService.rankingService.getBenchmarkMetadata(snapshotId)
+            val targetId = findLatestSavedBenchmarkSnapshotId() ?: return@withContext null
+            deps.arenaService.rankingService.getBenchmarkMetadata(targetId)
+        }
+
+    override suspend fun getModelAccuracies(
+        models: List<String>,
+        category: String?,
+        reservedOnly: Boolean
+    ): Map<String, Double> = withContext(Dispatchers.IO) {
+        deps.evalStore.getModelAccuracies(models, category, reservedOnly)
+    }
+
+    override suspend fun loadSavedBenchmarkLiveStats(): taxonomy.model.BenchmarkLiveStats? =
+        withContext(Dispatchers.IO) {
+            val snapId = deps.taxonomyService.activeSnapshotId() ?: return@withContext null
+            val metadata = deps.arenaService.rankingService.getBenchmarkMetadata(snapId) ?: return@withContext null
+            val modelNames = metadata.models
+            
+            val allRecordedMatches = deps.arenaService.rankingService.getAllRecordedMatches(snapId)
+            if (allRecordedMatches.isEmpty()) return@withContext null
+            
+            val runningAgreement = 1.0
+            val runningCoverage = 1.0
+            
+            val pairs = modelNames.flatMapIndexed { i: Int, a: String ->
+                modelNames.drop(i + 1).map { b: String -> Pair(a, b) }
+            }
+            val livePairStats = pairs.map { p ->
+                val modelA = p.first
+                val modelB = p.second
+                val pairKey = "${modelA}_vs_${modelB}"
+                val matches = allRecordedMatches.filter { (it.modelA == modelA && it.modelB == modelB) || (it.modelA == modelB && it.modelB == modelA) }
+                var winsA = 0.0; var winsB = 0.0; var ties = 0
+                matches.forEach { cm ->
+                    if (cm.isTie) {
+                        ties++
+                    } else if (cm.winner == modelA) {
+                        winsA++
+                    } else {
+                        winsB++
+                    }
+                }
+                taxonomy.model.ModelPairStats(
+                    modelA = modelA,
+                    modelB = modelB,
+                    totalMatches = matches.size,
+                    judgeWinsA = winsA.toInt(),
+                    judgeWinsB = winsB.toInt(),
+                    judgeTies = ties,
+                    accuracyWinsA = 0,
+                    accuracyWinsB = 0,
+                    accuracyTies = 0,
+                    judgeAccuracyAgreementRate = 1.0,
+                    avgConfidence = 1.0,
+                    isExhausted = false
+                )
+            }
+            
+            val root = deps.taxonomyService.getGraph()
+            val leafIds = mutableListOf<String>()
+            if (root != null) {
+                val visited = mutableSetOf<String>()
+                fun walk(n: GraphNode) {
+                    if (!visited.add(n.id)) return
+                    if (n.children.isEmpty()) leafIds.add(n.id)
+                    else n.children.forEach { walk(it) }
+                }
+                walk(root)
+            }
+            
+            val currentAggregated = deps.arenaService.rankingService.aggregateLeafScores(leafIds, snapId)
+            
+            val offsets = deps.arenaService.rankingService.getPairQueryOffsets(snapId)
+            val processed = allRecordedMatches.size
+            val total = offsets.values.sum().coerceAtLeast(processed)
+            
+            taxonomy.model.BenchmarkLiveStats(
+                processed = processed,
+                total = total,
+                currentQuestion = "",
+                runningAgreement = runningAgreement,
+                runningCoverage = runningCoverage,
+                perCategoryProgress = emptyMap(),
+                pairStats = livePairStats,
+                currentRound = deps.arenaService.rankingService.getAllBtStates(snapId).values.map { it.fitVersion }.maxOrNull() ?: 1,
+                activeTargets = emptyList(),
+                btRatings = currentAggregated.ranks.associate { it.modelId to it.btScore },
+                btErrors = currentAggregated.ranks.associate { it.modelId to it.stdError }
+            )
         }
 
     override suspend fun downloadEvalResults(onProgress: (String, Long, Long) -> Unit) {

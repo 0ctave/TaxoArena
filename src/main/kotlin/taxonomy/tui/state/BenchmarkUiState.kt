@@ -84,6 +84,7 @@ data class BenchmarkUiState(
 
     // Live per-question progress streamed from a running benchmark (null when idle).
     val liveStats: taxonomy.model.BenchmarkLiveStats? = null,
+    val modelGlobalAccuracies: Map<String, Double> = emptyMap(),
 
     // Eval-results auto-download progress: file name → fraction complete [0,1].
     val isDownloadingEval: Boolean = false,

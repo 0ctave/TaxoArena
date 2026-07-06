@@ -29,9 +29,9 @@ internal class ConfigKeyHandler(
         if (state.shell.focusedPanel == FocusPanel.SYSTEM_LOGS) {
             when (key) {
                 "w", "z", "arrowup" ->
-                    dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
-                "s", "arrowdown" ->
                     dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
+                "s", "arrowdown" ->
+                    dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
                 "q", "escape", "arrowleft", "backspace" ->
                     dispatch(TuiEvent.FocusPanelRequested(FocusPanel.CONFIG))
             }

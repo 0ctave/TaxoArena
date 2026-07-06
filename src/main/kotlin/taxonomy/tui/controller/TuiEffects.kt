@@ -92,6 +92,22 @@ class DefaultTuiEffects(
             if (ok) {
                 dispatch(TuiEvent.SnapshotLoaded(snapshotId, snapshot?.description))
                 dispatch(TuiEvent.RefreshSnapshots)
+                val hasSaved = gateway.hasSavedBenchmark()
+                dispatch(TuiEvent.SetHasSavedBenchmark(hasSaved))
+                if (hasSaved) {
+                    val metadata = gateway.getSavedBenchmarkMetadata()
+                    dispatch(TuiEvent.SetSavedBenchmarkMetadata(metadata))
+                    if (metadata != null) {
+                        dispatch(TuiEvent.RestoreSavedBenchmarkSettings(metadata))
+                        val accuracies = gateway.getModelAccuracies(metadata.models, metadata.category, metadata.reservedOnly)
+                        dispatch(TuiEvent.SetModelGlobalAccuracies(accuracies))
+                    }
+                    val savedStats = gateway.loadSavedBenchmarkLiveStats()
+                    dispatch(TuiEvent.BenchmarkLiveUpdate(savedStats))
+                } else {
+                    dispatch(TuiEvent.SetSavedBenchmarkMetadata(null))
+                    dispatch(TuiEvent.BenchmarkLiveUpdate(null))
+                }
                 loadLeafRanks(dispatch)
             } else {
                 dispatch(TuiEvent.SnapshotLoadFailed(snapshotId))
@@ -282,6 +298,43 @@ class DefaultTuiEffects(
         dispatch: (TuiEvent) -> Unit
     ) {
         scope.launch {
+            if (resume) {
+                val savedSnapshotId = gateway.findLatestSavedBenchmarkSnapshotId()
+                if (savedSnapshotId != null) {
+                    val snapshot = gateway.findSnapshot(savedSnapshotId)
+                    val ok = gateway.loadSnapshot(savedSnapshotId)
+                    if (ok) {
+                        dispatch(TuiEvent.SnapshotLoaded(savedSnapshotId, snapshot?.description))
+                        dispatch(TuiEvent.RefreshSnapshots)
+                        val metadata = gateway.getSavedBenchmarkMetadata()
+                        if (metadata != null) {
+                            dispatch(TuiEvent.RestoreSavedBenchmarkSettings(metadata))
+                        }
+                        loadLeafRanks(dispatch)
+                    }
+                }
+            }
+            val activeModels = if (resume) {
+                val metadata = gateway.getSavedBenchmarkMetadata()
+                metadata?.models ?: models
+            } else {
+                models
+            }
+            val resolvedCategory = if (resume) {
+                val metadata = gateway.getSavedBenchmarkMetadata()
+                metadata?.category
+            } else {
+                category
+            }
+            val resolvedReservedOnly = if (resume) {
+                val metadata = gateway.getSavedBenchmarkMetadata()
+                metadata?.reservedOnly ?: reservedOnly
+            } else {
+                reservedOnly
+            }
+            val accuracies = gateway.getModelAccuracies(activeModels, resolvedCategory, resolvedReservedOnly)
+            dispatch(TuiEvent.SetModelGlobalAccuracies(accuracies))
+
             gateway.runBenchmarkConfigured(
                 models, queryLimit, category, confidenceGate, parallelism, updateRankings, reservedOnly, resume
             ) { stats -> dispatch(TuiEvent.BenchmarkLiveUpdate(stats)) }
@@ -430,6 +483,7 @@ interface TuiGateway {
     suspend fun saveSnapshot(description: String)
     suspend fun renameSnapshot(snapshotId: String, newDescription: String)
     suspend fun deleteSnapshot(snapshotId: String)
+    suspend fun findLatestSavedBenchmarkSnapshotId(): String?
 
     suspend fun isDatasetDownloaded(): Boolean
     suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit)
@@ -481,4 +535,6 @@ interface TuiGateway {
     suspend fun loadLeafRanks(): Map<String, Pair<String, String>>
     suspend fun hasSavedBenchmark(): Boolean
     suspend fun getSavedBenchmarkMetadata(): taxonomy.service.SavedBenchmarkMetadata?
+    suspend fun getModelAccuracies(models: List<String>, category: String?, reservedOnly: Boolean): Map<String, Double>
+    suspend fun loadSavedBenchmarkLiveStats(): taxonomy.model.BenchmarkLiveStats?
 }

@@ -57,6 +57,9 @@ fun TuiDependencies.buildController(onQuit: () -> Unit = {}): TuiController {
         selectedNodeProvider = { arenaService.state.value.selectedNode },
         metricsHistoryProvider = { taxonomyService.getMetricsHistory().mapNotNull { it as? taxonomy.model.IterationMetrics } },
         performanceReportProvider = { taxonomyService.getPerformanceReport() },
+        processesCountProvider = { state ->
+            deriveProcessRows(this, state, null).size
+        },
         onQuit = onQuit,
     )
 }

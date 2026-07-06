@@ -117,7 +117,7 @@ class TaxonomyRankingService {
         return synchronized(dbLock) {
             ensureDatabaseInitialized()
             var attempts = 0
-            val maxRetries = 10
+            val maxRetries = 100
             val delayMs = 100L
             var result: T? = null
             var completed = false
@@ -560,7 +560,42 @@ data class AggregatedLeaderboard(
         val raw = allModels.mapNotNull { model ->
             val wSum = weightTotal[model] ?: return@mapNotNull null
             if (wSum == 0.0) return@mapNotNull null
-            model to Pair(weightedSum[model]!! / wSum, 1.0 / kotlin.math.sqrt(wSum))
+
+            val aggregatedScore = weightedSum[model]!! / wSum
+
+            // 1. Propagated within-leaf uncertainty
+            var withinVar = 0.0
+            // 2. Between-leaf heterogeneity (weighted sample variance of leaf scores)
+            var betweenVar = 0.0
+            var wSumSq = 0.0
+            var kLeaves = 0
+
+            for (state in eligible) {
+                val leafWeight = nodeToQuestions[state.nodeId]?.size?.toDouble() ?: 1.0
+                val score = state.btScores[model] ?: continue
+                val se = state.stdErrors[model]?.takeIf { it < 9.0 } ?: continue
+                val w = (1.0 / (se * se)) * leafWeight
+
+                withinVar += (w * w * se * se)  // w² × SE²
+                val diff = score - aggregatedScore
+                betweenVar += w * diff * diff
+                wSumSq += w * w
+                kLeaves++
+            }
+
+            // Normalise
+            withinVar /= (wSum * wSum)    // divide by (Σw)²
+
+            // Bessel-corrected between-leaf variance (DerSimonian-Laird style)
+            val denomBetween = wSum - (wSumSq / wSum)   // = Σw - Σw²/Σw
+            val betweenTau2 = if (kLeaves > 1 && denomBetween > 0.0)
+                (betweenVar - (kLeaves - 1)) / denomBetween  // subtract expected within-var
+                else 0.0
+            val tau2 = betweenTau2.coerceAtLeast(0.0)   // DL τ² ≥ 0 by definition
+
+            val combinedSE = kotlin.math.sqrt(withinVar + tau2 / kLeaves)
+
+            model to Pair(aggregatedScore, combinedSE)
         }.toMap()
 
         val mean = if (raw.isNotEmpty()) raw.values.map { it.first }.average() else 0.0

@@ -631,6 +631,13 @@ object TuiReducer {
                     )
                 )
 
+            is TuiEvent.SetProcessesScroll ->
+                state.copy(
+                    logs = state.logs.copy(
+                        processScrollOffset = event.offset.coerceAtLeast(0)
+                    )
+                )
+
             TuiEvent.StartBatchGeneralityInput ->
                 state.copy(
                     analysis = state.analysis.copy(
@@ -1037,6 +1044,11 @@ object TuiReducer {
                     benchmark = state.benchmark.copy(liveStats = event.stats)
                 )
 
+            is TuiEvent.SetModelGlobalAccuracies ->
+                state.copy(
+                    benchmark = state.benchmark.copy(modelGlobalAccuracies = event.accuracies)
+                )
+
             TuiEvent.DownloadEvalResults ->
                 state.copy(
                     benchmark = state.benchmark.copy(
@@ -1185,7 +1197,10 @@ object TuiReducer {
 
             TuiEvent.ResumeBenchmark ->
                 state.copy(
-                    benchmark = state.benchmark.copy(benchmarkSubScreen = taxonomy.tui.state.BenchmarkSubScreen.RESULTS)
+                    benchmark = state.benchmark.copy(
+                        benchmarkType = taxonomy.tui.state.BenchmarkType.ARENA,
+                        benchmarkSubScreen = taxonomy.tui.state.BenchmarkSubScreen.RESULTS
+                    )
                 )
 
             TuiEvent.RunEvalLoad ->
@@ -1530,6 +1545,11 @@ object TuiReducer {
                 state.copy(
                     logs = state.logs.copy(logScrollOffset = safe)
                 )
+
+            ScrollbarTarget.PROCESSES ->
+                state.copy(
+                    logs = state.logs.copy(processScrollOffset = safe)
+                )
         }
     }
 
@@ -1623,7 +1643,14 @@ object TuiReducer {
             ScrollbarTarget.LOGS ->
                 state.copy(
                     logs = state.logs.copy(
-                        logScrollOffset = (state.logs.logScrollOffset + delta).coerceAtLeast(0)
+                        logScrollOffset = (state.logs.logScrollOffset - delta).coerceAtLeast(0)
+                    )
+                )
+
+            ScrollbarTarget.PROCESSES ->
+                state.copy(
+                    logs = state.logs.copy(
+                        processScrollOffset = (state.logs.processScrollOffset + delta).coerceAtLeast(0)
                     )
                 )
         }

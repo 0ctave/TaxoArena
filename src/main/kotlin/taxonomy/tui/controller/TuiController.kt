@@ -44,6 +44,7 @@ class TuiController(
     private val selectedNodeProvider: () -> GraphNode? = { null },
     private val metricsHistoryProvider: () -> List<taxonomy.model.IterationMetrics> = { emptyList() },
     private val performanceReportProvider: () -> Map<String, taxonomy.utils.PerformanceStats> = { emptyMap() },
+    private val processesCountProvider: (TuiAppState) -> Int = { 0 },
     /** Invoked when the user asks to quit (Ctrl-C / Ctrl-Q / quit hotkey). Restores the
      *  terminal and stops the process. */
     private val onQuit: () -> Unit = {},
@@ -314,6 +315,7 @@ class TuiController(
             PanelRegion.CONFIG_LEFT -> ScrollbarTarget.CONFIG_DOMAINS
             PanelRegion.SYSTEM_LOGS -> ScrollbarTarget.LOGS
             PanelRegion.ANALYSIS_HUB -> ScrollbarTarget.ANALYSIS
+            PanelRegion.GPU_TRACES -> ScrollbarTarget.PROCESSES
             else -> return null
         }
 
@@ -373,6 +375,15 @@ class TuiController(
                     visibleItems = (layout.bottomHeight - 2).coerceAtLeast(1),
                     totalItems = total,
                     reversed = true
+                )
+            }
+            ScrollbarTarget.PROCESSES -> {
+                val total = processesCountProvider(state)
+                ScrollbarTargetBounds(
+                    target = target,
+                    trackStartY = layout.bottomRowStartY + 1,
+                    visibleItems = (layout.bottomHeight - 2).coerceAtLeast(1),
+                    totalItems = total
                 )
             }
             ScrollbarTarget.ANALYSIS -> {

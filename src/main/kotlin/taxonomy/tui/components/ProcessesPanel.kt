@@ -53,61 +53,81 @@ fun ProcessesPanel(
     height: Int,
     rows: List<ProcessRow>,
     spinnerTick: Int,
+    scrollOffset: Int = 0,
+    dispatch: (taxonomy.tui.controller.TuiEvent) -> Unit = {},
 ) {
-    Column(modifier = Modifier.padding(left = 1, top = 0)) {
-        if (rows.isEmpty()) {
+    if (rows.isEmpty()) {
+        Column(modifier = Modifier.padding(left = 1, top = 0)) {
             val s = TuiTheme.SPINNER[spinnerTick % TuiTheme.SPINNER.size]
             Text("Idle $s  no active processes", color = TuiTheme.INFO)
-            return@Column
         }
+        return
+    }
+
+    val safeW = width.coerceAtLeast(1)
+    val visible = height.coerceAtLeast(1)
+
+    ScrollablePanelContent(
+        pWidth = safeW,
+        pHeight = visible,
+        itemCount = rows.size,
+        scrollOffset = scrollOffset,
+        hasPadding = false,
+        onScrollClamp = { dispatch(taxonomy.tui.controller.TuiEvent.ScrollTo(taxonomy.tui.state.ScrollbarTarget.PROCESSES, it)) }
+    ) { visibleHeight, startIdx, contentWidth ->
+        val budget = (visibleHeight - 2).coerceAtLeast(1)
+        val withSeparators = budget >= rows.size * 4
+        val itemSize = if (withSeparators) 4 else 3
+        val visibleItemsCount = (budget / itemSize).coerceAtLeast(1)
 
         Text(
-            value = "  ACTIVE PROCESSES (${rows.size})".take(width - 1),
+            value = "  ACTIVE PROCESSES (${rows.size})".take(contentWidth - 1),
             color = Cyan,
             textStyle = Bold,
         )
 
-        val barW = (width - 18).coerceIn(8, 48)
-        val budget = (height - 2).coerceAtLeast(1)
-        val withSeparators = budget >= rows.size * 4
-        rows.take((budget / if (withSeparators) 4 else 3).coerceAtLeast(1)).forEachIndexed { idx, row ->
-            val color = TuiTheme.statusColor(done = row.done, error = row.error)
-            val marker = when {
-                row.error -> "x"
-                row.done  -> "\u2713"
-                else      -> TuiTheme.SPINNER[spinnerTick % TuiTheme.SPINNER.size]
-            }
-            Text(
-                value = "$marker ${row.name}".take(width - 1),
-                color = nameColor(row.name, color),
-                textStyle = Bold,
-            )
-            if (row.percent != null) {
-                ProgressBar(
-                    percent = row.percent,
-                    width = barW,
-                    label = "  ",
-                    barColor = color,
-                    textColor = color,
-                )
-            } else if (!row.done && !row.error) {
-                val pos = spinnerTick % barW
-                val track = buildString {
-                    for (i in 0 until barW) append(if (i == pos) '\u2588' else '\u2591')
+        val endIdx = (startIdx + visibleItemsCount).coerceAtMost(rows.size)
+        val visibleRows = rows.subList(startIdx, endIdx)
+        val barW = (contentWidth - 18).coerceIn(8, 48)
+
+        Column(modifier = Modifier.padding(left = 1, top = 0)) {
+            visibleRows.forEachIndexed { idx, row ->
+                val color = TuiTheme.statusColor(done = row.done, error = row.error)
+                val marker = when {
+                    row.error -> "x"
+                    row.done  -> "\u2713"
+                    else      -> TuiTheme.SPINNER[spinnerTick % TuiTheme.SPINNER.size]
                 }
-                // Guard: "  " prefix + track must not exceed available width.
-                Text("  $track".take(width - 1), color = color)
+                Text(
+                    value = "$marker ${row.name}".take(contentWidth - 1),
+                    color = nameColor(row.name, color),
+                    textStyle = Bold,
+                )
+                if (row.percent != null) {
+                    ProgressBar(
+                        percent = row.percent,
+                        width = barW,
+                        label = "  ",
+                        barColor = color,
+                        textColor = color,
+                    )
+                } else if (!row.done && !row.error) {
+                    val pos = spinnerTick % barW
+                    val track = buildString {
+                        for (i in 0 until barW) append(if (i == pos) '\u2588' else '\u2591')
+                    }
+                    Text("  $track".take(contentWidth - 1), color = color)
+                }
+                
+                val statusLine = row.status
+                    .lineSequence()
+                    .firstOrNull { it.isNotBlank() }
+                    ?.trim()
+                    ?.take((contentWidth - 3).coerceAtLeast(4))
+                    ?: ""
+                if (statusLine.isNotBlank()) Text("  $statusLine", color = TuiTheme.INFO)
+                if (withSeparators && idx < visibleRows.lastIndex) Text("", color = TuiTheme.INFO)
             }
-            // Extract the first non-blank line of status so that multi-line LLM responses
-            // (judge prompts, JSON blobs) never embed \n into a single-line Text draw call.
-            val statusLine = row.status
-                .lineSequence()
-                .firstOrNull { it.isNotBlank() }
-                ?.trim()
-                ?.take((width - 3).coerceAtLeast(4))
-                ?: ""
-            if (statusLine.isNotBlank()) Text("  $statusLine", color = TuiTheme.INFO)
-            if (withSeparators && idx < rows.lastIndex) Text("", color = TuiTheme.INFO)
         }
     }
 }

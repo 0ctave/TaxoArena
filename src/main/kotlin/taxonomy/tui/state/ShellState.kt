@@ -27,5 +27,6 @@ enum class ScrollbarTarget {
     TOPOLOGY,
     CONFIG_DOMAINS,
     ANALYSIS,
-    LOGS
+    LOGS,
+    PROCESSES
 }

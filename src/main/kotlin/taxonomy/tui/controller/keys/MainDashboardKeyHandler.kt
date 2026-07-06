@@ -139,7 +139,7 @@ internal class MainDashboardKeyHandler(
             FocusPanel.TOPOLOGY      -> topologyHandler.handle(state, key, dispatch)
             FocusPanel.ANALYSIS_HUB  -> analysisHandler.handle(state, key, dispatch)
             FocusPanel.SYSTEM_LOGS   -> analysisHandler.handleLogsKeys(state, key, dispatch)
-            FocusPanel.PROCESSES     -> Unit
+            FocusPanel.PROCESSES     -> analysisHandler.handleProcessesKeys(state, key, dispatch)
             FocusPanel.CONFIG        -> configHandler.handle(state, key, dispatch)
         }
     }

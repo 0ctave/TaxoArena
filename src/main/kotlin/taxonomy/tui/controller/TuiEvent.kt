@@ -143,6 +143,7 @@ sealed interface TuiEvent {
     data class SetInspectorScroll(val offset: Int) : TuiEvent
     data class SetMetricsScroll(val offset: Int) : TuiEvent
     data class SetLogsScroll(val offset: Int) : TuiEvent
+    data class SetProcessesScroll(val offset: Int) : TuiEvent
 
     // 3-zone METRICS view navigation.
     data class SetMetricsIterationIndex(val index: Int) : TuiEvent
@@ -237,7 +238,7 @@ sealed interface TuiEvent {
     /** Flip the live-run view between the summary dashboard and the per-question stream. */
     data object ToggleBenchmarkLiveView : TuiEvent
     /** Live per-question progress streamed from a running benchmark. */
-    data class BenchmarkLiveUpdate(val stats: taxonomy.model.BenchmarkLiveStats) : TuiEvent
+    data class BenchmarkLiveUpdate(val stats: taxonomy.model.BenchmarkLiveStats?) : TuiEvent
     /** Auto-download the MMLU-Pro eval_results cache from GitHub (the "d" key inside the picker). */
     data object DownloadEvalResults : TuiEvent
 
@@ -275,6 +276,7 @@ sealed interface TuiEvent {
     data class NodeLeaderboardLoaded(val leaderboard: AggregatedLeaderboard) : TuiEvent
     data class LeafRanksLoaded(val ranks: Map<String, Pair<String, String>>) : TuiEvent
     data class BenchmarkModelsLoaded(val models: List<String>) : TuiEvent
+    data class SetModelGlobalAccuracies(val accuracies: Map<String, Double>) : TuiEvent
     data class SetSelectedBenchmarkField(val index: Int) : TuiEvent
     data object StartEditingBenchmarkField : TuiEvent
     data object ConfirmEditingBenchmarkField : TuiEvent

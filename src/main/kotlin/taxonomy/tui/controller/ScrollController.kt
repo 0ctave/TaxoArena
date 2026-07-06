@@ -19,7 +19,7 @@ class ScrollController {
         return when (state.shell.focusedPanel) {
             FocusPanel.TOPOLOGY -> TuiEvent.ScrollBy(ScrollbarTarget.TOPOLOGY, delta)
             FocusPanel.SYSTEM_LOGS -> TuiEvent.ScrollBy(ScrollbarTarget.LOGS, delta)
-            FocusPanel.PROCESSES -> null
+            FocusPanel.PROCESSES -> TuiEvent.ScrollBy(ScrollbarTarget.PROCESSES, delta)
             FocusPanel.CONFIG -> {
                 when (state.config.activeSubPanel) {
                     ConfigSubPanel.DOMAINS -> TuiEvent.ScrollBy(ScrollbarTarget.CONFIG_DOMAINS, delta)

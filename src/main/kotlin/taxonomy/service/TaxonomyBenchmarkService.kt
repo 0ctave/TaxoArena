@@ -268,9 +268,69 @@ class TaxonomyBenchmarkService(
             }
             completedResults.addAll(reconstructed)
             log.info("Reconstructed ${reconstructed.size} previous match results from database.")
+
+            // Rebuild node_pair_stats and node_bt_states from reconstructed matches
+            val reconstructedPairs = mutableMapOf<String, MutableMap<String, NodePairStats>>()
+            cachedMatches.forEach { cm ->
+                val leafNode = allNodes.firstOrNull { it.label == cm.domain || it.id == cm.domain } ?: return@forEach
+                val leafId = leafNode.id
+                val pairKey = "${cm.modelA}_vs_${cm.modelB}"
+                val pairStatsMapForNode = reconstructedPairs.getOrPut(leafId) { mutableMapOf() }
+                
+                val (wA, wB) = if (cm.isTie) {
+                    0.0 to 0.0
+                } else if (cm.winner == cm.modelA) {
+                    1.0 to 0.0
+                } else {
+                    0.0 to 1.0
+                }
+                
+                val existing = pairStatsMapForNode[pairKey]
+                if (existing != null) {
+                    existing.winsA += wA
+                    existing.winsB += wB
+                    existing.ties += if (cm.isTie) 1 else 0
+                    existing.totalComparisons += 1
+                } else {
+                    pairStatsMapForNode[pairKey] = NodePairStats(
+                        nodeId = leafId,
+                        modelA = cm.modelA,
+                        modelB = cm.modelB,
+                        winsA = wA,
+                        winsB = wB,
+                        ties = if (cm.isTie) 1 else 0,
+                        totalComparisons = 1,
+                        positionFlips = 0,
+                        lastUpdated = System.currentTimeMillis()
+                    )
+                }
+            }
+
+            reconstructedPairs.forEach { (leafId, statsMapForNode) ->
+                statsMapForNode.values.forEach { stats ->
+                    rankingService.saveNodePairStats(stats, snapshotId)
+                }
+                val nodePairs = rankingService.getNodePairStats(leafId, snapshotId)
+                pairStatsMap[leafId] = nodePairs.toMutableList()
+                
+                if (nodePairs.isNotEmpty()) {
+                    val scores = BtMmFitter.fit(modelNames, nodePairs)
+                    val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
+                    val state = NodeBtState(
+                        nodeId = leafId,
+                        btScores = scores,
+                        stdErrors = stdErrors,
+                        fitVersion = (btStates[leafId]?.fitVersion ?: 0) + 1,
+                        totalComparisons = nodePairs.sumOf { it.totalComparisons },
+                        lastFitAt = System.currentTimeMillis()
+                    )
+                    rankingService.saveBtState(state, snapshotId)
+                    btStates[leafId] = state
+                }
+            }
         }
 
-        val completedAtStartOfRound = java.util.concurrent.atomic.AtomicInteger(0)
+        val completedAtStartOfRound = java.util.concurrent.atomic.AtomicInteger(completedResults.size)
 
         var currentAggregated: TaxonomyRankingService.AggregatedLeaderboard? = null
         var lastUpdateAt = 0L
@@ -280,7 +340,7 @@ class TaxonomyBenchmarkService(
             if (force || now - lastUpdateAt >= 150L) {
                 lastUpdateAt = now
                 val resultsSnapshot = synchronized(completedResults) { completedResults.toList() }
-                if (onProgress != null && resultsSnapshot.isNotEmpty()) {
+                if (onProgress != null) {
                     val allAgreements = resultsSnapshot.flatMap { it.judgeAccuracyAgreement.values }
                     val runningAgreement = if (allAgreements.isNotEmpty()) allAgreements.count { it }.toDouble() / allAgreements.size else 0.0
                     val runningCoverage = 1.0
@@ -390,8 +450,10 @@ class TaxonomyBenchmarkService(
                         pairStats = livePairStats,
                         currentRound = round + 1,
                         activeTargets = activeTargetNames,
-                        btRatings = currentAggregated?.ranks?.associate { it.modelId to it.btScore } ?: emptyMap(),
-                        btErrors = currentAggregated?.ranks?.associate { it.modelId to it.stdError } ?: emptyMap()
+                        btRatings = currentAggregated?.ranks?.takeIf { it.isNotEmpty() }?.associate { it.modelId to it.btScore }
+                            ?: modelNames.associateWith { 0.0 },
+                        btErrors = currentAggregated?.ranks?.takeIf { it.isNotEmpty() }?.associate { it.modelId to it.stdError }
+                            ?: modelNames.associateWith { 10.0 }
                     )
                     onProgress?.invoke(live)
                 }

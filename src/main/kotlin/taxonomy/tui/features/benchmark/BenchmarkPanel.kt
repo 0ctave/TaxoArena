@@ -368,7 +368,7 @@ private fun ArenaBenchmarkLiveView(
 
         // Bottom panels
         if (w >= 90) {
-            val leftColW = 46
+            val leftColW = 56
             val rightColW = w - leftColW
             
             val showHeaders = bottomH >= 6
@@ -407,7 +407,7 @@ private fun ArenaBenchmarkLiveView(
                 ) {
                     Column {
                         if (showHeaders) {
-                            val headerLine = "%-24s | %8s | %6s".format("Model", "BT Score", "StdErr")
+                            val headerLine = "%-20s | %8s | %6s | %8s".format("Model", "BT Score", "StdErr", "GT MMLU")
                             Text(headerLine.take(leftColW - 4), color = Cyan, textStyle = Bold)
                             Text("-".repeat((leftColW - 4).coerceAtLeast(1)), color = White)
                         }
@@ -426,7 +426,8 @@ private fun ArenaBenchmarkLiveView(
                                 val model = entry.key
                                 val score = entry.value
                                 val se = live?.btErrors?.get(model) ?: 0.0
-                                val rowStr = "%-24s | %8.3f | %6.3f".format(model.take(24), score, se)
+                                val gtAcc = b.modelGlobalAccuracies[model] ?: 0.0
+                                val rowStr = "%-20s | %8.3f | %6.3f | %7.1f%%".format(model.take(20), score, se, gtAcc * 100)
                                 Text(rowStr.take(innerW), color = White, modifier = Modifier.height(1))
                             }
                             val emptyRows = visibleHeight - (end - startIdx)

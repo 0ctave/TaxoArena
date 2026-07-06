@@ -71,11 +71,35 @@ class ModelEvalStore(
                 null
             } else {
                 synchronized(dbLock) {
-                    try {
-                        method.invoke(sharedConnection, *(args ?: emptyArray()))
-                    } catch (e: java.lang.reflect.InvocationTargetException) {
-                        throw e.cause ?: e
+                    var attempts = 0
+                    val maxRetries = 100
+                    val delayMs = 100L
+                    var completed = false
+                    var result: Any? = null
+                    while (!completed) {
+                        try {
+                            result = method.invoke(sharedConnection, *(args ?: emptyArray()))
+                            completed = true
+                        } catch (e: java.lang.reflect.InvocationTargetException) {
+                            val cause = e.cause
+                            if (cause is java.sql.SQLException) {
+                                attempts++
+                                val msg = cause.message ?: ""
+                                val isBusy = cause.errorCode == 5 ||
+                                             msg.contains("busy", ignoreCase = true) ||
+                                             msg.contains("locked", ignoreCase = true)
+                                if (isBusy && attempts < maxRetries) {
+                                    log.warn("Database busy/locked (attempt $attempts/$maxRetries). Retrying in ${delayMs}ms...")
+                                    Thread.sleep(delayMs)
+                                } else {
+                                    throw cause
+                                }
+                            } else {
+                                throw cause ?: e
+                            }
+                        }
                     }
+                    result
                 }
             }
         } as Connection
@@ -451,6 +475,33 @@ class ModelEvalStore(
                 "SELECT DISTINCT category FROM eval_results ORDER BY category"
             )
             buildList { while (rs.next()) add(rs.getString(1)) }
+        }
+    }
+
+    fun getModelAccuracies(
+        models: List<String>,
+        category: String? = null,
+        reservedOnly: Boolean = false
+    ): Map<String, Double> = conn().use { c ->
+        val catLower = category?.lowercase()
+        models.associateWith { model ->
+            val sql = buildString {
+                append("SELECT COUNT(*), SUM(is_correct) FROM eval_results WHERE model_name = ?")
+                if (catLower != null) append(" AND category = ?")
+                if (reservedOnly) append(" AND is_reserved = 1")
+            }
+            c.prepareStatement(sql).use { ps ->
+                ps.setString(1, model)
+                if (catLower != null) ps.setString(2, catLower)
+                val rs = ps.executeQuery()
+                if (rs.next()) {
+                    val total = rs.getInt(1)
+                    val correct = rs.getInt(2)
+                    if (total > 0) correct.toDouble() / total else 0.0
+                } else {
+                    0.0
+                }
+            }
         }
     }
 

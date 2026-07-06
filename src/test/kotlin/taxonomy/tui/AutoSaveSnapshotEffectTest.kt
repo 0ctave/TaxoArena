@@ -32,6 +32,7 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override suspend fun loadSnapshot(snapshotId: String): Boolean = false
     override suspend fun renameSnapshot(snapshotId: String, newDescription: String) {}
     override suspend fun deleteSnapshot(snapshotId: String) {}
+    override suspend fun findLatestSavedBenchmarkSnapshotId(): String? = null
     override suspend fun isDatasetDownloaded(): Boolean = false
     override suspend fun downloadDataset(maxQueries: Int, onProgress: (Float, String) -> Unit) {}
     override suspend fun runBatchJudge(generality: Int, parallelism: Int, replaceExisting: Boolean) {}
@@ -79,6 +80,8 @@ private class RecordingGateway(private val failSave: Boolean = false) : TuiGatew
     override suspend fun loadLeafRanks(): Map<String, Pair<String, String>> = emptyMap()
     override suspend fun hasSavedBenchmark(): Boolean = false
     override suspend fun getSavedBenchmarkMetadata(): taxonomy.service.SavedBenchmarkMetadata? = null
+    override suspend fun getModelAccuracies(models: List<String>, category: String?, reservedOnly: Boolean): Map<String, Double> = emptyMap()
+    override suspend fun loadSavedBenchmarkLiveStats(): taxonomy.model.BenchmarkLiveStats? = null
 }
 
 class AutoSaveSnapshotEffectTest {
