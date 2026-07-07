@@ -52,7 +52,7 @@ dependencies {
     implementation("me.paulschwarz:spring-dotenv:5.1.0")
 
     // Coroutines for asynchronous LLM calls
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 
     // Kotlinx Serialization for robust JSON parsing from LLM outputs
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
