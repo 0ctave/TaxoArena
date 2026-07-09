@@ -97,7 +97,7 @@ class BtMatchScheduler(
                 val total = W + T
                 val tau = if (total == 0.0) 0.0 else T.toDouble() / total
                 val size = history.size
-                val deltaConf = if (size >= 3) abs(history[size - 1] - history[size - 3]) else 999.0
+                val deltaConf = if (size >= 2) abs(history[size - 1] - history[size - 2]) else 999.0
 
                 if (tau >= 0.55 && deltaConf <= 0.02) {
                     irresolvablePairs.add(key)
@@ -553,25 +553,17 @@ class BtMatchScheduler(
 
         if (state == null) return LN2
 
-        val si = state.btScores[mA] ?: 0.0
-        val sj = state.btScores[mB] ?: 0.0
-        val seA = state.stdErrors[mA] ?: 10.0
-        val seB = state.stdErrors[mB] ?: 10.0
-        val denom = exp(si) + exp(sj)
-        val p = if (denom == 0.0) 0.5 else exp(si) / denom
-        val conf = maxOf(p, 1.0 - p)
-
-        val gap = abs(si - sj)
-        val sigmaSum = (seA + seB).coerceAtLeast(1e-6)
-
         val T = ps?.ties ?: 0
         val W = (ps?.winsA ?: 0.0) + (ps?.winsB ?: 0.0)
         val total = W + T
         val tau = if (total == 0.0) 0.0 else T.toDouble() / total
-
         val mask = if (tau >= 0.55) 0.0 else 1.0
 
-        return (1.0 - conf) * (gap / sigmaSum) * mask
+        val alpha = computeAlpha(state, models, pairsResolved)
+        val sScore = structureScore(mA, mB, state)
+        val rScore = resolveScore(mA, mB, state, nij)
+        val repeatDiscount = (nij.toDouble() / budgetPerPair).coerceAtMost(1.0)
+        return (alpha * sScore + (1.0 - alpha) * rScore) * (1.0 - 0.3 * repeatDiscount) * mask
     }
 
     private fun pairBudget(nodeId: String, mA: String, mB: String): Int {

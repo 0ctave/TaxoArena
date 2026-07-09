@@ -124,8 +124,20 @@ class BtStoppingPolicy(
             val rankStable = history.size >= stabilityRounds && history.all { it == currentRank }
             val structurallyConverged = isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries)
 
+            val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
+            // NEW: irresolvable-only leaf — rank noise from tie pairs should not block
+            val allPairsResolved = allPairs.all { (mA, mB) ->
+                val pk = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
+                globallyResolvedPairs.contains(pk) ||
+                (pairStats[leafId] ?: emptyList()).firstOrNull {
+                    (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+                }?.let { ps ->
+                    ps.totalComparisons >= pairCustomBudgets.getOrDefault("$leafId|$pk", budgetPerPair)
+                } ?: false
+            }
+
             val leafWeight = (nodeToQueries[leafId]?.size ?: 1).toDouble()
-            if (rankStable && structurallyConverged) {
+            if ((rankStable || allPairsResolved) && structurallyConverged) {
                 weightedConverged += leafWeight
             }
         }

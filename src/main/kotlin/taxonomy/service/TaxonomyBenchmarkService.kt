@@ -1196,14 +1196,13 @@ class TaxonomyBenchmarkService(
             if (n >= 6) {
                 val delta = (ps.winAFirst - ps.winASecond) / n.toDouble()
                 if (abs(delta) > 0.3) {
+                    // Debias: rebalance winsA and winsB to reflect average win rate
+                    val correctedWinA = (ps.winAFirst + ps.winASecond) / 2.0
+                    val correctedWinB = n.toDouble() - correctedWinA - ps.ties
                     ps.copy(
-                        winsA = ps.winsA / 2.0,
-                        winsB = ps.winsB / 2.0,
-                        ties = ps.ties / 2,
-                        totalComparisons = n / 2,
-                        positionFlips = ps.positionFlips / 2,
-                        winAFirst = ps.winAFirst / 2.0,
-                        winASecond = ps.winASecond / 2.0
+                        winsA = correctedWinA,
+                        winsB = correctedWinB.coerceAtLeast(0.0)
+                        // totalComparisons and ties unchanged — no data discarded
                     )
                 } else ps
             } else ps
