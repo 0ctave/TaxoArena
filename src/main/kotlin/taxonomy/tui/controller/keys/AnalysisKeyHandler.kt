@@ -332,9 +332,18 @@ internal class AnalysisKeyHandler(
     fun handleLogsKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
         when (key) {
             "w", "z", "arrowup" ->
-                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
-            "s", "arrowdown" ->
                 dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset + 1).coerceAtLeast(0)))
+            "s", "arrowdown" ->
+                dispatch(TuiEvent.SetLogsScroll((state.logs.logScrollOffset - 1).coerceAtLeast(0)))
+        }
+    }
+
+    fun handleProcessesKeys(state: TuiAppState, key: String, dispatch: (TuiEvent) -> Unit) {
+        when (key) {
+            "w", "z", "arrowup" ->
+                dispatch(TuiEvent.SetProcessesScroll((state.logs.processScrollOffset - 1).coerceAtLeast(0)))
+            "s", "arrowdown" ->
+                dispatch(TuiEvent.SetProcessesScroll((state.logs.processScrollOffset + 1).coerceAtLeast(0)))
         }
     }
 

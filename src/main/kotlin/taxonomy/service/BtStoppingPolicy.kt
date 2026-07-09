@@ -14,6 +14,8 @@ class BtStoppingPolicy(
     val budgetPerPair: Int
 ) {
     private val leafRankHistory = mutableMapOf<String, ArrayDeque<List<String>>>()
+    val globallyResolvedPairs = mutableSetOf<String>()
+    val pairCustomBudgets = mutableMapOf<String, Int>()
 
     // PUBLIC — called by both shouldStop() and BtMatchScheduler
     fun isLeafConverged(
@@ -41,8 +43,10 @@ class BtStoppingPolicy(
         if (liveTotalComparisons < minComparisonsPerLeaf) return false
 
         val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
-
         val informativePairs = allPairs.filter { (mA, mB) ->
+            val pairKey = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
+            if (globallyResolvedPairs.contains(pairKey)) return@filter false
+
             val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
@@ -50,7 +54,7 @@ class BtStoppingPolicy(
             if (nij < 2) return@filter true  // bootstrap not done -> still informative
 
             // NEW: if this pair has exhausted its budget, it's resolved regardless of gap
-            val budget = (budgetPerPair).coerceAtLeast(1)
+            val budget = pairCustomBudgets.getOrDefault("${nodeId}|$pairKey", budgetPerPair).coerceAtLeast(1)
             if (nij >= budget) return@filter false  // budget-exhausted → accepted as resolved
 
             val si = state.btScores[mA] ?: 0.0

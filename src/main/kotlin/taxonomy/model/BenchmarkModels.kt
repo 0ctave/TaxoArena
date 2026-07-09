@@ -97,7 +97,11 @@ data class NodePairStats(
     var ties: Int = 0,             // raw tie count (position flips)
     var totalComparisons: Int = 0,
     var positionFlips: Int = 0,
-    var lastUpdated: Long = 0L
+    var lastUpdated: Long = 0L,
+    var winAFirst: Double = 0.0,
+    var winASecond: Double = 0.0,
+    var agreementWins: Int = 0,
+    var agreementChecks: Int = 0
 )
 
 @Serializable

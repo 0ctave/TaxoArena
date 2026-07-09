@@ -44,7 +44,8 @@ class TaxonomyBenchmarkService(
         modelA: String,
         modelB: String,
         outcome: DomainEvaluation,
-        snapshotId: String
+        snapshotId: String,
+        judgeAgreed: Boolean = true
     ) {
         val (wA, wB) = when (outcome.winner.uppercase()) {
             "MODEL A" -> 1.0 to 0.0
@@ -62,13 +63,19 @@ class TaxonomyBenchmarkService(
             if (existing.modelA == modelA) {
                 existing.winsA += wA
                 existing.winsB += wB
+                existing.winAFirst += outcome.winAFirst
+                existing.winASecond += outcome.winASecond
             } else {
                 existing.winsA += wB
                 existing.winsB += wA
+                existing.winAFirst += (1.0 - outcome.winAFirst)
+                existing.winASecond += (1.0 - outcome.winASecond)
             }
             existing.ties += if (isTie) 1 else 0
             existing.totalComparisons += 1
             existing.positionFlips += if (outcome.positionFlip) 1 else 0
+            existing.agreementWins += if (judgeAgreed) 1 else 0
+            existing.agreementChecks += 1
             existing.lastUpdated = System.currentTimeMillis()
             existing
         } else {
@@ -81,6 +88,10 @@ class TaxonomyBenchmarkService(
                 ties = if (isTie) 1 else 0,
                 totalComparisons = 1,
                 positionFlips = if (outcome.positionFlip) 1 else 0,
+                winAFirst = outcome.winAFirst,
+                winASecond = outcome.winASecond,
+                agreementWins = if (judgeAgreed) 1 else 0,
+                agreementChecks = 1,
                 lastUpdated = System.currentTimeMillis()
             )
         }
@@ -311,17 +322,18 @@ class TaxonomyBenchmarkService(
                     rankingService.saveNodePairStats(stats, snapshotId)
                 }
                 val nodePairs = rankingService.getNodePairStats(leafId, snapshotId)
-                pairStatsMap[leafId] = nodePairs.toMutableList()
+                val adjustedNodePairs = adjustForPositionBias(nodePairs)
+                pairStatsMap[leafId] = adjustedNodePairs.toMutableList()
                 
-                if (nodePairs.isNotEmpty()) {
-                    val scores = BtMmFitter.fit(modelNames, nodePairs)
-                    val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
+                if (adjustedNodePairs.isNotEmpty()) {
+                    val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
+                    val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
                     val state = NodeBtState(
                         nodeId = leafId,
                         btScores = scores,
                         stdErrors = stdErrors,
                         fitVersion = (btStates[leafId]?.fitVersion ?: 0) + 1,
-                        totalComparisons = nodePairs.sumOf { it.totalComparisons },
+                        totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons },
                         lastFitAt = System.currentTimeMillis()
                     )
                     rankingService.saveBtState(state, snapshotId)
@@ -477,6 +489,24 @@ class TaxonomyBenchmarkService(
             nodeToQueries
         )) {
             completedAtStartOfRound.set(completedResults.size)
+            // Update globally resolved pairs in stoppingPolicy
+            stoppingPolicy.globallyResolvedPairs.clear()
+            currentAggregated?.let { board ->
+                val ranksMap = board.ranks.associateBy { it.modelId }
+                val allPairs = modelNames.flatMapIndexed { i, mA -> modelNames.drop(i + 1).map { mB -> mA to mB } }
+                for ((mA, mB) in allPairs) {
+                    val rA = ranksMap[mA]
+                    val rB = ranksMap[mB]
+                    if (rA != null && rB != null) {
+                        val gap = abs(rA.btScore - rB.btScore)
+                        val sigma = maxOf(rA.stdError, rB.stdError)
+                        if (gap > 2.5 * sigma) {
+                            stoppingPolicy.globallyResolvedPairs.add("${minOf(mA, mB)}|${maxOf(mA, mB)}")
+                        }
+                    }
+                }
+            }
+
             // Re-select each round: converged leaves are excluded, uncertain ones are promoted
             targetNodes = scheduler.selectTargetNodes(
                 allNodes, btStates, nodeToQueries,
@@ -494,7 +524,8 @@ class TaxonomyBenchmarkService(
                 resultsMatrix = matrix,
                 nodeToQueries = nodeToQueries,
                 batchSize = params.questionsPerRound,
-                maxConcurrentPerModel = params.maxConcurrentPerModel
+                maxConcurrentPerModel = params.maxConcurrentPerModel,
+                globalLeaderboard = currentAggregated
             )
             val startTime = System.currentTimeMillis()
 
@@ -614,13 +645,25 @@ class TaxonomyBenchmarkService(
                             }
                         }
 
+                        val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
+                        val aCorrectVal = modelCorrect[task.modelA] ?: false
+                        val bCorrectVal = modelCorrect[task.modelB] ?: false
+                        val accWinner = when {
+                            aCorrectVal && !bCorrectVal -> "MODEL A"
+                            bCorrectVal && !aCorrectVal -> "MODEL B"
+                            else -> "TIE"
+                        }
+                        val judgeWinnerVal = primaryEval.winner.uppercase()
+                        val judgeAgreed = (judgeWinnerVal == accWinner)
+
                         withContext(dbWriteDispatcher) {
                             propagateOutcome(
                                 leafId = leafNode.id,
                                 modelA = task.modelA,
                                 modelB = task.modelB,
                                 outcome = primaryEval,
-                                snapshotId = snapshotId
+                                snapshotId = snapshotId,
+                                judgeAgreed = judgeAgreed
                             )
                         }
 
@@ -634,7 +677,8 @@ class TaxonomyBenchmarkService(
                                     modelA = task.modelA,
                                     modelB = task.modelB,
                                     outcome = primaryEval,
-                                    snapshotId = snapshotId
+                                    snapshotId = snapshotId,
+                                    judgeAgreed = judgeAgreed
                                 )
                                 if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
                                     val siblingDomain = siblingNode.label ?: siblingNode.id
@@ -656,9 +700,8 @@ class TaxonomyBenchmarkService(
                         }
 
                         val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
-                        val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
-                        val aCorrect = modelCorrect[task.modelA] ?: false
-                        val bCorrect = modelCorrect[task.modelB] ?: false
+                        val aCorrect = aCorrectVal
+                        val bCorrect = bCorrectVal
                         val gtWinner = when {
                             aCorrect && !bCorrect -> task.modelA
                             bCorrect && !aCorrect -> task.modelB
@@ -727,18 +770,19 @@ class TaxonomyBenchmarkService(
             withContext(dbWriteDispatcher) {
                 for (nodeId in dirtyNodes) {
                     val nodePairs = rankingService.getNodePairStats(nodeId, snapshotId)
-                    log.trace("Round $round - updated nodePairs for $nodeId: ${nodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
-                    pairStatsMap[nodeId] = nodePairs.toMutableList()
+                    val adjustedNodePairs = adjustForPositionBias(nodePairs)
+                    log.trace("Round $round - updated nodePairs for $nodeId: ${adjustedNodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
+                    pairStatsMap[nodeId] = adjustedNodePairs.toMutableList()
 
-                    if (nodePairs.isNotEmpty()) {
-                        val scores = BtMmFitter.fit(modelNames, nodePairs)
-                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
+                    if (adjustedNodePairs.isNotEmpty()) {
+                        val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
+                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
                         val state = NodeBtState(
                             nodeId = nodeId,
                             btScores = scores,
                             stdErrors = stdErrors,
                             fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
-                            totalComparisons = nodePairs.sumOf { it.totalComparisons },
+                            totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons },
                             lastFitAt = System.currentTimeMillis()
                         )
                         rankingService.saveBtState(state, snapshotId)
@@ -1144,6 +1188,26 @@ class TaxonomyBenchmarkService(
         }
         lines.append("  └─────────────────────────────────")
         log.info(lines.toString())
+    }
+
+    private fun adjustForPositionBias(stats: List<NodePairStats>): List<NodePairStats> {
+        return stats.map { ps ->
+            val n = ps.totalComparisons
+            if (n >= 6) {
+                val delta = (ps.winAFirst - ps.winASecond) / n.toDouble()
+                if (abs(delta) > 0.3) {
+                    ps.copy(
+                        winsA = ps.winsA / 2.0,
+                        winsB = ps.winsB / 2.0,
+                        ties = ps.ties / 2,
+                        totalComparisons = n / 2,
+                        positionFlips = ps.positionFlips / 2,
+                        winAFirst = ps.winAFirst / 2.0,
+                        winASecond = ps.winASecond / 2.0
+                    )
+                } else ps
+            } else ps
+        }
     }
 
     private fun logRoundSummary(round: Int, summaries: List<PairRoundSummary>) {

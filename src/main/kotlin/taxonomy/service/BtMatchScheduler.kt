@@ -3,6 +3,7 @@ package taxonomy.service
 import taxonomy.model.*
 import taxonomy.dataset.ModelEvalResult
 import taxonomy.utils.StatisticsUtils
+import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import java.util.UUID
 import java.util.PriorityQueue
 import kotlin.math.abs
@@ -29,9 +30,119 @@ class BtMatchScheduler(
     val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
-    fun reset() { pairQueryOffsets.clear() }
+    
+    private val pairConfHistory = mutableMapOf<String, MutableList<Double>>()
+    private val stablePairs = mutableSetOf<String>()
+    private val irresolvablePairs = mutableSetOf<String>()
+
+    fun reset() {
+        pairQueryOffsets.clear()
+        pairConfHistory.clear()
+        stablePairs.clear()
+        irresolvablePairs.clear()
+        stoppingPolicy.pairCustomBudgets.clear()
+        stoppingPolicy.globallyResolvedPairs.clear()
+    }
     fun loadOffsets(offsets: Map<String, Int>) { pairQueryOffsets.putAll(offsets) }
     fun getOffsets(): Map<String, Int> = pairQueryOffsets.toMap()
+
+    private fun updateBudgetsAndPools(
+        targetNodes: List<GraphNode>,
+        btStates: Map<String, NodeBtState>,
+        pairStats: Map<String, List<NodePairStats>>,
+        models: List<String>
+    ) {
+        val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
+        val leafPool = mutableMapOf<String, Int>()
+
+        for (node in targetNodes) {
+            val state = btStates[node.id] ?: continue
+            val nodePairs = pairStats[node.id] ?: emptyList()
+
+            for ((mA, mB) in allPairs) {
+                val key = "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
+                if (key in stablePairs || key in irresolvablePairs) continue
+
+                val ps = nodePairs.firstOrNull {
+                    (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+                } ?: continue
+
+                val si = state.btScores[mA] ?: 0.0
+                val sj = state.btScores[mB] ?: 0.0
+                val denom = exp(si) + exp(sj)
+                val p = if (denom == 0.0) 0.5 else exp(si) / denom
+                val conf = maxOf(p, 1.0 - p)
+
+                val history = pairConfHistory.getOrPut(key) { mutableListOf() }
+                history.add(conf)
+
+                val comparisons = ps.totalComparisons
+
+                // 1. Check if stable
+                if (conf >= 0.88) {
+                    stablePairs.add(key)
+                    val currentBudget = stoppingPolicy.pairCustomBudgets.getOrDefault(key, budgetPerPair)
+                    val remaining = maxOf(0, currentBudget - comparisons)
+                    if (remaining > 0) {
+                        leafPool[node.id] = (leafPool[node.id] ?: 0) + remaining
+                    }
+                    stoppingPolicy.pairCustomBudgets[key] = comparisons
+                    log.info("Pair $mA vs $mB on leaf ${node.id} marked STABLE (conf: ${"%.2f".format(conf)}). Releasing $remaining queries.")
+                    continue
+                }
+
+                // 2. Check if irresolvable
+                val T = ps.ties
+                val W = ps.winsA + ps.winsB
+                val total = W + T
+                val tau = if (total == 0.0) 0.0 else T.toDouble() / total
+                val size = history.size
+                val deltaConf = if (size >= 3) abs(history[size - 1] - history[size - 3]) else 999.0
+
+                if (tau >= 0.55 && deltaConf <= 0.02) {
+                    irresolvablePairs.add(key)
+                    val currentBudget = stoppingPolicy.pairCustomBudgets.getOrDefault(key, budgetPerPair)
+                    val remaining = maxOf(0, currentBudget - comparisons)
+                    if (remaining > 0) {
+                        leafPool[node.id] = (leafPool[node.id] ?: 0) + remaining
+                    }
+                    stoppingPolicy.pairCustomBudgets[key] = comparisons
+                    log.info("Pair $mA vs $mB on leaf ${node.id} marked IRRESOLVABLE (tau: ${"%.2f".format(tau)}, deltaConf: ${"%.3f".format(deltaConf)}). Releasing $remaining queries.")
+                }
+            }
+
+            // Redistribute released budget for this leaf
+            val pool = leafPool[node.id] ?: 0
+            if (pool > 0) {
+                val candidates = allPairs.map { (mA, mB) -> "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}" }
+                    .filter { it !in stablePairs && it !in irresolvablePairs }
+                if (candidates.isNotEmpty()) {
+                    val maxFlips = candidates.maxOfOrNull { key ->
+                        val parts = key.split("|")
+                        val mA = parts[1]
+                        val mB = parts[2]
+                        val ps = nodePairs.firstOrNull { (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) }
+                        ps?.positionFlips ?: 0
+                    } ?: 0
+                    val bestCandidates = candidates.filter { key ->
+                        val parts = key.split("|")
+                        val mA = parts[1]
+                        val mB = parts[2]
+                        val ps = nodePairs.firstOrNull { (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA) }
+                        (ps?.positionFlips ?: 0) == maxFlips
+                    }
+                    val share = pool / bestCandidates.size
+                    val remainder = pool % bestCandidates.size
+                    bestCandidates.forEachIndexed { idx, key ->
+                        val extra = share + (if (idx < remainder) 1 else 0)
+                        val prevBudget = stoppingPolicy.pairCustomBudgets.getOrDefault(key, budgetPerPair)
+                        stoppingPolicy.pairCustomBudgets[key] = prevBudget + extra
+                        log.info("Redistributed $extra queries of released budget to pair $key (new budget: ${prevBudget + extra})")
+                    }
+                }
+            }
+        }
+    }
 
     private fun isMatchInformative(
         mA: String, mB: String,
@@ -39,6 +150,9 @@ class BtMatchScheduler(
         ps: NodePairStats?,
         minMatches: Int = 2
     ): Boolean {
+        val pairKey = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
+        if (stoppingPolicy.globallyResolvedPairs.contains(pairKey)) return false
+
         // Always play if either model is unseen (bootstrap guarantee)
         val nij = ps?.totalComparisons ?: 0
         if (nij < minMatches) return true
@@ -69,11 +183,14 @@ class BtMatchScheduler(
         if (state == null) return models.size * (models.size - 1) / 2
         val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
         return allPairs.count { (mA, mB) ->
+            val pairKey = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
+            if (stoppingPolicy.globallyResolvedPairs.contains(pairKey)) return@count false
             val ps = pairs.firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
             val nij = ps?.totalComparisons ?: 0
-            if (nij >= budgetPerPair) return@count false  // budget-exhausted: skip
+            val budget = stoppingPolicy.pairCustomBudgets.getOrDefault("${nodeId}|$pairKey", budgetPerPair)
+            if (nij >= budget) return@count false  // budget-exhausted: skip
             if (nij < 2) return@count true
             val si = state.btScores[mA] ?: 0.0
             val sj = state.btScores[mB] ?: 0.0
@@ -114,14 +231,14 @@ class BtMatchScheduler(
                 }
                 if (!isMatchInformative(mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
 
-                val budget = pairBudget(mA, mB, state, ps)
+                val budget = pairBudget(node.id, mA, mB)
                 val already = ps?.totalComparisons ?: 0
                 if (already >= budget) continue  // exhausted
 
                 val isBlockingPair = isMatchInformative(mA, mB, state, ps) && already < (budgetPerPair - 5) // not near budget
                 val convergenceBonus = if (debt <= 5 && isBlockingPair) 1.5 else 1.0  // last-mile boost
 
-                val u = computeUtility(mA, mB, state, leafMatches, already, models, pairsResolved) * convergenceBonus
+                val u = computeUtility(mA, mB, state, leafMatches, already, models, pairsResolved, ps) * convergenceBonus
                 val pairKey = "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
                 queue.add(MatchCandidate(node.id, mA, mB, u, pairKey))
             }
@@ -137,8 +254,11 @@ class BtMatchScheduler(
         resultsMatrix: Map<Int, Map<String, ModelEvalResult>>,
         nodeToQueries: Map<String, List<Int>>,
         batchSize: Int,
-        maxConcurrentPerModel: Int = maxOf(2, models.size - 1)
+        maxConcurrentPerModel: Int = maxOf(2, models.size - 1),
+        globalLeaderboard: AggregatedLeaderboard? = null
     ): List<BtMatchTask> {
+        updateBudgetsAndPools(targetNodes, btStates, pairStats, models)
+
         val leafModelMatches = targetNodes.associate { node ->
             node.id to models.associateWith { model ->
                 (pairStats[node.id] ?: emptyList())
@@ -161,6 +281,24 @@ class BtMatchScheduler(
             }
         }
 
+        // track per-model active pair count dynamically and raise maxConcurrentPerModel to 4 for models whose remaining active pairs are all in the irresolvable or stable state
+        val modelMaxConcurrentMap = models.associateWith { m ->
+            val activePairsForModel = allPairs.filter { (mA, mB) -> mA == m || mB == m }
+                .flatMap { (mA, mB) -> targetNodes.map { Triple(it.id, mA, mB) } }
+                .filter { (nodeId, mA, mB) ->
+                    val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
+                        (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
+                    }
+                    val budget = stoppingPolicy.pairCustomBudgets.getOrDefault("${nodeId}|${minOf(mA, mB)}|${maxOf(mA, mB)}", budgetPerPair)
+                    (ps?.totalComparisons ?: 0) < budget
+                }
+            val hasOnlyStableOrIrresolvable = activePairsForModel.isNotEmpty() && activePairsForModel.all { (nodeId, mA, mB) ->
+                val key = "${nodeId}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
+                key in stablePairs || key in irresolvablePairs
+            }
+            hasOnlyStableOrIrresolvable
+        }
+
         val tasks = mutableListOf<BtMatchTask>()
         val nodeModelLoad = mutableMapOf<String, MutableMap<String, Int>>()
         val globalModelLoad = mutableMapOf<String, Int>()
@@ -179,6 +317,7 @@ class BtMatchScheduler(
         ): Boolean {
             if (tasks.size >= batchSize) return false
             val pk = pairKey(mA, mB)
+            if (stoppingPolicy.globallyResolvedPairs.contains(pk)) return false
             if (!ignoreFairShare && (pairBatchCount[pk] ?: 0) >= fairSharePerPair) return false
 
             val nodeLoad = nodeModelLoad.getOrPut(nodeId) { mutableMapOf() }
@@ -186,14 +325,16 @@ class BtMatchScheduler(
             if (!ignoreNodeCap && (nodeLoad[mB] ?: 0) >= 1) return false
 
             if (!ignoreGlobalCap) {
-                if ((globalModelLoad[mA] ?: 0) >= maxConcurrentPerModel) return false
-                if ((globalModelLoad[mB] ?: 0) >= maxConcurrentPerModel) return false
+                val limitA = if (modelMaxConcurrentMap[mA] == true) 4 else maxConcurrentPerModel
+                val limitB = if (modelMaxConcurrentMap[mB] == true) 4 else maxConcurrentPerModel
+                if ((globalModelLoad[mA] ?: 0) >= limitA) return false
+                if ((globalModelLoad[mB] ?: 0) >= limitB) return false
             }
 
             val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
-            val budget = pairBudget(mA, mB, btStates[nodeId], ps)
+            val budget = pairBudget(nodeId, mA, mB)
             if ((ps?.totalComparisons ?: 0) >= budget) return false
 
             val nodeQueryIds = (nodeToQueries[nodeId] ?: emptyList()).sorted()
@@ -403,7 +544,8 @@ class BtMatchScheduler(
         leafModelMatches: Map<String, Int>,
         nij: Int,
         models: List<String>,
-        pairsResolved: Int
+        pairsResolved: Int,
+        ps: NodePairStats?
     ): Double {
         // Bootstrap: unseen model -> maximum priority
         if ((leafModelMatches[mA] ?: 0) == 0 || (leafModelMatches[mB] ?: 0) == 0)
@@ -411,16 +553,30 @@ class BtMatchScheduler(
 
         if (state == null) return LN2
 
-        val alpha = computeAlpha(state, models, pairsResolved)
-        val sScore = structureScore(mA, mB, state)
-        val rScore = resolveScore(mA, mB, state, nij)
+        val si = state.btScores[mA] ?: 0.0
+        val sj = state.btScores[mB] ?: 0.0
+        val seA = state.stdErrors[mA] ?: 10.0
+        val seB = state.stdErrors[mB] ?: 10.0
+        val denom = exp(si) + exp(sj)
+        val p = if (denom == 0.0) 0.5 else exp(si) / denom
+        val conf = maxOf(p, 1.0 - p)
 
-        val repeatDiscount = (nij.toDouble() / budgetPerPair).coerceAtMost(1.0)
-        return (alpha * sScore + (1.0 - alpha) * rScore) * (1.0 - 0.3 * repeatDiscount)
+        val gap = abs(si - sj)
+        val sigmaSum = (seA + seB).coerceAtLeast(1e-6)
+
+        val T = ps?.ties ?: 0
+        val W = (ps?.winsA ?: 0.0) + (ps?.winsB ?: 0.0)
+        val total = W + T
+        val tau = if (total == 0.0) 0.0 else T.toDouble() / total
+
+        val mask = if (tau >= 0.55) 0.0 else 1.0
+
+        return (1.0 - conf) * (gap / sigmaSum) * mask
     }
 
-    private fun pairBudget(mA: String, mB: String, state: NodeBtState?, ps: NodePairStats?): Int {
-        return budgetPerPair
+    private fun pairBudget(nodeId: String, mA: String, mB: String): Int {
+        val key = "$nodeId|${minOf(mA, mB)}|${maxOf(mA, mB)}"
+        return stoppingPolicy.pairCustomBudgets.getOrDefault(key, budgetPerPair)
     }
 
     fun selectTargetNodes(

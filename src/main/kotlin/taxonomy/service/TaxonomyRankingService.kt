@@ -234,6 +234,10 @@ class TaxonomyRankingService {
                             ties INTEGER,
                             total_comparisons INTEGER,
                             position_flips INTEGER,
+                            win_a_first REAL DEFAULT 0.0,
+                            win_a_second REAL DEFAULT 0.0,
+                            agreement_wins INTEGER DEFAULT 0,
+                            agreement_checks INTEGER DEFAULT 0,
                             last_updated INTEGER,
                             PRIMARY KEY (snapshot_id, node_id, model_a, model_b)
                         )
@@ -292,6 +296,22 @@ class TaxonomyRankingService {
                         s.execute("UPDATE match_history SET snapshot_id = 'global' WHERE snapshot_id IS NULL")
                     }
                 } catch (_: Exception) {}
+
+                // Migrate node_pair_stats to add win_a_first, win_a_second, agreement_wins, and agreement_checks
+                for (col in listOf("win_a_first", "win_a_second")) {
+                    try {
+                        conn.createStatement().use { stmt ->
+                            stmt.execute("ALTER TABLE node_pair_stats ADD COLUMN $col REAL DEFAULT 0.0")
+                        }
+                    } catch (_: Exception) {}
+                }
+                for (col in listOf("agreement_wins", "agreement_checks")) {
+                    try {
+                        conn.createStatement().use { stmt ->
+                            stmt.execute("ALTER TABLE node_pair_stats ADD COLUMN $col INTEGER DEFAULT 0")
+                        }
+                    } catch (_: Exception) {}
+                }
 
                 dbInitialized = true
                 log.info("SQLite Agent Ratings V2, Match History, and Bradley-Terry schema initialized.")
@@ -354,8 +374,8 @@ class TaxonomyRankingService {
             withConn { conn ->
                 val sql = """
                     INSERT OR REPLACE INTO node_pair_stats 
-                    (snapshot_id, node_id, model_a, model_b, wins_a, wins_b, ties, total_comparisons, position_flips, last_updated)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (snapshot_id, node_id, model_a, model_b, wins_a, wins_b, ties, total_comparisons, position_flips, win_a_first, win_a_second, agreement_wins, agreement_checks, last_updated)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """.trimIndent()
                 conn.prepareStatement(sql).use { pstmt ->
                     pstmt.setString(1, snapshotId)
@@ -367,7 +387,11 @@ class TaxonomyRankingService {
                     pstmt.setInt(7, stats.ties)
                     pstmt.setInt(8, stats.totalComparisons)
                     pstmt.setInt(9, stats.positionFlips)
-                    pstmt.setLong(10, stats.lastUpdated)
+                    pstmt.setDouble(10, stats.winAFirst)
+                    pstmt.setDouble(11, stats.winASecond)
+                    pstmt.setInt(12, stats.agreementWins)
+                    pstmt.setInt(13, stats.agreementChecks)
+                    pstmt.setLong(14, stats.lastUpdated)
                     pstmt.executeUpdate()
                 }
             }
@@ -395,6 +419,10 @@ class TaxonomyRankingService {
                                 ties = rs.getInt("ties"),
                                 totalComparisons = rs.getInt("total_comparisons"),
                                 positionFlips = rs.getInt("position_flips"),
+                                winAFirst = rs.getDouble("win_a_first"),
+                                winASecond = rs.getDouble("win_a_second"),
+                                agreementWins = rs.getInt("agreement_wins"),
+                                agreementChecks = rs.getInt("agreement_checks"),
                                 lastUpdated = rs.getLong("last_updated")
                             )
                         )
@@ -426,6 +454,10 @@ class TaxonomyRankingService {
                                 ties = rs.getInt("ties"),
                                 totalComparisons = rs.getInt("total_comparisons"),
                                 positionFlips = rs.getInt("position_flips"),
+                                winAFirst = rs.getDouble("win_a_first"),
+                                winASecond = rs.getDouble("win_a_second"),
+                                agreementWins = rs.getInt("agreement_wins"),
+                                agreementChecks = rs.getInt("agreement_checks"),
                                 lastUpdated = rs.getLong("last_updated")
                             )
                         )
@@ -536,7 +568,21 @@ data class AggregatedLeaderboard(
         nodeToQuestions: Map<String, List<Int>> = emptyMap()
     ): AggregatedLeaderboard {
         val allStates = leafNodeIds.mapNotNull { getBtState(it, snapshotId) }
-        val eligible = allStates.filter { it.totalComparisons >= minComparisons }
+        val eligible = allStates.filter { it.totalComparisons >= minComparisons }.map { state ->
+            val pairStats = getNodePairStats(state.nodeId, snapshotId)
+            val isJudgeInconsistent = pairStats.any {
+                it.agreementChecks >= minComparisons && (it.agreementWins.toDouble() / it.agreementChecks) < 0.50
+            }
+            if (isJudgeInconsistent) {
+                log.warn("Leaf ${state.nodeId} is judge-inconsistent (agreement < 0.50). Replacing scores with noisy prior centered on global mean.")
+                state.copy(
+                    btScores = state.btScores.keys.associateWith { 0.0 },
+                    stdErrors = state.stdErrors.keys.associateWith { 10.0 }
+                )
+            } else {
+                state
+            }
+        }
 
         if (eligible.isEmpty()) return AggregatedLeaderboard(
             emptyList(), 0, leafNodeIds.size, 0, false

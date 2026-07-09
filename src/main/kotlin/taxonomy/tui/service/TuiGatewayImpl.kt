@@ -36,6 +36,7 @@ import java.net.http.HttpResponse
 class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
 
     private val dbWriteMutex = Mutex()
+    private val prettyJson = kotlinx.serialization.json.Json { prettyPrint = true }
 
     // ── Snapshot helpers ────────────────────────────────────────────────────────
 
@@ -371,6 +372,23 @@ class TuiGatewayImpl(private val deps: TuiDependencies) : TuiGateway {
                 onLive(live)
             }
             deps.arenaService.completeBenchmark(report)
+            
+            val backupDir = java.io.File("benchmark_backups")
+            if (!backupDir.exists()) {
+                backupDir.mkdirs()
+            }
+            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(java.util.Date())
+            val backupFile = java.io.File(backupDir, "benchmark_${snapId}_$timestamp.json")
+            try {
+                val jsonString = prettyJson.encodeToString(
+                    taxonomy.model.BenchmarkReport.serializer(),
+                    report
+                )
+                backupFile.writeText(jsonString)
+                deps.log.info("Saved benchmark report backup to ${backupFile.absolutePath}")
+            } catch (e: Exception) {
+                deps.log.error("Failed to backup benchmark report: ${e.message}", e)
+            }
             deps.log.info(
                 "Benchmark complete: ${report.totalQueries} queries · ${report.totalModelPairs} pairs · " +
                     "coverage ${"%,.3f".format(report.coverageRate)} · " +

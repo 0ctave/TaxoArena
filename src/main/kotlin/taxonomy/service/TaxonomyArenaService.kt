@@ -46,7 +46,9 @@ data class DomainEvaluation(
     val confidence: Double,
     val positionFlip: Boolean = false,
     val nodeId: String? = null,
-    val tieSource: String? = null
+    val tieSource: String? = null,
+    val winAFirst: Double = 0.5,
+    val winASecond: Double = 0.5
 ) {
     val domainLabel: String get() = domain
 }
@@ -320,7 +322,7 @@ class TaxonomyArenaService(
         arenaResult to answers
     }
 
-    private fun extractAnswerLetter(trace: String): String {
+    fun extractAnswerLetter(trace: String): String {
         // 1. Try "answer is X", "answer: X", "= X", "choice X" patterns
         val explicit = Regex(
             """(?i)(?:answer\s*(?:is|:|\s)\s*|the\s+correct\s+(?:answer|option)\s*(?:is|:)?\s*)([A-Ja-j])\b"""
@@ -420,6 +422,8 @@ class TaxonomyArenaService(
         }
 
         val finalConfidence = if (positionFlip) 0.5 else avgConfidence.coerceIn(0.0, 0.95)
+        val winAFirst = if (res1.winner == "Model A") 1.0 else if (res1.winner == "Model B") 0.0 else 0.5
+        val winASecond = if (res2.winner == "Model B") 1.0 else if (res2.winner == "Model A") 0.0 else 0.5
 
         DomainEvaluation(
             domain      = node.label ?: "Emergent Concept",
@@ -428,7 +432,9 @@ class TaxonomyArenaService(
             confidence  = finalConfidence,
             positionFlip = positionFlip,
             nodeId       = node.id,
-            tieSource    = tieSource
+            tieSource    = tieSource,
+            winAFirst    = winAFirst,
+            winASecond   = winASecond
         )
     }
 
