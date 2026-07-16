@@ -1,4 +1,524 @@
-\chapter{Experimental Design}\label{ch:experimental-design}
-Please rename this chapter as you please.
 
-\blindtext[2]
+\chapter{Experimental Setup}\label{ch:experimental-design}
+
+This chapter specifies the concrete configuration under which the
+architecture of Chapter~\ref{ch:architecture} and the methodology of
+Chapter~\ref{ch:methodology} are instantiated for the experiments
+reported in Chapter~\ref{ch:results}: dataset preparation, domain
+selection, hyperparameters, judge generation configuration, arena
+configuration, baseline conditions, and the statistical protocol used
+to interpret results.
+
+\section{Research Questions and Experimental Conditions}\label{sec:exp-rqmap}
+
+Table~\ref{tab:rq-map} fixes, before any experiment is run, which
+condition answers which research question and with which metric,
+so that the mapping from research question to reported number is
+traceable and not reconstructed post hoc.
+
+\begin{table}[h]
+\centering
+\caption{Research question to condition and metric mapping.}
+\label{tab:rq-map}
+\begin{tabular}{p{1.0cm}p{4.6cm}p{3.2cm}p{4.0cm}}
+\toprule
+RQ & Question & Primary condition(s) & Primary metric \\
+\midrule
+RQ1 & Does seed-guided geometric refinement produce a taxonomy of
+useful quality relative to supervised and unsupervised baselines?
+& Canonical construction vs.\ Table~\ref{tab:baselines} baselines
+& H-F1, Dendrogram Purity, Spherical Silhouette \\
+\addlinespace
+RQ2 & Does geometry-corrected (adapted) partitioning improve
+rank-agreement with ground-truth accuracy relative to the editorial
+(canonical) partition?
+& Track A (canonical) vs.\ Track B (adapted), \S\ref{sec:meth-aggregation}
+& $\Delta\rho = \rho_{\text{adapted}} - \rho_{\text{canonical}}$ \\
+\addlinespace
+RQ3 & Does adaptive, uncertainty-driven scheduling recover the same
+ranking at lower judge-call cost than uninformed scheduling?
+& Adaptive scheduler vs.\ random-scheduler ablation, \S\ref{sec:exp-arena}
+& Judge calls to convergence at matched $\rho$; budget-fidelity curve \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+RQ1 and RQ2 are further decomposed into the four arena-level
+conditions C1--C4 specified in
+Table~\ref{tab:arena-conditions} (\S\ref{sec:exp-arena-conditions}),
+which isolate the contribution of geometric partitioning and
+reference-informed judging from the contribution of the taxonomy
+structure itself.
+
+\section{Implementation Environment}\label{sec:exp-env}
+
+The pipeline is implemented in Kotlin on Spring Boot, backed by
+SQLite in WAL mode for the three persistent databases described in
+Section~\ref{sec:arch-infra}.
+Embeddings are produced by Qwen3-Embedding served locally via Ollama;
+the judge model is Mistral-Large-3, accessed through an Azure OpenAI
+endpoint.
+All experiments are executed on [CPU/GPU spec, RAM, OS --- to be
+finalised at submission].
+Reproducibility follows the tuple convention of
+Section~\ref{sec:arch-infra}: every run is seeded from
+$\{42, 137, 2048\}$, and the canonical \texttt{TaxonomyConfig} values
+are \texttt{splitThreshold} $= 0.02$ (equivalently reported as 80 in
+the pre-normalised internal scale), \texttt{minClusterSize} $= 15$,
+\texttt{separationEpsilon} $= 0.08$, routing temperature $\tau = 2.0$,
+\texttt{assignmentGap} $\delta_{\text{assign}} = 0.2$, and EMA
+smoothing $\alpha_{\text{EMA}} = 0.5$ for maturity tracking.
+Exact commit SHA and environment lockfile are recorded in
+\texttt{REPRODUCIBILITY.md} and cited at submission.
+
+\section{Datasets}\label{sec:exp-datasets}
+
+\subsection{Primary Corpus: MMLU-Pro}
+
+The primary corpus is MMLU-Pro~\parencite{wang2024mmlupro}, 12,000
+questions across 14 domains with human-verified reference answers.
+MMLU-Pro is used for two roles simultaneously: it supplies the
+ground-truth domain labels that seed the 14 anchor nodes
+(Section~\ref{sec:meth-migration}), and it supplies the per-domain
+accuracy scores used as the external validation signal
+(Section~\ref{sec:meth-validation}).
+For the results reported in this thesis, taxonomy construction and
+arena evaluation are run on the \textbf{Math} sub-corpus of MMLU-Pro:
+1,079 queries after deduplication, chosen as the primary experimental
+domain because it has among the largest per-domain query counts and
+the clearest ground-truth answer format, minimising label noise in
+the accuracy computation.
+
+\subsection{Secondary Corpus: AG News}
+
+AG News~\parencite{zhang2015agnews}, a four-class topic classification
+corpus of news headlines, is used as a pipeline sanity check: it has
+no MMLU-Pro-style domain structure and no reference-answer format
+compatible with the reference-informed judge design, so it is not
+used for anchor seeding or arena evaluation.
+Its role is limited to verifying that the embedding, vMF fitting, and
+splitting stages of the taxonomy pipeline execute correctly and
+produce a geometrically coherent DAG on a corpus with known,
+independently-labelled topic structure, as a check against
+implementation bugs that MMLU-Pro's larger and noisier label space
+might mask.
+
+\section{Domain Selection and Split Protocol}\label{sec:exp-split}
+
+\subsection{Domain Scope}
+
+The experiments in this thesis are scoped to the Math domain of
+MMLU-Pro rather than all 14 domains simultaneously.
+This scoping decision reflects a compute-budget trade-off: a
+full 14-anchor run multiplies the arena's judge-call budget by
+roughly an order of magnitude for the same per-leaf statistical
+power, and the core research questions (taxonomy quality, RQ1;
+migration effect, RQ2; scheduling efficiency, RQ3) are each
+answerable within a single, well-populated domain.
+Generalisation across domains is identified as future work in
+Section~\ref{sec:future-work}.
+
+\subsection{Stratified Split}
+
+The 1,079-query Math sub-corpus is split 70/30 into a construction
+set (755 queries, used for taxonomy induction, migration scoring, and
+reference-informed guideline generation) and an arena set (324
+queries, reserved exclusively for held-out routing and pairwise
+evaluation).
+The split is stratified by the finest available sub-topic tag in the
+MMLU-Pro metadata, ensuring that both partitions are proportionally
+representative before any geometric restructuring occurs, and is
+fixed across all three random seeds to isolate taxonomy-construction
+variance from split variance.
+
+The 30\% arena allocation is chosen so that the smallest leaf in the
+canonical run receives approximately 12 held-out queries.
+At 16 evaluated models, this leaf presents $\binom{16}{2} = 120$
+model pairs; with the connectivity bootstrap requiring at least one
+comparison per pair and each of the 12 queries eligible for multiple
+pairs, this establishes an upper bound of 1,440 judge calls
+(120 pairs $\times$ 12 queries) at that leaf before any adaptive
+scheduling logic is invoked, which is the binding constraint on
+choosing a smaller arena fraction.
+A sensitivity row repeats the canonical run at a 40\% arena split to
+verify that headline Spearman $\rho$ results are not an artefact of
+the specific split ratio.
+
+\section{DAG Construction Hyperparameters}\label{sec:exp-hyperparams}
+
+Table~\ref{tab:hyperparams} lists the canonical hyperparameter values
+used for the taxonomy construction pipeline, cross-referenced to the
+formal definitions in Chapter~\ref{ch:methodology}.
+
+\begin{table}[h]
+\centering
+\caption{Canonical taxonomy construction hyperparameters.}
+\label{tab:hyperparams}
+\begin{tabular}{llll}
+\toprule
+Parameter & Symbol & Value & Defined in \\
+\midrule
+Dasgupta split threshold & $\delta_{\text{Dasgupta}}$ & 0.02 & \S\ref{sec:meth-split} \\
+Minimum cluster size & $n_{\min}$ & 15 & \S\ref{sec:meth-split} \\
+Sibling merge threshold & $\epsilon_{\text{sep}}$ & 0.08 & \S\ref{sec:meth-topology} \\
+Routing temperature & $\tau$ & 2.0 & \S\ref{sec:meth-routing} \\
+Assignment gap (cross-link) & $\delta_{\text{assign}}$ & 0.20 & \S\ref{sec:meth-routing} \\
+Confidence funnel, depth 0 & $\gamma_0$ & 0.999 & \S\ref{sec:meth-routing} \\
+Confidence funnel, depth 3 & $\gamma_3$ & 0.90 & \S\ref{sec:meth-routing} \\
+Migration threshold & $\delta_{\text{mig}}$ & 1.5 (log-nats) & \S\ref{sec:meth-migration} \\
+Maximum recursion depth & $D_{\max}$ & 3 & \S\ref{sec:meth-split} \\
+Starved-leaf ratio & --- & 0.20 & \S\ref{sec:meth-topology} \\
+Maturity EMA smoothing & $\alpha_{\text{EMA}}$ & 0.50 & \S\ref{sec:meth-scheduling} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The canonical run executes for a maximum of 35 iterations with early
+stopping enabled on the Math domain; the structural convergence
+parameters $\epsilon_{\text{struct}}$ and $K_{\text{stable}}$
+governing early stopping are held fixed across all ablations to
+isolate the effect of the parameter under test.
+
+\subsection{Ablation Matrix}
+
+Table~\ref{tab:ablations} summarises the eight ablation experiments
+run against the canonical configuration, each varying exactly one
+hyperparameter or structural choice while holding all others fixed.
+
+\begin{table}[h]
+\centering
+\caption{Taxonomy construction ablation matrix.}
+\label{tab:ablations}
+\begin{tabular}{p{1.0cm}p{4.2cm}p{7.2cm}}
+\toprule
+ID & Factor & Levels tested \\
+\midrule
+A1 & MRL dimension schedule & $\{128,256,512\}$, $\{128,512,1024\}$, $\{128,256,512,1024\}$ (canonical), uniform $\{512\}$ \\
+A2 & Hornik--Grün bias correction & On (canonical) vs. off \\
+A3$^\dagger$ & NMI variant & Overlapping vs. disjoint Shannon entropy \\
+A4$^\dagger$ & Purity formula & DAG-dendrogram purity vs. standard tree purity \\
+A5 & Split threshold $\delta_{\text{Dasgupta}}$ & $\{0.01, 0.02, 0.04, 0.08\}$ \\
+A6 & Assignment gap $\delta_{\text{assign}}$ & $\{0.05, 0.10, 0.20\}$ \\
+A7 & Iteration count & $\{10, 25, 50\}$ \\
+A8 & Query set scope & Reserved (arena-excluded) vs. full corpus \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each ablation is run across all three seeds and reported as
+mean $\pm$ std following the protocol of
+Section~\ref{sec:exp-metrics}.
+A3 and A4 (marked $\dagger$) are not system ablations in the same
+sense as A1--A2 and A5--A8: they vary the \textit{metric computation
+formula} used to score a fixed, already-constructed taxonomy, rather
+than a system parameter that changes the taxonomy itself.
+They are retained in this matrix as \textit{reporting-sensitivity
+analyses}, testing whether the headline quality conclusions are an
+artefact of a specific metric definition rather than a property of
+the system under test; this distinction is revisited in
+Section~\ref{sec:exp-metrics}.
+
+\section{Reference-Informed Judge Generation Configuration}\label{sec:exp-judge}
+
+The judge rubric generation procedure (Section~\ref{subsec:judge})
+is instantiated as follows.
+Representative-query packs are drawn from each leaf's construction
+pool at pack size $k = 5$; a leaf with fewer than 5 construction
+queries uses its full pool as a single pack.
+The map-step LLM and the reduce-step LLM are the same underlying
+model as the arena judge, Mistral-Large-3, to avoid introducing a
+second model's stylistic biases into the rubric; this choice is
+revisited as a limitation in Section~\ref{sec:arch-limits}.
+The global structural template---covering presentation order, tie
+handling, and output format---is fixed across all leaves and is
+listed in full in Appendix~\ref{app:judge-template}.
+Guideline generation is a one-time cost per frozen snapshot: rubrics
+are computed once at snapshot-freeze time and reused for every
+subsequent arena run against that snapshot, regardless of which
+models are being compared.
+
+\section{Arena Evaluation Configuration}\label{sec:exp-arena}
+
+\subsection{Evaluated Models}
+
+The canonical arena evaluates 16 models spanning open-weight and
+proprietary families at comparable parameter-count tiers [full model
+list and provider details in Appendix~\ref{app:models}].
+The canonical construction run yields 17 leaves under the Math
+anchor; all 17 are included in the arena's held-out routing target
+set.
+
+\subsection{Scheduling and Budget}
+
+The per-pair comparison budget is $B_{ij} = 20$ (\texttt{budget\_pair}
+$= 20$), and the arena runs for a maximum of 10 scheduling rounds
+(\texttt{maxRounds} $= 10$) before the global escape valve is
+consulted.
+Each logical comparison is realised as two judge calls under the
+dual-call, position-reversed protocol of Section~\ref{subsec:judge},
+so the canonical arena's theoretical judge-call ceiling is
+$2 \times 20 \times \binom{16}{2} \times 17 = 81{,}600$ calls if every
+pair at every leaf exhausted its full budget.
+This ceiling is not the expected utilisation: with 324 held-out
+queries distributed across 17 leaves, the mean leaf receives
+approximately 19 queries, and the connectivity bootstrap alone
+(one comparison per one of $\binom{16}{2} = 120$ pairs) already
+approaches or exceeds a leaf's available query pool before
+utility-driven scheduling or per-pair budget exhaustion becomes the
+binding constraint.
+The 81,600 figure is reported only as an upper bound for provisioning
+API rate limits; the expected realised call count, together with the
+per-leaf query-pool-to-pair-count ratio and its effect on how many
+leaves reach \texttt{BUDGET\_EXHAUSTED} versus \texttt{CONVERGED}, is
+reported directly in Chapter~\ref{ch:results}.
+
+\subsection{Random Scheduler Ablation}
+
+A random scheduler ablation replaces the composite-utility pair and
+query selection of Section~\ref{sec:meth-scheduling} with uniformly
+random pair and query selection, while retaining the same per-pair
+and per-leaf budgets and the same three-level stopping policy.
+This ablation isolates the marginal contribution of adaptive
+scheduling by comparing, at matched final judge-call counts, the
+total match count, the achieved Spearman $\rho$ against MMLU-Pro
+accuracy, and the number of rounds to convergence between the
+adaptive and random-scheduler conditions.
+An exhaustive round-robin condition (every pair against every routed
+query, no stopping) is deliberately not included as a primary
+ablation: at the canonical budget it is computationally prohibitive
+across all 17 leaves, and it is reported only if the implementation
+status permits a reduced-scale run, consistent with
+Chapter~\ref{ch:introduction}.
+
+\subsection{Verbosity Bias Probe}
+
+Fifty judge matches are sampled uniformly from the canonical arena
+run and re-judged with response position swapped, independent of the
+standard dual-call protocol's own position randomisation, to produce
+an out-of-protocol audit sample.
+The position-flip rate (fraction of re-judged matches whose verdict
+changes under the swap) and a per-model verbosity delta
+$\Delta_{\text{verbosity}}$ (difference in win rate attributable to
+response length after controlling for BT score) are reported.
+This probe is specifically designed to confirm or quantify an anomaly
+observed in preliminary runs (\texttt{arenabenchmark.log}) in which
+one evaluated model's verdicts appeared to correlate with response
+length independent of content quality; the probe is a targeted
+diagnostic rather than a general-purpose bias correction.
+
+\subsection{Arena-Level Conditions (C1--C4)}\label{sec:exp-arena-conditions}
+
+The taxonomy-structure baselines of Section~\ref{sec:exp-baselines}
+evaluate the induced DAG in isolation from the arena; they do not by
+themselves produce the ranking-recovery result that is this thesis's
+primary contribution.
+Table~\ref{tab:arena-conditions} specifies the four arena-level
+conditions that isolate, one factor at a time, the contribution of
+geometric re-partitioning and reference-informed judging to that
+result.
+All four conditions share the identical frozen snapshot, held-out
+query pool, and evaluated model roster; only the factor listed in the
+``Delta from C1'' column is varied.
+
+\begin{table}[h]
+\centering
+\caption{Arena-level experimental conditions C1--C4.}
+\label{tab:arena-conditions}
+\begin{tabular}{p{0.9cm}p{3.0cm}p{5.4cm}p{3.2cm}}
+\toprule
+ID & Condition & Delta from C1 & Targets \\
+\midrule
+C1 & Main condition
+& --- (adapted partition, reference-informed judge, adaptive scheduler)
+& RQ1, RQ2, RQ3 (reference) \\
+\addlinespace
+C2 & Canonical grouping
+& Verdicts grouped by MMLU-Pro label instead of adapted partition;
+identical judge and scheduler
+& RQ2 ($\rho_{\text{canonical}}$ vs.\ $\rho_{\text{adapted}}$) \\
+\addlinespace
+C3 & Generic judge
+& Judge prompt uses the shared structural template only, with no
+leaf-specific reference-informed rubric
+& RQ1 (judge-design contribution, isolated from taxonomy quality) \\
+\addlinespace
+C4 & Random scheduler
+& Uniformly random pair and query selection in place of the
+composite-utility scheduler (\S\ref{sec:exp-arena})
+& RQ3 (scheduling efficiency) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+C2 isolates the migration effect measured by $\Delta\rho$
+independently of any judge or scheduling factor.
+C3 isolates the marginal contribution of domain-conditioned,
+reference-informed judging by holding the taxonomy and grouping fixed
+and varying only the judge prompt, addressing the concern that RQ1's
+taxonomy-quality result could be confounded with judge quality.
+C4 is the random-scheduler ablation of Section~\ref{sec:exp-arena},
+listed here for completeness against C1--C3.
+
+\subsection{Information Separation Protocol}\label{sec:exp-info-separation}
+
+The answer-key-blind design asserted throughout
+Chapters~\ref{ch:architecture}~and~\ref{ch:methodology} is made
+concrete in Table~\ref{tab:info-separation}: at every pipeline phase,
+only the data marked \checkmark{} is accessible to the corresponding
+component.
+
+\begin{table}[h]
+\centering
+\caption{Data access by pipeline phase.}
+\label{tab:info-separation}
+\begin{tabular}{p{3.6cm}ccccc}
+\toprule
+Phase &
+$\mathcal{Q}_{\text{con}}$ text &
+$\mathcal{Q}_{\text{con}}$ labels/answers &
+$\mathcal{Q}_{\text{eval}}$ text &
+$\mathcal{Q}_{\text{eval}}$ labels/answers \\
+\midrule
+DAG construction & \checkmark & \checkmark & --- & --- \\
+Rubric generation & \checkmark & \checkmark & --- & --- \\
+Held-out routing & --- & --- & \checkmark & --- \\
+Arena evaluation (judging) & --- & --- & \checkmark & --- \\
+Post-hoc validation & --- & --- & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The evaluation set's labels and reference answers ($A_{i,D_k}$ inputs)
+are accessed only in the final, post-hoc validation phase, after
+every arena verdict has been recorded; no component upstream of
+validation---including the judge and the scheduler---has access to
+them.
+This table is the formal specification of the claim that the arena
+ranking is produced without knowledge of the ground truth it is later
+validated against.
+
+\section{Baseline Conditions}\label{sec:exp-baselines}
+
+Table~\ref{tab:baselines} lists the four comparison conditions used
+to contextualise TaxoArena's taxonomy quality against existing
+hierarchical text classification (HTC) and unsupervised clustering
+approaches, all evaluated on the identical 70/30 Math split and
+Qwen3 embeddings where applicable.
+
+\begin{table}[h]
+\centering
+\caption{Baseline conditions for taxonomy quality evaluation.}
+\label{tab:baselines}
+\begin{tabular}{p{2.6cm}p{4.6cm}p{5.2cm}}
+\toprule
+Baseline & Description & Reported metrics \\
+\midrule
+HiAGM~\parencite{zhou2020hiagm}
+& BERT-based supervised hierarchical text classifier, trained on the
+construction split with MMLU-Pro labels as supervision
+& H-F1, Edge F1, Triplet Accuracy \\
+\addlinespace
+HGCLR~\parencite{wang2022hgclr}
+& Graph-contrastive supervised HTC; included as a minimum-viable
+modern supervised baseline
+& H-F1, Edge F1, Triplet Accuracy \\
+\addlinespace
+Flat $k$-means
+& Cosine-distance $k$-means on the same Qwen3 embeddings, $k = 17$
+matching TaxoArena's canonical leaf count
+& Dendrogram Purity, Silhouette \\
+\addlinespace
+HAC (Ward)
+& SciPy agglomerative clustering with Ward linkage on the same
+embeddings, cut to 17 leaves
+& Dendrogram Purity, Silhouette, Sackin Index \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A fifth condition, a \textbf{random taxonomy null baseline}, shuffles
+query-to-node assignments while preserving TaxoArena's own induced
+topology, providing a floor against which the non-random structure
+of the other conditions can be confirmed statistically.
+HiAGM and HGCLR are supervised on the same ground-truth labels used
+to seed TaxoArena's anchors, making them the most direct competitors
+for the seed-guided refinement claim; the flat $k$-means, HAC, and
+random baselines isolate the contribution of TaxoArena's iterative
+vMF-based splitting and topological optimisation relative to
+simpler unsupervised alternatives on identical embeddings.
+
+\section{Metrics and Statistical Protocol}\label{sec:exp-metrics}
+
+\subsection{Taxonomy Quality Metrics}
+
+Nine metrics characterise the induced DAG independent of arena
+evaluation: hierarchical F1 (hP, hR, H-F1) and Edge F1 against the
+MMLU-Pro-derived gold DAG structure where applicable to the supervised
+baselines; Triplet Accuracy; Dendrogram Purity and Weighted Leaf
+Purity; Spherical Silhouette; Total Dasgupta Cost; Normalised Sackin
+Index (tree balance); and Routing Expected Calibration Error (ECE) of
+the trickle-routing softmax against ground-truth domain membership.
+
+\subsection{Arena Quality Metrics}
+
+Per-leaf and per-anchor BT scores are reported with their Fisher
+information standard errors; Spearman $\rho$ against MMLU-Pro
+accuracy is the headline validation statistic
+(Section~\ref{sec:meth-validation}); $\Delta_{\text{verbosity}}$ and
+judge Cohen's $\kappa$ (inter-call agreement under the dual-call
+protocol) quantify judge reliability; total match count and matches
+per leaf quantify budget efficiency.
+
+\subsection{Aggregation and Significance Testing}
+
+All headline numbers are reported as mean $\pm$ standard deviation
+over the three seeds $\{42, 137, 2048\}$.
+The primary significance test is a Wilcoxon signed-rank test on
+per-leaf Spearman $\rho$, comparing the adaptive scheduler against
+the random-scheduler ablation at matched judge-call budgets; this
+non-parametric paired test is chosen over a paired $t$-test because
+per-leaf $\rho$ values are bounded in $[-1,1]$ and are not assumed
+normally distributed across the small number of leaves.
+A pre-specified threshold of $\rho > 0.7$ (strong positive rank
+correlation) is adopted before data collection, consistent with the
+success criterion stated in Chapter~\ref{ch:introduction}, as the
+minimum bar for declaring the arena ranking a useful proxy for
+MMLU-Pro accuracy at the anchor-domain level; results below this
+threshold are reported and discussed but not characterised as
+validating the arena's discriminative power.
+Bootstrap confidence intervals (2,000 resamples, percentile method)
+are reported alongside every Spearman $\rho$ and $\Delta\rho$
+estimate to quantify sampling uncertainty given the finite held-out
+query pool per leaf.
+Resampling is performed at the query level within domain: each
+bootstrap resample draws held-out queries with replacement from
+$Q_{D_k}^{\text{adapted}}$ (or $Q_{D_k}^{\text{canonical}}$ for Track
+A), and all verdicts associated with a sampled query are carried into
+the resample together, preserving the within-query dependence
+structure noted as a methodological assumption in
+Section~\ref{sec:meth-assumptions} rather than treating individual
+verdicts as independent resampling units.
+
+\section{Chapter Summary}
+
+This chapter fixed, before data collection, the mapping from research
+question to experimental condition and metric (Table~\ref{tab:rq-map}),
+then specified the concrete implementation environment; dataset
+preparation (MMLU-Pro Math sub-corpus as primary, AG News as a
+pipeline sanity check); the domain-scoping decision and 70/30
+stratified split protocol with its query-budget rationale; the
+canonical taxonomy construction hyperparameters and eight-experiment
+ablation matrix, including the reporting-sensitivity distinction for
+A3--A4; the reference-informed judge generation configuration; the
+arena's model roster, scheduling budget, the four arena-level
+conditions C1--C4 that isolate the contribution of geometric
+partitioning and reference-informed judging (Table~\ref{tab:arena-conditions}),
+the information-separation protocol formalising the answer-key-blind
+design (Table~\ref{tab:info-separation}), and the random-scheduler
+and verbosity-bias diagnostic conditions; five taxonomy-structure
+baseline comparisons spanning supervised HTC and unsupervised
+clustering; and the metrics and statistical protocol---including the
+pre-specified $\rho > 0.7$ validation threshold, the query-level
+bootstrap resampling procedure, and the caveat on the theoretical
+judge-call ceiling---used to interpret the results reported in
+Chapter~\ref{ch:results}.

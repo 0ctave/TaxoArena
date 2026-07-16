@@ -18,39 +18,10 @@ object StatisticsUtils {
         if (rBar <= 0.0) return 1e-3   // Floor at kappa_min (uniform)
         val kappaML   = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
         val shrinkage = (n - 1).toDouble() / (n + d - 2).toDouble().coerceAtLeast(1.0)
+        if (n > 0 && d.toDouble() / n > 10.0) {
+            log.warn("[VMF] d/N=${"%.2f".format(d.toDouble() / n)} > 10 — κ estimate unreliable, NiW prior dominates")
+        }
         return (kappaML * shrinkage).coerceIn(1e-3, 1e4)
-    }
-
-    /**
-     * κ bias correction for high-dimensional vMF MLE.
-     *
-     * Hornik & Grün (2014), "movMF: An R Package for Fitting Mixtures of von
-     * Mises-Fisher Distributions", Journal of Statistical Software 58(10),
-     * Equation (9) — DOI: https://doi.org/10.18637/jss.v058.i10
-     *
-     * The MLE κ̂ carries an O(d/N) positive bias: at depth ≥ 3 (d=1024, N≈15–30)
-     * it over-estimates concentration, making leaf nodes look more coherent than
-     * they are and propagating into the NiW posterior and soft routing scores.
-     * The correction is only meaningful when d/N is large, so it is applied only
-     * for d/N > 5; below that the bias is negligible and the MLE is returned
-     * unchanged. When d/N > 10 the estimate is unreliable (the NiW prior should
-     * dominate) and a WARN is emitted.
-     */
-    fun biasCorrectKappa(kappaMle: Double, meanResultantLength: Double, dim: Int, n: Int): Double {
-        if (n <= 0) return kappaMle
-        val d = dim.toDouble()
-        val ratio = d / n
-        if (ratio > 10.0) {
-            log.warn("[VMF] d/N=${"%.2f".format(ratio)} > 10 — κ estimate unreliable, NiW prior dominates")
-        }
-        return if (ratio > 5.0) {
-            // Hornik & Grün (2014) Eq. (9): apply shrinkage factor ON TOP of the input kappaMle,
-            // never recompute from rBar — correctedKappa already ran the Banerjee approximation.
-            val shrinkage = (n - 1).toDouble() / (n + dim - 2).toDouble().coerceAtLeast(1.0)
-            (kappaMle * shrinkage).coerceIn(1e-3, 1e4)
-        } else {
-            kappaMle
-        }
     }
 
     fun dotProduct(a: DoubleArray, b: FloatArray): Double {

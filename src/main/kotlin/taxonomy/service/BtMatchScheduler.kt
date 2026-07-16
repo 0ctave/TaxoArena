@@ -207,7 +207,8 @@ class BtMatchScheduler(
         pairStats: Map<String, List<NodePairStats>>,
         models: List<String>,
         leafModelMatches: Map<String, Map<String, Int>>,
-        nodeToQueries: Map<String, List<Int>>
+        nodeToQueries: Map<String, List<Int>>,
+        condition: String = "MAIN"
     ): PriorityQueue<MatchCandidate> {
         // Max-heap: highest utility first
         val queue = PriorityQueue<MatchCandidate>(compareByDescending { it.utility })
@@ -238,7 +239,11 @@ class BtMatchScheduler(
                 val isBlockingPair = isMatchInformative(mA, mB, state, ps) && already < (budgetPerPair - 5) // not near budget
                 val convergenceBonus = if (debt <= 5 && isBlockingPair) 1.5 else 1.0  // last-mile boost
 
-                val u = computeUtility(mA, mB, state, leafMatches, already, models, pairsResolved, ps) * convergenceBonus
+                val u = if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
+                    java.util.Random().nextDouble()
+                } else {
+                    computeUtility(mA, mB, state, leafMatches, already, models, pairsResolved, ps) * convergenceBonus
+                }
                 val pairKey = "${node.id}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
                 queue.add(MatchCandidate(node.id, mA, mB, u, pairKey))
             }
@@ -255,7 +260,8 @@ class BtMatchScheduler(
         nodeToQueries: Map<String, List<Int>>,
         batchSize: Int,
         maxConcurrentPerModel: Int = maxOf(2, models.size - 1),
-        globalLeaderboard: AggregatedLeaderboard? = null
+        globalLeaderboard: AggregatedLeaderboard? = null,
+        condition: String = "MAIN"
     ): List<BtMatchTask> {
         updateBudgetsAndPools(targetNodes, btStates, pairStats, models)
 
@@ -397,7 +403,7 @@ class BtMatchScheduler(
         // --- Phase 2: Entropy queue for remaining budget ---
         // Build heap only for remaining capacity, using true H(p) / varSum scores
         if (tasks.size < batchSize) {
-            val heap = buildQueue(unconvergedNodes, btStates, pairStats, models, leafModelMatches, nodeToQueries)
+            val heap = buildQueue(unconvergedNodes, btStates, pairStats, models, leafModelMatches, nodeToQueries, condition)
 
             val remainingCandidates = mutableListOf<MatchCandidate>()
             while (tasks.size < batchSize && heap.isNotEmpty()) {
@@ -531,9 +537,9 @@ class BtMatchScheduler(
 
         val seA = state.stdErrors[mA] ?: 1.0
         val seB = state.stdErrors[mB] ?: 1.0
-        val varSum = (seA * seA + seB * seB).coerceAtLeast(1e-6)
+        val varSum = (seA * seA + seB * seB)
 
-        val hNorm = h / varSum
+        val hNorm = h * varSum
         val w = densityAwarePairWeight(mA, mB, state)
         return hNorm * w
     }

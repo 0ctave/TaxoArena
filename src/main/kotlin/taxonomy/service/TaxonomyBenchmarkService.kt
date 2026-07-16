@@ -418,9 +418,9 @@ class TaxonomyBenchmarkService(
                             val available = nodeToQueries[leafId]?.size ?: 0
                             val maxPossible = if (available > 0) available * numPairs else 0
                             val mCap = if (maxPossible > 0) {
-                                minOf(params.budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
+                                maxOf(1, minOf(kotlin.math.ceil(params.budgetPerPair.toDouble() * numPairs / 2.0).toInt(), (maxPossible * 0.9).toInt()))
                             } else {
-                                params.budgetPerPair * numPairs / 2
+                                maxOf(1, kotlin.math.ceil(params.budgetPerPair.toDouble() * numPairs / 2.0).toInt())
                             }
                             
                             val minPerPair = (stoppingPolicy.minComparisonsPerLeaf / modelNames.size).coerceAtLeast(1)
@@ -440,9 +440,9 @@ class TaxonomyBenchmarkService(
                         val available = nodeToQueries[leafId]?.size ?: 0
                         val maxPossible = if (available > 0) available * numPairs else 0
                         val mCap = if (maxPossible > 0) {
-                            minOf(params.budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
+                            maxOf(1, minOf(kotlin.math.ceil(params.budgetPerPair.toDouble() * numPairs / 2.0).toInt(), (maxPossible * 0.9).toInt()))
                         } else {
-                            params.budgetPerPair * numPairs / 2
+                            maxOf(1, kotlin.math.ceil(params.budgetPerPair.toDouble() * numPairs / 2.0).toInt())
                         }
                         
                         val minPerPair = (stoppingPolicy.minComparisonsPerLeaf / modelNames.size).coerceAtLeast(1)
@@ -525,7 +525,8 @@ class TaxonomyBenchmarkService(
                 nodeToQueries = nodeToQueries,
                 batchSize = params.questionsPerRound,
                 maxConcurrentPerModel = params.maxConcurrentPerModel,
-                globalLeaderboard = currentAggregated
+                globalLeaderboard = currentAggregated,
+                condition = req.condition
             )
             val startTime = System.currentTimeMillis()
 
@@ -566,7 +567,7 @@ class TaxonomyBenchmarkService(
                         val domainName = requireNotNull(leafNode.label) { "Leaf node ${leafNode.id} has no label" }
 
                         val cacheKey = "${qId}::${sample.questionText}"
-                        val cached = rankingService.getRecordedMatch(
+                        val cached = if (req.condition.equals("CANONICAL", ignoreCase = true)) null else rankingService.getRecordedMatch(
                             snapshotId = snapshotId,
                             domain = domainName,
                             query = cacheKey,
@@ -602,7 +603,10 @@ class TaxonomyBenchmarkService(
                                 expectedNodeId = task.nodeId,
                                 frozenLeafIds = frozenLeafIds,
                                 gtAnswer = sample.gtAnswer,
-                                assignedLeafIds = queryToLeaves[qId]
+                                assignedLeafIds = queryToLeaves[qId],
+                                condition = req.condition,
+                                isCorrectA = outputA.isCorrect,
+                                isCorrectB = outputB.isCorrect
                             )
                             evals
                         }
@@ -722,7 +726,7 @@ class TaxonomyBenchmarkService(
                             modelAnswers = modelAnswers,
                             modelCorrect = modelCorrect,
                             matchedLeafLabels = listOf(primaryEval.domain),
-                            hadJudge = true,
+                            hadJudge = (cached == null && !req.condition.equals("CANONICAL", ignoreCase = true)),
                             domainEvaluations = listOf(primaryEval),
                             pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
                             judgeAccuracyAgreement = mapOf(pairKey to agrees)
@@ -864,7 +868,7 @@ class TaxonomyBenchmarkService(
                 val outputB = modelResults[modelB] ?: return@async null
 
                 runCatching {
-                    val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds)
+                    val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds, sample.category)
                     val judges = leaves.mapNotNull { arenaService.leafJudge(it) }
                     val primaryJudge = judges.maxByOrNull { it.depth } ?: return@async null
                     checkNotNull(primaryJudge.judgePrompt) {
@@ -873,7 +877,7 @@ class TaxonomyBenchmarkService(
                     val domainName = requireNotNull(primaryJudge.label) { "Leaf node ${primaryJudge.id} has no label" }
 
                     val cacheKey = "${sample.questionId}::${sample.questionText}"
-                    val cached = rankingService.getRecordedMatch(
+                    val cached = if (req.condition.equals("CANONICAL", ignoreCase = true)) null else rankingService.getRecordedMatch(
                         snapshotId = snapshotId,
                         domain = domainName,
                         query = cacheKey,
@@ -906,7 +910,10 @@ class TaxonomyBenchmarkService(
                             modelB = modelB,
                             traceB = getRobustTrace(outputB),
                             frozenLeafIds = frozenLeafIds,
-                            gtAnswer = sample.gtAnswer
+                            gtAnswer = sample.gtAnswer,
+                            condition = req.condition,
+                            isCorrectA = outputA.isCorrect,
+                            isCorrectB = outputB.isCorrect
                         )
                     }
 
@@ -1198,6 +1205,8 @@ class TaxonomyBenchmarkService(
                 if (abs(delta) > 0.3) {
                     // Debias: rebalance winsA and winsB to reflect average win rate
                     val correctedWinA = (ps.winAFirst + ps.winASecond) / 2.0
+                    // Note: correctedWinB relies on ps.ties being exactly consistent with winAFirst/winASecond bookkeeping.
+                    // If they ever diverge, correctedWinB might become slightly negative, which we defensively clamp with coerceAtLeast(0.0).
                     val correctedWinB = n.toDouble() - correctedWinA - ps.ties
                     ps.copy(
                         winsA = correctedWinA,

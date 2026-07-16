@@ -553,6 +553,47 @@ class TaxonomyRankingService {
         return map
     }
 
+    data class MatchRecord(
+        val queryId: Int,
+        val queryText: String,
+        val modelA: String,
+        val modelB: String,
+        val winner: String,
+        val loser: String,
+        val isTie: Boolean,
+        val domain: String
+    )
+
+    fun getMatchRecords(snapshotId: String): List<MatchRecord> {
+        return withConn { conn ->
+            val list = mutableListOf<MatchRecord>()
+            conn.prepareStatement(
+                "SELECT query, model_a, model_b, winner, loser, is_tie, domain FROM match_history WHERE snapshot_id = ?"
+            ).use { ps ->
+                ps.setString(1, snapshotId)
+                val rs = ps.executeQuery()
+                while (rs.next()) {
+                    val rawQuery = rs.getString("query") ?: ""
+                    val qId = rawQuery.substringBefore("::").toIntOrNull() ?: -1
+                    val qText = rawQuery.substringAfter("::")
+                    list.add(
+                        MatchRecord(
+                            queryId = qId,
+                            queryText = qText,
+                            modelA = rs.getString("model_a") ?: "",
+                            modelB = rs.getString("model_b") ?: "",
+                            winner = rs.getString("winner") ?: "",
+                            loser = rs.getString("loser") ?: "",
+                            isTie = rs.getInt("is_tie") == 1,
+                            domain = rs.getString("domain") ?: ""
+                        )
+                    )
+                }
+            }
+            list
+        }
+    }
+
 data class AggregatedLeaderboard(
     val ranks: List<ModelRank>,
     val leafsEligible: Int,
@@ -568,97 +609,167 @@ data class AggregatedLeaderboard(
         nodeToQuestions: Map<String, List<Int>> = emptyMap()
     ): AggregatedLeaderboard {
         val allStates = leafNodeIds.mapNotNull { getBtState(it, snapshotId) }
-        val eligible = allStates.filter { it.totalComparisons >= minComparisons }.map { state ->
+        val eligible = allStates.filter { it.totalComparisons >= minComparisons }
+        
+        // Identify judge-inconsistent leaf node IDs
+        val inconsistentLeafIds = eligible.filter { state ->
             val pairStats = getNodePairStats(state.nodeId, snapshotId)
-            val isJudgeInconsistent = pairStats.any {
+            pairStats.any {
                 it.agreementChecks >= minComparisons && (it.agreementWins.toDouble() / it.agreementChecks) < 0.50
             }
-            if (isJudgeInconsistent) {
-                log.warn("Leaf ${state.nodeId} is judge-inconsistent (agreement < 0.50). Replacing scores with noisy prior centered on global mean.")
-                state.copy(
-                    btScores = state.btScores.keys.associateWith { 0.0 },
-                    stdErrors = state.stdErrors.keys.associateWith { 10.0 }
-                )
-            } else {
-                state
-            }
-        }
+        }.map { it.nodeId }.toSet()
 
         if (eligible.isEmpty()) return AggregatedLeaderboard(
             emptyList(), 0, leafNodeIds.size, 0, false
         )
 
-        val allModels = eligible.flatMap { it.btScores.keys }.toSet()
-        val weightedSum = mutableMapOf<String, Double>()
-        val weightTotal = mutableMapOf<String, Double>()
+        val allModels = eligible.flatMap { it.btScores.keys }.toSet().toList()
 
-        for (state in eligible) {
-            val leafWeight = nodeToQuestions[state.nodeId]?.size?.toDouble() ?: 1.0
-            for (model in allModels) {
-                val score = state.btScores[model] ?: continue
-                val se = state.stdErrors[model]?.takeIf { it < 9.0 } ?: continue
-                val w = (1.0 / (se * se)) * leafWeight
-                weightedSum[model] = (weightedSum[model] ?: 0.0) + w * score
-                weightTotal[model] = (weightTotal[model] ?: 0.0) + w
+        // 1. Sufficient-Statistic Pooling: Sum wins, ties, and comparisons across all eligible, consistent leaf nodes
+        val allEligiblePairs = eligible
+            .filter { it.nodeId !in inconsistentLeafIds }
+            .flatMap { getNodePairStats(it.nodeId, snapshotId) }
+        val pooledStatsMap = mutableMapOf<String, NodePairStats>()
+        
+        for (ps in allEligiblePairs) {
+            val mA = minOf(ps.modelA, ps.modelB)
+            val mB = maxOf(ps.modelA, ps.modelB)
+            val key = "${mA}|${mB}"
+            
+            val isFlipped = ps.modelA != mA
+            val addWinsA = if (isFlipped) ps.winsB else ps.winsA
+            val addWinsB = if (isFlipped) ps.winsA else ps.winsB
+            
+            val existing = pooledStatsMap[key]
+            if (existing == null) {
+                pooledStatsMap[key] = NodePairStats(
+                    nodeId = "global",
+                    modelA = mA,
+                    modelB = mB,
+                    winsA = addWinsA,
+                    winsB = addWinsB,
+                    ties = ps.ties,
+                    totalComparisons = ps.totalComparisons
+                )
+            } else {
+                pooledStatsMap[key] = existing.copy(
+                    winsA = existing.winsA + addWinsA,
+                    winsB = existing.winsB + addWinsB,
+                    ties = existing.ties + ps.ties,
+                    totalComparisons = existing.totalComparisons + ps.totalComparisons
+                )
             }
         }
 
-        val raw = allModels.mapNotNull { model ->
-            val wSum = weightTotal[model] ?: return@mapNotNull null
-            if (wSum == 0.0) return@mapNotNull null
+        // Fit global Bradley-Terry scores on pooled statistics
+        val globalScores = BtMmFitter.fit(
+            models = allModels,
+            pairStats = pooledStatsMap.values.toList(),
+            maxIter = 200,
+            tol = 1e-6
+        )
 
-            val aggregatedScore = weightedSum[model]!! / wSum
+        // 2. Query-Level Bootstrap for Confidence Intervals (exclude matches from inconsistent domains)
+        val matches = getMatchRecords(snapshotId).filter { it.domain !in inconsistentLeafIds }
+        val matchesByQuery = matches.groupBy { it.queryId }
+        val queryIds = matchesByQuery.keys.filter { it >= 0 } // exclude invalid parsed query IDs
+        
+        val numIterations = 50
+        val bootstrapRanks = allModels.associateWith { DoubleArray(numIterations) }
+        val rng = java.util.Random(42) // frozen seed for reproducibility
 
-            // 1. Propagated within-leaf uncertainty
-            var withinVar = 0.0
-            // 2. Between-leaf heterogeneity (weighted sample variance of leaf scores)
-            var betweenVar = 0.0
-            var wSumSq = 0.0
-            var kLeaves = 0
-
-            for (state in eligible) {
-                val leafWeight = nodeToQuestions[state.nodeId]?.size?.toDouble() ?: 1.0
-                val score = state.btScores[model] ?: continue
-                val se = state.stdErrors[model]?.takeIf { it < 9.0 } ?: continue
-                val w = (1.0 / (se * se)) * leafWeight
-
-                withinVar += (w * w * se * se)  // w² × SE²
-                val diff = score - aggregatedScore
-                betweenVar += w * diff * diff
-                wSumSq += w * w
-                kLeaves++
+        if (queryIds.isNotEmpty()) {
+            for (iter in 0 until numIterations) {
+                val sampledQueryIds = List(queryIds.size) { queryIds[rng.nextInt(queryIds.size)] }
+                val tempPairStats = mutableMapOf<String, NodePairStats>()
+                
+                for (qId in sampledQueryIds) {
+                    val qMatches = matchesByQuery[qId] ?: continue
+                    for (m in qMatches) {
+                        val mA = minOf(m.modelA, m.modelB)
+                        val mB = maxOf(m.modelA, m.modelB)
+                        val key = "${mA}|${mB}"
+                        val isFlipped = m.modelA != mA
+                        
+                        val isTie = m.isTie
+                        val isWinA = !isTie && m.winner == mA
+                        val isWinB = !isTie && m.winner == mB
+                        
+                        // Laplace prior: add a tiny epsilon to wins to ensure connected graph
+                        val addWinsA = (if (isTie) 0.5 else if (isWinA) 1.0 else 0.0) + 1e-4
+                        val addWinsB = (if (isTie) 0.5 else if (isWinB) 1.0 else 0.0) + 1e-4
+                        
+                        val existing = tempPairStats[key]
+                        if (existing == null) {
+                            tempPairStats[key] = NodePairStats(
+                                nodeId = "bootstrap",
+                                modelA = mA,
+                                modelB = mB,
+                                winsA = addWinsA,
+                                winsB = addWinsB,
+                                ties = if (isTie) 1 else 0,
+                                totalComparisons = 1
+                            )
+                        } else {
+                            tempPairStats[key] = existing.copy(
+                                winsA = existing.winsA + addWinsA,
+                                winsB = existing.winsB + addWinsB,
+                                ties = existing.ties + (if (isTie) 1 else 0),
+                                totalComparisons = existing.totalComparisons + 1
+                            )
+                        }
+                    }
+                }
+                
+                val fit = BtMmFitter.fit(
+                    models = allModels,
+                    pairStats = tempPairStats.values.toList(),
+                    maxIter = 100,
+                    tol = 1e-4
+                )
+                val mean = fit.values.average()
+                for (model in allModels) {
+                    bootstrapRanks[model]!![iter] = (fit[model] ?: 0.0) - mean
+                }
             }
+        }
 
-            // Normalise
-            withinVar /= (wSum * wSum)    // divide by (Σw)²
-
-            // Bessel-corrected between-leaf variance (DerSimonian-Laird style)
-            val denomBetween = wSum - (wSumSq / wSum)   // = Σw - Σw²/Σw
-            val betweenTau2 = if (kLeaves > 1 && denomBetween > 0.0)
-                (betweenVar - (kLeaves - 1)) / denomBetween  // subtract expected within-var
-                else 0.0
-            val tau2 = betweenTau2.coerceAtLeast(0.0)   // DL τ² ≥ 0 by definition
-
-            val combinedSE = kotlin.math.sqrt(withinVar + tau2 / kLeaves)
-
-            model to Pair(aggregatedScore, combinedSE)
-        }.toMap()
-
-        val mean = if (raw.isNotEmpty()) raw.values.map { it.first }.average() else 0.0
-        val ranks = raw.entries
-            .map { (model, p) ->
-                val score = p.first - mean
-                val se = p.second
-                ModelRank(model, score, se, 0, score - 2*se, score + 2*se,
-                          winsTotal = 0.0,
-                          comparisonsTotal = eligible.sumOf { it.totalComparisons })
+        val bootstrapSEs = allModels.associateWith { model ->
+            if (queryIds.isEmpty()) 1.0 else {
+                val scores = bootstrapRanks[model]!!
+                val avg = scores.average()
+                val variance = scores.sumOf { (it - avg) * (it - avg) } / (numIterations - 1)
+                kotlin.math.sqrt(variance).coerceIn(1e-3, 10.0)
             }
-            .sortedByDescending { it.btScore }
-            .mapIndexed { i, r -> r.copy(rank = i + 1) }
+        }
+
+        // 3. Normalise and build ranks list
+        val globalMean = globalScores.values.average()
+        val ranks = allModels.map { model ->
+            val score = (globalScores[model] ?: 0.0) - globalMean
+            val se = bootstrapSEs[model] ?: 1.0
+            ModelRank(
+                modelId = model,
+                btScore = score,
+                stdError = se,
+                rank = 0,
+                confidenceIntervalLow = score - 2 * se,
+                confidenceIntervalHigh = score + 2 * se,
+                winsTotal = 0.0,
+                comparisonsTotal = eligible.sumOf { it.totalComparisons }
+            )
+        }
+        .sortedByDescending { it.btScore }
+        .mapIndexed { i, r -> r.copy(rank = i + 1) }
 
         val coverage = eligible.size.toDouble() / leafNodeIds.size
-        return AggregatedLeaderboard(ranks, eligible.size, leafNodeIds.size,
-                                     eligible.sumOf { it.totalComparisons }, coverage >= 0.30)
+        return AggregatedLeaderboard(
+            ranks = ranks,
+            leafsEligible = eligible.size,
+            leafsTotal = leafNodeIds.size,
+            totalComparisons = eligible.sumOf { it.totalComparisons },
+            isReliable = coverage >= 0.30
+        )
     }
 
     fun getNodeLeaderboard(nodeId: String, snapshotId: String = "global"): List<ModelRank>? {

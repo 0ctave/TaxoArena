@@ -36,7 +36,7 @@ class TaxoAdaptRunner(
                 // Optional Service Mode
                 if (config.execution.startService) {
                     runServiceMode()
-                } else if (!config.execution.enableTui) {
+                } else if (!config.execution.enableTui && !args.contains("--config")) {
                     log.info("Process complete. Exiting application...")
                     if (System.getProperty("org.gradle.test.worker") == null) {
                         System.exit(0)
@@ -44,7 +44,7 @@ class TaxoAdaptRunner(
                 }
             } catch (e: Exception) {
                 log.error("Background logic failed", e)
-                if (!config.execution.startService && !config.execution.enableTui) {
+                if (!config.execution.startService && !config.execution.enableTui && !args.contains("--config")) {
                     if (System.getProperty("org.gradle.test.worker") == null) {
                         System.exit(1)
                     }

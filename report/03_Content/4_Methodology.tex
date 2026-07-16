@@ -1,4 +1,436 @@
-\chapter{Methodology: Population Synthesis \& Query Curation}\label{ch:methodology:-population-synthesis-&-query-curation}
-Please rename this chapter as you please.
 
-\blindtext[2]
+\chapter{Formal Foundations}\label{ch:methodology}
+
+This chapter formalises the statistical and algorithmic components
+that TaxoArena's implementation actually executes: the directional
+node model and its bias-corrected MLE, the Matryoshka embedding
+schedule, the migration rule, the Dasgupta splitting oracle, the
+trickle-routing softmax, the Bradley--Terry estimator and its MM
+solver, the active scheduling utility, the three-level stopping
+policy, and upward score aggregation.
+Numerical-stability engineering that supports these computations but
+is not itself a modelling choice---log-Bessel evaluation at high
+dimension, the KDE bandwidth derivation, and the full Fisher
+information matrix derivation---is summarised here and given in full
+in Appendix~\ref{app:numerics}.
+
+\section{Notation and Problem Formalisation}\label{sec:meth-notation}
+
+Let $\mathcal{Q} = \{q_1, \ldots, q_N\}$ denote the corpus of
+$N$ MMLU-Pro queries under consideration, each with a full-dimensional
+MRL embedding $\mathbf{x}_i \in \mathbb{R}^{4096}$ stored at unit
+norm; the concrete value of $N$ and the domain scope are specified
+in Chapter~\ref{ch:experimental-design}.
+At depth $\ell$, the effective representation of $q_i$ is the prefix
+slice $\mathbf{x}_i^{(\ell)} \in \mathcal{S}^{d_\ell - 1}$
+(Section~\ref{sec:meth-mrl}).
+Each query carries a ground-truth domain label
+$y_i^{\text{MMLU}} \in \{D_1, \ldots, D_{14}\}$.
+
+The corpus is partitioned once, before construction begins, into a
+disjoint construction set $\mathcal{Q}_{\text{con}}$ and an evaluation
+set $\mathcal{Q}_{\text{eval}}$, with $\mathcal{Q} = \mathcal{Q}_{\text{con}}
+\cup \mathcal{Q}_{\text{eval}}$ and
+$\mathcal{Q}_{\text{con}} \cap \mathcal{Q}_{\text{eval}} = \emptyset$.
+$\mathcal{Q}_{\text{con}}$ is the only query set visible to the
+taxonomy construction pipeline (anchor seeding, migration, splitting,
+topological optimisation) and to reference-informed guideline
+generation.
+$\mathcal{Q}_{\text{eval}}$ is reserved exclusively for held-out
+routing and arena evaluation and is never inspected during
+construction; this boundary is a methodological constraint on the
+experimental design, not a configuration choice, and is the basis of
+the answer-key-blind claim formalised in
+Table~\ref{tab:info-separation}.
+
+The anchor set $\mathcal{A} = \{D_1, \ldots, D_{14}\}$ is in
+one-to-one correspondence with the 14 MMLU-Pro domains; each anchor
+is a depth-0 node from which the pipeline induces a sub-tree of
+internal nodes and leaves $\mathcal{L}(D_k)$, with full leaf set
+$\mathcal{L} = \bigcup_k \mathcal{L}(D_k)$.
+The membership map $\hat{D}(q_i)$ assigns each query to the anchor of
+its primary leaf after construction.
+
+Two query populations are defined per anchor.
+The \textit{canonical partition}
+$Q_{D_k}^{\text{canonical}} = \{q_i : y_i^{\text{MMLU}} = D_k\}$ is
+the MMLU-Pro label partition; the \textit{adapted partition}
+$Q_{D_k}^{\text{adapted}} = \{q_i : \hat{D}(q_i) = D_k\}$ is the
+partition induced by construction.
+The two coincide absent cross-domain migration.
+
+The primary objective is a per-anchor, per-model BT score
+$s_{i,D_k}$ reflecting comparative response quality on
+$Q_{D_k}^{\text{adapted}}$; the validation objective is the
+rank-agreement between $\hat{\boldsymbol{s}}_{D_k}$ and the
+ground-truth per-domain accuracy vector $\mathbf{A}_{D_k}$.
+
+\section{Directional Node Model}\label{sec:meth-vmf}
+
+\subsection{von Mises--Fisher Density and MLE}
+
+The vMF distribution on $\mathcal{S}^{d-1}$ with mean direction
+$\boldsymbol{\mu}$ and concentration $\kappa \geq 0$ has density
+\[
+p(\mathbf{x} \mid \boldsymbol{\mu}, \kappa)
+= C_d(\kappa) \exp\!\left(\kappa \boldsymbol{\mu}^\top \mathbf{x}\right),
+\qquad
+C_d(\kappa) = \frac{\kappa^{d/2 - 1}}{(2\pi)^{d/2}\, I_{d/2 - 1}(\kappa)}.
+\]
+Given $N$ unit-vector observations, the MLE of $\boldsymbol{\mu}$ is
+the normalised sample mean $\hat{\boldsymbol{\mu}} =
+\bar{\mathbf{x}} / \|\bar{\mathbf{x}}\|_2$.
+The Banerjee closed-form approximation~\parencite{banerjee2005vmf}
+\[
+\hat{\kappa}_{\text{Banerjee}}
+= \frac{\bar{R}\, d - \bar{R}^3}{1 - \bar{R}^2},
+\qquad \bar{R} = \|\bar{\mathbf{x}}\|_2,
+\]
+avoids iterative root-finding for $\kappa$ and is accurate for
+$d \geq 4$, $N \geq 5$.
+The estimator is biased upward in high dimensions at small sample
+sizes ($O(d/N)$ bias; approximately 27\% overestimation at depth-3
+leaves with $N \approx 20$, $d = 1024$).
+The mandatory Hornik--Grün correction~\parencite{hornik2014vmf}
+\[
+\hat{\kappa}_{\text{corrected}}
+= \hat{\kappa}_{\text{Banerjee}} \cdot \frac{N - 1}{N(d - 2)}
+\]
+is applied at every estimation call site.
+Numerically stable evaluation of $\log I_\nu(\kappa)$ at $d \geq 256$
+via the Debye asymptotic expansion is given in
+Appendix~\ref{app:numerics}.
+
+\subsection{NiW Auxiliary Regulariser}
+
+A Normal-inverse-Wishart (NiW) posterior is fit to each node's member
+embeddings to provide a tractable Bayesian membership-scoring model
+for routing and cross-link insertion.
+The NiW is \textit{not} the conjugate prior for the vMF---the vMF's
+conjugate is the vMF itself~\parencite{gopal2014mises}---but is used
+as an engineering regulariser whose posterior predictive is a
+multivariate Student-$t$, accurate when $\kappa$ is moderate to large
+so that the tangent-plane approximation to $\mathcal{S}^{d-1}$ holds.
+At near-uniform nodes ($\kappa < 1$) the approximation degrades; such
+nodes are flagged as geometric leaves and excluded from splitting.
+
+The prior mean is the parent's vMF centroid, the prior pseudocount is
+$\kappa_0 = 1.0$, the prior degrees of freedom are
+$\nu_0 = d_\ell + 2$, and the prior scale is
+$\boldsymbol{\Lambda}_0 = \lambda_0 \mathbf{I}_{d_\ell}$ with
+$\lambda_0 = 1/(\hat{\kappa}_{\text{parent}} d_\ell)$.
+At $d_\ell \geq 512$ a diagonal approximation to
+$\boldsymbol{\Lambda}_N$ is stored, reducing memory from $O(d^2)$ to
+$O(d)$ per node.
+The posterior update equations and the resulting Student-$t$
+predictive density are given in Appendix~\ref{app:numerics}; the
+predictive log-density is the scoring function used throughout
+routing, migration, and cross-link decisions.
+
+\section{Matryoshka Embedding Schedule}\label{sec:meth-mrl}
+
+MRL~\parencite{kusupati2022mrl} trains a single embedding model such
+that every prefix slice $\mathbf{x}_{1:d}$ is itself a meaningful
+embedding, allowing the full vector to be stored once and sliced at
+query time.
+TaxoArena's depth-dimension schedule is
+\[
+d(\ell) =
+\begin{cases}
+128 & \ell = 0, \\
+256 & \ell = 1, \\
+512 & \ell = 2, \\
+1024 & \ell \geq 3,
+\end{cases}
+\]
+reflecting the coarse-to-fine information structure of MRL
+embeddings: domain-level distinctions are separable in 128
+dimensions, while sub-topic distinctions require the full
+1024-dimensional prefix.
+Re-normalisation after slicing is mandatory, since MRL guarantees
+semantic meaningfulness of $\mathbf{x}_{1:d}$ but not unit norm:
+\(
+\mathbf{x}^{(\ell)}
+= \mathbf{x}_{1:d_\ell} / \|\mathbf{x}_{1:d_\ell}\|_2.
+\)
+
+\section{Seed Initialisation and Cross-Domain Migration}\label{sec:meth-migration}
+
+At iteration 0, each anchor $D_k$ is initialised with the canonical
+partition and a vMF/NiW self-model fit at $d(0) = 128$; the anchor's
+identity, depth, and \texttt{isAnchor} flag are set once and never
+modified.
+
+For each query $q_i$, the domain score under anchor $D_k$ is the
+NiW log-posterior predictive
+$z_{D_k}(\mathbf{x}_i) = \log p_{\text{NiW}}(\mathbf{x}_i^{(0)} \mid D_k)$.
+Letting $D_{\text{seed}}(i)$ be $q_i$'s MMLU-Pro label and
+$D^*(i) = \arg\max_k z_{D_k}(\mathbf{x}_i)$, query $q_i$ migrates from
+$D_{\text{seed}}(i)$ to $D^*(i)$ iff
+\[
+z_{D^*(i)}(\mathbf{x}_i) - z_{D_{\text{seed}}(i)}(\mathbf{x}_i)
+> \delta_{\text{mig}}.
+\]
+All $N$ migration decisions are evaluated in a single simultaneous
+scoring pass before any reassignment, preventing cascading migrations
+in which an early reassignment perturbs the NiW posteriors used to
+score later queries.
+Migration is applied only in the first construction iteration; a hard
+cap of one pass prevents oscillation and stabilises
+$Q_{D_k}^{\text{adapted}}$ before sub-domain splitting begins.
+Anchor nodes are exempt from all destructive topology operations
+regardless of migration volume, enforced by a
+\texttt{TopologyViolationException} at the data-model level.
+
+\section{Adaptive Splitting Oracle}\label{sec:meth-split}
+
+Before applying vMF-EM refinement, a warm-start bisection is computed
+via furthest-point $k$-means$++$ initialisation: the first centroid is
+the node's vMF centroid, and the second is the member farthest by
+angular distance, avoiding the dual-collapse failure mode of random
+initialisation in high dimensions.
+
+The Dasgupta cost of a hierarchical clustering
+$T$ with cosine similarity $w_{ij} = \mathbf{x}_i^\top \mathbf{x}_j$
+is $\text{cost}(T) = \sum_{i \neq j} w_{ij} |\text{leaves}(\text{LCA}_T(i,j))|$
+\parencite{dasgupta2016cost}.
+For a proposed bisection into $S_L, S_R$ with sizes $N_L, N_R$, the
+normalised cost delta reduces to
+\[
+\delta_{\text{Dasgupta}}
+= \frac{N_R W_L + N_L W_R}{N \cdot W_{\text{total}}},
+\]
+using the efficient identity
+$W_L = \tfrac{1}{2}(\|\sum_{i \in S_L} \mathbf{x}_i\|_2^2 - N_L)$,
+which reduces cost computation to $O(N_L d)$.
+A split is accepted iff $\delta_{\text{Dasgupta}} > 0.02$ and both
+children satisfy $|S_L|, |S_R| \geq n_{\min} = 15$.
+The threshold has no closed-form optimum and trades over-splitting
+against under-splitting; the bisecting procedure always proposes
+exactly two children, and $D_{\max} = 3$ hard-caps recursion depth.
+The greedy oracle provides no worst-case global-cost guarantee.
+
+\section{Trickle Routing and Polyhierarchy}\label{sec:meth-routing}
+
+At construction time, node $v$ with children $\{c_1, \ldots, c_K\}$
+routes query embedding $\mathbf{x} \in \mathcal{Q}_{\text{con}}$ to
+child $c_k$ with probability
+\[
+P_{\text{con}}(c_k \mid \mathbf{x}, v)
+= \frac{\exp\!\left(\hat{\kappa}_{c_k} \hat{\boldsymbol{\mu}}_{c_k}^\top
+\mathbf{x}^{(\ell+1)} / \tau\right) p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_k)}
+{\sum_{j=1}^{K} \exp\!\left(\hat{\kappa}_{c_j} \hat{\boldsymbol{\mu}}_{c_j}^\top
+\mathbf{x}^{(\ell+1)} / \tau\right) p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_j)},
+\]
+combining the vMF concentration term with the NiW posterior
+predictive, computed in log-space with log-sum-exp for multi-path
+aggregation.
+At evaluation time, held-out queries
+$\mathbf{x} \in \mathcal{Q}_{\text{eval}}$ are routed using the NiW
+posterior predictive alone, with no $\hat{\kappa}\hat{\boldsymbol{\mu}}^\top\mathbf{x}$
+term:
+\[
+P_{\text{eval}}(c_k \mid \mathbf{x}, v)
+= \frac{p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_k)}
+{\sum_{j=1}^{K} p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_j)}.
+\]
+This asymmetry is deliberate: the vMF term encodes the frozen
+snapshot's own directional geometry and is appropriate for the
+queries that shaped that geometry, whereas the NiW posterior
+predictive is a calibrated density that generalises to unseen queries
+without re-fitting.
+A depth-decaying confidence funnel, from $\gamma_0 = 0.999$ at depth 0
+to $\gamma_3 = 0.90$ at depth 3, retains a query at its current node
+as a leaf if its top assignment probability under the applicable
+routing distribution falls below $\gamma_\ell$.
+Multi-label assignment---and the corresponding DAG cross-link---occurs
+when the log-probability gap between the top two children is below
+$\delta_{\text{assign}}$.
+MMLU-Pro labels are never used in either routing distribution; they
+are inspected only afterward, for the canonical-versus-adapted
+divergence metrics (Section~\ref{sec:meth-validation}).
+
+\section{Topological Optimisation}\label{sec:meth-topology}
+
+Four anchor-exempt operations run after each splitting phase.
+\textbf{Sibling merge} pools two nodes when their vMF
+Jensen--Shannon divergence falls below $\epsilon_{\text{sep}}$.
+\textbf{Starved-leaf pruning} removes a leaf with fewer than $0.2$
+times the mean sibling size, reassigning its members to the
+highest-likelihood sibling.
+\textbf{Passthrough collapse} promotes the sole child of a
+single-child, memberless internal node.
+\textbf{Cross-link insertion} adds an edge from the lowest common
+ancestor of a query's primary leaf and a candidate leaf $L$ to $L$
+whenever $\log p_{\text{NiW}}(\mathbf{x} \mid L) > \theta_{\text{cross}}$,
+followed by a transitive reduction sweep that maintains the minimal
+DAG invariant.
+
+\section{Bradley--Terry Estimation}\label{sec:meth-bt}
+
+\subsection{Model and MM Solver}
+
+The BT model assigns each model $m_i$ a latent skill $s_i$ with
+$P(m_i \succ m_j) = \sigma(s_i - s_j)$~\parencite{bradley1952rank}.
+A zero-sum constraint $\sum_i s_i = 0$ fixes the additive degree of
+freedom; ties contribute a half-win to each model, so
+$W_{ij} + W_{ji} = N_{ij}$ without an explicit draw parameter.
+The Minorisation-Maximisation update~\parencite{hunter2004mm}
+\[
+s_i^{(t+1)} = \log\!\left(
+\frac{W_i}{\sum_{j \neq i} N_{ij} / \sigma(s_i^{(t)} - s_j^{(t)})}
+\right),
+\qquad W_i = \sum_{j \neq i} W_{ij},
+\]
+is applied cyclically with the zero-sum constraint re-enforced after
+each sweep, until $\max_i |s_i^{(t+1)} - s_i^{(t)}| < 10^{-6}$ or a
+500-iteration cap is reached.
+
+\subsection{Standard Errors and Identifiability}
+
+Standard errors are $\hat{\sigma}_i =
+\sqrt{[\mathcal{I}(\hat{\mathbf{s}})^{-1}]_{ii}}$ from the observed
+Fisher information matrix (full form in
+Appendix~\ref{app:numerics}), using the pseudoinverse to account for
+the rank-one deficiency induced by the zero-sum constraint.
+BT parameters are identified only up to an additive constant per
+connected component of the comparison graph; the connectivity
+bootstrap phase of the scheduler (Section~\ref{sec:meth-scheduling})
+guarantees every pair receives at least one comparison before
+utility-driven scheduling begins.
+
+\section{Active Match Scheduling}\label{sec:meth-scheduling}
+
+The composite utility of comparison triple $(i,j,L)$ combines a
+structural exploration term and an uncertainty resolution term under
+a maturity-decaying mixing parameter $\alpha$:
+\[
+U(i,j,L) = \left[\alpha\, U_{\text{struct}}(i,j,L)
++ (1-\alpha)\, U_{\text{resolve}}(i,j,L)\right]
+\times \left(1 - 0.3\, \frac{n_{ij}^{(L)}}{B_{ij}}\right).
+\]
+$U_{\text{struct}}$ rewards closely-ranked pairs
+($\exp(-|\text{rank}_i - \text{rank}_j|)$).
+$U_{\text{resolve}}$ is the binary entropy of the current win
+probability $p_{ij} = \sigma(\hat{s}_i - \hat{s}_j)$, divided by the
+combined variance $\hat{\sigma}_i^2 + \hat{\sigma}_j^2$, and weighted
+by a KDE valley weight favouring midpoints in low-density regions of
+the score distribution (bandwidth and weight derivation in
+Appendix~\ref{app:numerics}).
+The entropy term is maximised when $p_{ij} \approx 0.5$, prioritising
+pairs whose current ranking is genuinely ambiguous; the variance
+division then downweights pairs whose standard errors are already
+large, since a single additional comparison contributes little
+information relative to the pair's existing noise floor, and
+upweights pairs that are ambiguous \textit{despite} already having
+tight, well-estimated scores---the case where one more comparison is
+most likely to be decisive.
+This is the internally consistent reading of the utility term: entropy
+identifies ambiguity, and dividing by variance targets that ambiguity
+toward pairs where additional evidence is most informative rather than
+toward pairs that are simply noisy.
+$\alpha$ decays from $1.0$ to approximately $0.20$ as leaf maturity---a
+weighted combination of standard-error reduction and completed-pair
+fraction---approaches 1.
+Within a scheduled pair, queries are selected by descending cosine
+similarity to the leaf's vMF centroid, prioritising representative
+queries.
+
+\section{Stopping Policy}\label{sec:meth-stopping}
+
+A pair $(i,j)$ at leaf $L$ resolves when any of three conditions
+holds: separation
+$|\hat{s}_i - \hat{s}_j| \geq 3.0(\hat{\sigma}_i + \hat{\sigma}_j)$;
+budget exhaustion $n_{ij}^{(L)} \geq B_{ij}$; or utility floor
+$U(i,j,L) < U_{\min}$.
+A leaf converges when all pairs have resolved and the top-two
+separation guard
+$|\hat{s}_1^{(L)} - \hat{s}_2^{(L)}| > 1.5(\hat{\sigma}_1^{(L)} +
+\hat{\sigma}_2^{(L)})$ holds, preventing premature convergence when
+leading models remain statistically indistinguishable.
+The arena halts globally when the query-weighted converged fraction
+$f_{\text{conv}} = \sum_{L \in \mathcal{C}} |Q_L| /
+\sum_{L \in \mathcal{L}} |Q_L|$ reaches $f^*$ for $R_{\text{stable}}$
+consecutive rounds, with a hard escape valve at $B_{\max}$ total judge
+calls.
+
+\section{Upward Aggregation to GT Domains}\label{sec:meth-aggregation}
+
+Domain-level win and comparison counts pool leaf-level sufficient
+statistics under the primary-path convention,
+$W_{ij,D_k} = \sum_{L \in \mathcal{D}(D_k)} W_{ij}^{(L)}$ and
+analogously for $N_{ij,D_k}$, and a fresh MM fit produces
+$\hat{\mathbf{s}}_{D_k}$.
+Leaf-level parameters are never averaged: BT identification is fixed
+only up to a per-component additive constant, so averaging
+differently-normalised leaf scales produces no interpretable result,
+whereas pooling counts and refitting yields a single shared scale.
+A fractional-weight sensitivity analysis, in which a leaf with $k$
+primary parents contributes $(1/k)$ of its counts to each, is
+recorded under a separate \texttt{aggregationConvention} field for
+comparison in Chapter~\ref{ch:results}.
+
+Two parallel tracks are maintained per anchor: \textit{Track A
+(canonical)} groups verdicts by MMLU-Pro label, producing
+$\rho_{\text{canonical}}$; \textit{Track B (adapted)} groups by the
+adapted partition, producing $\rho_{\text{adapted}}$.
+The migration effect is
+$\Delta\rho = \rho_{\text{adapted}} - \rho_{\text{canonical}}$; a
+positive value indicates that geometric re-partitioning improves
+rank agreement with ground-truth accuracy.
+
+\section{Validation Against MMLU-Pro}\label{sec:meth-validation}
+
+Ground-truth per-domain accuracy
+$A_{i,D_k} = |\{q \in Q_{D_k} : m_i(q) = y_q^{\text{MMLU}}\}| / |Q_{D_k}|$
+is computed on both partitions.
+The judge rubric is \textit{reference-informed}: construction-set
+reference answers inform the domain-conditioned evaluation criteria
+generated by \texttt{GuidelineGenerator} (Section~\ref{subsec:judge}),
+so that the judge's notion of quality is shaped by what correct
+responses look like in the domain.
+Ground-truth accuracy itself, and the reference answers for
+$\mathcal{Q}_{\text{eval}}$ specifically, are never inspected during
+arena evaluation; $A_{i,D_k}$ is computed strictly after all verdicts
+are recorded and is used only for external, post-hoc validation.
+Four rank-agreement metrics are reported per domain: Spearman $\rho$;
+Kendall $\tau$ (preferred when $M$ is small); pairwise-winner
+accuracy; and top-$k$ Jaccard agreement for $k \in \{3,5\}$.
+The budget-fidelity curve plots $\rho$ against cumulative judge calls
+for the adaptive scheduler versus random and round-robin baselines,
+quantifying the marginal value of adaptive scheduling and the budget
+at which additional calls yield diminishing returns.
+
+\section{Methodological Assumptions}\label{sec:meth-assumptions}
+
+Six assumptions underlie the methodology, each paired with a
+diagnostic or sensitivity check: directional geometry reflects
+semantic compatibility (checked via spherical silhouette score);
+single-component vMF adequacy per node (checked via the Dasgupta
+split test); local BT transitivity within coherent domains (supported
+by domain-conditioned judging); judge reliability under domain
+conditioning (partially tested by calibration analysis, not
+structurally guaranteed); MMLU-Pro domains as a useful reporting
+vocabulary (quantified by $\Delta\rho$); and query reuse inducing
+within-query dependence across comparisons, which the Fisher
+information standard errors treat as independent and therefore
+slightly underestimate.
+
+\section{Chapter Summary}
+
+This chapter formalised the vMF/NiW node model and its bias-corrected
+MLE, the MRL embedding schedule, the migration rule with its
+single-pass oscillation guard, the Dasgupta splitting oracle, the
+log-space trickle-routing softmax with confidence funnel, the
+four-operation topological optimisation pass, the half-win BT
+estimator with its MM solver and Fisher-information standard errors,
+the composite-utility active scheduler, the three-level stopping
+policy, sufficient-statistic pooling for upward aggregation under the
+primary-path and fractional-weight conventions, and the four
+rank-agreement validation metrics against MMLU-Pro.
+Numerical-stability procedures supporting these models---log-Bessel
+evaluation, the NiW posterior update algebra, the KDE bandwidth
+derivation, and the full Fisher information matrix---are given in
+Appendix~\ref{app:numerics}.
+Hyperparameter values are specified and justified in
+Chapter~\ref{ch:experimental-design}.

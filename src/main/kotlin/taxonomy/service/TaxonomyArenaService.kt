@@ -355,7 +355,7 @@ class TaxonomyArenaService(
     ): List<GraphNode> {
         val root = taxonomyService.getGraph() ?: return emptyList()
         val vector = embeddingCache.getOrCreate(text)
-        val emb = Embedding(text, text, vector)
+        val emb = Embedding(text, text, vector, category ?: "")
         // routeQuery already walks the DAG and returns the best-fit leaves
         return ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) })
             .keys
@@ -376,10 +376,14 @@ class TaxonomyArenaService(
         nameB: String,
         traceA: String,
         traceB: String,
+        condition: String = "MAIN"
     ): DomainEvaluation = coroutineScope {
+        require(!query.contains("Ground Truth Answer")) {
+            "Information leakage: prompt contains the ground truth answer!"
+        }
 
-        val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node), buildJudgeUserPrompt(query, traceA, traceB), judgeSchema) }
-        val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node), buildJudgeUserPrompt(query, traceB, traceA), judgeSchema) }
+        val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node, condition), buildJudgeUserPrompt(query, traceA, traceB), judgeSchema) }
+        val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node, condition), buildJudgeUserPrompt(query, traceB, traceA), judgeSchema) }
 
         val res1 = parseJudgeResponse(p1.await())
         val res2 = parseJudgeResponse(p2.await())
@@ -448,7 +452,10 @@ class TaxonomyArenaService(
         expectedNodeId: String? = null,
         frozenLeafIds: Set<String>? = null,
         gtAnswer: String? = null,
-        assignedLeafIds: List<String>? = null
+        assignedLeafIds: List<String>? = null,
+        condition: String = "MAIN",
+        isCorrectA: Boolean? = null,
+        isCorrectB: Boolean? = null
     ): List<DomainEvaluation> = coroutineScope {
         val leaves = if (assignedLeafIds != null) {
             val root = taxonomyService.getGraph()
@@ -478,16 +485,36 @@ class TaxonomyArenaService(
         }
         if (judges.isEmpty()) return@coroutineScope emptyList()
 
+        if (condition.equals("CANONICAL", ignoreCase = true)) {
+            val winnerName = when {
+                isCorrectA == true && isCorrectB == false -> "Model A"
+                isCorrectB == true && isCorrectA == false -> "Model B"
+                else -> "TIE"
+            }
+            return@coroutineScope judges.map { node ->
+                DomainEvaluation(
+                    domain = node.label ?: node.id,
+                    winner = winnerName,
+                    rationale = "Oracle Comparison (Canonical). CorrectA=$isCorrectA, CorrectB=$isCorrectB.",
+                    confidence = 1.0,
+                    positionFlip = false,
+                    nodeId = node.id,
+                    tieSource = if (winnerName == "TIE") "CANONICAL_TIE" else null,
+                    winAFirst = if (winnerName == "Model A") 1.0 else if (winnerName == "Model B") 0.0 else 0.5,
+                    winASecond = if (winnerName == "Model A") 1.0 else if (winnerName == "Model B") 0.0 else 0.5
+                )
+            }
+        }
+
         // Build the MCQ context for judge prompts (question + options visible)
         val optionsBlock = options.mapIndexed { i, opt -> "${('A' + i)}) $opt" }.joinToString("\n")
         val questionWithOptions = buildString {
             append("$query\n\nOptions:\n$optionsBlock")
-            if (gtAnswer != null) append("\n\n[Ground Truth Answer: $gtAnswer]")
         }
 
         judges.map { node ->
             async {
-                evaluatePairwise(node, questionWithOptions, modelA, modelB, traceA, traceB)
+                evaluatePairwise(node, questionWithOptions, modelA, modelB, traceA, traceB, condition)
             }
         }.awaitAll()
     }
@@ -709,9 +736,18 @@ class TaxonomyArenaService(
         }
     }
 
-    private fun buildJudgeSystemPrompt(node: GraphNode): String {
-        val systemPrompt = node.judgePrompt ?: "You are an expert academic evaluator in the domain: ${node.label ?: "General Science"}."
-        val rubric = node.judgeRubric ?: "Grade the response based on domain correctness, precision, and logical reasoning."
+    private fun buildJudgeSystemPrompt(node: GraphNode, condition: String = "MAIN"): String {
+        val useGeneric = condition.equals("GENERIC_JUDGE", ignoreCase = true)
+        val systemPrompt = if (useGeneric) {
+            "You are an expert academic evaluator. Analyze the two responses and grade them based on overall correctness and reasoning quality."
+        } else {
+            node.judgePrompt ?: "You are an expert academic evaluator in the domain: ${node.label ?: "General Science"}."
+        }
+        val rubric = if (useGeneric) {
+            "Grade the response based on domain correctness, precision, and logical reasoning."
+        } else {
+            node.judgeRubric ?: "Grade the response based on domain correctness, precision, and logical reasoning."
+        }
 
         return """$systemPrompt
 

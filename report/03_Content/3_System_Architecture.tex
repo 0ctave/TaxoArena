@@ -1,20 +1,934 @@
+
 \chapter{System Architecture}\label{ch:system-architecture}
 
+TaxoArena comprises two coupled subsystems: a taxonomy construction
+pipeline that induces a domain sub-structure from the geometric structure
+of query embeddings within a set of fixed seed domains, and an arena
+evaluation subsystem that produces per-leaf and per-domain
+Bradley--Terry rankings through adaptive pairwise comparison and
+upward score aggregation.
+The chapter describes each subsystem at the architectural level---component
+responsibilities, data flows, state representations, and interface
+contracts---deferring formal derivations and algorithmic proofs to
+Chapter~\ref{ch:methodology}.
 
-\section{High-Level Design}\label{sec:high-level-design}
+A central structural decision distinguishes this design from a purely
+unsupervised taxonomy induction approach: the 14 domain labels of
+MMLU-Pro are used to initialise 14 immutable anchor nodes at depth~0.
+These anchors are not the final domain structure; they are fixed
+organisational boundaries within which the geometric refinement
+proceeds.
+Query membership across anchors is mutable---outlier queries may
+migrate to a geometrically more appropriate anchor during iterative
+refinement---but anchor nodes themselves are exempt from the merge,
+prune, and collapse operations that reshape internal and leaf nodes.
+This design preserves a direct correspondence between the induced
+taxonomy and MMLU-Pro's domain taxonomy, enabling the per-anchor
+Bradley--Terry rankings produced by upward score aggregation to be
+compared directly against MMLU-Pro accuracy computed on the held-out
+query subset.
 
+\section{Design Goals and Scope}\label{sec:arch-goals}
 
-\section{The Hybrid Semantic Router}\label{sec:the-hybrid-semantic-router}
+TaxoArena is designed around three primary goals, each of which imposes
+constraints on the architectural choices described in the remainder of
+this chapter.
 
+\textbf{Goal 1: Seed-guided geometric refinement.}
+The 14 domain labels of MMLU-Pro are used to initialise 14 immutable
+anchor nodes at depth~0.
+Within each anchor, the sub-structure is induced exclusively from the
+geometric arrangement of query embeddings: no editorial label, ontology,
+or human annotation governs the splitting, merging, or cross-linking
+of internal and leaf nodes below the anchor level.
+Query membership across anchors is mutable---a query initially assigned
+to its MMLU-Pro label may migrate to a geometrically more appropriate
+anchor during iterative refinement---but anchor nodes are exempt from
+all destructive topology operations (merge, prune, collapse).
 
-\section{The Arena (Execution Environment)}\label{sec:the-arena-(execution-environment)}
+\textbf{Goal 2: Budget efficiency.}
+Arena evaluations are conducted with as few judge calls as the
+statistical task permits.
+The comparison budget is allocated adaptively, concentrating calls on
+the model pairs that are hardest to distinguish at each leaf, and
+evaluation terminates per leaf when a formal convergence criterion is
+satisfied rather than after a fixed number of rounds.
+At the global level, convergence is declared by a query-weighted
+stability condition rather than a simple leaf-count fraction, preventing
+small boundary leaves from prematurely terminating the arena.
 
+\textbf{Goal 3: Reference-informed, domain-conditioned judging.}
+Each pairwise comparison is evaluated by a judge whose prompt is
+conditioned on domain-specific evaluation criteria generated at
+taxonomy construction time.
+The conditioning is derived from representative queries drawn from the
+leaf's construction pool---queries whose MMLU-Pro reference answers are
+available and are provided to \texttt{GuidelineGenerator} as evidence
+of what a correct response looks like in this topic area.
+The resulting rubric is \textit{reference-informed}: it encodes quality
+criteria that reflect the correct-answer standard of the construction
+corpus, while held-out evaluation queries and their answers do not enter
+this process.
+Dual-call consistency filtering and tie allowance are applied at the
+prompt level to suppress the two most tractable systematic biases
+identified in Section~\ref{sec:llm-as-a-judge}.
 
-\section{The Judiciary Service}\label{sec:the-judiciary-service}
+\subsection*{Scope Boundary}
 
+TaxoArena is an \textit{offline profiling system}.
+Its output is a set of per-leaf and per-anchor Bradley--Terry score
+vectors, one per evaluated model, organised by the nodes of the induced
+DAG.
+It does not implement a query router, a model cascade, or an inference
+dispatcher.
+The use of these profiles as input to a downstream routing system is
+outside the scope of this thesis and is identified as future work in
+Section~\ref{sec:future-work}.
 
-\section{The Vectorized ELO Engine}\label{sec:the-vectorized-elo-engine}
+\subsection*{Requirements Traceability}
 
-Some introducing words \dots
+Table~\ref{tab:requirements} maps each gap identified in
+Chapter~\ref{ch:literature-review} to the architectural component that
+addresses it.
 
-In this chapter, all fundamentals that are necessary to understand this work are introduced.
+\begin{table}[h]
+\centering
+\caption{Requirements traceability: literature gaps and architectural responses.}
+\label{tab:requirements}
+\begin{tabular}{p{4.6cm} p{3.0cm} p{4.6cm}}
+\toprule
+Gap (Ch.~\ref{ch:literature-review}) & Requirement & Component \\
+\midrule
+Fixed-corpus saturation and categorical brittleness
+& Induced sub-domain structure
+& Taxonomy pipeline (\S\ref{sec:arch-taxonomy}) \\
+\addlinespace
+No validation interface against existing benchmarks
+& Anchor nodes aligned to MMLU-Pro domains
+& Anchor initialisation (\S\ref{sec:arch-taxonomy}) \\
+\addlinespace
+No statistical node model in prior induction methods
+& vMF node model with verifiable coherence
+& \texttt{TaxonomyFitter} (\S\ref{sec:arch-taxonomy}) \\
+\addlinespace
+No formal splitting criterion in prior induction methods
+& Dasgupta cost delta as acceptance oracle
+& \texttt{TaxonomySplitter} (\S\ref{sec:arch-taxonomy}) \\
+\addlinespace
+Positional bias in automated pairwise judgments
+& Dual-call consistency filtering
+& \texttt{JudgeService} (\S\ref{sec:arch-arena}) \\
+\addlinespace
+Domain miscalibration of generic judges
+& Reference-informed leaf-conditioned guidelines
+& \texttt{GuidelineGenerator} (\S\ref{sec:arch-arena}) \\
+\addlinespace
+$O(M^2)$ comparison cost of round-robin evaluation
+& Uncertainty-driven adaptive scheduling
+& \texttt{BtMatchScheduler} (\S\ref{sec:arch-arena}) \\
+\addlinespace
+No formal convergence criterion in existing arenas
+& BT standard-error stopping policy
+& \texttt{BtStoppingPolicy} (\S\ref{sec:arch-arena}) \\
+\addlinespace
+Global BT model does not encode domain-conditional variation
+& Per-leaf and per-anchor BT score vectors
+& Upward aggregation (\S\ref{sec:arch-arena}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{System Overview and Data Flow}\label{sec:arch-overview}
+
+TaxoArena is structured as three subsystems connected by three
+persistent databases.
+The subsystems execute sequentially: the Embedding subsystem
+pre-computes all vector representations; the Taxonomy subsystem
+constructs the domain DAG from those representations within the
+fixed anchor structure; the Arena subsystem evaluates models within
+the induced leaf nodes and aggregates scores upward to anchor level.
+The databases serve as interface artefacts between subsystems,
+decoupling their execution and enabling each phase to be re-run
+independently without recomputing upstream results.
+
+\begin{figure}[h]
+\centering
+% \includegraphics[width=\textwidth]{figures/fig_pipeline_overview}
+\fbox{\parbox{0.92\textwidth}{\centering\vspace{3cm}
+Figure 3.1 --- End-to-end data flow diagram\vspace{3cm}}}
+\caption{End-to-end data flow in TaxoArena.
+The upper lane shows the taxonomy construction path:
+corpus queries are embedded, assigned to 14 immutable anchor nodes
+by MMLU-Pro ground-truth label, refined iteratively into a
+sub-domain DAG, and serialised as a frozen snapshot.
+The lower lane shows the arena path: a held-out query set is routed
+through the frozen snapshot, model responses are generated and
+judged pairwise at each leaf, leaf-level Bradley--Terry models are
+fit, and verdict sufficient statistics are aggregated upward through
+the DAG to produce per-anchor domain rankings.
+The rightmost output is the validation interface: anchor-level
+rankings are compared against MMLU-Pro accuracy computed on the
+held-out query subset.
+Anchor nodes (shaded) persist unchanged across both lanes.}
+\label{fig:pipeline-overview}
+\end{figure}
+
+\subsection*{Data Flow}
+
+The data flow follows seven stages.
+
+\begin{enumerate}
+\item \textbf{Embedding.}
+All corpus queries are embedded using Qwen3-Embedding and stored in
+\texttt{embeddings\_cache.db}.
+At each taxonomy depth a prefix slice of dimension
+$d \in \{128, 256, 512, 1024\}$ is extracted and
+$\ell_2$-normalised to the unit hypersphere.
+
+\item \textbf{Anchor initialisation.}
+Each query is assigned to the anchor node corresponding to its
+MMLU-Pro ground-truth domain label, creating 14 depth-0 partitions.
+These assignments are the starting point for iterative refinement;
+cross-domain migration may reassign queries during subsequent phases.
+
+\item \textbf{Iterative refinement.}
+The six-phase taxonomy loop runs within each anchor, inducing a
+sub-domain DAG by recursive vMF-based splitting and topological
+optimisation.
+On convergence, the current DAG state is serialised as an immutable
+snapshot to \texttt{snapshots.db}.
+
+\item \textbf{Held-out routing.}
+A reserved subset of queries not used during taxonomy construction
+is routed through the frozen snapshot using the NiW posterior
+predictive scores of each leaf.
+Each routed query is assigned to one or more target leaves, forming
+the per-leaf query pool for arena evaluation.
+
+\item \textbf{Response generation and judging.}
+For each query in a leaf's pool, responses are generated by each
+evaluated model and cached.
+The \texttt{BtMatchScheduler} selects comparison pairs; the
+\texttt{JudgeService} dispatches dual-call pairwise comparisons
+using a reference-informed, domain-conditioned prompt;
+verdicts are persisted to \texttt{arena.db}.
+
+\item \textbf{Upward score aggregation.}
+Verdict sufficient statistics ($W_{ij}$, $N_{ij}$) are propagated
+from leaves to ancestor nodes by pooling under the primary-path
+convention; a new Bradley--Terry model is fit at each ancestor.
+
+\item \textbf{Validation interface.}
+Per-anchor BT rankings are compared against MMLU-Pro accuracy
+computed on the held-out query subset, partitioned by domain,
+providing an external validity check on the arena's discriminative
+power.
+\end{enumerate}
+
+\subsection*{Key Invariant}
+
+Anchor nodes are created once during seed initialisation and persist
+unchanged through every subsequent phase; no topology operation may
+modify or remove them.
+The invariant is enforced at the data-model level: any operation
+targeting an anchor node raises a \texttt{TopologyViolationException}.
+
+\subsection*{Component Inventory}
+
+\begin{table}[h]
+\centering
+\caption{Component inventory.}
+\label{tab:components}
+\begin{tabular}{lll}
+\toprule
+Subsystem & Component & Responsibility \\
+\midrule
+Embedding
+& \texttt{EmbeddingService}
+& Embed queries; manage prefix slices and cache \\
+\midrule
+Taxonomy
+& \texttt{TaxonomyEngine}
+& Orchestrate iteration loop; convergence gate \\
+& \texttt{TaxonomyFitter}
+& vMF MLE and NiW posterior estimation \\
+& \texttt{TaxonomyTrickler}
+& Log-space soft routing; cross-domain migration \\
+& \texttt{TaxonomySplitter}
+& Propose and accept/reject bisections via Dasgupta delta \\
+& \texttt{TaxonomyMerger}
+& Merge, prune, cross-link, transitive reduction \\
+\midrule
+Arena
+& \texttt{BenchmarkService}
+& Orchestrate arena rounds; manage leaf state \\
+& \texttt{BtMatchScheduler}
+& Select next comparison pair per leaf \\
+& \texttt{BtStoppingPolicy}
+& Declare per-leaf and global convergence \\
+& \texttt{JudgeService}
+& Construct judge prompt; dispatch dual-call comparison \\
+& \texttt{GuidelineGenerator}
+& Generate reference-informed leaf-specific guidelines \\
+& \texttt{BtAggregator}
+& Pool verdict counts; refit BT at each ancestor level \\
+\midrule
+Storage
+& \texttt{embeddings\_cache.db}
+& MRL vectors keyed by query identifier \\
+& \texttt{snapshots.db}
+& Serialised DAG snapshots with version metadata \\
+& \texttt{arena.db}
+& BT state, verdict records, aggregated domain rankings \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Taxonomy Construction Pipeline}\label{sec:arch-taxonomy}
+
+\subsection{Seed Initialisation from Ground-Truth Domains}
+
+Before iterative refinement begins, each corpus query is assigned to
+the anchor node corresponding to its MMLU-Pro ground-truth domain label.
+This creates 14 depth-0 partitions---one per MMLU-Pro domain---each
+instantiated as a \texttt{GraphNode} with \texttt{isAnchor = true},
+\texttt{depth = 0}, and an initial member set $Q_D^{\text{canonical}}$
+equal to the set of queries carrying label $D$.
+
+The anchor flag enforces three invariants at the data-model level.
+First, anchor nodes are exempt from all destructive topology
+operations: \texttt{TaxonomyMerger} raises a
+\texttt{TopologyViolationException} if any merge, prune, or collapse
+operation targets an anchor.
+Second, anchor nodes are never removed from the DAG; they appear in
+every serialised snapshot with the same UUID and depth.
+Third, the anchor's \texttt{sliceDim} is fixed at $d_0 = 128$
+throughout the construction, matching the dimension at which the
+depth-0 vMF self-model is estimated.
+
+The ground-truth label assignment serves as initialisation only.
+The trickle routing phase may reassign a query to a geometrically more
+appropriate anchor, so that the adapted partition
+$Q_D^{\text{adapted}}$ at the end of construction need not equal
+$Q_D^{\text{canonical}}$.
+The distinction is recorded explicitly in the snapshot and is
+material for the validation comparison: the comparison is performed
+using $Q_D^{\text{adapted}}$, which reflects the geometry-corrected
+membership rather than the editorial label.
+
+\subsection{Iterative Six-Phase Refinement Loop}
+
+After anchor initialisation, \texttt{TaxonomyEngine} executes a
+six-phase loop over the current DAG state.
+Each iteration processes all non-converged nodes; the loop terminates
+when the convergence gate in Phase~6 is satisfied or the maximum
+iteration count is reached.
+Table~\ref{tab:pipeline} summarises the phases.
+
+\begin{table}[h]
+\centering
+\caption{Taxonomy construction phases, implementing classes, and outputs.}
+\label{tab:pipeline}
+\begin{tabular}{clll}
+\toprule
+Phase & Responsibility & Implementing class & Output \\
+\midrule
+1 & MRL prefix selection and $\ell_2$-normalisation
+& \texttt{EmbeddingService}
+& Normalised slice matrix $X^{(\ell)} \in \mathbb{R}^{N \times d_\ell}$ \\
+2 & vMF MLE and NiW posterior fitting
+& \texttt{TaxonomyFitter}
+& $(\hat{\boldsymbol{\mu}}, \hat{\kappa})$ per node;
+NiW hyperparameters $(m_N, \kappa_N, \nu_N, \Lambda_N)$ \\
+3 & Soft routing and cross-domain migration
+& \texttt{TaxonomyTrickler}
+& Updated member sets; cross-domain reassignments \\
+4 & Adaptive splitting
+& \texttt{TaxonomySplitter}
+& New child nodes where $\Delta_{\mathrm{Dasgupta}} \geq \delta$ \\
+5 & Topological optimisation
+& \texttt{TaxonomyMerger}
+& Merged siblings; pruned starved leaves;
+cross-links; transitive reduction \\
+6 & Convergence gate
+& \texttt{TaxonomyEngine}
+& Convergence flag or next-iteration trigger \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Phase 1 --- Embedding selection.}
+At each depth $\ell$, \texttt{EmbeddingService} extracts the prefix
+slice of dimension $d_\ell$ from the pre-computed MRL vectors and
+$\ell_2$-normalises each row to the unit hypersphere.
+
+\textbf{Phase 2 --- vMF/NiW fitting.}
+\texttt{TaxonomyFitter} fits a single-component vMF to each node's
+member embeddings, producing the directional centroid
+$(\hat{\boldsymbol{\mu}}, \hat{\kappa})$, and subsequently a
+Normal-inverse-Wishart posterior used for Bayesian membership scoring
+in Phase~3.
+Statistical detail is in Chapter~\ref{ch:methodology}.
+
+\textbf{Phase 3 --- Trickle routing and cross-domain migration.}
+\texttt{TaxonomyTrickler} routes each query to the single best-scoring
+child at each depth using NiW posterior predictive scores (construction
+routing is exclusive); queries that fall below the depth-decaying
+confidence gate are retained at the current node as leaves.
+At depth~0, all anchor nodes are scored in parallel, enabling
+cross-domain migration to a geometrically superior anchor if the score
+difference exceeds the migration threshold $\delta_{\text{mig}}$
+(Section~\ref{subsec:migration}).
+DAG polyhierarchy arises from Phase~5 topology operations, not from
+construction-time routing.
+
+\textbf{Phase 4 --- Adaptive splitting.}
+\texttt{TaxonomySplitter} proposes bisections of non-anchor internal
+nodes via spherical $k$-means with vMF-EM refinement, accepting only
+splits where the normalised Dasgupta cost delta $\Delta$ exceeds a
+threshold $\delta$ and both children satisfy a minimum size constraint
+$n_{\min}$ (values in Chapter~\ref{ch:experimental-design}).
+
+\textbf{Phase 5 --- Topological optimisation.}
+\texttt{TaxonomyMerger} executes four anchor-exempt operations in
+sequence: merge of similar siblings (Jensen--Shannon below
+$\delta_{\text{sep}}$); pruning of starved leaves with queries
+reassigned to the nearest sibling; collapse of single-child parents;
+and cross-link insertion for any query whose NiW score under a
+non-primary leaf exceeds $\theta_{\text{cross}}$, followed by
+transitive reduction to maintain the minimal DAG.
+
+\textbf{Phase 6 --- Convergence gate.}
+Convergence is declared when the structural edit distance between
+consecutive DAG snapshots (node additions, deletions, merges) falls
+below $\epsilon_{\text{struct}}$ for $K_{\text{stable}}$ consecutive
+rounds; the DAG is then serialised as an immutable snapshot.
+If $I_{\max}$ is reached first, the snapshot is marked
+\texttt{converged = false}.
+
+\subsection{Cross-Domain Migration}\label{subsec:migration}
+
+Cross-domain migration is the mechanism by which a query initially
+assigned to anchor $D$ by its MMLU-Pro label is reassigned to anchor
+$D'$ because its embedding is geometrically closer to $D'$'s
+directional profile.
+A query $q$ migrates from $D$ to $D'$ if
+\[
+\log p_{\text{NiW}}(q \mid D') - \log p_{\text{NiW}}(q \mid D)
+> \delta_{\text{mig}},
+\]
+where $\log p_{\text{NiW}}(q \mid D)$ is the NiW posterior predictive
+log-density of anchor $D$ evaluated at $q$'s embedding.
+Anchor nodes themselves never migrate; only query membership across
+anchors is mutable.
+
+Three downstream effects follow from migration.
+First, the vMF self-model of each anchor is refit in Phase~2 of
+subsequent iterations on $Q_D^{\text{adapted}}$, not
+$Q_D^{\text{canonical}}$.
+Second, all sub-domain structure induced below anchor $D$ is built
+from $Q_D^{\text{adapted}}$, meaning that a query that migrated into
+$D$ may reach a leaf that is thematically distant from its MMLU-Pro
+label.
+Third, the validation comparison is performed using
+$Q_D^{\text{adapted}}$ at the anchor level.
+The migration rate $\Delta\rho_D = |Q_D^{\text{adapted}} \setminus
+Q_D^{\text{canonical}}| / |Q_D^{\text{canonical}}|$ is reported as a
+diagnostic descriptor: it quantifies the fraction of queries that
+changed anchor assignment and contextualises the interpretation of the
+validation comparison.
+The primary RQ2 metric is the fidelity difference
+$\rho_{\text{adapted}} - \rho_{\text{canonical}}$---the Spearman
+correlation gain from using geometry-corrected rather than
+editorial-label partitions when computing anchor-level accuracy.
+
+\subsection{Convergence Semantics}
+
+Convergence in the taxonomy construction pipeline is defined
+structurally rather than by a loss function or likelihood threshold.
+At the end of each iteration, \texttt{TaxonomyEngine} computes the
+structural edit distance $\Delta_{\text{struct}}$ between the current
+DAG $\mathcal{G}^{(t)}$ and the preceding snapshot
+$\mathcal{G}^{(t-1)}$, defined as the number of node-level events:
+additions, deletions, and merges.
+Convergence is declared when
+\[
+\Delta_{\text{struct}}^{(t)} < \epsilon_{\text{struct}}
+\quad \text{for } K_{\text{stable}} \text{ consecutive iterations.}
+\]
+The stability window $K_{\text{stable}} \geq 2$ prevents premature
+termination due to a single quiescent iteration followed by renewed
+splitting activity.
+A hard upper bound $I_{\max}$ serves as an escape valve; the
+\texttt{converged} flag in the snapshot metadata allows analyses to
+distinguish stable from early-terminated taxonomies.
+Parameter values for $\epsilon_{\text{struct}}$, $K_{\text{stable}}$,
+and $I_{\max}$ are specified in
+Chapter~\ref{ch:experimental-design}.
+
+\section{Taxonomy DAG Data Model}\label{sec:arch-dag}
+
+Every node in the taxonomy is represented as a \texttt{GraphNode}
+object persisted to \texttt{snapshots.db}.
+Full field specifications are in Appendix~\ref{app:graphnode-schema};
+the summary below covers the architectural decisions that shape
+component behaviour.
+
+\subsection*{Node Types}
+
+Four node types are distinguished by their structural role.
+
+\begin{itemize}
+\item \textbf{Anchor} (\texttt{isAnchor = true}, \texttt{depth = 0}).
+Created during seed initialisation from MMLU-Pro ground-truth labels.
+Exempt from all destructive topology operations.
+Always present in the DAG; never removed, merged, or collapsed.
+
+\item \textbf{Internal.}
+A non-anchor node with at least one child.
+Created by the splitter when a bisection is accepted.
+Subject to merge and collapse if the topological optimiser determines
+the node is redundant.
+
+\item \textbf{Leaf.}
+A non-anchor node with no children after the final iteration.
+Carries a vMF self-model and NiW posterior; its member set forms
+the query pool for arena evaluation.
+
+\item \textbf{Residual.}
+A leaf that received no queries after routing.
+Flagged as \texttt{isResidual = true}; excluded from arena
+evaluation but retained in the snapshot for diagnostic purposes.
+\end{itemize}
+
+\subsection*{Embedding Dimension Schedule}
+
+The effective embedding dimension increases with depth according to
+the schedule $d(\ell) \in \{128, 256, 512, 1024\}$ for
+$\ell \in \{0, 1, 2, 3\}$.
+The rationale is grounded in the coarse-to-fine information packing
+property of MRL embeddings~\parencite{kusupati2022mrl}: coarse
+domain-level distinctions are geometrically separable in 128
+dimensions, while fine-grained leaf distinctions within a single
+anchor require the full 1024-dimensional prefix.
+
+A structural constraint follows: vMF parameters at different depths
+live on different unit hyperspheres and are not directly comparable.
+Any cross-depth operation requires down-projection to the lower
+dimension before cosine or KL comparison; \texttt{TaxonomyMerger}
+raises a \texttt{DimensionMismatchException} if this projection is
+omitted.
+
+\subsection*{Polyhierarchy and Cross-Links}
+
+The DAG structure---as distinct from a tree---arises exclusively from
+topology operations in Phase~5; construction-time routing is exclusive
+(one child per query per depth).
+
+The sole source of node-level polyhierarchy is cross-link insertion:
+after each splitting phase, \texttt{TaxonomyMerger} computes the NiW
+posterior predictive score of every leaf $L'$ for each query $q$ whose
+primary leaf is $L \neq L'$; when the score exceeds
+$\theta_{\text{cross}}$, a directed edge is added from the lowest
+common ancestor of $L$ and $L'$ to $L'$, giving $L'$ a second parent
+in the DAG while $L$ retains its terminal (leaf) status.
+This preserves the invariant that a leaf node has no outgoing
+parent-child edges.
+A transitive reduction sweep follows to maintain the minimal DAG.
+
+Evaluation-time multi-leaf assignment of held-out queries---governed
+by a gap threshold $\gamma$ in \texttt{BenchmarkService}---is
+distinct from this node-level polyhierarchy: it does not modify the
+frozen DAG topology but determines which leaves a given query
+contributes comparisons to during the arena run
+(Section~\ref{sec:arch-arena}).
+
+Cross-links between nodes at different depths are resolved by
+down-projecting the query's embedding to the lower dimension before
+scoring; the resulting edge carries a \texttt{projectedDepth}
+annotation.
+
+\subsection*{Snapshot Immutability}
+
+When the convergence gate declares termination, \texttt{TaxonomyEngine}
+serialises the current DAG to \texttt{snapshots.db} and sets an
+\texttt{isFrozen} flag on the snapshot record.
+A frozen snapshot is read-only: no subsequent taxonomy operation may
+modify its nodes or edges.
+The Arena subsystem reads exclusively from frozen snapshots,
+identified by a \texttt{snapshotId} UUID recorded in \texttt{arena.db}
+alongside every verdict.
+Multiple snapshots from successive construction runs are retained,
+providing a version history that supports ablation studies over
+taxonomy construction hyperparameters.
+
+\section{Arena Architecture}\label{sec:arch-arena}
+
+\subsection{Arena Lifecycle and Per-Leaf State}
+
+The arena subsystem is initialised from a frozen snapshot identified
+by a \texttt{snapshotId} and a specified set of evaluated models
+$\mathcal{M} = \{m_1, \ldots, m_M\}$.
+On startup, \texttt{BenchmarkService} routes the reserved held-out
+query set through the frozen DAG using NiW posterior predictive scores,
+assigning each query to one or more target leaves via a gap threshold
+$\gamma$.
+The resulting per-leaf query pools $\{Q_L\}_{L \in \mathcal{L}}$ are
+fixed for the duration of the arena run.
+When a held-out query $q$ is assigned to $k > 1$ leaves, its verdicts
+contribute with weight $1/k$ to each leaf's win-count matrix; this
+prevents the same comparison from inflating the sufficient statistics
+of multiple leaves and is distinct from the primary-path convention
+used for DAG polyhierarchy during upward aggregation
+(Section~\ref{subsec:aggregation}).
+
+For each target leaf $L$, \texttt{BenchmarkService} instantiates a
+\texttt{LeafArenaState} record containing: the BT log-strength vector
+$\boldsymbol{\theta}^{(L)}$ and per-parameter standard errors
+$\boldsymbol{\sigma}^{(L)}$, both initialised to $\mathbf{0}$ and
+$\infty$ respectively; the win-count matrix
+$W^{(L)} \in \mathbb{N}^{M \times M}$ and comparison-count matrix
+$N^{(L)}$, initialised to zero; the per-pair state map; the leaf
+convergence state; the pre-generated evaluation guidelines; and the
+response cache.
+
+The round loop then executes until the global stopping condition is
+satisfied.
+In each round, \texttt{BtMatchScheduler} selects a batch of
+comparison triples $(i, j, q)$; model responses are generated and
+cached; \texttt{JudgeService} dispatches the dual-call pairwise
+comparison; the consolidated verdict is recorded to \texttt{arena.db};
+and $W^{(L)}$, $N^{(L)}$, BT estimates, and stopping state are
+updated.
+Each model is queried at most once per query; responses are reused
+across all comparisons involving the same (query, model) pair.
+
+\subsection{Match Scheduling}\label{subsec:scheduling}
+
+\texttt{BtMatchScheduler} assigns a composite utility score to each
+candidate comparison triple $(i, j, q, L)$ and selects the
+highest-scoring batch.
+The utility function combines a \textit{structural exploration} term
+(prioritises unseen pairs) and an \textit{uncertainty resolution} term
+(prioritises pairs with overlapping BT confidence intervals).
+A mixing parameter $\lambda$ decays from exploration-dominated early
+in the run to uncertainty-dominated once every pair has been compared
+at least once.
+
+The connectivity bootstrap phase guarantees that every model pair
+$(i, j)$ at every leaf receives at least one comparison before
+utility-driven scheduling begins.
+Until full connectivity is achieved the structural exploration term
+dominates ($\lambda \approx 1$); the BT model requires a connected
+comparison graph for identifiability~\parencite{bradley1952rank}.
+Bootstrapping all $\binom{M}{2}$ pairs is a stronger guarantee than
+identifiability strictly requires (a spanning tree of $M-1$ edges
+suffices), but it ensures that every pair receives at least one
+unscheduled, order-naive comparison before utility-driven selection
+introduces prioritisation bias.
+
+Query selection within a scheduled pair prioritises queries by
+descending cosine similarity to the leaf's vMF centroid
+$\hat{\boldsymbol{\mu}}_L$.
+The formal specification of the utility function and decay schedule
+are in Chapter~\ref{ch:methodology}.
+
+\subsection{Stopping and Convergence States}
+
+The stopping policy operates at three nested levels.
+Table~\ref{tab:states} summarises the per-pair and per-leaf state
+machines.
+
+\begin{table}[h]
+\centering
+\caption{Arena state machines.}
+\label{tab:states}
+\begin{tabular}{llp{7.2cm}}
+\toprule
+Level & State & Entry condition \\
+\midrule
+\multirow{4}{*}{Per-pair}
+& \texttt{UNSEEN} & No comparisons yet for this pair at leaf $L$ \\
+& \texttt{INFORMATIVE} & $\geq 1$ comparison; BT intervals still overlap \\
+& \texttt{RESOLVED} & $|\theta_i{-}\theta_j|>3(\sigma_i{+}\sigma_j)$, or utility $< U_{\min}$ (sum of SE used as a conservative bound) \\
+& \texttt{EXHAUSTED} & Per-pair budget $n_{ij}^{\max}$ reached without resolution \\
+\addlinespace
+\multirow{4}{*}{Per-leaf}
+& \texttt{INITIALISING} & Comparison graph not yet fully connected (bootstrap active) \\
+& \texttt{ACTIVE} & Full connectivity achieved; utility scheduling in progress \\
+& \texttt{CONVERGED} & All pairs \texttt{RESOLVED}; top-two separation holds \\
+& \texttt{BUDGET\_EXHAUSTED} & Leaf budget consumed before \texttt{CONVERGED} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Global stopping condition.}
+The global condition is evaluated once per round as a query-weighted
+converged fraction:
+\[
+f_{\text{conv}} =
+\frac{\sum_{L \in \mathcal{C}} |Q_L|}{\sum_{L \in \mathcal{L}} |Q_L|},
+\]
+where $\mathcal{C} \subseteq \mathcal{L}$ is the set of leaves in
+state \texttt{CONVERGED}.
+Query-weighting prevents small boundary leaves from inflating the
+convergence fraction.
+The arena halts when $f_{\text{conv}} \geq f^*$ for $R_{\text{stable}}$
+consecutive rounds; a hard escape valve terminates at $B_{\max}$ total
+logical comparisons and marks the run \texttt{escaped = true}.
+
+\subsection{Upward Score Aggregation to Anchor Domains}\label{subsec:aggregation}
+
+After the arena run is complete, per-leaf verdict statistics are
+propagated upward through the DAG to produce coherent rankings at
+every level of the taxonomy: leaf, sub-domain, anchor domain, and root.
+
+\textbf{Propagation via sufficient statistics.}
+To produce a ranking at an ancestor node $A$, the aggregation
+procedure pools the sufficient statistics of all descendant leaves
+$\mathcal{D}(A)$ and refits a single Bradley--Terry model on the
+pooled counts:
+\[
+W^{(A)} = \sum_{L \in \mathcal{D}(A)} W^{(L)},
+\quad
+N^{(A)} = \sum_{L \in \mathcal{D}(A)} N^{(L)}.
+\]
+A fresh MM optimisation on $(W^{(A)}, N^{(A)})$ produces the
+ancestor-level parameter vector $\boldsymbol{\theta}^{(A)}$.
+
+\textbf{Why leaf-level BT parameters must not be averaged.}
+The BT model is identified only up to an additive constant per
+connected comparison graph~\parencite{bradley1952rank}; the MM
+algorithm applies an independent zero-sum normalisation at each leaf.
+Averaging parameters across leaves combines differently-normalised
+scales and produces a result with no probabilistic interpretation.
+Pooling sufficient statistics and refitting produces a vector
+identified on a single shared scale, with win probabilities
+$P(m_i \succ m_j \mid A) = \sigma(\theta_i^{(A)} - \theta_j^{(A)})$
+that are directly interpretable.
+
+\textbf{Multi-assignment handling.}
+The primary analysis uses the \textit{primary-path convention}: each
+leaf contributes its sufficient statistics to the ancestor reached
+via primary (splitter-generated) edges only, so that each verdict is
+counted exactly once at every level of the hierarchy.
+A fractional-weight sensitivity analysis is produced as a robustness
+check in Chapter~\ref{ch:results}, in which a leaf $L$ with $k$
+parent paths contributes $(1/k) \cdot W^{(L)}$ and
+$(1/k) \cdot N^{(L)}$ to each ancestor.
+
+\textbf{Ranking levels and the validation interface.}
+The anchor-domain rankings, defined over $Q_D^{\text{adapted}}$,
+form the primary validation interface: for each anchor $D$, the
+Spearman rank correlation between $\boldsymbol{\theta}^{(D)}$ and
+MMLU-Pro accuracy computed on the held-out query subset is reported
+as a structural validity check.
+The correlation is expected to be positive but not unity; divergence
+is informative, as it surfaces queries where geometric proximity
+diverges from editorial category membership.
+
+\subsection{Reference-Informed Judge Design}\label{subsec:judge}
+
+Every pairwise comparison in the arena is evaluated by an LLM judge
+conditioned on domain-specific evaluation criteria generated at
+taxonomy construction time.
+
+\textbf{Reference-informed guideline generation.}
+\texttt{GuidelineGenerator} produces a leaf rubric via a MapReduce
+procedure over the leaf's construction query pool.
+
+\textit{Map step.}
+The construction queries assigned to leaf $L$ are partitioned into
+small packs of $k$ queries (typically $k = 5$).
+Each pack is presented to a strong LLM together with the MMLU-Pro
+reference answers for those queries.
+The model is prompted to identify quality principles that distinguish
+correct from incorrect responses for queries of that type.
+Each pack produces a local principle list.
+
+\textit{Reduce step.}
+The local principle lists are consolidated by a second LLM call that
+de-duplicates, resolves conflicts, and produces a leaf-level rubric:
+a ranked list of evaluation criteria specific to the semantic content
+of leaf $L$.
+
+\textit{Global template.}
+A shared structural template covering presentation, tie handling, and
+output format is prepended to every leaf rubric, ensuring that judge
+calls across all leaves receive instructions in a consistent format.
+
+\textit{Information separation invariant.}
+Held-out evaluation queries and their answers never enter the
+guideline generation procedure.
+Only construction queries---whose ground-truth labels served as the
+anchor initialisation signal---are presented to
+\texttt{GuidelineGenerator}.
+The rubric is informed by what correct responses look like in the
+domain, but not by the specific queries on which models will be judged.
+
+The generated rubrics are stored in \texttt{snapshots.db} alongside
+the frozen DAG, so that every arena run on a given snapshot uses
+identical guidelines regardless of when it is executed.
+
+\textbf{Judge prompt structure.}
+Each judge call receives a prompt structured as four sequential
+blocks: (1)~domain guidelines, (2)~the query, (3)~Answer~A,
+(4)~Answer~B.
+The judge returns a structured verdict: \texttt{A}, \texttt{B},
+or \texttt{TIE}.
+
+\textbf{Dual-call consistency filtering.}
+Each comparison $(m_i, m_j, q, L)$ is evaluated by two judge calls
+with swapped presentation order.
+A verdict is consistent when both calls agree on the winner; when
+they disagree, the outcome is recorded as \texttt{TIE}.
+This protocol converts positional disagreements into explicit ties
+rather than noise in the BT sufficient statistics.
+
+\textbf{Tie encoding.}
+The \texttt{TIE} verdict is recorded as a fractional win of $0.5$
+to each model---a pragmatic approximation within the standard BT
+framework.
+A proper Davidson model~\parencite{davidson1970ties} would introduce
+a tie-propensity parameter per pair; this approximation is noted as
+Limitation~5 in Section~\ref{sec:arch-limits}.
+
+\textbf{Positioning relative to alternative judge designs.}
+The reference-informed, domain-conditioned approach sits between two
+alternatives: generic prompting (stable but domain-agnostic) and
+alignment-aware designs such as MemAlign~\parencite{memalign2024}
+(stronger calibration but requiring external preference corpora).
+The approach adopted here requires only the taxonomy and its
+construction-set reference answers.
+
+\textbf{Calibration caveat.}
+Reference-informed conditioning improves the semantic relevance and
+correctness-awareness of verdicts relative to generic prompting, but
+calibration against human preference judgements is not structurally
+guaranteed.
+Where an overlap set between TaxoArena's held-out queries and publicly
+available human preference annotations exists, empirical calibration
+can be assessed; this is treated as optional future work.
+
+\section{Persistence and Reproducibility}\label{sec:arch-infra}
+
+TaxoArena partitions its persistent state across three SQLite
+databases with distinct write lifecycles.
+\texttt{corpus.db} is written once before construction and stores
+full-dimensional MRL vectors as the single source of truth for all
+downstream slice operations.
+\texttt{snapshots.db} accumulates frozen DAG snapshots, each
+identified by a \texttt{snapshotId} UUID; only frozen snapshots are
+eligible as arena inputs.
+\texttt{arena.db} is append-only during an arena run and records every
+verdict, the per-round BT estimates, and run-level metadata;
+the \texttt{snapshotId} foreign key in every record allows the exact
+DAG under which a verdict was produced to be recovered unambiguously.
+
+Any result is fully specified by the reproducibility tuple
+\texttt{(corpusVersion, snapshotId, runId)}: given the three databases
+and this tuple, every component of the pipeline can be re-executed
+from scratch.
+Full field schemas, concurrency model, and snapshot versioning policy
+are in Appendix~\ref{app:infra}.
+
+\section{Architectural Limitations}\label{sec:arch-limits}
+
+The following limitations are inherent to the architectural choices
+described in this chapter.
+
+\textbf{1. Seed dependence on MMLU-Pro editorial domains.}
+The 14 anchor nodes are seeded from MMLU-Pro ground-truth labels and
+rendered permanently immutable.
+If the embedding space does not support 14 linearly separable
+domain-level clusters, the anchor structure will preserve editorial
+splits regardless of the geometry.
+Cross-domain migration partially mitigates this at the query level,
+but cannot relocate or merge anchors.
+Results at the anchor-domain level should be interpreted as rankings
+conditioned on the MMLU-Pro partitioning.
+
+\textbf{2. Corpus-bounded discovery.}
+The taxonomy is constructed from the 12{,}000 MMLU-Pro queries
+available at construction time.
+Sub-domains absent or sparsely represented in that corpus will not
+appear as leaves.
+Extending the system to a different corpus requires a full
+reconstruction run; there is no incremental insertion mechanism.
+
+\textbf{3. Embedding dependence.}
+The entire geometric structure of the taxonomy is contingent on the
+embedding model used at construction time.
+If drift exceeds the threshold $\delta_{\text{drift}} = 0.02$, the
+snapshot is invalidated and full reconstruction is required.
+Arena results produced under different embedding models are not
+directly comparable.
+
+\textbf{4. Residual judge bias.}
+The dual-call protocol mitigates positional bias but leaves two
+biases architecturally unmitigated.
+\textit{Verbosity bias}: LLM judges tend to prefer longer responses
+independent of quality~\parencite{dubois2024alpacafarm,wang2023large};
+the rubric includes no explicit length-normalisation criterion.
+\textit{Self-preference bias}: when the judge model coincides with an
+evaluated model, verdicts may favour the judge's own response
+style~\parencite{panickssery2024llm}; no judge-exclusion constraint
+is enforced.
+Their magnitude is bounded indirectly via the rank-stability analysis
+across different judge temperatures; a direct comparison against
+human preference annotations is identified as future work.
+
+\textbf{5. Tie approximation and dual-call budget accounting.}
+Ties are encoded as half-wins within the standard BT likelihood,
+which does not include Davidson's tie-propensity
+parameter~\parencite{davidson1970ties}; the approximation slightly
+underestimates tie frequency.
+Additionally, each logical comparison produces two API calls under the
+dual-call design; budget reporting distinguishes
+$B_{\text{logical}}$ (comparisons) from $B_{\text{API}} = 2 \cdot
+B_{\text{logical}}$ (judge calls).
+Convergence curves and efficiency comparisons are expressed in
+$B_{\text{logical}}$ to remain comparable with single-call systems.
+
+\textbf{6. Sparse-leaf risk at deep levels.}
+A leaf with a small held-out query pool may exhaust its comparison
+budget before the connectivity bootstrap achieves a fully connected
+comparison graph, since each query can serve multiple pairs but the
+number of pairs grows as $\binom{M}{2}$.
+Such leaves will terminate in state \texttt{BUDGET\_EXHAUSTED};
+their BT estimates enter the upward aggregation at full weight, which
+may inflate uncertainty at the ancestor level.
+The query-weighted convergence fraction $f_{\text{conv}}$ partially
+absorbs this: sparse leaves contribute little weight to the global
+condition.
+
+\textbf{7. Absence of a production-ready router.}
+The routing component exercised during the arena's pre-routing step
+is not exposed as a standalone service.
+This limitation is material only for deployment use cases; it does
+not affect the validity of the offline evaluation reported in this
+dissertation.
+
+\section{Chapter Summary}
+
+This chapter described TaxoArena as two coupled subsystems---taxonomy
+construction and arena evaluation---connected through an immutable
+DAG snapshot.
+The taxonomy pipeline induces sub-domain structure within 14 fixed
+anchor nodes through a six-phase iterative loop; DAG polyhierarchy
+arises exclusively from Phase~5 cross-link insertion, while
+construction-time routing is exclusive.
+The arena pipeline allocates comparisons adaptively, terminates under
+a three-level state machine with a query-weighted global condition,
+pools verdict sufficient statistics under the primary-path convention
+for upward aggregation, and conditions each judgment on a
+reference-informed leaf rubric generated via a MapReduce procedure
+with dual-call consistency filtering.
+Persistence is organised around the reproducibility tuple
+\texttt{(corpusVersion, snapshotId, runId)}, and seven structural
+limitations are catalogued: seed dependence, corpus-bounded discovery,
+embedding dependence, residual judge bias, tie approximation and
+dual-call budget accounting, sparse-leaf risk, and the absence of a
+production-ready router.
+The methodology underlying these components is derived formally in
+Chapter~\ref{ch:methodology}.

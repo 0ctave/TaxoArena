@@ -31,9 +31,9 @@ class BtStoppingPolicy(
         val available = nodeToQueries[nodeId]?.size ?: 0
         val maxPossible = if (available > 0) available * numPairs else 0
         val targetLimit = if (maxPossible > 0) {
-            minOf(budgetPerPair * numPairs / 2, (maxPossible * 0.9).toInt())
+            maxOf(1, minOf(kotlin.math.ceil(budgetPerPair.toDouble() * numPairs / 2.0).toInt(), (maxPossible * 0.9).toInt()))
         } else {
-            budgetPerPair * numPairs / 2
+            maxOf(1, kotlin.math.ceil(budgetPerPair.toDouble() * numPairs / 2.0).toInt())
         }
 
         val liveTotalComparisons = (pairStats[nodeId] ?: emptyList()).sumOf { it.totalComparisons }

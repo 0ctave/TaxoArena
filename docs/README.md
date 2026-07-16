@@ -37,6 +37,7 @@ Technical details of implementation, integration, and database operations.
 *   **[TUI Dashboard](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/tui-dashboard.md)**: Layout, terminal controls, and visualizer panel representation.
 *   **[Spring Integration](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/spring-integration.md)**: Component structure, dependency injection, and transaction layout.
 *   **[Database Concurrency](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/database-concurrency.md)**: Threading model, SQLite WAL (write-ahead log) operations, and connection pooling.
+*   **[Headless Experimentation](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/headless-experimentation.md)**: Headless CLI runner, TOML/JSON config formats, 4-condition matrix runner, and structured CSV/JSON results exporters.
 
 ### 6. [Legacy Documentation Archive](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/docs-old/)
 Archive of old designs and development notes. See [docs/docs-old/old-README.md](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/docs-old/old-README.md) for details.
@@ -58,6 +59,7 @@ For developers working directly with the implementation, these are the primary c
     *   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Interface for persisting ratings and match results.
     *   [BtMatchScheduler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt): Schedules informative matches.
     *   [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt): Decides when leaves or rounds have converged.
+    *   [HeadlessBenchmarkRunner](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/runner/HeadlessBenchmarkRunner.kt): Headless CLI entrypoint for batch matrix benchmarking.
     *   [BtMmFitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt): Runs MM updates for Bradley-Terry parameters.
 *   **Statistical Utilities**:
     *   [StatisticsUtils](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt): vMF, log-Bessel ratios, Dasgupta delta, and PCA.

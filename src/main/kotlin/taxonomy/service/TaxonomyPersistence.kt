@@ -78,7 +78,7 @@ class TaxonomyPersistence(
         val globalQueries = allNodes.flatMap { it.queries }.distinctBy { it.rawText }
         globalQueries.forEach { q ->
             val qId = "q_${hashQuery(q.rawText)}"
-            embeddingCache.putQuery(qId, q.rawText, q.distilledText)
+            embeddingCache.putQuery(qId, q.rawText, q.distilledText, q.groundTruthCategory)
         }
 
         // 2. Map nodes to SerialNodes
@@ -129,7 +129,7 @@ class TaxonomyPersistence(
         val serialized = json.decodeFromString<SerializedGraph>(file.readText())
 
         val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
-        val queryRowMap: Map<String, Pair<String, String>> = embeddingCache.getQueriesBatch(allQueryIds)
+        val queryRowMap: Map<String, Triple<String, String, String>> = embeddingCache.getQueriesBatch(allQueryIds)
         val allDistilled = queryRowMap.values.map { it.second }.toSet()
         val vectorMap = embeddingCache.getBatch(allDistilled)
 
@@ -158,9 +158,9 @@ class TaxonomyPersistence(
                 phaseCompleted = sNode.phaseCompleted
 
                 sNode.queryIds.forEach { qId ->
-                    val (raw, distilled) = queryRowMap[qId] ?: return@forEach
+                    val (raw, distilled, gtCat) = queryRowMap[qId] ?: return@forEach
                     val vector = vectorMap[distilled] ?: return@forEach
-                    queries.add(Embedding(raw, distilled, vector))
+                    queries.add(Embedding(raw, distilled, vector, gtCat))
                 }
             }
         }

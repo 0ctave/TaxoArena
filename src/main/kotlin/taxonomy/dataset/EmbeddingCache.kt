@@ -72,16 +72,21 @@ class EmbeddingCache(
                     """.trimIndent()
                     )
 
-                    // 3. NEW: Query references table
+                    // 3. NEW: Query references table with ground_truth_category
                     stmt.execute(
                         """
                         CREATE TABLE IF NOT EXISTS queries (
                             id TEXT PRIMARY KEY,
                             raw_text TEXT,
-                            distilled_text TEXT
+                            distilled_text TEXT,
+                            ground_truth_category TEXT DEFAULT ''
                         )
                     """.trimIndent()
                     )
+
+                    try {
+                        stmt.execute("ALTER TABLE queries ADD COLUMN ground_truth_category TEXT DEFAULT ''")
+                    } catch (_: Exception) {}
                 }
             }
             log.info("SQLite Embedding, GMM & Query Cache initialized successfully.")
@@ -90,14 +95,15 @@ class EmbeddingCache(
         }
     }
 
-    fun putQuery(id: String, raw: String, distilled: String) {
+    fun putQuery(id: String, raw: String, distilled: String, groundTruthCategory: String = "") {
         try {
             withConn { conn ->
-                conn.prepareStatement("INSERT OR REPLACE INTO queries (id, raw_text, distilled_text) VALUES (?, ?, ?)")
+                conn.prepareStatement("INSERT OR REPLACE INTO queries (id, raw_text, distilled_text, ground_truth_category) VALUES (?, ?, ?, ?)")
                     .use { pstmt ->
                         pstmt.setString(1, id)
                         pstmt.setString(2, raw)
                         pstmt.setString(3, distilled)
+                        pstmt.setString(4, groundTruthCategory)
                         pstmt.executeUpdate()
                     }
             }
@@ -106,14 +112,18 @@ class EmbeddingCache(
         }
     }
 
-    fun getQuery(id: String): Pair<String, String>? {
+    fun getQuery(id: String): Triple<String, String, String>? {
         try {
             withConn { conn ->
-                conn.prepareStatement("SELECT raw_text, distilled_text FROM queries WHERE id = ?").use { pstmt ->
+                conn.prepareStatement("SELECT raw_text, distilled_text, ground_truth_category FROM queries WHERE id = ?").use { pstmt ->
                     pstmt.setString(1, id)
                     val rs = pstmt.executeQuery()
                     if (rs.next()) {
-                        return rs.getString("raw_text") to rs.getString("distilled_text")
+                        return Triple(
+                            rs.getString("raw_text") ?: "",
+                            rs.getString("distilled_text") ?: "",
+                            rs.getString("ground_truth_category") ?: ""
+                        )
                     }
                 }
             }
@@ -123,21 +133,25 @@ class EmbeddingCache(
         return null
     }
 
-    fun getQueriesBatch(ids: Collection<String>): Map<String, Pair<String, String>> {
+    fun getQueriesBatch(ids: Collection<String>): Map<String, Triple<String, String, String>> {
         if (ids.isEmpty()) return emptyMap()
-        val result = mutableMapOf<String, Pair<String, String>>()
+        val result = mutableMapOf<String, Triple<String, String, String>>()
         try {
             withConn { conn ->
                 // SQLite has a 999-variable limit; chunk to be safe
                 ids.chunked(900).forEach { chunk ->
                     val placeholders = chunk.joinToString(",") { "?" }
                     conn.prepareStatement(
-                        "SELECT id, raw_text, distilled_text FROM queries WHERE id IN ($placeholders)"
+                        "SELECT id, raw_text, distilled_text, ground_truth_category FROM queries WHERE id IN ($placeholders)"
                     ).use { pstmt ->
                         chunk.forEachIndexed { i, id -> pstmt.setString(i + 1, id) }
                         val rs = pstmt.executeQuery()
                         while (rs.next()) {
-                            result[rs.getString("id")] = rs.getString("raw_text") to rs.getString("distilled_text")
+                            result[rs.getString("id")] = Triple(
+                                rs.getString("raw_text") ?: "",
+                                rs.getString("distilled_text") ?: "",
+                                rs.getString("ground_truth_category") ?: ""
+                            )
                         }
                     }
                 }

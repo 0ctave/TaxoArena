@@ -111,7 +111,10 @@ class BenchmarkE2EIntegrationTest {
             expectedNodeId: String?,
             frozenLeafIds: Set<String>?,
             gtAnswer: String?,
-            assignedLeafIds: List<String>?
+            assignedLeafIds: List<String>?,
+            condition: String,
+            isCorrectA: Boolean?,
+            isCorrectB: Boolean?
         ): List<DomainEvaluation> = listOf(
             DomainEvaluation(
                 domain = "stub-leaf-judge",

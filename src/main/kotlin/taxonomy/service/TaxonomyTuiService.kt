@@ -194,7 +194,7 @@ class TaxonomyTuiService(
     }
 
     override fun run(vararg args: String?) = runBlocking {
-        if (!config.execution.enableTui) return@runBlocking
+        if (!config.execution.enableTui || args.contains("--config")) return@runBlocking
 
         // Pre-flight TTY probe: fail fast (and loudly) when there is no controlling terminal, before
         // we hand control to Mosaic. Mosaic owns terminal I/O end-to-end (its own JNI/Panama Tty and

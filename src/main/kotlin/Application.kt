@@ -41,9 +41,15 @@ fun main(args: Array<String>) {
     // Spring's banner + bean-wiring logs print BEFORE the TUI service runs and would spill onto
     // the terminal Mosaic is about to take over. Quiet them at the source, before the context
     // (and logback) finish initialising, so the alternate screen starts clean.
+    val isHeadless = args.contains("--config")
     System.setProperty("spring.main.log-startup-info", "false")
-    System.setProperty("logging.level.root", "WARN")
-    System.setProperty("logging.level.org.springframework", "WARN")
+    if (!isHeadless) {
+        System.setProperty("logging.level.root", "WARN")
+        System.setProperty("logging.level.org.springframework", "WARN")
+    } else {
+        System.setProperty("logging.level.root", "INFO")
+        System.setProperty("logging.level.org.springframework", "WARN")
+    }
 
     // Force UTF-8 everywhere we can. Mosaic emits raw UTF-8 bytes for box-drawing (─│┌┐) and
     // emoji-style icons (◆) straight to its own Tty. On Windows the *console output code page*
