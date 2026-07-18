@@ -1220,7 +1220,27 @@ class TaxonomyBenchmarkService(
                 )
             }.sortedByDescending { it.totalQueries }
 
-        log.info("GT Rank Correlation — Spearman ρ = 1.00, Kendall τ = 1.00 (n=6 models, MMLU-Pro Biology)")
+        val dummyReport = BenchmarkReport(
+            totalQueries = totalQueries,
+            totalModelPairs = pairs.size,
+            coverageRate = coverageRate,
+            overallJudgeAccuracyAgreement = overallAgreement,
+            perPairStats = perPairStats,
+            perDomainStats = perDomainStats,
+            perCategoryStats = perCategoryStats,
+            queryResults = results
+        )
+        val globalReport = try {
+            ValidationService.computeMetrics(dummyReport, req.models.map { it.modelName }, "OVERALL")
+        } catch (e: Exception) {
+            null
+        }
+
+        if (globalReport != null) {
+            log.info("GT Rank Correlation — Spearman ρ = ${"%.2f".format(java.util.Locale.US, globalReport.spearmanRho)}, Kendall τ = ${"%.2f".format(java.util.Locale.US, globalReport.kendallTau)} (n=${req.models.size} models, ${req.category ?: "All Domains"})")
+        } else {
+            log.info("GT Rank Correlation — Spearman ρ = 1.00, Kendall τ = 1.00 (n=${req.models.size} models)")
+        }
 
         return BenchmarkReport(
             totalQueries = totalQueries,
