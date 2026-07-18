@@ -407,13 +407,17 @@ class TaxonomyArenaService(
             val p2Text = p2Raw.await()
 
             fun parseVerbatim(text: String): ParseResult {
+                val lastA = text.lastIndexOf("[[A]]")
+                val lastB = text.lastIndexOf("[[B]]")
+                val lastC = text.lastIndexOf("[[C]]")
+                val maxIdx = maxOf(lastA, lastB, lastC)
                 val winner = when {
-                    text.contains("[[A]]") -> "Model A"
-                    text.contains("[[B]]") -> "Model B"
-                    text.contains("[[C]]") -> "TIE"
-                    else -> "INVALID"
+                    maxIdx == -1 -> "INVALID"
+                    maxIdx == lastA -> "Model A"
+                    maxIdx == lastB -> "Model B"
+                    else -> "TIE"
                 }
-                val explanation = text.substringBefore("[[").trim()
+                val explanation = if (maxIdx != -1) text.substring(0, maxIdx).trim() else text.trim()
                 return ParseResult(winner, explanation, if (winner == "INVALID") 0.0 else 0.85, winner == "TIE")
             }
 
@@ -524,7 +528,7 @@ class TaxonomyArenaService(
         }
         if (judges.isEmpty()) return@coroutineScope emptyList()
 
-        if (condition.equals("CANONICAL", ignoreCase = true)) {
+        if (condition.equals("ORACLE", ignoreCase = true)) {
             val winnerName = when {
                 isCorrectA == true && isCorrectB == false -> "Model A"
                 isCorrectB == true && isCorrectA == false -> "Model B"
@@ -534,11 +538,11 @@ class TaxonomyArenaService(
                 DomainEvaluation(
                     domain = node.label ?: node.id,
                     winner = winnerName,
-                    rationale = "Oracle Comparison (Canonical). CorrectA=$isCorrectA, CorrectB=$isCorrectB.",
+                    rationale = "Oracle Comparison (Ground Truth). CorrectA=$isCorrectA, CorrectB=$isCorrectB.",
                     confidence = 1.0,
                     positionFlip = false,
                     nodeId = node.id,
-                    tieSource = if (winnerName == "TIE") "CANONICAL_TIE" else null,
+                    tieSource = if (winnerName == "TIE") "ORACLE_TIE" else null,
                     winAFirst = if (winnerName == "Model A") 1.0 else if (winnerName == "Model B") 0.0 else 0.5,
                     winASecond = if (winnerName == "Model A") 1.0 else if (winnerName == "Model B") 0.0 else 0.5
                 )

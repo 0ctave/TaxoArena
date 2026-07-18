@@ -23,13 +23,20 @@ class BtStoppingPolicy(
         btStates: Map<String, NodeBtState>,
         pairStats: Map<String, List<NodePairStats>>,
         models: List<String>,
-        nodeToQueries: Map<String, List<Int>> = emptyMap()
+        nodeToQueries: Map<String, List<Int>> = emptyMap(),
+        condition: String = "MAIN"
     ): Boolean {
-        val state = btStates[nodeId] ?: return false
-
         val numPairs = models.size * (models.size - 1) / 2
         val available = nodeToQueries[nodeId]?.size ?: 0
         val maxPossible = if (available > 0) available * numPairs else 0
+
+        if (condition.equals("ROUND_ROBIN", ignoreCase = true) || condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
+            val liveTotalComparisons = (pairStats[nodeId] ?: emptyList()).sumOf { it.totalComparisons }
+            return liveTotalComparisons >= maxPossible
+        }
+
+        val state = btStates[nodeId] ?: return false
+
         val targetLimit = if (maxPossible > 0) {
             maxOf(1, minOf(kotlin.math.ceil(budgetPerPair.toDouble() * numPairs / 2.0).toInt(), (maxPossible * 0.9).toInt()))
         } else {
@@ -94,8 +101,12 @@ class BtStoppingPolicy(
         round: Int,
         totalComparisons: Int,
         nodeToQueries: Map<String, List<Int>> = emptyMap(),
-        condition: String = "MAIN"
+        condition: String = "MAIN",
+        mainConditionTotalComparisons: Int = 72
     ): Boolean {
+        if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
+            return totalComparisons >= mainConditionTotalComparisons
+        }
         if (round >= maxRounds) return true
         if (condition.equals("ROUND_ROBIN", ignoreCase = true)) return false
         if (totalComparisons < minTotalComparisons) return false
@@ -105,7 +116,7 @@ class BtStoppingPolicy(
             // Last 3 rounds: stop if at least 50% are structurally converged
             // (even without rank stability) — prevents infinite runs
             val structConv = targetLeafIds.count { leafId ->
-                isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries)
+                isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries, condition)
             }
             if (structConv.toDouble() / targetLeafIds.size >= 0.50) return true
         }
@@ -124,7 +135,7 @@ class BtStoppingPolicy(
             if (history.size > stabilityRounds) history.removeFirst()
 
             val rankStable = history.size >= stabilityRounds && history.all { it == currentRank }
-            val structurallyConverged = isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries)
+            val structurallyConverged = isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries, condition)
 
             val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
             // NEW: irresolvable-only leaf — rank noise from tie pairs should not block

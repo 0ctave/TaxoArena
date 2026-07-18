@@ -174,6 +174,20 @@ object ReportGenerator {
         } catch (e: Exception) {
             log.error("Failed to write domain validation CSV: ${e.message}", e)
         }
+
+        // 8. Export trajectory report in CSV
+        val trajectoryCsvFile = File(dir, "${condition}_trajectory.csv")
+        try {
+            trajectoryCsvFile.bufferedWriter().use { writer ->
+                writer.write("round,comparisons,spearmanRho,kendallTau,pairwiseWinnerAccuracy\n")
+                report.trajectory.forEach { pt ->
+                    writer.write("${pt.round},${pt.comparisons},${pt.spearmanRho},${pt.kendallTau},${pt.pairwiseWinnerAccuracy}\n")
+                }
+            }
+            log.info("Successfully exported trajectory CSV to ${trajectoryCsvFile.absolutePath}")
+        } catch (e: Exception) {
+            log.error("Failed to write trajectory CSV: ${e.message}", e)
+        }
     }
 
     private fun escapeCsv(str: String): String {

@@ -280,7 +280,7 @@ def main():
     }
 
     # Save to snapshots.db
-    base_id = template_id.split("_Auto")[0] if "_Auto" in template_id else template_id
+    base_id = template_id
     
     def save_baseline(snap_id, desc, graph_obj):
         cursor_snap.execute("DELETE FROM snapshots WHERE id = ?", (snap_id,))

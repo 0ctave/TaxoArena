@@ -33,7 +33,8 @@ data class BenchmarkRequest(
     val questionsPerRound: Int = 12, // total queries per round (= numPairs * BATCH_STEP_SIZE)
     val updateRankings: Boolean = true,
     val reservedOnly: Boolean = true,  // benchmark only the reserved test pool by default
-    val condition: String = "MAIN"
+    val condition: String = "MAIN",
+    val seed: Long = 42L
 )
 
 @Serializable
@@ -48,7 +49,8 @@ data class QueryBenchmarkResult(
     val domainEvaluations: List<DomainEvaluation>,
     val pairEvaluations: Map<String, List<DomainEvaluation>> = emptyMap(),
     // per-model-pair: judgeWinner agrees with accuracy-based winner?
-    val judgeAccuracyAgreement: Map<String, Boolean>  // "A_vs_B" -> true/false
+    val judgeAccuracyAgreement: Map<String, Boolean>,  // "A_vs_B" -> true/false
+    val queryId: Int = 0
 )
 
 @Serializable
@@ -77,6 +79,15 @@ data class DomainStats(
 )
 
 @Serializable
+data class TrajectoryPoint(
+    val round: Int,
+    val comparisons: Int,
+    val spearmanRho: Double,
+    val kendallTau: Double,
+    val pairwiseWinnerAccuracy: Double
+)
+
+@Serializable
 data class BenchmarkReport(
     val totalQueries: Int,
     val totalModelPairs: Int,
@@ -85,7 +96,8 @@ data class BenchmarkReport(
     val perPairStats: List<ModelPairStats>,
     val perDomainStats: List<DomainStats>,
     val perCategoryStats: List<DomainStats>,  // grouped by MMLU-Pro GT category
-    val queryResults: List<QueryBenchmarkResult>   // full per-query detail
+    val queryResults: List<QueryBenchmarkResult>,   // full per-query detail
+    val trajectory: List<TrajectoryPoint> = emptyList()
 )
 
 @Serializable

@@ -25,9 +25,11 @@ class BtMatchScheduler(
     val minQueriesForBenchmark: Int = 1,
     val queriesPerPair: Int = 20,
     budgetPerPair: Int? = null,
-    val stoppingPolicy: BtStoppingPolicy
+    val stoppingPolicy: BtStoppingPolicy,
+    val seed: Long = 42L
 ) {
     val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
+    private val random = java.util.Random(seed)
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
     
@@ -215,7 +217,7 @@ class BtMatchScheduler(
 
         for (node in targetNodes) {
             // Converged leaves contribute no utility — skip entirely
-            if (stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries)) continue
+            if (stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries, condition)) continue
 
             val state = btStates[node.id]
             val nodePairs = pairStats[node.id] ?: emptyList()
@@ -241,7 +243,7 @@ class BtMatchScheduler(
                 val convergenceBonus = if (debt <= 5 && isBlockingPair) 1.5 else 1.0  // last-mile boost
 
                 val u = if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
-                    java.util.Random().nextDouble()
+                    random.nextDouble()
                 } else {
                     computeUtility(mA, mB, state, leafMatches, already, models, pairsResolved, ps) * convergenceBonus
                 }

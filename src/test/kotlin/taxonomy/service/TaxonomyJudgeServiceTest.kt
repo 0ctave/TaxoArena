@@ -44,6 +44,8 @@ class TaxonomyJudgeServiceTest {
             val llmClient = TestLlmClient()
             val config = TaxonomyConfig()
             val mockArenaService = mock(TaxonomyArenaService::class.java)
+            val mockEvalStore = mock(taxonomy.dataset.ModelEvalStore::class.java)
+            `when`(mockEvalStore.getReservedQuestionTexts()).thenReturn(emptySet())
 
             // Set up judge domains filter
             config.llm.judgeDomains = listOf("Math", "Science")
@@ -52,7 +54,8 @@ class TaxonomyJudgeServiceTest {
                 mockDatasetFetcher,
                 llmClient,
                 config,
-                mockArenaService
+                mockArenaService,
+                mockEvalStore
             )
 
             // Build mock DAG:

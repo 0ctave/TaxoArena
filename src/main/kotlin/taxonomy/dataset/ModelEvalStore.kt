@@ -536,6 +536,20 @@ class ModelEvalStore(
             IngestionHealth(model, total, reserved, math, reservedMath)
         }
     }
+
+    fun getReservedQuestionTexts(): Set<String> {
+        val result = mutableSetOf<String>()
+        conn().use { conn ->
+            conn.createStatement().use { stmt ->
+                stmt.executeQuery("SELECT DISTINCT question_text FROM eval_results WHERE is_reserved = 1").use { rs ->
+                    while (rs.next()) {
+                        rs.getString("question_text")?.let { result.add(it) }
+                    }
+                }
+            }
+        }
+        return result
+    }
 }
 
 data class IngestionHealth(

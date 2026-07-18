@@ -36,7 +36,7 @@ data class HeadlessCliConfig(
     val parallelism: Int = 6,
     val questionsPerRound: Int = 12,
     val reservedOnly: Boolean = true,
-    val conditions: List<String> = listOf("MAIN", "CANONICAL", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
+    val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
     val seed: Long = 42L,                  // deterministic seed
@@ -193,16 +193,22 @@ class HeadlessBenchmarkRunner(
         }
 
         // Apply fallback judge prompts to all nodes in the loaded/generated tree to prevent runtime IllegalStateException
-        fun ensureJudgePrompts(n: GraphNode) {
+        fun ensureJudgePrompts(n: GraphNode, condition: String) {
+            val isMain = condition.equals("MAIN", ignoreCase = true)
+            if (n.children.isEmpty()) { // leaf node
+                if (isMain && (n.judgePrompt.isNullOrBlank() || n.judgeRubric.isNullOrBlank())) {
+                    throw IllegalStateException("Missing custom induced judge prompt/rubric for leaf node '${n.label}' (id=${n.id}) under MAIN condition!")
+                }
+            }
             if (n.judgePrompt.isNullOrBlank()) {
                 n.judgePrompt = "You are a domain-expert judge evaluating answers in ${n.label}."
             }
             if (n.judgeRubric.isNullOrBlank()) {
                 n.judgeRubric = "Evaluate correctness based on accuracy and reasoning clarity."
             }
-            n.children.forEach { ensureJudgePrompts(it) }
+            n.children.forEach { ensureJudgePrompts(it, condition) }
         }
-        ensureJudgePrompts(root)
+        ensureJudgePrompts(root, "MAIN")
 
         taxonomyService.setGraph(root)
         log.info("Active graph node set: ${root.id}")
@@ -249,25 +255,34 @@ class HeadlessBenchmarkRunner(
                 val isWard = condition.equals("WARD_BASELINE", ignoreCase = true)
                 val isRandomNull = condition.equals("RANDOMNULL_BASELINE", ignoreCase = true)
 
-                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_CANONICAL").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
 
                 val activeRoot = when {
                     isKmeans -> {
-                        log.info("Loading Flat k-means (k=17) baseline snapshot...")
-                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_kmeans") ?: root
+                        log.info("Loading Flat k-means baseline snapshot...")
+                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_kmeans")
+                            ?: throw IllegalStateException("Required KMEANS_BASELINE snapshot not found: ${baseSnapshotId}_baseline_kmeans")
                     }
                     isWard -> {
-                        log.info("Loading HAC Ward (cut=17) baseline snapshot...")
-                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_ward") ?: root
+                        log.info("Loading HAC Ward baseline snapshot...")
+                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_ward")
+                            ?: throw IllegalStateException("Required WARD_BASELINE snapshot not found: ${baseSnapshotId}_baseline_ward")
                     }
                     isRandomNull -> {
                         log.info("Loading Random null baseline snapshot...")
-                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_randomnull") ?: root
+                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_randomnull")
+                            ?: throw IllegalStateException("Required RANDOMNULL_BASELINE snapshot not found: ${baseSnapshotId}_baseline_randomnull")
                     }
                     else -> root
                 }
 
-                ensureJudgePrompts(activeRoot)
+                val isBaseline = isKmeans || isWard || isRandomNull
+                if (cliConfig.judgeInduction && isBaseline) {
+                    log.info("Running judge prompt induction for baseline condition $condition to isolate topology effect...")
+                    judgeService.generateJudgesForDag(activeRoot, replaceExisting = true)
+                }
+
+                ensureJudgePrompts(activeRoot, condition)
                 taxonomyService.setGraph(activeRoot)
 
                 // Suffix active snapshotId to isolate condition stats in SQLite
@@ -287,7 +302,8 @@ class HeadlessBenchmarkRunner(
                     questionsPerRound = cliConfig.questionsPerRound,
                     updateRankings = true,
                     reservedOnly = cliConfig.reservedOnly,
-                    condition = condition
+                    condition = condition,
+                    seed = cliConfig.seed
                 )
 
                 val report = benchmarkService.runBenchmark(request)
@@ -515,37 +531,38 @@ class HeadlessBenchmarkRunner(
     private fun exportVerdicts(dir: File, condition: String, report: taxonomy.model.BenchmarkReport) {
         val file = File(dir, "${condition}_verdicts.csv")
         file.bufferedWriter().use { writer ->
-            writer.write("Condition,QueryText,Category,ModelA,ModelB,AnswerA,AnswerB,CorrectA,CorrectB,GroundTruth,Winner,Confidence,PositionFlip,Rationale\n")
-            report.queryResults.forEach { qr ->
-                qr.pairEvaluations.forEach { (pairKey, evals) ->
-                    val models = pairKey.split("_vs_")
-                    val mA = models.getOrNull(0) ?: "Model A"
-                    val mB = models.getOrNull(1) ?: "Model B"
-                    val ansA = qr.modelAnswers[mA] ?: "?"
-                    val ansB = qr.modelAnswers[mB] ?: "?"
-                    val corrA = qr.modelCorrect[mA] ?: false
-                    val corrB = qr.modelCorrect[mB] ?: false
+        writer.write("Condition,QueryId,QueryText,Category,ModelA,ModelB,AnswerA,AnswerB,CorrectA,CorrectB,GroundTruth,Winner,Confidence,PositionFlip,Rationale\n")
+        report.queryResults.forEach { qr ->
+            qr.pairEvaluations.forEach { (pairKey, evals) ->
+                val models = pairKey.split("_vs_")
+                val mA = models.getOrNull(0) ?: "Model A"
+                val mB = models.getOrNull(1) ?: "Model B"
+                val ansA = qr.modelAnswers[mA] ?: "?"
+                val ansB = qr.modelAnswers[mB] ?: "?"
+                val corrA = qr.modelCorrect[mA] ?: false
+                val corrB = qr.modelCorrect[mB] ?: false
 
-                    evals.forEach { ev ->
-                        writer.write(
-                            "${escapeCsv(condition)}," +
-                            "${escapeCsv(qr.query)}," +
-                            "${escapeCsv(qr.gtCategory)}," +
-                            "${escapeCsv(mA)}," +
-                            "${escapeCsv(mB)}," +
-                            "${escapeCsv(ansA)}," +
-                            "${escapeCsv(ansB)}," +
-                            "$corrA," +
-                            "$corrB," +
-                            "${escapeCsv(qr.gtCorrectAnswer)}," +
-                            "${escapeCsv(ev.winner)}," +
-                            "${ev.confidence}," +
-                            "${ev.positionFlip}," +
-                            "${escapeCsv(ev.rationale)}\n"
-                        )
-                    }
+                evals.forEach { ev ->
+                    writer.write(
+                        "${escapeCsv(condition)}," +
+                        "${qr.queryId}," +
+                        "${escapeCsv(qr.query)}," +
+                        "${escapeCsv(qr.gtCategory)}," +
+                        "${escapeCsv(mA)}," +
+                        "${escapeCsv(mB)}," +
+                        "${escapeCsv(ansA)}," +
+                        "${escapeCsv(ansB)}," +
+                        "$corrA," +
+                        "$corrB," +
+                        "${escapeCsv(qr.gtCorrectAnswer)}," +
+                        "${escapeCsv(ev.winner)}," +
+                        "${ev.confidence}," +
+                        "${ev.positionFlip}," +
+                        "${escapeCsv(ev.rationale)}\n"
+                    )
                 }
             }
+        }
         }
         log.info("Verdicts CSV written to ${file.absolutePath}")
     }
@@ -592,7 +609,7 @@ class HeadlessBenchmarkRunner(
         var parallelism = 6
         var questionsPerRound = 12
         var reservedOnly = true
-        var conditions = listOf("MAIN", "CANONICAL", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
+        var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
         var seed = 42L

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.dataset.ModelEvalStore
 import taxonomy.model.GraphNode
 import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.prompts.JudgePrompts
@@ -18,7 +19,8 @@ class TaxonomyJudgeService(
     private val datasetFetcher: MMLUDatasetFetcher,
     private val llmClient: TaxonomyLlmClient,
     private val config: TaxonomyConfig,
-    private val arenaService: TaxonomyArenaService
+    private val arenaService: TaxonomyArenaService,
+    private val evalStore: ModelEvalStore
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.JudgeService")
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
@@ -156,7 +158,9 @@ class TaxonomyJudgeService(
             abs(it.rawText.hashCode()) % 5 != 0
         }
         val detailsMap = datasetFetcher.getDetailsForQueries(corpusEmbeddings.map { it.rawText })
+        val reservedTexts = evalStore.getReservedQuestionTexts()
         val details = corpusEmbeddings.mapNotNull { detailsMap[it.rawText] }
+            .filter { it.question !in reservedTexts }
 
         if (details.isEmpty()) {
             log.warn("generateJudgeForNode: empty corpus for node '${node.label}' (id=${node.id}). " +

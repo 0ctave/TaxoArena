@@ -29,6 +29,8 @@ class TaxonomyBenchmarkService(
     private val log = LoggerFactory.getLogger("taxonomy.BenchmarkService")
     private val dbWriteDispatcher = Dispatchers.IO.limitedParallelism(1)
     private val json = Json { ignoreUnknownKeys = true }
+    @Volatile
+    private var mainConditionTotalComparisons: Int = 72
 
     private fun getAllNodes(root: GraphNode): List<GraphNode> {
         val visited = mutableSetOf<String>()
@@ -131,6 +133,38 @@ class TaxonomyBenchmarkService(
 
         log.info("Benchmark: ${matrix.size} questions, ${modelNames.size} models")
 
+        // Validate answer matrix completeness and export a missingness table
+        val missingnessReport = mutableListOf<String>()
+        var missingCount = 0
+        matrix.forEach { (qId, modelResults) ->
+            val presentModels = modelResults.keys
+            val missingModels = modelNames.filter { it !in presentModels }
+            if (missingModels.isNotEmpty()) {
+                missingCount++
+                val sample = modelResults.values.firstOrNull()
+                val qText = sample?.questionText?.replace("\n", " ")?.replace("\r", "")?.replace("\"", "\"\"")?.take(60) ?: "unknown"
+                missingnessReport.add("$qId,\"$qText\",${missingModels.joinToString("|")}")
+            }
+        }
+
+        if (missingnessReport.isNotEmpty()) {
+            log.warn("Answer matrix completeness check: $missingCount / ${matrix.size} queries have missing model answers!")
+            val missingnessFile = File("answer_matrix_missingness.csv")
+            try {
+                missingnessFile.bufferedWriter().use { writer ->
+                    writer.write("query_id,query_text,missing_models\n")
+                    missingnessReport.forEach { line ->
+                        writer.write("$line\n")
+                    }
+                }
+                log.info("Successfully exported missingness table to ${missingnessFile.absolutePath}")
+            } catch (e: Exception) {
+                log.error("Failed to export missingness table: ${e.message}", e)
+            }
+        } else {
+            log.info("Answer matrix completeness check: 100% complete! No missing model answers across all ${matrix.size} queries.")
+        }
+
         if (matrix.isEmpty()) {
             return@coroutineScope emptyReport()
         }
@@ -180,31 +214,31 @@ class TaxonomyBenchmarkService(
             minQueriesForBenchmark = 1,
             queriesPerPair = params.queriesPerPair,
             budgetPerPair = params.budgetPerPair,
-            stoppingPolicy = stoppingPolicy
+            stoppingPolicy = stoppingPolicy,
+            seed = req.seed
         )
 
         val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
-        val isReplayCondition = req.condition.equals("C3", ignoreCase = true) || req.condition.equals("C5", ignoreCase = true)
-        val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_CANONICAL").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER")
+        val isReplayCondition = req.condition.equals("C3", ignoreCase = true) || req.condition.equals("C5", ignoreCase = true) || req.condition.equals("GENERIC_JUDGE", ignoreCase = true)
+        val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
         
         val replayTriples: List<FrozenMatchTriple>? = if (isReplayCondition) {
-            val triplesFile = File("frozen_triples_${baseSnapshotId}.json")
+            val triplesFile = File("frozen_triples_${baseSnapshotId}_MAIN.json")
             if (triplesFile.exists()) {
                 try {
                     log.info("Loading frozen triples from ${triplesFile.absolutePath} for replay...")
                     json.decodeFromString<List<FrozenMatchTriple>>(triplesFile.readText())
                 } catch (e: Exception) {
-                    log.error("Failed to parse frozen triples: ${e.message}", e)
-                    null
+                    throw IllegalStateException("Failed to parse frozen triples: ${e.message}", e)
                 }
             } else {
-                log.warn("No frozen triples file found at ${triplesFile.absolutePath} — running live scheduler instead.")
-                null
+                throw IllegalStateException("Required frozen triples file for replay not found: ${triplesFile.absolutePath}")
             }
         } else {
             null
         }
         val evaluatedTriples = mutableListOf<FrozenMatchTriple>()
+        val trajectory = mutableListOf<TrajectoryPoint>()
         if (req.updateRankings) {
             val savedOffsets = rankingService.getPairQueryOffsets(snapshotId)
             if (savedOffsets.isNotEmpty()) {
@@ -299,7 +333,8 @@ class TaxonomyBenchmarkService(
                     hadJudge = true,
                     domainEvaluations = listOf(primaryEval),
                     pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
-                    judgeAccuracyAgreement = mapOf(pairKey to agrees)
+                    judgeAccuracyAgreement = mapOf(pairKey to agrees),
+                    queryId = qId
                 )
             }
             completedResults.addAll(reconstructed)
@@ -509,10 +544,15 @@ class TaxonomyBenchmarkService(
         publishProgress(true)
 
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
-            btStates, pairStatsMap, targetLeafIds, modelNames, round,
-            pairStatsMap.values.flatten().sumOf { it.totalComparisons },
-            nodeToQueries,
-            req.condition
+            btStates = btStates,
+            pairStats = pairStatsMap,
+            targetLeafIds = targetLeafIds,
+            models = modelNames,
+            round = round,
+            totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons },
+            nodeToQueries = nodeToQueries,
+            condition = req.condition,
+            mainConditionTotalComparisons = mainConditionTotalComparisons
         )) {
             completedAtStartOfRound.set(completedResults.size)
             // Update globally resolved pairs in stoppingPolicy
@@ -579,162 +619,110 @@ class TaxonomyBenchmarkService(
                     delay(i * 10L)
                     val leafNode = allNodes.firstOrNull { it.id == task.nodeId } ?: return@async emptyList<QueryBenchmarkResult>()
 
-                    val taskResults = task.queryIds.mapNotNull { queryIdStr ->
-                        val qId = queryIdStr.toIntOrNull() ?: run {
-                            log.warn("queryIdStr is not Int: $queryIdStr")
-                            return@mapNotNull null
-                        }
-                        val modelResults = matrix[qId] ?: run {
-                            log.warn("matrix[qId] is null for qId $qId")
-                            return@mapNotNull null
-                        }
-
-                        val sample = modelResults.values.firstOrNull() ?: run {
-                            log.warn("modelResults has no values for qId $qId")
-                            return@mapNotNull null
-                        }
-                        val gtAnswer = sample.gtAnswer
-                        val gtCategory = sample.category
-
-                        val outputA = modelResults[task.modelA] ?: run {
-                            log.warn("modelResults has no entry for modelA ${task.modelA} for qId $qId. Available models in results: ${modelResults.keys}")
-                            return@mapNotNull null
-                        }
-                        val outputB = modelResults[task.modelB] ?: run {
-                            log.warn("modelResults has no entry for modelB ${task.modelB} for qId $qId. Available models in results: ${modelResults.keys}")
-                            return@mapNotNull null
-                        }
-
-                        checkNotNull(leafNode.judgePrompt) {
-                            "Attempted to record match for node ${leafNode.id} with no judgePrompt"
-                        }
-                        val domainName = requireNotNull(leafNode.label) { "Leaf node ${leafNode.id} has no label" }
-
-                        val cacheKey = "${qId}::${sample.questionText}"
-                        val cached = if (req.condition.equals("CANONICAL", ignoreCase = true)) null else rankingService.getRecordedMatch(
-                            snapshotId = snapshotId,
-                            domain = domainName,
-                            query = cacheKey,
-                            modelA = task.modelA,
-                            modelB = task.modelB
-                        )
-
-                        val domainEvaluations = if (cached != null) {
-                            val cachedWinner = when {
-                                cached.isTie -> "TIE"
-                                cached.winner == task.modelA -> "Model A"
-                                cached.winner == task.modelB -> "Model B"
-                                else -> "TIE"
+                    try {
+                        val taskResults = task.queryIds.mapNotNull { queryIdStr ->
+                            val qId = queryIdStr.toIntOrNull() ?: run {
+                                log.warn("queryIdStr is not Int: $queryIdStr")
+                                return@mapNotNull null
                             }
-                            listOf(
-                                DomainEvaluation(
-                                    domain = cached.domain,
-                                    winner = cachedWinner,
-                                    rationale = "Cached match result",
-                                    confidence = 1.0,
-                                    positionFlip = false,
-                                    nodeId = leafNode.id
-                                )
-                            )
-                        } else {
-                            val evals = arenaService.evaluateWithPrecomputedTraces(
-                                query = sample.questionText,
-                                options = sample.options,
-                                modelA = task.modelA,
-                                traceA = getRobustTrace(outputA),
-                                modelB = task.modelB,
-                                traceB = getRobustTrace(outputB),
-                                expectedNodeId = task.nodeId,
-                                frozenLeafIds = frozenLeafIds,
-                                gtAnswer = sample.gtAnswer,
-                                assignedLeafIds = queryToLeaves[qId],
-                                condition = req.condition,
-                                isCorrectA = outputA.isCorrect,
-                                isCorrectB = outputB.isCorrect
-                            )
-                            evals
-                        }
+                            val modelResults = matrix[qId] ?: run {
+                                log.warn("matrix[qId] is null for qId $qId")
+                                return@mapNotNull null
+                            }
 
-                        if (domainEvaluations.isEmpty()) {
-                            log.trace("domainEvaluations is empty for qId $qId")
-                            return@mapNotNull null
-                        }
+                            val sample = modelResults.values.firstOrNull() ?: run {
+                                log.warn("modelResults has no values for qId $qId")
+                                return@mapNotNull null
+                            }
+                            val gtAnswer = sample.gtAnswer
+                            val gtCategory = sample.category
+
+                            val outputA = modelResults[task.modelA] ?: run {
+                                log.warn("modelResults has no entry for modelA ${task.modelA} for qId $qId. Available models in results: ${modelResults.keys}")
+                                return@mapNotNull null
+                            }
+                            val outputB = modelResults[task.modelB] ?: run {
+                                log.warn("modelResults has no entry for modelB ${task.modelB} for qId $qId. Available models in results: ${modelResults.keys}")
+                                return@mapNotNull null
+                            }
+
+                            checkNotNull(leafNode.judgePrompt) {
+                                "Attempted to record match for node ${leafNode.id} with no judgePrompt"
+                            }
+                            val domainName = requireNotNull(leafNode.label) { "Leaf node ${leafNode.id} has no label" }
+
+                            val cacheKey = "${qId}::${sample.questionText}"
+                            val cached = if (req.condition.equals("ORACLE", ignoreCase = true)) null else rankingService.getRecordedMatch(
+                                snapshotId = snapshotId,
+                                domain = domainName,
+                                query = cacheKey,
+                                modelA = task.modelA,
+                                modelB = task.modelB
+                            )
+
+                            val domainEvaluations = if (cached != null) {
+                                val cachedWinner = when {
+                                    cached.isTie -> "TIE"
+                                    cached.winner == task.modelA -> "Model A"
+                                    cached.winner == task.modelB -> "Model B"
+                                    else -> "TIE"
+                                }
+                                listOf(
+                                    DomainEvaluation(
+                                        domain = cached.domain,
+                                        winner = cachedWinner,
+                                        rationale = "Cached match result",
+                                        confidence = 1.0,
+                                        positionFlip = false,
+                                        nodeId = leafNode.id
+                                    )
+                                )
+                            } else {
+                                val evals = arenaService.evaluateWithPrecomputedTraces(
+                                    query = sample.questionText,
+                                    options = sample.options,
+                                    modelA = task.modelA,
+                                    traceA = getRobustTrace(outputA),
+                                    modelB = task.modelB,
+                                    traceB = getRobustTrace(outputB),
+                                    expectedNodeId = task.nodeId,
+                                    frozenLeafIds = frozenLeafIds,
+                                    gtAnswer = sample.gtAnswer,
+                                    assignedLeafIds = queryToLeaves[qId],
+                                    condition = req.condition,
+                                    isCorrectA = outputA.isCorrect,
+                                    isCorrectB = outputB.isCorrect
+                                )
+                                evals
+                            }
+
+                            if (domainEvaluations.isEmpty()) {
+                                log.trace("domainEvaluations is empty for qId $qId")
+                                return@mapNotNull null
+                            }
 
                             log.debug("multi-judge qId=$qId: ${domainEvaluations.joinToString { "${it.domain.take(15)}->${it.winner}" }}")
 
-                        val rawPrimaryEval = domainEvaluations.firstOrNull { it.nodeId == task.nodeId }
-                            ?: domainEvaluations.maxByOrNull { it.confidence }
-                            ?: return@mapNotNull null
-                        val satisfiesGate = rawPrimaryEval.confidence >= req.confidenceGate
-                            || rawPrimaryEval.tieSource == "POSITION_FLIP"  // flips always pass — they carry tie signal
+                            val rawPrimaryEval = domainEvaluations.firstOrNull { it.nodeId == task.nodeId }
+                                ?: domainEvaluations.maxByOrNull { it.confidence }
+                                ?: return@mapNotNull null
+                            val satisfiesGate = rawPrimaryEval.confidence >= req.confidenceGate
+                                || rawPrimaryEval.tieSource == "POSITION_FLIP"
 
-                        val primaryEval = if (satisfiesGate) {
-                            rawPrimaryEval
-                        } else {
-                            log.warn("evaluation confidence ${rawPrimaryEval.confidence} is below confidenceGate ${req.confidenceGate} for qId $qId. Treating as LOW_CONFIDENCE_TIE.")
-                            rawPrimaryEval.copy(winner = "TIE", rationale = "LOW_CONFIDENCE_TIE: Below confidence gate (${rawPrimaryEval.confidence} < ${req.confidenceGate}). Original: ${rawPrimaryEval.rationale}")
-                        }
-
-                        if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
-                            val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
-                            val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
-                            withContext(dbWriteDispatcher) {
-                                rankingService.recordMatch(
-                                    query = cacheKey,
-                                    domain = domainName,
-                                    winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
-                                    loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
-                                    isTie = isTie,
-                                    confidence = primaryEval.confidence,
-                                    snapshotId = snapshotId,
-                                    modelA = task.modelA,
-                                    modelB = task.modelB
-                                )
+                            val primaryEval = if (satisfiesGate) {
+                                rawPrimaryEval
+                            } else {
+                                log.warn("evaluation confidence ${rawPrimaryEval.confidence} is below confidenceGate ${req.confidenceGate} for qId $qId. Treating as LOW_CONFIDENCE_TIE.")
+                                rawPrimaryEval.copy(winner = "TIE", rationale = "LOW_CONFIDENCE_TIE: Below confidence gate (${rawPrimaryEval.confidence} < ${req.confidenceGate}). Original: ${rawPrimaryEval.rationale}")
                             }
-                        }
 
-                        val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
-                        val aCorrectVal = modelCorrect[task.modelA] ?: false
-                        val bCorrectVal = modelCorrect[task.modelB] ?: false
-                        val accWinner = when {
-                            aCorrectVal && !bCorrectVal -> "MODEL A"
-                            bCorrectVal && !aCorrectVal -> "MODEL B"
-                            else -> "TIE"
-                        }
-                        val judgeWinnerVal = primaryEval.winner.uppercase()
-                        val judgeAgreed = (judgeWinnerVal == accWinner)
-
-                        withContext(dbWriteDispatcher) {
-                            propagateOutcome(
-                                leafId = leafNode.id,
-                                modelA = task.modelA,
-                                modelB = task.modelB,
-                                outcome = primaryEval,
-                                snapshotId = snapshotId,
-                                judgeAgreed = judgeAgreed
-                            )
-                        }
-
-                        val otherLeaves = queryToLeaves[qId]?.filter { it != task.nodeId } ?: emptyList()
-                        for (siblingLeafId in otherLeaves) {
-                            val siblingNode = allNodes.firstOrNull { it.id == siblingLeafId } ?: continue
-                            if (siblingNode.judgePrompt == null) continue
-                            withContext(dbWriteDispatcher) {
-                                propagateOutcome(
-                                    leafId = siblingLeafId,
-                                    modelA = task.modelA,
-                                    modelB = task.modelB,
-                                    outcome = primaryEval,
-                                    snapshotId = snapshotId,
-                                    judgeAgreed = judgeAgreed
-                                )
-                                if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
-                                    val siblingDomain = siblingNode.label ?: siblingNode.id
-                                    val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
-                                    val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
+                            if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
+                                val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
+                                val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
+                                withContext(dbWriteDispatcher) {
                                     rankingService.recordMatch(
                                         query = cacheKey,
-                                        domain = siblingDomain,
+                                        domain = domainName,
                                         winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
                                         loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
                                         isTie = isTie,
@@ -745,55 +733,150 @@ class TaxonomyBenchmarkService(
                                     )
                                 }
                             }
+
+                            val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
+                            val aCorrectVal = modelCorrect[task.modelA] ?: false
+                            val bCorrectVal = modelCorrect[task.modelB] ?: false
+                            val accWinner = when {
+                                aCorrectVal && !bCorrectVal -> "MODEL A"
+                                bCorrectVal && !aCorrectVal -> "MODEL B"
+                                else -> "TIE"
+                            }
+                            val judgeWinnerVal = primaryEval.winner.uppercase()
+                            val judgeAgreed = (judgeWinnerVal == accWinner)
+
+                            withContext(dbWriteDispatcher) {
+                                propagateOutcome(
+                                    leafId = leafNode.id,
+                                    modelA = task.modelA,
+                                    modelB = task.modelB,
+                                    outcome = primaryEval,
+                                    snapshotId = snapshotId,
+                                    judgeAgreed = judgeAgreed
+                                )
+                            }
+
+                            val otherLeaves = queryToLeaves[qId]?.filter { it != task.nodeId } ?: emptyList()
+                            for (siblingLeafId in otherLeaves) {
+                                val siblingNode = allNodes.firstOrNull { it.id == siblingLeafId } ?: continue
+                                if (siblingNode.judgePrompt == null) continue
+                                withContext(dbWriteDispatcher) {
+                                    propagateOutcome(
+                                        leafId = siblingLeafId,
+                                        modelA = task.modelA,
+                                        modelB = task.modelB,
+                                        outcome = primaryEval,
+                                        snapshotId = snapshotId,
+                                        judgeAgreed = judgeAgreed
+                                    )
+                                    if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
+                                        val siblingDomain = siblingNode.label ?: siblingNode.id
+                                        val isTie = primaryEval.winner.equals("TIE", ignoreCase = true)
+                                        val isModelA = primaryEval.winner.equals("Model A", ignoreCase = true)
+                                        rankingService.recordMatch(
+                                            query = cacheKey,
+                                            domain = siblingDomain,
+                                            winner = if (isTie) task.modelA else if (isModelA) task.modelA else task.modelB,
+                                            loser = if (isTie) task.modelB else if (isModelA) task.modelB else task.modelA,
+                                            isTie = isTie,
+                                            confidence = primaryEval.confidence,
+                                            snapshotId = snapshotId,
+                                            modelA = task.modelA,
+                                            modelB = task.modelB
+                                        )
+                                    }
+                                }
+                            }
+
+                            val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
+                            val aCorrect = aCorrectVal
+                            val bCorrect = bCorrectVal
+                            val gtWinner = when {
+                                aCorrect && !bCorrect -> task.modelA
+                                bCorrect && !aCorrect -> task.modelB
+                                else -> "tie"
+                            }
+                            val judgeWinner = when (primaryEval.winner) {
+                                "Model A" -> task.modelA
+                                "Model B" -> task.modelB
+                                else -> "tie"
+                            }
+                            val agrees = judgeWinner == gtWinner
+                            val pairKey = "${task.modelA}_vs_${task.modelB}"
+
+                            val triple = FrozenMatchTriple(
+                                questionId = qId,
+                                modelA = task.modelA,
+                                modelB = task.modelB,
+                                nodeId = task.nodeId
+                            )
+                            synchronized(evaluatedTriples) {
+                                evaluatedTriples.add(triple)
+                            }
+
+                            QueryBenchmarkResult(
+                                query = sample.questionText,
+                                gtCategory = gtCategory,
+                                gtCorrectAnswer = gtAnswer,
+                                modelAnswers = modelAnswers,
+                                modelCorrect = modelCorrect,
+                                matchedLeafLabels = listOf(primaryEval.domain),
+                                hadJudge = (cached == null && !req.condition.equals("ORACLE", ignoreCase = true)),
+                                domainEvaluations = listOf(primaryEval),
+                                pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
+                                judgeAccuracyAgreement = mapOf(pairKey to agrees),
+                                queryId = qId
+                            )
                         }
 
-                        val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
-                        val aCorrect = aCorrectVal
-                        val bCorrect = bCorrectVal
-                        val gtWinner = when {
-                            aCorrect && !bCorrect -> task.modelA
-                            bCorrect && !aCorrect -> task.modelB
-                            else -> "tie"
+                        if (taskResults.isNotEmpty()) {
+                            synchronized(completedResults) {
+                                completedResults.addAll(taskResults)
+                            }
+                            publishProgress(false)
                         }
-                        val judgeWinner = when (primaryEval.winner) {
-                            "Model A" -> task.modelA
-                            "Model B" -> task.modelB
-                            else -> "tie"
+                        taskResults
+                    } catch (e: Exception) {
+                        log.error("Hard error occurred during judging of task ${task.modelA} vs ${task.modelB} on node ${task.nodeId}: ${e.message}", e)
+                        val fallbackResults = task.queryIds.mapNotNull { queryIdStr ->
+                            val qId = queryIdStr.toIntOrNull() ?: return@mapNotNull null
+                            val modelResults = matrix[qId] ?: return@mapNotNull null
+                            val sample = modelResults.values.firstOrNull() ?: return@mapNotNull null
+                            
+                            val pairKey = "${task.modelA}_vs_${task.modelB}"
+                            val primaryEval = DomainEvaluation(
+                                domain = leafNode.label ?: leafNode.id,
+                                winner = "INVALID",
+                                rationale = "CRITICAL HARD ERROR: ${e.message}",
+                                confidence = 0.0,
+                                positionFlip = false,
+                                nodeId = leafNode.id
+                            )
+                            val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
+                            val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
+                            
+                            QueryBenchmarkResult(
+                                query = sample.questionText,
+                                gtCategory = sample.category,
+                                gtCorrectAnswer = sample.gtAnswer,
+                                modelAnswers = modelAnswers,
+                                modelCorrect = modelCorrect,
+                                matchedLeafLabels = listOf(primaryEval.domain),
+                                hadJudge = true,
+                                domainEvaluations = listOf(primaryEval),
+                                pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
+                                judgeAccuracyAgreement = mapOf(pairKey to false),
+                                queryId = qId
+                            )
                         }
-                        val agrees = judgeWinner == gtWinner
-                        val pairKey = "${task.modelA}_vs_${task.modelB}"
-
-                        val triple = FrozenMatchTriple(
-                            questionId = qId,
-                            modelA = task.modelA,
-                            modelB = task.modelB,
-                            nodeId = task.nodeId
-                        )
-                        synchronized(evaluatedTriples) {
-                            evaluatedTriples.add(triple)
+                        if (fallbackResults.isNotEmpty()) {
+                            synchronized(completedResults) {
+                                completedResults.addAll(fallbackResults)
+                            }
+                            publishProgress(false)
                         }
-
-                        QueryBenchmarkResult(
-                            query = sample.questionText,
-                            gtCategory = gtCategory,
-                            gtCorrectAnswer = gtAnswer,
-                            modelAnswers = modelAnswers,
-                            modelCorrect = modelCorrect,
-                            matchedLeafLabels = listOf(primaryEval.domain),
-                            hadJudge = (cached == null && !req.condition.equals("CANONICAL", ignoreCase = true)),
-                            domainEvaluations = listOf(primaryEval),
-                            pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
-                            judgeAccuracyAgreement = mapOf(pairKey to agrees)
-                        )
+                        fallbackResults
                     }
-
-                    if (taskResults.isNotEmpty()) {
-                        synchronized(completedResults) {
-                            completedResults.addAll(taskResults)
-                        }
-                        publishProgress(false)
-                    }
-                    taskResults
                 }
             }.awaitAll().flatten()
 
@@ -886,17 +969,52 @@ class TaxonomyBenchmarkService(
             currentAggregated = aggregated
             publishProgress(true)
 
+            val totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons }
+            val dummyReport = BenchmarkReport(
+                totalQueries = completedResults.size,
+                totalModelPairs = modelNames.size * (modelNames.size - 1) / 2,
+                coverageRate = 1.0,
+                overallJudgeAccuracyAgreement = 1.0,
+                perPairStats = emptyList(),
+                perDomainStats = emptyList(),
+                perCategoryStats = emptyList(),
+                queryResults = completedResults.toList()
+            )
+            val intermediateReport = try {
+                ValidationService.computeMetrics(dummyReport, modelNames, "OVERALL", bootstrapResamples = 1)
+            } catch (e: Exception) {
+                null
+            }
+            if (intermediateReport != null) {
+                trajectory.add(
+                    TrajectoryPoint(
+                        round = round,
+                        comparisons = totalComparisons,
+                        spearmanRho = intermediateReport.spearmanRho,
+                        kendallTau = intermediateReport.kendallTau,
+                        pairwiseWinnerAccuracy = intermediateReport.pairwiseWinnerAccuracy
+                    )
+                )
+                log.info("Trajectory [Round $round]: comparisons = $totalComparisons, spearmanRho = ${intermediateReport.spearmanRho}, pairwiseWinnerAccuracy = ${intermediateReport.pairwiseWinnerAccuracy}")
+            }
+
             round++
         }
 
-        val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
-        val report = aggregate(completedResults, pairs, req)
+        val totalMatches = pairStatsMap.values.flatten().sumOf { it.totalComparisons }
+        if (req.condition.equals("MAIN", ignoreCase = true)) {
+            mainConditionTotalComparisons = totalMatches
+            log.info("MAIN condition finished. Captured budget limit: $mainConditionTotalComparisons matches.")
+        }
 
-        // Export evaluated triples if this is the C1/canonical/MAIN condition
-        val isExportCondition = req.condition.equals("MAIN", ignoreCase = true) || req.condition.equals("CANONICAL", ignoreCase = true)
+        val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
+        val report = aggregate(completedResults, pairs, req, trajectory)
+
+        // Export evaluated triples if this is the C1/MAIN condition
+        val isExportCondition = req.condition.equals("MAIN", ignoreCase = true)
         if (isExportCondition && evaluatedTriples.isNotEmpty()) {
-            val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_CANONICAL").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER")
-            val triplesFile = File("frozen_triples_${baseSnapshotId}.json")
+            val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+            val triplesFile = File("frozen_triples_${baseSnapshotId}_MAIN.json")
             try {
                 triplesFile.writeText(json.encodeToString<List<FrozenMatchTriple>>(evaluatedTriples))
                 log.info("Successfully exported ${evaluatedTriples.size} frozen triples to ${triplesFile.absolutePath}")
@@ -946,7 +1064,7 @@ class TaxonomyBenchmarkService(
                     val domainName = requireNotNull(primaryJudge.label) { "Leaf node ${primaryJudge.id} has no label" }
 
                     val cacheKey = "${sample.questionId}::${sample.questionText}"
-                    val cached = if (req.condition.equals("CANONICAL", ignoreCase = true)) null else rankingService.getRecordedMatch(
+                    val cached = if (req.condition.equals("ORACLE", ignoreCase = true)) null else rankingService.getRecordedMatch(
                         snapshotId = snapshotId,
                         domain = domainName,
                         query = cacheKey,
@@ -1073,7 +1191,8 @@ class TaxonomyBenchmarkService(
             hadJudge = hadJudge,
             domainEvaluations = domainEvaluations,
             pairEvaluations = pairEvaluations,
-            judgeAccuracyAgreement = judgeAccuracyAgreement
+            judgeAccuracyAgreement = judgeAccuracyAgreement,
+            queryId = questionId
         )
     }
 
@@ -1082,7 +1201,8 @@ class TaxonomyBenchmarkService(
     private fun aggregate(
         results: List<QueryBenchmarkResult>,
         pairs: List<Pair<String, String>>,
-        req: BenchmarkRequest
+        req: BenchmarkRequest,
+        trajectory: List<TrajectoryPoint> = emptyList()
     ): BenchmarkReport {
 
         // ─── Compute judge-GT agreement per leaf ───
@@ -1250,7 +1370,8 @@ class TaxonomyBenchmarkService(
             perPairStats = perPairStats,
             perDomainStats = perDomainStats,
             perCategoryStats = perCategoryStats,
-            queryResults = results
+            queryResults = results,
+            trajectory = trajectory
         )
     }
 

@@ -330,13 +330,10 @@ class ModelEvalLoader(
     }
 
     private fun loadReservedTextsFromFile(): Set<String> {
-        val file = File(reservedFilePath)
-        if (!file.exists()) return emptySet()
         return try {
-            val map: Map<String, List<String>> = json.decodeFromString(file.readText())
-            map.values.flatten().toSet()
+            store.getReservedQuestionTexts()
         } catch (e: Exception) {
-            log.warn("Could not parse reserved_test_queries.json: ${e.message}")
+            log.warn("Could not load reserved question texts from database: ${e.message}")
             emptySet()
         }
     }
