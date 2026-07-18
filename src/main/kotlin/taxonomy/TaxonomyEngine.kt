@@ -285,8 +285,8 @@ class TaxonomyEngine(
                 }
             }
 
-            if (!config.execution.enableLiveLabeling && config.execution.enableLabeling) {
-                log.info("Post-Pass: Live Labeling was disabled. Performing post-pass labeling on all nodes.")
+            if (config.execution.enableLabeling) {
+                log.info("Performing post-pass labeling on all nodes.")
                 taxonomyService.updateGenerationProgress(
                     GenerationProgress(
                         currentIteration = totalIters,

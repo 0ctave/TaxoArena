@@ -31,6 +31,14 @@ internal class WelcomeKeyHandler {
                 }
             }
 
+            "c", "C" -> {
+                val idx = state.startup.selectedWelcomeIdx - 1
+                if (idx in state.snapshot.snapshotList.indices) {
+                    val snap = state.snapshot.snapshotList[idx]
+                    dispatch(TuiEvent.CopySnapshotId(snap.id))
+                }
+            }
+
             "enter" -> {
                 if (state.startup.selectedWelcomeIdx == 0) {
                     dispatch(TuiEvent.EnterConfigSetup)

@@ -273,56 +273,7 @@ class TaxonomySplitter(
         parent: GraphNode,
         vmf: StatisticsUtils.VmfParameters
     ): GraphNode {
-        val representativeSamples = selectRepresentativeQueries(cluster, parent.depth + 1)
-        val lineage = mutableListOf<String>()
-        var current: GraphNode? = parent
-        val visitedLineage = mutableSetOf<String>()
-        while (current != null && visitedLineage.add(current.id)) {
-            lineage.add(0, current.label ?: "Emergent Concept")
-            current = current.parents.firstOrNull()
-        }
-
-        val siblingLabels = parent.children.mapNotNull { it.label }
-        val domainAnchors = representativeSamples.mapNotNull { question ->
-            datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
-                word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-            }
-        }.groupBy { it }.mapValues { it.value.size }
-            .entries.sortedByDescending { it.value }
-            .map { "${it.key} (${it.value} queries)" }
-
-        val label = if (config.execution.enableLiveLabeling && config.execution.enableLabeling) {
-            val prompt = TaxoPrompts.clusterLabeling(
-                querySamples = representativeSamples,
-                parentLabel = parent.label ?: "Universal Knowledge",
-                siblingLabels = siblingLabels,
-                branchHistory = lineage,
-                domainAnchors = domainAnchors,
-                depth = parent.depth + 1
-            )
-
-            val labelSchema = JsonSchema.builder()
-                .name("ClusterLabel")
-                .rootElement(
-                    JsonObjectSchema.builder()
-                        .addStringProperty("label", "A concise, domain-specific label for the concept cluster (3-7 words)")
-                        .required("label")
-                        .build()
-                )
-                .build()
-
-            val jsonResponse = llmSemaphore.withPermit {
-                llmClient.queryModelStructured(
-                    modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
-                    systemPrompt = null,
-                    userPrompt = prompt,
-                    schema = labelSchema
-                )
-            }
-            TaxoPrompts.parseClusterLabel(jsonResponse) ?: "Discovered Concept"
-        } else {
-            "Emergent Concept #${conceptCounter.getAndIncrement()}"
-        }
+        val label = "Emergent Concept #${conceptCounter.getAndIncrement()}"
 
         val newNode = GraphNode(label = label, depth = parent.depth + 1).apply {
             vmfMu = vmf.mu

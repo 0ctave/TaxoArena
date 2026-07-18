@@ -215,7 +215,6 @@ fun ConfigSnapshotPanel(
     add("  Iterations   ${config.execution.numIterations}")
     add("  Early stop   ${config.execution.enableEarlyStopping}")
     add("  Labeling     ${config.execution.enableLabeling}")
-    add("  Live label   ${config.execution.enableLiveLabeling}")
     add("")
 
     add("LLM", Cyan, true)

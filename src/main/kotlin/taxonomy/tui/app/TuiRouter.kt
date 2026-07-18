@@ -113,6 +113,7 @@ private fun HelpOverlay(
                 StartupState.LOAD_DAG -> {
                     Text("Load / Welcome", color = Cyan, textStyle = Bold)
                     Text("  Enter      Create new DAG / load snapshot", color = White)
+                    Text("  C          Copy selected snapshot ID", color = White)
                     Text("  D          Delete selected snapshot", color = White)
                     Text("  Q / Esc    Quit", color = White)
                 }
@@ -128,7 +129,7 @@ private fun HelpOverlay(
                 StartupState.MAINDASHBOARD -> {
                     Text("Dashboard", color = Cyan, textStyle = Bold)
                     Text("  M Metrics   C Config   A Arena   B Benchmark   T Trickle", color = White)
-                    Text("  G Generate judges", color = White)
+                    Text("  G Generate judges   Y Copy active snapshot ID", color = White)
                     Spacer()
                     Text("DAG Explorer (topology focus)", color = Cyan, textStyle = Bold)
                     Text("  →/L        Expand     ←/H  Collapse     Space  Toggle", color = White)
@@ -169,20 +170,26 @@ private fun WelcomeRoute(
         )
         Spacer(Modifier.width(1).height(contentH))
         Panel("SNAPSHOT SUMMARY", White, rightW, contentH) {
+            val rLimit = (rightW - 4).coerceAtLeast(1)
             Column(modifier = Modifier.padding(left = 2, top = 1)) {
                 val selectedSnapshot =
                     state.snapshot.snapshotList.getOrNull(state.startup.selectedWelcomeIdx - 1)
                 if (selectedSnapshot == null) {
-                    Text("Create a fresh taxonomy DAG or load a saved snapshot.", color = White)
+                    Text("Create a fresh taxonomy DAG or load a saved snapshot.".take(rLimit), color = White)
                 } else {
-                    Text(selectedSnapshot.description, color = White, textStyle = Bold)
+                    Text(selectedSnapshot.description.take(rLimit), color = White, textStyle = Bold)
                     Spacer()
-                    Text("Time ${selectedSnapshot.timestamp}", color = White)
-                    Text("Dataset ${selectedSnapshot.settings.datasetType}", color = White)
-                    Text("Total Nodes ${selectedSnapshot.metrics.totalNodes}", color = White)
-                    Text("Judged Nodes ${selectedSnapshot.metrics.nodesWithJudges}", color = White)
+                    Text("ID ${selectedSnapshot.id}".take(rLimit), color = Cyan)
+                    if (state.snapshot.lastCopiedId == selectedSnapshot.id) {
+                        Text("  (Copied to clipboard!)".take(rLimit), color = Green)
+                    }
+                    Spacer()
+                    Text("Time ${selectedSnapshot.timestamp}".take(rLimit), color = White)
+                    Text("Dataset ${selectedSnapshot.settings.datasetType}".take(rLimit), color = White)
+                    Text("Total Nodes ${selectedSnapshot.metrics.totalNodes}".take(rLimit), color = White)
+                    Text("Judged Nodes ${selectedSnapshot.metrics.nodesWithJudges}".take(rLimit), color = White)
                     Text(
-                        "Equilibrium ${"%.1f".format(Locale.US, selectedSnapshot.metrics.equilibriumIndex * 100.0)}",
+                        "Equilibrium ${"%.1f".format(Locale.US, selectedSnapshot.metrics.equilibriumIndex * 100.0)}".take(rLimit),
                         color = White
                     )
                 }
@@ -192,11 +199,14 @@ private fun WelcomeRoute(
 
     HotkeyBar(
         width,
-        contextual = listOf(
-            HotkeyAction("Enter", "Select", TuiTheme.ACCENT, isPrimary = true),
-            HotkeyAction("D", "Delete Snapshot"),
-            HotkeyAction("Q", "Quit", TuiTheme.ERROR),
-        ),
+        contextual = buildList {
+            add(HotkeyAction("Enter", "Select", TuiTheme.ACCENT, isPrimary = true))
+            if (state.startup.selectedWelcomeIdx > 0) {
+                add(HotkeyAction("C", "Copy ID"))
+                add(HotkeyAction("D", "Delete Snapshot"))
+            }
+            add(HotkeyAction("Q", "Quit", TuiTheme.ERROR))
+        },
         global = GlobalHotkeys.forState(state),
     )
 }

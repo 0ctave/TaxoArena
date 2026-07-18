@@ -275,6 +275,14 @@ object TuiReducer {
                 )
             }
 
+            is TuiEvent.CopySnapshotId -> {
+                state.copy(
+                    snapshot = state.snapshot.copy(
+                        lastCopiedId = event.snapshotId
+                    )
+                )
+            }
+
             is TuiEvent.SnapshotLoadFailed ->
                 state.copy(
                     startup = state.startup.copy(

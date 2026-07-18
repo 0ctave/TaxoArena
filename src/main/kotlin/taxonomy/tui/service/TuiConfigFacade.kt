@@ -35,14 +35,6 @@ class TuiConfigFacade(
             kind = SettingKind.BOOLEAN
         ),
         SettingItem(
-            name = "Live Labeling",
-            description = "Enable live LLM labeling during execution",
-            category = "Execution Settings",
-            getValue = { deps.config.execution.enableLiveLabeling.toString() },
-            setValue = { s -> s.toBooleanStrictOrNull()?.let { deps.config.execution.enableLiveLabeling = it; true } ?: false },
-            kind = SettingKind.BOOLEAN
-        ),
-        SettingItem(
             name = "LLM Parallelism Limit",
             description = "Max parallel LLM requests limit for DAG generation & judge generation",
             category = "Execution Settings",

@@ -64,7 +64,10 @@ object DashboardHotkeys {
         val arenaActions = buildList {
             add(HotkeyAction("A", "Arena"))
             add(HotkeyAction("G", "Generate Judges", TuiTheme.OK))
-            if (isViewingSnapshot) add(HotkeyAction("N", "Rename Snap"))
+            if (isViewingSnapshot) {
+                add(HotkeyAction("N", "Rename Snap"))
+                add(HotkeyAction("Y", "Copy ID"))
+            }
         }
         val arenaGroup = HotkeyGroup(label = "Arena", actions = arenaActions)
 

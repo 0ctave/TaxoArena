@@ -22,6 +22,7 @@ import taxonomy.model.GraphNode
 import taxonomy.TaxonomyEngine
 import taxonomy.service.TaxonomyJudgeService
 import taxonomy.model.ModelRank
+import taxonomy.utils.ReportGenerator
 import java.io.File
 import java.time.Instant
 
@@ -48,7 +49,6 @@ data class HeadlessCliConfig(
     val assignmentGap: Double? = null,
     val emaAlpha: Double? = null,
     val enableLabeling: Boolean? = null,
-    val enableLiveLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
     val datasetType: String? = null,
     val runBenchmark: Boolean = true,
@@ -120,7 +120,6 @@ class HeadlessBenchmarkRunner(
         cliConfig.assignmentGap?.let { config.formalism.assignmentGap = it }
         cliConfig.emaAlpha?.let { config.formalism.emaAlpha = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
-        cliConfig.enableLiveLabeling?.let { config.execution.enableLiveLabeling = it }
         cliConfig.datasetType?.let {
             config.dataset.datasetType = taxonomy.config.DatasetType.valueOf(it.uppercase())
         }
@@ -169,6 +168,24 @@ class HeadlessBenchmarkRunner(
                 ?: throw IllegalStateException("Failed to save snapshot for the newly generated DAG")
             snapshotId = snapshot.id
             log.info("Successfully generated and saved snapshot. Snapshot ID: $snapshotId")
+
+            // Generate baseline snapshots via Python subprocess
+            try {
+                log.info("Generating baseline snapshots via Python subprocess...")
+                val pb = ProcessBuilder("python", "scripts/generate_baselines.py")
+                pb.directory(File("."))
+                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT)
+                val process = pb.start()
+                val exitCode = process.waitFor()
+                if (exitCode == 0) {
+                    log.info("Baseline snapshots successfully generated.")
+                } else {
+                    log.error("Baseline generation failed with exit code $exitCode")
+                }
+            } catch (e: Exception) {
+                log.error("Failed to run baseline generator: ${e.message}", e)
+            }
         } else {
             log.info("Loading pre-existing snapshot: $snapshotId")
             root = snapshotManager.loadSnapshot(snapshotId)
@@ -228,6 +245,31 @@ class HeadlessBenchmarkRunner(
                 log.info("RUNNING CONDITION: $condition")
                 log.info("========================================")
 
+                val isKmeans = condition.equals("KMEANS_BASELINE", ignoreCase = true)
+                val isWard = condition.equals("WARD_BASELINE", ignoreCase = true)
+                val isRandomNull = condition.equals("RANDOMNULL_BASELINE", ignoreCase = true)
+
+                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_CANONICAL").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+
+                val activeRoot = when {
+                    isKmeans -> {
+                        log.info("Loading Flat k-means (k=17) baseline snapshot...")
+                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_kmeans") ?: root
+                    }
+                    isWard -> {
+                        log.info("Loading HAC Ward (cut=17) baseline snapshot...")
+                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_ward") ?: root
+                    }
+                    isRandomNull -> {
+                        log.info("Loading Random null baseline snapshot...")
+                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_randomnull") ?: root
+                    }
+                    else -> root
+                }
+
+                ensureJudgePrompts(activeRoot)
+                taxonomyService.setGraph(activeRoot)
+
                 // Suffix active snapshotId to isolate condition stats in SQLite
                 val suffixedSnapshotId = "${snapshotId}_$condition"
                 taxonomyService.setActiveSnapshotId(suffixedSnapshotId)
@@ -260,9 +302,10 @@ class HeadlessBenchmarkRunner(
 
                 // Export results
                 exportValidationMetrics(validationDir, condition, report)
-                exportLeafLeaderboard(validationDir, condition, suffixedSnapshotId, root, cliConfig.models)
+                exportLeafLeaderboard(validationDir, condition, suffixedSnapshotId, activeRoot, cliConfig.models)
                 exportDomainStats(validationDir, condition, report)
                 exportVerdicts(judgingDir, condition, report)
+                ReportGenerator.generateAndExport(validationDir, condition, report, activeRoot, cliConfig.models)
 
                 // Compute and export LaTeX table for the global leaderboard
                 val leafIds = mutableListOf<String>()
@@ -272,7 +315,7 @@ class HeadlessBenchmarkRunner(
                     if (n.children.isEmpty()) leafIds.add(n.id)
                     else n.children.forEach { walk(it) }
                 }
-                walk(root)
+                walk(activeRoot)
                 val globalLeaderboard = rankingService.aggregateLeafScores(leafIds, suffixedSnapshotId)
                 exportLatexTable(validationDir, condition, globalLeaderboard.ranks)
 
@@ -562,16 +605,37 @@ class HeadlessBenchmarkRunner(
         var assignmentGap: Double? = null
         var emaAlpha: Double? = null
         var enableLabeling: Boolean? = null
-        var enableLiveLabeling: Boolean? = null
         var judgeInduction = false
         var datasetType: String? = null
         var runBenchmark = true
         var runTrickle = false
         var domains = listOf<String>()
 
+        val lines = mutableListOf<String>()
+        var inArray = false
+        var arrayBuffer = StringBuilder()
+
         text.lines().forEach { rawLine ->
-            val line = rawLine.substringBefore("#").trim()
-            if (line.isEmpty() || !line.contains("=")) return@forEach
+            val trimmed = rawLine.substringBefore("#").trim()
+            if (trimmed.isEmpty()) return@forEach
+
+            if (inArray) {
+                arrayBuffer.append(" ").append(trimmed)
+                if (trimmed.contains("]")) {
+                    lines.add(arrayBuffer.toString())
+                    inArray = false
+                }
+            } else {
+                if (trimmed.contains("=") && trimmed.substringAfter("=").trim().startsWith("[") && !trimmed.contains("]")) {
+                    inArray = true
+                    arrayBuffer = StringBuilder(trimmed)
+                } else {
+                    lines.add(trimmed)
+                }
+            }
+        }
+
+        lines.forEach { line ->
             val key = line.substringBefore("=").trim()
             val rawVal = line.substringAfter("=").trim()
 
@@ -601,7 +665,6 @@ class HeadlessBenchmarkRunner(
                 "assignmentGap" -> assignmentGap = rawVal.toDouble()
                 "emaAlpha" -> emaAlpha = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
-                "enableLiveLabeling" -> enableLiveLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
                 "datasetType" -> datasetType = rawVal.trim('"', '\'')
                 "runBenchmark" -> runBenchmark = rawVal.toBoolean()
@@ -631,7 +694,6 @@ class HeadlessBenchmarkRunner(
             assignmentGap = assignmentGap,
             emaAlpha = emaAlpha,
             enableLabeling = enableLabeling,
-            enableLiveLabeling = enableLiveLabeling,
             judgeInduction = judgeInduction,
             datasetType = datasetType,
             runBenchmark = runBenchmark,

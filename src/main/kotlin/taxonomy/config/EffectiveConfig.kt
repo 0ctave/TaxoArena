@@ -25,8 +25,7 @@ data class EffectiveConfig(
     data class Execution(
         val numIterations: Int = 15,
         val enableEarlyStopping: Boolean = true,
-        val enableLabeling: Boolean = false,
-        val enableLiveLabeling: Boolean = false
+        val enableLabeling: Boolean = false
     )
 
     @Serializable

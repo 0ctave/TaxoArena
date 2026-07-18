@@ -137,7 +137,7 @@ class TaxonomySnapshotTest {
             totalNodes = 3, leafNodes = 2, crossDomainNodes = 0, maxDepth = 1, totalUniqueQueries = 10,
         ),
         settings = SnapshotSettings(
-            selectedDomains = emptyList(), maxDepth = 8, enableLabeling = false, enableLiveLabeling = false,
+            selectedDomains = emptyList(), maxDepth = 8, enableLabeling = false,
             separationEpsilon = 0.02, minClusterSize = 25, cosineTau = 5.0, assignmentGap = 1.0, emaAlpha = 0.7,
         ),
         logTrace = logTrace,

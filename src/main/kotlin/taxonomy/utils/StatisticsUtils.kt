@@ -19,7 +19,7 @@ object StatisticsUtils {
         val kappaML   = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
         val shrinkage = (n - 1).toDouble() / (n + d - 2).toDouble().coerceAtLeast(1.0)
         if (n > 0 && d.toDouble() / n > 10.0) {
-            log.warn("[VMF] d/N=${"%.2f".format(d.toDouble() / n)} > 10 — κ estimate unreliable, NiW prior dominates")
+            log.debug("[VMF] d/N=${"%.2f".format(d.toDouble() / n)} > 10 — κ estimate unreliable, NiW prior dominates")
         }
         return (kappaML * shrinkage).coerceIn(1e-3, 1e4)
     }

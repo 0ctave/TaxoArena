@@ -25,7 +25,6 @@ class TaxonomyConfig {
         var enableVisualization: Boolean = true
         var enableTui: Boolean = true
         var enableLabeling: Boolean = false
-        var enableLiveLabeling: Boolean = false
 
         /**
          * Kill-switch for the pre-flight TTY probe done before the TUI enters the alt-screen.
@@ -120,7 +119,6 @@ class TaxonomyConfig {
         sb.append("│   - Num Iterations:       ${execution.numIterations}\n")
         sb.append("│   - Early Stopping:       ${execution.enableEarlyStopping}\n")
         sb.append("│   - Labeling:             ${execution.enableLabeling}\n")
-        sb.append("│   - Live Labeling:        ${execution.enableLiveLabeling}\n")
         sb.append("│   - Selected Domains:     ${dataset.selectedDomains.ifEmpty { listOf("All") }}\n")
         sb.append("│   - Split Dataset:        ${dataset.splitDataset}\n")
         sb.append("│   - Test Split Ratio:     ${dataset.testSplitRatio}\n")
@@ -148,8 +146,7 @@ class TaxonomyConfig {
         execution = EffectiveConfig.Execution(
             numIterations = execution.numIterations,
             enableEarlyStopping = execution.enableEarlyStopping,
-            enableLabeling = execution.enableLabeling,
-            enableLiveLabeling = execution.enableLiveLabeling
+            enableLabeling = execution.enableLabeling
         ),
         dataset = EffectiveConfig.Dataset(
             datasetType = dataset.datasetType,
@@ -181,7 +178,6 @@ class TaxonomyConfig {
         execution.numIterations = c.execution.numIterations
         execution.enableEarlyStopping = c.execution.enableEarlyStopping
         execution.enableLabeling = c.execution.enableLabeling
-        execution.enableLiveLabeling = c.execution.enableLiveLabeling
 
         dataset.datasetType = c.dataset.datasetType
         dataset.splitDataset = c.dataset.splitDataset

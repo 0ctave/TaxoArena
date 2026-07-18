@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import taxonomy.prompts.GenericPairwiseJudgePrompt
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.EmbeddingCache
 import taxonomy.dataset.ModelEvalStore
@@ -382,11 +383,49 @@ class TaxonomyArenaService(
             "Information leakage: prompt contains the ground truth answer!"
         }
 
-        val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node, condition), buildJudgeUserPrompt(query, traceA, traceB), judgeSchema) }
-        val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node, condition), buildJudgeUserPrompt(query, traceB, traceA), judgeSchema) }
+        val isC5 = condition.equals("C5", ignoreCase = true) || condition.equals("GENERIC_PAIRV2", ignoreCase = true)
+        val res1: ParseResult
+        val res2: ParseResult
 
-        val res1 = parseJudgeResponse(p1.await())
-        val res2 = parseJudgeResponse(p2.await())
+        if (isC5) {
+            val systemPrompt = GenericPairwiseJudgePrompt.SYSTEM_PROMPT
+            
+            val userPrompt1 = GenericPairwiseJudgePrompt.USER_TEMPLATE
+                .replace("{question}", query)
+                .replace("{answer_a}", traceA)
+                .replace("{answer_b}", traceB)
+            
+            val userPrompt2 = GenericPairwiseJudgePrompt.USER_TEMPLATE
+                .replace("{question}", query)
+                .replace("{answer_a}", traceB)
+                .replace("{answer_b}", traceA)
+
+            val p1Raw = async { llmClient.queryModel(config.llm.judgeModel, systemPrompt, userPrompt1) }
+            val p2Raw = async { llmClient.queryModel(config.llm.judgeModel, systemPrompt, userPrompt2) }
+
+            val p1Text = p1Raw.await()
+            val p2Text = p2Raw.await()
+
+            fun parseVerbatim(text: String): ParseResult {
+                val winner = when {
+                    text.contains("[[A]]") -> "Model A"
+                    text.contains("[[B]]") -> "Model B"
+                    text.contains("[[C]]") -> "TIE"
+                    else -> "INVALID"
+                }
+                val explanation = text.substringBefore("[[").trim()
+                return ParseResult(winner, explanation, if (winner == "INVALID") 0.0 else 0.85, winner == "TIE")
+            }
+
+            res1 = parseVerbatim(p1Text)
+            res2 = parseVerbatim(p2Text)
+        } else {
+            val p1 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node, condition), buildJudgeUserPrompt(query, traceA, traceB), judgeSchema) }
+            val p2 = async { llmClient.queryModelStructured(config.llm.judgeModel, buildJudgeSystemPrompt(node, condition), buildJudgeUserPrompt(query, traceB, traceA), judgeSchema) }
+
+            res1 = parseJudgeResponse(p1.await())
+            res2 = parseJudgeResponse(p2.await())
+        }
 
         val vote1 = res1.winner
         val vote2 = when (res2.winner) {
@@ -738,12 +777,13 @@ class TaxonomyArenaService(
 
     private fun buildJudgeSystemPrompt(node: GraphNode, condition: String = "MAIN"): String {
         val useGeneric = condition.equals("GENERIC_JUDGE", ignoreCase = true)
+        val isC3 = condition.equals("C3", ignoreCase = true)
         val systemPrompt = if (useGeneric) {
             "You are an expert academic evaluator. Analyze the two responses and grade them based on overall correctness and reasoning quality."
         } else {
             node.judgePrompt ?: "You are an expert academic evaluator in the domain: ${node.label ?: "General Science"}."
         }
-        val rubric = if (useGeneric) {
+        val rubric = if (useGeneric || isC3) {
             "Grade the response based on domain correctness, precision, and logical reasoning."
         } else {
             node.judgeRubric ?: "Grade the response based on domain correctness, precision, and logical reasoning."

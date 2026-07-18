@@ -149,7 +149,6 @@ data class SnapshotSettings(
     val selectedDomains: List<String>,
     val maxDepth: Int,
     val enableLabeling: Boolean,
-    val enableLiveLabeling: Boolean,
     val separationEpsilon: Double,
     val minClusterSize: Int,
     val cosineTau: Double,
@@ -166,8 +165,7 @@ data class SnapshotSettings(
     /** Map the legacy persisted settings onto the effective config; unknown fields keep defaults. */
     fun toEffectiveConfig(): EffectiveConfig = EffectiveConfig(
         execution = EffectiveConfig.Execution(
-            enableLabeling = enableLabeling,
-            enableLiveLabeling = enableLiveLabeling
+            enableLabeling = enableLabeling
         ),
         dataset = EffectiveConfig.Dataset(
             datasetType = datasetType,
@@ -496,7 +494,6 @@ class TaxonomySnapshotManager(
             selectedDomains = config.dataset.selectedDomains,
             maxDepth = config.formalism.maxDepth,
             enableLabeling = config.execution.enableLabeling,
-            enableLiveLabeling = config.execution.enableLiveLabeling,
             separationEpsilon = config.formalism.separationEpsilon,
             minClusterSize = config.formalism.minClusterSize,
             cosineTau = config.formalism.cosineTau,

@@ -9,6 +9,9 @@ import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.dataset.ModelEvalResult
 import taxonomy.model.*
+import java.io.File
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import kotlin.collections.filter
 import kotlin.math.abs
 import kotlin.math.exp
@@ -25,6 +28,7 @@ class TaxonomyBenchmarkService(
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.BenchmarkService")
     private val dbWriteDispatcher = Dispatchers.IO.limitedParallelism(1)
+    private val json = Json { ignoreUnknownKeys = true }
 
     private fun getAllNodes(root: GraphNode): List<GraphNode> {
         val visited = mutableSetOf<String>()
@@ -180,6 +184,27 @@ class TaxonomyBenchmarkService(
         )
 
         val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
+        val isReplayCondition = req.condition.equals("C3", ignoreCase = true) || req.condition.equals("C5", ignoreCase = true)
+        val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_CANONICAL").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER")
+        
+        val replayTriples: List<FrozenMatchTriple>? = if (isReplayCondition) {
+            val triplesFile = File("frozen_triples_${baseSnapshotId}.json")
+            if (triplesFile.exists()) {
+                try {
+                    log.info("Loading frozen triples from ${triplesFile.absolutePath} for replay...")
+                    json.decodeFromString<List<FrozenMatchTriple>>(triplesFile.readText())
+                } catch (e: Exception) {
+                    log.error("Failed to parse frozen triples: ${e.message}", e)
+                    null
+                }
+            } else {
+                log.warn("No frozen triples file found at ${triplesFile.absolutePath} — running live scheduler instead.")
+                null
+            }
+        } else {
+            null
+        }
+        val evaluatedTriples = mutableListOf<FrozenMatchTriple>()
         if (req.updateRankings) {
             val savedOffsets = rankingService.getPairQueryOffsets(snapshotId)
             if (savedOffsets.isNotEmpty()) {
@@ -486,7 +511,8 @@ class TaxonomyBenchmarkService(
         while (round < params.maxRounds && !stoppingPolicy.shouldStop(
             btStates, pairStatsMap, targetLeafIds, modelNames, round,
             pairStatsMap.values.flatten().sumOf { it.totalComparisons },
-            nodeToQueries
+            nodeToQueries,
+            req.condition
         )) {
             completedAtStartOfRound.set(completedResults.size)
             // Update globally resolved pairs in stoppingPolicy
@@ -512,22 +538,40 @@ class TaxonomyBenchmarkService(
                 allNodes, btStates, nodeToQueries,
                 pairStats = pairStatsMap, models = modelNames, maxNodes = 100
             )
-            if (targetNodes.isEmpty()) break
+            if (targetNodes.isEmpty() && replayTriples == null) break
             log.debug("Round $round — active leaves: ${targetNodes.size} / ${targetLeafIds.size} " +
                       "(converged: ${targetLeafIds.size - targetNodes.size})")
 
-            val batch = scheduler.selectNextBatch(
-                targetNodes = targetNodes,
-                btStates = btStates,
-                pairStats = pairStatsMap,
-                models = modelNames,
-                resultsMatrix = matrix,
-                nodeToQueries = nodeToQueries,
-                batchSize = params.questionsPerRound,
-                maxConcurrentPerModel = params.maxConcurrentPerModel,
-                globalLeaderboard = currentAggregated,
-                condition = req.condition
-            )
+            val batch = if (replayTriples != null) {
+                val startIdx = round * params.questionsPerRound
+                if (startIdx >= replayTriples.size) {
+                    break
+                }
+                val chunk = replayTriples.drop(startIdx).take(params.questionsPerRound)
+                chunk.mapIndexed { idx, triple ->
+                    BtMatchTask(
+                        nodeId = triple.nodeId,
+                        modelA = triple.modelA,
+                        modelB = triple.modelB,
+                        queryIds = listOf(triple.questionId.toString()),
+                        priority = 1.0,
+                        batchId = "replay_${round}_$idx"
+                    )
+                }
+            } else {
+                scheduler.selectNextBatch(
+                    targetNodes = targetNodes,
+                    btStates = btStates,
+                    pairStats = pairStatsMap,
+                    models = modelNames,
+                    resultsMatrix = matrix,
+                    nodeToQueries = nodeToQueries,
+                    batchSize = params.questionsPerRound,
+                    maxConcurrentPerModel = params.maxConcurrentPerModel,
+                    globalLeaderboard = currentAggregated,
+                    condition = req.condition
+                )
+            }
             val startTime = System.currentTimeMillis()
 
             val roundResults = batch.mapIndexed { i, task ->
@@ -719,6 +763,16 @@ class TaxonomyBenchmarkService(
                         val agrees = judgeWinner == gtWinner
                         val pairKey = "${task.modelA}_vs_${task.modelB}"
 
+                        val triple = FrozenMatchTriple(
+                            questionId = qId,
+                            modelA = task.modelA,
+                            modelB = task.modelB,
+                            nodeId = task.nodeId
+                        )
+                        synchronized(evaluatedTriples) {
+                            evaluatedTriples.add(triple)
+                        }
+
                         QueryBenchmarkResult(
                             query = sample.questionText,
                             gtCategory = gtCategory,
@@ -836,7 +890,22 @@ class TaxonomyBenchmarkService(
         }
 
         val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
-        aggregate(completedResults, pairs, req)
+        val report = aggregate(completedResults, pairs, req)
+
+        // Export evaluated triples if this is the C1/canonical/MAIN condition
+        val isExportCondition = req.condition.equals("MAIN", ignoreCase = true) || req.condition.equals("CANONICAL", ignoreCase = true)
+        if (isExportCondition && evaluatedTriples.isNotEmpty()) {
+            val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_CANONICAL").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER")
+            val triplesFile = File("frozen_triples_${baseSnapshotId}.json")
+            try {
+                triplesFile.writeText(json.encodeToString<List<FrozenMatchTriple>>(evaluatedTriples))
+                log.info("Successfully exported ${evaluatedTriples.size} frozen triples to ${triplesFile.absolutePath}")
+            } catch (e: Exception) {
+                log.error("Failed to export frozen triples: ${e.message}", e)
+            }
+        }
+
+        return@coroutineScope report
     }
 
     // ─── Core per-query logic ────────────────────────────────────────────────

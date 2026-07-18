@@ -136,3 +136,11 @@ data class ModelRank(
     val winsTotal: Double,
     val comparisonsTotal: Int
 )
+
+@Serializable
+data class FrozenMatchTriple(
+    val questionId: Int,
+    val modelA: String,
+    val modelB: String,
+    val nodeId: String
+)

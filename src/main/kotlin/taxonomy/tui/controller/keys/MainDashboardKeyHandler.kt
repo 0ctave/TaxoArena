@@ -105,6 +105,13 @@ internal class MainDashboardKeyHandler(
                 }
             }
 
+            "y", "Y" -> {
+                val activeId = state.snapshot.activeSnapshotId
+                if (activeId != null) {
+                    dispatch(TuiEvent.CopySnapshotId(activeId))
+                }
+            }
+
             "o"   -> if (
                 state.analysis.mode == AnalysisMode.BENCHMARK ||
                 state.analysis.mode == AnalysisMode.ARENA

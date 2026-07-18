@@ -1,11 +1,13 @@
 package taxonomy.utils
 
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.ConsoleAppender
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
+import org.springframework.boot.ApplicationArguments
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
 import taxonomy.config.TaxonomyConfig
@@ -23,13 +25,20 @@ import taxonomy.config.TaxonomyConfig
  */
 @Configuration
 @Lazy(false)
-class LogbackConfigurator(private val config: TaxonomyConfig) {
+class LogbackConfigurator(
+    private val config: TaxonomyConfig,
+    private val appArgs: ApplicationArguments
+) {
     @PostConstruct
     fun configureLogging() {
         val context = LoggerFactory.getILoggerFactory() as? LoggerContext ?: return
         val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME) as? Logger ?: return
 
-        if (!config.execution.enableTui) {
+        val hasConfigArg = appArgs.sourceArgs.any { it != null && (it == "--config" || it.startsWith("--config=")) }
+        val isHeadless = !config.execution.enableTui || hasConfigArg
+
+        if (isHeadless) {
+            rootLogger.level = Level.INFO
             if (rootLogger.getAppender("CONSOLE") == null) {
                 val consoleAppender = ConsoleAppender<ch.qos.logback.classic.spi.ILoggingEvent>()
                 consoleAppender.context = context
@@ -46,6 +55,7 @@ class LogbackConfigurator(private val config: TaxonomyConfig) {
 
                 rootLogger.addAppender(consoleAppender)
             }
+            rootLogger.detachAppender("TUI")
             return
         }
 

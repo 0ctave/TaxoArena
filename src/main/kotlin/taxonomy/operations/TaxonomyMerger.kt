@@ -251,56 +251,7 @@ class TaxonomyMerger(
             val sources = cluster.subList(1, cluster.size)
             val combinedQueries = cluster.flatMap { it.queries }.distinctBy { it.rawText }
 
-            val newLabel = if (config.execution.enableLiveLabeling && config.execution.enableLabeling && combinedQueries.isNotEmpty()) {
-                val representativeSamples = selectRepresentativeQueries(combinedQueries)
-                val siblingLabels = node.children.filter { it !in cluster }.mapNotNull { it.label }
-                val lineage = mutableListOf<String>()
-                var curr: GraphNode? = node
-                val visitedLineage = mutableSetOf<String>()
-                while (curr != null && visitedLineage.add(curr.id)) {
-                    lineage.add(0, curr.label ?: "Emergent Concept")
-                    curr = curr.parents.firstOrNull()
-                }
-                val domainAnchors = representativeSamples.mapNotNull { question ->
-                    datasetFetcher.getDetailsForQuery(question)?.category?.split("_", "-")?.joinToString(" ") { word ->
-                        word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-                    }
-                }.groupBy { it }.mapValues { it.value.size }
-                    .entries.sortedByDescending { it.value }
-                    .map { "${it.key} (${it.value} queries)" }
-
-                val prompt = TaxoPrompts.clusterLabeling(
-                    querySamples = representativeSamples,
-                    parentLabel = node.label ?: "Universal Knowledge",
-                    siblingLabels = siblingLabels,
-                    branchHistory = lineage,
-                    domainAnchors = domainAnchors,
-                    depth = node.depth + 1
-                )
-
-                val labelSchema = JsonSchema.builder()
-                    .name("ClusterLabel")
-                    .rootElement(
-                        JsonObjectSchema.builder()
-                            .addStringProperty(
-                                "label",
-                                "A concise, domain-specific label for the concept cluster (3-7 words)"
-                            )
-                            .required("label")
-                            .build()
-                    )
-                    .build()
-                val jsonResponse = llmClient.queryModelStructured(
-                    modelName = System.getenv("ARC_MODEL") ?: config.llm.labelingModel,
-                    systemPrompt = null,
-                    userPrompt = prompt,
-                    schema = labelSchema
-                )
-                TaxoPrompts.parseClusterLabel(jsonResponse)
-                    ?: cluster.joinToString(" & ") { it.label ?: "" }
-            } else {
-                cluster.joinToString(" & ") { it.label ?: "" }
-            }
+            val newLabel = cluster.joinToString(" & ") { it.label ?: "" }
 
             log.info("[MERGE] Fused ${cluster.map { it.label }} -> '$newLabel'")
             target.label = newLabel

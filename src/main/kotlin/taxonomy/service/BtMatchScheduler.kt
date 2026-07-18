@@ -230,7 +230,8 @@ class BtMatchScheduler(
                 val ps = nodePairs.firstOrNull {
                     (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                 }
-                if (!isMatchInformative(mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
+                val isRR = condition.equals("ROUND_ROBIN", ignoreCase = true)
+                if (!isRR && !isMatchInformative(mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
 
                 val budget = pairBudget(node.id, mA, mB)
                 val already = ps?.totalComparisons ?: 0

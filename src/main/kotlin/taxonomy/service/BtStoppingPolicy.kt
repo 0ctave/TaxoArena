@@ -93,9 +93,11 @@ class BtStoppingPolicy(
         models: List<String>,
         round: Int,
         totalComparisons: Int,
-        nodeToQueries: Map<String, List<Int>> = emptyMap()
+        nodeToQueries: Map<String, List<Int>> = emptyMap(),
+        condition: String = "MAIN"
     ): Boolean {
         if (round >= maxRounds) return true
+        if (condition.equals("ROUND_ROBIN", ignoreCase = true)) return false
         if (totalComparisons < minTotalComparisons) return false
         if (targetLeafIds.isEmpty()) return false
 

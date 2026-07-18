@@ -17,6 +17,7 @@ import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import com.jakewharton.mosaic.ui.TextStyle.Companion.Unspecified
 import taxonomy.service.DagSnapshot
 import taxonomy.tui.components.Panel
+import taxonomy.tui.components.take
 
 @Composable
 fun WelcomePanel(
@@ -25,14 +26,15 @@ fun WelcomePanel(
     selectedWelcomeIdx: Int,
     snapshots: List<DagSnapshot>,
 ) {
+    val wLimit = (width - 4).coerceAtLeast(1)
     Panel("LOAD DAG", Cyan, width, height) {
         Column {
-            Text("  ╔══ TAXO ARENA ══╗", color = Cyan, textStyle = Bold)
-            Text("  ║  DAG · ARENA   ║", color = Cyan, textStyle = Bold)
-            Text("  ╚════════════════╝", color = Cyan, textStyle = Bold)
+            Text("  ╔══ TAXO ARENA ══╗".take(wLimit), color = Cyan, textStyle = Bold)
+            Text("  ║  DAG · ARENA   ║".take(wLimit), color = Cyan, textStyle = Bold)
+            Text("  ╚════════════════╝".take(wLimit), color = Cyan, textStyle = Bold)
             Spacer()
 
-            Text("Select a saved snapshot or start a new generation.", color = White)
+            Text("Select a saved snapshot or start a new generation.".take(wLimit), color = White)
             Spacer()
 
             val selectedNew = selectedWelcomeIdx == 0
@@ -46,11 +48,11 @@ fun WelcomePanel(
                             textStyle = if (selectedNew) Bold else Unspecified
                         )
                     ) { append("Generate new DAG") }
-                }
+                }.take(wLimit)
             )
 
             Spacer()
-            Text("Snapshots", color = Yellow, textStyle = Bold)
+            Text("Snapshots".take(wLimit), color = Yellow, textStyle = Bold)
 
             snapshots.forEachIndexed { idx, snap ->
                 val selected = selectedWelcomeIdx == idx + 1
@@ -67,7 +69,7 @@ fun WelcomePanel(
                         withStyle(SpanStyle(color = White)) {
                             append("  (${snap.timestamp} · ${snap.metrics.totalNodes} nodes)")
                         }
-                    }
+                    }.take(wLimit)
                 )
             }
         }

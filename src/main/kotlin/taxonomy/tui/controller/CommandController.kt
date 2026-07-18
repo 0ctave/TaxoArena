@@ -47,6 +47,10 @@ class CommandController(
                 effects.deleteSnapshot(event.snapshotId, dispatch)
             }
 
+            is TuiEvent.CopySnapshotId -> {
+                taxonomy.tui.utils.ClipboardHelper.copyToClipboard(event.snapshotId)
+            }
+
             is TuiEvent.StartDatasetDownload -> {
                 effects.downloadDataset(event.maxQueries, dispatch)
             }

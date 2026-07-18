@@ -291,6 +291,7 @@ sealed interface TuiEvent {
     data class UpdateEvalLoaderPathInput(val value: String) : TuiEvent
     data class SetEvalLoaderRunning(val running: Boolean) : TuiEvent
     data class SetEvalLoaderStatus(val status: String) : TuiEvent
+    data class CopySnapshotId(val snapshotId: String) : TuiEvent
 }
 
 enum class MouseButton {
