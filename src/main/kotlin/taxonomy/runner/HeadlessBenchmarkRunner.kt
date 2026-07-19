@@ -135,12 +135,23 @@ class HeadlessBenchmarkRunner(
 
         val seeds = if (cliConfig.seeds.isNotEmpty()) cliConfig.seeds else listOf(cliConfig.seed)
         for (currentSeed in seeds) {
-            log.info("==================================================")
-            log.info("STARTING PIPELINE AND EVALUATION WITH SEED: $currentSeed")
-            log.info("==================================================")
+            val baseDir = File(cliConfig.outputDir + "/seed_$currentSeed")
+            baseDir.mkdirs()
+            val seedLogFile = File(baseDir, "headless_run.log")
+            val seedAppender = try {
+                startFileLogging(seedLogFile.absolutePath)
+            } catch (e: Exception) {
+                log.error("Failed to initialize seed file logging: ${e.message}")
+                null
+            }
 
-            var snapshotId = cliConfig.snapshotId
-            var root: GraphNode
+            try {
+                log.info("==================================================")
+                log.info("STARTING PIPELINE AND EVALUATION WITH SEED: $currentSeed")
+                log.info("==================================================")
+
+                var snapshotId = cliConfig.snapshotId
+                var root: GraphNode
 
             if (cliConfig.runPipeline) {
                 log.info("Headless pipeline execution enabled. Starting DAG generation pipeline...")
@@ -316,7 +327,7 @@ class HeadlessBenchmarkRunner(
                             
                             log.info("McNemar Significance (MAIN vs $baselineName):")
                             log.info("  - Chi-Squared: ${"%,.4f".format(chiSquared)}")
-                            log.info("  - p-value: ${"%,.4e".format(pVal)}")
+                            log.info("  - p-value: ${"%.4e".format(pVal)}")
                         }
                         
                         checkMcNemar("KMEANS_BASELINE", kmeansCorrect)
@@ -460,6 +471,13 @@ class HeadlessBenchmarkRunner(
                 )
                 manifestFile.writeText(json.encodeToString(manifest))
                 log.info("Experiment manifest written to ${manifestFile.absolutePath}")
+            }
+            } finally {
+                try {
+                    stopFileLogging(seedAppender)
+                } catch (e: Exception) {
+                    log.error("Failed to stop seed file logging: ${e.message}")
+                }
             }
         }
     }
@@ -1021,6 +1039,37 @@ class HeadlessBenchmarkRunner(
             runTrickle = runTrickle,
             domains = domains
         )
+    }
+
+    private fun startFileLogging(filePath: String): ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent>? {
+        val context = org.slf4j.LoggerFactory.getILoggerFactory() as? ch.qos.logback.classic.LoggerContext ?: return null
+        val rootLogger = context.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as? ch.qos.logback.classic.Logger ?: return null
+
+        val fileAppender = ch.qos.logback.core.FileAppender<ch.qos.logback.classic.spi.ILoggingEvent>()
+        fileAppender.context = context
+        fileAppender.name = "SEED_FILE_APPENDER"
+        fileAppender.file = filePath
+        fileAppender.isAppend = true
+
+        val encoder = ch.qos.logback.classic.encoder.PatternLayoutEncoder()
+        encoder.context = context
+        encoder.charset = java.nio.charset.StandardCharsets.UTF_8
+        encoder.pattern = "%d{HH:mm:ss.SSS} [%-5level] %logger{0} - %msg%n"
+        encoder.start()
+
+        fileAppender.encoder = encoder
+        fileAppender.start()
+
+        rootLogger.addAppender(fileAppender)
+        return fileAppender
+    }
+
+    private fun stopFileLogging(appender: ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent>?) {
+        if (appender == null) return
+        val context = org.slf4j.LoggerFactory.getILoggerFactory() as? ch.qos.logback.classic.LoggerContext ?: return
+        val rootLogger = context.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as? ch.qos.logback.classic.Logger ?: return
+        rootLogger.detachAppender(appender)
+        appender.stop()
     }
 }
 
