@@ -740,6 +740,7 @@ class TaxonomyMerger(
             bridgeNode.isBridge = true
             bridgeNode.bridgeJsDivergence = div
             bridgeNode.sliceDim = commonDim
+            bridgeNode.queries.addAll(combinedQueries)
 
             val d = commonDim
             val combinedCentroid = DoubleArray(d)
@@ -840,7 +841,7 @@ class TaxonomyMerger(
 
         val internalNodes = allNodesB.filter { !it.isLeaf && !it.isBridge && it.depth >= 2 }
         for (v in internalNodes) {
-            if (bridgesCreated >= config.formalism.maxBridgeNodes) break
+            if (bridgesCreated + currentBridgeCount >= config.formalism.maxBridgeNodes) break
             val residualEmbeddings = v.residualQueries.mapNotNull { allEmbeddingsMap[it] }.distinctBy { it.rawText }
             if (residualEmbeddings.size < config.formalism.minBridgeCoverage) continue
 

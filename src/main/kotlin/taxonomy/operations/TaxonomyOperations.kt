@@ -80,26 +80,10 @@ class TaxonomyOperations(
                 for (emb in chunk) {
                     val originals = groundTruthMap[emb.rawText]
                     val routeResult = trickler.routeQuery(emb, root, currentIteration, originals)
-                    val results = routeResult.leaves
-                    val bestLogProb = results.values.maxOrNull() ?: Double.NEGATIVE_INFINITY
-                    val destinations = results.entries
-                        .filter { (leaf, logProb) ->
-                            val parent = leaf.parents.find { it.id == leaf.treeParentId } ?: leaf.parents.firstOrNull()
-                            val siblingKappaEffective = parent?.let { p ->
-                                val activeChildren = p.children
-                                if (activeChildren.isNotEmpty()) activeChildren.map { it.vmfKappa }.average() else null
-                            }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
-
-                            val marginNats = config.formalism.assignmentMarginNats * (config.formalism.cosineTau / siblingKappaEffective)
-                            (bestLogProb - logProb) <= marginNats
-                        }
-                        .sortedByDescending { it.value }
-                        .take(config.formalism.maxLeafAssignments)
-                        .map { it.key }
-                        .ifEmpty {
-                            log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
-                            listOf(root)
-                        }
+                    val destinations = routeResult.leaves.keys.toList().ifEmpty {
+                        log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
+                        listOf(root)
+                    }
                     destinations.forEach { it.queries.add(emb) }
                     
                     if (config.formalism.enableResidualRouting) {
@@ -118,7 +102,10 @@ class TaxonomyOperations(
     fun clearGraphQueries(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
         if (!visited.add(node.id)) return
         node.queries.clear()
+        node.residualQueries.clear()
+        node.residualConfidences.clear()
         node.children.forEach { clearGraphQueries(it, visited) }
+        node.crossLinkChildren.forEach { clearGraphQueries(it, visited) }
     }
 
     fun countNodes(root: GraphNode): Int {

@@ -115,9 +115,9 @@ class TaxonomyTrickler(
             val smoothedProbs = DoubleArray(K) { (rawProbs[it] + laplaceEps) / (1.0 + K * laplaceEps) }
             val logSmoothed = DoubleArray(K) { ln(smoothedProbs[it].coerceAtLeast(1e-300)) }
 
-            val maxScore = scores.maxOrNull() ?: 0.0
+            val maxLogSoftmax = logSoftmax.maxOrNull() ?: 0.0
             val bestIndices = children.indices
-                .filter { (maxScore - scores[it]) <= config.formalism.deltaAssign }
+                .filter { (maxLogSoftmax - logSoftmax[it]) <= config.formalism.deltaAssign }
 
             for (i in bestIndices) {
                 walk(children[i], currentLogProb + logSmoothed[i])

@@ -668,7 +668,7 @@ class TaxonomyDagMaxFeaturesTest {
 
         val bridges = allNodes.filter { it.isBridge }
         assertTrue(bridges.isNotEmpty(), "Bridges should be created by post-hoc merger")
-        assertTrue(bridges.all { it.queries.isEmpty() }, "Bridges must be query-less")
+        assertTrue(bridges.all { it.queries.isNotEmpty() }, "Bridges must have populated queries")
     }
 
     @Test
