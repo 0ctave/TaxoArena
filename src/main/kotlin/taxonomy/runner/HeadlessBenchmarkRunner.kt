@@ -196,7 +196,7 @@ class HeadlessBenchmarkRunner(
         fun ensureJudgePrompts(n: GraphNode, condition: String) {
             val isMain = condition.equals("MAIN", ignoreCase = true)
             if (n.children.isEmpty()) { // leaf node
-                if (isMain && (n.judgePrompt.isNullOrBlank() || n.judgeRubric.isNullOrBlank())) {
+                if (isMain && cliConfig.runBenchmark && (n.judgePrompt.isNullOrBlank() || n.judgeRubric.isNullOrBlank())) {
                     throw IllegalStateException("Missing custom induced judge prompt/rubric for leaf node '${n.label}' (id=${n.id}) under MAIN condition!")
                 }
             }
@@ -237,7 +237,43 @@ class HeadlessBenchmarkRunner(
 
         // 4. Run trickle validation if enabled
         if (cliConfig.runTrickle) {
-            runHeadlessTrickle(root, cliConfig, baseDir)
+            val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+
+            log.info("========================================")
+            log.info("RUNNING TRICKLE VALIDATION: MAIN")
+            log.info("========================================")
+            taxonomyService.setGraph(root)
+            runHeadlessTrickle(root, "MAIN", cliConfig, baseDir)
+
+            val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
+            snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
+                log.info("========================================")
+                log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
+                log.info("========================================")
+                taxonomyService.setGraph(kmeansRoot)
+                runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir)
+            }
+
+            val wardSnapshot = "${baseSnapshotId}_baseline_ward"
+            snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
+                log.info("========================================")
+                log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
+                log.info("========================================")
+                taxonomyService.setGraph(wardRoot)
+                runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir)
+            }
+
+            val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
+            snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
+                log.info("========================================")
+                log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
+                log.info("========================================")
+                taxonomyService.setGraph(randomNullRoot)
+                runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir)
+            }
+
+            // Restore active root graph for downstream benchmark
+            taxonomyService.setGraph(root)
         }
 
         // 5. Run each condition back-to-back if enabled
@@ -371,8 +407,8 @@ class HeadlessBenchmarkRunner(
         }
     }
 
-    private fun runHeadlessTrickle(root: GraphNode, cliConfig: HeadlessCliConfig, baseDir: File) = runBlocking {
-        log.info("Starting Headless Batch Trickle Validation...")
+    private fun runHeadlessTrickle(root: GraphNode, condition: String, cliConfig: HeadlessCliConfig, baseDir: File) = runBlocking {
+        log.info("Starting Headless Batch Trickle Validation for $condition...")
 
         val reservedFile = File("reserved_test_queries.json")
         if (!reservedFile.exists()) {
@@ -468,17 +504,32 @@ class HeadlessBenchmarkRunner(
             }
         )
 
-        log.info("Batch Trickle Results:")
+        log.info("Batch Trickle Results ($condition):")
         log.info("  - Total Queries: ${out.totalQueries}")
         log.info("  - Top-1 Accuracy: ${"%,.2f%%".format(out.top1Accuracy * 100)}")
         log.info("  - Any-Match Accuracy: ${"%,.2f%%".format(out.anyMatchAccuracy * 100)}")
         log.info("  - Mean Leaf Purity: ${"%,.2f%%".format(out.meanLeafPurity * 100)}")
+        log.info("  - Expected Calibration Error (ECE): ${"%,.4f".format(out.ece)}")
         log.info("  - Macro F1: ${"%,.2f%%".format(out.macroF1 * 100)}")
+
+        val tableStr = StringBuilder().apply {
+            appendLine("Per-Domain Trickle Results ($condition):")
+            appendLine("----------------------------------------------------------------------")
+            appendLine("%-25s | %7s | %9s | %8s | %8s".format("Domain", "Support", "Precision", "Recall", "F1"))
+            appendLine("----------------------------------------------------------------------")
+            out.perDomainF1.entries.sortedByDescending { it.value.support }.forEach { (domain, f1) ->
+                appendLine("%-25s | %7d | %8.1f%% | %7.1f%% | %7.1f%%".format(
+                    domain.take(25), f1.support, f1.precision * 100, f1.recall * 100, f1.f1 * 100
+                ))
+            }
+            appendLine("======================================================================")
+        }.toString()
+        log.info("\n$tableStr")
 
         // Export results
         val trickleDir = File(baseDir, "validation")
         trickleDir.mkdirs()
-        val file = File(trickleDir, "trickle_validation_results.csv")
+        val file = File(trickleDir, "${condition}_trickle_validation_results.csv")
         file.bufferedWriter().use { writer ->
             writer.write("Metric,Value\n")
             writer.write("TotalQueries,${out.totalQueries}\n")
@@ -488,6 +539,7 @@ class HeadlessBenchmarkRunner(
             writer.write("MeanRoutingDepth,${out.meanRoutingDepth}\n")
             writer.write("MacroF1,${out.macroF1}\n")
             writer.write("NoMatchRate,${out.noMatchRate}\n")
+            writer.write("ECE,${out.ece}\n")
         }
         log.info("Trickle validation results written to ${file.absolutePath}")
     }

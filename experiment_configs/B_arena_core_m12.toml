@@ -1,0 +1,43 @@
+# B_arena_core_m12.toml  —  RQ1-Intro + RQ2 + RQ3 + oracle ceiling (12 models)
+datasetType = "MMLU_PRO"
+
+models = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct"
+]
+
+category = "math"
+queryLimit = 0
+outputDir = "experiment_results/arena_core_m12"
+testRatio = 0.3
+seed = 42
+
+runPipeline   = true
+runBenchmark  = true
+runTrickle    = false
+judgeInduction = true
+
+conditions = [
+    "MAIN",             # RQ1-Intro, RQ2 (re-bucket), frozen-triples source
+    "GENERIC_JUDGE",    # RQ1-Intro ablation (replays MAIN matchups)
+    "RANDOM_SCHEDULER", # RQ3 (budget-matched to MAIN)  [see caveat below]
+    "ORACLE"            # correctness ceiling — 0 judge calls
+]
+
+maxDepth = 8
+minClusterSize = 40
+separationEpsilon = 0.08
+cosineTau = 2.0
+assignmentGap = 0.2
+emaAlpha = 0.5
+enableLabeling = true

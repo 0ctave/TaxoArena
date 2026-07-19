@@ -96,11 +96,6 @@ class TaxonomyMetricsIntegrationTest {
         val physics = node("Physics", 1)
         link(root, math); link(root, physics)
 
-        val mLeaf1 = node("algebra", 2); val mLeaf2 = node("geometry", 2)
-        val pLeaf1 = node("optics", 2); val pLeaf2 = node("mechanics", 2)
-        link(math, mLeaf1); link(math, mLeaf2)
-        link(physics, pLeaf1); link(physics, pLeaf2)
-
         val groundTruth = HashMap<String, List<String>>()
         fun place(leaf: GraphNode, texts: List<String>) {
             texts.forEach { t ->
@@ -108,15 +103,13 @@ class TaxonomyMetricsIntegrationTest {
                 groundTruth[t] = listOf(leaf.label!!)
             }
         }
-        place(mLeaf1, listOf("q1", "q2", "q3"))
-        place(mLeaf2, listOf("q4", "q5"))
-        place(pLeaf1, listOf("q6", "q7", "q8"))
-        place(pLeaf2, listOf("q9", "q10"))
+        place(math, listOf("q1", "q2", "q3"))
+        place(physics, listOf("q6", "q7", "q8"))
 
         val report = TaxonomyMetrics(root, groundTruth).generateReport()
 
         assertEquals(1.0, report.hF1, 1e-9, "Exact routing must give H-F₁ = 1.0")
-        assertEquals(1.0, report.nmi, 1e-9, "Identical coverings must give Overlapping NMI = 1.0")
+        assertEquals(1.0, report.nmi, 1e-9, "Identical coverings must give NMI = 1.0")
     }
 
     @Test

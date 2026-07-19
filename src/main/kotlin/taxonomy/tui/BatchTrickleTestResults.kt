@@ -37,4 +37,6 @@ data class BatchTrickleTestResults(
     val noMatchRate: Double = 0.0,
     /** Per-domain precision/recall/F1, keyed by domain. */
     val perDomainF1: Map<String, DomainF1> = emptyMap(),
+    /** Expected Calibration Error of the routing confidence. */
+    val ece: Double = 0.0,
 )

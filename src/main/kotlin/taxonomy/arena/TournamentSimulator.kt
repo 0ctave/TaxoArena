@@ -180,7 +180,7 @@ class TournamentSimulator(
     private fun loadCachedQueries(limit: Int): List<Pair<String, String>> {
         val list = mutableListOf<Pair<String, String>>()
         try {
-            DriverManager.getConnection("jdbc:sqlite:mmlu_pro_dataset_cache_v2.db").use { conn ->
+            DriverManager.getConnection("jdbc:sqlite:mmlu_pro_dataset_cache_v2.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000").use { conn ->
                 conn.prepareStatement("SELECT question, category FROM mmlu_pro ORDER BY RANDOM() LIMIT ?").use { pstmt ->
                     pstmt.setInt(1, limit)
                     val rs = pstmt.executeQuery()

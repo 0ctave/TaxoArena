@@ -264,8 +264,39 @@ class BtMatchScheduler(
         batchSize: Int,
         maxConcurrentPerModel: Int = maxOf(2, models.size - 1),
         globalLeaderboard: AggregatedLeaderboard? = null,
-        condition: String = "MAIN"
+        condition: String = "LEGACY_MAIN",
+        completedResults: List<QueryBenchmarkResult> = emptyList()
     ): List<BtMatchTask> {
+        val isNewMain = condition.equals("MAIN", ignoreCase = true)
+        val isNewRandom = condition.equals("RANDOM_SCHEDULER", ignoreCase = true)
+
+        if (isNewMain) {
+            val activeRacing = ActiveBtRacingScheduler(alpha = 0.05, nMin = 5)
+            return activeRacing.selectNextBatch(
+                targetNodes = targetNodes,
+                pairStats = pairStats,
+                models = models,
+                resultsMatrix = resultsMatrix,
+                nodeToQueries = nodeToQueries,
+                batchSize = batchSize,
+                completedResults = completedResults,
+                budgetPerPair = budgetPerPair
+            )
+        }
+
+        if (isNewRandom) {
+            val randomScheduler = RandomTournamentScheduler(seed = seed)
+            return randomScheduler.selectNextBatch(
+                targetNodes = targetNodes,
+                pairStats = pairStats,
+                models = models,
+                resultsMatrix = resultsMatrix,
+                nodeToQueries = nodeToQueries,
+                batchSize = batchSize,
+                completedResults = completedResults,
+                budgetPerPair = budgetPerPair
+            )
+        }
         updateBudgetsAndPools(targetNodes, btStates, pairStats, models)
 
         val leafModelMatches = targetNodes.associate { node ->

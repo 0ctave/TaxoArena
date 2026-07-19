@@ -1,0 +1,24 @@
+# C_baseline_arena.toml  —  OPTIONAL: arena ranking on flat baselines
+datasetType = "MMLU_PRO"
+models = [   # use the 8-model list to contain cost at M=12
+    "gpt-4o-2024-08-06", "claude-3-5-sonnet-20241022", "gemini-1.5-pro-002",
+    "Meta-Llama-3_1-70B-Instruct", "Qwen1.5-72B-Chat", "gpt-4o-mini",
+    "Mixtral-8x7B-Instruct-v0.1", "Meta-Llama-3_1-8B-Instruct"
+]
+category = "math"
+queryLimit = 0
+outputDir = "experiment_results/baseline_arena_m8"
+testRatio = 0.3
+seed = 42
+runPipeline   = true
+runBenchmark  = true
+runTrickle    = false
+judgeInduction = false   # baselines use generic prompts (see critique F7)
+conditions = ["KMEANS_BASELINE", "WARD_BASELINE", "RANDOMNULL_BASELINE"]
+maxDepth = 8
+minClusterSize = 40
+separationEpsilon = 0.08
+cosineTau = 2.0
+assignmentGap = 0.2
+emaAlpha = 0.5
+enableLabeling = true

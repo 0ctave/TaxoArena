@@ -246,23 +246,9 @@ class TaxonomyMetrics(
             result
         }
 
-        // NMI selection:
-        // • groundTruthLeaves non-empty  → overlapping NMI (Lancichinetti et al. 2009)
-        //   comparing covering sets at leaf granularity. This is the correct path when
-        //   embeddings carry groundTruthCategory (post-PR-#48 caches).
-        // • groundTruthLeaves empty      → Shannon NMI over depth-1-collapsed partitions.
-        //   Both gtSimple and predSimple are now at the same 13-category granularity,
-        //   so MI is no longer dwarfed by H(predicted). Old embedding caches (blank
-        //   groundTruthCategory) take this path and will still produce meaningful scores.
-        val groundTruthCover: Map<String, Map<String, Double>> = groundTruthLeaves
-            .mapValues { (_, gtNode) -> mapOf(gtNode.id to 1.0) }
-
-        val nmi = if (groundTruthLeaves.isNotEmpty()) {
-            OverlappingNmi.compute(predictedCover, groundTruthCover)
-        } else {
-            // Fallback: Shannon NMI over domain-collapsed partitions (same granularity).
-            ShannonNmi.compute(gtSimple, predSimple)
-        }
+        // Standard Shannon NMI on depth-1-collapsed partitions (same granularity)
+        // to avoid LFK overlapping NMI degeneracy on small clusters.
+        val nmi = ShannonNmi.compute(gtSimple, predSimple)
 
         val ari               = calculateAri(uniqueQueryTexts, gtSimple, predSimple)
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)

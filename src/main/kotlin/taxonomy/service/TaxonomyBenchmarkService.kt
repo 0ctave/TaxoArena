@@ -609,7 +609,8 @@ class TaxonomyBenchmarkService(
                     batchSize = params.questionsPerRound,
                     maxConcurrentPerModel = params.maxConcurrentPerModel,
                     globalLeaderboard = currentAggregated,
-                    condition = req.condition
+                    condition = req.condition,
+                    completedResults = completedResults.toList()
                 )
             }
             val startTime = System.currentTimeMillis()

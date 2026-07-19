@@ -24,7 +24,7 @@ class BtStoppingPolicy(
         pairStats: Map<String, List<NodePairStats>>,
         models: List<String>,
         nodeToQueries: Map<String, List<Int>> = emptyMap(),
-        condition: String = "MAIN"
+        condition: String = "LEGACY_MAIN"
     ): Boolean {
         val numPairs = models.size * (models.size - 1) / 2
         val available = nodeToQueries[nodeId]?.size ?: 0
@@ -33,6 +33,58 @@ class BtStoppingPolicy(
         if (condition.equals("ROUND_ROBIN", ignoreCase = true) || condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
             val liveTotalComparisons = (pairStats[nodeId] ?: emptyList()).sumOf { it.totalComparisons }
             return liveTotalComparisons >= maxPossible
+        }
+
+        if (condition.equals("MAIN", ignoreCase = true)) {
+            val queryIds = nodeToQueries[nodeId] ?: emptyList()
+            val leafArena = LeafArena(nodeId, models, queryIds, emptyMap(), budgetPerPair)
+
+            val nodePairs = pairStats[nodeId] ?: emptyList()
+            for (ps in nodePairs) {
+                val key = ordered(ps.modelA, ps.modelB)
+                val stats = leafArena.stats.getOrPut(key) { PairStats() }
+                val isModelA = key.first == ps.modelA
+                val winsFirst = if (isModelA) ps.winsA else ps.winsB
+                stats.sumX = winsFirst + 0.5 * ps.ties
+                stats.n = ps.totalComparisons
+            }
+
+            fun epsilon(n: Int, k: Int, bMax: Int): Double {
+                if (n <= 0) return Double.POSITIVE_INFINITY
+                val p = k * (k - 1) / 2
+                return Math.sqrt(Math.log(2.0 * p * bMax / 0.05) / (2.0 * n))
+            }
+
+            val score = models.associateWith { 0.0 }.toMutableMap()
+            for ((key, s) in leafArena.stats) {
+                val (x, y) = key
+                if (s.n == 0) continue
+                val phat = s.sumX / s.n
+                score[x] = score.getValue(x) + phat
+                score[y] = score.getValue(y) + (1.0 - phat)
+            }
+            val ranked = score.toList().sortedByDescending { it.second }.map { it.first }
+
+            if (ranked.size < 2) return true
+
+            if (leafArena.pairs.any { (leafArena.stats[it]?.n ?: 0) == 0 }) {
+                return false
+            }
+
+            var allTerminal = true
+            for (k in 0 until ranked.size - 1) {
+                val key = ordered(ranked[k], ranked[k + 1])
+                val s = leafArena.stats[key] ?: PairStats()
+                val eps = epsilon(s.n, models.size, budgetPerPair)
+                val phat = if (s.n > 0) s.sumX / s.n else 0.5
+                val resolved = (s.n >= 5) && (abs(phat - 0.5) > eps)
+                val exhausted = s.n >= budgetPerPair
+                if (!resolved && !exhausted) {
+                    allTerminal = false
+                    break
+                }
+            }
+            return allTerminal
         }
 
         val state = btStates[nodeId] ?: return false
@@ -101,7 +153,7 @@ class BtStoppingPolicy(
         round: Int,
         totalComparisons: Int,
         nodeToQueries: Map<String, List<Int>> = emptyMap(),
-        condition: String = "MAIN",
+        condition: String = "LEGACY_MAIN",
         mainConditionTotalComparisons: Int = 72
     ): Boolean {
         if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {

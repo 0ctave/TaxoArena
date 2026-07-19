@@ -107,9 +107,13 @@ object BatchTrickleEvaluator {
         val fn = HashMap<String, Int>()
         val support = HashMap<String, Int>()
 
+        val predictedMap = HashMap<String, Map<String, Double>>()
+        val gtMap = HashMap<String, String>()
+
         var processed = 0
         for ((trueDomain, text) in testQueries) {
             support[trueDomain] = (support[trueDomain] ?: 0) + 1
+            gtMap[text] = trueDomain
 
             val matched = routeFn(text).mapNotNull { (leafId, conf) ->
                 perLeafDomains[leafId]?.let { it to conf }
@@ -119,6 +123,10 @@ object BatchTrickleEvaluator {
                 noMatch++
                 fn[trueDomain] = (fn[trueDomain] ?: 0) + 1  // missed: counts against recall
             } else {
+                val domainConf = matched.groupBy { it.first.dominantDomain }
+                    .mapValues { (_, list) -> list.maxOf { it.second } }
+                predictedMap[text] = domainConf
+
                 val top = matched.maxByOrNull { it.second }!!.first
                 top1Matched++
                 puritySum += top.purity
@@ -152,6 +160,7 @@ object BatchTrickleEvaluator {
             f1Sum += f1
         }
         val macroF1 = if (support.isNotEmpty()) f1Sum / support.size else 0.0
+        val eceVal = taxonomy.utils.computeRoutingECE(predictedMap, gtMap)
 
         return BatchTrickleTestResults(
             totalQueries = testQueries.size,
@@ -162,6 +171,7 @@ object BatchTrickleEvaluator {
             meanRoutingDepth = if (top1Matched > 0) depthSum / top1Matched else 0.0,
             noMatchRate = noMatch / n,
             perDomainF1 = perDomain,
+            ece = eceVal,
         )
     }
 }
