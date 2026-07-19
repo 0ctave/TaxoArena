@@ -56,11 +56,13 @@ data class GraphNode(
     // Agent Judge Profiles
     var judgePrompt: String? = null,
     var judgeRubric: String? = null,
-    var judgeGtAgreement: Double? = null
+    var judgeGtAgreement: Double? = null,
+    var isBridge: Boolean = false,
+    val residualQueries: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 ) {
     // isLeaf is true iff this node has NO tree children.
     // Cross-link children are irrelevant to leaf status.
-    val isLeaf: Boolean get() = children.isEmpty()
+    val isLeaf: Boolean get() = children.isEmpty() && !isBridge
 
     val treeChildren: MutableSet<GraphNode> get() = children
 
@@ -175,7 +177,7 @@ const val PHASE_OPTIMIZED = 16
  * and ensures all occurrences of identical queries share the same ID.
  * Walks BOTH tree children AND cross-link children.
  */
-fun assignQueryIds(root: GraphNode) {
+fun assignQueryIds(root: GraphNode, enableStableQuestionIds: Boolean = false) {
     val visited = mutableSetOf<String>()
     val uniqueQueries = mutableListOf<Embedding>()
     val seenTexts = mutableSetOf<String>()
@@ -184,8 +186,16 @@ fun assignQueryIds(root: GraphNode) {
         if (!visited.add(node.id)) return
         synchronized(node.queries) {
             node.queries.forEach { q ->
-                if (seenTexts.add(q.rawText)) {
-                    uniqueQueries.add(q)
+                if (enableStableQuestionIds) {
+                    val clean = TextNormalizer.cleanText(q.rawText)
+                    val qId = QuestionIdRegistry.lookup(q.rawText) 
+                        ?: QuestionIdRegistry.lookup(clean)
+                        ?: (clean.hashCode() and 0x7FFFFFFF)
+                    q.queryId = qId
+                } else {
+                    if (seenTexts.add(q.rawText)) {
+                        uniqueQueries.add(q)
+                    }
                 }
             }
         }
@@ -194,24 +204,56 @@ fun assignQueryIds(root: GraphNode) {
     }
     walk(root)
 
-    uniqueQueries.forEachIndexed { index, emb ->
-        emb.queryId = index
-    }
-
-    val textToId = uniqueQueries.associate { it.rawText to it.queryId }
-
-    val visitedAssign = mutableSetOf<String>()
-    fun walkAssign(node: GraphNode) {
-        if (!visitedAssign.add(node.id)) return
-        synchronized(node.queries) {
-            node.queries.forEach { q ->
-                q.queryId = textToId[q.rawText] ?: -1
-            }
+    if (!enableStableQuestionIds) {
+        uniqueQueries.forEachIndexed { index, emb ->
+            emb.queryId = index
         }
-        node.children.forEach { walkAssign(it) }
-        node.crossLinkChildren.forEach { walkAssign(it) }
+        val textToId = uniqueQueries.associate { it.rawText to it.queryId }
+
+        val visitedAssign = mutableSetOf<String>()
+        fun walkAssign(node: GraphNode) {
+            if (!visitedAssign.add(node.id)) return
+            synchronized(node.queries) {
+                node.queries.forEach { q ->
+                    q.queryId = textToId[q.rawText] ?: -1
+                }
+            }
+            node.children.forEach { walkAssign(it) }
+            node.crossLinkChildren.forEach { walkAssign(it) }
+        }
+        walkAssign(root)
+    } else {
+        val textToId = mutableMapOf<String, Int>()
+        val visitedCollect = mutableSetOf<String>()
+        fun walkCollect(node: GraphNode) {
+            if (!visitedCollect.add(node.id)) return
+            synchronized(node.queries) {
+                node.queries.forEach { q ->
+                    val clean = TextNormalizer.cleanText(q.rawText)
+                    if (q.queryId != -1) {
+                        textToId[clean] = q.queryId
+                    }
+                }
+            }
+            node.children.forEach { walkCollect(it) }
+            node.crossLinkChildren.forEach { walkCollect(it) }
+        }
+        walkCollect(root)
+
+        val visitedAssign = mutableSetOf<String>()
+        fun walkAssign(node: GraphNode) {
+            if (!visitedAssign.add(node.id)) return
+            synchronized(node.queries) {
+                node.queries.forEach { q ->
+                    val clean = TextNormalizer.cleanText(q.rawText)
+                    q.queryId = textToId[clean] ?: q.queryId
+                }
+            }
+            node.children.forEach { walkAssign(it) }
+            node.crossLinkChildren.forEach { walkAssign(it) }
+        }
+        walkAssign(root)
     }
-    walkAssign(root)
 }
 
 fun GraphNode.allAncestors(): Set<String> {

@@ -718,7 +718,7 @@ class TaxonomySnapshotManager(
                 if (tempFile.exists()) tempFile.delete()
             }
             if (root != null) {
-                assignQueryIds(root)
+                assignQueryIds(root, config.formalism.enableStableQuestionIds)
             }
             return root
         } catch (e: Exception) {

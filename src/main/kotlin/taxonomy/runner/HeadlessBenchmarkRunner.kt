@@ -56,7 +56,20 @@ data class HeadlessCliConfig(
     val datasetType: String? = null,
     val runBenchmark: Boolean = true,
     val runTrickle: Boolean = false,
-    val domains: List<String> = emptyList()
+    val domains: List<String> = emptyList(),
+    val enableStableQuestionIds: Boolean? = null,
+    val enableResidualRouting: Boolean? = null,
+    val enableResidualSplitGate: Boolean? = null,
+    val enableBridging: Boolean? = null,
+    val routeConfidenceTau: Double? = null,
+    val bridgeSeparationCeiling: Double? = null,
+    val bridgeEntropyCap: Double? = null,
+    val bridgeMaxArity: Int? = null,
+    val bridgeParentBudget: Int? = null,
+    val maxBridgeNodes: Int? = null,
+    val maxBridgesPerDomainPair: Int? = null,
+    val bridgeCandidateTopK: Int? = null,
+    val minBridgeCoverage: Int? = null
 )
 
 @Component
@@ -128,6 +141,20 @@ class HeadlessBenchmarkRunner(
             config.dataset.datasetType = taxonomy.config.DatasetType.valueOf(it.uppercase())
         }
 
+        cliConfig.enableStableQuestionIds?.let { config.formalism.enableStableQuestionIds = it }
+        cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
+        cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
+        cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
+        cliConfig.routeConfidenceTau?.let { config.formalism.routeConfidenceTau = it }
+        cliConfig.bridgeSeparationCeiling?.let { config.formalism.bridgeSeparationCeiling = it }
+        cliConfig.bridgeEntropyCap?.let { config.formalism.bridgeEntropyCap = it }
+        cliConfig.bridgeMaxArity?.let { config.formalism.bridgeMaxArity = it }
+        cliConfig.bridgeParentBudget?.let { config.formalism.bridgeParentBudget = it }
+        cliConfig.maxBridgeNodes?.let { config.formalism.maxBridgeNodes = it }
+        cliConfig.maxBridgesPerDomainPair?.let { config.formalism.maxBridgesPerDomainPair = it }
+        cliConfig.bridgeCandidateTopK?.let { config.formalism.bridgeCandidateTopK = it }
+        cliConfig.minBridgeCoverage?.let { config.formalism.minBridgeCoverage = it }
+
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
         if (targetDomains.isNotEmpty()) {
             config.dataset.selectedDomains = targetDomains
@@ -137,6 +164,7 @@ class HeadlessBenchmarkRunner(
         for (currentSeed in seeds) {
             val baseDir = File(cliConfig.outputDir + "/seed_$currentSeed")
             baseDir.mkdirs()
+            taxonomy.model.ExperimentOutputContext.activeBaseDir = baseDir
             val seedLogFile = File(baseDir, "headless_run.log")
             val seedAppender = try {
                 startFileLogging(seedLogFile.absolutePath)
@@ -255,6 +283,7 @@ class HeadlessBenchmarkRunner(
             val judgingDir = File(baseDir, "judging")
             validationDir.mkdirs()
             judgingDir.mkdirs()
+            taxonomy.model.ExperimentOutputContext.activeBaseDir = baseDir
 
             // 4. Run trickle validation if enabled
             if (cliConfig.runTrickle) {
@@ -947,6 +976,19 @@ class HeadlessBenchmarkRunner(
         var runBenchmark = true
         var runTrickle = false
         var domains = listOf<String>()
+        var enableStableQuestionIds: Boolean? = null
+        var enableResidualRouting: Boolean? = null
+        var enableResidualSplitGate: Boolean? = null
+        var enableBridging: Boolean? = null
+        var routeConfidenceTau: Double? = null
+        var bridgeSeparationCeiling: Double? = null
+        var bridgeEntropyCap: Double? = null
+        var bridgeMaxArity: Int? = null
+        var bridgeParentBudget: Int? = null
+        var maxBridgeNodes: Int? = null
+        var maxBridgesPerDomainPair: Int? = null
+        var bridgeCandidateTopK: Int? = null
+        var minBridgeCoverage: Int? = null
 
         val lines = mutableListOf<String>()
         var inArray = false
@@ -1008,6 +1050,19 @@ class HeadlessBenchmarkRunner(
                 "runTrickle" -> runTrickle = rawVal.toBoolean()
                 "domains" -> domains = parseStringList(rawVal)
                 "seeds" -> seeds = parseStringList(rawVal).map { it.toLong() }
+                "enableStableQuestionIds" -> enableStableQuestionIds = rawVal.toBoolean()
+                "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
+                "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
+                "enableBridging" -> enableBridging = rawVal.toBoolean()
+                "routeConfidenceTau" -> routeConfidenceTau = rawVal.toDouble()
+                "bridgeSeparationCeiling" -> bridgeSeparationCeiling = rawVal.toDouble()
+                "bridgeEntropyCap" -> bridgeEntropyCap = rawVal.toDouble()
+                "bridgeMaxArity" -> bridgeMaxArity = rawVal.toInt()
+                "bridgeParentBudget" -> bridgeParentBudget = rawVal.toInt()
+                "maxBridgeNodes" -> maxBridgeNodes = rawVal.toInt()
+                "maxBridgesPerDomainPair" -> maxBridgesPerDomainPair = rawVal.toInt()
+                "bridgeCandidateTopK" -> bridgeCandidateTopK = rawVal.toInt()
+                "minBridgeCoverage" -> minBridgeCoverage = rawVal.toInt()
             }
         }
         return HeadlessCliConfig(
@@ -1037,7 +1092,20 @@ class HeadlessBenchmarkRunner(
             datasetType = datasetType,
             runBenchmark = runBenchmark,
             runTrickle = runTrickle,
-            domains = domains
+            domains = domains,
+            enableStableQuestionIds = enableStableQuestionIds,
+            enableResidualRouting = enableResidualRouting,
+            enableResidualSplitGate = enableResidualSplitGate,
+            enableBridging = enableBridging,
+            routeConfidenceTau = routeConfidenceTau,
+            bridgeSeparationCeiling = bridgeSeparationCeiling,
+            bridgeEntropyCap = bridgeEntropyCap,
+            bridgeMaxArity = bridgeMaxArity,
+            bridgeParentBudget = bridgeParentBudget,
+            maxBridgeNodes = maxBridgeNodes,
+            maxBridgesPerDomainPair = maxBridgesPerDomainPair,
+            bridgeCandidateTopK = bridgeCandidateTopK,
+            minBridgeCoverage = minBridgeCoverage
         )
     }
 

@@ -82,33 +82,40 @@ data class SavedBenchmarkMetadata(
 @Service
 class TaxonomyRankingService {
     private val log = LoggerFactory.getLogger("taxonomy.RankingService")
-    private val dbUrl = "jdbc:sqlite:${System.getProperty("ranking.db.path", "ratings.db")}?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000&transaction_mode=IMMEDIATE"
-
-    // Initial constant values matching standard OpenSkill (Weng-Lin) defaults
     private val initialMu = 25.0
     private val initialSigma = 8.333
-    private val beta = 4.167 // Game outcomes noise (gamma)
+    private val beta = 4.167
     private val drawMargin = 0.1
-
-    // Single held-open connection (WAL mode) guarded by a lock to avoid the cost
-    // and contention of opening a new SQLite connection on every call.
     private val dbLock = Any()
-    private val connection: Connection by lazy {
-        val conn = DriverManager.getConnection(dbUrl)
-        try {
-            conn.autoCommit = true
-            conn.createStatement().use { stmt ->
-                stmt.execute("PRAGMA journal_mode=WAL;")
-                stmt.execute("PRAGMA synchronous=NORMAL;")
-                stmt.execute("PRAGMA busy_timeout=10000;")
+
+    private var lastDbPath: String? = null
+    private var cachedConn: Connection? = null
+
+    private val connection: Connection
+        get() {
+            val currentPath = System.getProperty("ranking.db.path", "ratings.db")
+            if (currentPath != lastDbPath || cachedConn == null || cachedConn!!.isClosed) {
+                try { cachedConn?.close() } catch (_: Exception) {}
+                val dbUrl = "jdbc:sqlite:$currentPath?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000&transaction_mode=IMMEDIATE"
+                val conn = DriverManager.getConnection(dbUrl)
+                try {
+                    conn.autoCommit = true
+                    conn.createStatement().use { stmt ->
+                        stmt.execute("PRAGMA journal_mode=WAL;")
+                        stmt.execute("PRAGMA synchronous=NORMAL;")
+                        stmt.execute("PRAGMA busy_timeout=10000;")
+                    }
+                } catch (e: Exception) {
+                    log.error("Failed to set SQLite PRAGMAs, closing connection: ${e.message}", e)
+                    try { conn.close() } catch (_: Exception) {}
+                    throw e
+                }
+                cachedConn = conn
+                lastDbPath = currentPath
+                dbInitialized = false
             }
-        } catch (e: Exception) {
-            log.error("Failed to set SQLite PRAGMAs, closing connection: ${e.message}", e)
-            try { conn.close() } catch (_: Exception) {}
-            throw e
+            return cachedConn!!
         }
-        conn
-    }
 
     @Volatile
     private var dbInitialized = false
@@ -190,8 +197,13 @@ class TaxonomyRankingService {
 
                     // Migrate data if old table exists
                     try {
-                        val rsTables = conn.metaData.getTables(null, null, "agent_ratings", null)
-                        if (rsTables.next()) {
+                        var hasOldTable = false
+                        conn.metaData.getTables(null, null, "agent_ratings", null).use { rsTables ->
+                            if (rsTables.next()) {
+                                hasOldTable = true
+                            }
+                        }
+                        if (hasOldTable) {
                             stmt.execute("""
                                 INSERT OR IGNORE INTO agent_ratings_v2 (snapshot_id, agent_name, domain, mu, sigma)
                                 SELECT 'global', agent_name, domain, mu, sigma FROM agent_ratings

@@ -283,44 +283,54 @@ class ModelEvalLoader(
 
     // ─── Cross-reference helpers ──────────────────────────────────────────────
 
-    /**
-     * Queries mmlu_pro table to get the local row id for each question text.
-     * Returns a map of question_text → mmlu_pro.id
-     */
     private fun fetchMmlProRowIds(questions: List<String>): Map<String, Int> {
         val result = mutableMapOf<String, Int>()
+        val normalizedDbMap = mutableMapOf<String, Int>()
         DriverManager.getConnection(datasetDbUrl).use { c ->
-            questions.chunked(900).forEach { chunk ->
-                val placeholders = chunk.joinToString(",") { "?" }
-                c.prepareStatement(
-                    "SELECT id, question FROM mmlu_pro WHERE question IN ($placeholders)"
-                ).use { ps ->
-                    chunk.forEachIndexed { i, q -> ps.setString(i + 1, q) }
-                    val rs = ps.executeQuery()
-                    while (rs.next()) result[rs.getString("question")] = rs.getInt("id")
+            c.createStatement().use { stmt ->
+                stmt.executeQuery("SELECT id, question FROM mmlu_pro").use { rs ->
+                    while (rs.next()) {
+                        val qText = rs.getString("question") ?: ""
+                        val qId = rs.getInt("id")
+                        normalizedDbMap[qText] = qId
+                        normalizedDbMap[taxonomy.model.TextNormalizer.cleanText(qText)] = qId
+                    }
+                }
+            }
+        }
+        for (q in questions) {
+            val exact = normalizedDbMap[q]
+            if (exact != null) {
+                result[q] = exact
+            } else {
+                val cleaned = taxonomy.model.TextNormalizer.cleanText(q)
+                val fallback = normalizedDbMap[cleaned]
+                if (fallback != null) {
+                    result[q] = fallback
                 }
             }
         }
         return result
     }
 
-    /**
-     * Queries embeddings_cache.db to check which question texts already have an embedding.
-     * Returns a set of question texts that are cached.
-     */
     private fun fetchEmbeddingHits(questions: List<String>): Set<String> {
         val result = mutableSetOf<String>()
+        val normalizedCacheMap = mutableSetOf<String>()
         try {
             DriverManager.getConnection(embeddingDbUrl).use { c ->
-                questions.chunked(900).forEach { chunk ->
-                    val placeholders = chunk.joinToString(",") { "?" }
-                    c.prepareStatement(
-                        "SELECT query FROM embeddings WHERE query IN ($placeholders)"
-                    ).use { ps ->
-                        chunk.forEachIndexed { i, q -> ps.setString(i + 1, q) }
-                        val rs = ps.executeQuery()
-                        while (rs.next()) result.add(rs.getString("query"))
+                c.createStatement().use { stmt ->
+                    stmt.executeQuery("SELECT query FROM embeddings").use { rs ->
+                        while (rs.next()) {
+                            val qText = rs.getString("query") ?: ""
+                            normalizedCacheMap.add(qText)
+                            normalizedCacheMap.add(taxonomy.model.TextNormalizer.cleanText(qText))
+                        }
                     }
+                }
+            }
+            for (q in questions) {
+                if (normalizedCacheMap.contains(q) || normalizedCacheMap.contains(taxonomy.model.TextNormalizer.cleanText(q))) {
+                    result.add(q)
                 }
             }
         } catch (e: Exception) {

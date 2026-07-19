@@ -15,28 +15,34 @@ import kotlin.math.ln
  * Routes queries down the DAG using log-space temperature-scaled softmax,
  * then prunes results to within [assignmentMargin] nats of the best leaf.
  */
+data class RoutingResult(
+    val leaves: Map<GraphNode, Double>,
+    val residualHits: List<ResidualHit>,
+    val trace: List<String> = emptyList()
+)
+
+data class ResidualHit(
+    val node: GraphNode,
+    val questionId: String,
+    val bestChildScore: Double
+)
+
 @Service
 class TaxonomyTrickler(
     private val config: TaxonomyConfig
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.Trickler")
 
-    /**
-     * Routes a query through the DAG.
-     * Returns a map from reached nodes (leaves/residuals) to their normalized log-probabilities.
-     *
-     * Only leaves within [config.formalism.assignmentGap] nats of the best leaf are returned.
-     * This mirrors the assignmentMargin filter used in TaxonomyOperations.reassignQueries.
-     */
     fun routeQuery(
         query: Embedding,
         root: GraphNode,
         currentIteration: Int,
         originalCategories: List<String>? = null,
         isInference: Boolean = false
-        ): Map<GraphNode, Double> {
+        ): RoutingResult {
         val logProbMap = mutableMapOf<String, Double>()
         val nodeMap = mutableMapOf<String, GraphNode>()
+        val residualHits = mutableListOf<ResidualHit>()
 
         fun logSumExp(a: Double, b: Double): Double {
             val maxVal = maxOf(a, b)
@@ -50,7 +56,7 @@ class TaxonomyTrickler(
 
             if (node.isLeaf) return
 
-            val children = node.children.toList()
+            val children = (node.children + node.crossLinkChildren).toList()
             if (children.isEmpty()) return
 
             val scores = DoubleArray(children.size)
@@ -88,6 +94,14 @@ class TaxonomyTrickler(
             val K = children.size
             val laplaceEps = 0.05 / K
             val rawProbs = DoubleArray(K) { exp(logSoftmax[it]) }
+
+            // pre-smoothing best-child responsibility
+            val bestChildResp = rawProbs.maxOrNull() ?: 0.0
+            if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < config.formalism.routeConfidenceTau) {
+                val qId = if (query.queryId != -1) query.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(query.rawText)
+                residualHits.add(ResidualHit(node, qId, bestChildResp))
+            }
+
             val smoothedProbs = DoubleArray(K) { (rawProbs[it] + laplaceEps) / (1.0 + K * laplaceEps) }
             val logSmoothed = DoubleArray(K) { ln(smoothedProbs[it].coerceAtLeast(1e-300)) }
 
@@ -99,7 +113,6 @@ class TaxonomyTrickler(
         walk(root, 0.0)
 
         // --- assignmentMargin filter ---
-        // Find the best log-prob among all leaves first.
         val bestLeafLogProb = logProbMap
             .filter { (id, _) -> nodeMap[id]?.isLeaf == true }
             .values
@@ -109,12 +122,14 @@ class TaxonomyTrickler(
         val results = mutableMapOf<GraphNode, Double>()
         for ((nodeId, logProb) in logProbMap) {
             val node = nodeMap[nodeId] ?: continue
+            if (node.isBridge) continue
             if (node.isLeaf) {
                 val thisLinear = exp(logProb)
                 if (thisLinear >= bestLinear * (1.0 - config.formalism.assignmentGap))
                     results[node] = logProb
             } else {
-                if (!node.children.any { logProbMap.containsKey(it.id) })
+                val activeChildren = node.children + node.crossLinkChildren
+                if (!activeChildren.any { logProbMap.containsKey(it.id) })
                     results[node] = logProb
             }
         }
@@ -128,8 +143,10 @@ class TaxonomyTrickler(
         val sumExpVal = results.values.sumOf { exp(it - maxLog) }
         val logSumExpFinal = maxLog + ln(sumExpVal.coerceAtLeast(1e-300))
 
-        return results.mapValues { (_, logProb) ->
+        val leavesMap = results.mapValues { (_, logProb) ->
             logProb - logSumExpFinal
         }
+
+        return RoutingResult(leavesMap, residualHits)
     }
 }

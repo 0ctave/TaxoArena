@@ -232,7 +232,7 @@ class TaxonomyEngine(
                         )
 
                         val optimizeTime = measureTimeMillis {
-                            ops.optimizeHierarchy(root)
+                            ops.optimizeHierarchy(root, i)
                         }
                         perfTracker.recordTime("Phase 5: Hierarchy Optimization", optimizeTime)
                         taxonomyService.notifyGraphUpdated(true)
@@ -308,7 +308,7 @@ class TaxonomyEngine(
                 taxonomyService.notifyGraphUpdated()
             }
 
-            assignQueryIds(root)
+            assignQueryIds(root, config.formalism.enableStableQuestionIds)
             log.info("--- ${config.execution.numIterations}-Iteration Evolution Completed ---")
             ops.printHierarchy(root)
             

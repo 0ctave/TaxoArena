@@ -79,7 +79,8 @@ class TournamentSimulator(
                         val labelNormalized = label.trim().lowercase()
                         agentSkills[labelNormalized]?.let { return it }
                     }
-                    current = current.parents.firstOrNull()
+                    val treeParentId = current.treeParentId
+                    current = current.parents.find { it.id == treeParentId }
                 }
             }
         }

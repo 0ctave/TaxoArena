@@ -82,28 +82,87 @@ class TaxonomySplitter(
             return
         }
 
-        if (node.vmfKappa < 0.5 && node.queries.size < 10 * config.formalism.minClusterSize) {
-            log.debug("Split Skipped: '${node.label}' kappa=${node.vmfKappa} too diffuse.")
-            return
+        val isDiffuse = node.vmfKappa < 0.5 && node.queries.size < 10 * config.formalism.minClusterSize
+        if (isDiffuse) {
+            var viable = false
+            if (config.formalism.enableResidualSplitGate) {
+                val minClusterSize = config.formalism.minClusterSize
+                val allSubtreeQueries = node.getAllQueriesInRegion()
+                val residualEmbeddings = allSubtreeQueries.filter { emb ->
+                    val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                    qId in node.residualQueries
+                }
+                
+                if (residualEmbeddings.size >= minClusterSize) {
+                    val resDim = node.sliceDim
+                    val projectedRes = residualEmbeddings.map { it.projectTo(resDim) }
+                    val resCentroid = DoubleArray(resDim)
+                    for (vec in projectedRes) {
+                        for (i in 0 until resDim) resCentroid[i] += vec[i]
+                    }
+                    var resNorm = 0.0
+                    for (i in 0 until resDim) resNorm += resCentroid[i] * resCentroid[i]
+                    resNorm = kotlin.math.sqrt(resNorm)
+                    val resMu = FloatArray(resDim) { i -> if (resNorm > 0.0) (resCentroid[i] / resNorm).toFloat() else 0.0f }
+                    if (resNorm == 0.0 && resDim > 0) resMu[0] = 1.0f
+
+                    var resDotSum = 0.0
+                    for (vec in projectedRes) {
+                        for (i in 0 until resDim) resDotSum += resMu[i] * vec[i]
+                    }
+                    val resRBar = (resDotSum / projectedRes.size.coerceAtLeast(1)).coerceAtLeast(0.0)
+                    val resKappa = StatisticsUtils.correctedKappa(resRBar, resDim, projectedRes.size)
+
+                    val siblings = node.parents.flatMap { it.children }.filter { it.id != node.id }
+                    viable = siblings.isEmpty() || siblings.all { sib ->
+                        val commonDim = minOf(resDim, sib.vmfMu.size)
+                        if (commonDim > 0) {
+                            val projResMu = StatisticsUtils.projectVector(resMu, commonDim)
+                            val projSibMu = StatisticsUtils.projectVector(sib.vmfMu, commonDim)
+                            val div = StatisticsUtils.vmfJsDivergence(projResMu, resKappa, projSibMu, sib.vmfKappa, commonDim)
+                            div >= config.formalism.separationEpsilon
+                        } else {
+                            true
+                        }
+                    }
+                }
+            }
+            
+            if (!viable) {
+                log.debug("Split Skipped: '${node.label}' kappa=${node.vmfKappa} too diffuse.")
+                return
+            } else {
+                log.debug("Split Allowed via Residual Viability Gate: '${node.label}' is diffuse but has coherent residual cluster.")
+            }
         }
 
-        log.debug("Scanning '${node.label}' (${node.queries.size} q) for split...")
+        val targetQueries = if (isDiffuse && config.formalism.enableResidualSplitGate) {
+            val allSubtreeQueries = node.getAllQueriesInRegion()
+            allSubtreeQueries.filter { emb ->
+                val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                qId in node.residualQueries
+            }.ifEmpty { node.queries }
+        } else {
+            node.queries
+        }
+
+        log.debug("Scanning '${node.label}' (${targetQueries.size} q) for split...")
 
         val childDim =  dimForDepth(node.depth + 1)
         val minClusterSize = config.formalism.minClusterSize
 
-        val rawVectors = node.queries.map { it.toDoubleArray() }
+        val rawVectors = targetQueries.map { it.toDoubleArray() }
 
         val splitDim = when {
-            node.queries.size < 100 -> 32
-            node.queries.size < 500 -> 64
+            targetQueries.size < 100 -> 32
+            targetQueries.size < 500 -> 64
             else                    -> 128
         }.coerceAtMost(rawVectors.first().size)
 
         val pcaProjected = StatisticsUtils.pcaProject(rawVectors, splitDim)
 
         // ── k-ary mixture selection ───────────────────────────────────────────
-        val minClusterFrac = minClusterSize.toDouble() / node.queries.size
+        val minClusterFrac = minClusterSize.toDouble() / targetQueries.size
 
         val probe = StatisticsUtils.performVmfKMeans(
             embeddings = pcaProjected,
@@ -139,10 +198,10 @@ class TaxonomySplitter(
         val clusters         = Array(k) { mutableListOf<Embedding>() }
         val clustersProjected = Array(k) { mutableListOf<DoubleArray>() }
 
-        for (i in node.queries.indices) {
+        for (i in targetQueries.indices) {
             val resp = mixture.responsibilities[i]
             val best = resp.indices.maxByOrNull { resp[it] } ?: 0
-            clusters[best].add(node.queries[i])
+            clusters[best].add(targetQueries[i])
             clustersProjected[best].add(pcaProjected[i])
         }
 
@@ -156,7 +215,7 @@ class TaxonomySplitter(
         val deltaNorm = StatisticsUtils.calculateDasguptaDeltaK(clustersProjected.map { it.toList() })
         node.dasguptaDeltaNorm = deltaNorm
 
-        val requiredEps = if (node.queries.size < 2 * minClusterSize)
+        val requiredEps = if (targetQueries.size < 2 * minClusterSize)
             2.0 * config.formalism.separationEpsilon
         else
             config.formalism.separationEpsilon
@@ -188,7 +247,7 @@ class TaxonomySplitter(
             return
         }
 
-        log.info("Split '${node.label}' (q=${node.queries.size}, k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)}) -> Spawning $k children")
+        log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)}) -> Spawning $k children")
 
         // ── Create children and wire topology ────────────────────────────────
         val newChildren = clusters.mapIndexed { idx, cluster ->
@@ -352,13 +411,14 @@ class TaxonomySplitter(
                             .distinct()
                     }
 
-                    // Lineage (same as before)
+                    val treeParentId = node.treeParentId
                     val lineage = mutableListOf<String>()
-                    var current: GraphNode? = parents.firstOrNull()
+                    var current: GraphNode? = parents.find { it.id == treeParentId }
                     val visitedLineage = mutableSetOf<String>()
                     while (current != null && visitedLineage.add(current.id)) {
                         lineage.add(0, current.label ?: "Emergent Concept")
-                        current = current.parents.firstOrNull()
+                        val nextTreeParentId = current.treeParentId
+                        current = current.parents.find { it.id == nextTreeParentId }
                     }
 
                     // Domain anchors: top 1–2 domain names, no counts
@@ -384,7 +444,7 @@ class TaxonomySplitter(
 
                     val prompt = TaxoPrompts.clusterLabeling(
                         querySamples = representativeSamples,
-                        parentLabel = parents.firstOrNull()?.label ?: "Universal Knowledge",
+                        parentLabel = parents.find { it.id == treeParentId }?.label ?: "Universal Knowledge",
                         siblingLabels = siblingLabels,
                         branchHistory = lineage,
                         domainAnchors = domainAnchors,

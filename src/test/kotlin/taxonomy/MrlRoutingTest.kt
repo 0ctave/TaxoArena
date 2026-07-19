@@ -81,7 +81,7 @@ class MrlRoutingTest {
 
         // 2. Verify routeQuery matches child or root
         val results = trickler.routeQuery(embedding, root, currentIteration = 2)
-        assertTrue(results.isNotEmpty())
+        assertTrue(results.leaves.isNotEmpty())
     }
 
 }

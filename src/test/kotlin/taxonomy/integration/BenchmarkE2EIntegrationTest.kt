@@ -205,7 +205,6 @@ class BenchmarkE2EIntegrationTest {
         val rankingDb = File(tmp, "ratings_${System.nanoTime()}.db")
         System.setProperty("ranking.db.path", rankingDb.absolutePath)
         val rankingService = TaxonomyRankingService()
-        System.clearProperty("ranking.db.path")
 
         benchmarkService = TaxonomyBenchmarkService(
             arenaService = FakeArenaService(mockOps, mockTaxonomyService, mockEmbeddingCache),
@@ -214,6 +213,12 @@ class BenchmarkE2EIntegrationTest {
             taxonomyService = mockTaxonomyService,
             evalStore = store
         )
+    }
+
+    @org.junit.jupiter.api.AfterAll
+    fun tearDown() {
+        System.clearProperty("ranking.db.path")
+        tmp.deleteRecursively()
     }
 
     @BeforeEach

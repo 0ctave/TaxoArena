@@ -107,8 +107,21 @@ class TaxonomyConfig {
         var emaAlpha: Double = 0.7
         val gedThreshold: Double = 0.005
 
-        // ── Iteration budget ──────────────────────────────────────────────────
-        // (numIterations lives in ExecutionConfig for historical reasons)
+        // ── DAG Maximization flags & parameters ────────────────────────────────
+        var enableStableQuestionIds: Boolean = false
+        var enableResidualRouting: Boolean = false
+        var enableResidualSplitGate: Boolean = false
+        var enableBridging: Boolean = false
+
+        var routeConfidenceTau: Double = 0.5
+        var bridgeSeparationCeiling: Double = 0.20
+        var bridgeEntropyCap: Double = 1.05
+        var bridgeMaxArity: Int = 2
+        var bridgeParentBudget: Int = 1
+        var maxBridgeNodes: Int = 14
+        var maxBridgesPerDomainPair: Int = 2
+        var bridgeCandidateTopK: Int = 10
+        var minBridgeCoverage: Int = 50
     }
 
     fun formatConfigReport(): String {
@@ -169,7 +182,20 @@ class TaxonomyConfig {
             separationEpsilon = formalism.separationEpsilon,
             cosineTau = formalism.cosineTau,
             assignmentGap = formalism.assignmentGap,
-            emaAlpha = formalism.emaAlpha
+            emaAlpha = formalism.emaAlpha,
+            enableStableQuestionIds = formalism.enableStableQuestionIds,
+            enableResidualRouting = formalism.enableResidualRouting,
+            enableResidualSplitGate = formalism.enableResidualSplitGate,
+            enableBridging = formalism.enableBridging,
+            routeConfidenceTau = formalism.routeConfidenceTau,
+            bridgeSeparationCeiling = formalism.bridgeSeparationCeiling,
+            bridgeEntropyCap = formalism.bridgeEntropyCap,
+            bridgeMaxArity = formalism.bridgeMaxArity,
+            bridgeParentBudget = formalism.bridgeParentBudget,
+            maxBridgeNodes = formalism.maxBridgeNodes,
+            maxBridgesPerDomainPair = formalism.maxBridgesPerDomainPair,
+            bridgeCandidateTopK = formalism.bridgeCandidateTopK,
+            minBridgeCoverage = formalism.minBridgeCoverage
         )
     )
 
@@ -198,6 +224,19 @@ class TaxonomyConfig {
         formalism.cosineTau = c.formalism.cosineTau
         formalism.assignmentGap = c.formalism.assignmentGap
         formalism.emaAlpha = c.formalism.emaAlpha
+        formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
+        formalism.enableResidualRouting = c.formalism.enableResidualRouting
+        formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate
+        formalism.enableBridging = c.formalism.enableBridging
+        formalism.routeConfidenceTau = c.formalism.routeConfidenceTau
+        formalism.bridgeSeparationCeiling = c.formalism.bridgeSeparationCeiling
+        formalism.bridgeEntropyCap = c.formalism.bridgeEntropyCap
+        formalism.bridgeMaxArity = c.formalism.bridgeMaxArity
+        formalism.bridgeParentBudget = c.formalism.bridgeParentBudget
+        formalism.maxBridgeNodes = c.formalism.maxBridgeNodes
+        formalism.maxBridgesPerDomainPair = c.formalism.maxBridgesPerDomainPair
+        formalism.bridgeCandidateTopK = c.formalism.bridgeCandidateTopK
+        formalism.minBridgeCoverage = c.formalism.minBridgeCoverage
     }
 }
 

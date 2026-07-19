@@ -212,9 +212,7 @@ fun buildTreeLines(
             }
         }
 
-        val hasChildren = node.children.isNotEmpty() && !alreadyVisited
-        // Default view (no explicit expand state yet): auto-expand the root and the first
-        // level so the domains are visible immediately; deeper levels stay collapsed.
+        val hasChildren = (node.children + node.crossLinkChildren).isNotEmpty() && !alreadyVisited
         val isExpanded = expandedNodes[node.id] ?: (depth < 1)
         val fold = " "
         val nodeCol = depthColor(node.depth)
@@ -237,7 +235,7 @@ fun buildTreeLines(
         out += TreeLine(node = node, text = text, isPoly = isPoly, topTwoRanks = leafRanks[node.id])
 
         if (alreadyVisited || !isExpanded) return
-        val sorted = node.children.sortedByDescending { it.getRecursiveQueryCount() }
+        val sorted = (node.children + node.crossLinkChildren).sortedByDescending { it.getRecursiveQueryCount() }
         sorted.forEachIndexed { index, child ->
             walk(child, depth + 1, ancestorHasMore + (index < sorted.size - 1))
         }

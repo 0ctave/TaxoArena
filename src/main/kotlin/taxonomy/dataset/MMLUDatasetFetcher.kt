@@ -184,13 +184,19 @@ class MMLUDatasetFetcher(
 
     suspend fun fetchDataset(maxQueries: Int = 12000, selectedDomains: List<String> = emptyList()): Map<String, List<MMLUQuery>> {
         val type = config.dataset.datasetType
-        return when (type) {
+        val result = when (type) {
             DatasetType.MMLU_PRO -> fetchMmluPro(maxQueries, selectedDomains)
             DatasetType.MMLU_ORIGINAL -> fetchMmluOriginal(maxQueries, selectedDomains)
             DatasetType.ARC -> fetchArc(maxQueries, selectedDomains)
             DatasetType.TWENTY_NEWSGROUPS -> fetchTwentyNewsgroups(maxQueries, selectedDomains)
             DatasetType.AG_NEWS -> fetchAgNews(maxQueries, selectedDomains)
         }
+        
+        result.values.flatten().forEach { query ->
+            taxonomy.model.QuestionIdRegistry.register(query.text, query.id)
+        }
+        
+        return result
     }
 
     private suspend fun fetchMmluPro(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {

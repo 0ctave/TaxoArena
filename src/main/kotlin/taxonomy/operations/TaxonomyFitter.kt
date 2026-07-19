@@ -95,6 +95,14 @@ class TaxonomyFitter(
         // ── n for NiW (always branch-based for routing confidence) ───────────────
         val branchQueries = node.getAllQueriesInRegion()
         val n = branchQueries.size
+        val kappaQueries = if (config.formalism.enableResidualRouting) {
+            branchQueries.filter { emb ->
+                val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                qId !in node.residualQueries
+            }.ifEmpty { branchQueries }
+        } else {
+            branchQueries
+        }
 
         if (n == 0) {
             node.vmfMu = FloatArray(d) { 0.0f }.apply { if (d > 0) this[0] = 1.0f }
@@ -154,16 +162,16 @@ class TaxonomyFitter(
                     // This measures "how broad is this domain really?" from the queries,
                     // not from the child mean coherence (which is always high for 2 child-means).
                     var dotSum = 0.0
-                    val branchVecs = branchQueries.map { it.projectTo(d) }
-                    for (vec in branchVecs) {
+                    val kappaVecs = kappaQueries.map { it.projectTo(d) }
+                    for (vec in kappaVecs) {
                         for (i in 0 until d) dotSum += mu[i] * vec[i]
                     }
-                    val rBar = (dotSum / branchVecs.size.coerceAtLeast(1)).coerceAtLeast(0.0)
-                    val newKappa = StatisticsUtils.correctedKappa(rBar, d, branchVecs.size)
+                    val rBar = (dotSum / kappaVecs.size.coerceAtLeast(1)).coerceAtLeast(0.0)
+                    val newKappa = StatisticsUtils.correctedKappa(rBar, d, kappaVecs.size)
 
                     // EMA dampening (keep if node already has a sensible kappa)
                     val prevKappa = node.vmfKappa
-                    val sampleWeight = (branchVecs.size / (10.0 * config.formalism.minClusterSize))
+                    val sampleWeight = (kappaVecs.size / (10.0 * config.formalism.minClusterSize))
                         .coerceIn(0.0, 1.0)
                     node.vmfKappa = if (prevKappa > 1e-2)
                         prevKappa + sampleWeight * (newKappa - prevKappa)
@@ -182,13 +190,13 @@ class TaxonomyFitter(
             // mu trusted from splitter — recompute kappa from current branch to reflect
             // who is actually here now, not who was here at split time
             val rBar = run {
-                val projected = branchQueries.map { it.projectTo(d) }
+                val projected = kappaQueries.map { it.projectTo(d) }
                 var dot = 0.0
                 for (vec in projected) for (i in 0 until d) dot += node.vmfMu[i] * vec[i]
-                (dot / n.coerceAtLeast(1)).coerceAtLeast(0.0)
+                (dot / kappaQueries.size.coerceAtLeast(1)).coerceAtLeast(0.0)
             }
-            val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
-            val sampleWeight = (n / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
+            val rawKappa = StatisticsUtils.correctedKappa(rBar, d, kappaQueries.size)
+            val sampleWeight = (kappaQueries.size / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
             val effectiveAlpha = config.formalism.emaAlpha * sampleWeight
             val oldKappa = node.vmfKappa.takeIf { it > 1e-3 } ?: rawKappa
             node.vmfKappa = (1.0 - effectiveAlpha) * rawKappa + effectiveAlpha * oldKappa
@@ -233,11 +241,17 @@ class TaxonomyFitter(
         for (vec in projected) for (i in 0 until fitDim) sampleMean[i] += vec[i]
         for (i in 0 until fitDim) sampleMean[i] /= n.toDouble()
 
-        val kappaN = kappa0 + n
-        val nuN = nu0 + n
+        val effectiveN = if (node.isBridge) {
+            (config.formalism.minClusterSize * 1.5).coerceAtMost(n.toDouble())
+        } else {
+            n.toDouble()
+        }
+
+        val kappaN = kappa0 + effectiveN
+        val nuN = nu0 + effectiveN
 
         val mN = FloatArray(fitDim) { i ->
-            ((kappa0 * m0[i] + n * sampleMean[i]) / kappaN).toFloat()
+            ((kappa0 * m0[i] + effectiveN * sampleMean[i]) / kappaN).toFloat()
         }
 
         val lambdaN = FloatArray(fitDim)
@@ -249,7 +263,7 @@ class TaxonomyFitter(
         }
         for (i in 0 until fitDim) {
             val meanDiff = sampleMean[i] - m0[i]
-            val updatePart = (kappa0 * n / kappaN) * meanDiff * meanDiff
+            val updatePart = (kappa0 * effectiveN / kappaN) * meanDiff * meanDiff
             lambdaN[i] = (lambda + lambdaN[i] + updatePart).toFloat()
         }
 

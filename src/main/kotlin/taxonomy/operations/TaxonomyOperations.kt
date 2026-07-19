@@ -30,7 +30,7 @@ class TaxonomyOperations(
         currentIteration: Int = 2,
         originalCategories: List<String>? = null
     ): Map<GraphNode, Double> =
-        trickler.routeQuery(query, root, currentIteration, originalCategories)
+        trickler.routeQuery(query, root, currentIteration, originalCategories).leaves
 
     suspend fun fitNodeRecursive(node: GraphNode) = fitter.fitNodeRecursive(node)
 
@@ -41,7 +41,7 @@ class TaxonomyOperations(
 
     fun resetConceptCounter() = splitter.resetConceptCounter()
 
-    suspend fun optimizeHierarchy(root: GraphNode) = merger.optimizeHierarchy(root)
+    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2) = merger.optimizeHierarchy(root, currentIteration)
 
     suspend fun prunePassthroughNodesPublic(root: GraphNode) = merger.prunePassthroughNodesPublic(root)
 
@@ -80,7 +80,8 @@ class TaxonomyOperations(
             async(Dispatchers.Default) {
                 for (emb in chunk) {
                     val originals = groundTruthMap[emb.rawText]
-                    val results = trickler.routeQuery(emb, root, currentIteration, originals)
+                    val routeResult = trickler.routeQuery(emb, root, currentIteration, originals)
+                    val results = routeResult.leaves
                     val bestLogProb = results.values.maxOrNull() ?: Double.NEGATIVE_INFINITY
                     val bestLinear = exp(bestLogProb)
                     val destinations = results.entries
@@ -91,6 +92,14 @@ class TaxonomyOperations(
                             listOf(root)
                         }
                     destinations.forEach { it.queries.add(emb) }
+                    
+                    if (config.formalism.enableResidualRouting) {
+                        for (hit in routeResult.residualHits) {
+                            synchronized(hit.node.residualQueries) {
+                                hit.node.residualQueries.add(hit.questionId)
+                            }
+                        }
+                    }
                 }
             }
         }.awaitAll()

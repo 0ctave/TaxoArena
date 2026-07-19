@@ -47,7 +47,7 @@ class TaxonomyService(
 
     fun notifyGraphUpdated(structuralChange: Boolean = false) {
         if (structuralChange) {
-            _rootNode.value?.let { assignQueryIds(it) }
+            _rootNode.value?.let { assignQueryIds(it, config.formalism.enableStableQuestionIds) }
         }
         _graphVersion.value += 1
     }

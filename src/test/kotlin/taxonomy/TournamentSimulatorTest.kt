@@ -101,8 +101,10 @@ class TournamentSimulatorTest {
 
         root.children.add(businessNode)
         businessNode.parents.add(root)
+        businessNode.treeParentId = root.id
         businessNode.children.add(valuationNode)
         valuationNode.parents.add(businessNode)
+        valuationNode.treeParentId = businessNode.id
 
         taxonomyService.setGraph(root)
 

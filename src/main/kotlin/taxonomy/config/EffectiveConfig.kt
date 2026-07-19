@@ -54,6 +54,19 @@ data class EffectiveConfig(
         val separationEpsilon: Double = 0.04,
         val cosineTau: Double = 2.0,
         val assignmentGap: Double = 0.05,
-        val emaAlpha: Double = 0.7
+        val emaAlpha: Double = 0.7,
+        val enableStableQuestionIds: Boolean = false,
+        val enableResidualRouting: Boolean = false,
+        val enableResidualSplitGate: Boolean = false,
+        val enableBridging: Boolean = false,
+        val routeConfidenceTau: Double = 0.5,
+        val bridgeSeparationCeiling: Double = 0.20,
+        val bridgeEntropyCap: Double = 1.05,
+        val bridgeMaxArity: Int = 2,
+        val bridgeParentBudget: Int = 1,
+        val maxBridgeNodes: Int = 14,
+        val maxBridgesPerDomainPair: Int = 2,
+        val bridgeCandidateTopK: Int = 10,
+        val minBridgeCoverage: Int = 50
     )
 }

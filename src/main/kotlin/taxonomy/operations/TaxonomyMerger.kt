@@ -33,9 +33,13 @@ class TaxonomyMerger(
 
     private val log = LoggerFactory.getLogger("taxonomy.Merger")
 
-    suspend fun optimizeHierarchy(root: GraphNode) {
+    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2) {
         pruneUnrelevantNodes(root)
         mergeSimilarSiblings(root)
+
+        if (config.formalism.enableBridging) {
+            insertBridgingParents(root, currentIteration)
+        }
 
         val ancestorMap = buildAncestorMap(root)  // ← build once
         evaluateCrossLinks(root, ancestorMap)
@@ -384,14 +388,14 @@ class TaxonomyMerger(
         var severedShortcuts = 0
         for (node in allNodes) {
             val redundantParents = node.parents.filter { p1 ->
+                if (node.isBridge || p1.isBridge) return@filter false
                 if (node.treeParentId == p1.id) {
                     keptEdges++
                     return@filter false
                 }
-                // Safe lookup: if p1 or p2 is not in ancestorMap (stale ref), treat as non-redundant
                 val p1Ancestors = ancestorMap[p1.id] ?: return@filter false
                 node.parents.any { p2 ->
-                    p1.id != p2.id && p1.id in (ancestorMap[p2.id] ?: emptySet())
+                    !p2.isBridge && p1.id != p2.id && p1.id in (ancestorMap[p2.id] ?: emptySet())
                 }
             }
             for (rp in redundantParents) {
@@ -560,5 +564,236 @@ class TaxonomyMerger(
             node.phaseCompleted = node.phaseCompleted and PHASE_VMF_FIT.inv()
         }
         node.children.forEach { recomputeDepths(it, newDepth + 1, visited) }
+    }
+
+    private fun logBridgeResidual(
+        iteration: Int,
+        candidateId: String,
+        sourceNodes: String,
+        size: Int,
+        entropy: Double,
+        div: Double,
+        accepted: Boolean,
+        reason: String
+    ) {
+        val baseDir = taxonomy.model.ExperimentOutputContext.activeBaseDir ?: java.io.File(".")
+        val csvFile = java.io.File(baseDir, "bridge_residuals.csv")
+        synchronized(this) {
+            val exists = csvFile.exists()
+            java.io.FileWriter(csvFile, true).use { fw ->
+                if (!exists) {
+                    fw.write("iteration,candidate_id,source_nodes,size,entropy,div,accepted,reason\n")
+                }
+                val escNodes = "\"${sourceNodes.replace("\"", "\"\"")}\""
+                val escReason = "\"${reason.replace("\"", "\"\"")}\""
+                fw.write("$iteration,$candidateId,$escNodes,$size,${"%.4f".format(java.util.Locale.US, entropy)},${"%.4f".format(java.util.Locale.US, div)},$accepted,$escReason\n")
+            }
+        }
+    }
+
+    private suspend fun insertBridgingParents(root: GraphNode, iteration: Int) {
+        val leaves = collectAllLeaves(root)
+        var bridgesCreated = 0
+        
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walkCount(n: GraphNode) {
+            if (!allNodes.add(n)) return
+            n.children.forEach { walkCount(it) }
+            n.crossLinkChildren.forEach { walkCount(it) }
+        }
+        walkCount(root)
+        val currentBridgeCount = allNodes.count { it.isBridge }
+        val maxBridgeNodes = config.formalism.maxBridgeNodes
+        
+        if (currentBridgeCount >= maxBridgeNodes) {
+            log.info("Bridge Insertion: budget reached ($currentBridgeCount >= $maxBridgeNodes). Skipping.")
+            return
+        }
+
+        val candidatePairs = mutableListOf<Pair<GraphNode, GraphNode>>()
+        for (i in leaves.indices) {
+            for (j in i + 1 until leaves.size) {
+                val u = leaves[i]
+                val v = leaves[j]
+                
+                val uAncestors = getDepth1Ancestors(u)
+                val vAncestors = getDepth1Ancestors(v)
+                if (uAncestors.isEmpty() || vAncestors.isEmpty() || uAncestors.intersect(vAncestors).isNotEmpty()) {
+                    continue
+                }
+                
+                val commonDim = minOf(u.vmfMu.size, v.vmfMu.size)
+                if (commonDim == 0) continue
+                val projUMu = StatisticsUtils.projectVector(u.vmfMu, commonDim)
+                val projVMu = StatisticsUtils.projectVector(v.vmfMu, commonDim)
+                val div = StatisticsUtils.vmfJsDivergence(projUMu, u.vmfKappa, projVMu, v.vmfKappa, commonDim)
+                
+                val lower = config.formalism.separationEpsilon
+                val upper = config.formalism.bridgeSeparationCeiling
+                if (div in lower..upper) {
+                    candidatePairs.add(u to v)
+                }
+            }
+        }
+
+        log.info("Bridge Insertion: Found ${candidatePairs.size} candidate pairs in adjacency band [${config.formalism.separationEpsilon}, ${config.formalism.bridgeSeparationCeiling}]")
+
+        for ((u, v) in candidatePairs) {
+            if (bridgesCreated + currentBridgeCount >= maxBridgeNodes) break
+
+            val candidateId = "cand_${u.id.take(4)}_${v.id.take(4)}"
+            val sourceNodes = "${u.label ?: u.id} + ${v.label ?: v.id}"
+            val combinedQueries = u.queries + v.queries
+            val size = combinedQueries.size
+            val entropy = calculateGtEntropy(combinedQueries)
+            
+            val commonDim = minOf(u.vmfMu.size, v.vmfMu.size)
+            val projUMu = StatisticsUtils.projectVector(u.vmfMu, commonDim)
+            val projVMu = StatisticsUtils.projectVector(v.vmfMu, commonDim)
+            val div = StatisticsUtils.vmfJsDivergence(projUMu, u.vmfKappa, projVMu, v.vmfKappa, commonDim)
+
+            if (entropy > config.formalism.bridgeEntropyCap) {
+                logBridgeResidual(
+                    iteration = iteration,
+                    candidateId = candidateId,
+                    sourceNodes = sourceNodes,
+                    size = size,
+                    entropy = entropy,
+                    div = div,
+                    accepted = false,
+                    reason = "Entropy exceeds budget (${"%.4f".format(java.util.Locale.US, entropy)} > ${config.formalism.bridgeEntropyCap})"
+                )
+                continue
+            }
+
+            val bridgeNode = GraphNode(
+                id = "bridge_" + java.util.UUID.randomUUID().toString().take(8),
+                label = "Temporary Bridge",
+                depth = maxOf(2, maxOf(u.depth, v.depth) - 1)
+            )
+            bridgeNode.isBridge = true
+            bridgeNode.sliceDim = commonDim
+
+            val d = commonDim
+            val combinedCentroid = DoubleArray(d)
+            val projected = combinedQueries.map { it.projectTo(d) }
+            for (vec in projected) {
+                for (i in 0 until d) combinedCentroid[i] += vec[i]
+            }
+            var norm = 0.0
+            for (i in 0 until d) norm += combinedCentroid[i] * combinedCentroid[i]
+            norm = sqrt(norm)
+            val mu = FloatArray(d) { i -> if (norm > 0.0) (combinedCentroid[i] / norm).toFloat() else 0.0f }
+            if (norm == 0.0 && d > 0) mu[0] = 1.0f
+            bridgeNode.vmfMu = mu
+            
+            var dot = 0.0
+            for (vec in projected) for (i in 0 until d) dot += mu[i] * vec[i]
+            val rBar = (dot / combinedQueries.size.coerceAtLeast(1)).coerceAtLeast(0.0)
+            bridgeNode.vmfKappa = StatisticsUtils.correctedKappa(rBar, d, combinedQueries.size)
+            bridgeNode.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, bridgeNode.vmfKappa)
+
+            var finalLabel = "Bridge Concept [${u.label ?: u.id} ↔ ${v.label ?: v.id}]"
+            if (config.execution.enableLabeling) {
+                try {
+                    val representativeSamples = combinedQueries.shuffled().take(30).map { it.rawText }
+                    val prompt = taxonomy.prompts.TaxoPrompts.clusterLabeling(
+                        querySamples = representativeSamples,
+                        parentLabel = "Bridging Parent",
+                        siblingLabels = emptyList(),
+                        branchHistory = listOf(u.label ?: "", v.label ?: ""),
+                        domainAnchors = listOf(u.label ?: "", v.label ?: ""),
+                        childLabels = emptyList(),
+                        depth = bridgeNode.depth
+                    )
+                    val generated = llmClient.generateClusterLabel(prompt)
+                    if (generated.isNotBlank()) {
+                        finalLabel = generated.trim()
+                    }
+                } catch (e: Exception) {
+                    log.warn("LLM labeling failed for bridge, falling back to: $finalLabel")
+                }
+            }
+            bridgeNode.label = finalLabel
+
+            bridgeNode.crossLinkChildren.add(u)
+            bridgeNode.crossLinkChildren.add(v)
+            u.parents.add(bridgeNode)
+            v.parents.add(bridgeNode)
+
+            val pU = u.parents.find { it.id == u.treeParentId }
+            val pV = v.parents.find { it.id == v.treeParentId }
+            if (pU != null) {
+                bridgeNode.parents.add(pU)
+                pU.crossLinkChildren.add(bridgeNode)
+            }
+            if (pV != null && pV.id != pU?.id) {
+                bridgeNode.parents.add(pV)
+                pV.crossLinkChildren.add(bridgeNode)
+            }
+
+            bridgesCreated++
+            log.info("Bridge Insertion: Created bridge '${bridgeNode.label}' between '${u.label}' and '${v.label}' with entropy ${"%.4f".format(java.util.Locale.US, entropy)}")
+
+            logBridgeResidual(
+                iteration = iteration,
+                candidateId = candidateId,
+                sourceNodes = sourceNodes,
+                size = size,
+                entropy = entropy,
+                div = div,
+                accepted = true,
+                reason = "Success"
+            )
+        }
+    }
+
+    private fun collectAllLeaves(root: GraphNode): List<GraphNode> {
+        val leaves = mutableListOf<GraphNode>()
+        val visited = mutableSetOf<String>()
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            if (node.isLeaf) leaves.add(node)
+            else {
+                node.children.forEach { walk(it) }
+                node.crossLinkChildren.forEach { walk(it) }
+            }
+        }
+        walk(root)
+        return leaves
+    }
+
+    private fun getDepth1Ancestors(node: GraphNode): Set<String> {
+        val ancestors = mutableSetOf<String>()
+        val visited   = mutableSetOf<String>()
+        fun walk(n: GraphNode) {
+            if (!visited.add(n.id)) return
+            if (n.depth == 1) {
+                (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
+            } else {
+                val treeParent = n.parents.find { it.id == n.treeParentId }
+                if (treeParent != null) {
+                    walk(treeParent)
+                }
+            }
+        }
+        walk(node)
+        return ancestors
+    }
+
+    private fun calculateGtEntropy(queries: List<Embedding>): Double {
+        val counts = HashMap<String, Int>()
+        for (q in queries) {
+            val cat = datasetFetcher.getDetailsForQuery(q.rawText)?.category ?: continue
+            counts[cat] = (counts[cat] ?: 0) + 1
+        }
+        val total = counts.values.sum().toDouble()
+        if (total == 0.0) return 0.0
+        var entropy = 0.0
+        for (count in counts.values) {
+            val p = count.toDouble() / total
+            entropy -= p * kotlin.math.log2(p)
+        }
+        return entropy
     }
 }

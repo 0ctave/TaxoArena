@@ -2,6 +2,25 @@ package taxonomy.model
 
 import kotlinx.serialization.Serializable
 
+object TextNormalizer {
+    fun cleanText(s: String): String {
+        return s.replace("\r\n", "\n").replace("\r", "\n").trim()
+    }
+}
+
+object QuestionIdRegistry {
+    private val textToId = java.util.concurrent.ConcurrentHashMap<String, Int>()
+
+    fun register(text: String, id: Int) {
+        textToId[text] = id
+        textToId[TextNormalizer.cleanText(text)] = id
+    }
+
+    fun lookup(text: String): Int? {
+        return textToId[text] ?: textToId[TextNormalizer.cleanText(text)]
+    }
+}
+
 /**
  * Represents a high-dimensional vector x ∈ ℝᵈ along with its source text.
  * Stores both the original raw query and its distilled semantic signature.
@@ -29,14 +48,13 @@ data class Embedding(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Embedding) return false
-        if (rawText != other.rawText) return false
-        return values.contentEquals(other.values)
+        val thisId = if (queryId != -1) queryId else (TextNormalizer.cleanText(rawText).hashCode() and 0x7FFFFFFF)
+        val otherId = if (other.queryId != -1) other.queryId else (TextNormalizer.cleanText(other.rawText).hashCode() and 0x7FFFFFFF)
+        return thisId == otherId
     }
 
     override fun hashCode(): Int {
-        var result = rawText.hashCode()
-        result = 31 * result + values.contentHashCode()
-        return result
+        return if (queryId != -1) queryId else (TextNormalizer.cleanText(rawText).hashCode() and 0x7FFFFFFF)
     }
 }
 
@@ -178,3 +196,8 @@ data class GenerationProgress(
     val percentComplete: Double,
     val statusText: String
 )
+
+object ExperimentOutputContext {
+    @Volatile
+    var activeBaseDir: java.io.File? = null
+}

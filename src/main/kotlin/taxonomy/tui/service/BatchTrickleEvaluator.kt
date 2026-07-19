@@ -18,6 +18,8 @@ data class LeafDomainProfile(
     val dominantDomain: String,
     val purity: Double,
     val domainHistogram: Map<String, Int>,
+    val domainHistogramDouble: Map<String, Double> = emptyMap(),
+    val sizeDouble: Double = size.toDouble()
 )
 
 /**
@@ -46,33 +48,83 @@ object BatchTrickleEvaluator {
         return out.values.toList()
     }
 
-    /**
-     * Tag each leaf with the dominant domain of the training queries it holds. [textToDomain] maps
-     * a query's raw text to its true domain (built from the train set). Leaves whose queries carry
-     * no domain label (post-merge orphans) are skipped.
-     */
+    enum class ProfileMode {
+        PARTITION, SOFT
+    }
+
+    private fun computeSimilarity(emb: taxonomy.model.Embedding, leaf: GraphNode): Double {
+        val targetDim = leaf.vmfMu.size
+        if (targetDim == 0) return -1.0
+        val projected = taxonomy.utils.StatisticsUtils.projectVector(emb.values, targetDim)
+        var dot = 0.0
+        for (i in 0 until targetDim) {
+            dot += projected[i] * leaf.vmfMu[i]
+        }
+        return dot
+    }
+
     fun buildLeafProfiles(
         leaves: List<GraphNode>,
         textToDomain: Map<String, String>,
+        profileMode: ProfileMode = ProfileMode.PARTITION
     ): Map<String, LeafDomainProfile> {
         val out = LinkedHashMap<String, LeafDomainProfile>()
+        val queryToLeaves = HashMap<String, MutableList<Pair<GraphNode, Double>>>()
+        
         for (leaf in leaves) {
-            val counts = HashMap<String, Int>()
             for (emb in leaf.queries) {
-                val domain = textToDomain[emb.rawText] ?: continue
-                counts[domain] = (counts[domain] ?: 0) + 1
+                val queryKey = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                val score = computeSimilarity(emb, leaf)
+                queryToLeaves.getOrPut(queryKey) { mutableListOf() }.add(leaf to score)
             }
-            val labeled = counts.values.sum()
-            if (labeled == 0) continue
-            val dominant = counts.maxByOrNull { it.value }!!
+        }
+
+        val queryAssignments = HashMap<String, Map<String, Double>>()
+        for ((queryKey, leafList) in queryToLeaves) {
+            if (profileMode == ProfileMode.PARTITION) {
+                val bestLeaf = leafList.maxByOrNull { it.second }?.first ?: continue
+                queryAssignments[queryKey] = mapOf(bestLeaf.id to 1.0)
+            } else {
+                val tau = 1.0
+                val exponents = leafList.map { it.first.id to kotlin.math.exp(it.second / tau) }
+                val sumExp = exponents.sumOf { it.second }
+                if (sumExp > 0.0) {
+                    queryAssignments[queryKey] = exponents.associate { it.first to (it.second / sumExp) }
+                } else {
+                    val bestLeaf = leafList.maxByOrNull { it.second }?.first ?: continue
+                    queryAssignments[queryKey] = mapOf(bestLeaf.id to 1.0)
+                }
+            }
+        }
+
+        for (leaf in leaves) {
+            val countsDouble = HashMap<String, Double>()
+            for (emb in leaf.queries) {
+                val queryKey = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                val domain = textToDomain[emb.rawText] ?: continue
+                val weight = queryAssignments[queryKey]?.get(leaf.id) ?: 0.0
+                if (weight > 0.0) {
+                    countsDouble[domain] = (countsDouble[domain] ?: 0.0) + weight
+                }
+            }
+
+            val sizeDouble = countsDouble.values.sum()
+            if (sizeDouble < 1e-9) continue
+
+            val dominant = countsDouble.maxByOrNull { it.value }!!
+            val countsInt = countsDouble.mapValues { Math.round(it.value).toInt() }.filterValues { it > 0 }
+            val sizeInt = Math.round(sizeDouble).toInt()
+
             out[leaf.id] = LeafDomainProfile(
                 leafId = leaf.id,
                 label = leaf.label ?: leaf.id,
                 depth = leaf.depth,
-                size = labeled,
+                size = sizeInt,
                 dominantDomain = dominant.key,
-                purity = dominant.value.toDouble() / labeled,
-                domainHistogram = counts,
+                purity = dominant.value / sizeDouble,
+                domainHistogram = countsInt,
+                domainHistogramDouble = countsDouble,
+                sizeDouble = sizeDouble
             )
         }
         return out

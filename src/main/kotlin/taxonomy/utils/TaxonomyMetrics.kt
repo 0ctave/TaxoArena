@@ -150,7 +150,12 @@ class TaxonomyMetrics(
         allNodes.filter { !it.isLeaf }.forEach { node ->
             node.queries.forEach { internalQueryTexts.add(it.rawText) }
         }
-        val residualQueries    = (internalQueryTexts - leafQueryTexts).size
+        val hasResiduals = allNodes.filter { !it.isLeaf }.any { it.residualQueries.isNotEmpty() }
+        val residualQueries = if (hasResiduals) {
+            allNodes.filter { !it.isLeaf }.flatMap { it.residualQueries }.toSet().size
+        } else {
+            (internalQueryTexts - leafQueryTexts).size
+        }
 
         val totalUnique        = maxOf(1, allQueryTexts.size)
         val residualRatio      = residualQueries.toDouble() / totalUnique.toDouble()
@@ -378,7 +383,12 @@ class TaxonomyMetrics(
                 // Prefer originalCategory (frozen at bootstrap) over label (may be LLM-renamed).
                 (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
             }
-            else n.parents.forEach { walk(it) }
+            else {
+                val treeParent = n.parents.find { it.id == n.treeParentId }
+                if (treeParent != null) {
+                    walk(treeParent)
+                }
+            }
         }
         walk(node)
         return ancestors
