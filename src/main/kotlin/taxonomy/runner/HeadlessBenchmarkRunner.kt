@@ -73,7 +73,8 @@ data class HeadlessCliConfig(
     val maxBridgesPerDomainPair: Int? = null,
     val bridgeCandidateTopK: Int? = null,
     val minBridgeCoverage: Int? = null,
-    val numIterations: Int? = null
+    val numIterations: Int? = null,
+    val runBaselines: Boolean = true
 )
 
 @Component
@@ -306,77 +307,79 @@ class HeadlessBenchmarkRunner(
                 taxonomyService.setGraph(root)
                 val mainCorrect = runHeadlessTrickle(root, "MAIN", cliConfig, baseDir, currentSeed)
 
-                var kmeansCorrect: Map<String, Boolean>? = null
-                val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
-                snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
-                    log.info("========================================")
-                    log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
-                    log.info("========================================")
-                    taxonomyService.setGraph(kmeansRoot)
-                    kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed)
-                }
-
-                var wardCorrect: Map<String, Boolean>? = null
-                val wardSnapshot = "${baseSnapshotId}_baseline_ward"
-                snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
-                    log.info("========================================")
-                    log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
-                    log.info("========================================")
-                    taxonomyService.setGraph(wardRoot)
-                    wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed)
-                }
-
-                var randomNullCorrect: Map<String, Boolean>? = null
-                val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
-                snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
-                    log.info("========================================")
-                    log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
-                    log.info("========================================")
-                    taxonomyService.setGraph(randomNullRoot)
-                    randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed)
-                }
-
-                // McNemar significance comparisons between MAIN and the baselines
-                try {
-                    val mcnemarFile = File(validationDir, "mcnemar_significance_results.csv")
-                    mcnemarFile.bufferedWriter().use { writer ->
-                        writer.write("Baseline,BothCorrect,MainCorrectBaselineIncorrect,BaselineCorrectMainIncorrect,BothIncorrect,ChiSquared,PValue\n")
-                        
-                        fun checkMcNemar(baselineName: String, baselineCorrect: Map<String, Boolean>?) {
-                            if (baselineCorrect == null) return
-                            var bothCorrect = 0
-                            var mainCorrectBaselineIncorrect = 0
-                            var baselineCorrectMainIncorrect = 0
-                            var bothIncorrect = 0
-                            
-                            for ((q, correctMain) in mainCorrect) {
-                                val correctBase = baselineCorrect[q] ?: false
-                                if (correctMain && correctBase) bothCorrect++
-                                else if (correctMain && !correctBase) mainCorrectBaselineIncorrect++
-                                else if (!correctMain && correctBase) baselineCorrectMainIncorrect++
-                                else bothIncorrect++
-                            }
-                            val discordant = mainCorrectBaselineIncorrect + baselineCorrectMainIncorrect
-                            val chiSquared = if (discordant > 0) {
-                                val diff = kotlin.math.abs(mainCorrectBaselineIncorrect - baselineCorrectMainIncorrect).toDouble()
-                                val correctedDiff = (diff - 1.0).coerceAtLeast(0.0)
-                                (correctedDiff * correctedDiff) / discordant.toDouble()
-                            } else 0.0
-                            val pVal = ValidationService.chiSquaredToPValue(chiSquared)
-                            writer.write("$baselineName,$bothCorrect,$mainCorrectBaselineIncorrect,$baselineCorrectMainIncorrect,$bothIncorrect,$chiSquared,$pVal\n")
-                            
-                            log.info("McNemar Significance (MAIN vs $baselineName):")
-                            log.info("  - Chi-Squared: ${"%,.4f".format(chiSquared)}")
-                            log.info("  - p-value: ${"%.4e".format(pVal)}")
-                        }
-                        
-                        checkMcNemar("KMEANS_BASELINE", kmeansCorrect)
-                        checkMcNemar("WARD_BASELINE", wardCorrect)
-                        checkMcNemar("RANDOMNULL_BASELINE", randomNullCorrect)
+                if (cliConfig.runBaselines) {
+                    var kmeansCorrect: Map<String, Boolean>? = null
+                    val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
+                    snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
+                        log.info("========================================")
+                        log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
+                        log.info("========================================")
+                        taxonomyService.setGraph(kmeansRoot)
+                        kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed)
                     }
-                    log.info("McNemar significance results written to ${mcnemarFile.absolutePath}")
-                } catch (e: Exception) {
-                    log.error("Failed to run McNemar significance tests: ${e.message}", e)
+
+                    var wardCorrect: Map<String, Boolean>? = null
+                    val wardSnapshot = "${baseSnapshotId}_baseline_ward"
+                    snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
+                        log.info("========================================")
+                        log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
+                        log.info("========================================")
+                        taxonomyService.setGraph(wardRoot)
+                        wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed)
+                    }
+
+                    var randomNullCorrect: Map<String, Boolean>? = null
+                    val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
+                    snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
+                        log.info("========================================")
+                        log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
+                        log.info("========================================")
+                        taxonomyService.setGraph(randomNullRoot)
+                        randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed)
+                    }
+
+                    // McNemar significance comparisons between MAIN and the baselines
+                    try {
+                        val mcnemarFile = File(validationDir, "mcnemar_significance_results.csv")
+                        mcnemarFile.bufferedWriter().use { writer ->
+                            writer.write("Baseline,BothCorrect,MainCorrectBaselineIncorrect,BaselineCorrectMainIncorrect,BothIncorrect,ChiSquared,PValue\n")
+                            
+                            fun checkMcNemar(baselineName: String, baselineCorrect: Map<String, Boolean>?) {
+                                if (baselineCorrect == null) return
+                                var bothCorrect = 0
+                                var mainCorrectBaselineIncorrect = 0
+                                var baselineCorrectMainIncorrect = 0
+                                var bothIncorrect = 0
+                                
+                                for ((q, correctMain) in mainCorrect) {
+                                    val correctBase = baselineCorrect[q] ?: false
+                                    if (correctMain && correctBase) bothCorrect++
+                                    else if (correctMain && !correctBase) mainCorrectBaselineIncorrect++
+                                    else if (!correctMain && correctBase) baselineCorrectMainIncorrect++
+                                    else bothIncorrect++
+                                }
+                                val discordant = mainCorrectBaselineIncorrect + baselineCorrectMainIncorrect
+                                val chiSquared = if (discordant > 0) {
+                                    val diff = kotlin.math.abs(mainCorrectBaselineIncorrect - baselineCorrectMainIncorrect).toDouble()
+                                    val correctedDiff = (diff - 1.0).coerceAtLeast(0.0)
+                                    (correctedDiff * correctedDiff) / discordant.toDouble()
+                                } else 0.0
+                                val pVal = ValidationService.chiSquaredToPValue(chiSquared)
+                                writer.write("$baselineName,$bothCorrect,$mainCorrectBaselineIncorrect,$baselineCorrectMainIncorrect,$bothIncorrect,$chiSquared,$pVal\n")
+                                
+                                log.info("McNemar Significance (MAIN vs $baselineName):")
+                                log.info("  - Chi-Squared: ${"%,.4f".format(chiSquared)}")
+                                log.info("  - p-value: ${"%.4e".format(pVal)}")
+                            }
+                            
+                            checkMcNemar("KMEANS_BASELINE", kmeansCorrect)
+                            checkMcNemar("WARD_BASELINE", wardCorrect)
+                            checkMcNemar("RANDOMNULL_BASELINE", randomNullCorrect)
+                        }
+                        log.info("McNemar significance results written to ${mcnemarFile.absolutePath}")
+                    } catch (e: Exception) {
+                        log.error("Failed to run McNemar significance tests: ${e.message}", e)
+                    }
                 }
 
                 // Restore active root graph for downstream benchmark
@@ -1172,6 +1175,7 @@ class HeadlessBenchmarkRunner(
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
+        var runBaselines = true
 
         val lines = mutableListOf<String>()
         var inArray = false
@@ -1249,6 +1253,7 @@ class HeadlessBenchmarkRunner(
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
+                "runBaselines" -> runBaselines = rawVal.toBoolean()
             }
         }
         return HeadlessCliConfig(
@@ -1294,7 +1299,8 @@ class HeadlessBenchmarkRunner(
             maxBridgesPerDomainPair = maxBridgesPerDomainPair,
             bridgeCandidateTopK = bridgeCandidateTopK,
             minBridgeCoverage = minBridgeCoverage,
-            numIterations = numIterations
+            numIterations = numIterations,
+            runBaselines = runBaselines
         )
     }
 
