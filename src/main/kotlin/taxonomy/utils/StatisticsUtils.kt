@@ -9,6 +9,7 @@ import kotlin.math.*
  */
 object StatisticsUtils {
     private val log = LoggerFactory.getLogger("taxonomy.Statistics")
+    private val unreliableKappaCount = java.util.concurrent.atomic.AtomicInteger(0)
 
     /**
      * Banerjee closed-form kappa estimation with small-sample shrinkage correction.
@@ -19,9 +20,16 @@ object StatisticsUtils {
         val kappaML   = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
         val shrinkage = (n - 1).toDouble() / (n + d - 2).toDouble().coerceAtLeast(1.0)
         if (n > 0 && d.toDouble() / n > 10.0) {
-            log.warn("[VMF] d/N=${"%.2f".format(d.toDouble() / n)} > 10 — κ estimate unreliable, NiW prior dominates")
+            val count = unreliableKappaCount.incrementAndGet()
+            if (count == 1 || count % 100 == 0) {
+                log.warn("[VMF] d/N=${"%.2f".format(d.toDouble() / n)} > 10 — κ estimate unreliable, NiW prior dominates (occurrence count: $count)")
+            }
         }
         return (kappaML * shrinkage).coerceIn(1e-3, 1e4)
+    }
+
+    fun resetUnreliableKappaCount() {
+        unreliableKappaCount.set(0)
     }
 
     fun dotProduct(a: DoubleArray, b: FloatArray): Double {

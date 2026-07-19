@@ -49,6 +49,7 @@ class KappaBiasCorrectionTest {
         val appender = ListAppender<ILoggingEvent>().apply { start() }
         logger.addAppender(appender)
         try {
+            StatisticsUtils.resetUnreliableKappaCount()
             // d/N = 1024/5 = 204.8 > 10 -> WARN log
             StatisticsUtils.correctedKappa(0.95, 1024, 5)
         } finally {
