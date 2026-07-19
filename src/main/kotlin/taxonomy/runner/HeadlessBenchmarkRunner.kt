@@ -616,6 +616,8 @@ class HeadlessBenchmarkRunner(
         log.info("  - Mean Leaf Purity: ${"%,.2f%%".format(out.meanLeafPurity * 100)}")
         log.info("  - Expected Calibration Error (ECE): ${"%,.4f".format(out.ece)}")
         log.info("  - Macro F1: ${"%,.2f%%".format(out.macroF1 * 100)}")
+        log.info("  - Avg Match Count (Eval): ${"%,.2f".format(out.avgMatchCountEval)} leaves/query")
+        log.info("  - Median Nodes/Query (Eval): ${"%,.2f".format(out.medianNodesPerQueryEval)}")
 
         val tableStr = StringBuilder().apply {
             appendLine("Per-Domain Trickle Results ($condition):")
@@ -646,6 +648,8 @@ class HeadlessBenchmarkRunner(
             writer.write("MacroF1,${out.macroF1}\n")
             writer.write("NoMatchRate,${out.noMatchRate}\n")
             writer.write("ECE,${out.ece}\n")
+            writer.write("AvgMatchCountEval,${out.avgMatchCountEval}\n")
+            writer.write("MedianNodesPerQueryEval,${out.medianNodesPerQueryEval}\n")
         }
         log.info("Trickle validation results written to ${file.absolutePath}")
 

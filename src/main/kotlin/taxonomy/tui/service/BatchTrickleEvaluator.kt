@@ -161,7 +161,7 @@ object BatchTrickleEvaluator {
 
         val predictedMap = HashMap<String, Map<String, Double>>()
         val gtMap = HashMap<String, String>()
-
+        val matchCounts = mutableListOf<Int>()
         var processed = 0
         for ((trueDomain, text) in testQueries) {
             support[trueDomain] = (support[trueDomain] ?: 0) + 1
@@ -170,6 +170,7 @@ object BatchTrickleEvaluator {
             val matched = routeFn(text).mapNotNull { (leafId, conf) ->
                 perLeafDomains[leafId]?.let { it to conf }
             }
+            matchCounts.add(matched.size)
 
             if (matched.isEmpty()) {
                 noMatch++
@@ -230,6 +231,15 @@ object BatchTrickleEvaluator {
             ((val1 + val2) / denom).coerceIn(0.0, 1.0)
         } else 0.0
 
+        val avgMatchCountEval = if (matchCounts.isNotEmpty()) matchCounts.average() else 1.0
+        val sortedCounts = matchCounts.sorted()
+        val medianNodesPerQueryEval = when {
+            sortedCounts.isEmpty() -> 1.0
+            sortedCounts.size % 2 == 0 ->
+                (sortedCounts[sortedCounts.size / 2].toDouble() + sortedCounts[sortedCounts.size / 2 - 1].toDouble()) / 2.0
+            else -> sortedCounts[sortedCounts.size / 2].toDouble()
+        }
+
         return BatchTrickleTestResults(
             totalQueries = testQueries.size,
             top1Accuracy = top1Correct / n,
@@ -242,6 +252,8 @@ object BatchTrickleEvaluator {
             noMatchRate = noMatch / n,
             perDomainF1 = perDomain,
             ece = eceVal,
+            avgMatchCountEval = avgMatchCountEval,
+            medianNodesPerQueryEval = medianNodesPerQueryEval,
         )
     }
 }

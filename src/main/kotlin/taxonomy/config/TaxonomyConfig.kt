@@ -102,6 +102,9 @@ class TaxonomyConfig {
         // so only leaves whose mean is within ~1° of the best match are included.
         // Increase to allow more cross-domain overlap; decrease for stricter purity.
         var assignmentGap: Double = 0.05
+        var assignmentMarginNats: Double = 1.2
+        var deltaAssign: Double = 0.20
+        var maxLeafAssignments: Int = 5
 
         // ── Merging / convergence ─────────────────────────────────────────────
         var emaAlpha: Double = 0.7
@@ -112,6 +115,7 @@ class TaxonomyConfig {
         var enableResidualRouting: Boolean = false
         var enableResidualSplitGate: Boolean = false
         var enableBridging: Boolean = false
+        var refitMuPerIteration: Boolean = false
 
         var routeConfidenceTau: Double = 0.5
         var bridgeSeparationCeiling: Double = 0.20
@@ -182,11 +186,15 @@ class TaxonomyConfig {
             separationEpsilon = formalism.separationEpsilon,
             cosineTau = formalism.cosineTau,
             assignmentGap = formalism.assignmentGap,
+            assignmentMarginNats = formalism.assignmentMarginNats,
+            deltaAssign = formalism.deltaAssign,
+            maxLeafAssignments = formalism.maxLeafAssignments,
             emaAlpha = formalism.emaAlpha,
             enableStableQuestionIds = formalism.enableStableQuestionIds,
             enableResidualRouting = formalism.enableResidualRouting,
             enableResidualSplitGate = formalism.enableResidualSplitGate,
             enableBridging = formalism.enableBridging,
+            refitMuPerIteration = formalism.refitMuPerIteration,
             routeConfidenceTau = formalism.routeConfidenceTau,
             bridgeSeparationCeiling = formalism.bridgeSeparationCeiling,
             bridgeEntropyCap = formalism.bridgeEntropyCap,
@@ -223,11 +231,15 @@ class TaxonomyConfig {
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.cosineTau = c.formalism.cosineTau
         formalism.assignmentGap = c.formalism.assignmentGap
+        formalism.assignmentMarginNats = c.formalism.assignmentMarginNats
+        formalism.deltaAssign = c.formalism.deltaAssign
+        formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
         formalism.emaAlpha = c.formalism.emaAlpha
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
         formalism.enableResidualRouting = c.formalism.enableResidualRouting
         formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate
         formalism.enableBridging = c.formalism.enableBridging
+        formalism.refitMuPerIteration = c.formalism.refitMuPerIteration
         formalism.routeConfidenceTau = c.formalism.routeConfidenceTau
         formalism.bridgeSeparationCeiling = c.formalism.bridgeSeparationCeiling
         formalism.bridgeEntropyCap = c.formalism.bridgeEntropyCap

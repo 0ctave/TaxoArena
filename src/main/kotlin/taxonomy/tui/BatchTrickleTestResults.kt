@@ -41,4 +41,6 @@ data class BatchTrickleTestResults(
     val perDomainF1: Map<String, DomainF1> = emptyMap(),
     /** Expected Calibration Error of the routing confidence. */
     val ece: Double = 0.0,
+    val avgMatchCountEval: Double = 1.0,
+    val medianNodesPerQueryEval: Double = 1.0,
 )

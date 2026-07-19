@@ -891,4 +891,94 @@ class TaxonomyDagMaxFeaturesTest {
         // Since bestChildResp is above adaptiveTau (0.12), there should be NO residual hits
         assertTrue(result.residualHits.isEmpty(), "Adaptive threshold must prevent near-universal residual tagging at high-level nodes")
     }
+
+    @Test
+    fun `R15 - Source-B residual cluster bridging at internal nodes`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableResidualRouting = true
+        config.formalism.enableBridging = true
+        config.formalism.minBridgeCoverage = 2  // low threshold for testing
+
+        val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
+
+        val root = node("root", "Root Domain", 0)
+        val domainV = node("domainV", "Internal Node V", 2)
+        link(root, domainV)
+
+        val child1 = node("child1", "Child 1", 3)
+        val child2 = node("child2", "Child 2", 3)
+        link(domainV, child1)
+        link(domainV, child2)
+
+        // Setup centroids
+        child1.vmfMu = floatArrayOf(1.0f, 0.0f)
+        child1.vmfKappa = 10.0
+        child1.sliceDim = 2
+
+        child2.vmfMu = floatArrayOf(0.0f, 1.0f)
+        child2.vmfKappa = 10.0
+        child2.sliceDim = 2
+
+        // Create residual queries belonging to domainV
+        val q1 = embWithVec("query1", 101, "child1", floatArrayOf(0.707f, 0.707f))
+        val q2 = embWithVec("query2", 102, "child2", floatArrayOf(0.707f, 0.707f))
+
+        domainV.residualQueries.add("101")
+        domainV.residualQueries.add("102")
+
+        child1.queries.add(q1)
+        child2.queries.add(q2)
+
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
+
+        // Verify a bridge was created at internal node domainV
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (allNodes.add(n)) {
+                n.children.forEach { walk(it) }
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+        }
+        walk(root)
+
+        val sourceBBridges = allNodes.filter { it.isBridge && it.id.startsWith("bridge_sourceB_") }
+        assertEquals(1, sourceBBridges.size)
+        val bridge = sourceBBridges.first()
+        assertTrue(bridge.crossLinkChildren.contains(child1))
+        assertTrue(bridge.crossLinkChildren.contains(child2))
+        assertTrue(domainV.crossLinkChildren.contains(bridge))
+    }
+
+    @Test
+    fun `R16 - log-space adaptive soft-membership and branch-point descent gating`() {
+        val config = TaxonomyConfig()
+        config.formalism.deltaAssign = 0.20  // branch-point descent gating margin
+        config.formalism.assignmentMarginNats = 0.50  // log-space margin
+
+        val trickler = TaxonomyTrickler(config)
+        val parent = node("parent", "Parent Domain", 2)
+        val child1 = node("child1", "Child One", 3)
+        val child2 = node("child2", "Child Two", 3)
+        link(parent, child1)
+        link(parent, child2)
+
+        child1.vmfMu = floatArrayOf(1.0f, 0.0f)
+        child1.vmfKappa = 10.0
+        child1.sliceDim = 2
+
+        child2.vmfMu = floatArrayOf(0.99f, 0.1f)  // very close, will result in high similarity
+        child2.vmfKappa = 10.0
+        child2.sliceDim = 2
+
+        val query = Embedding("near-tie", "near-tie", floatArrayOf(1.0f, 0.0f))
+        query.queryId = 301
+
+        val result = trickler.routeQuery(query, parent, currentIteration = 2)
+
+        // Verify that the query routes to both child1 and child2
+        assertTrue(result.leaves.keys.any { it.id == child1.id })
+        assertTrue(result.leaves.keys.any { it.id == child2.id })
+    }
 }

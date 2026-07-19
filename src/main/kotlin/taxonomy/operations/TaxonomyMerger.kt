@@ -711,14 +711,16 @@ class TaxonomyMerger(
             }
 
             val sourceNodes = "${u.label ?: u.id} + ${v.label ?: v.id}"
-            val combinedQueries = u.queries + v.queries
-            val size = combinedQueries.size
-
-            // Enforce minBridgeCoverage = 50
-            if (size < config.formalism.minBridgeCoverage) {
-                log.info("Bridge Insertion: skipping candidate $candidateId; combined query size $size < minBridgeCoverage ${config.formalism.minBridgeCoverage}")
+            val straddlingCount = u.queries.intersect(v.queries.toSet()).size
+            if (straddlingCount < config.formalism.minBridgeCoverage) {
+                log.info("Bridge Insertion: skipping candidate $candidateId; straddling query size $straddlingCount < minBridgeCoverage ${config.formalism.minBridgeCoverage}")
                 continue
             }
+            var combinedQueries = u.queries.intersect(v.queries.toSet()).toList()
+            if (combinedQueries.isEmpty()) {
+                combinedQueries = (u.queries + v.queries).distinctBy { if (it.queryId >= 0) it.queryId.toString() else it.rawText }
+            }
+            val size = combinedQueries.size
             val entropy = calculateGtEntropy(combinedQueries)
             
             val commonDim = minOf(u.vmfMu.size, v.vmfMu.size)
@@ -820,6 +822,131 @@ class TaxonomyMerger(
                 reason = "Success"
             )
         }
+
+        // --- Source-B: Residual Bridge Insertion at internal nodes ---
+        val allNodesB = mutableSetOf<GraphNode>()
+        fun walkAllB(n: GraphNode) {
+            if (!allNodesB.add(n)) return
+            n.children.forEach { walkAllB(it) }
+            n.crossLinkChildren.forEach { walkAllB(it) }
+        }
+        walkAllB(root)
+
+        val allEmbeddingsMap = allNodesB.flatMap { it.queries }.distinctBy {
+            if (it.queryId != -1) it.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(it.rawText)
+        }.associateBy {
+            if (it.queryId != -1) it.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(it.rawText)
+        }
+
+        val internalNodes = allNodesB.filter { !it.isLeaf && !it.isBridge && it.depth >= 2 }
+        for (v in internalNodes) {
+            if (bridgesCreated >= config.formalism.maxBridgeNodes) break
+            val residualEmbeddings = v.residualQueries.mapNotNull { allEmbeddingsMap[it] }.distinctBy { it.rawText }
+            if (residualEmbeddings.size < config.formalism.minBridgeCoverage) continue
+
+            // 1. Compute residual centroid (mu)
+            val d = v.sliceDim
+            val centroid = DoubleArray(d)
+            val projected = residualEmbeddings.map { it.projectTo(d) }
+            for (vec in projected) {
+                for (i in 0 until d) centroid[i] += vec[i]
+            }
+            var norm = 0.0
+            for (i in 0 until d) norm += centroid[i] * centroid[i]
+            norm = sqrt(norm)
+            val mu = FloatArray(d) { i -> if (norm > 0.0) (centroid[i] / norm).toFloat() else 0.0f }
+            if (norm == 0.0 && d > 0) mu[0] = 1.0f
+
+            // 2. Compute coherence (intra-cluster cosine similarity)
+            val coherence = projected.map { StatisticsUtils.dotProduct(it, mu) }.average()
+            if (coherence < 0.70) {
+                log.info("Source-B: skipping residual cluster at ${v.label ?: v.id}; coherence ${"%.4f".format(java.util.Locale.US, coherence)} < 0.70")
+                continue
+            }
+
+            // 3. Distinct from children check
+            val maxChildSim = v.children.filter { it.vmfMu.isNotEmpty() }
+                .map { child ->
+                    val proj = StatisticsUtils.projectVector(mu, child.vmfMu.size)
+                    StatisticsUtils.dotProduct(proj.map { it.toDouble() }.toDoubleArray(), child.vmfMu)
+                }
+                .maxOrNull() ?: 0.0
+            if (maxChildSim >= 0.92) {
+                log.info("Source-B: skipping residual cluster at ${v.label ?: v.id}; distinctness check failed (maxChildSim ${"%.4f".format(java.util.Locale.US, maxChildSim)} >= 0.92)")
+                continue
+            }
+
+            // 4. Identify top 2 children representing relevant subtrees
+            val childrenWithSims = v.children.map { child ->
+                val childSim = projected.map { query ->
+                    val proj = projectDoubleVector(query, child.vmfMu.size)
+                    StatisticsUtils.dotProduct(proj, child.vmfMu)
+                }.average()
+                child to childSim
+            }.sortedByDescending { it.second }
+
+            if (childrenWithSims.size < 2) continue
+            val c1 = childrenWithSims[0].first
+            val c2 = childrenWithSims[1].first
+
+            // Cycle check
+            if (isAncestor(c1, c2) || isAncestor(c2, c1)) {
+                log.warn("Source-B: cycle detected between target children of ${v.label ?: v.id}, skipping.")
+                continue
+            }
+
+            // 5. Create the bridge node
+            val bridgeNode = GraphNode(
+                id = "bridge_sourceB_" + java.util.UUID.randomUUID().toString().take(8),
+                label = "Temporary Bridge (Source B)",
+                depth = maxOf(2, minOf(c1.depth, c2.depth) - 1)
+            )
+            bridgeNode.isBridge = true
+            bridgeNode.bridgeJsDivergence = 0.10
+            bridgeNode.sliceDim = d
+            bridgeNode.vmfMu = mu
+            
+            val rBar = norm / residualEmbeddings.size
+            bridgeNode.vmfKappa = StatisticsUtils.correctedKappa(rBar, d, residualEmbeddings.size)
+            bridgeNode.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, bridgeNode.vmfKappa)
+
+            var finalLabel = "Bridge Concept [${c1.label ?: c1.id} ↔ ${c2.label ?: c2.id}]"
+            if (config.execution.enableLabeling) {
+                try {
+                    val representativeSamples = residualEmbeddings.shuffled().take(30).map { it.rawText }
+                    val prompt = taxonomy.prompts.TaxoPrompts.clusterLabeling(
+                        querySamples = representativeSamples,
+                        parentLabel = "Bridging Parent",
+                        siblingLabels = emptyList(),
+                        branchHistory = listOf(v.label ?: ""),
+                        domainAnchors = listOf(c1.label ?: "", c2.label ?: ""),
+                        childLabels = emptyList(),
+                        depth = bridgeNode.depth
+                    )
+                    val generated = llmClient.generateClusterLabel(prompt)
+                    if (generated.isNotBlank()) {
+                        finalLabel = generated.trim()
+                    }
+                } catch (e: Exception) {
+                    log.warn("LLM labeling failed for Source-B bridge, falling back to: $finalLabel")
+                }
+            }
+            bridgeNode.label = finalLabel
+
+            // Wire bridge
+            bridgeNode.crossLinkChildren.add(c1)
+            bridgeNode.crossLinkChildren.add(c2)
+            c1.parents.add(bridgeNode)
+            c2.parents.add(bridgeNode)
+
+            bridgeNode.parents.add(v)
+            v.crossLinkChildren.add(bridgeNode)
+
+            bridgeNode.queries.addAll(residualEmbeddings)
+
+            bridgesCreated++
+            log.info("Source-B: Created bridge '${bridgeNode.label}' at internal node '${v.label}' bridging children '${c1.label}' and '${c2.label}'")
+        }
     }
 
     private fun isAncestor(ancestor: GraphNode, descendant: GraphNode): Boolean {
@@ -889,5 +1016,14 @@ class TaxonomyMerger(
             entropy -= p * kotlin.math.log2(p)
         }
         return entropy
+    }
+
+    private fun projectDoubleVector(vec: DoubleArray, targetDim: Int): DoubleArray {
+        if (vec.size == targetDim) return vec.copyOf()
+        val sliced = vec.copyOf(targetDim)
+        var norm2 = 0.0
+        for (v in sliced) norm2 += v * v
+        val norm = kotlin.math.sqrt(norm2)
+        return if (norm > 0.0) DoubleArray(targetDim) { sliced[it] / norm } else sliced
     }
 }

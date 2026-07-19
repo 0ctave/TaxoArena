@@ -33,7 +33,7 @@ class TaxonomyOperations(
     ): Map<GraphNode, Double> =
         trickler.routeQuery(query, root, currentIteration, originalCategories).leaves
 
-    suspend fun fitNodeRecursive(node: GraphNode) = fitter.fitNodeRecursive(node)
+    suspend fun fitNodeRecursive(node: GraphNode, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, isFinalIteration)
 
     suspend fun splitNodesRecursive(node: GraphNode) = splitter.splitNodesRecursive(node)
 
@@ -75,8 +75,6 @@ class TaxonomyOperations(
 
         val numCores = Runtime.getRuntime().availableProcessors()
         val chunkSize = maxOf(5, (embeddings.size + (numCores * 4) - 1) / (numCores * 4)).coerceAtMost(25)
-        val gap = config.formalism.assignmentGap  // fraction, e.g. 0.05
-
         embeddings.chunked(chunkSize).map { chunk ->
             async(Dispatchers.Default) {
                 for (emb in chunk) {
@@ -84,9 +82,19 @@ class TaxonomyOperations(
                     val routeResult = trickler.routeQuery(emb, root, currentIteration, originals)
                     val results = routeResult.leaves
                     val bestLogProb = results.values.maxOrNull() ?: Double.NEGATIVE_INFINITY
-                    val bestLinear = exp(bestLogProb)
                     val destinations = results.entries
-                        .filter { exp(it.value) >= bestLinear * (1.0 - gap) }
+                        .filter { (leaf, logProb) ->
+                            val parent = leaf.parents.find { it.id == leaf.treeParentId } ?: leaf.parents.firstOrNull()
+                            val siblingKappaEffective = parent?.let { p ->
+                                val activeChildren = p.children
+                                if (activeChildren.isNotEmpty()) activeChildren.map { it.vmfKappa }.average() else null
+                            }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
+
+                            val marginNats = config.formalism.assignmentMarginNats * (config.formalism.cosineTau / siblingKappaEffective)
+                            (bestLogProb - logProb) <= marginNats
+                        }
+                        .sortedByDescending { it.value }
+                        .take(config.formalism.maxLeafAssignments)
                         .map { it.key }
                         .ifEmpty {
                             log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")

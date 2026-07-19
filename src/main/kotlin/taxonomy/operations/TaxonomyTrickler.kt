@@ -101,7 +101,12 @@ class TaxonomyTrickler(
 
             // pre-smoothing best-child responsibility
             val bestChildResp = rawProbs.maxOrNull() ?: 0.0
-            val adaptiveTau = (config.formalism.routeConfidenceTau * (2.0 / K)).coerceAtMost(config.formalism.routeConfidenceTau)
+            val baseTauAtDepth = when (node.depth) {
+                0, 1 -> 0.999
+                2 -> 0.95
+                else -> 0.90
+            }
+            val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
             if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < adaptiveTau) {
                 val qId = if (query.queryId != -1) query.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(query.rawText)
                 residualHits.add(ResidualHit(node, qId, bestChildResp))
@@ -110,7 +115,11 @@ class TaxonomyTrickler(
             val smoothedProbs = DoubleArray(K) { (rawProbs[it] + laplaceEps) / (1.0 + K * laplaceEps) }
             val logSmoothed = DoubleArray(K) { ln(smoothedProbs[it].coerceAtLeast(1e-300)) }
 
-            for (i in children.indices) {
+            val maxScore = scores.maxOrNull() ?: 0.0
+            val bestIndices = children.indices
+                .filter { (maxScore - scores[it]) <= config.formalism.deltaAssign }
+
+            for (i in bestIndices) {
                 walk(children[i], currentLogProb + logSmoothed[i])
             }
         }
@@ -119,28 +128,44 @@ class TaxonomyTrickler(
 
 
         // --- assignmentMargin filter ---
-        val bestLeafLogProb = logProbMap
-            .filter { (id, _) -> nodeMap[id]?.isLeaf == true }
-            .values
-            .maxOrNull()
+        val leafCandidates = logProbMap
+            .filterKeys { id -> nodeMap[id]?.isLeaf == true }
+            .map { (id, logProb) -> nodeMap.getValue(id) to logProb }
+            .toMap()
 
-        val bestLinear = exp(bestLeafLogProb ?: 0.0)
+        val bestLeafLogProb = leafCandidates.values.maxOrNull() ?: Double.NEGATIVE_INFINITY
+
         val results = mutableMapOf<GraphNode, Double>()
+        val qualifiedLeaves = leafCandidates.entries
+            .filter { (leaf, logProb) ->
+                val parent = leaf.parents.find { it.id == leaf.treeParentId } ?: leaf.parents.firstOrNull()
+                val siblingKappaEffective = parent?.let { p ->
+                    val activeChildren = p.children
+                    if (activeChildren.isNotEmpty()) activeChildren.map { it.vmfKappa }.average() else null
+                }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
+
+                val marginNats = config.formalism.assignmentMarginNats * (config.formalism.cosineTau / siblingKappaEffective)
+                (bestLeafLogProb - logProb) <= marginNats
+            }
+            .sortedByDescending { it.value }
+            .take(config.formalism.maxLeafAssignments)
+
+        qualifiedLeaves.forEach { (leaf, logProb) ->
+            results[leaf] = logProb
+        }
+
         for ((nodeId, logProb) in logProbMap) {
             val node = nodeMap[nodeId] ?: continue
             if (node.isBridge) continue
-            if (node.isLeaf) {
-                val thisLinear = exp(logProb)
-                if (thisLinear >= bestLinear * (1.0 - config.formalism.assignmentGap))
-                    results[node] = logProb
-            } else {
+            if (!node.isLeaf) {
                 val activeChildren = if (config.formalism.enableBridging) {
                     node.children + node.crossLinkChildren
                 } else {
                     node.children
                 }
-                if (!activeChildren.any { logProbMap.containsKey(it.id) })
+                if (!activeChildren.any { logProbMap.containsKey(it.id) }) {
                     results[node] = logProb
+                }
             }
         }
 

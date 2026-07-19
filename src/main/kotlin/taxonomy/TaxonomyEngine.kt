@@ -253,7 +253,7 @@ class TaxonomyEngine(
                         )
 
                         val refitTime = measureTimeMillis {
-                            ops.fitNodeRecursive(root)
+                            ops.fitNodeRecursive(root, isFinalIteration = (i == totalIters))
                         }
                         perfTracker.recordTime("Refit after Optimization", refitTime)
                         taxonomyService.notifyGraphUpdated()

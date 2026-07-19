@@ -25,7 +25,7 @@ class TaxonomyFitter(
      * Parallel BFS level-by-level fitting. Processes root-first (shallow to deep)
      * so parent parameters are available for prior calibration at child nodes.
      */
-    suspend fun fitNodeRecursive(root: GraphNode) = withContext(Dispatchers.Default) {
+    suspend fun fitNodeRecursive(root: GraphNode, isFinalIteration: Boolean = false) = withContext(Dispatchers.Default) {
         log.info("Starting level-by-level parallel vMF/NiW fitting...")
         val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
         val visited = mutableSetOf<String>()
@@ -54,7 +54,7 @@ class TaxonomyFitter(
             val nodesAtDepth = byDepth[depth]!!
             nodesAtDepth.map { node ->
                 async {
-                    fitSingleNode(node)
+                    fitSingleNode(node, isFinalIteration)
                 }
             }.awaitAll()
         }
@@ -79,17 +79,35 @@ class TaxonomyFitter(
         }
         if (normVec == 0.0 && d > 0) mu[0] = 1.0f
 
+        val oldMu = node.vmfMu
+        if (oldMu.isNotEmpty() && oldMu.size == d) {
+            val dot = StatisticsUtils.dotProduct(oldMu.map { it.toDouble() }.toDoubleArray(), mu)
+            if (dot >= 0.999) {
+                node.vmfMu = oldMu
+            } else {
+                val emaAlpha = config.formalism.emaAlpha
+                val blended = DoubleArray(d) { i -> (1.0 - emaAlpha) * mu[i].toDouble() + emaAlpha * oldMu[i].toDouble() }
+                var norm = 0.0
+                for (i in 0 until d) norm += blended[i] * blended[i]
+                norm = sqrt(norm)
+                val newMu = FloatArray(d) { i -> if (norm > 0.0) (blended[i] / norm).toFloat() else 0.0f }
+                if (norm == 0.0 && d > 0) newMu[0] = 1.0f
+                node.vmfMu = newMu
+            }
+        } else {
+            node.vmfMu = mu
+        }
+
         val rBar = normVec / n
         val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
         val sampleWeight = (n / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
         val effectiveAlpha = config.formalism.emaAlpha * sampleWeight
         val oldKappa = node.vmfKappa.takeIf { it > 1e-3 } ?: rawKappa
-        node.vmfMu = mu
         node.vmfKappa = (1.0 - effectiveAlpha) * rawKappa + effectiveAlpha * oldKappa
         node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
     }
 
-    fun fitSingleNode(node: GraphNode) {
+    fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) {
         val d = node.sliceDim
 
         // ── n for NiW (always branch-based for routing confidence) ───────────────
@@ -131,7 +149,8 @@ class TaxonomyFitter(
         //
         // 3. Leaf node (no tree children): fit vMF from node.queries directly.
         //    Fall back to branchQueries only if node.queries is empty.
-        val muAlreadyFit = (node.phaseCompleted and PHASE_SPLIT_EVAL) != 0
+        val muAlreadyFit = ((node.phaseCompleted and PHASE_SPLIT_EVAL) != 0) &&
+                !(config.formalism.refitMuPerIteration || isFinalIteration)
 
         if (!muAlreadyFit) {
             if (!node.isLeaf && node.children.isNotEmpty()) {
