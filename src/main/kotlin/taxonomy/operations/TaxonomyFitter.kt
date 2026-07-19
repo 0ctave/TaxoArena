@@ -82,7 +82,7 @@ class TaxonomyFitter(
         val oldMu = node.vmfMu
         if (oldMu.isNotEmpty() && oldMu.size == d) {
             val dot = StatisticsUtils.dotProduct(oldMu.map { it.toDouble() }.toDoubleArray(), mu)
-            if (dot >= 0.999) {
+            if (dot >= 0.9975) {
                 node.vmfMu = oldMu
             } else {
                 val emaAlpha = config.formalism.emaAlpha

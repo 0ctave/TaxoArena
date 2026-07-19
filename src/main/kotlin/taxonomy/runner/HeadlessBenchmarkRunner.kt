@@ -1102,6 +1102,7 @@ class HeadlessBenchmarkRunner(
         var maxBridgesPerDomainPair: Int? = null
         var bridgeCandidateTopK: Int? = null
         var minBridgeCoverage: Int? = null
+        var numIterations: Int? = null
 
         val lines = mutableListOf<String>()
         var inArray = false
@@ -1176,6 +1177,7 @@ class HeadlessBenchmarkRunner(
                 "maxBridgesPerDomainPair" -> maxBridgesPerDomainPair = rawVal.toInt()
                 "bridgeCandidateTopK" -> bridgeCandidateTopK = rawVal.toInt()
                 "minBridgeCoverage" -> minBridgeCoverage = rawVal.toInt()
+                "numIterations" -> numIterations = rawVal.toInt()
             }
         }
         return HeadlessCliConfig(
@@ -1218,7 +1220,8 @@ class HeadlessBenchmarkRunner(
             maxBridgeNodes = maxBridgeNodes,
             maxBridgesPerDomainPair = maxBridgesPerDomainPair,
             bridgeCandidateTopK = bridgeCandidateTopK,
-            minBridgeCoverage = minBridgeCoverage
+            minBridgeCoverage = minBridgeCoverage,
+            numIterations = numIterations
         )
     }
 
