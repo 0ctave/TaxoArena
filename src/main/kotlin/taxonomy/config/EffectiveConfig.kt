@@ -54,7 +54,7 @@ data class EffectiveConfig(
         val separationEpsilon: Double = 0.04,
         val cosineTau: Double = 2.0,
         val assignmentGap: Double = 0.05,
-        val assignmentMarginNats: Double = 1.2,
+        val assignmentMarginNats: Double = 0.03,
         val deltaAssign: Double = 0.20,
         val maxLeafAssignments: Int = 5,
         val emaAlpha: Double = 0.7,

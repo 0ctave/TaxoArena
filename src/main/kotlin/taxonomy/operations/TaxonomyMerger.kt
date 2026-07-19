@@ -861,7 +861,7 @@ class TaxonomyMerger(
             // 2. Compute coherence (intra-cluster cosine similarity)
             val coherence = projected.map { StatisticsUtils.dotProduct(it, mu) }.average()
             if (coherence < 0.70) {
-                log.info("Source-B: skipping residual cluster at ${v.label ?: v.id}; coherence ${"%.4f".format(java.util.Locale.US, coherence)} < 0.70")
+                log.debug("Source-B: skipping residual cluster at ${v.label ?: v.id}; coherence ${"%.4f".format(java.util.Locale.US, coherence)} < 0.70")
                 continue
             }
 
@@ -873,7 +873,7 @@ class TaxonomyMerger(
                 }
                 .maxOrNull() ?: 0.0
             if (maxChildSim >= 0.92) {
-                log.info("Source-B: skipping residual cluster at ${v.label ?: v.id}; distinctness check failed (maxChildSim ${"%.4f".format(java.util.Locale.US, maxChildSim)} >= 0.92)")
+                log.debug("Source-B: skipping residual cluster at ${v.label ?: v.id}; distinctness check failed (maxChildSim ${"%.4f".format(java.util.Locale.US, maxChildSim)} >= 0.92)")
                 continue
             }
 
@@ -892,7 +892,7 @@ class TaxonomyMerger(
 
             val alreadyBridged = c1.parents.any { p -> p.isBridge && c2.parents.any { cp -> cp.id == p.id } }
             if (alreadyBridged) {
-                log.info("Source-B: skipping candidate at ${v.label ?: v.id}; children ${c1.label ?: c1.id} and ${c2.label ?: c2.id} are already bridged")
+                log.debug("Source-B: skipping candidate at ${v.label ?: v.id}; children ${c1.label ?: c1.id} and ${c2.label ?: c2.id} are already bridged")
                 continue
             }
 

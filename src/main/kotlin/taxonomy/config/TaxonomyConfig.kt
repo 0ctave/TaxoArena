@@ -102,7 +102,7 @@ class TaxonomyConfig {
         // so only leaves whose mean is within ~1° of the best match are included.
         // Increase to allow more cross-domain overlap; decrease for stricter purity.
         var assignmentGap: Double = 0.05
-        var assignmentMarginNats: Double = 1.2
+        var assignmentMarginNats: Double = 0.03
         var deltaAssign: Double = 0.20
         var maxLeafAssignments: Int = 5
 
