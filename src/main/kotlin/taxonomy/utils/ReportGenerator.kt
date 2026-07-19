@@ -42,7 +42,31 @@ object ReportGenerator {
         val overallKendallCiHigh: Double,
         val overallPairwiseWinnerAccuracy: Double,
         val overallTopKJaccard: Double,
-        val domainReports: List<ValidationService.ValidationMetricsReport>
+        val domainReports: List<ValidationService.ValidationMetricsReport>,
+        
+        // Thesis adapted/canonical validation & significance metrics
+        val adaptedSpearmanRho: Double = 0.0,
+        val adaptedSpearmanCiLow: Double = 0.0,
+        val adaptedSpearmanCiHigh: Double = 0.0,
+        val canonicalSpearmanRho: Double = 0.0,
+        val canonicalSpearmanCiLow: Double = 0.0,
+        val canonicalSpearmanCiHigh: Double = 0.0,
+        val deltaSpearmanRho: Double = 0.0,
+        val deltaSpearmanCiLow: Double = 0.0,
+        val deltaSpearmanCiHigh: Double = 0.0,
+        val deltaSpearmanPermutationPValue: Double = 1.0,
+
+        val adaptedKendallTau: Double = 0.0,
+        val adaptedKendallCiLow: Double = 0.0,
+        val adaptedKendallCiHigh: Double = 0.0,
+        val canonicalKendallTau: Double = 0.0,
+        val canonicalKendallCiLow: Double = 0.0,
+        val canonicalKendallCiHigh: Double = 0.0,
+        val deltaKendallTau: Double = 0.0,
+        val deltaKendallCiLow: Double = 0.0,
+        val deltaKendallCiHigh: Double = 0.0,
+        val deltaKendallPermutationPValue: Double = 1.0,
+        val domainWilcoxonPValue: Double = 1.0
     )
 
     fun generateAndExport(
@@ -72,6 +96,10 @@ object ReportGenerator {
         }
         val globalReport = ValidationService.computeMetrics(report, models, "OVERALL")
 
+        val domainSpearmanAdapted = domainReports.map { it.adaptedSpearmanRho }
+        val domainSpearmanCanonical = domainReports.map { it.canonicalSpearmanRho }
+        val wilcoxonPValue = ValidationService.computeWilcoxonPValue(domainSpearmanAdapted, domainSpearmanCanonical)
+
         // 4. Construct Complete Report
         val completeReport = CompleteThesisReport(
             condition = condition,
@@ -99,7 +127,28 @@ object ReportGenerator {
             overallKendallCiHigh = globalReport.kendallCiHigh,
             overallPairwiseWinnerAccuracy = globalReport.pairwiseWinnerAccuracy,
             overallTopKJaccard = globalReport.topKJaccard,
-            domainReports = domainReports
+            domainReports = domainReports,
+            adaptedSpearmanRho = globalReport.adaptedSpearmanRho,
+            adaptedSpearmanCiLow = globalReport.adaptedSpearmanCiLow,
+            adaptedSpearmanCiHigh = globalReport.adaptedSpearmanCiHigh,
+            canonicalSpearmanRho = globalReport.canonicalSpearmanRho,
+            canonicalSpearmanCiLow = globalReport.canonicalSpearmanCiLow,
+            canonicalSpearmanCiHigh = globalReport.canonicalSpearmanCiHigh,
+            deltaSpearmanRho = globalReport.deltaSpearmanRho,
+            deltaSpearmanCiLow = globalReport.deltaSpearmanCiLow,
+            deltaSpearmanCiHigh = globalReport.deltaSpearmanCiHigh,
+            deltaSpearmanPermutationPValue = globalReport.deltaSpearmanPermutationPValue,
+            adaptedKendallTau = globalReport.adaptedKendallTau,
+            adaptedKendallCiLow = globalReport.adaptedKendallCiLow,
+            adaptedKendallCiHigh = globalReport.adaptedKendallCiHigh,
+            canonicalKendallTau = globalReport.canonicalKendallTau,
+            canonicalKendallCiLow = globalReport.canonicalKendallCiLow,
+            canonicalKendallCiHigh = globalReport.canonicalKendallCiHigh,
+            deltaKendallTau = globalReport.deltaKendallTau,
+            deltaKendallCiLow = globalReport.deltaKendallCiLow,
+            deltaKendallCiHigh = globalReport.deltaKendallCiHigh,
+            deltaKendallPermutationPValue = globalReport.deltaKendallPermutationPValue,
+            domainWilcoxonPValue = wilcoxonPValue
         )
 
         // 5. Export JSON
@@ -144,6 +193,30 @@ object ReportGenerator {
                 writer.write("$condition,overallKendallCiHigh,${completeReport.overallKendallCiHigh}\n")
                 writer.write("$condition,overallPairwiseWinnerAccuracy,${completeReport.overallPairwiseWinnerAccuracy}\n")
                 writer.write("$condition,overallTopKJaccard,${completeReport.overallTopKJaccard}\n")
+
+                // Adapted / Canonical thesis metrics
+                writer.write("$condition,adaptedSpearmanRho,${completeReport.adaptedSpearmanRho}\n")
+                writer.write("$condition,adaptedSpearmanCiLow,${completeReport.adaptedSpearmanCiLow}\n")
+                writer.write("$condition,adaptedSpearmanCiHigh,${completeReport.adaptedSpearmanCiHigh}\n")
+                writer.write("$condition,canonicalSpearmanRho,${completeReport.canonicalSpearmanRho}\n")
+                writer.write("$condition,canonicalSpearmanCiLow,${completeReport.canonicalSpearmanCiLow}\n")
+                writer.write("$condition,canonicalSpearmanCiHigh,${completeReport.canonicalSpearmanCiHigh}\n")
+                writer.write("$condition,deltaSpearmanRho,${completeReport.deltaSpearmanRho}\n")
+                writer.write("$condition,deltaSpearmanCiLow,${completeReport.deltaSpearmanCiLow}\n")
+                writer.write("$condition,deltaSpearmanCiHigh,${completeReport.deltaSpearmanCiHigh}\n")
+                writer.write("$condition,deltaSpearmanPermutationPValue,${completeReport.deltaSpearmanPermutationPValue}\n")
+
+                writer.write("$condition,adaptedKendallTau,${completeReport.adaptedKendallTau}\n")
+                writer.write("$condition,adaptedKendallCiLow,${completeReport.adaptedKendallCiLow}\n")
+                writer.write("$condition,adaptedKendallCiHigh,${completeReport.adaptedKendallCiHigh}\n")
+                writer.write("$condition,canonicalKendallTau,${completeReport.canonicalKendallTau}\n")
+                writer.write("$condition,canonicalKendallCiLow,${completeReport.canonicalKendallCiLow}\n")
+                writer.write("$condition,canonicalKendallCiHigh,${completeReport.canonicalKendallCiHigh}\n")
+                writer.write("$condition,deltaKendallTau,${completeReport.deltaKendallTau}\n")
+                writer.write("$condition,deltaKendallCiLow,${completeReport.deltaKendallCiLow}\n")
+                writer.write("$condition,deltaKendallCiHigh,${completeReport.deltaKendallCiHigh}\n")
+                writer.write("$condition,deltaKendallPermutationPValue,${completeReport.deltaKendallPermutationPValue}\n")
+                writer.write("$condition,domainWilcoxonPValue,${completeReport.domainWilcoxonPValue}\n")
             }
             log.info("Successfully exported CSV report to ${csvFile.absolutePath}")
         } catch (e: Exception) {

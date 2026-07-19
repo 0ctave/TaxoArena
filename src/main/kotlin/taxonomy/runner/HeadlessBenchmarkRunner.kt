@@ -14,6 +14,7 @@ import taxonomy.service.TaxonomyService
 import taxonomy.service.TaxonomySnapshotManager
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.service.TaxonomyRankingService
+import taxonomy.service.ValidationService
 import taxonomy.model.BenchmarkRequest
 import taxonomy.model.ModelSource
 import taxonomy.dataset.MMLUDatasetFetcher
@@ -23,6 +24,7 @@ import taxonomy.TaxonomyEngine
 import taxonomy.service.TaxonomyJudgeService
 import taxonomy.model.ModelRank
 import taxonomy.utils.ReportGenerator
+import taxonomy.dataset.EmbeddingCache
 import java.io.File
 import java.time.Instant
 
@@ -40,6 +42,7 @@ data class HeadlessCliConfig(
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
     val seed: Long = 42L,                  // deterministic seed
+    val seeds: List<Long> = emptyList(),   // multi-seed support
     val regenerateSplit: Boolean = false,
     val runPipeline: Boolean = false,
     val maxDepth: Int? = null,
@@ -68,7 +71,8 @@ class HeadlessBenchmarkRunner(
     private val datasetFetcher: MMLUDatasetFetcher,
     private val evalLoader: ModelEvalLoader,
     private val taxonomyEngine: TaxonomyEngine,
-    private val judgeService: TaxonomyJudgeService
+    private val judgeService: TaxonomyJudgeService,
+    private val embeddingCache: EmbeddingCache
 ) : CommandLineRunner {
 
     private val log = LoggerFactory.getLogger("taxonomy.HeadlessRunner")
@@ -129,295 +133,355 @@ class HeadlessBenchmarkRunner(
             config.dataset.selectedDomains = targetDomains
         }
 
-        var snapshotId = cliConfig.snapshotId
-        var root: GraphNode
+        val seeds = if (cliConfig.seeds.isNotEmpty()) cliConfig.seeds else listOf(cliConfig.seed)
+        for (currentSeed in seeds) {
+            log.info("==================================================")
+            log.info("STARTING PIPELINE AND EVALUATION WITH SEED: $currentSeed")
+            log.info("==================================================")
 
-        if (cliConfig.runPipeline) {
-            log.info("Headless pipeline execution enabled. Starting DAG generation pipeline...")
-            if (!datasetFetcher.isDatasetDownloaded()) {
-                log.info("Downloading dataset...")
-                datasetFetcher.downloadDataset()
-            }
-            log.info("Loading dataset for domains: $targetDomains")
-            val dataset = datasetFetcher.fetchDataset(
-                selectedDomains = targetDomains
-            )
-            log.info("Splitting dataset into train/test (ratio=${cliConfig.testRatio}, seed=${cliConfig.seed})...")
-            val (trainSet, testSet) = datasetFetcher.splitTrainTest(
-                dataset,
-                testRatio = cliConfig.testRatio,
-                seed = cliConfig.seed
-            )
-            log.info("Syncing database reserved pool...")
-            evalLoader.syncReservedPool()
+            var snapshotId = cliConfig.snapshotId
+            var root: GraphNode
 
-            log.info("Running GMM splitting and trickle routing pipeline...")
-            root = taxonomyEngine.adaptTaxonomy(
-                rootLabel = config.dataset.datasetType.name,
-                dataset = trainSet.mapValues { (_, qs) -> qs.map { it.text } }
-            )
-
-            if (cliConfig.judgeInduction) {
-                log.info("Starting headless LLM judge prompt induction...")
-                judgeService.generateJudgesForDag(root, replaceExisting = true)
-            }
-
-            log.info("Saving generated DAG snapshot to database...")
-            val snapshotDesc = "Headless Run Auto-generated DAG"
-            val snapshot = snapshotManager.saveSnapshot(root, snapshotDesc)
-                ?: throw IllegalStateException("Failed to save snapshot for the newly generated DAG")
-            snapshotId = snapshot.id
-            log.info("Successfully generated and saved snapshot. Snapshot ID: $snapshotId")
-
-            // Generate baseline snapshots via Python subprocess
-            try {
-                log.info("Generating baseline snapshots via Python subprocess...")
-                val pb = ProcessBuilder("python", "scripts/generate_baselines.py")
-                pb.directory(File("."))
-                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                pb.redirectError(ProcessBuilder.Redirect.INHERIT)
-                val process = pb.start()
-                val exitCode = process.waitFor()
-                if (exitCode == 0) {
-                    log.info("Baseline snapshots successfully generated.")
-                } else {
-                    log.error("Baseline generation failed with exit code $exitCode")
+            if (cliConfig.runPipeline) {
+                log.info("Headless pipeline execution enabled. Starting DAG generation pipeline...")
+                if (!datasetFetcher.isDatasetDownloaded()) {
+                    log.info("Downloading dataset...")
+                    datasetFetcher.downloadDataset()
                 }
-            } catch (e: Exception) {
-                log.error("Failed to run baseline generator: ${e.message}", e)
-            }
-        } else {
-            log.info("Loading pre-existing snapshot: $snapshotId")
-            root = snapshotManager.loadSnapshot(snapshotId)
-                ?: throw IllegalStateException("Could not load snapshot: $snapshotId")
-        }
+                log.info("Loading dataset for domains: $targetDomains")
+                val dataset = datasetFetcher.fetchDataset(
+                    selectedDomains = targetDomains
+                )
+                log.info("Splitting dataset into train/test (ratio=${cliConfig.testRatio}, seed=$currentSeed)...")
+                val (trainSet, testSet) = datasetFetcher.splitTrainTest(
+                    dataset,
+                    testRatio = cliConfig.testRatio,
+                    seed = currentSeed
+                )
+                log.info("Syncing database reserved pool...")
+                evalLoader.syncReservedPool()
 
-        // Apply fallback judge prompts to all nodes in the loaded/generated tree to prevent runtime IllegalStateException
-        fun ensureJudgePrompts(n: GraphNode, condition: String) {
-            val isMain = condition.equals("MAIN", ignoreCase = true)
-            if (n.children.isEmpty()) { // leaf node
-                if (isMain && cliConfig.runBenchmark && (n.judgePrompt.isNullOrBlank() || n.judgeRubric.isNullOrBlank())) {
-                    throw IllegalStateException("Missing custom induced judge prompt/rubric for leaf node '${n.label}' (id=${n.id}) under MAIN condition!")
-                }
-            }
-            if (n.judgePrompt.isNullOrBlank()) {
-                n.judgePrompt = "You are a domain-expert judge evaluating answers in ${n.label}."
-            }
-            if (n.judgeRubric.isNullOrBlank()) {
-                n.judgeRubric = "Evaluate correctness based on accuracy and reasoning clarity."
-            }
-            n.children.forEach { ensureJudgePrompts(it, condition) }
-        }
-        ensureJudgePrompts(root, "MAIN")
-
-        taxonomyService.setGraph(root)
-        log.info("Active graph node set: ${root.id}")
-
-        // Deterministic train/test split if requested for pre-existing snapshot
-        if (cliConfig.regenerateSplit && !cliConfig.runPipeline) {
-            log.info("Regenerating deterministic 70/30 split (ratio=${cliConfig.testRatio}, seed=${cliConfig.seed})")
-            if (!datasetFetcher.isDatasetDownloaded()) {
-                log.info("Downloading dataset...")
-                datasetFetcher.downloadDataset()
-            }
-            val dataset = datasetFetcher.fetchDataset(
-                selectedDomains = targetDomains
-            )
-            datasetFetcher.splitTrainTest(dataset, testRatio = cliConfig.testRatio, seed = cliConfig.seed)
-            log.info("Syncing database reserved pool...")
-            evalLoader.syncReservedPool()
-        }
-
-        // 3. Create export directories
-        val baseDir = File(cliConfig.outputDir)
-        val validationDir = File(baseDir, "validation")
-        val judgingDir = File(baseDir, "judging")
-        validationDir.mkdirs()
-        judgingDir.mkdirs()
-
-        // 4. Run trickle validation if enabled
-        if (cliConfig.runTrickle) {
-            val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
-
-            log.info("========================================")
-            log.info("RUNNING TRICKLE VALIDATION: MAIN")
-            log.info("========================================")
-            taxonomyService.setGraph(root)
-            runHeadlessTrickle(root, "MAIN", cliConfig, baseDir)
-
-            val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
-            snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
-                log.info("========================================")
-                log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
-                log.info("========================================")
-                taxonomyService.setGraph(kmeansRoot)
-                runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir)
-            }
-
-            val wardSnapshot = "${baseSnapshotId}_baseline_ward"
-            snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
-                log.info("========================================")
-                log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
-                log.info("========================================")
-                taxonomyService.setGraph(wardRoot)
-                runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir)
-            }
-
-            val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
-            snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
-                log.info("========================================")
-                log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
-                log.info("========================================")
-                taxonomyService.setGraph(randomNullRoot)
-                runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir)
-            }
-
-            // Restore active root graph for downstream benchmark
-            taxonomyService.setGraph(root)
-        }
-
-        // 5. Run each condition back-to-back if enabled
-        if (cliConfig.runBenchmark) {
-            val completedConditions = mutableListOf<String>()
-            val logicalComparisonsMap = mutableMapOf<String, Int>()
-            val judgeApiCallsMap = mutableMapOf<String, Int>()
-
-            cliConfig.conditions.forEach { condition ->
-                log.info("========================================")
-                log.info("RUNNING CONDITION: $condition")
-                log.info("========================================")
-
-                val isKmeans = condition.equals("KMEANS_BASELINE", ignoreCase = true)
-                val isWard = condition.equals("WARD_BASELINE", ignoreCase = true)
-                val isRandomNull = condition.equals("RANDOMNULL_BASELINE", ignoreCase = true)
-
-                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
-
-                val activeRoot = when {
-                    isKmeans -> {
-                        log.info("Loading Flat k-means baseline snapshot...")
-                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_kmeans")
-                            ?: throw IllegalStateException("Required KMEANS_BASELINE snapshot not found: ${baseSnapshotId}_baseline_kmeans")
-                    }
-                    isWard -> {
-                        log.info("Loading HAC Ward baseline snapshot...")
-                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_ward")
-                            ?: throw IllegalStateException("Required WARD_BASELINE snapshot not found: ${baseSnapshotId}_baseline_ward")
-                    }
-                    isRandomNull -> {
-                        log.info("Loading Random null baseline snapshot...")
-                        snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_randomnull")
-                            ?: throw IllegalStateException("Required RANDOMNULL_BASELINE snapshot not found: ${baseSnapshotId}_baseline_randomnull")
-                    }
-                    else -> root
-                }
-
-                val isBaseline = isKmeans || isWard || isRandomNull
-                if (cliConfig.judgeInduction && isBaseline) {
-                    log.info("Running judge prompt induction for baseline condition $condition to isolate topology effect...")
-                    judgeService.generateJudgesForDag(activeRoot, replaceExisting = true)
-                }
-
-                ensureJudgePrompts(activeRoot, condition)
-                taxonomyService.setGraph(activeRoot)
-
-                // Suffix active snapshotId to isolate condition stats in SQLite
-                val suffixedSnapshotId = "${snapshotId}_$condition"
-                taxonomyService.setActiveSnapshotId(suffixedSnapshotId)
-                
-                // Clear existing snapshot data to ensure clean, reproducible experimental runs from scratch
-                rankingService.clearRatings(suffixedSnapshotId)
-
-                val modelSources = cliConfig.models.map { ModelSource(it) }
-                val request = BenchmarkRequest(
-                    models = modelSources,
-                    queryLimit = cliConfig.queryLimit,
-                    category = cliConfig.category,
-                    confidenceGate = cliConfig.confidenceGate,
-                    parallelism = cliConfig.parallelism,
-                    questionsPerRound = cliConfig.questionsPerRound,
-                    updateRankings = true,
-                    reservedOnly = cliConfig.reservedOnly,
-                    condition = condition,
-                    seed = cliConfig.seed
+                log.info("Running GMM splitting and trickle routing pipeline...")
+                root = taxonomyEngine.adaptTaxonomy(
+                    rootLabel = config.dataset.datasetType.name,
+                    dataset = trainSet.mapValues { (_, qs) -> qs.map { it.text } }
                 )
 
-                val report = benchmarkService.runBenchmark(request)
-                val logicalComparisons = report.queryResults.size
-                val judgeApiCalls = report.queryResults.count { it.hadJudge } * 2
-                logicalComparisonsMap[condition] = logicalComparisons
-                judgeApiCallsMap[condition] = judgeApiCalls
-
-                log.info("Condition $condition completed. Overall Agreement Rate: ${report.overallJudgeAccuracyAgreement}")
-                log.info("  - Logical Comparisons: $logicalComparisons")
-                log.info("  - LLM Judge API Calls: $judgeApiCalls")
-
-                // Export results
-                exportValidationMetrics(validationDir, condition, report)
-                exportLeafLeaderboard(validationDir, condition, suffixedSnapshotId, activeRoot, cliConfig.models)
-                exportDomainStats(validationDir, condition, report)
-                exportVerdicts(judgingDir, condition, report)
-                ReportGenerator.generateAndExport(validationDir, condition, report, activeRoot, cliConfig.models)
-
-                // Compute and export LaTeX table for the global leaderboard
-                val leafIds = mutableListOf<String>()
-                val visited = mutableSetOf<String>()
-                fun walk(n: GraphNode) {
-                    if (!visited.add(n.id)) return
-                    if (n.children.isEmpty()) leafIds.add(n.id)
-                    else n.children.forEach { walk(it) }
+                if (cliConfig.judgeInduction) {
+                    log.info("Starting headless LLM judge prompt induction...")
+                    judgeService.generateJudgesForDag(root, replaceExisting = true)
                 }
-                walk(activeRoot)
-                val globalLeaderboard = rankingService.aggregateLeafScores(leafIds, suffixedSnapshotId)
-                exportLatexTable(validationDir, condition, globalLeaderboard.ranks)
 
-                // Save backup of the full JSON benchmark report
-                val backupDir = File("benchmark_backups")
-                if (!backupDir.exists()) {
-                    backupDir.mkdirs()
-                }
-                val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(java.util.Date())
-                val backupFile = File(backupDir, "benchmark_${suffixedSnapshotId}_$timestamp.json")
+                log.info("Saving generated DAG snapshot to database...")
+                val snapshotDesc = "Headless Run Auto-generated DAG"
+                val snapshot = snapshotManager.saveSnapshot(root, snapshotDesc)
+                    ?: throw IllegalStateException("Failed to save snapshot for the newly generated DAG")
+                snapshotId = snapshot.id
+                log.info("Successfully generated and saved snapshot. Snapshot ID: $snapshotId")
+
+                // Generate baseline snapshots via Python subprocess
                 try {
-                    val jsonString = json.encodeToString(report)
-                    backupFile.writeText(jsonString)
-                    log.info("Saved benchmark report backup to ${backupFile.absolutePath}")
+                    log.info("Generating baseline snapshots via Python subprocess...")
+                    val pb = ProcessBuilder("python", "scripts/generate_baselines.py")
+                    pb.directory(File("."))
+                    pb.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                    pb.redirectError(ProcessBuilder.Redirect.INHERIT)
+                    val process = pb.start()
+                    val exitCode = process.waitFor()
+                    if (exitCode == 0) {
+                        log.info("Baseline snapshots successfully generated.")
+                    } else {
+                        log.error("Baseline generation failed with exit code $exitCode")
+                    }
                 } catch (e: Exception) {
-                    log.error("Failed to backup benchmark report: ${e.message}", e)
+                    log.error("Failed to run baseline generator: ${e.message}", e)
                 }
-
-                completedConditions.add(condition)
+            } else {
+                log.info("Loading pre-existing snapshot: $snapshotId")
+                root = snapshotManager.loadSnapshot(snapshotId)
+                    ?: throw IllegalStateException("Could not load snapshot: $snapshotId")
             }
 
-            // 6. Write Experiment Manifest
-            val manifestFile = File(baseDir, "manifest.json")
-            val manifest = ExperimentManifest(
-                runId = "run_" + Instant.now().toString().replace(":", "-"),
-                snapshotId = snapshotId,
-                models = cliConfig.models,
-                seed = cliConfig.seed,
-                testRatio = cliConfig.testRatio,
-                conditionsRun = completedConditions,
-                runTimestamp = Instant.now().toString(),
-                logicalComparisons = logicalComparisonsMap,
-                llmJudgeApiCalls = judgeApiCallsMap
-            )
-            manifestFile.writeText(json.encodeToString(manifest))
-            log.info("Experiment manifest written to ${manifestFile.absolutePath}")
+            // Apply fallback judge prompts to all nodes in the loaded/generated tree to prevent runtime IllegalStateException
+            fun ensureJudgePrompts(n: GraphNode, condition: String) {
+                val isMain = condition.equals("MAIN", ignoreCase = true)
+                if (n.children.isEmpty()) { // leaf node
+                    if (isMain && cliConfig.runBenchmark && (n.judgePrompt.isNullOrBlank() || n.judgeRubric.isNullOrBlank())) {
+                        throw IllegalStateException("Missing custom induced judge prompt/rubric for leaf node '${n.label}' (id=${n.id}) under MAIN condition!")
+                    }
+                }
+                if (n.judgePrompt.isNullOrBlank()) {
+                    n.judgePrompt = "You are a domain-expert judge evaluating answers in ${n.label}."
+                }
+                if (n.judgeRubric.isNullOrBlank()) {
+                    n.judgeRubric = "Evaluate correctness based on accuracy and reasoning clarity."
+                }
+                n.children.forEach { ensureJudgePrompts(it, condition) }
+            }
+            ensureJudgePrompts(root, "MAIN")
+
+            taxonomyService.setGraph(root)
+            log.info("Active graph node set: ${root.id}")
+
+            // Deterministic train/test split if requested for pre-existing snapshot
+            if (cliConfig.regenerateSplit && !cliConfig.runPipeline) {
+                log.info("Regenerating deterministic 70/30 split (ratio=${cliConfig.testRatio}, seed=$currentSeed)")
+                if (!datasetFetcher.isDatasetDownloaded()) {
+                    log.info("Downloading dataset...")
+                    datasetFetcher.downloadDataset()
+                }
+                val dataset = datasetFetcher.fetchDataset(
+                    selectedDomains = targetDomains
+                )
+                datasetFetcher.splitTrainTest(dataset, testRatio = cliConfig.testRatio, seed = currentSeed)
+                log.info("Syncing database reserved pool...")
+                evalLoader.syncReservedPool()
+            }
+
+            // 3. Create export directories per seed
+            val baseDir = File(cliConfig.outputDir + "/seed_$currentSeed")
+            val validationDir = File(baseDir, "validation")
+            val judgingDir = File(baseDir, "judging")
+            validationDir.mkdirs()
+            judgingDir.mkdirs()
+
+            // 4. Run trickle validation if enabled
+            if (cliConfig.runTrickle) {
+                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+
+                log.info("========================================")
+                log.info("RUNNING TRICKLE VALIDATION: MAIN")
+                log.info("========================================")
+                taxonomyService.setGraph(root)
+                val mainCorrect = runHeadlessTrickle(root, "MAIN", cliConfig, baseDir, currentSeed)
+
+                var kmeansCorrect: Map<String, Boolean>? = null
+                val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
+                snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
+                    log.info("========================================")
+                    log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
+                    log.info("========================================")
+                    taxonomyService.setGraph(kmeansRoot)
+                    kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed)
+                }
+
+                var wardCorrect: Map<String, Boolean>? = null
+                val wardSnapshot = "${baseSnapshotId}_baseline_ward"
+                snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
+                    log.info("========================================")
+                    log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
+                    log.info("========================================")
+                    taxonomyService.setGraph(wardRoot)
+                    wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed)
+                }
+
+                var randomNullCorrect: Map<String, Boolean>? = null
+                val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
+                snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
+                    log.info("========================================")
+                    log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
+                    log.info("========================================")
+                    taxonomyService.setGraph(randomNullRoot)
+                    randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed)
+                }
+
+                // McNemar significance comparisons between MAIN and the baselines
+                try {
+                    val mcnemarFile = File(validationDir, "mcnemar_significance_results.csv")
+                    mcnemarFile.bufferedWriter().use { writer ->
+                        writer.write("Baseline,BothCorrect,MainCorrectBaselineIncorrect,BaselineCorrectMainIncorrect,BothIncorrect,ChiSquared,PValue\n")
+                        
+                        fun checkMcNemar(baselineName: String, baselineCorrect: Map<String, Boolean>?) {
+                            if (baselineCorrect == null) return
+                            var bothCorrect = 0
+                            var mainCorrectBaselineIncorrect = 0
+                            var baselineCorrectMainIncorrect = 0
+                            var bothIncorrect = 0
+                            
+                            for ((q, correctMain) in mainCorrect) {
+                                val correctBase = baselineCorrect[q] ?: false
+                                if (correctMain && correctBase) bothCorrect++
+                                else if (correctMain && !correctBase) mainCorrectBaselineIncorrect++
+                                else if (!correctMain && correctBase) baselineCorrectMainIncorrect++
+                                else bothIncorrect++
+                            }
+                            val discordant = mainCorrectBaselineIncorrect + baselineCorrectMainIncorrect
+                            val chiSquared = if (discordant > 0) {
+                                val diff = kotlin.math.abs(mainCorrectBaselineIncorrect - baselineCorrectMainIncorrect).toDouble()
+                                val correctedDiff = (diff - 1.0).coerceAtLeast(0.0)
+                                (correctedDiff * correctedDiff) / discordant.toDouble()
+                            } else 0.0
+                            val pVal = ValidationService.chiSquaredToPValue(chiSquared)
+                            writer.write("$baselineName,$bothCorrect,$mainCorrectBaselineIncorrect,$baselineCorrectMainIncorrect,$bothIncorrect,$chiSquared,$pVal\n")
+                            
+                            log.info("McNemar Significance (MAIN vs $baselineName):")
+                            log.info("  - Chi-Squared: ${"%,.4f".format(chiSquared)}")
+                            log.info("  - p-value: ${"%,.4e".format(pVal)}")
+                        }
+                        
+                        checkMcNemar("KMEANS_BASELINE", kmeansCorrect)
+                        checkMcNemar("WARD_BASELINE", wardCorrect)
+                        checkMcNemar("RANDOMNULL_BASELINE", randomNullCorrect)
+                    }
+                    log.info("McNemar significance results written to ${mcnemarFile.absolutePath}")
+                } catch (e: Exception) {
+                    log.error("Failed to run McNemar significance tests: ${e.message}", e)
+                }
+
+                // Restore active root graph for downstream benchmark
+                taxonomyService.setGraph(root)
+            }
+
+            // 5. Run each condition back-to-back if enabled
+            if (cliConfig.runBenchmark) {
+                val completedConditions = mutableListOf<String>()
+                val logicalComparisonsMap = mutableMapOf<String, Int>()
+                val judgeApiCallsMap = mutableMapOf<String, Int>()
+
+                cliConfig.conditions.forEach { condition ->
+                    log.info("========================================")
+                    log.info("RUNNING CONDITION: $condition")
+                    log.info("========================================")
+
+                    val isKmeans = condition.equals("KMEANS_BASELINE", ignoreCase = true)
+                    val isWard = condition.equals("WARD_BASELINE", ignoreCase = true)
+                    val isRandomNull = condition.equals("RANDOMNULL_BASELINE", ignoreCase = true)
+
+                    val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+
+                    val activeRoot = when {
+                        isKmeans -> {
+                            log.info("Loading Flat k-means baseline snapshot...")
+                            snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_kmeans")
+                                ?: throw IllegalStateException("Required KMEANS_BASELINE snapshot not found: ${baseSnapshotId}_baseline_kmeans")
+                        }
+                        isWard -> {
+                            log.info("Loading HAC Ward baseline snapshot...")
+                            snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_ward")
+                                ?: throw IllegalStateException("Required WARD_BASELINE snapshot not found: ${baseSnapshotId}_baseline_ward")
+                        }
+                        isRandomNull -> {
+                            log.info("Loading Random null baseline snapshot...")
+                            snapshotManager.loadSnapshot("${baseSnapshotId}_baseline_randomnull")
+                                ?: throw IllegalStateException("Required RANDOMNULL_BASELINE snapshot not found: ${baseSnapshotId}_baseline_randomnull")
+                        }
+                        else -> root
+                    }
+
+                    val isBaseline = isKmeans || isWard || isRandomNull
+                    if (cliConfig.judgeInduction && isBaseline) {
+                        log.info("Running judge prompt induction for baseline condition $condition to isolate topology effect...")
+                        judgeService.generateJudgesForDag(activeRoot, replaceExisting = true)
+                    }
+
+                    ensureJudgePrompts(activeRoot, condition)
+                    taxonomyService.setGraph(activeRoot)
+
+                    // Suffix active snapshotId to isolate condition stats in SQLite
+                    val suffixedSnapshotId = "${snapshotId}_$condition"
+                    taxonomyService.setActiveSnapshotId(suffixedSnapshotId)
+                    
+                    // Clear existing snapshot data to ensure clean, reproducible experimental runs from scratch
+                    rankingService.clearRatings(suffixedSnapshotId)
+
+                    val modelSources = cliConfig.models.map { ModelSource(it) }
+                    val request = BenchmarkRequest(
+                        models = modelSources,
+                        queryLimit = cliConfig.queryLimit,
+                        category = cliConfig.category,
+                        confidenceGate = cliConfig.confidenceGate,
+                        parallelism = cliConfig.parallelism,
+                        questionsPerRound = cliConfig.questionsPerRound,
+                        updateRankings = true,
+                        reservedOnly = cliConfig.reservedOnly,
+                        condition = condition,
+                        seed = currentSeed
+                    )
+
+                    val report = benchmarkService.runBenchmark(request)
+                    val logicalComparisons = report.queryResults.size
+                    val judgeApiCalls = report.queryResults.count { it.hadJudge } * 2
+                    logicalComparisonsMap[condition] = logicalComparisons
+                    judgeApiCallsMap[condition] = judgeApiCalls
+
+                    log.info("Condition $condition completed. Overall Agreement Rate: ${report.overallJudgeAccuracyAgreement}")
+                    log.info("  - Logical Comparisons: $logicalComparisons")
+                    log.info("  - LLM Judge API Calls: $judgeApiCalls")
+
+                    // Export results
+                    exportValidationMetrics(validationDir, condition, report)
+                    exportLeafLeaderboard(validationDir, condition, suffixedSnapshotId, activeRoot, cliConfig.models)
+                    exportDomainStats(validationDir, condition, report)
+                    exportVerdicts(judgingDir, condition, report)
+                    ReportGenerator.generateAndExport(validationDir, condition, report, activeRoot, cliConfig.models)
+
+                    // Compute and export LaTeX table for the global leaderboard
+                    val leafIds = mutableListOf<String>()
+                    val visited = mutableSetOf<String>()
+                    fun walk(n: GraphNode) {
+                        if (!visited.add(n.id)) return
+                        if (n.children.isEmpty()) leafIds.add(n.id)
+                        else n.children.forEach { walk(it) }
+                    }
+                    walk(activeRoot)
+                    val globalLeaderboard = rankingService.aggregateLeafScores(leafIds, suffixedSnapshotId)
+                    exportLatexTable(validationDir, condition, globalLeaderboard.ranks)
+
+                    // Save backup of the full JSON benchmark report
+                    val backupDir = File("benchmark_backups")
+                    if (!backupDir.exists()) {
+                        backupDir.mkdirs()
+                    }
+                    val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(java.util.Date())
+                    val backupFile = File(backupDir, "benchmark_${suffixedSnapshotId}_$timestamp.json")
+                    try {
+                        val jsonString = json.encodeToString(report)
+                        backupFile.writeText(jsonString)
+                        log.info("Saved benchmark report backup to ${backupFile.absolutePath}")
+                    } catch (e: Exception) {
+                        log.error("Failed to backup benchmark report: ${e.message}", e)
+                    }
+
+                    completedConditions.add(condition)
+                }
+
+                // 6. Write Experiment Manifest
+                val manifestFile = File(baseDir, "manifest.json")
+                val manifest = ExperimentManifest(
+                    runId = "run_" + Instant.now().toString().replace(":", "-"),
+                    snapshotId = snapshotId,
+                    models = cliConfig.models,
+                    seed = currentSeed,
+                    testRatio = cliConfig.testRatio,
+                    conditionsRun = completedConditions,
+                    runTimestamp = Instant.now().toString(),
+                    logicalComparisons = logicalComparisonsMap,
+                    llmJudgeApiCalls = judgeApiCallsMap
+                )
+                manifestFile.writeText(json.encodeToString(manifest))
+                log.info("Experiment manifest written to ${manifestFile.absolutePath}")
+            }
         }
     }
 
-    private fun runHeadlessTrickle(root: GraphNode, condition: String, cliConfig: HeadlessCliConfig, baseDir: File) = runBlocking {
+
+    private fun runHeadlessTrickle(
+        root: GraphNode, 
+        condition: String, 
+        cliConfig: HeadlessCliConfig, 
+        baseDir: File,
+        currentSeed: Long
+    ): Map<String, Boolean> = runBlocking {
         log.info("Starting Headless Batch Trickle Validation for $condition...")
 
         val reservedFile = File("reserved_test_queries.json")
         if (!reservedFile.exists()) {
-            log.warn("reserved_test_queries.json not found — cannot run trickle validation."); return@runBlocking
+            log.warn("reserved_test_queries.json not found — cannot run trickle validation."); return@runBlocking emptyMap()
         }
         val reservedByDomain: Map<String, List<Int>> = try {
             json.decodeFromString(reservedFile.readText())
         } catch (t: Throwable) {
-            log.error("Failed to parse reserved set for trickle validation", t); return@runBlocking
+            log.error("Failed to parse reserved set for trickle validation", t); return@runBlocking emptyMap()
         }
 
         fun cleanText(s: String): String = s.replace("\r\n", "\n").replace("\r", "\n").trim()
@@ -425,7 +489,6 @@ class HeadlessBenchmarkRunner(
         val leaves = taxonomy.tui.service.BatchTrickleEvaluator.collectLeaves(root)
         val textToDomain = HashMap<String, String>()
 
-        // 1. First try to extract categories directly from GraphNode queries
         var embeddedCount = 0
         for (leaf in leaves) {
             for (emb in leaf.queries) {
@@ -438,7 +501,6 @@ class HeadlessBenchmarkRunner(
         }
         log.info("Loaded $embeddedCount ground-truth categories directly from DAG queries.")
 
-        // 2. Fetch train set to backfill or profile
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
         val fullByDomain = datasetFetcher.fetchDataset(selectedDomains = targetDomains)
         val reservedIds: Set<Int> = reservedByDomain.values.flatten().toSet()
@@ -457,21 +519,10 @@ class HeadlessBenchmarkRunner(
         }
         log.info("Backfilled $databaseCount categories from local cache. Total mapping keys: ${textToDomain.size}")
 
-        // Diagnostic logs
-        if (textToDomain.isNotEmpty()) {
-            log.info("Sample mapping keys: ${textToDomain.keys.take(3).map { it.take(50) }}")
-        }
-        val allLeafQueries = leaves.flatMap { it.queries }
-        if (allLeafQueries.isNotEmpty()) {
-            log.info("Sample leaf query rawTexts: ${allLeafQueries.take(3).map { it.rawText.take(50) }}")
-            val matches = allLeafQueries.count { textToDomain.containsKey(it.rawText) || textToDomain.containsKey(cleanText(it.rawText)) }
-            log.info("Diagnostic matching rate: $matches out of ${allLeafQueries.size} leaf queries match textToDomain keys.")
-        }
-
         val profiles = taxonomy.tui.service.BatchTrickleEvaluator.buildLeafProfiles(leaves, textToDomain)
         log.info("Indexed leaves: ${profiles.size} / ${leaves.size} leaves tagged with a domain.")
         if (profiles.isEmpty()) {
-            log.warn("No leaves could be tagged — DAG has no labeled training queries. Skipping trickle."); return@runBlocking
+            log.warn("No leaves could be tagged — DAG has no labeled training queries. Skipping trickle."); return@runBlocking emptyMap()
         }
 
         val idToText = fullByDomain.values.flatten().associate { it.id to it.text }
@@ -481,11 +532,11 @@ class HeadlessBenchmarkRunner(
                     idToText[id]?.let { text -> domain to text }
                 }
             }
-            .shuffled(java.util.Random(cliConfig.seed))
+            .shuffled(java.util.Random(currentSeed))
         
         val testQueries = poolAll
         if (testQueries.isEmpty()) {
-            log.warn("Reserved test set is empty. Skipping trickle."); return@runBlocking
+            log.warn("Reserved test set is empty. Skipping trickle."); return@runBlocking emptyMap()
         }
 
         log.info("Routing ${testQueries.size} test queries...")
@@ -506,7 +557,7 @@ class HeadlessBenchmarkRunner(
 
         log.info("Batch Trickle Results ($condition):")
         log.info("  - Total Queries: ${out.totalQueries}")
-        log.info("  - Top-1 Accuracy: ${"%,.2f%%".format(out.top1Accuracy * 100)}")
+        log.info("  - Top-1 Accuracy: ${"%,.2f%%".format(out.top1Accuracy * 100)} (95% Wilson CI: [${"%,.2f%%".format(out.top1WilsonLow * 100)}, ${"%,.2f%%".format(out.top1WilsonHigh * 100)}])")
         log.info("  - Any-Match Accuracy: ${"%,.2f%%".format(out.anyMatchAccuracy * 100)}")
         log.info("  - Mean Leaf Purity: ${"%,.2f%%".format(out.meanLeafPurity * 100)}")
         log.info("  - Expected Calibration Error (ECE): ${"%,.4f".format(out.ece)}")
@@ -526,7 +577,6 @@ class HeadlessBenchmarkRunner(
         }.toString()
         log.info("\n$tableStr")
 
-        // Export results
         val trickleDir = File(baseDir, "validation")
         trickleDir.mkdirs()
         val file = File(trickleDir, "${condition}_trickle_validation_results.csv")
@@ -534,6 +584,8 @@ class HeadlessBenchmarkRunner(
             writer.write("Metric,Value\n")
             writer.write("TotalQueries,${out.totalQueries}\n")
             writer.write("Top1Accuracy,${out.top1Accuracy}\n")
+            writer.write("Top1WilsonLow,${out.top1WilsonLow}\n")
+            writer.write("Top1WilsonHigh,${out.top1WilsonHigh}\n")
             writer.write("AnyMatchAccuracy,${out.anyMatchAccuracy}\n")
             writer.write("MeanLeafPurity,${out.meanLeafPurity}\n")
             writer.write("MeanRoutingDepth,${out.meanRoutingDepth}\n")
@@ -542,6 +594,203 @@ class HeadlessBenchmarkRunner(
             writer.write("ECE,${out.ece}\n")
         }
         log.info("Trickle validation results written to ${file.absolutePath}")
+
+        // 1. Run Nearest Centroid flat sweep baseline
+        try {
+            runCentroidRoutingTest(leaves, profiles, testQueries, condition, baseDir)
+        } catch (e: Exception) {
+            log.error("Failed to run centroid routing test: ${e.message}", e)
+        }
+
+        // 2. Compute and export migration flow matrix
+        try {
+            val domainsList = profiles.values.map { it.dominantDomain }.distinct().sorted()
+            val matrix = LinkedHashMap<String, LinkedHashMap<String, Int>>()
+            for (trueDomain in testQueries.map { it.first }.distinct().sorted()) {
+                val row = LinkedHashMap<String, Int>()
+                domainsList.forEach { row[it] = 0 }
+                row["Other"] = 0
+                matrix[trueDomain] = row
+            }
+
+            for ((trueDomain, text) in testQueries) {
+                val matched = try {
+                    runBlocking {
+                        taxonomyService.routeQueryToLeaves(text).mapNotNull { (leaf, conf) ->
+                            profiles[leaf.id]?.let { it to conf }
+                        }
+                    }
+                } catch (t: Throwable) {
+                    emptyList()
+                }
+                val row = matrix[trueDomain] ?: continue
+                if (matched.isEmpty()) {
+                    row["Other"] = (row["Other"] ?: 0) + 1
+                } else {
+                    val top = matched.maxByOrNull { it.second }!!.first
+                    val predicted = top.dominantDomain
+                    row[predicted] = (row[predicted] ?: 0) + 1
+                }
+            }
+
+            val matrixFile = File(trickleDir, "${condition}_migration_flow_matrix.csv")
+            matrixFile.bufferedWriter().use { writer ->
+                writer.write("TrueDomain," + domainsList.joinToString(",") + ",Other\n")
+                for ((trueDomain, row) in matrix) {
+                    writer.write(trueDomain + "," + domainsList.map { row[it] ?: 0 }.joinToString(",") + "," + (row["Other"] ?: 0) + "\n")
+                }
+            }
+            log.info("Migration flow matrix written to ${matrixFile.absolutePath}")
+        } catch (e: Exception) {
+            log.error("Failed to generate migration flow matrix: ${e.message}", e)
+        }
+
+        // 3. Compute and export WARD/MAIN diagnostics
+        val correctnessMap = HashMap<String, Boolean>()
+        var diagWriter: java.io.BufferedWriter? = null
+        try {
+            if (condition.equals("WARD_BASELINE", ignoreCase = true) || condition.equals("MAIN", ignoreCase = true)) {
+                val diagFile = File(trickleDir, "${condition}_routing_diagnostics.txt")
+                diagWriter = diagFile.bufferedWriter()
+                diagWriter.write("=== Per-Query Routing Diagnostics ($condition) ===\n\n")
+            }
+
+            for ((trueDomain, text) in testQueries) {
+                val matched = try {
+                    runBlocking {
+                        taxonomyService.routeQueryToLeaves(text).mapNotNull { (leaf, conf) ->
+                            profiles[leaf.id]?.let { it to conf }
+                        }.sortedByDescending { it.second }
+                    }
+                } catch (t: Throwable) {
+                    emptyList()
+                }
+
+                val isCorrect = if (matched.isEmpty()) {
+                    false
+                } else {
+                    matched.first().first.dominantDomain == trueDomain
+                }
+                correctnessMap[text] = isCorrect
+
+                diagWriter?.let { writer ->
+                    writer.write("Query: \"$text\"\n")
+                    writer.write("True Domain: $trueDomain\n")
+                    writer.write("Candidate Count: ${matched.size}\n")
+                    if (matched.isNotEmpty()) {
+                        writer.write("Top-1 Leaf: ${matched.first().first.label} (ID: ${matched.first().first.leafId}) | Dominant: ${matched.first().first.dominantDomain} | Conf: ${"%.4f".format(matched.first().second)}\n")
+                        
+                        val firstCorrectIdx = matched.indexOfFirst { it.first.dominantDomain == trueDomain }
+                        val firstCorrectRank = if (firstCorrectIdx != -1) (firstCorrectIdx + 1).toString() else "N/A"
+                        writer.write("Rank of First Correct Domain Candidate: $firstCorrectRank\n")
+                        
+                        writer.write("All Match Candidates:\n")
+                        matched.forEachIndexed { idx, (profile, conf) ->
+                            writer.write("  [${idx + 1}] Leaf: ${profile.label} | Dominant: ${profile.dominantDomain} | Conf: ${"%.4f".format(conf)}\n")
+                        }
+                    } else {
+                        writer.write("No candidates matched.\n")
+                    }
+                    writer.write("--------------------------------------------------\n")
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to write routing diagnostics: ${e.message}", e)
+        } finally {
+            diagWriter?.close()
+        }
+
+        return@runBlocking correctnessMap
+    }
+
+    private fun runCentroidRoutingTest(
+        leaves: List<GraphNode>,
+        profiles: Map<String, taxonomy.tui.service.LeafDomainProfile>,
+        testQueries: List<Pair<String, String>>,
+        condition: String,
+        baseDir: File
+    ) {
+        val testTexts = testQueries.map { it.second }.toSet()
+        val embeddings = embeddingCache.getBatch(testTexts)
+
+        var top1Correct = 0
+        var top3Correct = 0
+        var top5Correct = 0
+        var top10Correct = 0
+        var total = 0
+
+        for ((trueDomain, text) in testQueries) {
+            val emb = embeddings[text] ?: continue
+            val doubleEmb = DoubleArray(emb.size) { emb[it].toDouble() }
+            val normEmb = l2Normalize(doubleEmb)
+
+            val scoredLeaves = leaves.mapNotNull { leaf ->
+                val profile = profiles[leaf.id] ?: return@mapNotNull null
+                val centroid = leaf.vmfMu
+                if (centroid.isEmpty()) return@mapNotNull null
+                val doubleCentroid = DoubleArray(centroid.size) { centroid[it].toDouble() }
+                val normCentroid = l2Normalize(doubleCentroid)
+                val dot = dotProduct(normEmb, normCentroid)
+                profile to dot
+            }.sortedByDescending { it.second }
+
+            if (scoredLeaves.isEmpty()) continue
+            total++
+
+            if (scoredLeaves.first().first.dominantDomain == trueDomain) {
+                top1Correct++
+            }
+            if (scoredLeaves.take(3).any { it.first.dominantDomain == trueDomain }) {
+                top3Correct++
+            }
+            if (scoredLeaves.take(5).any { it.first.dominantDomain == trueDomain }) {
+                top5Correct++
+            }
+            if (scoredLeaves.take(10).any { it.first.dominantDomain == trueDomain }) {
+                top10Correct++
+            }
+        }
+
+        val t1 = if (total > 0) top1Correct.toDouble() / total else 0.0
+        val t3 = if (total > 0) top3Correct.toDouble() / total else 0.0
+        val t5 = if (total > 0) top5Correct.toDouble() / total else 0.0
+        val t10 = if (total > 0) top10Correct.toDouble() / total else 0.0
+
+        log.info("Nearest-Centroid Routing Results ($condition):")
+        log.info("  - Total Evaluated: $total")
+        log.info("  - Top-1 Accuracy: ${"%,.2f%%".format(t1 * 100)}")
+        log.info("  - Top-3 Accuracy: ${"%,.2f%%".format(t3 * 100)}")
+        log.info("  - Top-5 Accuracy: ${"%,.2f%%".format(t5 * 100)}")
+        log.info("  - Top-10 Accuracy: ${"%,.2f%%".format(t10 * 100)}")
+
+        val trickleDir = File(baseDir, "validation")
+        val file = File(trickleDir, "${condition}_centroid_routing_results.csv")
+        file.bufferedWriter().use { writer ->
+            writer.write("Metric,Value\n")
+            writer.write("TotalQueries,$total\n")
+            writer.write("Top1Accuracy,$t1\n")
+            writer.write("Top3Accuracy,$t3\n")
+            writer.write("Top5Accuracy,$t5\n")
+            writer.write("Top10Accuracy,$t10\n")
+        }
+        log.info("Centroid routing results written to ${file.absolutePath}")
+    }
+
+    private fun l2Normalize(vec: DoubleArray): DoubleArray {
+        var sum = 0.0
+        for (x in vec) sum += x * x
+        val mag = kotlin.math.sqrt(sum)
+        if (mag == 0.0) return vec
+        return DoubleArray(vec.size) { vec[it] / mag }
+    }
+
+    private fun dotProduct(a: DoubleArray, b: DoubleArray): Double {
+        var sum = 0.0
+        val limit = minOf(a.size, b.size)
+        for (i in 0 until limit) {
+            sum += a[i] * b[i]
+        }
+        return sum
     }
 
     private fun exportValidationMetrics(dir: File, condition: String, report: taxonomy.model.BenchmarkReport) {
@@ -665,6 +914,7 @@ class HeadlessBenchmarkRunner(
         var outputDir = "experiment"
         var testRatio = 0.3
         var seed = 42L
+        var seeds = listOf<Long>()
         var regenerateSplit = false
         var runPipeline = false
         var maxDepth: Int? = null
@@ -739,6 +989,7 @@ class HeadlessBenchmarkRunner(
                 "runBenchmark" -> runBenchmark = rawVal.toBoolean()
                 "runTrickle" -> runTrickle = rawVal.toBoolean()
                 "domains" -> domains = parseStringList(rawVal)
+                "seeds" -> seeds = parseStringList(rawVal).map { it.toLong() }
             }
         }
         return HeadlessCliConfig(
@@ -754,6 +1005,7 @@ class HeadlessBenchmarkRunner(
             outputDir = outputDir,
             testRatio = testRatio,
             seed = seed,
+            seeds = seeds,
             regenerateSplit = regenerateSplit,
             runPipeline = runPipeline,
             maxDepth = maxDepth,

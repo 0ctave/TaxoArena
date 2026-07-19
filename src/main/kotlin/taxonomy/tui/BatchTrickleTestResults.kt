@@ -25,6 +25,8 @@ data class BatchTrickleTestResults(
     val totalQueries: Int = 0,
     /** Top-1 leaf-domain accuracy: dominant domain of the highest-confidence matched leaf == truth. */
     val top1Accuracy: Double = 0.0,
+    val top1WilsonLow: Double = 0.0,
+    val top1WilsonHigh: Double = 0.0,
     /** Any-match accuracy: any matched leaf's dominant domain == truth. */
     val anyMatchAccuracy: Double = 0.0,
     /** Mean purity (topCount / leafSize) of the top-1 matched leaf — cluster-coherence signal. */

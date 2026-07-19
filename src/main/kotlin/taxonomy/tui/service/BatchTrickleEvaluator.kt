@@ -162,9 +162,27 @@ object BatchTrickleEvaluator {
         val macroF1 = if (support.isNotEmpty()) f1Sum / support.size else 0.0
         val eceVal = taxonomy.utils.computeRoutingECE(predictedMap, gtMap)
 
+        val p = top1Correct.toDouble() / n
+        val num = testQueries.size
+        val z = 1.96
+        val wilsonLow = if (num > 0) {
+            val val1 = p + (z * z) / (2.0 * num)
+            val val2 = z * kotlin.math.sqrt((p * (1.0 - p)) / num + (z * z) / (4.0 * num * num))
+            val denom = 1.0 + (z * z) / num
+            ((val1 - val2) / denom).coerceIn(0.0, 1.0)
+        } else 0.0
+        val wilsonHigh = if (num > 0) {
+            val val1 = p + (z * z) / (2.0 * num)
+            val val2 = z * kotlin.math.sqrt((p * (1.0 - p)) / num + (z * z) / (4.0 * num * num))
+            val denom = 1.0 + (z * z) / num
+            ((val1 + val2) / denom).coerceIn(0.0, 1.0)
+        } else 0.0
+
         return BatchTrickleTestResults(
             totalQueries = testQueries.size,
             top1Accuracy = top1Correct / n,
+            top1WilsonLow = wilsonLow,
+            top1WilsonHigh = wilsonHigh,
             anyMatchAccuracy = anyCorrect / n,
             meanLeafPurity = if (top1Matched > 0) puritySum / top1Matched else 0.0,
             macroF1 = macroF1,
