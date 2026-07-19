@@ -765,7 +765,7 @@ class TaxonomyMerger(
             }
             bridgeNode.label = finalLabel
 
-            if (isAncestor(u, bridgeNode) || isAncestor(v, bridgeNode) || isAncestor(bridgeNode, u) || isAncestor(bridgeNode, v)) {
+            if (isAncestor(u, v) || isAncestor(v, u)) {
                 log.warn("Bridge Insertion: cycle detected for candidate $candidateId, skipping.")
                 continue
             }

@@ -105,6 +105,7 @@ class TournamentSimulator(
      */
     suspend fun runSimulation(numMatches: Int, strategy: String = "ig"): SimulationResult {
         log.info("Starting Simulated Tournament ($numMatches matches) using '$strategy' matchmaking...")
+        val rng = Random(42)
         
         // Reset ratings in database to defaults for a clean experiment run
         resetDatabaseRatings()
@@ -131,7 +132,7 @@ class TournamentSimulator(
             val (agentA, agentB) = if (strategy.lowercase() == "ig") {
                 findInformationGainMatch(matchedDomain)
             } else {
-                findRandomMatch()
+                findRandomMatch(rng)
             }
 
             // 3. Simulate Match Outcome based on True Skills
@@ -140,7 +141,7 @@ class TournamentSimulator(
 
             // Logistic probability: P(A wins) = 1 / (1 + exp(-(skillA - skillB) / 8.0))
             val pA = 1.0 / (1.0 + Math.exp(-(skillA - skillB) / 8.0))
-            val rand = Random.nextDouble()
+            val rand = rng.nextDouble()
             
             val (winner, loser, isTie) = when {
                 rand < pA - (drawMargin / 2.0) -> Triple(agentA, agentB, false)
@@ -210,11 +211,11 @@ class TournamentSimulator(
         }
     }
 
-    private fun findRandomMatch(): Pair<String, String> {
-        val a = agents.random()
-        var b = agents.random()
+    private fun findRandomMatch(rng: Random): Pair<String, String> {
+        val a = agents.random(rng)
+        var b = agents.random(rng)
         while (a == b) {
-            b = agents.random()
+            b = agents.random(rng)
         }
         return a to b
     }
