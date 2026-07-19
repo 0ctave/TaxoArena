@@ -101,7 +101,8 @@ class TaxonomyTrickler(
 
             // pre-smoothing best-child responsibility
             val bestChildResp = rawProbs.maxOrNull() ?: 0.0
-            if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < config.formalism.routeConfidenceTau) {
+            val adaptiveTau = (config.formalism.routeConfidenceTau * (2.0 / K)).coerceAtMost(config.formalism.routeConfidenceTau)
+            if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < adaptiveTau) {
                 val qId = if (query.queryId != -1) query.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(query.rawText)
                 residualHits.add(ResidualHit(node, qId, bestChildResp))
             }

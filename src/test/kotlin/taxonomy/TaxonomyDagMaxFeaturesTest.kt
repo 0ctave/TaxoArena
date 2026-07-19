@@ -798,4 +798,97 @@ class TaxonomyDagMaxFeaturesTest {
         // Under TREE_ONLY, leafA resolves strictly to domainA, so contamination is 0.0.
         assertEquals(0.0, report.contaminationRatio, 1e-9)
     }
+
+    @Test
+    fun `R13 - duplicate bridge prevention across iterations`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableBridging = true
+        config.formalism.minClusterSize = 2
+        config.formalism.maxDepth = 5
+        config.formalism.separationEpsilon = 0.001
+        config.formalism.bridgeSeparationCeiling = 5000.0
+        config.formalism.minBridgeCoverage = 0
+        config.formalism.maxBridgeNodes = 5
+
+        val root = node("root", "Root Node", 0)
+        val domainA = node("domainA", "domainA", 1)
+        val domainB = node("domainB", "domainB", 1)
+        link(root, domainA)
+        link(root, domainB)
+
+        val leafA = node("leafA", "Leaf A", 2)
+        link(domainA, leafA)
+        leafA.vmfMu = floatArrayOf(1.0f, 0.0f)
+        leafA.vmfKappa = 10.0
+        leafA.queries.add(emb("qA", 1, "domainA"))
+
+        val leafB = node("leafB", "Leaf B", 2)
+        link(domainB, leafB)
+        leafB.vmfMu = floatArrayOf(0.9f, 0.43f)
+        leafB.vmfKappa = 10.0
+        leafB.queries.add(emb("qB", 2, "domainB"))
+
+        val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
+        
+        // First pass
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
+
+        val allNodes1 = mutableSetOf<GraphNode>()
+        fun walk1(n: GraphNode) {
+            if (allNodes1.add(n)) {
+                n.children.forEach { walk1(it) }
+                n.crossLinkChildren.forEach { walk1(it) }
+            }
+        }
+        walk1(root)
+        val bridges1 = allNodes1.filter { it.isBridge }
+        assertEquals(1, bridges1.size, "Should create exactly 1 bridge node first")
+
+        // Second pass
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
+
+        val allNodes2 = mutableSetOf<GraphNode>()
+        fun walk2(n: GraphNode) {
+            if (allNodes2.add(n)) {
+                n.children.forEach { walk2(it) }
+                n.crossLinkChildren.forEach { walk2(it) }
+            }
+        }
+        walk2(root)
+        val bridges2 = allNodes2.filter { it.isBridge }
+        assertEquals(1, bridges2.size, "Should not duplicate bridge node on second pass")
+    }
+
+    @Test
+    fun `R14 - routeConfidenceTau scales adaptively with branching factor`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableResidualRouting = true
+        config.formalism.routeConfidenceTau = 0.6
+
+        val trickler = TaxonomyTrickler(config)
+        val parent = node("parent", "Parent Domain", 2)
+        
+        // Create 10 children to make branching factor K = 10
+        val children = (1..10).map { node("child_$it", "Child $it", 3) }
+        children.forEach {
+            link(parent, it)
+            it.vmfMu = floatArrayOf(if (it.id == "child_1") 1.0f else 0.0f)
+            it.vmfKappa = 10.0
+            it.sliceDim = 1
+        }
+
+        // Setup a query that is equally far/close, so responsibility for child1 is around 0.3
+        // Under a fixed tau of 0.6, it would trigger a residual hit.
+        // Under adaptive tau = 0.6 * (2.0 / 10) = 0.12, since 0.3 >= 0.12, it should NOT trigger a residual hit.
+        val query = Embedding("q", "q", floatArrayOf(0.5f))
+        query.queryId = 201
+
+        val result = trickler.routeQuery(query, parent, currentIteration = 2)
+        // Since bestChildResp is above adaptiveTau (0.12), there should be NO residual hits
+        assertTrue(result.residualHits.isEmpty(), "Adaptive threshold must prevent near-universal residual tagging at high-level nodes")
+    }
 }

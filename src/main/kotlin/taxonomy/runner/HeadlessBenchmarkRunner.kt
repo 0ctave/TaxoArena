@@ -932,13 +932,29 @@ class HeadlessBenchmarkRunner(
         }
         walk(root)
 
+        fun collectSubtreeQueries(node: GraphNode): List<Embedding> {
+            val queries = mutableListOf<Embedding>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                if (n.isLeaf) {
+                    queries.addAll(n.queries)
+                } else {
+                    n.children.forEach { walk(it) }
+                    n.crossLinkChildren.forEach { walk(it) }
+                }
+            }
+            walk(node)
+            return queries
+        }
+
         val bridges = allNodes.filter { it.isBridge }
         file.bufferedWriter().use { writer ->
             writer.write("BridgeId,Label,MemberDomains,ChildLeafIds,Coverage,Entropy,JsDivergence,Depth\n")
             bridges.forEach { b ->
                 val memberDomains = b.crossLinkChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
                 val childLeafIds = b.crossLinkChildren.map { it.id }.joinToString(";")
-                val combinedQueries = b.crossLinkChildren.flatMap { it.queries }
+                val combinedQueries = b.crossLinkChildren.flatMap { collectSubtreeQueries(it) }.distinctBy { it.rawText }
                 val coverage = combinedQueries.size
                 val entropyVal = calculateGtEntropyForQueries(combinedQueries)
                 val jsDiv = b.bridgeJsDivergence

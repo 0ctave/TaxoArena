@@ -663,8 +663,18 @@ class TaxonomyMerger(
 
         log.info("Bridge Insertion: Found ${candidatePairs.size} candidate pairs in adjacency band [${config.formalism.separationEpsilon}, ${config.formalism.bridgeSeparationCeiling}] after Top-K filtering and sorting")
 
-        val bridgedLeaves = mutableMapOf<String, Int>()
+        val bridgedLeaves = leaves.associate { it.id to it.parents.count { p -> p.isBridge } }.toMutableMap()
         val domainPairCounts = mutableMapOf<String, Int>()
+        val existingBridges = allNodes.filter { it.isBridge }
+        for (b in existingBridges) {
+            val domains = b.parents.mapNotNull { it.originalCategory ?: it.label }.distinct()
+            if (domains.size >= 2) {
+                val domU = domains[0]
+                val domV = domains[1]
+                val domainPairKey = if (domU < domV) "$domU|$domV" else "$domV|$domU"
+                domainPairCounts[domainPairKey] = domainPairCounts.getOrDefault(domainPairKey, 0) + 1
+            }
+        }
 
         for (cand in candidatePairs) {
             val u = cand.u
@@ -672,6 +682,12 @@ class TaxonomyMerger(
             val div = cand.div
             val candidateId = "cand_${u.id.take(4)}_${v.id.take(4)}"
             if (bridgesCreated + currentBridgeCount >= maxBridgeNodes) break
+
+            val alreadyBridged = u.parents.any { p -> p.isBridge && v.parents.any { vp -> vp.id == p.id } }
+            if (alreadyBridged) {
+                log.info("Bridge Insertion: skipping candidate $candidateId; leaf pair is already bridged")
+                continue
+            }
 
             // Enforce bridgeParentBudget
             val uCount = bridgedLeaves.getOrDefault(u.id, 0)
