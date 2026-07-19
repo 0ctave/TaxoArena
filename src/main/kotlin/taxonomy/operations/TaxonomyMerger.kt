@@ -775,8 +775,8 @@ class TaxonomyMerger(
             u.parents.add(bridgeNode)
             v.parents.add(bridgeNode)
 
-            val pU = u.parents.find { it.id == u.treeParentId }
-            val pV = v.parents.find { it.id == v.treeParentId }
+            val pU = u.parents.find { it.id == u.treeParentId } ?: u.parents.firstOrNull { it.id != bridgeNode.id }
+            val pV = v.parents.find { it.id == v.treeParentId } ?: v.parents.firstOrNull { it.id != bridgeNode.id }
             if (pU != null) {
                 bridgeNode.parents.add(pU)
                 pU.crossLinkChildren.add(bridgeNode)
@@ -841,7 +841,7 @@ class TaxonomyMerger(
             } else {
                 when (policy) {
                     taxonomy.model.TraversalPolicy.TREE_ONLY -> {
-                        val treeParent = n.parents.find { it.id == n.treeParentId }
+                        val treeParent = n.parents.find { it.id == n.treeParentId } ?: n.parents.firstOrNull()
                         if (treeParent != null) {
                             walk(treeParent)
                         }

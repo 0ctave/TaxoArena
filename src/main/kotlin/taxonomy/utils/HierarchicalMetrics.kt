@@ -44,7 +44,7 @@ private fun ancestorsInclusive(node: GraphNode, policy: TraversalPolicy = Traver
         if (!out.add(n)) return
         when (policy) {
             TraversalPolicy.TREE_ONLY -> {
-                val treeParent = n.parents.find { it.id == n.treeParentId }
+                val treeParent = n.parents.find { it.id == n.treeParentId } ?: n.parents.firstOrNull()
                 if (treeParent != null) walk(treeParent)
             }
             TraversalPolicy.BRIDGE_ONLY -> {

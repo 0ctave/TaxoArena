@@ -110,7 +110,7 @@ class TaxonomyMetrics(
     // ─────────────────────────────────────────────────────────────────────────
     //  generateReport
     // ─────────────────────────────────────────────────────────────────────────
-    fun generateReport(policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): Report {
+    fun generateReport(policy: TraversalPolicy = TraversalPolicy.TREE_ONLY): Report {
         val allNodes = mutableSetOf<GraphNode>()
         fun walk(n: GraphNode) { if (allNodes.add(n)) n.children.forEach { walk(it) } }
         walk(root)
@@ -375,7 +375,7 @@ class TaxonomyMetrics(
             query to node
         }.toMap()
 
-    private fun getDepth1Ancestors(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.TREE_ONLY): Set<String> {
+    fun getDepth1Ancestors(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.TREE_ONLY): Set<String> {
         val ancestors = mutableSetOf<String>()
         val visited   = mutableSetOf<String>()
         fun walk(n: GraphNode) {
@@ -387,7 +387,7 @@ class TaxonomyMetrics(
             else {
                 when (policy) {
                     TraversalPolicy.TREE_ONLY -> {
-                        val treeParent = n.parents.find { it.id == n.treeParentId }
+                        val treeParent = n.parents.find { it.id == n.treeParentId } ?: n.parents.firstOrNull()
                         if (treeParent != null) {
                             walk(treeParent)
                         }

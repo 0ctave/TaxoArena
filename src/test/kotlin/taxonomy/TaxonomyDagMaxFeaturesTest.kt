@@ -773,4 +773,29 @@ class TaxonomyDagMaxFeaturesTest {
         assertTrue(dotBoth.contains("\"root\" -> \"child\""))
         assertTrue(dotBoth.contains("\"root\" -> \"bridge\""))
     }
+
+    @Test
+    fun `R12 - TaxonomyMetrics generateReport defaults to TREE_ONLY`() {
+        val root = node("root", "Root Node", 0)
+        val domainA = node("domainA", "domainA", 1)
+        val domainB = node("domainB", "domainB", 1)
+        link(root, domainA)
+        link(root, domainB)
+
+        val leafA = node("leafA", "Leaf A", 2)
+        link(domainA, leafA)
+        leafA.queries.add(emb("qA", 1, "domainA"))
+
+        val bridge = node("bridge", "Bridge", 1).apply { isBridge = true }
+        bridge.parents.add(domainA)
+        bridge.parents.add(domainB)
+        bridge.crossLinkChildren.add(leafA)
+        leafA.parents.add(bridge)
+
+        val metrics = TaxonomyMetrics(root, mapOf("domainA" to listOf("qA")))
+        val report = metrics.generateReport()
+        // If the report default policy was DAG_BOTH, leafA would resolve to both domainA and domainB, so contamination would be > 0.
+        // Under TREE_ONLY, leafA resolves strictly to domainA, so contamination is 0.0.
+        assertEquals(0.0, report.contaminationRatio, 1e-9)
+    }
 }

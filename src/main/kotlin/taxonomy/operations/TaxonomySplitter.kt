@@ -415,12 +415,12 @@ class TaxonomySplitter(
 
                     val treeParentId = node.treeParentId
                     val lineage = mutableListOf<String>()
-                    var current: GraphNode? = parents.find { it.id == treeParentId }
+                    var current: GraphNode? = parents.find { it.id == treeParentId } ?: parents.firstOrNull()
                     val visitedLineage = mutableSetOf<String>()
                     while (current != null && visitedLineage.add(current.id)) {
                         lineage.add(0, current.label ?: "Emergent Concept")
                         val nextTreeParentId = current.treeParentId
-                        current = current.parents.find { it.id == nextTreeParentId }
+                        current = current.parents.find { it.id == nextTreeParentId } ?: current.parents.firstOrNull()
                     }
 
                     // Domain anchors: top 1–2 domain names, no counts
