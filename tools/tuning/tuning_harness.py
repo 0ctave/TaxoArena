@@ -545,7 +545,15 @@ def cmd_select(args):
             for idx, r in enumerate(ranked[:10]):
                 hard_status = "PASSED" if r["hard_gates_passed"] else "FAILED"
                 soft_status = "PASSED" if r["soft_gates_passed"] else "FAILED"
-                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {float(r['Top1Accuracy']):.2f}% | {float(r['AnyMatchAccuracy']):.2f}% | {float(r['RoutingECE']):.4f} | {r['assignmentCosineGap']} | {r['tauFunnelFloor']} | {r['minBridgeCoverage']} | {r['splitThreshold']} |\n")
+                
+                top1_val = float(r['Top1Accuracy'])
+                if top1_val <= 1.0:
+                    top1_val *= 100.0
+                anymatch_val = float(r['AnyMatchAccuracy'])
+                if anymatch_val <= 1.0:
+                    anymatch_val *= 100.0
+                    
+                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r['RoutingECE']):.4f} | {r['assignmentCosineGap']} | {r['tauFunnelFloor']} | {r['minBridgeCoverage']} | {r['splitThreshold']} |\n")
                 
             f.write("\n## Gate Failure Explanations (Top 10 Runs)\n\n")
             for idx, r in enumerate(ranked[:10]):

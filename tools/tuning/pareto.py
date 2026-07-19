@@ -49,8 +49,8 @@ def check_soft_gates(row, gates_spec):
         
     # 2. Top1Accuracy_ge
     top1 = float(row.get("Top1Accuracy", 0.0))
-    # Note: Top1Accuracy is stored as percentage in the CSV, e.g. 75.8, so convert threshold if needed.
-    # The gate is Top1Accuracy_ge = 0.756. If stored as percentage in ledger, threshold is 75.6.
+    if top1 <= 1.0:
+        top1 = top1 * 100.0
     ge_val = gates_spec.get("soft", {}).get("Top1Accuracy_ge", 0.756)
     threshold = ge_val if ge_val > 1.0 else ge_val * 100.0
     if top1 < threshold:

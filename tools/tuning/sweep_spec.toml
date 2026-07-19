@@ -1,0 +1,36 @@
+[base]
+config = "experiment_configs/dagmax_feature_on.toml"
+gradle_cmd = "gradlew.bat bootRun"  # For Windows execution
+extra_args = ""
+
+[output]
+runs_dir = "tuning/runs"
+combined_ledger = "tuning/combined_ledger.csv"
+
+[screening]
+design = "L9_3_4"
+seed = 42
+stage = "screen"
+
+[finalists]
+seeds = [137, 2048]
+stage = "validate"
+
+# factor -> {level1, level2, level3}; mapped onto L9 columns A..D
+[factors]
+assignmentCosineGap = [0.02, 0.03, 0.05]
+tauFunnelFloor      = [0.75, 0.80, 0.90]
+minBridgeCoverage   = [25, 50, 75]
+splitThreshold      = [0.01, 0.02, 0.03]  # Maps to separationEpsilon in generated TOML
+
+[gates.hard]
+Acyclic = true
+DuplicateBridgeCount = 0
+OrphanCount = 0
+MaxAssignmentCapRate_le = 0.20
+has_depth2_sourceB = true
+
+[gates.soft]
+AvgMatchCount_band = [1.05, 1.30]
+Top1Accuracy_ge = 0.756
+RoutingECE_le = 0.25
