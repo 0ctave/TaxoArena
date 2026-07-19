@@ -250,22 +250,70 @@ class TaxonomySplitter(
         log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)}) -> Spawning $k children")
 
         // ── Create children and wire topology ────────────────────────────────
-        val newChildren = clusters.mapIndexed { idx, cluster ->
-            createNodeFromCluster(cluster, node, childVmfs[idx])
-        }
+        val allSpawnedLeaves = mutableListOf<GraphNode>()
 
-        for (child in newChildren) {
-            node.children.add(child)
-            child.parents.add(node)
+        for (idx in clusters.indices) {
+            val cluster = clusters[idx]
+            val vmf = childVmfs[idx]
+
+            val domainsInCluster = cluster.map { it.groundTruthCategory.lowercase() }
+                .filter { it.isNotBlank() }
+                .toSet()
+
+            if (domainsInCluster.size >= 2 && config.formalism.enableBridging) {
+                // Route to bridging consumer: Create a bridge node B
+                val bridgeLabel = "bridge::Emergent Bridge #${conceptCounter.getAndIncrement()}"
+                val bridgeNode = GraphNode(label = bridgeLabel, depth = maxOf(2, node.depth)).apply {
+                    vmfMu = vmf.mu
+                    vmfKappa = vmf.kappa
+                    vmfLogNormalizer = vmf.logNormalizer
+                    phaseCompleted = phaseCompleted or PHASE_SPLIT_EVAL
+                    isBridge = true
+                    treeParentId = node.id
+                }
+
+                // Add bridge to parent's cross-links
+                node.crossLinkChildren.add(bridgeNode)
+                bridgeNode.parents.add(node)
+
+                // Group queries by domain to create same-domain leaf sub-clusters under the bridge
+                val domainGroups = cluster.groupBy { it.groundTruthCategory }
+                for ((domain, qList) in domainGroups) {
+                    if (qList.size >= minClusterSize) {
+                        val leafLabel = "Emergent Concept #${conceptCounter.getAndIncrement()} ($domain)"
+                        val leafVmf = fitVmfParams(qList, childDim)
+                        val leafNode = GraphNode(label = leafLabel, depth = bridgeNode.depth + 1).apply {
+                            vmfMu = leafVmf.mu
+                            vmfKappa = leafVmf.kappa
+                            vmfLogNormalizer = leafVmf.logNormalizer
+                            phaseCompleted = phaseCompleted or PHASE_SPLIT_EVAL
+                            treeParentId = bridgeNode.id
+                        }
+                        leafNode.queries.addAll(qList)
+
+                        // Wire leaf under the bridge
+                        bridgeNode.crossLinkChildren.add(leafNode)
+                        leafNode.parents.add(bridgeNode)
+
+                        // Fit immediately
+                        fitter.fitSingleNode(leafNode)
+                        allSpawnedLeaves.add(leafNode)
+                    }
+                }
+            } else {
+                // Normal child
+                val child = createNodeFromCluster(cluster, node, vmf)
+                node.children.add(child)
+                child.parents.add(node)
+                fitter.fitSingleNode(child)
+                allSpawnedLeaves.add(child)
+            }
         }
         node.queries.clear()
 
-        // Fit NiW posteriors for all children immediately
-        for (child in newChildren) fitter.fitSingleNode(child)
-
         // ── Macro-concept decomposition (lowered threshold: 3x instead of 5x) ─
         val macroThreshold = threshold * 3
-        for (child in newChildren) {
+        for (child in allSpawnedLeaves) {
             if (child.queries.size > macroThreshold && child.depth < config.formalism.maxDepth) {
                 log.info("Decomposing macro-cluster '${child.label}' immediately (${child.queries.size} q)")
                 splitSingleNode(child)

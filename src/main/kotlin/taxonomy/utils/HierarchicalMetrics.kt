@@ -1,6 +1,7 @@
 package taxonomy.utils
 
 import taxonomy.model.GraphNode
+import taxonomy.model.TraversalPolicy
 
 /**
  * DAG-aware hierarchical metrics.
@@ -21,9 +22,9 @@ import taxonomy.model.GraphNode
  */
 
 /** All common ancestors of [nodeA] and [nodeB] in the DAG (each node counts as its own ancestor). */
-fun findAllLCAs(nodeA: GraphNode, nodeB: GraphNode): Set<GraphNode> {
-    val ancestorsA = ancestorsInclusive(nodeA)
-    val ancestorsB = ancestorsInclusive(nodeB)
+fun findAllLCAs(nodeA: GraphNode, nodeB: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): Set<GraphNode> {
+    val ancestorsA = ancestorsInclusive(nodeA, policy)
+    val ancestorsB = ancestorsInclusive(nodeB, policy)
     return ancestorsA intersect ancestorsB
 }
 
@@ -33,25 +34,52 @@ fun findAllLCAs(nodeA: GraphNode, nodeB: GraphNode): Set<GraphNode> {
  * choice per Monath et al. (2021). Falls back to [nodeA] when the two share no
  * common ancestor (disconnected components).
  */
-fun shallowLCA(nodeA: GraphNode, nodeB: GraphNode): GraphNode =
-    findAllLCAs(nodeA, nodeB).maxByOrNull { it.depth } ?: nodeA
+fun shallowLCA(nodeA: GraphNode, nodeB: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): GraphNode =
+    findAllLCAs(nodeA, nodeB, policy).maxByOrNull { it.depth } ?: nodeA
 
 /** Ancestors reachable by following parents upward, including the node itself. */
-private fun ancestorsInclusive(node: GraphNode): Set<GraphNode> {
+private fun ancestorsInclusive(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): Set<GraphNode> {
     val out = mutableSetOf<GraphNode>()
-    fun walk(n: GraphNode) { if (out.add(n)) n.parents.forEach { walk(it) } }
+    fun walk(n: GraphNode) {
+        if (!out.add(n)) return
+        when (policy) {
+            TraversalPolicy.TREE_ONLY -> {
+                val treeParent = n.parents.find { it.id == n.treeParentId }
+                if (treeParent != null) walk(treeParent)
+            }
+            TraversalPolicy.BRIDGE_ONLY -> {
+                n.parents.filter { it.isBridge }.forEach { walk(it) }
+            }
+            TraversalPolicy.DAG_BOTH -> {
+                n.parents.forEach { walk(it) }
+            }
+        }
+    }
     walk(node)
     return out
 }
 
 /** Strict ancestors (parents transitively), excluding the node itself. */
-fun dagAllAncestors(node: GraphNode): Set<GraphNode> =
-    ancestorsInclusive(node) - node
+fun dagAllAncestors(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): Set<GraphNode> =
+    ancestorsInclusive(node, policy) - node
 
 /** All nodes in the tree-subtree rooted at [node] (itself + transitive tree children). */
-private fun subtreeNodes(node: GraphNode): Set<GraphNode> {
+private fun subtreeNodes(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): Set<GraphNode> {
     val out = mutableSetOf<GraphNode>()
-    fun walk(n: GraphNode) { if (out.add(n)) n.children.forEach { walk(it) } }
+    fun walk(n: GraphNode) {
+        if (!out.add(n)) return
+        when (policy) {
+            TraversalPolicy.TREE_ONLY -> {
+                n.children.forEach { walk(it) }
+            }
+            TraversalPolicy.BRIDGE_ONLY -> {
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+            TraversalPolicy.DAG_BOTH -> {
+                (n.children + n.crossLinkChildren).forEach { walk(it) }
+            }
+        }
+    }
     walk(node)
     return out
 }
@@ -70,6 +98,7 @@ private fun subtreeNodes(node: GraphNode): Set<GraphNode> {
 fun dagDendrogramPurity(
     queryAssignments: Map<String, GraphNode>,
     groundTruth: Map<String, String>,
+    policy: TraversalPolicy = TraversalPolicy.DAG_BOTH
 ): Double {
     // queries with both an assignment and a known label, grouped by label
     val labelled = queryAssignments.keys
@@ -86,7 +115,7 @@ fun dagDendrogramPurity(
     }
 
     val subtreeCache = HashMap<GraphNode, Set<GraphNode>>()
-    fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n) }
+    fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n, policy) }
 
     var pure = 0
     var total = 0
@@ -94,7 +123,7 @@ fun dagDendrogramPurity(
         for (i in queries.indices) for (j in i + 1 until queries.size) {
             val a = queryAssignments.getValue(queries[i])
             val b = queryAssignments.getValue(queries[j])
-            val lca = shallowLCA(a, b)
+            val lca = shallowLCA(a, b, policy)
             total++
             val subtree = subtreeOf(lca)
             val allSameLabel = subtree.all { node ->
@@ -123,6 +152,7 @@ fun dagDendrogramPurity(
 fun computeHierarchicalF1(
     predicted: Map<String, GraphNode>,
     groundTruth: Map<String, GraphNode>,
+    policy: TraversalPolicy = TraversalPolicy.DAG_BOTH
 ): Triple<Double, Double, Double> {
     var numerator = 0.0
     var predDenom = 0.0
@@ -130,8 +160,8 @@ fun computeHierarchicalF1(
 
     for ((queryId, predLeaf) in predicted) {
         val trueLeaf = groundTruth[queryId] ?: continue
-        val predAncestors = dagAllAncestors(predLeaf) + predLeaf
-        val trueAncestors = dagAllAncestors(trueLeaf) + trueLeaf
+        val predAncestors = dagAllAncestors(predLeaf, policy) + predLeaf
+        val trueAncestors = dagAllAncestors(trueLeaf, policy) + trueLeaf
 
         numerator += (predAncestors intersect trueAncestors).size.toDouble()
         predDenom += predAncestors.size.toDouble()

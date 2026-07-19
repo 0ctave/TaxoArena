@@ -14,6 +14,7 @@ import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.operations.TaxonomyMerger
 import taxonomy.operations.TaxonomyTrickler
 import taxonomy.service.TaxonomyPersistence
+import taxonomy.dataset.CachedQuery
 import taxonomy.tui.service.BatchTrickleEvaluator
 import taxonomy.tui.service.BatchTrickleEvaluator.ProfileMode
 import taxonomy.utils.TaxonomyMetrics
@@ -32,6 +33,12 @@ class TaxonomyDagMaxFeaturesTest {
 
     private fun emb(text: String, queryId: Int = -1, gtCat: String = ""): Embedding {
         val e = Embedding(text, text, floatArrayOf(0.1f, 0.2f), gtCat)
+        e.queryId = queryId
+        return e
+    }
+
+    private fun embWithVec(text: String, queryId: Int, gtCat: String, vector: FloatArray): Embedding {
+        val e = Embedding(text, text, vector, gtCat)
         e.queryId = queryId
         return e
     }
@@ -252,7 +259,7 @@ class TaxonomyDagMaxFeaturesTest {
 
         // Mock DB batch lookup for loading
         `when`(mockEmbeddingCache.getQueriesBatch(setOf(qId)))
-            .thenReturn(mapOf(qId to Triple("test-query", "test-query", "")))
+            .thenReturn(mapOf(qId to CachedQuery("test-query", "test-query", "", 999)))
         `when`(mockEmbeddingCache.getBatch(setOf("test-query")))
             .thenReturn(mapOf("test-query" to floatArrayOf(0.1f, 0.2f)))
 
@@ -434,8 +441,8 @@ class TaxonomyDagMaxFeaturesTest {
         link(domainA, leafA)
         link(domainB, leafB)
 
-        // Make leafA an ancestor of leafB directly via tree children to create a potential cycle if linked back.
-        leafA.children.add(leafB)
+        // Make leafA an ancestor of leafB directly via cross-links to keep leafA as a leaf node.
+        leafA.crossLinkChildren.add(leafB)
         leafB.parents.add(leafA)
 
         leafA.vmfMu = floatArrayOf(1.0f, 0.0f)
@@ -544,5 +551,202 @@ class TaxonomyDagMaxFeaturesTest {
         }
         walk2(root2)
         assertTrue(allNodes2.none { it.isBridge }, "Bridge should be rejected due to bridgeParentBudget")
+    }
+
+    @Test
+    fun `R8 - bridgeMaxArity enforcement`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableBridging = true
+        config.formalism.separationEpsilon = 0.01
+        config.formalism.bridgeSeparationCeiling = 0.5
+        config.formalism.maxBridgeNodes = 5
+        config.formalism.bridgeMaxArity = 1
+
+        val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
+
+        val root = node("root", "Root Domain", 0)
+        val domainA = node("domainA", "Domain A", 1)
+        val domainB = node("domainB", "Domain B", 1)
+        link(root, domainA)
+        link(root, domainB)
+
+        val leafA = node("leafA", "Leaf A", 2)
+        val leafB = node("leafB", "Leaf B", 2)
+        link(domainA, leafA)
+        link(domainB, leafB)
+
+        leafA.vmfMu = floatArrayOf(1.0f, 0.0f)
+        leafA.vmfKappa = 10.0
+        leafB.vmfMu = floatArrayOf(0.98f, 0.2f)
+        leafB.vmfKappa = 10.0
+
+        leafA.queries.add(emb("queryA", 1, "domainA"))
+        leafB.queries.add(emb("queryB", 2, "domainB"))
+
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
+
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (allNodes.add(n)) {
+                n.children.forEach { walk(it) }
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+        }
+        walk(root)
+        assertTrue(allNodes.none { it.isBridge }, "Bridges should not form if bridgeMaxArity < 2")
+    }
+
+    @Test
+    fun `R9 - Phase 2_2 and Source-B handoff`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableBridging = true
+        config.formalism.minClusterSize = 2
+        config.formalism.maxDepth = 5
+        config.formalism.separationEpsilon = 0.001
+
+        val parent = node("parent", "Parent Node", 1)
+        parent.vmfKappa = 1.0
+
+        val q1 = embWithVec("q1", 1, "domainA", floatArrayOf(1.0f, 0.0f))
+        val q2 = embWithVec("q2", 2, "domainA", floatArrayOf(1.0f, 0.01f))
+        val q3 = embWithVec("q3", 3, "domainB", floatArrayOf(1.0f, -0.01f))
+        val q4 = embWithVec("q4", 4, "domainB", floatArrayOf(1.0f, 0.02f))
+
+        val q5 = embWithVec("q5", 5, "domainC", floatArrayOf(-1.0f, 0.0f))
+        val q6 = embWithVec("q6", 6, "domainC", floatArrayOf(-1.0f, 0.01f))
+        val q7 = embWithVec("q7", 7, "domainD", floatArrayOf(-1.0f, -0.01f))
+        val q8 = embWithVec("q8", 8, "domainD", floatArrayOf(-1.0f, 0.02f))
+
+        parent.queries.addAll(listOf(q1, q2, q3, q4, q5, q6, q7, q8))
+
+        val splitter = taxonomy.operations.TaxonomySplitter(
+            config,
+            mock(TaxonomyLlmClient::class.java),
+            mock(MMLUDatasetFetcher::class.java),
+            mock(TaxonomyFitter::class.java)
+        )
+
+        kotlinx.coroutines.runBlocking {
+            splitter.splitSingleNode(parent)
+        }
+
+        assertTrue(parent.children.isEmpty(), "Parent should have no standard children if all split parts were cross-domain")
+        assertEquals(2, parent.crossLinkChildren.size, "Parent should have 2 bridge children")
+
+        val bridge1 = parent.crossLinkChildren.elementAt(0)
+        val bridge2 = parent.crossLinkChildren.elementAt(1)
+        assertTrue(bridge1.isBridge)
+        assertTrue(bridge2.isBridge)
+        assertTrue(bridge1.queries.isEmpty(), "Bridges must be query-less")
+        assertTrue(bridge2.queries.isEmpty(), "Bridges must be query-less")
+
+        assertEquals(2, bridge1.crossLinkChildren.size)
+        assertEquals(2, bridge2.crossLinkChildren.size)
+        assertTrue(bridge1.crossLinkChildren.all { n -> !n.isBridge })
+    }
+
+    @Test
+    fun `R10 - snapshot version-keyed migration`() {
+        val config = TaxonomyConfig()
+        val cache = mock(EmbeddingCache::class.java)
+
+        val qId = "q_1234"
+        `when`(cache.getQueriesBatch(setOf(qId))).thenReturn(mapOf(
+            qId to CachedQuery("raw text", "distilled text", "category", 999)
+        ))
+        `when`(cache.getBatch(setOf("distilled text"))).thenReturn(mapOf(
+            "distilled text" to floatArrayOf(1.0f, 0.0f)
+        ))
+
+        val persistence = TaxonomyPersistence(config, cache)
+
+        val tempFile = File.createTempFile("taxo_test_v2", ".json")
+        tempFile.deleteOnExit()
+
+        val jsonContentV2 = """
+        {
+          "rootId": "root",
+          "distillationEnabled": false,
+          "version": 2,
+          "nodes": [
+            {
+              "id": "root",
+              "label": "Root",
+              "depth": 0,
+              "childIds": [],
+              "crossLinkChildIds": [],
+              "parentIds": [],
+              "queryIds": ["$qId"]
+            }
+          ]
+        }
+        """.trimIndent()
+        tempFile.writeText(jsonContentV2)
+        // Clear registry to avoid interference
+        taxonomy.model.QuestionIdRegistry.clear()
+
+        val rootV2 = persistence.load(tempFile.absolutePath)
+        assertNotNull(rootV2)
+        val embV2 = rootV2!!.queries.first()
+        assertEquals(999, embV2.queryId, "Version 2 should bypass registry lookup and use stored query_id directly")
+
+        // Register legacy mapping for version 1 test
+        taxonomy.model.QuestionIdRegistry.register("raw text", 888)
+
+        val jsonContentV1 = """
+        {
+          "rootId": "root",
+          "distillationEnabled": false,
+          "version": 1,
+          "nodes": [
+            {
+              "id": "root",
+              "label": "Root",
+              "depth": 0,
+              "childIds": [],
+              "crossLinkChildIds": [],
+              "parentIds": [],
+              "queryIds": ["$qId"]
+            }
+          ]
+        }
+        """.trimIndent()
+        tempFile.writeText(jsonContentV1)
+
+        val rootV1 = persistence.load(tempFile.absolutePath)
+        assertNotNull(rootV1)
+        val embV1 = rootV1!!.queries.first()
+        assertEquals(888, embV1.queryId, "Version 1 should fall back to registry lookup when query_id is -1 or legacy is active")
+    }
+
+    @Test
+    fun `R11 - TraversalPolicy visualizer and metrics consistency`() {
+        val root = node("root", "Root", 0)
+        val child = node("child", "Child", 1)
+        val bridge = node("bridge", "Bridge", 1).apply { isBridge = true }
+
+        root.children.add(child)
+        child.parents.add(root)
+
+        root.crossLinkChildren.add(bridge)
+        bridge.parents.add(root)
+
+        val ops = taxonomy.operations.TaxonomyOperations(
+            mock(TaxonomyFitter::class.java),
+            mock(TaxonomyTrickler::class.java),
+            mock(taxonomy.operations.TaxonomySplitter::class.java),
+            mock(TaxonomyMerger::class.java),
+            TaxonomyConfig()
+        )
+
+        val dotTree = ops.exportToDot(root, TraversalPolicy.TREE_ONLY)
+        assertTrue(dotTree.contains("\"root\" -> \"child\""))
+        assertFalse(dotTree.contains("\"root\" -> \"bridge\""))
+
+        val dotBoth = ops.exportToDot(root, TraversalPolicy.DAG_BOTH)
+        assertTrue(dotBoth.contains("\"root\" -> \"child\""))
+        assertTrue(dotBoth.contains("\"root\" -> \"bridge\""))
     }
 }

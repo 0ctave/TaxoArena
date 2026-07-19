@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.EmbeddingCache
+import taxonomy.dataset.CachedQuery
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
 import java.io.File
@@ -46,7 +47,7 @@ data class SerializedGraph(
     val rootId: String,
     val nodes: List<SerialNode>,
     val distillationEnabled: Boolean = false,
-    val version: Int = 2
+    val version: Int = 1
 )
 
 @Component
@@ -82,7 +83,7 @@ class TaxonomyPersistence(
         val globalQueries = allNodes.flatMap { it.queries }.distinctBy { it.rawText }
         globalQueries.forEach { q ->
             val qId = "q_${hashQuery(q.rawText)}"
-            embeddingCache.putQuery(qId, q.rawText, q.distilledText, q.groundTruthCategory)
+            embeddingCache.putQuery(qId, q.rawText, q.distilledText, q.groundTruthCategory, q.queryId)
         }
 
         // 2. Map nodes to SerialNodes
@@ -119,7 +120,8 @@ class TaxonomyPersistence(
         val serialized = SerializedGraph(
             rootId = root.id, 
             nodes = serialNodes,
-            distillationEnabled = false
+            distillationEnabled = false,
+            version = 2
         )
         
         File(path).writeText(json.encodeToString(serialized))
@@ -134,11 +136,12 @@ class TaxonomyPersistence(
 
         log.info("Loading Vector-Offloaded taxonomy from $path...")
         val serialized = json.decodeFromString<SerializedGraph>(file.readText())
-        log.info("Loaded serialized graph version: ${serialized.version}")
+        val isLegacy = serialized.version < 2
+        log.info("Loaded serialized graph version: ${serialized.version} (legacy: $isLegacy)")
 
         val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
-        val queryRowMap: Map<String, Triple<String, String, String>> = embeddingCache.getQueriesBatch(allQueryIds)
-        val allDistilled = queryRowMap.values.map { it.second }.toSet()
+        val queryRowMap: Map<String, CachedQuery> = embeddingCache.getQueriesBatch(allQueryIds)
+        val allDistilled = queryRowMap.values.map { it.distilledText }.toSet()
         val vectorMap = embeddingCache.getBatch(allDistilled)
 
         val nodeMap = serialized.nodes.associate { sNode ->
@@ -169,9 +172,16 @@ class TaxonomyPersistence(
                 phaseCompleted = sNode.phaseCompleted
 
                 sNode.queryIds.forEach { qId ->
-                    val (raw, distilled, gtCat) = queryRowMap[qId] ?: return@forEach
+                    val qRow = queryRowMap[qId] ?: return@forEach
+                    val raw = qRow.rawText
+                    val distilled = qRow.distilledText
+                    val gtCat = qRow.groundTruthCategory
                     val vector = vectorMap[distilled] ?: return@forEach
-                    val resolvedId = taxonomy.model.QuestionIdRegistry.lookup(raw) ?: qId.toIntOrNull() ?: -1
+                    val resolvedId = if (isLegacy) {
+                        taxonomy.model.QuestionIdRegistry.lookup(raw) ?: qRow.queryId.takeIf { it != -1 } ?: qId.toIntOrNull() ?: -1
+                    } else {
+                        qRow.queryId.takeIf { it != -1 } ?: qId.toIntOrNull() ?: -1
+                    }
                     val emb = Embedding(raw, distilled, vector, gtCat)
                     emb.queryId = resolvedId
                     queries.add(emb)

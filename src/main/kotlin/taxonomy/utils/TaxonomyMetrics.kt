@@ -110,7 +110,7 @@ class TaxonomyMetrics(
     // ─────────────────────────────────────────────────────────────────────────
     //  generateReport
     // ─────────────────────────────────────────────────────────────────────────
-    fun generateReport(): Report {
+    fun generateReport(policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): Report {
         val allNodes = mutableSetOf<GraphNode>()
         fun walk(n: GraphNode) { if (allNodes.add(n)) n.children.forEach { walk(it) } }
         walk(root)
@@ -168,7 +168,7 @@ class TaxonomyMetrics(
         var contaminatedCount      = 0
         var totalMappedLeafQueries = 0
         leaves.forEach { leaf ->
-            val leafDomains = getDepth1Ancestors(leaf).map { it.lowercase() }.toSet()
+            val leafDomains = getDepth1Ancestors(leaf, policy).map { it.lowercase() }.toSet()
             leaf.queries.forEach { emb ->
                 val gt = groundTruthMap[emb.rawText]
                 if (gt != null && leafDomains.isNotEmpty()) {
@@ -211,7 +211,7 @@ class TaxonomyMetrics(
         // Using raw leaf IDs (hundreds of distinct values) against 13 GT labels caused
         // H(predicted) >> H(GT), making MI negligible → NMI ≈ 0 always.
         val predSimple = queryToPrimaryLeaf.mapValues { (_, leaf) ->
-            getDepth1Ancestors(leaf).firstOrNull() ?: leaf.id
+            getDepth1Ancestors(leaf, policy).firstOrNull() ?: leaf.id
         }
 
         // Predicted covering: the set of leaves each query is assigned to.
@@ -260,13 +260,13 @@ class TaxonomyMetrics(
         val weightedLeafPurity = calculateWeightedLeafPurity(leaves, gtSimple)
         // DAG-compatible Dendrogram Purity (Monath et al. 2021): uses the
         // shallowest LCA, which is well-defined under polyhierarchy.
-        val dendrogramPurity  = dagDendrogramPurity(queryToPrimaryLeaf, gtSimple)
-        val edgeF1            = calculateEdgeF1(allNodes, queryToLeavesList, gtSimple)
+        val dendrogramPurity  = dagDendrogramPurity(queryToPrimaryLeaf, gtSimple, policy)
+        val edgeF1            = calculateEdgeF1(allNodes, queryToLeavesList, gtSimple, policy)
 
         // Hierarchical F₁ (Kosmopoulos et al. 2014) over the real per-query true leaves;
         // the predicted leaf is the argmax (max-κ) routed leaf computed above.
         val (hPrecision, hRecall, hF1) =
-            computeHierarchicalF1(queryToPrimaryLeaf, groundTruthLeaves)
+            computeHierarchicalF1(queryToPrimaryLeaf, groundTruthLeaves, policy)
 
         val sphericalSilhouette = run {
             val byDepth    = leaves.filter { it.vmfMu.isNotEmpty() }.groupBy { it.depth }
@@ -294,7 +294,7 @@ class TaxonomyMetrics(
             .groupBy { it.depth }
             .mapValues { (_, nodes) -> nodes.map { it.vmfKappa }.average() }
 
-        val ancestorCorrectRate = calculateAncestorCorrectRate(queryToLeavesList, gtSimple)
+        val ancestorCorrectRate = calculateAncestorCorrectRate(queryToLeavesList, gtSimple, policy)
         val leafDistribEntropy  = calculateLeafDistributionEntropy(leaves)
 
         // ── Publication-grade metrics (PR #49) ──
@@ -448,13 +448,14 @@ class TaxonomyMetrics(
     private fun calculateEdgeF1(
         allNodes:          Set<GraphNode>,
         queryToLeavesList: Map<String, List<GraphNode>>,
-        gt:                Map<String, String>
+        gt:                Map<String, String>,
+        policy:            TraversalPolicy
     ): Double {
         val nonRootNodes = allNodes.filter { it.depth > 0 }
         var totalEdges = 0; var correctEdges = 0
         for (node in nonRootNodes) for (p in node.parents) {
             totalEdges++
-            if (p.depth == 0 || getDepth1Ancestors(p).intersect(getDepth1Ancestors(node)).isNotEmpty())
+            if (p.depth == 0 || getDepth1Ancestors(p, policy).intersect(getDepth1Ancestors(node, policy)).isNotEmpty())
                 correctEdges++
         }
         val precision = if (totalEdges > 0) correctEdges.toDouble() / totalEdges else 1.0
@@ -464,7 +465,7 @@ class TaxonomyMetrics(
         for (text in leafQ) {
             val gtCat       = gt[text] ?: continue
             val primaryLeaf = queryToLeavesList[text]?.maxByOrNull { it.vmfKappa } ?: continue
-            if (getDepth1Ancestors(primaryLeaf).any { it.equals(gtCat, ignoreCase = true) }) recovered++
+            if (getDepth1Ancestors(primaryLeaf, policy).any { it.equals(gtCat, ignoreCase = true) }) recovered++
         }
         val recall = if (leafQ.isNotEmpty()) recovered.toDouble() / leafQ.size else 1.0
 
@@ -474,7 +475,8 @@ class TaxonomyMetrics(
 
     fun calculateAncestorCorrectRate(
         queryToLeavesList: Map<String, List<GraphNode>>,
-        gt:                Map<String, String>
+        gt:                Map<String, String>,
+        policy:            TraversalPolicy
     ): Double {
         if (gt.isEmpty()) return 0.0
         var correct = 0; var total = 0; var skipped = 0
@@ -483,7 +485,7 @@ class TaxonomyMetrics(
             if (matchedLeaves == null) { skipped++; continue }
             total++
             if (matchedLeaves.any { leaf ->
-                    getDepth1Ancestors(leaf).any { it.equals(domain, ignoreCase = true) }
+                    getDepth1Ancestors(leaf, policy).any { it.equals(domain, ignoreCase = true) }
                 }) correct++
         }
         if (skipped > 0) log.debug("ancestorCorrectRate: $skipped queries excluded (residuals)")

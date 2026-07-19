@@ -592,6 +592,12 @@ class TaxonomyMerger(
     }
 
     internal suspend fun insertBridgingParents(root: GraphNode, iteration: Int) {
+        val maxArity = config.formalism.bridgeMaxArity
+        if (maxArity < 2) {
+            log.info("Bridge Insertion: bridgeMaxArity $maxArity is less than 2. Skipping bridging.")
+            return
+        }
+
         val leaves = collectAllLeaves(root)
         var bridgesCreated = 0
         

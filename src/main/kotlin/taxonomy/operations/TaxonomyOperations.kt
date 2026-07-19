@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 import taxonomy.config.TaxonomyConfig
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
+import taxonomy.model.TraversalPolicy
 import kotlin.math.exp
 
 /**
@@ -123,7 +124,7 @@ class TaxonomyOperations(
         return visited.size
     }
 
-    fun exportToDot(root: GraphNode): String {
+    fun exportToDot(root: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH): String {
         val sb = StringBuilder()
         sb.append("digraph Taxonomy {\n")
         sb.append("  rankdir=LR;\n")
@@ -140,23 +141,27 @@ class TaxonomyOperations(
             val shape = if (node.isBridge) "doublecircle" else "box"
             sb.append("  \"${node.id}\" [label=\"${node.label}\\n(${node.queries.size} q)\", fillcolor=$color, shape=$shape];\n")
 
-            node.children.forEach { child ->
-                val edge = "\"${node.id}\" -> \"${child.id}\""
-                if (!edges.contains(edge)) {
-                    edges.add(edge)
-                    sb.append("  $edge;\n")
+            if (policy == TraversalPolicy.TREE_ONLY || policy == TraversalPolicy.DAG_BOTH) {
+                node.children.forEach { child ->
+                    val edge = "\"${node.id}\" -> \"${child.id}\""
+                    if (!edges.contains(edge)) {
+                        edges.add(edge)
+                        sb.append("  $edge;\n")
+                    }
+                    walk(child)
                 }
-                walk(child)
             }
 
-            node.crossLinkChildren.forEach { child ->
-                val edge = "\"${node.id}\" -> \"${child.id}\" [style=dashed, color=red]"
-                val key = "\"${node.id}\" -> \"${child.id}\""
-                if (!edges.contains(key)) {
-                    edges.add(key)
-                    sb.append("  $edge;\n")
+            if (policy == TraversalPolicy.BRIDGE_ONLY || policy == TraversalPolicy.DAG_BOTH) {
+                node.crossLinkChildren.forEach { child ->
+                    val edge = "\"${node.id}\" -> \"${child.id}\" [style=dashed, color=red]"
+                    val key = "\"${node.id}\" -> \"${child.id}\""
+                    if (!edges.contains(key)) {
+                        edges.add(key)
+                        sb.append("  $edge;\n")
+                    }
+                    walk(child)
                 }
-                walk(child)
             }
         }
 
@@ -165,18 +170,18 @@ class TaxonomyOperations(
         return sb.toString()
     }
 
-    fun printHierarchy(root: GraphNode) {
+    fun printHierarchy(root: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH) {
         val sb = java.lang.StringBuilder()
         sb.append("\n┌── TAXONOMY DAG HIERARCHY ───────────────────────────────\n")
-        buildTreeString(root, "│ ", true, sb, mutableSetOf())
+        buildTreeString(root, "│ ", true, sb, mutableSetOf(), false, policy)
         sb.append("└─────────────────────────────────────────────────────────")
         log.info(sb.toString())
     }
 
-    fun printHierarchyCompact(root: GraphNode) {
+    fun printHierarchyCompact(root: GraphNode, policy: TraversalPolicy = TraversalPolicy.DAG_BOTH) {
         val sb = java.lang.StringBuilder()
         sb.append("\n┌── TAXONOMY HIERARCHY ───────────────────────────────────\n")
-        buildTreeStringCompact(root, "│ ", true, sb, mutableSetOf())
+        buildTreeStringCompact(root, "│ ", true, sb, mutableSetOf(), false, policy)
         sb.append("└─────────────────────────────────────────────────────────")
         log.info(sb.toString())
     }
@@ -187,7 +192,8 @@ class TaxonomyOperations(
         isTail: Boolean,
         sb: java.lang.StringBuilder,
         visited: MutableSet<String>,
-        isCrossEdge: Boolean = false
+        isCrossEdge: Boolean = false,
+        policy: TraversalPolicy = TraversalPolicy.DAG_BOTH
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
@@ -206,15 +212,15 @@ class TaxonomyOperations(
         if (visited.contains(node.id)) return
         visited.add(node.id)
 
-        val children = node.children.toList()
-        val crossLinks = node.crossLinkChildren.toList()
+        val children = if (policy == TraversalPolicy.TREE_ONLY || policy == TraversalPolicy.DAG_BOTH) node.children.toList() else emptyList()
+        val crossLinks = if (policy == TraversalPolicy.BRIDGE_ONLY || policy == TraversalPolicy.DAG_BOTH) node.crossLinkChildren.toList() else emptyList()
         val allChildren = children + crossLinks
         for (i in allChildren.indices) {
             val child = allChildren[i]
             val childIsTail = i == allChildren.size - 1
             val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "│   "
             val childIsCross = i >= children.size
-            buildTreeStringCompact(child, nextPrefix, childIsTail, sb, visited, childIsCross)
+            buildTreeStringCompact(child, nextPrefix, childIsTail, sb, visited, childIsCross, policy)
         }
     }
 
@@ -224,7 +230,8 @@ class TaxonomyOperations(
         isTail: Boolean,
         sb: java.lang.StringBuilder,
         visited: MutableSet<String>,
-        isCrossEdge: Boolean = false
+        isCrossEdge: Boolean = false,
+        policy: TraversalPolicy = TraversalPolicy.DAG_BOTH
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
@@ -241,15 +248,15 @@ class TaxonomyOperations(
         if (visited.contains(node.id)) return
         visited.add(node.id)
 
-        val children = node.children.toList()
-        val crossLinks = node.crossLinkChildren.toList()
+        val children = if (policy == TraversalPolicy.TREE_ONLY || policy == TraversalPolicy.DAG_BOTH) node.children.toList() else emptyList()
+        val crossLinks = if (policy == TraversalPolicy.BRIDGE_ONLY || policy == TraversalPolicy.DAG_BOTH) node.crossLinkChildren.toList() else emptyList()
         val allChildren = children + crossLinks
         for (i in allChildren.indices) {
             val child = allChildren[i]
             val childIsTail = i == allChildren.size - 1
             val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "│   "
             val childIsCross = i >= children.size
-            buildTreeString(child, nextPrefix, childIsTail, sb, visited, childIsCross)
+            buildTreeString(child, nextPrefix, childIsTail, sb, visited, childIsCross, policy)
         }
     }
 

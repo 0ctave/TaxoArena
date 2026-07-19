@@ -19,6 +19,10 @@ object QuestionIdRegistry {
     fun lookup(text: String): Int? {
         return textToId[text] ?: textToId[TextNormalizer.cleanText(text)]
     }
+
+    fun clear() {
+        textToId.clear()
+    }
 }
 
 /**

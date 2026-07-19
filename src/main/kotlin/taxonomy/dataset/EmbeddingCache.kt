@@ -14,6 +14,13 @@ import taxonomy.model.dimForDepth
 import java.sql.DriverManager
 import java.util.concurrent.ConcurrentHashMap
 
+data class CachedQuery(
+    val rawText: String,
+    val distilledText: String,
+    val groundTruthCategory: String,
+    val queryId: Int
+)
+
 @Service
 class EmbeddingCache(
     private val config: TaxonomyConfig,
@@ -79,13 +86,17 @@ class EmbeddingCache(
                             id TEXT PRIMARY KEY,
                             raw_text TEXT,
                             distilled_text TEXT,
-                            ground_truth_category TEXT DEFAULT ''
+                            ground_truth_category TEXT DEFAULT '',
+                            query_id INTEGER DEFAULT -1
                         )
                     """.trimIndent()
                     )
 
                     try {
                         stmt.execute("ALTER TABLE queries ADD COLUMN ground_truth_category TEXT DEFAULT ''")
+                    } catch (_: Exception) {}
+                    try {
+                        stmt.execute("ALTER TABLE queries ADD COLUMN query_id INTEGER DEFAULT -1")
                     } catch (_: Exception) {}
                 }
             }
@@ -95,15 +106,16 @@ class EmbeddingCache(
         }
     }
 
-    fun putQuery(id: String, raw: String, distilled: String, groundTruthCategory: String = "") {
+    fun putQuery(id: String, raw: String, distilled: String, groundTruthCategory: String = "", queryId: Int = -1) {
         try {
             withConn { conn ->
-                conn.prepareStatement("INSERT OR REPLACE INTO queries (id, raw_text, distilled_text, ground_truth_category) VALUES (?, ?, ?, ?)")
+                conn.prepareStatement("INSERT OR REPLACE INTO queries (id, raw_text, distilled_text, ground_truth_category, query_id) VALUES (?, ?, ?, ?, ?)")
                     .use { pstmt ->
                         pstmt.setString(1, id)
                         pstmt.setString(2, raw)
                         pstmt.setString(3, distilled)
                         pstmt.setString(4, groundTruthCategory)
+                        pstmt.setInt(5, queryId)
                         pstmt.executeUpdate()
                     }
             }
@@ -112,17 +124,18 @@ class EmbeddingCache(
         }
     }
 
-    fun getQuery(id: String): Triple<String, String, String>? {
+    fun getQuery(id: String): CachedQuery? {
         try {
             withConn { conn ->
-                conn.prepareStatement("SELECT raw_text, distilled_text, ground_truth_category FROM queries WHERE id = ?").use { pstmt ->
+                conn.prepareStatement("SELECT raw_text, distilled_text, ground_truth_category, query_id FROM queries WHERE id = ?").use { pstmt ->
                     pstmt.setString(1, id)
                     val rs = pstmt.executeQuery()
                     if (rs.next()) {
-                        return Triple(
-                            rs.getString("raw_text") ?: "",
-                            rs.getString("distilled_text") ?: "",
-                            rs.getString("ground_truth_category") ?: ""
+                        return CachedQuery(
+                            rawText = rs.getString("raw_text") ?: "",
+                            distilledText = rs.getString("distilled_text") ?: "",
+                            groundTruthCategory = rs.getString("ground_truth_category") ?: "",
+                            queryId = rs.getInt("query_id")
                         )
                     }
                 }
@@ -133,24 +146,25 @@ class EmbeddingCache(
         return null
     }
 
-    fun getQueriesBatch(ids: Collection<String>): Map<String, Triple<String, String, String>> {
+    fun getQueriesBatch(ids: Collection<String>): Map<String, CachedQuery> {
         if (ids.isEmpty()) return emptyMap()
-        val result = mutableMapOf<String, Triple<String, String, String>>()
+        val result = mutableMapOf<String, CachedQuery>()
         try {
             withConn { conn ->
                 // SQLite has a 999-variable limit; chunk to be safe
                 ids.chunked(900).forEach { chunk ->
                     val placeholders = chunk.joinToString(",") { "?" }
                     conn.prepareStatement(
-                        "SELECT id, raw_text, distilled_text, ground_truth_category FROM queries WHERE id IN ($placeholders)"
+                        "SELECT id, raw_text, distilled_text, ground_truth_category, query_id FROM queries WHERE id IN ($placeholders)"
                     ).use { pstmt ->
                         chunk.forEachIndexed { i, id -> pstmt.setString(i + 1, id) }
                         val rs = pstmt.executeQuery()
                         while (rs.next()) {
-                            result[rs.getString("id")] = Triple(
-                                rs.getString("raw_text") ?: "",
-                                rs.getString("distilled_text") ?: "",
-                                rs.getString("ground_truth_category") ?: ""
+                            result[rs.getString("id")] = CachedQuery(
+                                rawText = rs.getString("raw_text") ?: "",
+                                distilledText = rs.getString("distilled_text") ?: "",
+                                groundTruthCategory = rs.getString("ground_truth_category") ?: "",
+                                queryId = rs.getInt("query_id")
                             )
                         }
                     }
