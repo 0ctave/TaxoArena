@@ -136,13 +136,24 @@ class TaxonomyOperations(
             if (visitedNodes.contains(node.id)) return
             visitedNodes.add(node.id)
 
-            val color = if (node.isLeaf) "lightblue" else "lightgrey"
-            sb.append("  \"${node.id}\" [label=\"${node.label}\\n(${node.queries.size} q)\", fillcolor=$color];\n")
+            val color = if (node.isBridge) "lightpink" else if (node.isLeaf) "lightblue" else "lightgrey"
+            val shape = if (node.isBridge) "doublecircle" else "box"
+            sb.append("  \"${node.id}\" [label=\"${node.label}\\n(${node.queries.size} q)\", fillcolor=$color, shape=$shape];\n")
 
             node.children.forEach { child ->
                 val edge = "\"${node.id}\" -> \"${child.id}\""
                 if (!edges.contains(edge)) {
                     edges.add(edge)
+                    sb.append("  $edge;\n")
+                }
+                walk(child)
+            }
+
+            node.crossLinkChildren.forEach { child ->
+                val edge = "\"${node.id}\" -> \"${child.id}\" [style=dashed, color=red]"
+                val key = "\"${node.id}\" -> \"${child.id}\""
+                if (!edges.contains(key)) {
+                    edges.add(key)
                     sb.append("  $edge;\n")
                 }
                 walk(child)
@@ -175,10 +186,12 @@ class TaxonomyOperations(
         prefix: String,
         isTail: Boolean,
         sb: java.lang.StringBuilder,
-        visited: MutableSet<String>
+        visited: MutableSet<String>,
+        isCrossEdge: Boolean = false
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
-        val type = if (node.isLeaf) "Leaf" else "Parent"
+        val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
+        val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent"
         val qCount = node.getRecursiveQueryCount()
         val directQ = node.queries.size
 
@@ -186,18 +199,22 @@ class TaxonomyOperations(
             " (kappa: ${"%.1f".format(java.util.Locale.US, node.vmfKappa)})"
         } else ""
 
-        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$cross"
+        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 
         if (visited.contains(node.id)) return
         visited.add(node.id)
 
-        val children = node.treeChildren.toList()
-        for (i in 0 until children.size) {
-            val childIsTail = i == children.size - 1
+        val children = node.children.toList()
+        val crossLinks = node.crossLinkChildren.toList()
+        val allChildren = children + crossLinks
+        for (i in allChildren.indices) {
+            val child = allChildren[i]
+            val childIsTail = i == allChildren.size - 1
             val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "│   "
-            buildTreeStringCompact(children[i], nextPrefix, childIsTail, sb, visited)
+            val childIsCross = i >= children.size
+            buildTreeStringCompact(child, nextPrefix, childIsTail, sb, visited, childIsCross)
         }
     }
 
@@ -206,16 +223,18 @@ class TaxonomyOperations(
         prefix: String,
         isTail: Boolean,
         sb: java.lang.StringBuilder,
-        visited: MutableSet<String>
+        visited: MutableSet<String>,
+        isCrossEdge: Boolean = false
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
-        val type = if (node.isLeaf) "Leaf" else "Parent/Residual"
+        val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
+        val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent/Residual"
 
         val vmfStats = if (node.vmfMu.isNotEmpty()) {
             " (vMF kappa: ${"%.3f".format(java.util.Locale.US, node.vmfKappa)})"
         } else ""
 
-        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$cross"
+        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 
@@ -223,10 +242,14 @@ class TaxonomyOperations(
         visited.add(node.id)
 
         val children = node.children.toList()
-        for (i in 0 until children.size) {
-            val childIsTail = i == children.size - 1
+        val crossLinks = node.crossLinkChildren.toList()
+        val allChildren = children + crossLinks
+        for (i in allChildren.indices) {
+            val child = allChildren[i]
+            val childIsTail = i == allChildren.size - 1
             val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "│   "
-            buildTreeString(children[i], nextPrefix, childIsTail, sb, visited)
+            val childIsCross = i >= children.size
+            buildTreeString(child, nextPrefix, childIsTail, sb, visited, childIsCross)
         }
     }
 

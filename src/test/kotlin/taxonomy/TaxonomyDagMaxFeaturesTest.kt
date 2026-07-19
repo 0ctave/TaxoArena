@@ -412,4 +412,137 @@ class TaxonomyDagMaxFeaturesTest {
         println("P6 DEBUG: resultB leaves = ${resultB.leaves.keys.map { it.id }}")
         assertTrue(resultB.leaves.keys.contains(leaf2))
     }
+
+    @Test
+    fun `R6 - bridge cycle prevention`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableBridging = true
+        config.formalism.separationEpsilon = 0.01
+        config.formalism.bridgeSeparationCeiling = 0.5
+        config.formalism.maxBridgeNodes = 5
+
+        val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
+
+        val root = node("root", "Root Domain", 0)
+        val domainA = node("domainA", "Domain A", 1)
+        val domainB = node("domainB", "Domain B", 1)
+        link(root, domainA)
+        link(root, domainB)
+
+        val leafA = node("leafA", "Leaf A", 2)
+        val leafB = node("leafB", "Leaf B", 2)
+        link(domainA, leafA)
+        link(domainB, leafB)
+
+        // Make leafA an ancestor of leafB directly via tree children to create a potential cycle if linked back.
+        leafA.children.add(leafB)
+        leafB.parents.add(leafA)
+
+        leafA.vmfMu = floatArrayOf(1.0f, 0.0f)
+        leafA.vmfKappa = 10.0
+        leafB.vmfMu = floatArrayOf(0.98f, 0.2f)
+        leafB.vmfKappa = 10.0
+
+        leafA.queries.add(emb("queryA", 1, "domainA"))
+        leafB.queries.add(emb("queryB", 2, "domainB"))
+
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
+
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (allNodes.add(n)) {
+                n.children.forEach { walk(it) }
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+        }
+        walk(root)
+
+        val bridges = allNodes.filter { it.isBridge }
+        assertTrue(bridges.isEmpty(), "Bridges must not be created if they form a cycle")
+    }
+
+    @Test
+    fun `R7 - bridge explosion budgets and coverage`() {
+        val config = TaxonomyConfig()
+        config.formalism.enableBridging = true
+        config.formalism.separationEpsilon = 0.01
+        config.formalism.bridgeSeparationCeiling = 0.5
+        config.formalism.maxBridgeNodes = 5
+        config.formalism.minBridgeCoverage = 10 // Require at least 10 queries total
+
+        val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
+
+        val root = node("root", "Root Domain", 0)
+        val domainA = node("domainA", "Domain A", 1)
+        val domainB = node("domainB", "Domain B", 1)
+        link(root, domainA)
+        link(root, domainB)
+
+        val leafA = node("leafA", "Leaf A", 2)
+        val leafB = node("leafB", "Leaf B", 2)
+        link(domainA, leafA)
+        link(domainB, leafB)
+
+        leafA.vmfMu = floatArrayOf(1.0f, 0.0f)
+        leafA.vmfKappa = 10.0
+        leafB.vmfMu = floatArrayOf(0.98f, 0.2f)
+        leafB.vmfKappa = 10.0
+
+        // Only 2 queries total (less than minBridgeCoverage of 10)
+        leafA.queries.add(emb("queryA", 1, "domainA"))
+        leafB.queries.add(emb("queryB", 2, "domainB"))
+
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
+
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (allNodes.add(n)) {
+                n.children.forEach { walk(it) }
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+        }
+        walk(root)
+        assertTrue(allNodes.none { it.isBridge }, "Bridge should be rejected due to minBridgeCoverage")
+
+        // Now change minBridgeCoverage to 0, but set bridgeParentBudget to 0
+        config.formalism.minBridgeCoverage = 0
+        config.formalism.bridgeParentBudget = 0
+
+        val root2 = node("root", "Root Domain", 0)
+        val domainA2 = node("domainA", "Domain A", 1)
+        val domainB2 = node("domainB", "Domain B", 1)
+        link(root2, domainA2)
+        link(root2, domainB2)
+
+        val leafA2 = node("leafA", "Leaf A", 2)
+        val leafB2 = node("leafB", "Leaf B", 2)
+        link(domainA2, leafA2)
+        link(domainB2, leafB2)
+
+        leafA2.vmfMu = floatArrayOf(1.0f, 0.0f)
+        leafA2.vmfKappa = 10.0
+        leafB2.vmfMu = floatArrayOf(0.98f, 0.2f)
+        leafB2.vmfKappa = 10.0
+
+        leafA2.queries.add(emb("queryA", 1, "domainA"))
+        leafB2.queries.add(emb("queryB", 2, "domainB"))
+
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root2, 1)
+        }
+
+        val allNodes2 = mutableSetOf<GraphNode>()
+        fun walk2(n: GraphNode) {
+            if (allNodes2.add(n)) {
+                n.children.forEach { walk2(it) }
+                n.crossLinkChildren.forEach { walk2(it) }
+            }
+        }
+        walk2(root2)
+        assertTrue(allNodes2.none { it.isBridge }, "Bridge should be rejected due to bridgeParentBudget")
+    }
 }

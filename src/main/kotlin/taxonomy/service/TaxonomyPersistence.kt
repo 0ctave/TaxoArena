@@ -37,6 +37,7 @@ data class SerialNode(
     val judgeCorpusFingerprint: String? = null,
     val judgeModelVersion: String? = null,
     val isBridge: Boolean = false,
+    val bridgeJsDivergence: Double = 0.0,
     val residualQueries: List<String> = emptyList()
 )
 
@@ -44,7 +45,8 @@ data class SerialNode(
 data class SerializedGraph(
     val rootId: String,
     val nodes: List<SerialNode>,
-    val distillationEnabled: Boolean = false
+    val distillationEnabled: Boolean = false,
+    val version: Int = 2
 )
 
 @Component
@@ -109,6 +111,7 @@ class TaxonomyPersistence(
                 judgeCorpusFingerprint = node.judgeCorpusFingerprint,
                 judgeModelVersion = node.judgeModelVersion,
                 isBridge = node.isBridge,
+                bridgeJsDivergence = node.bridgeJsDivergence,
                 residualQueries = node.residualQueries.toList()
             )
         }
@@ -131,6 +134,7 @@ class TaxonomyPersistence(
 
         log.info("Loading Vector-Offloaded taxonomy from $path...")
         val serialized = json.decodeFromString<SerializedGraph>(file.readText())
+        log.info("Loaded serialized graph version: ${serialized.version}")
 
         val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
         val queryRowMap: Map<String, Triple<String, String, String>> = embeddingCache.getQueriesBatch(allQueryIds)
@@ -145,6 +149,7 @@ class TaxonomyPersistence(
             ).apply {
                 proportionalWeight = sNode.proportionalWeight
                 isBridge = sNode.isBridge
+                bridgeJsDivergence = sNode.bridgeJsDivergence
                 residualQueries.addAll(sNode.residualQueries)
                 judgePrompt = sNode.judgePrompt
                 judgeRubric = sNode.judgeRubric

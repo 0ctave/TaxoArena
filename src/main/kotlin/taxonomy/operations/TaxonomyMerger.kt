@@ -655,17 +655,22 @@ class TaxonomyMerger(
 
         log.info("Bridge Insertion: Found ${candidatePairs.size} candidate pairs in adjacency band [${config.formalism.separationEpsilon}, ${config.formalism.bridgeSeparationCeiling}] after Top-K filtering and sorting")
 
-        val bridgedLeaves = mutableSetOf<String>()
+        val bridgedLeaves = mutableMapOf<String, Int>()
         val domainPairCounts = mutableMapOf<String, Int>()
 
         for (cand in candidatePairs) {
             val u = cand.u
             val v = cand.v
             val div = cand.div
+            val candidateId = "cand_${u.id.take(4)}_${v.id.take(4)}"
             if (bridgesCreated + currentBridgeCount >= maxBridgeNodes) break
 
-            // Enforce bridgeParentBudget = 1 (greedy selection consumes the leaf)
-            if (u.id in bridgedLeaves || v.id in bridgedLeaves) {
+            // Enforce bridgeParentBudget
+            val uCount = bridgedLeaves.getOrDefault(u.id, 0)
+            val vCount = bridgedLeaves.getOrDefault(v.id, 0)
+            val budget = config.formalism.bridgeParentBudget ?: 1
+            if (uCount >= budget || vCount >= budget) {
+                log.info("Bridge Insertion: skipping candidate $candidateId; bridgeParentBudget of $budget exceeded for leaf")
                 continue
             }
 
@@ -681,7 +686,6 @@ class TaxonomyMerger(
                 continue
             }
 
-            val candidateId = "cand_${u.id.take(4)}_${v.id.take(4)}"
             val sourceNodes = "${u.label ?: u.id} + ${v.label ?: v.id}"
             val combinedQueries = u.queries + v.queries
             val size = combinedQueries.size
@@ -708,6 +712,7 @@ class TaxonomyMerger(
                 depth = maxOf(2, minOf(u.depth, v.depth) - 1)
             )
             bridgeNode.isBridge = true
+            bridgeNode.bridgeJsDivergence = div
             bridgeNode.sliceDim = commonDim
 
             val d = commonDim
@@ -773,8 +778,8 @@ class TaxonomyMerger(
                 pV.crossLinkChildren.add(bridgeNode)
             }
 
-            bridgedLeaves.add(u.id)
-            bridgedLeaves.add(v.id)
+            bridgedLeaves[u.id] = uCount + 1
+            bridgedLeaves[v.id] = vCount + 1
             domainPairCounts[domainPairKey] = existingDomainBridges + 1
 
             bridgesCreated++

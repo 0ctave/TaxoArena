@@ -58,6 +58,7 @@ data class GraphNode(
     var judgeRubric: String? = null,
     var judgeGtAgreement: Double? = null,
     var isBridge: Boolean = false,
+    var bridgeJsDivergence: Double = 0.0,
     val residualQueries: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet(),
     val residualConfidences: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap()
 ) {

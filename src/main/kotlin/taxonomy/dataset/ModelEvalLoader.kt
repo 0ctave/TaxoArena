@@ -211,7 +211,7 @@ class ModelEvalLoader(
 
         // Build lookup maps for cross-referencing
         val questionTexts = raw.map { it.question }
-        val mmlProRowIds  = fetchMmlProRowIds(questionTexts)   // question_text → mmlu_pro.id
+        val (mmlProRowIds, dbIdSet) = fetchMmlProRowIdsAndSet(questionTexts)   // question_text → mmlu_pro.id
         val embeddingHits = fetchEmbeddingHits(questionTexts)  // question_text → exists?
 
         // Load existing reserved pool for immediate marking
@@ -242,9 +242,15 @@ class ModelEvalLoader(
                     isReserved   = isReserved
                 )
 
+                val resolvedMmlProId = if (item.question_id >= 0 && dbIdSet.contains(item.question_id)) {
+                    item.question_id
+                } else {
+                    mmlProRowIds[item.question]
+                }
+
                 links += EvalQuestionLink(
                     questionId    = item.question_id,
-                    mmlProRowId   = mmlProRowIds[item.question],
+                    mmlProRowId   = resolvedMmlProId,
                     questionText  = item.question,
                     hasEmbedding  = embeddingHits.contains(item.question)
                 )
@@ -283,15 +289,17 @@ class ModelEvalLoader(
 
     // ─── Cross-reference helpers ──────────────────────────────────────────────
 
-    private fun fetchMmlProRowIds(questions: List<String>): Map<String, Int> {
+    private fun fetchMmlProRowIdsAndSet(questions: List<String>): Pair<Map<String, Int>, Set<Int>> {
         val result = mutableMapOf<String, Int>()
         val normalizedDbMap = mutableMapOf<String, Int>()
+        val dbIdSet = mutableSetOf<Int>()
         DriverManager.getConnection(datasetDbUrl).use { c ->
             c.createStatement().use { stmt ->
                 stmt.executeQuery("SELECT id, question FROM mmlu_pro").use { rs ->
                     while (rs.next()) {
                         val qText = rs.getString("question") ?: ""
                         val qId = rs.getInt("id")
+                        dbIdSet.add(qId)
                         normalizedDbMap[qText] = qId
                         normalizedDbMap[taxonomy.model.TextNormalizer.cleanText(qText)] = qId
                     }
@@ -310,7 +318,7 @@ class ModelEvalLoader(
                 }
             }
         }
-        return result
+        return Pair(result, dbIdSet)
     }
 
     private fun fetchEmbeddingHits(questions: List<String>): Set<String> {

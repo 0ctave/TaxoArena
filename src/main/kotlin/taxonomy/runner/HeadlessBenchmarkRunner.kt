@@ -939,7 +939,7 @@ class HeadlessBenchmarkRunner(
                 val combinedQueries = b.crossLinkChildren.flatMap { it.queries }
                 val coverage = combinedQueries.size
                 val entropyVal = calculateGtEntropyForQueries(combinedQueries)
-                val jsDiv = b.dasguptaDeltaNorm
+                val jsDiv = b.bridgeJsDivergence
                 writer.write("${escapeCsv(b.id)},${escapeCsv(b.label ?: "")},${escapeCsv(memberDomains)},${escapeCsv(childLeafIds)},$coverage,${"%.4f".format(java.util.Locale.US, entropyVal)},${"%.4f".format(java.util.Locale.US, jsDiv)},${b.depth}\n")
             }
         }
