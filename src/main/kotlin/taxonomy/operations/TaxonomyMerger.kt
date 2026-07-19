@@ -816,7 +816,7 @@ class TaxonomyMerger(
         return check(ancestor)
     }
 
-    private fun collectAllLeaves(root: GraphNode): List<GraphNode> {
+    fun collectAllLeaves(root: GraphNode): List<GraphNode> {
         val leaves = mutableListOf<GraphNode>()
         val visited = mutableSetOf<String>()
         fun walk(node: GraphNode) {
@@ -831,7 +831,7 @@ class TaxonomyMerger(
         return leaves
     }
 
-    private fun getDepth1Ancestors(node: GraphNode, policy: taxonomy.model.TraversalPolicy = taxonomy.model.TraversalPolicy.TREE_ONLY): Set<String> {
+    fun getDepth1Ancestors(node: GraphNode, policy: taxonomy.model.TraversalPolicy = taxonomy.model.TraversalPolicy.TREE_ONLY): Set<String> {
         val ancestors = mutableSetOf<String>()
         val visited   = mutableSetOf<String>()
         fun walk(n: GraphNode) {

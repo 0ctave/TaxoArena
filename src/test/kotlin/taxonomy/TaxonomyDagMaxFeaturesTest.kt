@@ -18,6 +18,7 @@ import taxonomy.dataset.CachedQuery
 import taxonomy.tui.service.BatchTrickleEvaluator
 import taxonomy.tui.service.BatchTrickleEvaluator.ProfileMode
 import taxonomy.utils.TaxonomyMetrics
+import taxonomy.utils.StatisticsUtils
 import java.io.File
 import kotlin.math.ln
 
@@ -427,6 +428,7 @@ class TaxonomyDagMaxFeaturesTest {
         config.formalism.separationEpsilon = 0.01
         config.formalism.bridgeSeparationCeiling = 0.5
         config.formalism.maxBridgeNodes = 5
+        config.formalism.minBridgeCoverage = 0
 
         val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
 
@@ -605,21 +607,34 @@ class TaxonomyDagMaxFeaturesTest {
         config.formalism.minClusterSize = 2
         config.formalism.maxDepth = 5
         config.formalism.separationEpsilon = 0.001
+        config.formalism.bridgeSeparationCeiling = 5000.0
+        config.formalism.minBridgeCoverage = 0
+        config.formalism.maxBridgeNodes = 5
 
-        val parent = node("parent", "Parent Node", 1)
+        val root = node("root", "Root Node", 0)
+        val domainA = node("domainA", "domainA", 1)
+        val domainB = node("domainB", "domainB", 1)
+        link(root, domainA)
+        link(root, domainB)
+
+        val parent = node("parent", "Parent Node", 2)
+        link(domainA, parent)
         parent.vmfKappa = 1.0
 
-        val q1 = embWithVec("q1", 1, "domainA", floatArrayOf(1.0f, 0.0f))
-        val q2 = embWithVec("q2", 2, "domainA", floatArrayOf(1.0f, 0.01f))
-        val q3 = embWithVec("q3", 3, "domainB", floatArrayOf(1.0f, -0.01f))
-        val q4 = embWithVec("q4", 4, "domainB", floatArrayOf(1.0f, 0.02f))
+        val leafB = node("leafB", "Leaf B", 2)
+        link(domainB, leafB)
+        leafB.vmfMu = floatArrayOf(0.9f, 0.43f)
+        leafB.vmfKappa = 10.0
+        leafB.queries.add(emb("qB", 9, "domainB"))
 
-        val q5 = embWithVec("q5", 5, "domainC", floatArrayOf(-1.0f, 0.0f))
-        val q6 = embWithVec("q6", 6, "domainC", floatArrayOf(-1.0f, 0.01f))
-        val q7 = embWithVec("q7", 7, "domainD", floatArrayOf(-1.0f, -0.01f))
-        val q8 = embWithVec("q8", 8, "domainD", floatArrayOf(-1.0f, 0.02f))
-
-        parent.queries.addAll(listOf(q1, q2, q3, q4, q5, q6, q7, q8))
+        // parent queries that will split into a cluster close to leafB
+        val q1 = embWithVec("q1", 1, "domainA", floatArrayOf(1.0f, 0.2f))
+        val q2 = embWithVec("q2", 2, "domainA", floatArrayOf(1.0f, 0.21f))
+        val q3 = embWithVec("q3", 3, "domainA", floatArrayOf(1.0f, 0.19f))
+        val q4 = embWithVec("q4", 4, "domainA", floatArrayOf(1.0f, -0.2f))
+        val q5 = embWithVec("q5", 5, "domainA", floatArrayOf(1.0f, -0.21f))
+        val q6 = embWithVec("q6", 6, "domainA", floatArrayOf(1.0f, -0.19f))
+        parent.queries.addAll(listOf(q1, q2, q3, q4, q5, q6))
 
         val splitter = taxonomy.operations.TaxonomySplitter(
             config,
@@ -632,19 +647,28 @@ class TaxonomyDagMaxFeaturesTest {
             splitter.splitSingleNode(parent)
         }
 
-        assertTrue(parent.children.isEmpty(), "Parent should have no standard children if all split parts were cross-domain")
-        assertEquals(2, parent.crossLinkChildren.size, "Parent should have 2 bridge children")
+        // Splitter should create normal children on the backbone
+        assertTrue(parent.children.isNotEmpty(), "Parent should have normal children on backbone")
 
-        val bridge1 = parent.crossLinkChildren.elementAt(0)
-        val bridge2 = parent.crossLinkChildren.elementAt(1)
-        assertTrue(bridge1.isBridge)
-        assertTrue(bridge2.isBridge)
-        assertTrue(bridge1.queries.isEmpty(), "Bridges must be query-less")
-        assertTrue(bridge2.queries.isEmpty(), "Bridges must be query-less")
+        // Now run post-hoc bridging on the root
+        val merger = TaxonomyMerger(config, mock(TaxonomyLlmClient::class.java), mock(MMLUDatasetFetcher::class.java))
+        kotlinx.coroutines.runBlocking {
+            merger.insertBridgingParents(root, 1)
+        }
 
-        assertEquals(2, bridge1.crossLinkChildren.size)
-        assertEquals(2, bridge2.crossLinkChildren.size)
-        assertTrue(bridge1.crossLinkChildren.all { n -> !n.isBridge })
+        // Find bridges in the graph
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (allNodes.add(n)) {
+                n.children.forEach { walk(it) }
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+        }
+        walk(root)
+
+        val bridges = allNodes.filter { it.isBridge }
+        assertTrue(bridges.isNotEmpty(), "Bridges should be created by post-hoc merger")
+        assertTrue(bridges.all { it.queries.isEmpty() }, "Bridges must be query-less")
     }
 
     @Test

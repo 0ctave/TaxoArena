@@ -256,80 +256,12 @@ class TaxonomySplitter(
             val cluster = clusters[idx]
             val vmf = childVmfs[idx]
 
-            val domainsInCluster = cluster.map { it.groundTruthCategory.lowercase() }
-                .filter { it.isNotBlank() }
-                .toSet()
-
-            val root = run {
-                var curr = node
-                while (curr.parents.isNotEmpty()) {
-                    curr = curr.parents.first()
-                }
-                curr
-            }
-            val currentBridgeCount = run {
-                val visited = mutableSetOf<String>()
-                var count = 0
-                fun walk(n: GraphNode) {
-                    if (!visited.add(n.id)) return
-                    if (n.isBridge) count++
-                    n.children.forEach { walk(it) }
-                    n.crossLinkChildren.forEach { walk(it) }
-                }
-                walk(root)
-                count
-            }
-
-            if (domainsInCluster.size >= 2 && config.formalism.enableBridging && currentBridgeCount < config.formalism.maxBridgeNodes) {
-                // Route to bridging consumer: Create a bridge node B
-                val bridgeLabel = "bridge::Emergent Bridge #${conceptCounter.getAndIncrement()}"
-                val bridgeNode = GraphNode(label = bridgeLabel, depth = maxOf(2, node.depth)).apply {
-                    vmfMu = vmf.mu
-                    vmfKappa = vmf.kappa
-                    vmfLogNormalizer = vmf.logNormalizer
-                    phaseCompleted = phaseCompleted or PHASE_SPLIT_EVAL
-                    isBridge = true
-                    treeParentId = node.id
-                    sliceDim = vmf.mu.size
-                }
-
-                // Add bridge to parent's cross-links
-                node.crossLinkChildren.add(bridgeNode)
-                bridgeNode.parents.add(node)
-
-                // Group queries by domain to create same-domain leaf sub-clusters under the bridge
-                val domainGroups = cluster.groupBy { it.groundTruthCategory }
-                for ((domain, qList) in domainGroups) {
-                    if (qList.size >= minClusterSize) {
-                        val leafLabel = "Emergent Concept #${conceptCounter.getAndIncrement()} ($domain)"
-                        val leafVmf = fitVmfParams(qList, childDim)
-                        val leafNode = GraphNode(label = leafLabel, depth = bridgeNode.depth + 1).apply {
-                            vmfMu = leafVmf.mu
-                            vmfKappa = leafVmf.kappa
-                            vmfLogNormalizer = leafVmf.logNormalizer
-                            phaseCompleted = phaseCompleted or PHASE_SPLIT_EVAL
-                            treeParentId = bridgeNode.id
-                            sliceDim = leafVmf.mu.size
-                        }
-                        leafNode.queries.addAll(qList)
-
-                        // Wire leaf under the bridge
-                        bridgeNode.crossLinkChildren.add(leafNode)
-                        leafNode.parents.add(bridgeNode)
-
-                        // Fit immediately
-                        fitter.fitSingleNode(leafNode)
-                        allSpawnedLeaves.add(leafNode)
-                    }
-                }
-            } else {
-                // Normal child
-                val child = createNodeFromCluster(cluster, node, vmf)
-                node.children.add(child)
-                child.parents.add(node)
-                fitter.fitSingleNode(child)
-                allSpawnedLeaves.add(child)
-            }
+            // Normal child
+            val child = createNodeFromCluster(cluster, node, vmf)
+            node.children.add(child)
+            child.parents.add(node)
+            fitter.fitSingleNode(child)
+            allSpawnedLeaves.add(child)
         }
         node.queries.clear()
 
