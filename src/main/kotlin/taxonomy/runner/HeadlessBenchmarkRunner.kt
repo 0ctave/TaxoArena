@@ -70,7 +70,8 @@ data class HeadlessCliConfig(
     val maxBridgeNodes: Int? = null,
     val maxBridgesPerDomainPair: Int? = null,
     val bridgeCandidateTopK: Int? = null,
-    val minBridgeCoverage: Int? = null
+    val minBridgeCoverage: Int? = null,
+    val numIterations: Int? = null
 )
 
 @Component
@@ -155,6 +156,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.maxBridgesPerDomainPair?.let { config.formalism.maxBridgesPerDomainPair = it }
         cliConfig.bridgeCandidateTopK?.let { config.formalism.bridgeCandidateTopK = it }
         cliConfig.minBridgeCoverage?.let { config.formalism.minBridgeCoverage = it }
+        cliConfig.numIterations?.let { config.execution.numIterations = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
         if (targetDomains.isNotEmpty()) {
