@@ -56,7 +56,11 @@ class TaxonomyTrickler(
 
             if (node.isLeaf) return
 
-            val children = (node.children + node.crossLinkChildren).toList()
+            val children = if (config.formalism.enableBridging) {
+                (node.children + node.crossLinkChildren).toList()
+            } else {
+                node.children.toList()
+            }
             if (children.isEmpty()) return
 
             val scores = DoubleArray(children.size)
@@ -112,6 +116,7 @@ class TaxonomyTrickler(
 
         walk(root, 0.0)
 
+
         // --- assignmentMargin filter ---
         val bestLeafLogProb = logProbMap
             .filter { (id, _) -> nodeMap[id]?.isLeaf == true }
@@ -128,7 +133,11 @@ class TaxonomyTrickler(
                 if (thisLinear >= bestLinear * (1.0 - config.formalism.assignmentGap))
                     results[node] = logProb
             } else {
-                val activeChildren = node.children + node.crossLinkChildren
+                val activeChildren = if (config.formalism.enableBridging) {
+                    node.children + node.crossLinkChildren
+                } else {
+                    node.children
+                }
                 if (!activeChildren.any { logProbMap.containsKey(it.id) })
                     results[node] = logProb
             }

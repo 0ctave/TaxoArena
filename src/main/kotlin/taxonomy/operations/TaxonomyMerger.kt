@@ -382,7 +382,7 @@ class TaxonomyMerger(
      * Tree parent protection (treeParentId) still applies.
      * Redundant parents are removed from BOTH sets.
      */
-    private fun transitiveReduction(root: GraphNode, ancestorMap: Map<String, Set<String>>) {
+    internal fun transitiveReduction(root: GraphNode, ancestorMap: Map<String, Set<String>>) {
         val allNodes = getAllNodes(root)
         var keptEdges = 0
         var severedShortcuts = 0
@@ -510,7 +510,7 @@ class TaxonomyMerger(
         return visited
     }
 
-    private fun buildAncestorMap(root: GraphNode): Map<String, Set<String>> {
+    internal fun buildAncestorMap(root: GraphNode): Map<String, Set<String>> {
         if (root.id == ancestorMapRootId && cachedAncestorMap != null) {
             return cachedAncestorMap!!
         }
@@ -577,7 +577,7 @@ class TaxonomyMerger(
         reason: String
     ) {
         val baseDir = taxonomy.model.ExperimentOutputContext.activeBaseDir ?: java.io.File(".")
-        val csvFile = java.io.File(baseDir, "bridge_residuals.csv")
+        val csvFile = java.io.File(baseDir, "bridge_candidates.csv")
         synchronized(this) {
             val exists = csvFile.exists()
             java.io.FileWriter(csvFile, true).use { fw ->
@@ -591,7 +591,7 @@ class TaxonomyMerger(
         }
     }
 
-    private suspend fun insertBridgingParents(root: GraphNode, iteration: Int) {
+    internal suspend fun insertBridgingParents(root: GraphNode, iteration: Int) {
         val leaves = collectAllLeaves(root)
         var bridgesCreated = 0
         
@@ -610,10 +610,13 @@ class TaxonomyMerger(
             return
         }
 
-        val candidatePairs = mutableListOf<Pair<GraphNode, GraphNode>>()
+        class BridgeCandidate(val u: GraphNode, val v: GraphNode, val div: Double)
+
+        val leafCandidates = mutableMapOf<GraphNode, MutableList<BridgeCandidate>>()
         for (i in leaves.indices) {
-            for (j in i + 1 until leaves.size) {
-                val u = leaves[i]
+            val u = leaves[i]
+            for (j in leaves.indices) {
+                if (i == j) continue
                 val v = leaves[j]
                 
                 val uAncestors = getDepth1Ancestors(u)
@@ -631,45 +634,78 @@ class TaxonomyMerger(
                 val lower = config.formalism.separationEpsilon
                 val upper = config.formalism.bridgeSeparationCeiling
                 if (div in lower..upper) {
-                    candidatePairs.add(u to v)
+                    leafCandidates.getOrPut(u) { mutableListOf() }.add(BridgeCandidate(u, v, div))
                 }
             }
         }
 
-        log.info("Bridge Insertion: Found ${candidatePairs.size} candidate pairs in adjacency band [${config.formalism.separationEpsilon}, ${config.formalism.bridgeSeparationCeiling}]")
+        val allCandidates = mutableListOf<BridgeCandidate>()
+        val addedPairs = mutableSetOf<String>()
+        for ((u, candidates) in leafCandidates) {
+            val topK = candidates.sortedBy { it.div }.take(config.formalism.bridgeCandidateTopK ?: 10)
+            for (cand in topK) {
+                val pairKey = if (cand.u.id < cand.v.id) "${cand.u.id}|${cand.v.id}" else "${cand.v.id}|${cand.u.id}"
+                if (addedPairs.add(pairKey)) {
+                    allCandidates.add(cand)
+                }
+            }
+        }
 
-        for ((u, v) in candidatePairs) {
+        val candidatePairs = allCandidates.sortedBy { it.div }
+
+        log.info("Bridge Insertion: Found ${candidatePairs.size} candidate pairs in adjacency band [${config.formalism.separationEpsilon}, ${config.formalism.bridgeSeparationCeiling}] after Top-K filtering and sorting")
+
+        val bridgedLeaves = mutableSetOf<String>()
+        val domainPairCounts = mutableMapOf<String, Int>()
+
+        for (cand in candidatePairs) {
+            val u = cand.u
+            val v = cand.v
+            val div = cand.div
             if (bridgesCreated + currentBridgeCount >= maxBridgeNodes) break
+
+            // Enforce bridgeParentBudget = 1 (greedy selection consumes the leaf)
+            if (u.id in bridgedLeaves || v.id in bridgedLeaves) {
+                continue
+            }
+
+            // Enforce maxBridgesPerDomainPair = 2
+            val uAncestors = getDepth1Ancestors(u)
+            val vAncestors = getDepth1Ancestors(v)
+            val domU = uAncestors.firstOrNull() ?: "unknown"
+            val domV = vAncestors.firstOrNull() ?: "unknown"
+            val domainPairKey = if (domU < domV) "$domU|$domV" else "$domV|$domU"
+            val existingDomainBridges = domainPairCounts.getOrDefault(domainPairKey, 0)
+            if (existingDomainBridges >= (config.formalism.maxBridgesPerDomainPair ?: 2)) {
+                log.info("Bridge Insertion: skipping candidate between $domU and $domV; limit of ${config.formalism.maxBridgesPerDomainPair ?: 2} bridges for this pair reached.")
+                continue
+            }
 
             val candidateId = "cand_${u.id.take(4)}_${v.id.take(4)}"
             val sourceNodes = "${u.label ?: u.id} + ${v.label ?: v.id}"
             val combinedQueries = u.queries + v.queries
             val size = combinedQueries.size
+
+            // Enforce minBridgeCoverage = 50
+            if (size < config.formalism.minBridgeCoverage) {
+                log.info("Bridge Insertion: skipping candidate $candidateId; combined query size $size < minBridgeCoverage ${config.formalism.minBridgeCoverage}")
+                continue
+            }
             val entropy = calculateGtEntropy(combinedQueries)
             
             val commonDim = minOf(u.vmfMu.size, v.vmfMu.size)
             val projUMu = StatisticsUtils.projectVector(u.vmfMu, commonDim)
             val projVMu = StatisticsUtils.projectVector(v.vmfMu, commonDim)
-            val div = StatisticsUtils.vmfJsDivergence(projUMu, u.vmfKappa, projVMu, v.vmfKappa, commonDim)
 
-            if (entropy > config.formalism.bridgeEntropyCap) {
-                logBridgeResidual(
-                    iteration = iteration,
-                    candidateId = candidateId,
-                    sourceNodes = sourceNodes,
-                    size = size,
-                    entropy = entropy,
-                    div = div,
-                    accepted = false,
-                    reason = "Entropy exceeds budget (${"%.4f".format(java.util.Locale.US, entropy)} > ${config.formalism.bridgeEntropyCap})"
-                )
-                continue
+            val exceedsEntropy = entropy > config.formalism.bridgeEntropyCap
+            if (exceedsEntropy) {
+                log.info("Diagnostic: entropy ${"%.4f".format(java.util.Locale.US, entropy)} exceeds cap ${config.formalism.bridgeEntropyCap} for candidate $candidateId (diagnostic-only guard, not rejected)")
             }
 
             val bridgeNode = GraphNode(
                 id = "bridge_" + java.util.UUID.randomUUID().toString().take(8),
                 label = "Temporary Bridge",
-                depth = maxOf(2, maxOf(u.depth, v.depth) - 1)
+                depth = maxOf(2, minOf(u.depth, v.depth) - 1)
             )
             bridgeNode.isBridge = true
             bridgeNode.sliceDim = commonDim
@@ -716,6 +752,11 @@ class TaxonomyMerger(
             }
             bridgeNode.label = finalLabel
 
+            if (isAncestor(u, bridgeNode) || isAncestor(v, bridgeNode) || isAncestor(bridgeNode, u) || isAncestor(bridgeNode, v)) {
+                log.warn("Bridge Insertion: cycle detected for candidate $candidateId, skipping.")
+                continue
+            }
+
             bridgeNode.crossLinkChildren.add(u)
             bridgeNode.crossLinkChildren.add(v)
             u.parents.add(bridgeNode)
@@ -731,6 +772,10 @@ class TaxonomyMerger(
                 bridgeNode.parents.add(pV)
                 pV.crossLinkChildren.add(bridgeNode)
             }
+
+            bridgedLeaves.add(u.id)
+            bridgedLeaves.add(v.id)
+            domainPairCounts[domainPairKey] = existingDomainBridges + 1
 
             bridgesCreated++
             log.info("Bridge Insertion: Created bridge '${bridgeNode.label}' between '${u.label}' and '${v.label}' with entropy ${"%.4f".format(java.util.Locale.US, entropy)}")
@@ -748,6 +793,16 @@ class TaxonomyMerger(
         }
     }
 
+    private fun isAncestor(ancestor: GraphNode, descendant: GraphNode): Boolean {
+        val visited = mutableSetOf<String>()
+        fun check(curr: GraphNode): Boolean {
+            if (curr.id == descendant.id) return true
+            if (!visited.add(curr.id)) return false
+            return curr.children.any { check(it) } || curr.crossLinkChildren.any { check(it) }
+        }
+        return check(ancestor)
+    }
+
     private fun collectAllLeaves(root: GraphNode): List<GraphNode> {
         val leaves = mutableListOf<GraphNode>()
         val visited = mutableSetOf<String>()
@@ -763,7 +818,7 @@ class TaxonomyMerger(
         return leaves
     }
 
-    private fun getDepth1Ancestors(node: GraphNode): Set<String> {
+    private fun getDepth1Ancestors(node: GraphNode, policy: taxonomy.model.TraversalPolicy = taxonomy.model.TraversalPolicy.TREE_ONLY): Set<String> {
         val ancestors = mutableSetOf<String>()
         val visited   = mutableSetOf<String>()
         fun walk(n: GraphNode) {
@@ -771,9 +826,19 @@ class TaxonomyMerger(
             if (n.depth == 1) {
                 (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
             } else {
-                val treeParent = n.parents.find { it.id == n.treeParentId }
-                if (treeParent != null) {
-                    walk(treeParent)
+                when (policy) {
+                    taxonomy.model.TraversalPolicy.TREE_ONLY -> {
+                        val treeParent = n.parents.find { it.id == n.treeParentId }
+                        if (treeParent != null) {
+                            walk(treeParent)
+                        }
+                    }
+                    taxonomy.model.TraversalPolicy.BRIDGE_ONLY -> {
+                        n.parents.filter { it.isBridge }.forEach { walk(it) }
+                    }
+                    taxonomy.model.TraversalPolicy.DAG_BOTH -> {
+                        n.parents.forEach { walk(it) }
+                    }
                 }
             }
         }

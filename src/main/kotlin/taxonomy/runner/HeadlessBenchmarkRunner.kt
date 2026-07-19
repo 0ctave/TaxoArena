@@ -23,6 +23,7 @@ import taxonomy.model.GraphNode
 import taxonomy.TaxonomyEngine
 import taxonomy.service.TaxonomyJudgeService
 import taxonomy.model.ModelRank
+import taxonomy.model.Embedding
 import taxonomy.utils.ReportGenerator
 import taxonomy.dataset.EmbeddingCache
 import java.io.File
@@ -284,6 +285,10 @@ class HeadlessBenchmarkRunner(
             validationDir.mkdirs()
             judgingDir.mkdirs()
             taxonomy.model.ExperimentOutputContext.activeBaseDir = baseDir
+
+            // Export bridge details for diagnostics
+            exportBridgeNodes(validationDir, root)
+            exportBridgeResiduals(validationDir, root)
 
             // 4. Run trickle validation if enabled
             if (cliConfig.runTrickle) {
@@ -913,6 +918,92 @@ class HeadlessBenchmarkRunner(
         }
         }
         log.info("Verdicts CSV written to ${file.absolutePath}")
+    }
+
+    private fun exportBridgeNodes(dir: File, root: GraphNode) {
+        val file = File(dir, "bridge_nodes.csv")
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (!allNodes.add(n)) return
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+
+        val bridges = allNodes.filter { it.isBridge }
+        file.bufferedWriter().use { writer ->
+            writer.write("BridgeId,Label,MemberDomains,ChildLeafIds,Coverage,Entropy,JsDivergence,Depth\n")
+            bridges.forEach { b ->
+                val memberDomains = b.crossLinkChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
+                val childLeafIds = b.crossLinkChildren.map { it.id }.joinToString(";")
+                val combinedQueries = b.crossLinkChildren.flatMap { it.queries }
+                val coverage = combinedQueries.size
+                val entropyVal = calculateGtEntropyForQueries(combinedQueries)
+                val jsDiv = b.dasguptaDeltaNorm
+                writer.write("${escapeCsv(b.id)},${escapeCsv(b.label ?: "")},${escapeCsv(memberDomains)},${escapeCsv(childLeafIds)},$coverage,${"%.4f".format(java.util.Locale.US, entropyVal)},${"%.4f".format(java.util.Locale.US, jsDiv)},${b.depth}\n")
+            }
+        }
+        log.info("Bridge Nodes CSV written to ${file.absolutePath}")
+    }
+
+    private fun calculateGtEntropyForQueries(queries: List<Embedding>): Double {
+        val counts = HashMap<String, Int>()
+        for (q in queries) {
+            val cat = q.groundTruthCategory
+            if (!cat.isNullOrBlank()) {
+                counts[cat] = (counts[cat] ?: 0) + 1
+            }
+        }
+        val total = counts.values.sum().toDouble()
+        if (total == 0.0) return 0.0
+        var entropy = 0.0
+        for (count in counts.values) {
+            val p = count.toDouble() / total
+            entropy -= p * (kotlin.math.log(p, 2.0))
+        }
+        return entropy
+    }
+
+    private fun exportBridgeResiduals(dir: File, root: GraphNode) {
+        val file = File(dir, "bridge_residuals.csv")
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (!allNodes.add(n)) return
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+
+        val queryIdToCategory = mutableMapOf<String, String>()
+        allNodes.forEach { node ->
+            node.queries.forEach { q ->
+                val qIdStr = if (q.queryId != -1) q.queryId.toString() else q.rawText
+                queryIdToCategory[qIdStr] = q.groundTruthCategory
+            }
+        }
+
+        val nodesWithResiduals = allNodes.filter { it.residualQueries.isNotEmpty() }
+        file.bufferedWriter().use { writer ->
+            writer.write("NodeId,Label,ResidualCount,ResidualDomains,ConfDistribution\n")
+            nodesWithResiduals.forEach { n ->
+                val confs = n.residualConfidences.values
+                val confSummary = if (confs.isEmpty()) {
+                    "N/A"
+                } else {
+                    val avg = confs.average()
+                    val min = confs.minOrNull() ?: 0.0
+                    val max = confs.maxOrNull() ?: 0.0
+                    "avg=${"%.4f".format(java.util.Locale.US, avg)};min=${"%.4f".format(java.util.Locale.US, min)};max=${"%.4f".format(java.util.Locale.US, max)}"
+                }
+                
+                val domains = n.residualQueries.mapNotNull { qId ->
+                    queryIdToCategory[qId]
+                }.distinct().joinToString(";")
+
+                writer.write("${escapeCsv(n.id)},${escapeCsv(n.label ?: "")},${n.residualQueries.size},${escapeCsv(domains)},${escapeCsv(confSummary)}\n")
+            }
+        }
+        log.info("Bridge Residuals CSV written to ${file.absolutePath}")
     }
 
     private fun exportLatexTable(dir: File, condition: String, ranks: List<ModelRank>) {

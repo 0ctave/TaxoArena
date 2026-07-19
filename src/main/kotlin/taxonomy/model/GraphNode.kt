@@ -58,7 +58,8 @@ data class GraphNode(
     var judgeRubric: String? = null,
     var judgeGtAgreement: Double? = null,
     var isBridge: Boolean = false,
-    val residualQueries: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
+    val residualQueries: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet(),
+    val residualConfidences: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap()
 ) {
     // isLeaf is true iff this node has NO tree children.
     // Cross-link children are irrelevant to leaf status.

@@ -7,6 +7,7 @@ import taxonomy.model.GraphNode
 import taxonomy.model.IterationMetrics
 import taxonomy.model.TaxonomyMetricsData
 import taxonomy.model.projectTo
+import taxonomy.model.TraversalPolicy
 
 /**
  * Computes structural, geometric, and clustering metrics for the Taxonomy DAG.
@@ -374,7 +375,7 @@ class TaxonomyMetrics(
             query to node
         }.toMap()
 
-    private fun getDepth1Ancestors(node: GraphNode): Set<String> {
+    private fun getDepth1Ancestors(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.TREE_ONLY): Set<String> {
         val ancestors = mutableSetOf<String>()
         val visited   = mutableSetOf<String>()
         fun walk(n: GraphNode) {
@@ -384,9 +385,19 @@ class TaxonomyMetrics(
                 (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
             }
             else {
-                val treeParent = n.parents.find { it.id == n.treeParentId }
-                if (treeParent != null) {
-                    walk(treeParent)
+                when (policy) {
+                    TraversalPolicy.TREE_ONLY -> {
+                        val treeParent = n.parents.find { it.id == n.treeParentId }
+                        if (treeParent != null) {
+                            walk(treeParent)
+                        }
+                    }
+                    TraversalPolicy.BRIDGE_ONLY -> {
+                        n.parents.filter { it.isBridge }.forEach { walk(it) }
+                    }
+                    TraversalPolicy.DAG_BOTH -> {
+                        n.parents.forEach { walk(it) }
+                    }
                 }
             }
         }

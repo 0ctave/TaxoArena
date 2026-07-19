@@ -137,14 +137,16 @@ site — overlapping GT domain covering not yet wired.
 
 Adjusted Rand Index on flat partitions. Known to penalise polyhierarchy.
 
-### DAG Dendrogram Purity ✅ (formula correct post PR #46)
+### DAG Dendrogram Purity
 
-For a DAG, LCA is not unique. Implementation uses the *shallowest* LCA across all
-paths (conservative bound), following Monath et al. 2021.
+For a DAG, the LCA (Lowest Common Ancestor) is not unique. The implementation uses the *shallowest* LCA across all paths (conservative bound), following Monath et al. 2021.
+
+> [!WARNING]
+> **LCA Harshness Artifact:**
+> Because `dagDendrogramPurity` uses the shallowest LCA, any two same-label queries sitting in different subtrees will resolve to the root node (whose subtree spans all queries), making the pair count as impure. With data contamination and a large number of leaves (e.g. 134 leaves), most same-domain pairs are inevitably split across subtrees, causing the metric to collapse toward 0 (e.g. 0.0072). This acts as a measure of "are same-domain pairs kept under low LCAs," rather than overall quality of the taxonomy structure. It should be interpreted carefully alongside the flat Weighted Leaf Purity (which stays high at $\approx 0.725$).
 
 **Implementation:** `dagDendrogramPurity` in `HierarchicalMetrics.kt` (PR #46).
-**Citation:** Monath, Zaheer, Dubey, Ahmed & McCallum 2021, AISTATS, PMLR 130
-(DOI `10.48550/arXiv.2105.04024`).
+**Citation:** Monath, Zaheer, Dubey, Ahmed & McCallum 2021, AISTATS, PMLR 130 (DOI `10.48550/arXiv.2105.04024`).
 
 ### Weighted Leaf Purity (WLP) ⚠️
 

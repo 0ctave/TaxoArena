@@ -35,7 +35,9 @@ data class SerialNode(
     val queryIds: List<String> = emptyList(),
     val proportionalWeight: Double = 1.0,
     val judgeCorpusFingerprint: String? = null,
-    val judgeModelVersion: String? = null
+    val judgeModelVersion: String? = null,
+    val isBridge: Boolean = false,
+    val residualQueries: List<String> = emptyList()
 )
 
 @Serializable
@@ -105,7 +107,9 @@ class TaxonomyPersistence(
                 queryIds = node.queries.map { "q_${hashQuery(it.rawText)}" },
                 proportionalWeight = node.proportionalWeight,
                 judgeCorpusFingerprint = node.judgeCorpusFingerprint,
-                judgeModelVersion = node.judgeModelVersion
+                judgeModelVersion = node.judgeModelVersion,
+                isBridge = node.isBridge,
+                residualQueries = node.residualQueries.toList()
             )
         }
 
@@ -139,11 +143,13 @@ class TaxonomyPersistence(
                 label = sNode.label,
                 depth = sNode.depth
             ).apply {
+                proportionalWeight = sNode.proportionalWeight
+                isBridge = sNode.isBridge
+                residualQueries.addAll(sNode.residualQueries)
                 judgePrompt = sNode.judgePrompt
                 judgeRubric = sNode.judgeRubric
 
                 treeParentId = sNode.treeParentId
-                proportionalWeight = sNode.proportionalWeight
                 judgeCorpusFingerprint = sNode.judgeCorpusFingerprint
                 judgeModelVersion = sNode.judgeModelVersion
 
@@ -160,7 +166,10 @@ class TaxonomyPersistence(
                 sNode.queryIds.forEach { qId ->
                     val (raw, distilled, gtCat) = queryRowMap[qId] ?: return@forEach
                     val vector = vectorMap[distilled] ?: return@forEach
-                    queries.add(Embedding(raw, distilled, vector, gtCat))
+                    val resolvedId = taxonomy.model.QuestionIdRegistry.lookup(raw) ?: qId.toIntOrNull() ?: -1
+                    val emb = Embedding(raw, distilled, vector, gtCat)
+                    emb.queryId = resolvedId
+                    queries.add(emb)
                 }
             }
         }

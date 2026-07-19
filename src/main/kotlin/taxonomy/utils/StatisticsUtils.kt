@@ -61,10 +61,11 @@ object StatisticsUtils {
         if (kappa <= 1e-4) {
             return nu * ln(kappa / 2.0) - logGamma(nu + 1.0)
         }
-        val z = kappa / nu
+        val safeNu = if (nu <= 0.0) 1e-5 else nu
+        val z = kappa / safeNu
         val t = sqrt(1.0 + z * z)
         val eta = t + ln(z / (1.0 + t))
-        return nu * eta - 0.5 * ln(2.0 * PI * nu) - 0.25 * ln(1.0 + z * z)
+        return safeNu * eta - 0.5 * ln(2.0 * PI * safeNu) - 0.25 * ln(1.0 + z * z)
     }
 
     /**

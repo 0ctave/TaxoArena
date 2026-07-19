@@ -39,23 +39,19 @@ Values range within $[-1.0, 1.0]$. A positive value close to $1.0$ indicates tha
 
 ---
 
-## 2. Overlapping Normalized Mutual Information (NMI)
+## 2. Normalized Mutual Information (NMI)
 
 Standard NMI assumes a flat, hard partition where each query is assigned to exactly one domain. In a polyhierarchical DAG, queries can be assigned to multiple leaf nodes. Standard NMI penalizes this overlap as error.
 
-To evaluate overlapping assignments, TaxoArena implements the **Lancichinetti–Fortunato–Kértesz (LFK 2009)** overlapping NMI:
+To evaluate overlapping assignments, TaxoArena originally implemented the **Lancichinetti–Fortunato–Kértesz (LFK 2009)** overlapping NMI:
 
 $$ NMI_{\text{ovlp}}(X, Y) = 1.0 - \frac{1}{2} \left[ H(X \mid Y) + H(Y \mid X) \right] $$
 
-where:
-*   $X$ is the ground-truth domain partition, and $Y$ is the predicted DAG assignment matrix.
-*   $H(X \mid Y)$ is the generalized conditional entropy of overlapping covers. Let $X_i$ be the binary membership vector for community $i$. The conditional entropy is computed by matching community assignments via a column-normalized fuzzy joint entropy model:
-    
-    $$ H(X_i \mid Y_j) = H(X_i, Y_j) - H(Y_j) $$
-    
-    and summing over the best-matched community pairs.
-
-This metric is implemented in `OverlappingNmi.kt` (introduced in PR #46). It yields a stable metric on $[0.0, 1.0]$ that does not penalize polyhierarchy.
+> [!WARNING]
+> **LFK-NMI Mathematical Degeneracy:**
+> Under fine-grained hierarchies (e.g. 134 tiny leaves over 8016 queries), LFK-NMI suffers from a known mathematical degeneracy. The LFK formulation guards each pairwise conditional entropy with the constraint $h(P_{11}) + h(P_{00}) \ge h(P_{10}) + h(P_{01})$, otherwise defaulting to the marginal. With tiny leaves (each $\approx 1\%$ of $n$), $P_{00} \approx 1 \implies h(P_{00}) \approx 0$ and the asymmetric residue term dominates, causing this constraint to fail for almost every pair. Thus, both normalized conditional entropies default to 1, forcing $NMI_{\text{ovlp}} = 1 - 0.5(1 + 1) = \text{exactly } 0.0$.
+>
+> **Solution:** TaxoArena collapses the predicted assignments to their depth-1 ancestors (matching the 13 MMLU-Pro ground truth categories) and computes the standard **Shannon NMI** (with geometric-mean normalization) on these collapsed partitions, ensuring a robust, non-degenerate clustering quality measure.
 
 ---
 

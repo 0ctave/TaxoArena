@@ -38,6 +38,7 @@ Technical details of implementation, integration, and database operations.
 *   **[Spring Integration](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/spring-integration.md)**: Component structure, dependency injection, and transaction layout.
 *   **[Database Concurrency](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/database-concurrency.md)**: Threading model, SQLite WAL (write-ahead log) operations, and connection pooling.
 *   **[Headless Experimentation](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/system-architecture/headless-experimentation.md)**: Headless CLI runner, TOML/JSON config formats, 4-condition matrix runner, and structured CSV/JSON results exporters.
+*   **[Thesis Reproduction Guide](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/guides/thesis-reproduction.md)**: Walkthrough of end-to-end replication steps, configuration settings, baseline topologies, and exported results formatting.
 
 ### 6. [Legacy Documentation Archive](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/docs-old/)
 Archive of old designs and development notes. See [docs/docs-old/old-README.md](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/docs/docs-old/old-README.md) for details.

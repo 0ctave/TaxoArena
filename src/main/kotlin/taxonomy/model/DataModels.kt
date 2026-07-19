@@ -35,10 +35,9 @@ data class Embedding(
     val rawText: String,
     val distilledText: String,
     val values: FloatArray,
-    val groundTruthCategory: String = ""
-) {
-    @kotlinx.serialization.Transient
+    val groundTruthCategory: String = "",
     var queryId: Int = -1
+) {
 
     val dimensions: Int get() = values.size
 
@@ -200,4 +199,10 @@ data class GenerationProgress(
 object ExperimentOutputContext {
     @Volatile
     var activeBaseDir: java.io.File? = null
+}
+
+enum class TraversalPolicy {
+    TREE_ONLY,
+    BRIDGE_ONLY,
+    DAG_BOTH
 }

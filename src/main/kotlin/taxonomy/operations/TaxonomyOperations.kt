@@ -97,6 +97,7 @@ class TaxonomyOperations(
                         for (hit in routeResult.residualHits) {
                             synchronized(hit.node.residualQueries) {
                                 hit.node.residualQueries.add(hit.questionId)
+                                hit.node.residualConfidences[hit.questionId] = hit.bestChildScore
                             }
                         }
                     }
