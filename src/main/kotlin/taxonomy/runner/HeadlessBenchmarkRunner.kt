@@ -51,6 +51,8 @@ data class HeadlessCliConfig(
     val separationEpsilon: Double? = null,
     val cosineTau: Double? = null,
     val assignmentGap: Double? = null,
+    val assignmentCosineGap: Double? = null,
+    val tauFunnelFloor: Double? = null,
     val emaAlpha: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
@@ -137,6 +139,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.cosineTau?.let { config.formalism.cosineTau = it }
         cliConfig.assignmentGap?.let { config.formalism.assignmentGap = it }
+        cliConfig.assignmentCosineGap?.let { config.formalism.assignmentCosineGap = it }
+        cliConfig.tauFunnelFloor?.let { config.formalism.tauFunnelFloor = it }
         cliConfig.emaAlpha?.let { config.formalism.emaAlpha = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -528,6 +532,16 @@ class HeadlessBenchmarkRunner(
     ): Map<String, Boolean> = runBlocking {
         log.info("Starting Headless Batch Trickle Validation for $condition...")
 
+        val validationDir = File(baseDir, "validation")
+        validationDir.mkdirs()
+        try {
+            exportGraphValidity(validationDir, root, condition)
+            exportTaxonomyQuality(validationDir, root, condition)
+            exportBridgeQuality(validationDir, root, condition)
+        } catch (e: Exception) {
+            log.error("Failed to export structural/quality metrics for $condition: ${e.message}", e)
+        }
+
         val reservedFile = File("reserved_test_queries.json")
         if (!reservedFile.exists()) {
             log.warn("reserved_test_queries.json not found — cannot run trickle validation."); return@runBlocking emptyMap()
@@ -756,6 +770,59 @@ class HeadlessBenchmarkRunner(
             log.error("Failed to write routing diagnostics: ${e.message}", e)
         } finally {
             diagWriter?.close()
+        }
+
+        try {
+            val predictedMap = HashMap<String, Map<String, Double>>()
+            val gtMap = HashMap<String, String>()
+            val matchCounts = mutableListOf<Int>()
+            for ((trueDomain, text) in testQueries) {
+                gtMap[text] = trueDomain
+                val matched = try {
+                    runBlocking {
+                        taxonomyService.routeQueryToLeaves(text).mapNotNull { (leaf, conf) ->
+                            profiles[leaf.id]?.let { it to conf }
+                        }
+                    }
+                } catch (t: Throwable) {
+                    emptyList()
+                }
+                matchCounts.add(matched.size)
+                if (matched.isNotEmpty()) {
+                    val domainConf = matched.groupBy { it.first.dominantDomain }
+                        .mapValues { (_, list) -> list.maxOf { it.second } }
+                    predictedMap[text] = domainConf
+                }
+            }
+
+            val brierVal = computeBrierScore(predictedMap, gtMap, profiles.values)
+            val maxLeafAssignments = config.formalism.maxLeafAssignments
+            val maxAssignmentCapRate = if (testQueries.isNotEmpty()) {
+                matchCounts.count { it >= maxLeafAssignments }.toDouble() / testQueries.size.toDouble()
+            } else 0.0
+
+            val calibrationFile = File(trickleDir, "${condition}_routing_calibration.csv")
+            calibrationFile.bufferedWriter().use { writer ->
+                writer.write("Metric,Value\n")
+                writer.write("RoutingECE,${out.ece}\n")
+                writer.write("BrierScore,$brierVal\n")
+                writer.write("AvgMatchCount,${out.avgMatchCountEval}\n")
+                writer.write("NoMatchRate,${out.noMatchRate}\n")
+                writer.write("MaxAssignmentCapRate,$maxAssignmentCapRate\n")
+            }
+            log.info("Routing calibration CSV written to ${calibrationFile.absolutePath}")
+
+            appendToTuningLedger(
+                cliConfig.outputDir,
+                currentSeed,
+                condition,
+                root,
+                out,
+                brierVal,
+                maxAssignmentCapRate
+            )
+        } catch (e: Exception) {
+            log.error("Failed to compute and export calibration/ledger metrics for $condition: ${e.message}", e)
         }
 
         return@runBlocking correctnessMap
@@ -1103,6 +1170,8 @@ class HeadlessBenchmarkRunner(
         var bridgeCandidateTopK: Int? = null
         var minBridgeCoverage: Int? = null
         var numIterations: Int? = null
+        var assignmentCosineGap: Double? = null
+        var tauFunnelFloor: Double? = null
 
         val lines = mutableListOf<String>()
         var inArray = false
@@ -1178,6 +1247,8 @@ class HeadlessBenchmarkRunner(
                 "bridgeCandidateTopK" -> bridgeCandidateTopK = rawVal.toInt()
                 "minBridgeCoverage" -> minBridgeCoverage = rawVal.toInt()
                 "numIterations" -> numIterations = rawVal.toInt()
+                "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
+                "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
             }
         }
         return HeadlessCliConfig(
@@ -1201,6 +1272,8 @@ class HeadlessBenchmarkRunner(
             separationEpsilon = separationEpsilon,
             cosineTau = cosineTau,
             assignmentGap = assignmentGap,
+            assignmentCosineGap = assignmentCosineGap,
+            tauFunnelFloor = tauFunnelFloor,
             emaAlpha = emaAlpha,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,
@@ -1223,6 +1296,255 @@ class HeadlessBenchmarkRunner(
             minBridgeCoverage = minBridgeCoverage,
             numIterations = numIterations
         )
+    }
+
+    private fun checkAcyclic(root: GraphNode): Boolean {
+        val visited = mutableMapOf<String, Int>() // 0=unvisited, 1=visiting, 2=visited
+        fun dfs(n: GraphNode): Boolean {
+            val state = visited[n.id] ?: 0
+            if (state == 1) return false
+            if (state == 2) return true
+            visited[n.id] = 1
+            for (c in n.children + n.crossLinkChildren) {
+                if (!dfs(c)) return false
+            }
+            visited[n.id] = 2
+            return true
+        }
+        return dfs(root)
+    }
+
+    private fun getGitCommitSha(): String {
+        return try {
+            val process = Runtime.getRuntime().exec("git rev-parse HEAD")
+            process.inputStream.bufferedReader().readText().trim()
+        } catch (e: Exception) {
+            "unknown"
+        }
+    }
+
+    private fun computeConfigHash(): String {
+        val raw = listOf(
+            config.formalism.maxDepth,
+            config.formalism.minClusterSize,
+            config.formalism.separationEpsilon,
+            config.formalism.cosineTau,
+            config.formalism.assignmentCosineGap,
+            config.formalism.deltaAssign,
+            config.formalism.maxLeafAssignments,
+            config.formalism.emaAlpha,
+            config.formalism.refitMuPerIteration,
+            config.formalism.routeConfidenceTau,
+            config.formalism.bridgeSeparationCeiling,
+            config.formalism.bridgeEntropyCap,
+            config.formalism.bridgeMaxArity,
+            config.formalism.bridgeParentBudget,
+            config.formalism.maxBridgeNodes,
+            config.formalism.minBridgeCoverage,
+            config.formalism.tauFunnelFloor
+        ).joinToString(",")
+        return String.format(java.util.Locale.US, "%08x", raw.hashCode())
+    }
+
+    private fun exportGraphValidity(dir: File, root: GraphNode, condition: String) {
+        val file = File(dir, "${condition}_graph_validity.csv")
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (!allNodes.add(n)) return
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+
+        val acyclic = checkAcyclic(root)
+        val rootReachable = true
+        val leafCount = allNodes.count { it.isLeaf }
+        val bridgeCount = allNodes.count { it.isBridge }
+        val orphanCount = allNodes.count { it.id != root.id && it.parents.isEmpty() }
+        
+        val bridges = allNodes.filter { it.isBridge }
+        val bridgeGroups = bridges.groupBy { it.crossLinkChildren.map { c -> c.id }.toSet() }
+        val duplicateBridgeCount = bridgeGroups.values.filter { it.size > 1 }.sumOf { it.size - 1 }
+
+        val depthDist = allNodes.groupBy { it.depth }
+            .entries.sortedBy { it.key }
+            .joinToString(";") { "${it.key}:${it.value.size}" }
+
+        val residualCount = allNodes.sumOf { it.residualQueries.size }
+
+        file.bufferedWriter().use { writer ->
+            writer.write("Metric,Value\n")
+            writer.write("Acyclic,$acyclic\n")
+            writer.write("RootReachable,$rootReachable\n")
+            writer.write("OrphanCount,$orphanCount\n")
+            writer.write("DuplicateBridgeCount,$duplicateBridgeCount\n")
+            writer.write("DepthDistribution,$depthDist\n")
+            writer.write("LeafCount,$leafCount\n")
+            writer.write("BridgeCount,$bridgeCount\n")
+            writer.write("ResidualCount,$residualCount\n")
+        }
+        log.info("Graph validity CSV for $condition written to ${file.absolutePath}")
+    }
+
+    private fun exportTaxonomyQuality(dir: File, root: GraphNode, condition: String) {
+        val file = File(dir, "${condition}_taxonomy_quality.csv")
+        
+        val groundTruthMap = mutableMapOf<String, List<String>>()
+        fun walkGt(n: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
+            if (!visited.add(n.id)) return
+            n.queries.forEach { emb ->
+                val gt = emb.groundTruthCategory
+                if (gt.isNotBlank()) {
+                    groundTruthMap[emb.rawText] = listOf(gt)
+                }
+            }
+            n.children.forEach { walkGt(it, visited) }
+            n.crossLinkChildren.forEach { walkGt(it, visited) }
+        }
+        walkGt(root)
+
+        val reportObj = taxonomy.utils.TaxonomyMetrics(root, groundTruthMap).generateReport()
+
+        file.bufferedWriter().use { writer ->
+            writer.write("Metric,Value\n")
+            writer.write("WeightedLeafPurity,${reportObj.weightedLeafPurity}\n")
+            writer.write("DendrogramPurity,${reportObj.dendrogramPurity}\n")
+            writer.write("SphericalSilhouette,${reportObj.sphericalSilhouette}\n")
+            writer.write("TotalDasguptaCost,${reportObj.totalDasguptaCost}\n")
+            writer.write("NormalisedSackinIndex,${reportObj.normalisedSackin}\n")
+        }
+        log.info("Taxonomy quality CSV for $condition written to ${file.absolutePath}")
+    }
+
+    private fun exportBridgeQuality(dir: File, root: GraphNode, condition: String) {
+        val file = File(dir, "${condition}_bridge_quality.csv")
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (!allNodes.add(n)) return
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+
+        val bridges = allNodes.filter { it.isBridge }
+        val sourceA = bridges.filter { !it.id.startsWith("bridge_sourceB_") }
+        val sourceB = bridges.filter { it.id.startsWith("bridge_sourceB_") }
+
+        fun collectSubtreeQueries(node: GraphNode): List<Embedding> {
+            val queries = mutableListOf<Embedding>()
+            val visited = mutableSetOf<String>()
+            fun walkSub(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                if (n.isLeaf) {
+                    queries.addAll(n.queries)
+                } else {
+                    n.children.forEach { walkSub(it) }
+                    n.crossLinkChildren.forEach { walkSub(it) }
+                }
+            }
+            walkSub(node)
+            return queries
+        }
+
+        file.bufferedWriter().use { writer ->
+            writer.write("Metric/BridgeId,BridgeType/Value,Depth,Coverage,CrossDomainLabelMix,TopRepresentativeQueries\n")
+            writer.write("SourceA_Count,${sourceA.size},N/A,N/A,N/A,N/A\n")
+            writer.write("SourceB_Count,${sourceB.size},N/A,N/A,N/A,N/A\n")
+            bridges.forEach { b ->
+                val bType = if (b.id.startsWith("bridge_sourceB_")) "SourceB" else "SourceA"
+                val memberDomains = b.crossLinkChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
+                val combinedQueries = b.crossLinkChildren.flatMap { collectSubtreeQueries(it) }.distinctBy { it.rawText }
+                val coverage = combinedQueries.size
+                val topQueries = b.queries.take(10).map { it.rawText.replace(",", " ").replace("\n", " ").trim() }.joinToString(";")
+                writer.write("${escapeCsv(b.id)},$bType,${b.depth},$coverage,${escapeCsv(memberDomains)},${escapeCsv(topQueries)}\n")
+            }
+        }
+        log.info("Bridge quality CSV for $condition written to ${file.absolutePath}")
+    }
+
+    private fun computeBrierScore(
+        predictedMap: Map<String, Map<String, Double>>,
+        gtMap: Map<String, String>,
+        perLeafDomains: Collection<taxonomy.tui.service.LeafDomainProfile>
+    ): Double {
+        if (gtMap.isEmpty()) return 0.0
+        val allDomains = (perLeafDomains.map { it.dominantDomain } + gtMap.values).distinct().toSet()
+        var brierSum = 0.0
+        for ((text, trueDomain) in gtMap) {
+            val domainConf = predictedMap[text] ?: emptyMap()
+            var queryBrier = 0.0
+            for (d in allDomains) {
+                val f = domainConf[d] ?: 0.0
+                val y = if (d == trueDomain) 1.0 else 0.0
+                queryBrier += (f - y) * (f - y)
+            }
+            brierSum += queryBrier
+        }
+        return brierSum / gtMap.size
+    }
+
+    private fun appendToTuningLedger(
+        outputDir: String,
+        currentSeed: Long,
+        condition: String,
+        root: GraphNode,
+        out: taxonomy.tui.BatchTrickleTestResults,
+        brierVal: Double,
+        maxAssignmentCapRate: Double
+    ) {
+        val ledgerFile = File(outputDir, "tuning_ledger.csv")
+        val isNew = !ledgerFile.exists()
+
+        val allNodes = mutableSetOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (!allNodes.add(n)) return
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+
+        val acyclic = checkAcyclic(root)
+        val rootReachable = true
+        val leafCount = allNodes.count { it.isLeaf }
+        val bridgeCount = allNodes.count { it.isBridge }
+        val orphanCount = allNodes.count { it.id != root.id && it.parents.isEmpty() }
+        
+        val bridges = allNodes.filter { it.isBridge }
+        val bridgeGroups = bridges.groupBy { it.crossLinkChildren.map { c -> c.id }.toSet() }
+        val duplicateBridgeCount = bridgeGroups.values.filter { it.size > 1 }.sumOf { it.size - 1 }
+        val residualCount = allNodes.sumOf { it.residualQueries.size }
+
+        val sourceA = bridges.filter { !it.id.startsWith("bridge_sourceB_") }
+        val sourceB = bridges.filter { it.id.startsWith("bridge_sourceB_") }
+
+        val groundTruthMap = mutableMapOf<String, List<String>>()
+        fun walkGt(n: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
+            if (!visited.add(n.id)) return
+            n.queries.forEach { emb ->
+                val gt = emb.groundTruthCategory
+                if (gt.isNotBlank()) {
+                    groundTruthMap[emb.rawText] = listOf(gt)
+                }
+            }
+            n.children.forEach { walkGt(it, visited) }
+            n.crossLinkChildren.forEach { walkGt(it, visited) }
+        }
+        walkGt(root)
+
+        val reportObj = taxonomy.utils.TaxonomyMetrics(root, groundTruthMap).generateReport()
+
+        val configHash = computeConfigHash()
+        val commitSha = getGitCommitSha()
+
+        ledgerFile.parentFile?.mkdirs()
+        val fw = java.io.FileWriter(ledgerFile, true)
+        fw.buffered().use { writer ->
+            if (isNew) {
+                writer.write("ConfigHash,CommitSHA,Seed,Condition,Acyclic,RootReachable,OrphanCount,DuplicateBridgeCount,LeafCount,BridgeCount,ResidualCount,WeightedLeafPurity,DendrogramPurity,SphericalSilhouette,TotalDasguptaCost,NormalisedSackinIndex,SourceA_Count,SourceB_Count,RoutingECE,BrierScore,AvgMatchCount,NoMatchRate,MaxAssignmentCapRate,Top1Accuracy,AnyMatchAccuracy,MacroF1\n")
+            }
+            writer.write("$configHash,$commitSha,$currentSeed,$condition,$acyclic,$rootReachable,$orphanCount,$duplicateBridgeCount,$leafCount,$bridgeCount,$residualCount,${reportObj.weightedLeafPurity},${reportObj.dendrogramPurity},${reportObj.sphericalSilhouette},${reportObj.totalDasguptaCost},${reportObj.normalisedSackin},${sourceA.size},${sourceB.size},${out.ece},$brierVal,${out.avgMatchCountEval},${out.noMatchRate},$maxAssignmentCapRate,${out.top1Accuracy},${out.anyMatchAccuracy},${out.macroF1}\n")
+        }
+        log.info("Appended condition $condition results to ledger at ${ledgerFile.absolutePath}")
     }
 
     private fun startFileLogging(filePath: String): ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent>? {

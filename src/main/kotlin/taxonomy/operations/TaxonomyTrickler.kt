@@ -104,7 +104,7 @@ class TaxonomyTrickler(
             val baseTauAtDepth = when (node.depth) {
                 0, 1 -> 0.999
                 2 -> 0.95
-                else -> 0.90
+                else -> config.formalism.tauFunnelFloor
             }
             val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
             if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < adaptiveTau) {
@@ -145,7 +145,7 @@ class TaxonomyTrickler(
                 }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
 
                 val tauEffective = config.formalism.cosineTau.coerceAtLeast(0.01)
-                val marginNats = config.formalism.assignmentMarginNats * (siblingKappaEffective / tauEffective)
+                val marginNats = config.formalism.assignmentCosineGap * (siblingKappaEffective / tauEffective)
                 (bestLeafLogProb - logProb) <= marginNats
             }
             .sortedByDescending { it.value }

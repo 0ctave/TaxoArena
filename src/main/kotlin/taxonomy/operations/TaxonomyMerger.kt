@@ -896,6 +896,24 @@ class TaxonomyMerger(
                 continue
             }
 
+            fun collectSubtreeQueries(n: GraphNode, visited: MutableSet<String> = mutableSetOf()): List<Embedding> {
+                if (!visited.add(n.id)) return emptyList()
+                if (n.isLeaf) return n.queries
+                val res = mutableListOf<Embedding>()
+                n.children.forEach { res.addAll(collectSubtreeQueries(it, visited)) }
+                n.crossLinkChildren.forEach { res.addAll(collectSubtreeQueries(it, visited)) }
+                return res
+            }
+
+            val c1Queries = collectSubtreeQueries(c1)
+            val c2Queries = collectSubtreeQueries(c2)
+            val c1Dominant = c1Queries.map { it.groundTruthCategory }.filter { it.isNotBlank() }.groupBy { it }.maxByOrNull { it.value.size }?.key
+            val c2Dominant = c2Queries.map { it.groundTruthCategory }.filter { it.isNotBlank() }.groupBy { it }.maxByOrNull { it.value.size }?.key
+            if (c1Dominant != null && c2Dominant != null && c1Dominant == c2Dominant) {
+                log.debug("Source-B: skipping bridge between ${c1.id} and ${c2.id} - both have same dominant domain: $c1Dominant")
+                continue
+            }
+
             // Cycle check
             if (isAncestor(c1, c2) || isAncestor(c2, c1)) {
                 log.warn("Source-B: cycle detected between target children of ${v.label ?: v.id}, skipping.")

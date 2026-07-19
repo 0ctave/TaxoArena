@@ -955,7 +955,7 @@ class TaxonomyDagMaxFeaturesTest {
     fun `R16 - log-space adaptive soft-membership and branch-point descent gating`() {
         val config = TaxonomyConfig()
         config.formalism.deltaAssign = 0.20  // branch-point descent gating margin
-        config.formalism.assignmentMarginNats = 0.50  // log-space margin
+        config.formalism.assignmentCosineGap = 0.50  // log-space margin
 
         val trickler = TaxonomyTrickler(config)
         val parent = node("parent", "Parent Domain", 2)
@@ -980,5 +980,17 @@ class TaxonomyDagMaxFeaturesTest {
         // Verify that the query routes to both child1 and child2
         assertTrue(result.leaves.keys.any { it.id == child1.id })
         assertTrue(result.leaves.keys.any { it.id == child2.id })
+    }
+
+    @Test
+    fun `R17 - soft-membership margin unit check`() {
+        val config = TaxonomyConfig()
+        config.formalism.assignmentCosineGap = 0.03
+        config.formalism.cosineTau = 2.0
+
+        val siblingKappaEffective = 100.0
+        val tauEffective = config.formalism.cosineTau.coerceAtLeast(0.01)
+        val marginNats = config.formalism.assignmentCosineGap * (siblingKappaEffective / tauEffective)
+        assertEquals(1.5, marginNats, 1e-5)
     }
 }

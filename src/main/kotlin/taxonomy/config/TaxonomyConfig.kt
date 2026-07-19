@@ -102,7 +102,7 @@ class TaxonomyConfig {
         // so only leaves whose mean is within ~1° of the best match are included.
         // Increase to allow more cross-domain overlap; decrease for stricter purity.
         var assignmentGap: Double = 0.05
-        var assignmentMarginNats: Double = 0.03
+        var assignmentCosineGap: Double = 0.03
         var deltaAssign: Double = 0.20
         var maxLeafAssignments: Int = 5
 
@@ -126,6 +126,7 @@ class TaxonomyConfig {
         var maxBridgesPerDomainPair: Int = 2
         var bridgeCandidateTopK: Int = 10
         var minBridgeCoverage: Int = 50
+        var tauFunnelFloor: Double = 0.90
     }
 
     fun formatConfigReport(): String {
@@ -186,7 +187,7 @@ class TaxonomyConfig {
             separationEpsilon = formalism.separationEpsilon,
             cosineTau = formalism.cosineTau,
             assignmentGap = formalism.assignmentGap,
-            assignmentMarginNats = formalism.assignmentMarginNats,
+            assignmentCosineGap = formalism.assignmentCosineGap,
             deltaAssign = formalism.deltaAssign,
             maxLeafAssignments = formalism.maxLeafAssignments,
             emaAlpha = formalism.emaAlpha,
@@ -203,7 +204,8 @@ class TaxonomyConfig {
             maxBridgeNodes = formalism.maxBridgeNodes,
             maxBridgesPerDomainPair = formalism.maxBridgesPerDomainPair,
             bridgeCandidateTopK = formalism.bridgeCandidateTopK,
-            minBridgeCoverage = formalism.minBridgeCoverage
+            minBridgeCoverage = formalism.minBridgeCoverage,
+            tauFunnelFloor = formalism.tauFunnelFloor
         )
     )
 
@@ -231,7 +233,7 @@ class TaxonomyConfig {
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.cosineTau = c.formalism.cosineTau
         formalism.assignmentGap = c.formalism.assignmentGap
-        formalism.assignmentMarginNats = c.formalism.assignmentMarginNats
+        formalism.assignmentCosineGap = c.formalism.assignmentCosineGap
         formalism.deltaAssign = c.formalism.deltaAssign
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
         formalism.emaAlpha = c.formalism.emaAlpha
@@ -249,6 +251,7 @@ class TaxonomyConfig {
         formalism.maxBridgesPerDomainPair = c.formalism.maxBridgesPerDomainPair
         formalism.bridgeCandidateTopK = c.formalism.bridgeCandidateTopK
         formalism.minBridgeCoverage = c.formalism.minBridgeCoverage
+        formalism.tauFunnelFloor = c.formalism.tauFunnelFloor
     }
 }
 

@@ -54,7 +54,7 @@ data class EffectiveConfig(
         val separationEpsilon: Double = 0.04,
         val cosineTau: Double = 2.0,
         val assignmentGap: Double = 0.05,
-        val assignmentMarginNats: Double = 0.03,
+        val assignmentCosineGap: Double = 0.03,
         val deltaAssign: Double = 0.20,
         val maxLeafAssignments: Int = 5,
         val emaAlpha: Double = 0.7,
@@ -71,6 +71,7 @@ data class EffectiveConfig(
         val maxBridgeNodes: Int = 14,
         val maxBridgesPerDomainPair: Int = 2,
         val bridgeCandidateTopK: Int = 10,
-        val minBridgeCoverage: Int = 50
+        val minBridgeCoverage: Int = 50,
+        val tauFunnelFloor: Double = 0.90
     )
 }
