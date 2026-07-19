@@ -189,18 +189,19 @@ class TaxonomyFitter(
         } else {
             // mu trusted from splitter — recompute kappa from current branch to reflect
             // who is actually here now, not who was here at split time
+            val muSize = node.vmfMu.size
             val rBar = run {
-                val projected = kappaQueries.map { it.projectTo(d) }
+                val projected = kappaQueries.map { it.projectTo(muSize) }
                 var dot = 0.0
-                for (vec in projected) for (i in 0 until d) dot += node.vmfMu[i] * vec[i]
+                for (vec in projected) for (i in 0 until muSize) dot += node.vmfMu[i] * vec[i]
                 (dot / kappaQueries.size.coerceAtLeast(1)).coerceAtLeast(0.0)
             }
-            val rawKappa = StatisticsUtils.correctedKappa(rBar, d, kappaQueries.size)
+            val rawKappa = StatisticsUtils.correctedKappa(rBar, muSize, kappaQueries.size)
             val sampleWeight = (kappaQueries.size / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
             val effectiveAlpha = config.formalism.emaAlpha * sampleWeight
             val oldKappa = node.vmfKappa.takeIf { it > 1e-3 } ?: rawKappa
             node.vmfKappa = (1.0 - effectiveAlpha) * rawKappa + effectiveAlpha * oldKappa
-            node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
+            node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(muSize, node.vmfKappa)
         }
 
         // ── NiW posterior ─────────────────────────────────────────────────────────

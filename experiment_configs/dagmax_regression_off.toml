@@ -1,0 +1,40 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  dagmax_regression_off.toml
+#  PURPOSE: Flags-OFF baseline. Proves the DAG-Max branch does NOT change
+#           behavior when every new flag is false (the highest-value check).
+#           With enableBridging=false, insertBridgingParents is never called
+#           (TaxonomyMerger.kt:40) and the splitter's cross-domain path is
+#           skipped (TaxonomySplitter.kt:263 `&& config.formalism.enableBridging`),
+#           so no cross-links exist and DAG_BOTH ≡ TREE_ONLY everywhere.
+#  COST:    FREE (no arena / no LLM judging). Assumes the shipped
+#           mmlu_pro_dataset_cache.db embedding cache is warm.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06", "Meta-Llama-3_1-8B-Instruct"]  # parser requires the key; unused when runBenchmark=false
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/dagmax_regression_off"
+testRatio     = 0.3
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline    = true    # MUST be true: this is where the DAG is built
+runBenchmark   = false   # no arena → free
+runTrickle     = true    # trickle validation → produces NoMatchRate baseline
+judgeInduction = false    # no LLM judge induction
+enableLabeling = false    # no LLM cluster labeling
+
+# ── Core formalism (code defaults; keep identical across the 3 configs) ──────
+maxDepth          = 8
+minClusterSize    = 25
+separationEpsilon = 0.04
+cosineTau         = 2.0
+assignmentGap     = 0.05
+emaAlpha          = 0.7
+
+# ── DAG-Max flags: ALL OFF ───────────────────────────────────────────────────
+enableStableQuestionIds = false
+enableResidualRouting   = false
+enableResidualSplitGate = false
+enableBridging          = false

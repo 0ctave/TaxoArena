@@ -140,40 +140,42 @@ class TaxonomyMerger(
         if (visited.contains(node.id)) return
         visited.add(node.id)
 
-        val currentChildren = node.children.toList()
+        val currentChildren = (node.children + node.crossLinkChildren).toList()
         for (child in currentChildren) {
             pruneUnrelevantNodes(child, visited)
         }
 
-        // Cache branch-query counts once per child — getAllQueriesInBranch() is O(subtree).
-        val branchSizes = node.children.associateWith { it.getAllQueriesInBranch().size }
+        // Cache branch-query counts once per child — getAllQueriesInRegion() is O(subtree).
+        val allChildren = (node.children + node.crossLinkChildren).toList()
+        val branchSizes = allChildren.associateWith { it.getAllQueriesInRegion().size }
 
-        val nodesToPrune = node.children.filter { child ->
+        val nodesToPrune = allChildren.filter { child ->
             val totalQueriesInBranch = branchSizes[child] ?: 0
             val isTrulyDead = totalQueriesInBranch == 0
 
-            val liveSiblings = node.children.filter { (branchSizes[it] ?: 0) > 0 }
+            val liveSiblings = allChildren.filter { (branchSizes[it] ?: 0) > 0 }
             val siblingAvg = if (liveSiblings.size > 1)
                 liveSiblings.map { branchSizes[it] ?: 0 }.average()
             else
-                node.children.map { branchSizes[it] ?: 0 }.average()
+                allChildren.map { branchSizes[it] ?: 0 }.average()
 
-            val isStarved = child.isLeaf && totalQueriesInBranch < (siblingAvg * 0.2).coerceAtLeast(5.0)
-            val isEmptyParent = !child.isLeaf && child.children.isEmpty()
+            val isPhysicalLeaf = child.children.isEmpty() && child.crossLinkChildren.isEmpty()
+            val isStarved = isPhysicalLeaf && totalQueriesInBranch < (siblingAvg * 0.2).coerceAtLeast(5.0)
 
-            val wouldLeaveParentSingleChild = (node.children.size - 1) <= 1
+            val wouldLeaveParentSingleChild = (allChildren.size - 1) <= 1
 
-            isTrulyDead || ((isStarved || isEmptyParent) && !wouldLeaveParentSingleChild)
+            isTrulyDead || (isStarved && !wouldLeaveParentSingleChild)
         }
 
         if (nodesToPrune.isNotEmpty()) {
             nodesToPrune.forEach { target ->
-                if (target.parents.isEmpty() && !node.children.contains(target)) return@forEach  // already pruned this pass
+                if (target.parents.isEmpty() && !node.children.contains(target) && !node.crossLinkChildren.contains(target)) return@forEach  // already pruned this pass
                 log.info("[PRUNED] '${target.label}' (starved/empty)")
                 node.queries.addAll(target.queries)
                 node.children.remove(target)
+                node.crossLinkChildren.remove(target)
                 target.parents.remove(node)
-                // Clean up crossLinkChildren back-refs (Problem 10)
+                // Clean up crossLinkChildren back-refs
                 target.parents.toList().forEach { p ->
                     p.children.remove(target)
                     p.crossLinkChildren.remove(target)

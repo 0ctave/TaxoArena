@@ -1,0 +1,59 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  dagmax_feature_on.toml
+#  PURPOSE: All four DAG-Max flags ON, FREE (no arena). This is the actual
+#           DAG-construction test. Verify:
+#             - bridges form at predicted overlaps (Engineering↔Physics,
+#               Health↔Biology, Chemistry↔Physics, Business↔Economics)
+#             - NoMatchRate is real (not a forced-0.0 artifact)
+#             - parent κ no longer deflated by residuals
+#             - the 14 depth-1 domains are unchanged
+#             - the three bridge CSVs are emitted
+#  COST:    FREE (no arena / no LLM judging). Assumes warm embedding cache.
+#
+#  ⚠ CAVEAT (see RECHECK3 Part A #4): production metrics call generateReport()
+#    with NO policy arg → default DAG_BOTH → getDepth1Ancestors traverses bridge
+#    parents. The handout wants metrics TREE-ONLY. So with bridges present,
+#    contamination / edge-F1 / ancestor-correct / dendrogram-purity / hF1 will
+#    NOT be flat — they will reflect bridge edges. Treat any movement in those
+#    metrics as the known DAG_BOTH-default defect, not a real quality change.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06", "Meta-Llama-3_1-8B-Instruct"]  # unused when runBenchmark=false
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/dagmax_feature_on"
+testRatio     = 0.3
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline    = true
+runBenchmark   = false   # free
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false   # bridge labels stay as deterministic "Bridge Concept [A ↔ B]"
+
+# ── Core formalism (identical to regression_off for a clean diff) ────────────
+maxDepth          = 8
+minClusterSize    = 25
+separationEpsilon = 0.04
+cosineTau         = 2.0
+assignmentGap     = 0.05
+emaAlpha          = 0.7
+
+# ── DAG-Max flags: ALL ON ─────────────────────────────────────────────────────
+enableStableQuestionIds = true
+enableResidualRouting   = true
+enableResidualSplitGate = true
+enableBridging          = true
+
+# ── DAG-Max parameters (handout defaults) ─────────────────────────────────────
+routeConfidenceTau      = 0.5     # code default; gated behind enableResidualRouting
+bridgeSeparationCeiling = 0.20    # handout §3: ≈3-5× separationEpsilon
+bridgeEntropyCap        = 1.05    # handout: diagnostic-only guard (never rejects)
+bridgeMaxArity          = 2       # handout default (≤3); <2 disables bridging
+bridgeParentBudget      = 1       # each leaf joins at most one bridge
+maxBridgeNodes          = 14      # global cap ≈ number of depth-1 domains
+maxBridgesPerDomainPair = 2       # prevents micro-bridge proliferation per pair
+bridgeCandidateTopK     = 10      # top-k nearest candidates per leaf
+minBridgeCoverage       = 50      # handout: 2*minClusterSize (= 2*25)

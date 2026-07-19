@@ -21,6 +21,7 @@ data class SerialNode(
     val childIds: List<String>,
     val crossLinkChildIds: List<String> = emptyList(),
     val parentIds: List<String>,
+    val sliceDim: Int = 0,
     val vmfMu: FloatArray? = null,
     val vmfKappa: Double = 0.0,
     val vmfLogNormalizer: Double = 0.0,
@@ -95,6 +96,7 @@ class TaxonomyPersistence(
                 childIds = node.children.map { it.id },
                 crossLinkChildIds = node.crossLinkChildren.map { it.id },
                 parentIds = node.parents.map { it.id },
+                sliceDim = node.sliceDim,
                 vmfMu = if (node.vmfMu.isNotEmpty()) node.vmfMu else null,
                 vmfKappa = node.vmfKappa,
                 vmfLogNormalizer = node.vmfLogNormalizer,
@@ -150,6 +152,7 @@ class TaxonomyPersistence(
                 label = sNode.label,
                 depth = sNode.depth
             ).apply {
+                sliceDim = if (sNode.sliceDim > 0) sNode.sliceDim else taxonomy.model.dimForDepth(sNode.depth)
                 proportionalWeight = sNode.proportionalWeight
                 isBridge = sNode.isBridge
                 bridgeJsDivergence = sNode.bridgeJsDivergence
