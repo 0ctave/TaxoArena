@@ -890,6 +890,12 @@ class TaxonomyMerger(
             val c1 = childrenWithSims[0].first
             val c2 = childrenWithSims[1].first
 
+            val alreadyBridged = c1.parents.any { p -> p.isBridge && c2.parents.any { cp -> cp.id == p.id } }
+            if (alreadyBridged) {
+                log.info("Source-B: skipping candidate at ${v.label ?: v.id}; children ${c1.label ?: c1.id} and ${c2.label ?: c2.id} are already bridged")
+                continue
+            }
+
             // Cycle check
             if (isAncestor(c1, c2) || isAncestor(c2, c1)) {
                 log.warn("Source-B: cycle detected between target children of ${v.label ?: v.id}, skipping.")

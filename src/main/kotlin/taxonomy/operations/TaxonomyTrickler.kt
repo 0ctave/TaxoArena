@@ -144,7 +144,8 @@ class TaxonomyTrickler(
                     if (activeChildren.isNotEmpty()) activeChildren.map { it.vmfKappa }.average() else null
                 }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
 
-                val marginNats = config.formalism.assignmentMarginNats * (config.formalism.cosineTau / siblingKappaEffective)
+                val tauEffective = config.formalism.cosineTau.coerceAtLeast(0.01)
+                val marginNats = config.formalism.assignmentMarginNats * (siblingKappaEffective / tauEffective)
                 (bestLeafLogProb - logProb) <= marginNats
             }
             .sortedByDescending { it.value }
