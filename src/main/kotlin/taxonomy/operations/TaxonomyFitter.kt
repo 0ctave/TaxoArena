@@ -321,7 +321,7 @@ class TaxonomyFitter(
 
     private fun getAdaptiveSliceDim(targetDim: Int, nEffective: Double): Int {
         val prefixes = listOf(128, 256, 512, 1024).filter { it <= targetDim }
-        return prefixes.lastOrNull { it.toDouble() / nEffective.coerceAtLeast(1e-5) <= 8.0 } ?: 128
+        return prefixes.lastOrNull { it.toDouble() / nEffective.coerceAtLeast(1e-5) <= config.formalism.hdlssThreshold } ?: 128
     }
 
     fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) {
@@ -410,7 +410,7 @@ class TaxonomyFitter(
         
         val priorKappa = kappa0Parent.coerceAtLeast(1.0)
         
-        if (nEffective < 2.0) {
+        if (nEffective < config.formalism.effectiveSupportFloor) {
             node.vmfKappa = priorKappa
         } else {
             val rawKappa = StatisticsUtils.correctedKappa(rBar, fitDim, nEffective.toInt())

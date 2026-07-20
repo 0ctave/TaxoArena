@@ -35,7 +35,7 @@ enableLabeling = false   # bridge labels stay as deterministic "Bridge Concept [
 
 # ── Core formalism (identical to regression_off for a clean diff) ────────────
 maxDepth          = 8
-minClusterSize    = 25
+minClusterSize    = 40
 separationEpsilon = 0.04
 cosineTau         = 2.0
 tauFunnelFloor    = 0.90
@@ -55,15 +55,8 @@ enableResidualRouting   = true
 enableResidualSplitGate = true
 enableBridging          = true
 
-# ── DAG-Max parameters (handout defaults) ─────────────────────────────────────
-# routeConfidenceTau is deprecated/unused in favor of depth-adaptive tau funnels
-# routeConfidenceTau      = 0.5
-bridgeSeparationCeiling = 0.20    # handout §3: ≈3-5× separationEpsilon
-bridgeEntropyCap        = 1.05    # handout: diagnostic-only guard (never rejects)
-bridgeMaxArity          = 2       # handout default (≤3); <2 disables bridging
-bridgeParentBudget      = 1       # each leaf joins at most one bridge
-maxBridgeNodes          = 14      # global cap ≈ number of depth-1 domains
-maxBridgesPerDomainPair = 2       # prevents micro-bridge proliferation per pair
-bridgeCandidateTopK     = 10      # top-k nearest candidates per leaf
-minBridgeCoverage       = 50      # handout: 2*minClusterSize (= 2*25)
+# ── Emergent Router parameters ────────────────────────────────────────────────
+hdlssThreshold = 8.0
+fusionSimilarityThreshold = 0.92
+effectiveSupportFloor = 2.0
 numIterations           = 35

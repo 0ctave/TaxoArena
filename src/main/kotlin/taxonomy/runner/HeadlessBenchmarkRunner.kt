@@ -71,15 +71,9 @@ data class HeadlessCliConfig(
     val enableResidualRouting: Boolean? = null,
     val enableResidualSplitGate: Boolean? = null,
     val enableBridging: Boolean? = null,
-    val routeConfidenceTau: Double? = null,
-    val bridgeSeparationCeiling: Double? = null,
-    val bridgeEntropyCap: Double? = null,
-    val bridgeMaxArity: Int? = null,
-    val bridgeParentBudget: Int? = null,
-    val maxBridgeNodes: Int? = null,
-    val maxBridgesPerDomainPair: Int? = null,
-    val bridgeCandidateTopK: Int? = null,
-    val minBridgeCoverage: Int? = null,
+    val hdlssThreshold: Double? = null,
+    val fusionSimilarityThreshold: Double? = null,
+    val effectiveSupportFloor: Double? = null,
     val numIterations: Int? = null,
     val runBaselines: Boolean = true,
     val dPrefix: Int? = null
@@ -162,15 +156,9 @@ class HeadlessBenchmarkRunner(
         cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
         cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
         cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
-        cliConfig.routeConfidenceTau?.let { config.formalism.routeConfidenceTau = it }
-        cliConfig.bridgeSeparationCeiling?.let { config.formalism.bridgeSeparationCeiling = it }
-        cliConfig.bridgeEntropyCap?.let { config.formalism.bridgeEntropyCap = it }
-        cliConfig.bridgeMaxArity?.let { config.formalism.bridgeMaxArity = it }
-        cliConfig.bridgeParentBudget?.let { config.formalism.bridgeParentBudget = it }
-        cliConfig.maxBridgeNodes?.let { config.formalism.maxBridgeNodes = it }
-        cliConfig.maxBridgesPerDomainPair?.let { config.formalism.maxBridgesPerDomainPair = it }
-        cliConfig.bridgeCandidateTopK?.let { config.formalism.bridgeCandidateTopK = it }
-        cliConfig.minBridgeCoverage?.let { config.formalism.minBridgeCoverage = it }
+        cliConfig.hdlssThreshold?.let { config.formalism.hdlssThreshold = it }
+        cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
+        cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
@@ -1181,15 +1169,9 @@ class HeadlessBenchmarkRunner(
         var enableResidualRouting: Boolean? = null
         var enableResidualSplitGate: Boolean? = null
         var enableBridging: Boolean? = null
-        var routeConfidenceTau: Double? = null
-        var bridgeSeparationCeiling: Double? = null
-        var bridgeEntropyCap: Double? = null
-        var bridgeMaxArity: Int? = null
-        var bridgeParentBudget: Int? = null
-        var maxBridgeNodes: Int? = null
-        var maxBridgesPerDomainPair: Int? = null
-        var bridgeCandidateTopK: Int? = null
-        var minBridgeCoverage: Int? = null
+        var hdlssThreshold: Double? = null
+        var fusionSimilarityThreshold: Double? = null
+        var effectiveSupportFloor: Double? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
@@ -1260,15 +1242,9 @@ class HeadlessBenchmarkRunner(
                 "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
                 "enableBridging" -> enableBridging = rawVal.toBoolean()
-                "routeConfidenceTau" -> routeConfidenceTau = rawVal.toDouble()
-                "bridgeSeparationCeiling" -> bridgeSeparationCeiling = rawVal.toDouble()
-                "bridgeEntropyCap" -> bridgeEntropyCap = rawVal.toDouble()
-                "bridgeMaxArity" -> bridgeMaxArity = rawVal.toInt()
-                "bridgeParentBudget" -> bridgeParentBudget = rawVal.toInt()
-                "maxBridgeNodes" -> maxBridgeNodes = rawVal.toInt()
-                "maxBridgesPerDomainPair" -> maxBridgesPerDomainPair = rawVal.toInt()
-                "bridgeCandidateTopK" -> bridgeCandidateTopK = rawVal.toInt()
-                "minBridgeCoverage" -> minBridgeCoverage = rawVal.toInt()
+                "hdlssThreshold" -> hdlssThreshold = rawVal.toDouble()
+                "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
+                "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
@@ -1311,15 +1287,9 @@ class HeadlessBenchmarkRunner(
             enableResidualRouting = enableResidualRouting,
             enableResidualSplitGate = enableResidualSplitGate,
             enableBridging = enableBridging,
-            routeConfidenceTau = routeConfidenceTau,
-            bridgeSeparationCeiling = bridgeSeparationCeiling,
-            bridgeEntropyCap = bridgeEntropyCap,
-            bridgeMaxArity = bridgeMaxArity,
-            bridgeParentBudget = bridgeParentBudget,
-            maxBridgeNodes = maxBridgeNodes,
-            maxBridgesPerDomainPair = maxBridgesPerDomainPair,
-            bridgeCandidateTopK = bridgeCandidateTopK,
-            minBridgeCoverage = minBridgeCoverage,
+            hdlssThreshold = hdlssThreshold,
+            fusionSimilarityThreshold = fusionSimilarityThreshold,
+            effectiveSupportFloor = effectiveSupportFloor,
             numIterations = numIterations,
             runBaselines = runBaselines
         )
@@ -1361,13 +1331,9 @@ class HeadlessBenchmarkRunner(
             config.formalism.maxLeafAssignments,
             config.formalism.emaAlpha,
             config.formalism.refitMuPerIteration,
-            config.formalism.routeConfidenceTau,
-            config.formalism.bridgeSeparationCeiling,
-            config.formalism.bridgeEntropyCap,
-            config.formalism.bridgeMaxArity,
-            config.formalism.bridgeParentBudget,
-            config.formalism.maxBridgeNodes,
-            config.formalism.minBridgeCoverage,
+            config.formalism.hdlssThreshold,
+            config.formalism.fusionSimilarityThreshold,
+            config.formalism.effectiveSupportFloor,
             config.formalism.tauFunnelFloor
         ).joinToString(",")
         return String.format(java.util.Locale.US, "%08x", raw.hashCode())

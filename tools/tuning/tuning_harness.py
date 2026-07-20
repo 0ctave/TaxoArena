@@ -206,7 +206,7 @@ def cmd_generate(args):
                                 factors = {
                                     "assignmentCosineGap": float(row["assignmentCosineGap"]),
                                     "tauFunnelFloor": float(row["tauFunnelFloor"]),
-                                    "minBridgeCoverage": int(row["minBridgeCoverage"]),
+                                    "fusionSimilarityThreshold": float(row["fusionSimilarityThreshold"]),
                                     "splitThreshold": float(row["splitThreshold"])
                                 }
                                 sha_to_factors[sha] = factors
@@ -392,7 +392,7 @@ def cmd_collect(args):
     bridge_rows = []
     
     extra_cols = ["run_id", "config_path", "output_dir", "config_sha256", "stage", "seed", 
-                  "assignmentCosineGap", "tauFunnelFloor", "minBridgeCoverage", "splitThreshold"]
+                  "assignmentCosineGap", "tauFunnelFloor", "fusionSimilarityThreshold", "splitThreshold"]
                   
     for r in runs:
         run_id = r["run_id"]
@@ -416,7 +416,7 @@ def cmd_collect(args):
                 row["seed"] = seed
                 row["assignmentCosineGap"] = r["factors"]["assignmentCosineGap"]
                 row["tauFunnelFloor"] = r["factors"]["tauFunnelFloor"]
-                row["minBridgeCoverage"] = r["factors"]["minBridgeCoverage"]
+                row["fusionSimilarityThreshold"] = r["factors"]["fusionSimilarityThreshold"]
                 row["splitThreshold"] = r["factors"]["splitThreshold"]
                 
                 ledger_rows.append(row)
@@ -525,10 +525,10 @@ def cmd_select(args):
     if ranked:
         fieldnames = ["run_id", "config_sha256", "stage", "seed", "hard_gates_passed", "soft_gates_passed", "dominance_count", 
                       "hard_gate_failures", "soft_gate_failures",
-                      "assignmentCosineGap", "tauFunnelFloor", "minBridgeCoverage", "splitThreshold"] + \
+                      "assignmentCosineGap", "tauFunnelFloor", "fusionSimilarityThreshold", "splitThreshold"] + \
                      [k for k in ranked[0].keys() if k not in ["run_id", "config_sha256", "stage", "seed", "hard_gates_passed", "soft_gates_passed", "dominance_count", 
                                                               "hard_gate_failures", "soft_gate_failures",
-                                                              "assignmentCosineGap", "tauFunnelFloor", "minBridgeCoverage", "splitThreshold"]]
+                                                              "assignmentCosineGap", "tauFunnelFloor", "fusionSimilarityThreshold", "splitThreshold"]]
         with open(finalists_csv_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
