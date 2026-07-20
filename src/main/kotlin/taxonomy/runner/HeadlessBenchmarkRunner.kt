@@ -78,7 +78,9 @@ data class HeadlessCliConfig(
     val effectiveSupportFloor: Double? = null,
     val numIterations: Int? = null,
     val runBaselines: Boolean = true,
-    val dPrefix: Int? = null
+    val dPrefix: Int? = null,
+    val secondaryMassFloor: Double? = null,
+    val bridgeSupportFloor: Double? = null
 )
 
 @Component
@@ -163,6 +165,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.hdlssThreshold?.let { config.formalism.hdlssThreshold = it }
         cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
         cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
+        cliConfig.secondaryMassFloor?.let { config.formalism.secondaryMassFloor = it }
+        cliConfig.bridgeSupportFloor?.let { config.formalism.bridgeSupportFloor = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
@@ -1178,6 +1182,8 @@ class HeadlessBenchmarkRunner(
         var hdlssThreshold: Double? = null
         var fusionSimilarityThreshold: Double? = null
         var effectiveSupportFloor: Double? = null
+        var secondaryMassFloor: Double? = null
+        var bridgeSupportFloor: Double? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
@@ -1253,6 +1259,8 @@ class HeadlessBenchmarkRunner(
                 "hdlssThreshold" -> hdlssThreshold = rawVal.toDouble()
                 "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
                 "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
+                "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
+                "bridgeSupportFloor" -> bridgeSupportFloor = rawVal.toDouble()
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
@@ -1300,6 +1308,8 @@ class HeadlessBenchmarkRunner(
             hdlssThreshold = hdlssThreshold,
             fusionSimilarityThreshold = fusionSimilarityThreshold,
             effectiveSupportFloor = effectiveSupportFloor,
+            secondaryMassFloor = secondaryMassFloor,
+            bridgeSupportFloor = bridgeSupportFloor,
             numIterations = numIterations,
             runBaselines = runBaselines
         )
@@ -1346,6 +1356,8 @@ class HeadlessBenchmarkRunner(
             config.formalism.hdlssThreshold,
             config.formalism.fusionSimilarityThreshold,
             config.formalism.effectiveSupportFloor,
+            config.formalism.secondaryMassFloor,
+            config.formalism.bridgeSupportFloor,
             config.formalism.tauFunnelFloor
         ).joinToString(",")
         return String.format(java.util.Locale.US, "%08x", raw.hashCode())

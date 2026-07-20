@@ -240,6 +240,7 @@ class BridgeDiagnosticsExporter(
         }
 
         val numSecondaryCandidatesTotal = candidatePairs.size
+        var numPassCrossDomain = 0
         var numPassSecondaryMassFloor = 0
         var numPassDistinctnessGate = 0
         var numPassCoherenceGate = 0
@@ -306,7 +307,35 @@ class BridgeDiagnosticsExporter(
                     div = StatisticsUtils.vmfJsDivergence(projU, u.vmfKappa, projV, v.vmfKappa, commonDim)
                 }
 
-                // GATES VALIDATION
+                // Independent gate counts
+                if (crossDomain) {
+                    numPassCrossDomain++
+                }
+                if (secondaryMassSum >= config.formalism.secondaryMassFloor) {
+                    numPassSecondaryMassFloor++
+                }
+                val lower = config.formalism.separationEpsilon
+                val upper = 0.95
+                if (div >= lower && div <= upper) {
+                    numPassDistinctnessGate++
+                }
+                val uMass = uWeights.values.sum()
+                val vMass = vWeights.values.sum()
+                val uESS = if (uMass > 0.0) (uMass * uMass / uWeights.values.sumOf { it * it }) else 0.0
+                val vESS = if (vMass > 0.0) (vMass * vMass / vWeights.values.sumOf { it * it }) else 0.0
+                if (uESS >= 10.0 && vESS >= 10.0 && u.vmfKappa >= 1.0 && v.vmfKappa >= 1.0) {
+                    numPassCoherenceGate++
+                }
+                val relFraction = 0.10 * minOf(uMass, vMass)
+                if (secondaryMassSum >= config.formalism.bridgeSupportFloor && secondaryMassSum >= relFraction) {
+                    numPassSupportFloor++
+                }
+                val cycleExists = isAncestor(u, v) || isAncestor(v, u)
+                if (!cycleExists) {
+                    numPassLcaLegalityCheck++
+                }
+
+                // GATES VALIDATION (Sequential Flow)
                 var accepted = true
                 var rejectReason = "None"
 
@@ -318,60 +347,41 @@ class BridgeDiagnosticsExporter(
 
                 // Gate B: Secondary mass floor check
                 if (accepted) {
-                    if (secondaryMassSum < 5.0) {
-                        rejectReason = "Shared support mass below soft floor ($secondaryMassSum < 5.0)"
+                    if (secondaryMassSum < config.formalism.secondaryMassFloor) {
+                        rejectReason = "Shared support mass below soft floor ($secondaryMassSum < ${config.formalism.secondaryMassFloor})"
                         accepted = false
-                    } else {
-                        numPassSecondaryMassFloor++
                     }
                 }
 
                 // Gate C: Distinctness gate check
                 if (accepted) {
-                    val lower = config.formalism.separationEpsilon
-                    val upper = 0.95 // bridge separation ceiling
                     if (div < lower || div > upper) {
                         rejectReason = "JS-divergence out of bridge bounds ($div not in [$lower, $upper])"
                         accepted = false
-                    } else {
-                        numPassDistinctnessGate++
                     }
                 }
 
                 // Gate D: Coherence gate check
-                val uMass = uWeights.values.sum()
-                val vMass = vWeights.values.sum()
-                val uESS = if (uMass > 0.0) (uMass * uMass / uWeights.values.sumOf { it * it }) else 0.0
-                val vESS = if (vMass > 0.0) (vMass * vMass / vWeights.values.sumOf { it * it }) else 0.0
-
                 if (accepted) {
                     if (uESS < 10.0 || vESS < 10.0 || u.vmfKappa < 1.0 || v.vmfKappa < 1.0) {
                         rejectReason = "Adequate support or kappa check failed (ESS: u=$uESS, v=$vESS; Kappa: u=${u.vmfKappa}, v=${v.vmfKappa})"
                         accepted = false
-                    } else {
-                        numPassCoherenceGate++
                     }
                 }
 
                 // Gate E: Strict support floor check
                 if (accepted) {
-                    val relFraction = 0.10 * minOf(uMass, vMass)
-                    if (secondaryMassSum < 50.0 || secondaryMassSum < relFraction) {
-                        rejectReason = "Strict support floor or relative fraction check failed ($secondaryMassSum < 50.0 or < 10% minLeafMass)"
+                    if (secondaryMassSum < config.formalism.bridgeSupportFloor || secondaryMassSum < relFraction) {
+                        rejectReason = "Strict support floor or relative fraction check failed ($secondaryMassSum < ${config.formalism.bridgeSupportFloor} or < 10% minLeafMass)"
                         accepted = false
-                    } else {
-                        numPassSupportFloor++
                     }
                 }
 
                 // Gate F: LCA / Cycle Legality check
                 if (accepted) {
-                    val cycleExists = isAncestor(u, v) || isAncestor(v, u)
                     if (cycleExists) {
                         rejectReason = "Cycle or transitive duplicate legality violation detected"
                         accepted = false
-                    } else {
-                        numPassLcaLegalityCheck++
                     }
                 }
 
@@ -404,6 +414,7 @@ class BridgeDiagnosticsExporter(
                 )
             )
         }
+        log.info("Bridge diagnostics: $numPassCrossDomain / $numSecondaryCandidatesTotal candidates are cross-domain (passed Gate A).")
         log.info("Exported bridge candidate audit and rejection summary ($numFinalBridges final bridges passed).")
     }
 

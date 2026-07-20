@@ -68,6 +68,8 @@ data class EffectiveConfig(
         val hdlssThreshold: Double = 8.0,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
+        val secondaryMassFloor: Double = 5.0,
+        val bridgeSupportFloor: Double = 50.0,
         val tauFunnelFloor: Double = 0.90,
         val defaultKappaPrior: Double = 10.0,
         val dPrefix: Int = 64

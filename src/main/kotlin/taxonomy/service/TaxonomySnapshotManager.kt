@@ -154,6 +154,8 @@ data class SnapshotSettings(
     val cosineTau: Double,
     val routingSoftmaxTau: Double = 1.0,
     val leafAcceptanceScale: Double = 1.0,
+    val secondaryMassFloor: Double = 5.0,
+    val bridgeSupportFloor: Double = 50.0,
     val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
@@ -180,6 +182,8 @@ data class SnapshotSettings(
             cosineTau = cosineTau,
             routingSoftmaxTau = routingSoftmaxTau,
             leafAcceptanceScale = leafAcceptanceScale,
+            secondaryMassFloor = secondaryMassFloor,
+            bridgeSupportFloor = bridgeSupportFloor,
             assignmentGap = assignmentGap,
             emaAlpha = emaAlpha
         )
@@ -503,6 +507,8 @@ class TaxonomySnapshotManager(
             cosineTau = config.formalism.cosineTau,
             routingSoftmaxTau = config.formalism.routingSoftmaxTau,
             leafAcceptanceScale = config.formalism.leafAcceptanceScale,
+            secondaryMassFloor = config.formalism.secondaryMassFloor,
+            bridgeSupportFloor = config.formalism.bridgeSupportFloor,
             assignmentGap = config.formalism.assignmentGap,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

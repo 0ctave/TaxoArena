@@ -122,6 +122,8 @@ class TaxonomyConfig {
         var hdlssThreshold: Double = 8.0
         var fusionSimilarityThreshold: Double = 0.92
         var effectiveSupportFloor: Double = 2.0
+        var secondaryMassFloor: Double = 5.0
+        var bridgeSupportFloor: Double = 50.0
         var tauFunnelFloor: Double = 0.90
         var defaultKappaPrior: Double = 10.0
         var dPrefix: Int = 64
@@ -160,6 +162,8 @@ class TaxonomyConfig {
         sb.append("│   - HDLSS Threshold:      ${formalism.hdlssThreshold}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
+        sb.append("│   - Sec Mass Floor:       ${formalism.secondaryMassFloor}\n")
+        sb.append("│   - Bridge Support Floor: ${formalism.bridgeSupportFloor}\n")
         sb.append("│   - Tau Funnel Floor:     ${formalism.tauFunnelFloor}\n")
         sb.append("└──────────────────────────────────────────────────────────")
         return sb.toString()
@@ -207,6 +211,8 @@ class TaxonomyConfig {
             hdlssThreshold = formalism.hdlssThreshold,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
+            secondaryMassFloor = formalism.secondaryMassFloor,
+            bridgeSupportFloor = formalism.bridgeSupportFloor,
             tauFunnelFloor = formalism.tauFunnelFloor,
             defaultKappaPrior = formalism.defaultKappaPrior,
             dPrefix = formalism.dPrefix
@@ -251,6 +257,8 @@ class TaxonomyConfig {
         formalism.hdlssThreshold = c.formalism.hdlssThreshold
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
+        formalism.secondaryMassFloor = c.formalism.secondaryMassFloor
+        formalism.bridgeSupportFloor = c.formalism.bridgeSupportFloor
         formalism.tauFunnelFloor = c.formalism.tauFunnelFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
         formalism.dPrefix = c.formalism.dPrefix
