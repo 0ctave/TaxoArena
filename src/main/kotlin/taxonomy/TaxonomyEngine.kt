@@ -270,6 +270,8 @@ class TaxonomyEngine(
                 val iterMetrics = TaxonomyMetrics(root, groundTruthMap).generateReport()
                 taxonomyService.addIterationMetrics(reportToIterationMetrics("Iter $i", iterMetrics))
 
+                logNodeDiagnostics(root, distilledData.size)
+
                 // Print intermediate DAG structure / changes to save log size
                 val currentDagState = captureDagState(root)
                 if (previousDagState == null) {
@@ -557,6 +559,53 @@ class TaxonomyEngine(
             }
         }
         return null
+    }
+
+    private fun logNodeDiagnostics(root: GraphNode, totalCorpusSize: Int) {
+        log.info("=== DAG INVARIANT & MASS CONSERVATION DIAGNOSTICS ===")
+        val allNodes = mutableListOf<GraphNode>()
+        fun walk(n: GraphNode, visited: MutableSet<String>) {
+            if (!visited.add(n.id)) return
+            allNodes.add(n)
+            n.children.forEach { walk(it, visited) }
+        }
+        walk(root, mutableSetOf())
+
+        for (n in allNodes) {
+            val localMass = n.queryWeights.values.sum()
+            val localESS = if (localMass > 0.0) (localMass * localMass / n.queryWeights.values.sumOf { it * it }) else 0.0
+            
+            // Region effect (sum of weights in the subtree)
+            val regionWeights = mutableMapOf<String, Double>()
+            val subVisited = mutableSetOf<String>()
+            fun subWalk(curr: GraphNode) {
+                if (!subVisited.add(curr.id)) return
+                for ((q, w) in curr.queryWeights) {
+                    regionWeights[q] = (regionWeights[q] ?: 0.0) + w
+                }
+                curr.treeChildren.forEach { subWalk(it) }
+                curr.crossLinkChildren.forEach { subWalk(it) }
+            }
+            subWalk(n)
+            val regionEff = regionWeights.values.sum()
+
+            val isLeaf = n.children.isEmpty()
+            val queriesSize = n.queries.size
+
+            log.info(String.format(
+                java.util.Locale.US,
+                "Node ID: %s | Depth: %d | Leaf: %b | localMass: %.2f | localESS: %.2f | regionEff: %.2f | queriesSize: %d",
+                n.id, n.depth, isLeaf, localMass, localESS, regionEff, queriesSize
+            ))
+
+            // Invariant Check Warnings
+            if (regionEff > totalCorpusSize + 1e-4) {
+                log.warn("WARNING: Node ${n.id} (${n.label}) violates C1/C4! regionEff ($regionEff) > totalCorpusSize ($totalCorpusSize).")
+            }
+            if (!isLeaf && n.queries.isNotEmpty() && n.residualQueries.isEmpty()) {
+                log.warn("WARNING: Internal Node ${n.id} (${n.label}) violates C3! Has non-empty hard queries size ($queriesSize) but empty residualQueries.")
+            }
+        }
     }
 }
 

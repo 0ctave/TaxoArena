@@ -34,7 +34,7 @@ This acts as a soft seed, encouraging queries to route to their correct taxonomi
 Once raw sibling scores $f_i(x)$ are computed, they are normalized into a probability distribution.
 
 ### Softmax Temperature Scaling
-To adjust routing selectivity, we divide raw scores by a temperature parameter $\tau > 0$ (default $0.5$):
+To adjust routing selectivity, we divide raw scores by a temperature parameter $\tau > 0$ (default $2.0$):
 
 $$ P_i = \frac{\exp(f_i(x) / \tau)}{\sum_{j=1}^{K} \exp(f_j(x) / \tau)} $$
 
@@ -66,13 +66,9 @@ Once all reachable nodes are traversed, we identify the set of reached leaf node
 
 $$ \ln P_{\text{best}} = \max_{L \in \text{Leaves}} \ln P(L) $$
 
-We filter out leaves that deviate significantly from this optimal path. A leaf $L$ is assigned the query only if its path probability lies within the configured **assignment gap** boundary ($g_{\text{assign}}$, default $0.15$):
+We filter out leaves that deviate significantly from this optimal path. A leaf $L$ is assigned the query only if its path log-probability lies within the configured **assignment cosine gap** boundary ($g_{\text{assign}}$, default $0.03$):
 
-$$ P(L) \ge P_{\text{best}} \cdot (1.0 - g_{\text{assign}}) $$
-
-Or in log-space:
-
-$$ \ln P(L) \ge \ln P_{\text{best}} + \ln(1.0 - g_{\text{assign}}) $$
+$$ \ln P(L) \ge \ln P_{\text{best}} - g_{\text{assign}} $$
 
 Queries that satisfy this gate are assigned to the leaf. If multiple leaves pass, the query is assigned polyhierarchically to all of them. The final assignment log-probabilities are then normalized across the surviving leaves so that their linear sum equals $1.0$.
 

@@ -458,6 +458,9 @@ class TaxonomyMerger(
 
             // Move residual queries down
             grandchild.queries.addAll(passthrough.queries)
+            for ((q, w) in passthrough.queryWeights) {
+                grandchild.queryWeights[q] = (grandchild.queryWeights[q] ?: 0.0) + w
+            }
 
             // Re-parent grandchild under node (the passthrough's parent)
             node.children.remove(passthrough)
@@ -492,6 +495,7 @@ class TaxonomyMerger(
             passthrough.children.clear()
             passthrough.crossLinkChildren.clear()
             passthrough.queries.clear()
+            passthrough.queryWeights.clear()
         }
 
         return anyPruned

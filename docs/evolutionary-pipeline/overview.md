@@ -40,9 +40,9 @@ This phase models the statistical geometry of each domain node:
 
 ### Phase 3: Trickle (Top-Down Restrictive Routing)
 Queries are routed from the Root down the DAG:
-*   **Routing Probability**: Sibling nodes compete for queries. Sibling probabilities are computed using a log-space softmax scaled by temperature $\tau$ (default $0.5$) and regularized with Laplace smoothing.
+*   **Routing Probability**: Sibling nodes compete for queries. Sibling probabilities are computed using a log-space softmax scaled by temperature $\tau$ (default $2.0$) and regularized with Laplace smoothing.
 *   **Exclusion Funnel**: Depth-decaying confidence intervals act as safety valves, narrowing the routing boundaries from $0.999 \to 0.90$.
-*   **Execution**: Implemented in [TaxonomyTrickler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyTrickler.kt). It maps queries to reached leaves that fall within `assignmentGap` of the highest leaf score.
+*   **Execution**: Implemented in [TaxonomyTrickler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyTrickler.kt). It maps queries to reached leaves that fall within `assignmentCosineGap` of the highest leaf score.
 
 ### Phase 4: Discover (Adaptive Splitting)
 When query density within a leaf exceeds a threshold $2 \times N_{min}$, it is evaluated for sub-domain creation:

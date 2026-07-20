@@ -95,12 +95,15 @@ The configuration parameters are managed via a nested YAML setup (mapped to `Tax
 ```yaml
 taxonomy:
   formalism:
-    minClusterSize: 20            # Minimum queries required to keep a node or trigger a split ($N_{min}$)
-    maxDepth: 7                  # Maximum allowable depth of the taxonomy DAG ($D_{max}$)
-    separationEpsilon: 0.05      # JS-divergence distinctness threshold ($\epsilon$) for sibling merging
-    assignmentGap: 0.15          # Trickle routing assignment boundary in nats
-    cosineTau: 0.5               # Temperature ($\tau$) for softmax routing probabilities
-    emaAlpha: 0.3                # Decay rate ($\alpha_{EMA}$) for vMF concentration parameters
+    minClusterSize: 40            # Minimum queries required to keep a node or trigger a split ($N_{min}$)
+    maxDepth: 8                  # Maximum allowable depth of the taxonomy DAG ($D_{max}$)
+    separationEpsilon: 0.04      # JS-divergence distinctness threshold ($\epsilon$) for sibling merging
+    assignmentCosineGap: 0.03    # Soft routing assignment cosine gap threshold
+    cosineTau: 2.0               # Temperature ($\tau$) for softmax routing probabilities
+    emaAlpha: 0.7                # Decay rate ($\alpha_{EMA}$) for vMF concentration parameters
+    hdlssThreshold: 8.0          # d/N ratio limit for backing off to lower MRL dimension prefixes
+    fusionSimilarityThreshold: 0.92  # Cosine similarity threshold for organic node fusion
+    effectiveSupportFloor: 2.0   # Minimum effective query count required for fitting vMF variance
     biasCorrectionThreshold: 5.0 # Ratio $d/N$ above which kappa bias correction is applied
   llm:
     labelingModel: "gemini-2.5-flash"  # Model used for generating domain-specialized labels

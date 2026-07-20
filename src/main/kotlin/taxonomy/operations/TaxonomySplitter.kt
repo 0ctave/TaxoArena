@@ -75,14 +75,18 @@ class TaxonomySplitter(
     }
 
     suspend fun splitSingleNode(node: GraphNode) {
+        val localWeights = node.queryWeights
+        val mass = localWeights.values.sum()
+        val ess = if (mass > 0.0) (mass * mass / localWeights.values.sumOf { it * it }) else 0.0
         val threshold = 2 * config.formalism.minClusterSize
-        if (node.queries.size <= threshold) return
+        if (mass < threshold || ess < threshold) return
+
         if (node.depth >= config.formalism.maxDepth) {
             log.debug("Split Boundary: '${node.label}' reached max depth (${config.formalism.maxDepth}). Preventing split.")
             return
         }
 
-        val isDiffuse = node.vmfKappa < 0.5 && node.queries.size < 10 * config.formalism.minClusterSize
+        val isDiffuse = node.vmfKappa < 0.5 && mass < 10 * config.formalism.minClusterSize
         if (isDiffuse) {
             var viable = false
             if (config.formalism.enableResidualSplitGate) {
@@ -141,9 +145,9 @@ class TaxonomySplitter(
             allSubtreeQueries.filter { emb ->
                 val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
                 qId in node.residualQueries
-            }.ifEmpty { node.queries }
+            }.ifEmpty { localWeights.keys.mapNotNull { GraphNode.getEmbedding(it) } }
         } else {
-            node.queries
+            localWeights.keys.mapNotNull { GraphNode.getEmbedding(it) }
         }
 
         log.debug("Scanning '${node.label}' (${targetQueries.size} q) for split...")
@@ -263,7 +267,6 @@ class TaxonomySplitter(
             fitter.fitSingleNode(child)
             allSpawnedLeaves.add(child)
         }
-        node.queries.clear()
 
         // ── Macro-concept decomposition (lowered threshold: 3x instead of 5x) ─
         val macroThreshold = threshold * 3
@@ -344,9 +347,15 @@ class TaxonomySplitter(
             treeParentId = parent.id
         }
         newNode.queries.addAll(cluster)
-        for (q in cluster) {
-            newNode.queryWeights[q.rawText] = 1.0
-            GraphNode.registerEmbedding(q)
+        
+        synchronized(parent.queryWeights) {
+            for (q in cluster) {
+                val parentW = parent.queryWeights[q.rawText] ?: 1.0
+                newNode.queryWeights[q.rawText] = parentW
+                parent.queryWeights.remove(q.rawText)
+                parent.queries.removeIf { it.rawText == q.rawText }
+                GraphNode.registerEmbedding(q)
+            }
         }
 
         return newNode
