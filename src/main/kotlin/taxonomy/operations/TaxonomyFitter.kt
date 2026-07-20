@@ -61,7 +61,15 @@ class TaxonomyFitter(
         log.info("[FITTER] Fitting complete ($depthsCount depths, $totalNodesFitted nodes)")
     }
 
-    private fun fitVmfFromQueryList(node: GraphNode, queries: List<Embedding>, d: Int) {
+    private fun dOverNAlpha(rho: Double): Double {
+        return when {
+            rho <= 2.0  -> 0.0             // trust κ_ML
+            rho <= 10.0 -> (rho - 2.0) / 8.0 // ramp up
+            else        -> 1.0             // fully prior-dominated
+        }
+    }
+
+    private fun fitVmfFromQueryList(node: GraphNode, queries: List<Embedding>, d: Int, kappa0Parent: Double) {
         val n = queries.size
         if (n == 0) return
 
@@ -99,16 +107,27 @@ class TaxonomyFitter(
         }
 
         val rBar = normVec / n
+        val rho = d.toDouble() / n.coerceAtLeast(1)
+        node.dOverN = rho
+        val alphaD = dOverNAlpha(rho)
         val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
-        val sampleWeight = (n / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
-        val effectiveAlpha = config.formalism.emaAlpha * sampleWeight
-        val oldKappa = node.vmfKappa.takeIf { it > 1e-3 } ?: rawKappa
-        node.vmfKappa = (1.0 - effectiveAlpha) * rawKappa + effectiveAlpha * oldKappa
+        val priorKappa = kappa0Parent.coerceAtLeast(1.0)
+        node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
         node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
+
+        if (rho > 10.0) {
+            log.warn("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+        }
     }
 
     fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) {
         val d = node.sliceDim
+        val parents = node.parents
+        val kappa0Parent = if (parents.isNotEmpty()) {
+            parents.map { it.vmfKappa }.average()
+        } else {
+            config.formalism.defaultKappaPrior
+        }
 
         // ── n for NiW (always branch-based for routing confidence) ───────────────
         val branchQueries = node.getAllQueriesInRegion()
@@ -186,24 +205,23 @@ class TaxonomyFitter(
                         for (i in 0 until d) dotSum += mu[i] * vec[i]
                     }
                     val rBar = (dotSum / kappaVecs.size.coerceAtLeast(1)).coerceAtLeast(0.0)
-                    val newKappa = StatisticsUtils.correctedKappa(rBar, d, kappaVecs.size)
-
-                    // EMA dampening (keep if node already has a sensible kappa)
-                    val prevKappa = node.vmfKappa
-                    val sampleWeight = (kappaVecs.size / (10.0 * config.formalism.minClusterSize))
-                        .coerceIn(0.0, 1.0)
-                    node.vmfKappa = if (prevKappa > 1e-2)
-                        prevKappa + sampleWeight * (newKappa - prevKappa)
-                    else
-                        newKappa
-
+                    val rawKappa = StatisticsUtils.correctedKappa(rBar, d, kappaVecs.size)
+                    val rho = d.toDouble() / kappaVecs.size.coerceAtLeast(1)
+                    node.dOverN = rho
+                    val alphaD = dOverNAlpha(rho)
+                    val priorKappa = kappa0Parent.coerceAtLeast(1.0)
+                    node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
                     node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
+
+                    if (rho > 10.0) {
+                        log.warn("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+                    }
                 } else {
-                    fitVmfFromQueryList(node, node.queries.ifEmpty { branchQueries }, d)
+                    fitVmfFromQueryList(node, node.queries.ifEmpty { branchQueries }, d, kappa0Parent)
                 }
             } else {
                 val vmfSrc = node.queries.ifEmpty { branchQueries }
-                fitVmfFromQueryList(node, vmfSrc, d)
+                fitVmfFromQueryList(node, vmfSrc, d, kappa0Parent)
             }
         } else {
             // mu trusted from splitter — recompute kappa from current branch to reflect
@@ -216,11 +234,16 @@ class TaxonomyFitter(
                 (dot / kappaQueries.size.coerceAtLeast(1)).coerceAtLeast(0.0)
             }
             val rawKappa = StatisticsUtils.correctedKappa(rBar, muSize, kappaQueries.size)
-            val sampleWeight = (kappaQueries.size / (4.0 * config.formalism.minClusterSize)).coerceIn(0.0, 1.0)
-            val effectiveAlpha = config.formalism.emaAlpha * sampleWeight
-            val oldKappa = node.vmfKappa.takeIf { it > 1e-3 } ?: rawKappa
-            node.vmfKappa = (1.0 - effectiveAlpha) * rawKappa + effectiveAlpha * oldKappa
+            val rho = muSize.toDouble() / kappaQueries.size.coerceAtLeast(1)
+            node.dOverN = rho
+            val alphaD = dOverNAlpha(rho)
+            val priorKappa = kappa0Parent.coerceAtLeast(1.0)
+            node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
             node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(muSize, node.vmfKappa)
+
+            if (rho > 10.0) {
+                log.warn("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+            }
         }
 
         // ── NiW posterior ─────────────────────────────────────────────────────────
@@ -229,15 +252,11 @@ class TaxonomyFitter(
         val fitDim = node.vmfMu.size   // use actual mu size, not sliceDim, to stay consistent
         val projected = branchQueries.map { it.projectTo(fitDim) }
 
-        val parents = node.parents
         val m0 = DoubleArray(fitDim)
-        var kappa0Parent = 0.0
-
         if (parents.isNotEmpty()) {
             for (parent in parents) {
                 val projParentMu = StatisticsUtils.projectVector(parent.vmfMu, fitDim)
                 for (i in 0 until fitDim) m0[i] += projParentMu[i].toDouble()
-                kappa0Parent += parent.vmfKappa
             }
             var m0Norm = 0.0
             for (i in 0 until fitDim) {
@@ -247,10 +266,8 @@ class TaxonomyFitter(
             m0Norm = sqrt(m0Norm)
             if (m0Norm > 0.0) for (i in 0 until fitDim) m0[i] /= m0Norm
             else if (fitDim > 0) m0[0] = 1.0
-            kappa0Parent /= parents.size.toDouble()
         } else {
             if (fitDim > 0) m0[0] = 1.0
-            kappa0Parent = 10.0
         }
 
         val kappa0 = 1.0

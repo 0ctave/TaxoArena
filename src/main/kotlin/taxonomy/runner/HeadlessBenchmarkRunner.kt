@@ -53,6 +53,7 @@ data class HeadlessCliConfig(
     val assignmentGap: Double? = null,
     val assignmentCosineGap: Double? = null,
     val tauFunnelFloor: Double? = null,
+    val defaultKappaPrior: Double? = null,
     val emaAlpha: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
@@ -142,6 +143,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.assignmentGap?.let { config.formalism.assignmentGap = it }
         cliConfig.assignmentCosineGap?.let { config.formalism.assignmentCosineGap = it }
         cliConfig.tauFunnelFloor?.let { config.formalism.tauFunnelFloor = it }
+        cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.emaAlpha?.let { config.formalism.emaAlpha = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -1175,6 +1177,7 @@ class HeadlessBenchmarkRunner(
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
+        var defaultKappaPrior: Double? = null
         var runBaselines = true
 
         val lines = mutableListOf<String>()
@@ -1253,6 +1256,7 @@ class HeadlessBenchmarkRunner(
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
+                "defaultKappaPrior" -> defaultKappaPrior = rawVal.toDouble()
                 "runBaselines" -> runBaselines = rawVal.toBoolean()
             }
         }
@@ -1279,6 +1283,7 @@ class HeadlessBenchmarkRunner(
             assignmentGap = assignmentGap,
             assignmentCosineGap = assignmentCosineGap,
             tauFunnelFloor = tauFunnelFloor,
+            defaultKappaPrior = defaultKappaPrior,
             emaAlpha = emaAlpha,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,

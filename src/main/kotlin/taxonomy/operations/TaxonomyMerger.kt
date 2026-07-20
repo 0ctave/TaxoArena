@@ -685,7 +685,7 @@ class TaxonomyMerger(
 
             val alreadyBridged = u.parents.any { p -> p.isBridge && v.parents.any { vp -> vp.id == p.id } }
             if (alreadyBridged) {
-                log.info("Bridge Insertion: skipping candidate $candidateId; leaf pair is already bridged")
+                log.debug("Bridge Insertion: skipping candidate $candidateId; leaf pair is already bridged")
                 continue
             }
 
@@ -694,7 +694,7 @@ class TaxonomyMerger(
             val vCount = bridgedLeaves.getOrDefault(v.id, 0)
             val budget = config.formalism.bridgeParentBudget ?: 1
             if (uCount >= budget || vCount >= budget) {
-                log.info("Bridge Insertion: skipping candidate $candidateId; bridgeParentBudget of $budget exceeded for leaf")
+                log.debug("Bridge Insertion: skipping candidate $candidateId; bridgeParentBudget of $budget exceeded for leaf")
                 continue
             }
 
@@ -706,14 +706,14 @@ class TaxonomyMerger(
             val domainPairKey = if (domU < domV) "$domU|$domV" else "$domV|$domU"
             val existingDomainBridges = domainPairCounts.getOrDefault(domainPairKey, 0)
             if (existingDomainBridges >= (config.formalism.maxBridgesPerDomainPair ?: 2)) {
-                log.info("Bridge Insertion: skipping candidate between $domU and $domV; limit of ${config.formalism.maxBridgesPerDomainPair ?: 2} bridges for this pair reached.")
+                log.debug("Bridge Insertion: skipping candidate between $domU and $domV; limit of ${config.formalism.maxBridgesPerDomainPair ?: 2} bridges for this pair reached.")
                 continue
             }
 
             val sourceNodes = "${u.label ?: u.id} + ${v.label ?: v.id}"
             val straddlingCount = u.queries.intersect(v.queries.toSet()).size
             if (straddlingCount < config.formalism.minBridgeCoverage) {
-                log.info("Bridge Insertion: skipping candidate $candidateId; straddling query size $straddlingCount < minBridgeCoverage ${config.formalism.minBridgeCoverage}")
+                log.debug("Bridge Insertion: skipping candidate $candidateId; straddling query size $straddlingCount < minBridgeCoverage ${config.formalism.minBridgeCoverage}")
                 continue
             }
             var combinedQueries = u.queries.intersect(v.queries.toSet()).toList()
