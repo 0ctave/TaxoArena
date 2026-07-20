@@ -390,13 +390,19 @@ threshold $\delta$ and both children satisfy a minimum size constraint
 $n_{\min}$ (values in Chapter~\ref{ch:experimental-design}).
 
 \textbf{Phase 5 --- Topological optimisation.}
-\texttt{TaxonomyMerger} executes four anchor-exempt operations in
-sequence: merge of similar siblings (Jensen--Shannon below
+\texttt{TaxonomyMerger} executes a sequence of anchor-exempt
+operations: merge of similar siblings (Jensen--Shannon below
 $\delta_{\text{sep}}$); pruning of starved leaves with queries
 reassigned to the nearest sibling; collapse of single-child parents;
-and cross-link insertion for any query whose NiW score under a
-non-primary leaf exceeds $\theta_{\text{cross}}$, followed by
-transitive reduction to maintain the minimal DAG.
+soft-membership refitting via \texttt{refitMuPerIteration}, subject to
+a no-update band once a node's dominant posterior mass exceeds a high
+threshold (0.999 relaxing to 0.9975 as depth increases); and bridge
+insertion from two distinct sources, followed by transitive reduction
+to maintain the minimal DAG.
+Bridge insertion replaces a single global cross-link threshold with
+two gated sources described in
+Section~\ref{subsec:polyhierarchy}: \textit{Source-A} residual-node
+routing and \textit{Source-B} cross-domain bridging.
 
 \textbf{Phase 6 --- Convergence gate.}
 Convergence is declared when the structural edit distance between
@@ -519,22 +525,58 @@ dimension before cosine or KL comparison; \texttt{TaxonomyMerger}
 raises a \texttt{DimensionMismatchException} if this projection is
 omitted.
 
-\subsection*{Polyhierarchy and Cross-Links}
+\subsection*{Polyhierarchy and Cross-Links}\label{subsec:polyhierarchy}
 
 The DAG structure---as distinct from a tree---arises exclusively from
-topology operations in Phase~5; construction-time routing is exclusive
-(one child per query per depth).
+topology operations in Phase~5; construction-time routing remains
+exclusive (one primary child per query per depth), so every query
+retains exactly one primary leaf even after bridges are added.
 
-The sole source of node-level polyhierarchy is cross-link insertion:
-after each splitting phase, \texttt{TaxonomyMerger} computes the NiW
-posterior predictive score of every leaf $L'$ for each query $q$ whose
-primary leaf is $L \neq L'$; when the score exceeds
-$\theta_{\text{cross}}$, a directed edge is added from the lowest
-common ancestor of $L$ and $L'$ to $L'$, giving $L'$ a second parent
-in the DAG while $L$ retains its terminal (leaf) status.
+Node-level polyhierarchy is introduced by two gated bridge sources,
+both of which operate on the assignment-margin quantity
+\[
+\text{marginNats} = \text{assignmentCosineGap} \cdot
+\frac{\kappa_{\text{eff}}}{\tau_{\text{eff}}},
+\]
+which converts the raw cosine gap between a query's best- and
+second-best-scoring node into a log-odds margin under the fitted
+concentration $\kappa_{\text{eff}}$ and temperature $\tau_{\text{eff}}$
+(for example, $\text{assignmentCosineGap} = 0.03$ at
+$\kappa_{\text{eff}} = 100$ and $\tau_{\text{eff}} = 2$ yields a
+margin of 1.5 nats).
+A configurable depth-3 funnel floor, \texttt{tauFunnelFloor}
+(default $0.90$), lower-bounds the routing temperature at the deepest
+level so that leaf-level assignment remains appropriately permissive.
+
+\textbf{Source-A: residual bridges.}
+Residual nodes (Section~\ref{sec:arch-dag}) that receive no primary
+queries after routing are nonetheless retained as bridge targets: any
+query whose secondary NiW posterior score at a residual node clears
+the assignment-margin gate is linked to that node via a secondary
+edge, giving the residual node evaluable membership without altering
+any query's primary leaf.
+
+\textbf{Source-B: cross-domain bridges.}
+After each splitting phase, \texttt{TaxonomyMerger} evaluates
+candidate secondary edges between a query's primary leaf $L$ and every
+other leaf $L'$ (including leaves under a different anchor) whose NiW
+posterior score for $q$ clears the assignment-margin gate.
+A candidate edge is inserted only if it passes four sequential gates:
+deduplication against existing edges; a coherence gate rejecting
+edges where the resulting secondary membership would push $L'$'s
+internal coherence below $0.70$; a distinctness gate requiring the
+primary and secondary leaf profiles to remain at least $0.92$
+cosine-distinct; and a cycle check combined with a cross-domain
+dominant-category gate that blocks bridges which would make a leaf's
+secondary membership dominate its primary-anchor identity.
+A directed edge is added from the lowest common ancestor of $L$ and
+$L'$ to $L'$ when all gates pass, giving $L'$ a second parent in the
+DAG while $L$ retains its terminal (leaf) status and its status as
+$q$'s primary leaf.
 This preserves the invariant that a leaf node has no outgoing
 parent-child edges.
-A transitive reduction sweep follows to maintain the minimal DAG.
+A transitive reduction sweep follows both sources to maintain the
+minimal DAG.
 
 Evaluation-time multi-leaf assignment of held-out queries---governed
 by a gap threshold $\gamma$ in \texttt{BenchmarkService}---is
@@ -796,7 +838,7 @@ Limitation~5 in Section~\ref{sec:arch-limits}.
 \textbf{Positioning relative to alternative judge designs.}
 The reference-informed, domain-conditioned approach sits between two
 alternatives: generic prompting (stable but domain-agnostic) and
-alignment-aware designs such as MemAlign~\parencite{memalign2024}
+alignment-aware designs such as MemAlign~\parencite{databricks2025memalign}
 (stronger calibration but requiring external preference corpora).
 The approach adopted here requires only the taxonomy and its
 construction-set reference answers.
@@ -916,8 +958,8 @@ construction and arena evaluation---connected through an immutable
 DAG snapshot.
 The taxonomy pipeline induces sub-domain structure within 14 fixed
 anchor nodes through a six-phase iterative loop; DAG polyhierarchy
-arises exclusively from Phase~5 cross-link insertion, while
-construction-time routing is exclusive.
+arises exclusively from Phase~5 bridge insertion (residual and
+cross-domain sources), while construction-time routing is exclusive.
 The arena pipeline allocates comparisons adaptively, terminates under
 a three-level state machine with a query-weighted global condition,
 pools verdict sufficient statistics under the primary-path convention
