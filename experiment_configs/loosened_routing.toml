@@ -1,0 +1,48 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  loosened_routing.toml
+#  PURPOSE: Test run configuration with wider assignmentCosineGap to increase
+#           the average leaves per query (AvgMatchCountEval) from ~1.05 to a
+#           higher value.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06", "Meta-Llama-3_1-8B-Instruct"]
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/loosened_routing"
+testRatio     = 0.3
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false
+
+# ── Core formalism ──────────────────────────────────────────────────────────
+maxDepth          = 8
+minClusterSize    = 40
+separationEpsilon = 0.01
+routingSoftmaxTau = 1.0
+leafAcceptanceScale = 1.0
+tauFunnelFloor    = 0.75
+emaAlpha          = 0.7
+
+# ── Adaptive soft-membership params (loosened for higher spread) ─────────────
+assignmentCosineGap     = 0.12
+deltaAssign             = 0.20
+maxLeafAssignments      = 8
+refitMuPerIteration     = true
+
+# ── DAG-Max flags: ALL ON ─────────────────────────────────────────────────────
+enableStableQuestionIds = true
+enableResidualRouting   = true
+enableResidualSplitGate = true
+enableBridging          = true
+
+# ── Emergent Router parameters ────────────────────────────────────────────────
+hdlssThreshold = 8.0
+fusionSimilarityThreshold = 0.92
+effectiveSupportFloor = 2.0
+numIterations           = 35
