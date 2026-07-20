@@ -14,6 +14,9 @@ import taxonomy.service.TaxonomyService
 import taxonomy.utils.TaxonomyMetrics
 import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.utils.reportToIterationMetrics
+import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.operations.TaxonomyTrickler
+import taxonomy.utils.BridgeDiagnosticsExporter
 import java.io.File
 import kotlin.system.measureTimeMillis
 
@@ -30,7 +33,9 @@ class TaxonomyEngine(
     private val visualizer: TaxonomyVisualizer,
     private val stabilizer: TaxonomyStabilizer,
     private val taxonomyService: TaxonomyService,
-    private val perfTracker: TaxonomyPerformanceTracker
+    private val perfTracker: TaxonomyPerformanceTracker,
+    private val datasetFetcher: MMLUDatasetFetcher,
+    private val trickler: TaxonomyTrickler
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.Engine")
 
@@ -327,6 +332,15 @@ class TaxonomyEngine(
             assignQueryIds(root, config.formalism.enableStableQuestionIds)
             log.info("--- ${config.execution.numIterations}-Iteration Evolution Completed ---")
             ops.printHierarchy(root)
+
+            // Generate and export bridge and soft routing diagnostics
+            try {
+                val exporter = BridgeDiagnosticsExporter(config, datasetFetcher, trickler)
+                val outPath = (ExperimentOutputContext.activeBaseDir ?: File(".")).absolutePath
+                exporter.exportDiagnostics(root, uniqueEmbs, outPath)
+            } catch (e: Exception) {
+                log.warn("Failed to export bridge diagnostics: ${e.message}", e)
+            }
             
             // Final Exports
             if (config.execution.enableVisualization) {
