@@ -78,7 +78,7 @@ class BtMatchScheduler(
                 val history = pairConfHistory.getOrPut(key) { mutableListOf() }
                 history.add(conf)
 
-                val comparisons = ps.totalComparisons
+                val comparisons = ps.totalComparisons.toInt()
 
                 // 1. Check if stable
                 if (conf >= 0.88) {
@@ -156,7 +156,7 @@ class BtMatchScheduler(
         if (stoppingPolicy.globallyResolvedPairs.contains(pairKey)) return false
 
         // Always play if either model is unseen (bootstrap guarantee)
-        val nij = ps?.totalComparisons ?: 0
+        val nij = ps?.totalComparisons?.toInt() ?: 0
         if (nij < minMatches) return true
 
         // No BT state yet → informative by default
@@ -190,7 +190,7 @@ class BtMatchScheduler(
             val ps = pairs.firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
-            val nij = ps?.totalComparisons ?: 0
+            val nij = ps?.totalComparisons?.toInt() ?: 0
             val budget = stoppingPolicy.pairCustomBudgets.getOrDefault("${nodeId}|$pairKey", budgetPerPair)
             if (nij >= budget) return@count false  // budget-exhausted: skip
             if (nij < 2) return@count true
@@ -236,7 +236,7 @@ class BtMatchScheduler(
                 if (!isRR && !isMatchInformative(mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
 
                 val budget = pairBudget(node.id, mA, mB)
-                val already = ps?.totalComparisons ?: 0
+                val already = ps?.totalComparisons?.toInt() ?: 0
                 if (already >= budget) continue  // exhausted
 
                 val isBlockingPair = isMatchInformative(mA, mB, state, ps) && already < (budgetPerPair - 5) // not near budget
@@ -303,7 +303,7 @@ class BtMatchScheduler(
             node.id to models.associateWith { model ->
                 (pairStats[node.id] ?: emptyList())
                     .filter { it.modelA == model || it.modelB == model }
-                    .sumOf { it.totalComparisons }
+                    .sumOf { it.totalComparisons }.toInt()
             }
         }
 
@@ -317,7 +317,7 @@ class BtMatchScheduler(
             targetNodes.sumOf { node ->
                 (pairStats[node.id] ?: emptyList()).firstOrNull {
                     (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
-                }?.totalComparisons ?: 0
+                }?.totalComparisons?.toInt() ?: 0
             }
         }
 
@@ -330,7 +330,7 @@ class BtMatchScheduler(
                         (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                     }
                     val budget = stoppingPolicy.pairCustomBudgets.getOrDefault("${nodeId}|${minOf(mA, mB)}|${maxOf(mA, mB)}", budgetPerPair)
-                    (ps?.totalComparisons ?: 0) < budget
+                    (ps?.totalComparisons?.toInt() ?: 0) < budget
                 }
             val hasOnlyStableOrIrresolvable = activePairsForModel.isNotEmpty() && activePairsForModel.all { (nodeId, mA, mB) ->
                 val key = "${nodeId}|${minOf(mA, mB)}|${maxOf(mA, mB)}"
@@ -375,7 +375,7 @@ class BtMatchScheduler(
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
             val budget = pairBudget(nodeId, mA, mB)
-            if ((ps?.totalComparisons ?: 0) >= budget) return false
+            if ((ps?.totalComparisons?.toInt() ?: 0) >= budget) return false
 
             val nodeQueryIds = (nodeToQueries[nodeId] ?: emptyList()).sorted()
             val available = resultsMatrix.keys.intersect(nodeQueryIds.toSet()).sorted()
@@ -396,7 +396,7 @@ class BtMatchScheduler(
                 available
             }
 
-            val offset = pairQueryOffsets.getOrDefault("$nodeId|$pk", ps?.totalComparisons ?: 0)
+            val offset = pairQueryOffsets.getOrDefault("$nodeId|$pk", ps?.totalComparisons?.toInt() ?: 0)
             val slice = rankedAvailable.drop(offset).take(BATCH_STEP_SIZE)
             if (slice.isEmpty()) return false
 
@@ -593,7 +593,7 @@ class BtMatchScheduler(
 
         if (state == null) return LN2
 
-        val T = ps?.ties ?: 0
+        val T = ps?.ties ?: 0.0
         val W = (ps?.winsA ?: 0.0) + (ps?.winsB ?: 0.0)
         val total = W + T
         val tau = if (total == 0.0) 0.0 else T.toDouble() / total

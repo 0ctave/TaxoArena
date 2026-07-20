@@ -73,6 +73,7 @@ data class EffectiveConfig(
         val bridgeCandidateTopK: Int = 10,
         val minBridgeCoverage: Int = 50,
         val tauFunnelFloor: Double = 0.90,
-        val defaultKappaPrior: Double = 10.0
+        val defaultKappaPrior: Double = 10.0,
+        val dPrefix: Int = 64
     )
 }

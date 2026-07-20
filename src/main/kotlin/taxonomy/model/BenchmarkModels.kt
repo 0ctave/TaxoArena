@@ -50,7 +50,8 @@ data class QueryBenchmarkResult(
     val pairEvaluations: Map<String, List<DomainEvaluation>> = emptyMap(),
     // per-model-pair: judgeWinner agrees with accuracy-based winner?
     val judgeAccuracyAgreement: Map<String, Boolean>,  // "A_vs_B" -> true/false
-    val queryId: Int = 0
+    val queryId: Int = 0,
+    val secondaryMemberships: Map<String, Double> = emptyMap()
 )
 
 @Serializable
@@ -107,15 +108,36 @@ data class NodePairStats(
     val modelB: String,
     var winsA: Double = 0.0,      // Double to support 0.5 for BT ties
     var winsB: Double = 0.0,
-    var ties: Int = 0,             // raw tie count (position flips)
-    var totalComparisons: Int = 0,
+    var ties: Double = 0.0,             // raw tie count (position flips)
+    var totalComparisons: Double = 0.0,
     var positionFlips: Int = 0,
     var lastUpdated: Long = 0L,
     var winAFirst: Double = 0.0,
     var winASecond: Double = 0.0,
     var agreementWins: Int = 0,
     var agreementChecks: Int = 0
-)
+) {
+    constructor(
+        nodeId: String,
+        modelA: String,
+        modelB: String,
+        winsA: Double = 0.0,
+        winsB: Double = 0.0,
+        ties: Int = 0,
+        totalComparisons: Int = 0,
+        positionFlips: Int = 0,
+        lastUpdated: Long = 0L,
+        winAFirst: Double = 0.0,
+        winASecond: Double = 0.0,
+        agreementWins: Int = 0,
+        agreementChecks: Int = 0
+    ) : this(
+        nodeId, modelA, modelB, winsA, winsB,
+        ties.toDouble(), totalComparisons.toDouble(),
+        positionFlips, lastUpdated, winAFirst, winASecond,
+        agreementWins, agreementChecks
+    )
+}
 
 @Serializable
 data class NodeBtState(

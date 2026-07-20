@@ -128,6 +128,7 @@ class TaxonomyConfig {
         var minBridgeCoverage: Int = 50
         var tauFunnelFloor: Double = 0.90
         var defaultKappaPrior: Double = 10.0
+        var dPrefix: Int = 64
     }
 
     fun formatConfigReport(): String {
@@ -207,7 +208,8 @@ class TaxonomyConfig {
             bridgeCandidateTopK = formalism.bridgeCandidateTopK,
             minBridgeCoverage = formalism.minBridgeCoverage,
             tauFunnelFloor = formalism.tauFunnelFloor,
-            defaultKappaPrior = formalism.defaultKappaPrior
+            defaultKappaPrior = formalism.defaultKappaPrior,
+            dPrefix = formalism.dPrefix
         )
     )
 
@@ -255,6 +257,7 @@ class TaxonomyConfig {
         formalism.minBridgeCoverage = c.formalism.minBridgeCoverage
         formalism.tauFunnelFloor = c.formalism.tauFunnelFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
+        formalism.dPrefix = c.formalism.dPrefix
     }
 }
 

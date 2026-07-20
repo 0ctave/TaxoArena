@@ -197,7 +197,7 @@ class ActiveBtRacingScheduler(
                 val isModelA = key.first == ps.modelA
                 val winsFirst = if (isModelA) ps.winsA else ps.winsB
                 stats.sumX = winsFirst + 0.5 * ps.ties
-                stats.n = ps.totalComparisons
+                stats.n = ps.totalComparisons.toInt()
             }
 
             leafArena

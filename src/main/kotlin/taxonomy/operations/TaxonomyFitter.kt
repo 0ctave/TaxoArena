@@ -20,13 +20,100 @@ class TaxonomyFitter(
     private val config: TaxonomyConfig
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.Fitter")
+    private val highDOverNCount = java.util.concurrent.atomic.AtomicInteger(0)
 
-    /**
-     * Parallel BFS level-by-level fitting. Processes root-first (shallow to deep)
-     * so parent parameters are available for prior calibration at child nodes.
-     */
+    private val calibratedRatios = java.util.concurrent.ConcurrentHashMap<Int, Double>()
+
+    private fun computePrefixKappa(node: GraphNode, queries: List<Embedding>, dPrefix: Int): Double {
+        val n = queries.size
+        if (n < 2) return 1.0
+        
+        val actualDPrefix = minOf(dPrefix, node.sliceDim)
+        val projected = queries.map { it.projectTo(actualDPrefix) }
+        
+        val sumVec = DoubleArray(actualDPrefix)
+        for (vec in projected) {
+            for (i in 0 until actualDPrefix) {
+                sumVec[i] += vec[i].toDouble()
+            }
+        }
+        
+        var normVec = 0.0
+        for (i in 0 until actualDPrefix) normVec += sumVec[i] * sumVec[i]
+        normVec = sqrt(normVec)
+        
+        val prefixMu = DoubleArray(actualDPrefix) { i -> if (normVec > 0.0) sumVec[i] / normVec else 0.0 }
+        if (normVec == 0.0 && actualDPrefix > 0) prefixMu[0] = 1.0
+        
+        var dotSum = 0.0
+        for (vec in projected) {
+            for (i in 0 until actualDPrefix) {
+                dotSum += prefixMu[i] * vec[i]
+            }
+        }
+        val rBarPrefix = (dotSum / n.coerceAtLeast(1)).coerceAtLeast(0.0)
+        
+        return StatisticsUtils.correctedKappa(rBarPrefix, actualDPrefix, n)
+    }
+
+    private fun calibrateKappaPrior(root: GraphNode) {
+        calibratedRatios.clear()
+        val depthRatios = mutableMapOf<Int, MutableList<Double>>()
+        val visited = mutableSetOf<String>()
+        val queue = ArrayDeque<GraphNode>().apply { add(root) }
+        
+        while (queue.isNotEmpty()) {
+            val node = queue.removeFirst()
+            if (!visited.add(node.id)) continue
+            
+            val branchQueries = node.getAllQueriesInRegion()
+            val n = branchQueries.size
+            val d = node.sliceDim
+            
+            if (n >= 2 * d && n >= 10) {
+                val projected = branchQueries.map { it.projectTo(d) }
+                val sumVec = DoubleArray(d)
+                for (vec in projected) for (i in 0 until d) sumVec[i] += vec[i]
+                var normVec = 0.0
+                for (i in 0 until d) normVec += sumVec[i] * sumVec[i]
+                normVec = sqrt(normVec)
+                val rBar = normVec / n
+                
+                val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
+                val kappaPrefix = computePrefixKappa(node, branchQueries, config.formalism.dPrefix)
+                
+                if (kappaPrefix > 0.0) {
+                    depthRatios.getOrPut(node.depth) { mutableListOf() }.add(rawKappa / kappaPrefix)
+                }
+            }
+            queue.addAll(node.children)
+            queue.addAll(node.crossLinkChildren)
+        }
+        
+        depthRatios.forEach { (depth, ratios) ->
+            calibratedRatios[depth] = ratios.average()
+            log.info("[FITTER] Calibrated kappa ratio for depth $depth: ${"%.4f".format(ratios.average())} (based on ${ratios.size} well-behaved nodes)")
+        }
+    }
+
+    private fun getCalibratedRatio(depth: Int, dFull: Int, dPrefix: Int): Double {
+        val observed = calibratedRatios[depth]
+        if (observed != null) return observed
+        return dFull.toDouble() / dPrefix.toDouble().coerceAtLeast(1.0)
+    }
+
+    private fun mapPrefixToPrior(depth: Int, dFull: Int, dPrefix: Int, kappaPrefix: Double): Double {
+        val ratio = getCalibratedRatio(depth, dFull, dPrefix)
+        return ratio * kappaPrefix
+    }
+
     suspend fun fitNodeRecursive(root: GraphNode, isFinalIteration: Boolean = false) = withContext(Dispatchers.Default) {
         log.info("Starting level-by-level parallel vMF/NiW fitting...")
+        highDOverNCount.set(0)
+        
+        // 1. Empirical prior calibration pre-pass
+        calibrateKappaPrior(root)
+
         val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
         val visited = mutableSetOf<String>()
         val treeQueue = ArrayDeque<GraphNode>().apply { add(root) }
@@ -58,7 +145,102 @@ class TaxonomyFitter(
                 }
             }.awaitAll()
         }
+        val highCount = highDOverNCount.get()
+        if (highCount > 0) {
+            log.info("[FITTER] $highCount nodes had high d/N ratio (> 10.0) and were prior-dominated")
+        }
         log.info("[FITTER] Fitting complete ($depthsCount depths, $totalNodesFitted nodes)")
+
+        // 2. Diagnostics logging per run
+        try {
+            val visitedDiag = mutableSetOf<String>()
+            val queueDiag = ArrayDeque<GraphNode>().apply { add(root) }
+            
+            data class DiagStats(
+                var count: Int = 0,
+                var sumPrefix: Double = 0.0,
+                var sumPrior: Double = 0.0,
+                var smallLeafCount: Int = 0,
+                var sumMlMinusPrefix: Double = 0.0,
+                var sumMlMinusNew: Double = 0.0
+            )
+            
+            val depthDiag = mutableMapOf<Int, DiagStats>()
+            
+            while (queueDiag.isNotEmpty()) {
+                val node = queueDiag.removeFirst()
+                if (!visitedDiag.add(node.id)) continue
+                
+                val d = node.sliceDim
+                val branchQueries = node.getAllQueriesInRegion()
+                val n = branchQueries.size
+                
+                val kappaPrefix = computePrefixKappa(node, branchQueries, config.formalism.dPrefix)
+                
+                val rawKappa = run {
+                    val projected = branchQueries.map { it.projectTo(d) }
+                    var dotSum = 0.0
+                    val mu = node.vmfMu.takeIf { it.size == d } ?: FloatArray(d) { 0.0f }.apply { if (d > 0) this[0] = 1.0f }
+                    for (vec in projected) {
+                        for (i in 0 until d) dotSum += mu[i] * vec[i]
+                    }
+                    val rBar = (dotSum / branchQueries.size.coerceAtLeast(1)).coerceAtLeast(0.0)
+                    StatisticsUtils.correctedKappa(rBar, d, branchQueries.size)
+                }
+                
+                val avgKappaPrefixAtParent = if (node.parents.isNotEmpty()) {
+                    node.parents.map { parent ->
+                        val pq = parent.getAllQueriesInRegion()
+                        computePrefixKappa(parent, pq, config.formalism.dPrefix)
+                    }.average()
+                } else {
+                    0.0
+                }
+                val kappa0Parent = if (node.parents.isNotEmpty()) {
+                    mapPrefixToPrior(node.depth, d, config.formalism.dPrefix, avgKappaPrefixAtParent)
+                } else {
+                    config.formalism.defaultKappaPrior
+                }
+                
+                val stats = depthDiag.getOrPut(node.depth) { DiagStats() }
+                stats.count++
+                stats.sumPrefix += kappaPrefix
+                stats.sumPrior += kappa0Parent
+                
+                if (node.isLeaf && n < 30) {
+                    stats.smallLeafCount++
+                    stats.sumMlMinusPrefix += (rawKappa - kappaPrefix)
+                    stats.sumMlMinusNew += (rawKappa - node.vmfKappa)
+                }
+                
+                queueDiag.addAll(node.children)
+                queueDiag.addAll(node.crossLinkChildren)
+            }
+            
+            val diagSb = StringBuilder()
+            diagSb.append("\n┌── FITTER DIAGNOSTICS SUMMARY ───────────────────────────\n")
+            diagSb.append("│ %-5s | %-12s | %-12s | %-15s | %-18s | %-18s\n".format(
+                "Depth", "Avg Prefix K", "Avg Prior K", "Small Leaves", "Avg (K_ML - K_pref)", "Avg (K_ML - K_new)"
+            ))
+            diagSb.append("├─────────────────────────────────────────────────────────\n")
+            depthDiag.keys.sorted().forEach { depth ->
+                val stats = depthDiag.getValue(depth)
+                val avgPrefix = stats.sumPrefix / stats.count.coerceAtLeast(1)
+                val avgPrior = stats.sumPrior / stats.count.coerceAtLeast(1)
+                val avgDiffPrefix = if (stats.smallLeafCount > 0) stats.sumMlMinusPrefix / stats.smallLeafCount else 0.0
+                val avgDiffNew = if (stats.smallLeafCount > 0) stats.sumMlMinusNew / stats.smallLeafCount else 0.0
+                
+                diagSb.append(String.format(
+                    java.util.Locale.US,
+                    "│ %-5d | %-12.4f | %-12.4f | %-15d | %-18.4f | %-18.4f\n",
+                    depth, avgPrefix, avgPrior, stats.smallLeafCount, avgDiffPrefix, avgDiffNew
+                ))
+            }
+            diagSb.append("└─────────────────────────────────────────────────────────")
+            log.info(diagSb.toString())
+        } catch (diagEx: Exception) {
+            log.warn("Diagnostics logging failed: ${diagEx.message}")
+        }
     }
 
     private fun dOverNAlpha(rho: Double): Double {
@@ -116,15 +298,25 @@ class TaxonomyFitter(
         node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
 
         if (rho > 10.0) {
-            log.warn("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+            highDOverNCount.incrementAndGet()
+            log.debug("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
         }
     }
 
     fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) {
         val d = node.sliceDim
         val parents = node.parents
+        val avgKappaPrefixAtParent = if (parents.isNotEmpty()) {
+            parents.map { parent ->
+                val parentQueries = parent.getAllQueriesInRegion()
+                computePrefixKappa(parent, parentQueries, config.formalism.dPrefix)
+            }.average()
+        } else {
+            0.0
+        }
+
         val kappa0Parent = if (parents.isNotEmpty()) {
-            parents.map { it.vmfKappa }.average()
+            mapPrefixToPrior(node.depth, d, config.formalism.dPrefix, avgKappaPrefixAtParent)
         } else {
             config.formalism.defaultKappaPrior
         }
@@ -214,7 +406,8 @@ class TaxonomyFitter(
                     node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
 
                     if (rho > 10.0) {
-                        log.warn("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+                        highDOverNCount.incrementAndGet()
+                        log.debug("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
                     }
                 } else {
                     fitVmfFromQueryList(node, node.queries.ifEmpty { branchQueries }, d, kappa0Parent)
@@ -242,7 +435,8 @@ class TaxonomyFitter(
             node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(muSize, node.vmfKappa)
 
             if (rho > 10.0) {
-                log.warn("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+                highDOverNCount.incrementAndGet()
+                log.debug("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
             }
         }
 

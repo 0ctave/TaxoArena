@@ -44,7 +44,21 @@ object ValidationService {
         val deltaKendallTau: Double = 0.0,
         val deltaKendallCiLow: Double = 0.0,
         val deltaKendallCiHigh: Double = 0.0,
-        val deltaKendallPermutationPValue: Double = 1.0
+        val deltaKendallPermutationPValue: Double = 1.0,
+
+        // Soft membership metrics
+        val rhoHardCanonical: Double = 0.0,
+        val rhoHardAdapted: Double = 0.0,
+        val rhoSoftAdapted: Double = 0.0,
+        val deltaRhoGeom: Double = 0.0,
+        val deltaRhoSoft: Double = 0.0,
+        val deltaRhoTotal: Double = 0.0,
+        val rhoSoftAdaptedCiLow: Double = 0.0,
+        val rhoSoftAdaptedCiHigh: Double = 0.0,
+        val deltaRhoSoftCiLow: Double = 0.0,
+        val deltaRhoSoftCiHigh: Double = 0.0,
+        val deltaRhoTotalCiLow: Double = 0.0,
+        val deltaRhoTotalCiHigh: Double = 0.0
     )
 
     fun computeMetrics(
@@ -78,6 +92,7 @@ object ValidationService {
 
         val canonicalBtScores = computeCanonicalBtScores(domainResults, models)
         val adaptedBtScores = computeAdaptedBtScoresFromResults(domainResults, models)
+        val softBtScores = computeSoftAdaptedBtScores(domainResults, models)
 
         // 3. Compute base Spearman, Kendall, Pairwise Winner, Jaccard
         val accVector = models.map { modelAccuracies[it] ?: 0.0 }
@@ -85,6 +100,7 @@ object ValidationService {
 
         val adaptedBtVector = models.map { adaptedBtScores[it] ?: 0.0 }
         val canonicalBtVector = models.map { canonicalBtScores[it] ?: 0.0 }
+        val softBtVector = models.map { softBtScores[it] ?: 0.0 }
 
         val baseSpearman = computeSpearman(accVector, btVector)
         val baseKendall = computeKendall(accVector, btVector)
@@ -99,6 +115,12 @@ object ValidationService {
         val canonicalKendall = computeKendall(accVector, canonicalBtVector)
         val deltaKendall = adaptedKendall - canonicalKendall
 
+        // Soft membership base metrics
+        val softSpearman = computeSpearman(accVector, softBtVector)
+        val deltaRhoGeom = deltaSpearman
+        val deltaRhoSoft = softSpearman - adaptedSpearman
+        val deltaRhoTotal = softSpearman - canonicalSpearman
+
         // 4. Bootstrap CI
         val spearmanList = mutableListOf<Double>()
         val kendallList = mutableListOf<Double>()
@@ -110,6 +132,10 @@ object ValidationService {
         val adaptedKendallList = mutableListOf<Double>()
         val canonicalKendallList = mutableListOf<Double>()
         val deltaKendallList = mutableListOf<Double>()
+
+        val rhoSoftAdaptedList = mutableListOf<Double>()
+        val deltaRhoSoftList = mutableListOf<Double>()
+        val deltaRhoTotalList = mutableListOf<Double>()
 
         val random = java.util.Random(42)
         repeat(bootstrapResamples) {
@@ -128,9 +154,11 @@ object ValidationService {
 
             val resampledBtAdapted = computeAdaptedBtScoresFromResults(resampled, models)
             val resampledBtCanonical = computeCanonicalBtScores(resampled, models)
+            val resampledBtSoft = computeSoftAdaptedBtScores(resampled, models)
 
             val resampledBtAdaptedVec = models.map { resampledBtAdapted[it] ?: 0.0 }
             val resampledBtCanonicalVec = models.map { resampledBtCanonical[it] ?: 0.0 }
+            val resampledBtSoftVec = models.map { resampledBtSoft[it] ?: 0.0 }
 
             val rho = computeSpearman(resampledAcc, resampledBt)
             val tau = computeKendall(resampledAcc, resampledBt)
@@ -138,6 +166,10 @@ object ValidationService {
             val rhoAdapted = computeSpearman(resampledAcc, resampledBtAdaptedVec)
             val rhoCanonical = computeSpearman(resampledAcc, resampledBtCanonicalVec)
             val deltaRho = rhoAdapted - rhoCanonical
+
+            val rhoSoft = computeSpearman(resampledAcc, resampledBtSoftVec)
+            val deltaRhoS = rhoSoft - rhoAdapted
+            val deltaRhoT = rhoSoft - rhoCanonical
 
             val tauAdapted = computeKendall(resampledAcc, resampledBtAdaptedVec)
             val tauCanonical = computeKendall(resampledAcc, resampledBtCanonicalVec)
@@ -153,6 +185,10 @@ object ValidationService {
             if (!tauAdapted.isNaN()) adaptedKendallList.add(tauAdapted)
             if (!tauCanonical.isNaN()) canonicalKendallList.add(tauCanonical)
             if (!deltaTau.isNaN()) deltaKendallList.add(deltaTau)
+
+            if (!rhoSoft.isNaN()) rhoSoftAdaptedList.add(rhoSoft)
+            if (!deltaRhoS.isNaN()) deltaRhoSoftList.add(deltaRhoS)
+            if (!deltaRhoT.isNaN()) deltaRhoTotalList.add(deltaRhoT)
         }
 
         spearmanList.sort()
@@ -163,6 +199,10 @@ object ValidationService {
         adaptedKendallList.sort()
         canonicalKendallList.sort()
         deltaKendallList.sort()
+
+        rhoSoftAdaptedList.sort()
+        deltaRhoSoftList.sort()
+        deltaRhoTotalList.sort()
 
         val spearmanCiLow = if (spearmanList.isNotEmpty()) spearmanList[(spearmanList.size * 0.025).toInt()] else 0.0
         val spearmanCiHigh = if (spearmanList.isNotEmpty()) spearmanList[(spearmanList.size * 0.975).toInt().coerceAtMost(spearmanList.size - 1)] else 0.0
@@ -187,6 +227,15 @@ object ValidationService {
 
         val deltaKendallCiLow = if (deltaKendallList.isNotEmpty()) deltaKendallList[(deltaKendallList.size * 0.025).toInt()] else 0.0
         val deltaKendallCiHigh = if (deltaKendallList.isNotEmpty()) deltaKendallList[(deltaKendallList.size * 0.975).toInt().coerceAtMost(deltaKendallList.size - 1)] else 0.0
+
+        val rhoSoftAdaptedCiLow = if (rhoSoftAdaptedList.isNotEmpty()) rhoSoftAdaptedList[(rhoSoftAdaptedList.size * 0.025).toInt()] else 0.0
+        val rhoSoftAdaptedCiHigh = if (rhoSoftAdaptedList.isNotEmpty()) rhoSoftAdaptedList[(rhoSoftAdaptedList.size * 0.975).toInt().coerceAtMost(rhoSoftAdaptedList.size - 1)] else 0.0
+
+        val deltaRhoSoftCiLow = if (deltaRhoSoftList.isNotEmpty()) deltaRhoSoftList[(deltaRhoSoftList.size * 0.025).toInt()] else 0.0
+        val deltaRhoSoftCiHigh = if (deltaRhoSoftList.isNotEmpty()) deltaRhoSoftList[(deltaRhoSoftList.size * 0.975).toInt().coerceAtMost(deltaRhoSoftList.size - 1)] else 0.0
+
+        val deltaRhoTotalCiLow = if (deltaRhoTotalList.isNotEmpty()) deltaRhoTotalList[(deltaRhoTotalList.size * 0.025).toInt()] else 0.0
+        val deltaRhoTotalCiHigh = if (deltaRhoTotalList.isNotEmpty()) deltaRhoTotalList[(deltaRhoTotalList.size * 0.975).toInt().coerceAtMost(deltaRhoTotalList.size - 1)] else 0.0
 
         val deltaSpearmanPVal = computePermutationPValue(accVector, adaptedBtVector, canonicalBtVector, deltaSpearman)
         val deltaKendallPVal = computePermutationPValue(accVector, adaptedBtVector, canonicalBtVector, deltaKendall)
@@ -221,7 +270,21 @@ object ValidationService {
             deltaKendallTau = if (deltaKendall.isNaN()) 0.0 else deltaKendall,
             deltaKendallCiLow = deltaKendallCiLow,
             deltaKendallCiHigh = deltaKendallCiHigh,
-            deltaKendallPermutationPValue = deltaKendallPVal
+            deltaKendallPermutationPValue = deltaKendallPVal,
+            
+            // Soft membership metrics
+            rhoHardCanonical = if (canonicalSpearman.isNaN()) 0.0 else canonicalSpearman,
+            rhoHardAdapted = if (adaptedSpearman.isNaN()) 0.0 else adaptedSpearman,
+            rhoSoftAdapted = if (softSpearman.isNaN()) 0.0 else softSpearman,
+            deltaRhoGeom = if (deltaRhoGeom.isNaN()) 0.0 else deltaRhoGeom,
+            deltaRhoSoft = if (deltaRhoSoft.isNaN()) 0.0 else deltaRhoSoft,
+            deltaRhoTotal = if (deltaRhoTotal.isNaN()) 0.0 else deltaRhoTotal,
+            rhoSoftAdaptedCiLow = rhoSoftAdaptedCiLow,
+            rhoSoftAdaptedCiHigh = rhoSoftAdaptedCiHigh,
+            deltaRhoSoftCiLow = deltaRhoSoftCiLow,
+            deltaRhoSoftCiHigh = deltaRhoSoftCiHigh,
+            deltaRhoTotalCiLow = deltaRhoTotalCiLow,
+            deltaRhoTotalCiHigh = deltaRhoTotalCiHigh
         )
     }
 
@@ -250,8 +313,8 @@ object ValidationService {
                             existing.winsA += wB
                             existing.winsB += wA
                         }
-                        existing.ties += if (isTie) 1 else 0
-                        existing.totalComparisons += 1
+                        existing.ties += if (isTie) 1.0 else 0.0
+                        existing.totalComparisons += 1.0
                     } else {
                         statsMap[k] = NodePairStats(
                             nodeId = domain,
@@ -259,8 +322,8 @@ object ValidationService {
                             modelB = maxOf(mA, mB),
                             winsA = if (mA < mB) wA else wB,
                             winsB = if (mA < mB) wB else wA,
-                            ties = if (isTie) 1 else 0,
-                            totalComparisons = 1
+                            ties = if (isTie) 1.0 else 0.0,
+                            totalComparisons = 1.0
                         )
                     }
                 }
@@ -415,8 +478,8 @@ object ValidationService {
                             existing.winsA += wB
                             existing.winsB += wA
                         }
-                        existing.ties += if (isTie) 1 else 0
-                        existing.totalComparisons += 1
+                        existing.ties += if (isTie) 1.0 else 0.0
+                        existing.totalComparisons += 1.0
                         existing.agreementChecks += 1
                         existing.agreementWins += if (accuracyAgreed) 1 else 0
                     } else {
@@ -426,8 +489,8 @@ object ValidationService {
                             modelB = maxOf(mA, mB),
                             winsA = if (mA < mB) wA else wB,
                             winsB = if (mA < mB) wB else wA,
-                            ties = if (isTie) 1 else 0,
-                            totalComparisons = 1,
+                            ties = if (isTie) 1.0 else 0.0,
+                            totalComparisons = 1.0,
                             agreementChecks = 1,
                             agreementWins = if (accuracyAgreed) 1 else 0
                         )
@@ -614,5 +677,116 @@ object ValidationService {
         val d = 0.3989422804014327 * kotlin.math.exp(-x * x / 2.0)
         val p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))))
         return if (x >= 0.0) 1.0 - p else p
+    }
+
+    fun computeSoftAdaptedBtScores(results: List<QueryBenchmarkResult>, models: List<String>): Map<String, Double> {
+        val byLeafWeighted = mutableMapOf<String, MutableList<Pair<QueryBenchmarkResult, Double>>>()
+        for (qr in results) {
+            val primaryLabel = qr.matchedLeafLabels.firstOrNull() ?: qr.gtCategory
+            val wPrimary = (1.0 - qr.secondaryMemberships.values.sum()).coerceIn(0.0, 1.0)
+            
+            byLeafWeighted.computeIfAbsent(primaryLabel) { mutableListOf() }.add(qr to wPrimary)
+            for ((secondaryLabel, weight) in qr.secondaryMemberships) {
+                byLeafWeighted.computeIfAbsent(secondaryLabel) { mutableListOf() }.add(qr to weight)
+            }
+        }
+        
+        val eligibleStats = mutableListOf<NodePairStats>()
+        for ((leafLabel, weightedQueries) in byLeafWeighted) {
+            val leafStats = buildPairStatsWithWeights(weightedQueries, models, leafLabel)
+            val totalComparisons = leafStats.sumOf { it.totalComparisons }
+            if (totalComparisons < 5.0) continue
+            val isConsistent = leafStats.none {
+                it.agreementChecks >= 5 && (it.agreementWins.toDouble() / it.agreementChecks) < 0.50
+            }
+            if (isConsistent) {
+                eligibleStats.addAll(leafStats)
+            }
+        }
+        if (eligibleStats.isEmpty()) return emptyMap()
+        
+        val pooled = mutableMapOf<String, NodePairStats>()
+        for (ps in eligibleStats) {
+            val mA = minOf(ps.modelA, ps.modelB)
+            val mB = maxOf(ps.modelA, ps.modelB)
+            val key = "$mA|$mB"
+            val existing = pooled[key]
+            if (existing != null) {
+                existing.winsA += ps.winsA
+                existing.winsB += ps.winsB
+                existing.ties += ps.ties
+                existing.totalComparisons += ps.totalComparisons
+            } else {
+                pooled[key] = NodePairStats(
+                    nodeId = "pooled",
+                    modelA = mA,
+                    modelB = mB,
+                    winsA = ps.winsA,
+                    winsB = ps.winsB,
+                    ties = ps.ties,
+                    totalComparisons = ps.totalComparisons
+                )
+            }
+        }
+        return BtMmFitter.fit(models, pooled.values.toList())
+    }
+
+    private fun buildPairStatsWithWeights(
+        results: List<Pair<QueryBenchmarkResult, Double>>, 
+        models: List<String>, 
+        domain: String
+    ): List<NodePairStats> {
+        val statsMap = mutableMapOf<String, NodePairStats>()
+        for ((qr, weight) in results) {
+            if (weight <= 0.0) continue
+            qr.pairEvaluations.forEach { (pairKey, evals) ->
+                val parts = pairKey.split("_vs_")
+                val mA = parts.getOrNull(0) ?: return@forEach
+                val mB = parts.getOrNull(1) ?: return@forEach
+                if (mA !in models || mB !in models) return@forEach
+
+                val isCorrectA = qr.modelCorrect[mA] ?: false
+                val isCorrectB = qr.modelCorrect[mB] ?: false
+
+                evals.forEach { eval ->
+                    val isTie = eval.winner.equals("TIE", ignoreCase = true)
+                    val isA = eval.winner.equals("Model A", ignoreCase = true)
+                    val winner = if (isTie) "TIE" else if (isA) mA else mB
+                    val accuracyAgreed = (isCorrectA && winner == mA) || (isCorrectB && winner == mB) || (!isCorrectA && !isCorrectB && isTie)
+
+                    val wA = (if (isTie) 0.5 else if (isA) 1.0 else 0.0) * weight
+                    val wB = (if (isTie) 0.5 else if (isA) 0.0 else 1.0) * weight
+
+                    val k = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
+                    val existing = statsMap[k]
+                    if (existing != null) {
+                        if (mA < mB) {
+                            existing.winsA += wA
+                            existing.winsB += wB
+                        } else {
+                            existing.winsA += wB
+                            existing.winsB += wA
+                        }
+                        existing.ties += (if (isTie) 1.0 else 0.0) * weight
+                        existing.totalComparisons += 1.0 * weight
+                        existing.agreementChecks += 1
+                        existing.agreementWins += if (accuracyAgreed) 1 else 0
+                    } else {
+                        statsMap[k] = NodePairStats(
+                            nodeId = domain,
+                            modelA = minOf(mA, mB),
+                            modelB = maxOf(mA, mB),
+                            winsA = if (mA < mB) wA else wB,
+                            winsB = if (mA < mB) wB else wA,
+                            ties = (if (isTie) 1.0 else 0.0) * weight,
+                            totalComparisons = 1.0 * weight,
+                            agreementChecks = 1,
+                            agreementWins = if (accuracyAgreed) 1 else 0
+                        )
+                    }
+                }
+            }
+        }
+        return statsMap.values.toList()
     }
 }

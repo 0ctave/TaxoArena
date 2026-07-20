@@ -23,6 +23,34 @@ An Orthogonal Array $L_9(3^4)$ design is used for parameter screening. The 4 fac
 
 ---
 
+## Extended Tuning Metrics and Gates
+
+To improve quality evaluation and structure validation, the tuning harness integrates 22 extended metrics across five categories:
+
+### 1. Hard Gates
+* **Acyclic**: Strict DAG acyclicity check.
+* **DuplicateBridgeCount**: No duplicate bridges.
+* **OrphanCount**: No orphan nodes.
+* **MaxAssignmentCapRate**: Fraction of queries exceeding leaf routing capacity ($\le 0.20$).
+* **has_depth2_sourceB**: Requires at least one Source-B bridge with depth $\ge 2$.
+* **SmallLeafFraction**: Fraction of leaves with $d/N > 10$ ($\le 0.50$).
+* **SelectedNodeStarvedLeafFraction**: Fraction of starved leaves under selected nodes ($\le 0.20$).
+* **SourceBPerAnchorMean**: Mean Source-B bridges per anchor ($\le 3.0$).
+
+### 2. Soft Gates
+* **AvgMatchCount**: Average matches per query (band: $[1.05, 1.30]$).
+* **Top1Accuracy**: Top-1 classification accuracy ($\ge 75.6\%$).
+* **RoutingECE**: Expected Calibration Error ($\le 0.25$).
+* **BorderlineRate**: Fraction of queries with runner-up leaves in cosine gap (band: $[0.20, 0.35]$).
+* **CrossAnchorMigrationRate**: Fraction of queries migrated from ground-truth category anchor (band: $[0.10, 0.30]$).
+* **CanonicalAdaptedJaccard**: Overlap between canonical and adapted query partitions (band: $[0.40, 0.70]$).
+
+### 3. Pareto Objectives
+* **Maximize**: `WeightedLeafPurity`, `DendrogramPurity`, `SphericalSilhouette`, `DeltaRhoTotal`, `CanonicalAdaptedJaccard`.
+* **Minimize**: `TotalDasguptaCost`, `RoutingECE`, `BrierScore`, `NoMatchRate`, `SmallLeafFraction`, `KappaShrinkageMean`, `SelectedNodeStarvedLeafFraction`.
+
+---
+
 ## Replication / Execution Workflow
 
 Follow this step-by-step sequence to reproduce the tuning results:

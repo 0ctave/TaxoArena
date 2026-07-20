@@ -46,7 +46,7 @@ class BtStoppingPolicy(
                 val isModelA = key.first == ps.modelA
                 val winsFirst = if (isModelA) ps.winsA else ps.winsB
                 stats.sumX = winsFirst + 0.5 * ps.ties
-                stats.n = ps.totalComparisons
+                stats.n = ps.totalComparisons.toInt()
             }
 
             fun epsilon(n: Int, k: Int, bMax: Int): Double {
@@ -109,7 +109,7 @@ class BtStoppingPolicy(
             val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
-            val nij = ps?.totalComparisons ?: 0
+            val nij = ps?.totalComparisons?.toInt() ?: 0
             if (nij < 2) return@filter true  // bootstrap not done -> still informative
 
             // NEW: if this pair has exhausted its budget, it's resolved regardless of gap
@@ -132,7 +132,7 @@ class BtStoppingPolicy(
             val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
-            (ps?.totalComparisons ?: 0) >= minPerPair
+            (ps?.totalComparisons?.toInt() ?: 0) >= minPerPair
         }
         if (!informativePairsCovered) return false
 
@@ -197,7 +197,7 @@ class BtStoppingPolicy(
                 (pairStats[leafId] ?: emptyList()).firstOrNull {
                     (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                 }?.let { ps ->
-                    ps.totalComparisons >= pairCustomBudgets.getOrDefault("$leafId|$pk", budgetPerPair)
+                    ps.totalComparisons.toInt() >= pairCustomBudgets.getOrDefault("$leafId|$pk", budgetPerPair)
                 } ?: false
             }
 

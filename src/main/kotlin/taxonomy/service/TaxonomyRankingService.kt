@@ -243,8 +243,8 @@ class TaxonomyRankingService {
                             model_b TEXT NOT NULL,
                             wins_a REAL,
                             wins_b REAL,
-                            ties INTEGER,
-                            total_comparisons INTEGER,
+                            ties REAL,
+                            total_comparisons REAL,
                             position_flips INTEGER,
                             win_a_first REAL DEFAULT 0.0,
                             win_a_second REAL DEFAULT 0.0,
@@ -396,8 +396,8 @@ class TaxonomyRankingService {
                     pstmt.setString(4, stats.modelB)
                     pstmt.setDouble(5, stats.winsA)
                     pstmt.setDouble(6, stats.winsB)
-                    pstmt.setInt(7, stats.ties)
-                    pstmt.setInt(8, stats.totalComparisons)
+                    pstmt.setDouble(7, stats.ties)
+                    pstmt.setDouble(8, stats.totalComparisons)
                     pstmt.setInt(9, stats.positionFlips)
                     pstmt.setDouble(10, stats.winAFirst)
                     pstmt.setDouble(11, stats.winASecond)
@@ -428,8 +428,8 @@ class TaxonomyRankingService {
                                 modelB = rs.getString("model_b"),
                                 winsA = rs.getDouble("wins_a"),
                                 winsB = rs.getDouble("wins_b"),
-                                ties = rs.getInt("ties"),
-                                totalComparisons = rs.getInt("total_comparisons"),
+                                ties = rs.getDouble("ties"),
+                                totalComparisons = rs.getDouble("total_comparisons"),
                                 positionFlips = rs.getInt("position_flips"),
                                 winAFirst = rs.getDouble("win_a_first"),
                                 winASecond = rs.getDouble("win_a_second"),
@@ -463,8 +463,8 @@ class TaxonomyRankingService {
                                 modelB = rs.getString("model_b"),
                                 winsA = rs.getDouble("wins_a"),
                                 winsB = rs.getDouble("wins_b"),
-                                ties = rs.getInt("ties"),
-                                totalComparisons = rs.getInt("total_comparisons"),
+                                ties = rs.getDouble("ties"),
+                                totalComparisons = rs.getDouble("total_comparisons"),
                                 positionFlips = rs.getInt("position_flips"),
                                 winAFirst = rs.getDouble("win_a_first"),
                                 winASecond = rs.getDouble("win_a_second"),
@@ -719,15 +719,15 @@ data class AggregatedLeaderboard(
                                 modelB = mB,
                                 winsA = addWinsA,
                                 winsB = addWinsB,
-                                ties = if (isTie) 1 else 0,
-                                totalComparisons = 1
+                                ties = if (isTie) 1.0 else 0.0,
+                                totalComparisons = 1.0
                             )
                         } else {
                             tempPairStats[key] = existing.copy(
                                 winsA = existing.winsA + addWinsA,
                                 winsB = existing.winsB + addWinsB,
-                                ties = existing.ties + (if (isTie) 1 else 0),
-                                totalComparisons = existing.totalComparisons + 1
+                                ties = existing.ties + (if (isTie) 1.0 else 0.0),
+                                totalComparisons = existing.totalComparisons + 1.0
                             )
                         }
                     }
@@ -805,7 +805,7 @@ data class AggregatedLeaderboard(
                 confidenceIntervalLow = btScore - 2.0 * stdError,
                 confidenceIntervalHigh = btScore + 2.0 * stdError,
                 winsTotal = totalWins,
-                comparisonsTotal = comps
+                comparisonsTotal = comps.toInt()
             )
         }.sortedByDescending { it.btScore }
          .mapIndexed { index, modelRank -> modelRank.copy(rank = index + 1) }

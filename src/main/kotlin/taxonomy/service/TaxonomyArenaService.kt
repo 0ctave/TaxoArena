@@ -366,6 +366,93 @@ class TaxonomyArenaService(
             }
     }
 
+    data class SoftRoutingResult(
+        val primaryLeaf: GraphNode,
+        val secondaryMemberships: Map<String, Double>
+    )
+
+    suspend fun routeToLeavesSoft(
+        text: String,
+        frozenLeafIds: Set<String>? = null,
+        category: String? = null
+    ): SoftRoutingResult? {
+        val root = taxonomyService.getGraph() ?: return null
+        val vector = embeddingCache.getOrCreate(text)
+        val emb = Embedding(text, text, vector, category ?: "")
+        val routeResult = ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) })
+        
+        val leafLogProbs = routeResult.filter { (node, _) ->
+            if (frozenLeafIds != null) node.id in frozenLeafIds
+            else node.isLeaf
+        }
+        if (leafLogProbs.isEmpty()) return null
+        
+        val maxLog = leafLogProbs.values.maxOrNull() ?: 0.0
+        val leafProbs = leafLogProbs.mapValues { kotlin.math.exp(it.value - maxLog) }
+        val sumProbs = leafProbs.values.sum()
+        val normalizedPosterior = if (sumProbs > 0.0) {
+            leafProbs.mapValues { it.value / sumProbs }
+        } else {
+            emptyMap()
+        }
+        
+        if (normalizedPosterior.isEmpty()) return null
+        
+        val sortedCandidates = normalizedPosterior.toList().sortedByDescending { it.second }
+        val primaryLeaf = sortedCandidates.first().first
+        
+        // Entropy guard check before degree cap (fits in all sisters rule)
+        // K_cap = 3
+        val K_cap = 3
+        if (sortedCandidates.size > K_cap) {
+            val allProbs = sortedCandidates.map { it.second }
+            if (isNearUniform(allProbs)) {
+                return SoftRoutingResult(primaryLeaf, emptyMap())
+            }
+        }
+        
+        // Apply degree cap: keep at most K_max secondaries (K_max = 2)
+        val K_max = 2
+        val keptCandidates = sortedCandidates.take(1 + K_max)
+        
+        if (keptCandidates.size <= 1) {
+            return SoftRoutingResult(primaryLeaf, emptyMap())
+        }
+        
+        // Renormalize kept candidates
+        val keptSum = keptCandidates.sumOf { it.second }
+        if (keptSum <= 0.0) {
+            return SoftRoutingResult(primaryLeaf, emptyMap())
+        }
+        val keptNormalized = keptCandidates.map { it.first to (it.second / keptSum) }
+        
+        // Entropy guard check on final kept candidates
+        val keptProbs = keptNormalized.map { it.second }
+        if (isNearUniform(keptProbs)) {
+            return SoftRoutingResult(primaryLeaf, emptyMap())
+        }
+        
+        val primaryNormalized = keptNormalized.first()
+        val secondaries = keptNormalized.drop(1)
+        
+        val secondaryMemberships = secondaries.associate { (leaf, prob) ->
+            val key = leaf.label?.takeIf { it.isNotBlank() } ?: leaf.id
+            key to prob
+        }
+        
+        return SoftRoutingResult(primaryNormalized.first, secondaryMemberships)
+    }
+
+    private fun isNearUniform(probs: List<Double>): Boolean {
+        if (probs.size <= 1) return false
+        val h = -probs.sumOf { p -> if (p > 0.0) p * kotlin.math.log(p, kotlin.math.E) else 0.0 }
+        val hUniform = kotlin.math.log(probs.size.toDouble(), kotlin.math.E)
+        val diff = hUniform - h
+        val ratio = h / hUniform
+        return ratio > 0.95 || diff < 0.05
+    }
+
+
     // NEW: Given a leaf node, return it as judge if it has a prompt. Null = discard.
     fun leafJudge(node: GraphNode): GraphNode? =
         if (node.judgePrompt != null) node else null

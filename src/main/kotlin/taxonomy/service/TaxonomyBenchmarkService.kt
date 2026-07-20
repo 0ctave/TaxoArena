@@ -91,8 +91,8 @@ class TaxonomyBenchmarkService(
                 modelB = modelB,
                 winsA = wA,
                 winsB = wB,
-                ties = if (isTie) 1 else 0,
-                totalComparisons = 1,
+                ties = if (isTie) 1.0 else 0.0,
+                totalComparisons = 1.0,
                 positionFlips = if (outcome.positionFlip) 1 else 0,
                 winAFirst = outcome.winAFirst,
                 winASecond = outcome.winASecond,
@@ -177,19 +177,20 @@ class TaxonomyBenchmarkService(
         // Pre-route all questions to target nodes dynamically using the NiW routing engine
         val nodeToQueries = mutableMapOf<String, MutableList<Int>>()
         val queryToLeaves = mutableMapOf<Int, MutableList<String>>()
+        val queryToSoftRouting = java.util.Collections.synchronizedMap(mutableMapOf<Int, TaxonomyArenaService.SoftRoutingResult>())
         var outlierCount = 0
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
-            val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds, sample.category)
-            if (leaves.isEmpty()) {
+            val softResult = arenaService.routeToLeavesSoft(sample.questionText, frozenLeafIds, sample.category)
+            if (softResult == null) {
                 outlierCount++
                 log.debug("qId=$qId is an outlier — no leaf match, skipping")
                 return@forEach
             }
-            leaves.forEach { leaf ->
-                nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
-                queryToLeaves.getOrPut(qId) { mutableListOf() }.add(leaf.id)
-            }
+            queryToSoftRouting[qId] = softResult
+            val leaf = softResult.primaryLeaf
+            nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
+            queryToLeaves.getOrPut(qId) { mutableListOf() }.add(leaf.id)
         }
         log.info("Pre-routing complete: ${matrix.size - outlierCount} questions routed, $outlierCount outliers discarded")
 
@@ -265,7 +266,7 @@ class TaxonomyBenchmarkService(
                     btScores = modelNames.associateWith { 0.0 },
                     stdErrors = modelNames.associateWith { 10.0 },
                     fitVersion = 0,
-                    totalComparisons = nodePairs.sumOf { it.totalComparisons },
+                    totalComparisons = nodePairs.sumOf { it.totalComparisons }.toInt(),
                     lastFitAt = System.currentTimeMillis()
                 )
             }
@@ -360,8 +361,8 @@ class TaxonomyBenchmarkService(
                 if (existing != null) {
                     existing.winsA += wA
                     existing.winsB += wB
-                    existing.ties += if (cm.isTie) 1 else 0
-                    existing.totalComparisons += 1
+                    existing.ties += if (cm.isTie) 1.0 else 0.0
+                    existing.totalComparisons += 1.0
                 } else {
                     pairStatsMapForNode[pairKey] = NodePairStats(
                         nodeId = leafId,
@@ -369,8 +370,8 @@ class TaxonomyBenchmarkService(
                         modelB = cm.modelB,
                         winsA = wA,
                         winsB = wB,
-                        ties = if (cm.isTie) 1 else 0,
-                        totalComparisons = 1,
+                        ties = if (cm.isTie) 1.0 else 0.0,
+                        totalComparisons = 1.0,
                         positionFlips = 0,
                         lastUpdated = System.currentTimeMillis()
                     )
@@ -393,7 +394,7 @@ class TaxonomyBenchmarkService(
                         btScores = scores,
                         stdErrors = stdErrors,
                         fitVersion = (btStates[leafId]?.fitVersion ?: 0) + 1,
-                        totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons },
+                        totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
                         lastFitAt = System.currentTimeMillis()
                     )
                     rankingService.saveBtState(state, snapshotId)
@@ -549,7 +550,7 @@ class TaxonomyBenchmarkService(
             targetLeafIds = targetLeafIds,
             models = modelNames,
             round = round,
-            totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons },
+            totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons }.toInt(),
             nodeToQueries = nodeToQueries,
             condition = req.condition,
             mainConditionTotalComparisons = mainConditionTotalComparisons
@@ -815,6 +816,9 @@ class TaxonomyBenchmarkService(
                                 evaluatedTriples.add(triple)
                             }
 
+                            val softResult = queryToSoftRouting[qId]
+                            val secondaryMemberships = softResult?.secondaryMemberships ?: emptyMap()
+
                             QueryBenchmarkResult(
                                 query = sample.questionText,
                                 gtCategory = gtCategory,
@@ -826,7 +830,8 @@ class TaxonomyBenchmarkService(
                                 domainEvaluations = listOf(primaryEval),
                                 pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
                                 judgeAccuracyAgreement = mapOf(pairKey to agrees),
-                                queryId = qId
+                                queryId = qId,
+                                secondaryMemberships = secondaryMemberships
                             )
                         }
 
@@ -856,6 +861,9 @@ class TaxonomyBenchmarkService(
                             val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
                             val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
                             
+                            val softResult = queryToSoftRouting[qId]
+                            val secondaryMemberships = softResult?.secondaryMemberships ?: emptyMap()
+                            
                             QueryBenchmarkResult(
                                 query = sample.questionText,
                                 gtCategory = sample.category,
@@ -867,7 +875,8 @@ class TaxonomyBenchmarkService(
                                 domainEvaluations = listOf(primaryEval),
                                 pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
                                 judgeAccuracyAgreement = mapOf(pairKey to false),
-                                queryId = qId
+                                queryId = qId,
+                                secondaryMemberships = secondaryMemberships
                             )
                         }
                         if (fallbackResults.isNotEmpty()) {
@@ -924,7 +933,7 @@ class TaxonomyBenchmarkService(
                             btScores = scores,
                             stdErrors = stdErrors,
                             fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
-                            totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons },
+                            totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
                             lastFitAt = System.currentTimeMillis()
                         )
                         rankingService.saveBtState(state, snapshotId)
@@ -990,7 +999,7 @@ class TaxonomyBenchmarkService(
                 trajectory.add(
                     TrajectoryPoint(
                         round = round,
-                        comparisons = totalComparisons,
+                        comparisons = totalComparisons.toInt(),
                         spearmanRho = intermediateReport.spearmanRho,
                         kendallTau = intermediateReport.kendallTau,
                         pairwiseWinnerAccuracy = intermediateReport.pairwiseWinnerAccuracy
@@ -1004,7 +1013,7 @@ class TaxonomyBenchmarkService(
 
         val totalMatches = pairStatsMap.values.flatten().sumOf { it.totalComparisons }
         if (req.condition.equals("MAIN", ignoreCase = true)) {
-            mainConditionTotalComparisons = totalMatches
+            mainConditionTotalComparisons = totalMatches.toInt()
             log.info("MAIN condition finished. Captured budget limit: $mainConditionTotalComparisons matches.")
         }
 
@@ -1182,6 +1191,9 @@ class TaxonomyBenchmarkService(
         val pairEvaluations = pairResults.associate { pr -> pr.agreementKey.first to pr.arenaResult.domainEvaluations }
         val judgeAccuracyAgreement = pairResults.map { it.agreementKey }.toMap()
 
+        val softResult = arenaService.routeToLeavesSoft(sample.questionText, frozenLeafIds, sample.category)
+        val secondaryMemberships = softResult?.secondaryMemberships ?: emptyMap()
+
         QueryBenchmarkResult(
             query = sample.questionText,
             gtCategory = gtCategory,
@@ -1193,7 +1205,8 @@ class TaxonomyBenchmarkService(
             domainEvaluations = domainEvaluations,
             pairEvaluations = pairEvaluations,
             judgeAccuracyAgreement = judgeAccuracyAgreement,
-            queryId = questionId
+            queryId = questionId,
+            secondaryMemberships = secondaryMemberships
         )
     }
 

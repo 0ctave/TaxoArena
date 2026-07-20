@@ -36,6 +36,24 @@ def check_hard_gates(row, bridge_depths, gates_spec):
         if not has_depth_2:
             reasons.append("No Source-B bridge with depth >= 2")
             
+    # 6. SmallLeafFraction
+    small_leaf_frac = float(row.get("SmallLeafFraction", 0.0))
+    le_val = gates_spec.get("hard", {}).get("SmallLeafFraction_le", 0.50)
+    if small_leaf_frac > le_val:
+        reasons.append(f"SmallLeafFraction = {small_leaf_frac:.4f} > {le_val}")
+        
+    # 7. SelectedNodeStarvedLeafFraction
+    starved_frac = float(row.get("SelectedNodeStarvedLeafFraction", 0.0))
+    le_val = gates_spec.get("hard", {}).get("SelectedNodeStarvedLeafFraction_le", 0.20)
+    if starved_frac > le_val:
+        reasons.append(f"SelectedNodeStarvedLeafFraction = {starved_frac:.4f} > {le_val}")
+        
+    # 8. SourceBPerAnchorMean
+    sb_mean = float(row.get("SourceBPerAnchorMean", 0.0))
+    le_val = gates_spec.get("hard", {}).get("SourceBPerAnchorMean_le", 3.0)
+    if sb_mean > le_val:
+        reasons.append(f"SourceBPerAnchorMean = {sb_mean:.4f} > {le_val}")
+        
     return len(reasons) == 0, reasons
 
 def check_soft_gates(row, gates_spec):
@@ -62,17 +80,35 @@ def check_soft_gates(row, gates_spec):
     if ece > le_val:
         reasons.append(f"RoutingECE = {ece:.4f} > {le_val}")
         
+    # 4. BorderlineRate band
+    borderline = float(row.get("BorderlineRate", 0.0))
+    band = gates_spec.get("soft", {}).get("BorderlineRate_band", [0.20, 0.35])
+    if not (band[0] <= borderline <= band[1]):
+        reasons.append(f"BorderlineRate = {borderline:.4f} outside band {band}")
+        
+    # 5. CrossAnchorMigrationRate band
+    migration = float(row.get("CrossAnchorMigrationRate", 0.0))
+    band = gates_spec.get("soft", {}).get("CrossAnchorMigrationRate_band", [0.10, 0.30])
+    if not (band[0] <= migration <= band[1]):
+        reasons.append(f"CrossAnchorMigrationRate = {migration:.4f} outside band {band}")
+        
+    # 6. CanonicalAdaptedJaccard band
+    jaccard = float(row.get("CanonicalAdaptedJaccard", 0.0))
+    band = gates_spec.get("soft", {}).get("CanonicalAdaptedJaccard_band", [0.40, 0.70])
+    if not (band[0] <= jaccard <= band[1]):
+        reasons.append(f"CanonicalAdaptedJaccard = {jaccard:.4f} outside band {band}")
+        
     return len(reasons) == 0, reasons
 
 def dominates(candidate1, candidate2):
     # Candidate 1 dominates Candidate 2 if it's better or equal in all objectives
     # and strictly better in at least one.
     # Objectives:
-    # Maximize: WeightedLeafPurity, DendrogramPurity, SphericalSilhouette
-    # Minimize: TotalDasguptaCost, RoutingECE, BrierScore, NoMatchRate
+    # Maximize: WeightedLeafPurity, DendrogramPurity, SphericalSilhouette, DeltaRhoTotal, CanonicalAdaptedJaccard
+    # Minimize: TotalDasguptaCost, RoutingECE, BrierScore, NoMatchRate, SmallLeafFraction, KappaShrinkageMean, SelectedNodeStarvedLeafFraction
     
-    obj_max = ["WeightedLeafPurity", "DendrogramPurity", "SphericalSilhouette"]
-    obj_min = ["TotalDasguptaCost", "RoutingECE", "BrierScore", "NoMatchRate"]
+    obj_max = ["WeightedLeafPurity", "DendrogramPurity", "SphericalSilhouette", "DeltaRhoTotal", "CanonicalAdaptedJaccard"]
+    obj_min = ["TotalDasguptaCost", "RoutingECE", "BrierScore", "NoMatchRate", "SmallLeafFraction", "KappaShrinkageMean", "SelectedNodeStarvedLeafFraction"]
     
     better_or_equal = True
     strictly_better = False

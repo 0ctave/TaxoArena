@@ -540,8 +540,8 @@ def cmd_select(args):
         finalists_md_path = "tuning/finalists.md"
         with open(finalists_md_path, "w", encoding="utf-8") as f:
             f.write("# TaxoArena — Tuning Finalists Summary\n\n")
-            f.write("| Rank | Run ID | Stage | Seed | Hard Gates | Soft Gates | Dom Count | Top-1 Acc | AnyMatch | ECE | Gap | Floor | Coverage | SplitThresh |\n")
-            f.write("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
+            f.write("| Rank | Run ID | Stage | Seed | Hard | Soft | Dom | Top-1 Acc | AnyMatch | ECE | Borderline | Migration | DeltaRho | SmallLeaf | SrcBDepth2 |\n")
+            f.write("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
             for idx, r in enumerate(ranked[:10]):
                 hard_status = "PASSED" if r["hard_gates_passed"] else "FAILED"
                 soft_status = "PASSED" if r["soft_gates_passed"] else "FAILED"
@@ -552,8 +552,14 @@ def cmd_select(args):
                 anymatch_val = float(r['AnyMatchAccuracy'])
                 if anymatch_val <= 1.0:
                     anymatch_val *= 100.0
-                    
-                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r['RoutingECE']):.4f} | {r['assignmentCosineGap']} | {r['tauFunnelFloor']} | {r['minBridgeCoverage']} | {r['splitThreshold']} |\n")
+                
+                borderline = float(r.get('BorderlineRate', 0.0))
+                migration = float(r.get('CrossAnchorMigrationRate', 0.0))
+                delta_rho = float(r.get('DeltaRhoTotal', 0.0))
+                small_leaf = float(r.get('SmallLeafFraction', 0.0))
+                sb_depth2 = int(r.get('SourceBDepth2Count', 0))
+                
+                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r['RoutingECE']):.4f} | {borderline:.4f} | {migration:.4f} | {delta_rho:.4f} | {small_leaf:.4f} | {sb_depth2} |\n")
                 
             f.write("\n## Gate Failure Explanations (Top 10 Runs)\n\n")
             for idx, r in enumerate(ranked[:10]):

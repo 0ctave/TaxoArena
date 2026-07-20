@@ -12,6 +12,7 @@ import taxonomy.config.TaxonomyConfig
 import taxonomy.service.TaxonomyBenchmarkService
 import taxonomy.service.TaxonomyService
 import taxonomy.service.TaxonomySnapshotManager
+import taxonomy.service.TaxonomyArenaService
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.service.TaxonomyRankingService
 import taxonomy.service.ValidationService
@@ -28,6 +29,11 @@ import taxonomy.utils.ReportGenerator
 import taxonomy.dataset.EmbeddingCache
 import java.io.File
 import java.time.Instant
+import taxonomy.model.projectTo
+import taxonomy.utils.StatisticsUtils
+import taxonomy.tui.service.LeafDomainProfile
+import taxonomy.model.BenchmarkReport
+import kotlin.math.sqrt
 
 @Serializable
 data class HeadlessCliConfig(
@@ -75,7 +81,8 @@ data class HeadlessCliConfig(
     val bridgeCandidateTopK: Int? = null,
     val minBridgeCoverage: Int? = null,
     val numIterations: Int? = null,
-    val runBaselines: Boolean = true
+    val runBaselines: Boolean = true,
+    val dPrefix: Int? = null
 )
 
 @Component
@@ -91,7 +98,8 @@ class HeadlessBenchmarkRunner(
     private val evalLoader: ModelEvalLoader,
     private val taxonomyEngine: TaxonomyEngine,
     private val judgeService: TaxonomyJudgeService,
-    private val embeddingCache: EmbeddingCache
+    private val embeddingCache: EmbeddingCache,
+    private val arenaService: TaxonomyArenaService
 ) : CommandLineRunner {
 
     private val log = LoggerFactory.getLogger("taxonomy.HeadlessRunner")
@@ -300,103 +308,16 @@ class HeadlessBenchmarkRunner(
             exportBridgeResiduals(validationDir, root)
 
             // 4. Run trickle validation if enabled
-            if (cliConfig.runTrickle) {
-                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+            val reportsByCondition = mutableMapOf<String, BenchmarkReport>()
+            val completedConditions = mutableListOf<String>()
+            val logicalComparisonsMap = mutableMapOf<String, Int>()
+            val judgeApiCallsMap = mutableMapOf<String, Int>()
 
-                log.info("========================================")
-                log.info("RUNNING TRICKLE VALIDATION: MAIN")
-                log.info("========================================")
-                taxonomyService.setGraph(root)
-                val mainCorrect = runHeadlessTrickle(root, "MAIN", cliConfig, baseDir, currentSeed)
-
-                if (cliConfig.runBaselines) {
-                    var kmeansCorrect: Map<String, Boolean>? = null
-                    val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
-                    snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
-                        log.info("========================================")
-                        log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
-                        log.info("========================================")
-                        taxonomyService.setGraph(kmeansRoot)
-                        kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed)
-                    }
-
-                    var wardCorrect: Map<String, Boolean>? = null
-                    val wardSnapshot = "${baseSnapshotId}_baseline_ward"
-                    snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
-                        log.info("========================================")
-                        log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
-                        log.info("========================================")
-                        taxonomyService.setGraph(wardRoot)
-                        wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed)
-                    }
-
-                    var randomNullCorrect: Map<String, Boolean>? = null
-                    val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
-                    snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
-                        log.info("========================================")
-                        log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
-                        log.info("========================================")
-                        taxonomyService.setGraph(randomNullRoot)
-                        randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed)
-                    }
-
-                    // McNemar significance comparisons between MAIN and the baselines
-                    try {
-                        val mcnemarFile = File(validationDir, "mcnemar_significance_results.csv")
-                        mcnemarFile.bufferedWriter().use { writer ->
-                            writer.write("Baseline,BothCorrect,MainCorrectBaselineIncorrect,BaselineCorrectMainIncorrect,BothIncorrect,ChiSquared,PValue\n")
-                            
-                            fun checkMcNemar(baselineName: String, baselineCorrect: Map<String, Boolean>?) {
-                                if (baselineCorrect == null) return
-                                var bothCorrect = 0
-                                var mainCorrectBaselineIncorrect = 0
-                                var baselineCorrectMainIncorrect = 0
-                                var bothIncorrect = 0
-                                
-                                for ((q, correctMain) in mainCorrect) {
-                                    val correctBase = baselineCorrect[q] ?: false
-                                    if (correctMain && correctBase) bothCorrect++
-                                    else if (correctMain && !correctBase) mainCorrectBaselineIncorrect++
-                                    else if (!correctMain && correctBase) baselineCorrectMainIncorrect++
-                                    else bothIncorrect++
-                                }
-                                val discordant = mainCorrectBaselineIncorrect + baselineCorrectMainIncorrect
-                                val chiSquared = if (discordant > 0) {
-                                    val diff = kotlin.math.abs(mainCorrectBaselineIncorrect - baselineCorrectMainIncorrect).toDouble()
-                                    val correctedDiff = (diff - 1.0).coerceAtLeast(0.0)
-                                    (correctedDiff * correctedDiff) / discordant.toDouble()
-                                } else 0.0
-                                val pVal = ValidationService.chiSquaredToPValue(chiSquared)
-                                writer.write("$baselineName,$bothCorrect,$mainCorrectBaselineIncorrect,$baselineCorrectMainIncorrect,$bothIncorrect,$chiSquared,$pVal\n")
-                                
-                                log.info("McNemar Significance (MAIN vs $baselineName):")
-                                log.info("  - Chi-Squared: ${"%,.4f".format(chiSquared)}")
-                                log.info("  - p-value: ${"%.4e".format(pVal)}")
-                            }
-                            
-                            checkMcNemar("KMEANS_BASELINE", kmeansCorrect)
-                            checkMcNemar("WARD_BASELINE", wardCorrect)
-                            checkMcNemar("RANDOMNULL_BASELINE", randomNullCorrect)
-                        }
-                        log.info("McNemar significance results written to ${mcnemarFile.absolutePath}")
-                    } catch (e: Exception) {
-                        log.error("Failed to run McNemar significance tests: ${e.message}", e)
-                    }
-                }
-
-                // Restore active root graph for downstream benchmark
-                taxonomyService.setGraph(root)
-            }
-
-            // 5. Run each condition back-to-back if enabled
+            // 4. Run each condition back-to-back if enabled
             if (cliConfig.runBenchmark) {
-                val completedConditions = mutableListOf<String>()
-                val logicalComparisonsMap = mutableMapOf<String, Int>()
-                val judgeApiCallsMap = mutableMapOf<String, Int>()
-
                 cliConfig.conditions.forEach { condition ->
                     log.info("========================================")
-                    log.info("RUNNING CONDITION: $condition")
+                    log.info("RUNNING BENCHMARK CONDITION: $condition")
                     log.info("========================================")
 
                     val isKmeans = condition.equals("KMEANS_BASELINE", ignoreCase = true)
@@ -455,6 +376,7 @@ class HeadlessBenchmarkRunner(
                     )
 
                     val report = benchmarkService.runBenchmark(request)
+                    reportsByCondition[condition] = report
                     val logicalComparisons = report.queryResults.size
                     val judgeApiCalls = report.queryResults.count { it.hadJudge } * 2
                     logicalComparisonsMap[condition] = logicalComparisons
@@ -501,7 +423,7 @@ class HeadlessBenchmarkRunner(
                     completedConditions.add(condition)
                 }
 
-                // 6. Write Experiment Manifest
+                // Write Experiment Manifest
                 val manifestFile = File(baseDir, "manifest.json")
                 val manifest = ExperimentManifest(
                     runId = "run_" + Instant.now().toString().replace(":", "-"),
@@ -516,6 +438,95 @@ class HeadlessBenchmarkRunner(
                 )
                 manifestFile.writeText(json.encodeToString(manifest))
                 log.info("Experiment manifest written to ${manifestFile.absolutePath}")
+            }
+
+            // 5. Run trickle validation if enabled
+            if (cliConfig.runTrickle) {
+                val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
+
+                log.info("========================================")
+                log.info("RUNNING TRICKLE VALIDATION: MAIN")
+                log.info("========================================")
+                taxonomyService.setGraph(root)
+                val mainCorrect = runHeadlessTrickle(root, "MAIN", cliConfig, baseDir, currentSeed, reportsByCondition["MAIN"])
+
+                if (cliConfig.runBaselines) {
+                    var kmeansCorrect: Map<String, Boolean>? = null
+                    val kmeansSnapshot = "${baseSnapshotId}_baseline_kmeans"
+                    snapshotManager.loadSnapshot(kmeansSnapshot)?.let { kmeansRoot ->
+                        log.info("========================================")
+                        log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
+                        log.info("========================================")
+                        taxonomyService.setGraph(kmeansRoot)
+                        kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["KMEANS_BASELINE"])
+                    }
+
+                    var wardCorrect: Map<String, Boolean>? = null
+                    val wardSnapshot = "${baseSnapshotId}_baseline_ward"
+                    snapshotManager.loadSnapshot(wardSnapshot)?.let { wardRoot ->
+                        log.info("========================================")
+                        log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
+                        log.info("========================================")
+                        taxonomyService.setGraph(wardRoot)
+                        wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["WARD_BASELINE"])
+                    }
+
+                    var randomNullCorrect: Map<String, Boolean>? = null
+                    val randomNullSnapshot = "${baseSnapshotId}_baseline_randomnull"
+                    snapshotManager.loadSnapshot(randomNullSnapshot)?.let { randomNullRoot ->
+                        log.info("========================================")
+                        log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
+                        log.info("========================================")
+                        taxonomyService.setGraph(randomNullRoot)
+                        randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["RANDOMNULL_BASELINE"])
+                    }
+
+                    // McNemar significance comparisons between MAIN and the baselines
+                    try {
+                        val mcnemarFile = File(validationDir, "mcnemar_significance_results.csv")
+                        mcnemarFile.bufferedWriter().use { writer ->
+                            writer.write("Baseline,BothCorrect,MainCorrectBaselineIncorrect,BaselineCorrectMainIncorrect,BothIncorrect,ChiSquared,PValue\n")
+                            
+                            fun checkMcNemar(baselineName: String, baselineCorrect: Map<String, Boolean>?) {
+                                if (baselineCorrect == null) return
+                                var bothCorrect = 0
+                                var mainCorrectBaselineIncorrect = 0
+                                var baselineCorrectMainIncorrect = 0
+                                var bothIncorrect = 0
+                                
+                                for ((q, correctMain) in mainCorrect) {
+                                    val correctBase = baselineCorrect[q] ?: false
+                                    if (correctMain && correctBase) bothCorrect++
+                                    else if (correctMain && !correctBase) mainCorrectBaselineIncorrect++
+                                    else if (!correctMain && correctBase) baselineCorrectMainIncorrect++
+                                    else bothIncorrect++
+                                }
+                                val discordant = mainCorrectBaselineIncorrect + baselineCorrectMainIncorrect
+                                val chiSquared = if (discordant > 0) {
+                                    val diff = kotlin.math.abs(mainCorrectBaselineIncorrect - baselineCorrectMainIncorrect).toDouble()
+                                    val correctedDiff = (diff - 1.0).coerceAtLeast(0.0)
+                                    (correctedDiff * correctedDiff) / discordant.toDouble()
+                                } else 0.0
+                                val pVal = ValidationService.chiSquaredToPValue(chiSquared)
+                                writer.write("$baselineName,$bothCorrect,$mainCorrectBaselineIncorrect,$baselineCorrectMainIncorrect,$bothIncorrect,$chiSquared,$pVal\n")
+                                
+                                log.info("McNemar Significance (MAIN vs $baselineName):")
+                                log.info("  - Chi-Squared: ${"%,.4f".format(chiSquared)}")
+                                log.info("  - p-value: ${"%.4e".format(pVal)}")
+                            }
+                            
+                            checkMcNemar("KMEANS_BASELINE", kmeansCorrect)
+                            checkMcNemar("WARD_BASELINE", wardCorrect)
+                            checkMcNemar("RANDOMNULL_BASELINE", randomNullCorrect)
+                        }
+                        log.info("McNemar significance results written to ${mcnemarFile.absolutePath}")
+                    } catch (e: Exception) {
+                        log.error("Failed to run McNemar significance tests: ${e.message}", e)
+                    }
+                }
+
+                // Restore active root graph for downstream benchmark
+                taxonomyService.setGraph(root)
             }
             } finally {
                 try {
@@ -533,7 +544,8 @@ class HeadlessBenchmarkRunner(
         condition: String, 
         cliConfig: HeadlessCliConfig, 
         baseDir: File,
-        currentSeed: Long
+        currentSeed: Long,
+        benchmarkReport: BenchmarkReport? = null
     ): Map<String, Boolean> = runBlocking {
         log.info("Starting Headless Batch Trickle Validation for $condition...")
 
@@ -824,7 +836,11 @@ class HeadlessBenchmarkRunner(
                 root,
                 out,
                 brierVal,
-                maxAssignmentCapRate
+                maxAssignmentCapRate,
+                testQueries,
+                profiles,
+                benchmarkReport,
+                cliConfig
             )
         } catch (e: Exception) {
             log.error("Failed to compute and export calibration/ledger metrics for $condition: ${e.message}", e)
@@ -1501,7 +1517,11 @@ class HeadlessBenchmarkRunner(
         root: GraphNode,
         out: taxonomy.tui.BatchTrickleTestResults,
         brierVal: Double,
-        maxAssignmentCapRate: Double
+        maxAssignmentCapRate: Double,
+        testQueries: List<Pair<String, String>>,
+        profiles: Map<String, LeafDomainProfile>,
+        benchmarkReport: BenchmarkReport?,
+        cliConfig: HeadlessCliConfig
     ) {
         val ledgerFile = File(outputDir, "tuning_ledger.csv")
         val isNew = !ledgerFile.exists()
@@ -1547,13 +1567,180 @@ class HeadlessBenchmarkRunner(
         val configHash = computeConfigHash()
         val commitSha = getGitCommitSha()
 
+        // ─── Extended metrics calculations ───
+        val valReport = benchmarkReport?.let { report ->
+            try {
+                ValidationService.computeMetrics(report, cliConfig.models, "OVERALL")
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        // Soft routing / borderline
+        var borderlineCount = 0
+        var softDegreeSum = 0
+        var entropyGuardCount = 0
+        var essSum = 0.0
+
+        val queryToPrimaryLeaf = testQueries.associate { (_, text) ->
+            val matched = try {
+                runBlocking { taxonomyService.routeQueryToLeaves(text) }
+            } catch (t: Throwable) {
+                emptyList()
+            }
+            text to matched.firstOrNull()?.first
+        }
+
+        for ((_, text) in testQueries) {
+            val matched = try {
+                runBlocking { taxonomyService.routeQueryToLeaves(text) }
+            } catch (t: Throwable) {
+                emptyList()
+            }
+            
+            val isBorderline = matched.size > 1
+            if (isBorderline) {
+                borderlineCount++
+                softDegreeSum += matched.size
+            }
+            
+            val softResult = try {
+                runBlocking { arenaService.routeToLeavesSoft(text, null, null) }
+            } catch (t: Throwable) {
+                null
+            }
+            
+            if (softResult != null) {
+                val wSecondary = softResult.secondaryMemberships.values
+                val wPrimary = (1.0 - wSecondary.sum()).coerceIn(0.0, 1.0)
+                val sumW2 = wPrimary * wPrimary + wSecondary.sumOf { it * it }
+                val ess = if (sumW2 > 0.0) 1.0 / sumW2 else 1.0
+                essSum += ess
+                
+                if (isBorderline && wSecondary.isEmpty()) {
+                    entropyGuardCount++
+                }
+            } else {
+                essSum += 1.0
+            }
+        }
+
+        val borderlineRate = if (testQueries.isNotEmpty()) borderlineCount.toDouble() / testQueries.size else 0.0
+        val softDegreeMean = if (borderlineCount > 0) softDegreeSum.toDouble() / borderlineCount else 0.0
+        val entropyGuardRate = if (borderlineCount > 0) entropyGuardCount.toDouble() / borderlineCount else 0.0
+        val softEffSampleSize = essSum
+
+        // Migration / non-vacuity
+        var migrationCount = 0
+        for ((trueDomain, text) in testQueries) {
+            val primaryLeaf = queryToPrimaryLeaf[text]
+            val primaryLeafId = primaryLeaf?.id
+            val adaptedAnchor = if (primaryLeafId != null) profiles[primaryLeafId]?.dominantDomain else null
+            if (adaptedAnchor != null && adaptedAnchor != trueDomain) {
+                migrationCount++
+            }
+        }
+        val crossAnchorMigrationRate = if (testQueries.isNotEmpty()) migrationCount.toDouble() / testQueries.size else 0.0
+
+        val jaccards = mutableListOf<Double>()
+        for ((leafId, profile) in profiles) {
+            val canonicalQueries = testQueries.filter { it.first == profile.dominantDomain }.map { it.second }.toSet()
+            val adaptedQueries = testQueries.filter { queryToPrimaryLeaf[it.second]?.id == leafId }.map { it.second }.toSet()
+            
+            val intersection = canonicalQueries.intersect(adaptedQueries).size
+            val union = canonicalQueries.union(adaptedQueries).size
+            if (union > 0) {
+                jaccards.add(intersection.toDouble() / union.toDouble())
+            }
+        }
+        val canonicalAdaptedJaccard = if (jaccards.isNotEmpty()) {
+            val sorted = jaccards.sorted()
+            if (sorted.size % 2 == 0) {
+                (sorted[sorted.size / 2] + sorted[sorted.size / 2 - 1]) / 2.0
+            } else {
+                sorted[sorted.size / 2]
+            }
+        } else 0.0
+        val canonicalAdaptedSymDiffMass = 1.0 - canonicalAdaptedJaccard
+
+        // vMF kappa / dOverN summaries
+        val leaves = allNodes.filter { it.isLeaf }
+        val smallLeaves = leaves.filter { it.dOverN > 10.0 }
+        val smallLeafFraction = if (leaves.isNotEmpty()) smallLeaves.size.toDouble() / leaves.size else 0.0
+        
+        val shrinkageVals = smallLeaves.mapNotNull { leaf ->
+            val branchQueries = leaf.getAllQueriesInRegion()
+            val n = branchQueries.size
+            val d = leaf.sliceDim
+            if (n > 0 && d > 0) {
+                val projected = branchQueries.map { it.projectTo(d) }
+                val sumVec = DoubleArray(d)
+                for (vec in projected) for (i in 0 until d) sumVec[i] += vec[i]
+                var normVec = 0.0
+                for (i in 0 until d) normVec += sumVec[i] * sumVec[i]
+                normVec = sqrt(normVec)
+                val rBar = normVec / n
+                val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
+                val kappaNew = leaf.vmfKappa
+                if (rawKappa > 0.0) {
+                    kotlin.math.abs(kappaNew - rawKappa) / rawKappa
+                } else null
+            } else null
+        }
+        val kappaShrinkageMean = if (shrinkageVals.isNotEmpty()) shrinkageVals.sum() / shrinkageVals.size else 0.0
+
+        // Delta Rho decomposition
+        val rhoCanonicalHard = valReport?.rhoHardCanonical ?: 0.0
+        val rhoAdaptedHard = valReport?.rhoHardAdapted ?: 0.0
+        val rhoAdaptedSoft = valReport?.rhoSoftAdapted ?: 0.0
+        val deltaRhoGeom = valReport?.deltaRhoGeom ?: 0.0
+        val deltaRhoSoft = valReport?.deltaRhoSoft ?: 0.0
+        val deltaRhoTotal = valReport?.deltaRhoTotal ?: 0.0
+
+        // Judge-readiness
+        val leafCounts = leaves.map { it.getAllQueriesInRegion().size }
+        val sortedCounts = leafCounts.sorted()
+        val selectedNodeP10QueryCount = if (sortedCounts.isNotEmpty()) {
+            val idx = (sortedCounts.size * 0.10).toInt().coerceAtMost(sortedCounts.size - 1)
+            sortedCounts[idx].toDouble()
+        } else 0.0
+        
+        val starvedThreshold = 10
+        val starvedCount = leafCounts.count { it < starvedThreshold }
+        val selectedNodeStarvedLeafFraction = if (leafCounts.isNotEmpty()) starvedCount.toDouble() / leafCounts.size else 0.0
+        
+        val totalQueriesInLeaves = leafCounts.sum().toDouble()
+        val selectedNodeLeafBalanceEntropy = if (totalQueriesInLeaves > 0.0) {
+            -leafCounts.sumOf { count ->
+                val p = count.toDouble() / totalQueriesInLeaves
+                if (p > 0.0) p * kotlin.math.log(p, kotlin.math.E) else 0.0
+            }
+        } else 0.0
+
+        // Bridges
+        val sourceBDepth2Count = sourceB.count { it.depth >= 2 }
+        val sourceBCountPerDomain = mutableMapOf<String, Int>()
+        for (b in sourceB) {
+            val targetedDomains = b.crossLinkChildren.mapNotNull { target ->
+                profiles[target.id]?.dominantDomain
+            }.distinct()
+            for (domain in targetedDomains) {
+                sourceBCountPerDomain[domain] = (sourceBCountPerDomain[domain] ?: 0) + 1
+            }
+        }
+        val allDomains = profiles.values.map { it.dominantDomain }.distinct()
+        val sourceBPerAnchorMean = if (allDomains.isNotEmpty()) {
+            allDomains.sumOf { domain -> sourceBCountPerDomain[domain] ?: 0 }.toDouble() / allDomains.size
+        } else 0.0
+        val bridgeStabilityScore = "NA"
+
         ledgerFile.parentFile?.mkdirs()
         val fw = java.io.FileWriter(ledgerFile, true)
         fw.buffered().use { writer ->
             if (isNew) {
-                writer.write("ConfigHash,CommitSHA,Seed,Condition,Acyclic,RootReachable,OrphanCount,DuplicateBridgeCount,LeafCount,BridgeCount,ResidualCount,WeightedLeafPurity,DendrogramPurity,SphericalSilhouette,TotalDasguptaCost,NormalisedSackinIndex,SourceA_Count,SourceB_Count,RoutingECE,BrierScore,AvgMatchCount,NoMatchRate,MaxAssignmentCapRate,Top1Accuracy,AnyMatchAccuracy,MacroF1\n")
+                writer.write("ConfigHash,CommitSHA,Seed,Condition,Acyclic,RootReachable,OrphanCount,DuplicateBridgeCount,LeafCount,BridgeCount,ResidualCount,WeightedLeafPurity,DendrogramPurity,SphericalSilhouette,TotalDasguptaCost,NormalisedSackinIndex,SourceA_Count,SourceB_Count,RoutingECE,BrierScore,AvgMatchCount,NoMatchRate,MaxAssignmentCapRate,Top1Accuracy,AnyMatchAccuracy,MacroF1,BorderlineRate,SoftDegreeMean,EntropyGuardRate,SoftEffSampleSize,CrossAnchorMigrationRate,CanonicalAdaptedJaccard,CanonicalAdaptedSymDiffMass,RhoCanonicalHard,RhoAdaptedHard,RhoAdaptedSoft,DeltaRhoGeom,DeltaRhoSoft,DeltaRhoTotal,SmallLeafFraction,KappaShrinkageMean,SelectedNodeP10QueryCount,SelectedNodeStarvedLeafFraction,SelectedNodeLeafBalanceEntropy,SourceBBridgeCount,SourceBDepth2Count,SourceBPerAnchorMean,BridgeStabilityScore\n")
             }
-            writer.write("$configHash,$commitSha,$currentSeed,$condition,$acyclic,$rootReachable,$orphanCount,$duplicateBridgeCount,$leafCount,$bridgeCount,$residualCount,${reportObj.weightedLeafPurity},${reportObj.dendrogramPurity},${reportObj.sphericalSilhouette},${reportObj.totalDasguptaCost},${reportObj.normalisedSackin},${sourceA.size},${sourceB.size},${out.ece},$brierVal,${out.avgMatchCountEval},${out.noMatchRate},$maxAssignmentCapRate,${out.top1Accuracy},${out.anyMatchAccuracy},${out.macroF1}\n")
+            writer.write("$configHash,$commitSha,$currentSeed,$condition,$acyclic,$rootReachable,$orphanCount,$duplicateBridgeCount,$leafCount,$bridgeCount,$residualCount,${reportObj.weightedLeafPurity},${reportObj.dendrogramPurity},${reportObj.sphericalSilhouette},${reportObj.totalDasguptaCost},${reportObj.normalisedSackin},${sourceA.size},${sourceB.size},${out.ece},$brierVal,${out.avgMatchCountEval},${out.noMatchRate},$maxAssignmentCapRate,${out.top1Accuracy},${out.anyMatchAccuracy},${out.macroF1},$borderlineRate,$softDegreeMean,$entropyGuardRate,$softEffSampleSize,$crossAnchorMigrationRate,$canonicalAdaptedJaccard,$canonicalAdaptedSymDiffMass,$rhoCanonicalHard,$rhoAdaptedHard,$rhoAdaptedSoft,$deltaRhoGeom,$deltaRhoSoft,$deltaRhoTotal,$smallLeafFraction,$kappaShrinkageMean,$selectedNodeP10QueryCount,$selectedNodeStarvedLeafFraction,$selectedNodeLeafBalanceEntropy,${sourceB.size},$sourceBDepth2Count,$sourceBPerAnchorMean,$bridgeStabilityScore\n")
         }
         log.info("Appended condition $condition results to ledger at ${ledgerFile.absolutePath}")
     }
