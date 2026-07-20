@@ -322,9 +322,7 @@ class BridgeDiagnosticsExporter(
                 if (secondaryMassSum >= config.formalism.secondaryMassFloor) {
                     numPassSecondaryMassFloor++
                 }
-                val lower = config.formalism.separationEpsilon
-                val upper = 0.95
-                if (div >= lower && div <= upper) {
+                if (cosine in 0.3..0.95) {
                     numPassDistinctnessGate++
                 }
                 val uMass = uWeights.values.sum()
@@ -361,10 +359,10 @@ class BridgeDiagnosticsExporter(
                     }
                 }
 
-                // Gate C: Distinctness gate check
+                // Gate C: Distinctness gate check (Cosine-based)
                 if (accepted) {
-                    if (div < lower || div > upper) {
-                        rejectReason = "JS-divergence out of bridge bounds ($div not in [$lower, $upper])"
+                    if (cosine < 0.3 || cosine > 0.95) {
+                        rejectReason = "Cosine out of bridge bounds (cos=$cosine not in [0.3, 0.95])"
                         accepted = false
                     }
                 }
