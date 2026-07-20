@@ -332,7 +332,7 @@ class BridgeDiagnosticsExporter(
                 if (uESS >= 10.0 && vESS >= 10.0 && u.vmfKappa >= 1.0 && v.vmfKappa >= 1.0) {
                     numPassCoherenceGate++
                 }
-                val relFraction = 0.10 * minOf(uMass, vMass)
+                val relFraction = config.formalism.bridgeSupportRelFraction * minOf(uMass, vMass)
                 if (secondaryMassSum >= config.formalism.bridgeSupportFloor && secondaryMassSum >= relFraction) {
                     numPassSupportFloor++
                 }
@@ -378,7 +378,7 @@ class BridgeDiagnosticsExporter(
                 // Gate E: Strict support floor check
                 if (accepted) {
                     if (secondaryMassSum < config.formalism.bridgeSupportFloor || secondaryMassSum < relFraction) {
-                        rejectReason = "Strict support floor or relative fraction check failed ($secondaryMassSum < ${config.formalism.bridgeSupportFloor} or < 10% minLeafMass)"
+                        rejectReason = "Strict support floor or relative fraction check failed ($secondaryMassSum < ${config.formalism.bridgeSupportFloor} or < ${(config.formalism.bridgeSupportRelFraction * 100).toInt()}% minLeafMass)"
                         accepted = false
                     }
                 }

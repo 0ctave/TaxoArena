@@ -1,0 +1,69 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  thesis_canonical.toml
+#  PURPOSE: Canonical thesis parameter configuration (Math sub-corpus only).
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf",
+    "Meta-Llama-3-70B-Instruct"
+]
+category      = "math"
+queryLimit    = 0
+outputDir     = "experiment_results/thesis_canonical"
+testRatio     = 0.3
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false
+
+# ── Core formalism ──────────────────────────────────────────────────────────
+maxDepth          = 8
+minClusterSize    = 15
+separationEpsilon = 0.08
+cosineTau         = 2.0
+tauFunnelFloor    = 0.90
+assignmentGap     = 0.05
+emaAlpha          = 0.7
+
+# ── DAG-Max flags: ALL ON ─────────────────────────────────────────────────────
+enableStableQuestionIds = true
+enableResidualRouting   = true
+enableResidualSplitGate = true
+enableBridging          = true
+
+# ── DAG-Max parameters ────────────────────────────────────────────────────────
+routeConfidenceTau      = 0.5
+bridgeSeparationCeiling = 0.20
+bridgeEntropyCap        = 1.05
+bridgeMaxArity          = 2
+bridgeParentBudget      = 1
+maxBridgeNodes          = 14
+maxBridgesPerDomainPair = 2
+bridgeCandidateTopK     = 10
+minBridgeCoverage       = 30  # 2 * minClusterSize = 30
+numIterations           = 15
+
+# ── Adaptive soft-membership params ──────────────────────────────────────────
+assignmentCosineGap     = 0.20  # δ_assign
+deltaAssign             = 0.20  # branch-point descent gating δ_assign
+maxLeafAssignments      = 5
+refitMuPerIteration     = true

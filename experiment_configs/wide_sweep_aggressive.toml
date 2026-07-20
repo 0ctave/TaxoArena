@@ -1,0 +1,35 @@
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06", "Meta-Llama-3_1-8B-Instruct"]
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/wide_sweep_aggressive"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false
+
+maxDepth          = 8
+minClusterSize    = 40
+separationEpsilon = 0.04
+cosineTau         = 2.0
+tauFunnelFloor    = 0.90
+emaAlpha          = 0.7
+
+assignmentCosineGap     = 0.03
+deltaAssign             = 0.20
+maxLeafAssignments      = 5
+refitMuPerIteration     = true
+
+enableStableQuestionIds = true
+enableResidualRouting   = true
+enableResidualSplitGate = true
+enableBridging          = true
+
+hdlssThreshold = 12.0
+fusionSimilarityThreshold = 0.88
+effectiveSupportFloor = 1.5
+numIterations           = 35

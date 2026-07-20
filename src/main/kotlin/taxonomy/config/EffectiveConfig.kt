@@ -70,6 +70,7 @@ data class EffectiveConfig(
         val effectiveSupportFloor: Double = 2.0,
         val secondaryMassFloor: Double = 5.0,
         val bridgeSupportFloor: Double = 50.0,
+        val bridgeSupportRelFraction: Double = 0.10,
         val tauFunnelFloor: Double = 0.90,
         val defaultKappaPrior: Double = 10.0,
         val dPrefix: Int = 64

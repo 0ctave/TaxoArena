@@ -1,0 +1,51 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  test_dag_metrics.toml
+#  PURPOSE: Test configuration to evaluate the new DAG generation pipeline,
+#           adaptive soft-membership routing, and depth-adaptive tau funnels.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06", "Meta-Llama-3_1-8B-Instruct"]
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/test_dag_metrics"
+testRatio     = 0.3
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline    = true
+runBenchmark   = false   # Free dry-run classification test (no LLM calling costs)
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false
+
+# ── Core formalism ──────────────────────────────────────────
+maxDepth          = 8
+minClusterSize    = 25
+separationEpsilon = 0.02   # Mapped onto splitThreshold in tuning harness
+cosineTau         = 2.0
+tauFunnelFloor    = 0.85   # Funnel floor for depth-adaptive tau scale
+emaAlpha          = 0.7
+numIterations     = 35
+
+# ── Adaptive soft-membership & MRL Prefix Priors ──────────────────────────────────────────
+assignmentCosineGap     = 0.03   # Cosine gap for secondary leaf assignment
+deltaAssign             = 0.20
+maxLeafAssignments      = 5      # Maximum number of leaves to route a query to
+refitMuPerIteration     = true
+
+# ── DAG-Max flags: ALL ON ─────────────────────────────────────────────────────
+enableStableQuestionIds = true
+enableResidualRouting   = true
+enableResidualSplitGate = true
+enableBridging          = true
+
+# ── DAG-Max parameters ─────────────────────────────────────
+bridgeSeparationCeiling = 0.20
+bridgeEntropyCap        = 1.05
+bridgeMaxArity          = 2
+bridgeParentBudget      = 1
+maxBridgeNodes          = 14
+maxBridgesPerDomainPair = 2
+bridgeCandidateTopK     = 10
+minBridgeCoverage       = 50

@@ -124,6 +124,7 @@ class TaxonomyConfig {
         var effectiveSupportFloor: Double = 2.0
         var secondaryMassFloor: Double = 5.0
         var bridgeSupportFloor: Double = 50.0
+        var bridgeSupportRelFraction: Double = 0.10
         var tauFunnelFloor: Double = 0.90
         var defaultKappaPrior: Double = 10.0
         var dPrefix: Int = 64
@@ -164,6 +165,7 @@ class TaxonomyConfig {
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
         sb.append("│   - Sec Mass Floor:       ${formalism.secondaryMassFloor}\n")
         sb.append("│   - Bridge Support Floor: ${formalism.bridgeSupportFloor}\n")
+        sb.append("│   - Bridge Support Rel Frac: ${formalism.bridgeSupportRelFraction}\n")
         sb.append("│   - Tau Funnel Floor:     ${formalism.tauFunnelFloor}\n")
         sb.append("└──────────────────────────────────────────────────────────")
         return sb.toString()
@@ -213,6 +215,7 @@ class TaxonomyConfig {
             effectiveSupportFloor = formalism.effectiveSupportFloor,
             secondaryMassFloor = formalism.secondaryMassFloor,
             bridgeSupportFloor = formalism.bridgeSupportFloor,
+            bridgeSupportRelFraction = formalism.bridgeSupportRelFraction,
             tauFunnelFloor = formalism.tauFunnelFloor,
             defaultKappaPrior = formalism.defaultKappaPrior,
             dPrefix = formalism.dPrefix
@@ -259,6 +262,7 @@ class TaxonomyConfig {
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
         formalism.secondaryMassFloor = c.formalism.secondaryMassFloor
         formalism.bridgeSupportFloor = c.formalism.bridgeSupportFloor
+        formalism.bridgeSupportRelFraction = c.formalism.bridgeSupportRelFraction
         formalism.tauFunnelFloor = c.formalism.tauFunnelFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
         formalism.dPrefix = c.formalism.dPrefix
