@@ -157,6 +157,7 @@ data class SnapshotSettings(
     val secondaryMassFloor: Double = 5.0,
     val bridgeSupportFloor: Double = 50.0,
     val bridgeSupportRelFraction: Double = 0.10,
+    val deltaAssign: Double = 0.20,
     val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
@@ -186,6 +187,7 @@ data class SnapshotSettings(
             secondaryMassFloor = secondaryMassFloor,
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
+            deltaAssign = deltaAssign,
             assignmentGap = assignmentGap,
             emaAlpha = emaAlpha
         )
@@ -512,6 +514,7 @@ class TaxonomySnapshotManager(
             secondaryMassFloor = config.formalism.secondaryMassFloor,
             bridgeSupportFloor = config.formalism.bridgeSupportFloor,
             bridgeSupportRelFraction = config.formalism.bridgeSupportRelFraction,
+            deltaAssign = config.formalism.deltaAssign,
             assignmentGap = config.formalism.assignmentGap,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

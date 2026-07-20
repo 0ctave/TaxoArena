@@ -81,7 +81,8 @@ data class HeadlessCliConfig(
     val dPrefix: Int? = null,
     val secondaryMassFloor: Double? = null,
     val bridgeSupportFloor: Double? = null,
-    val bridgeSupportRelFraction: Double? = null
+    val bridgeSupportRelFraction: Double? = null,
+    val deltaAssign: Double? = null
 )
 
 @Component
@@ -169,6 +170,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.secondaryMassFloor?.let { config.formalism.secondaryMassFloor = it }
         cliConfig.bridgeSupportFloor?.let { config.formalism.bridgeSupportFloor = it }
         cliConfig.bridgeSupportRelFraction?.let { config.formalism.bridgeSupportRelFraction = it }
+        cliConfig.deltaAssign?.let { config.formalism.deltaAssign = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
@@ -1187,6 +1189,7 @@ class HeadlessBenchmarkRunner(
         var secondaryMassFloor: Double? = null
         var bridgeSupportFloor: Double? = null
         var bridgeSupportRelFraction: Double? = null
+        var deltaAssign: Double? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
@@ -1265,6 +1268,7 @@ class HeadlessBenchmarkRunner(
                 "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
                 "bridgeSupportFloor" -> bridgeSupportFloor = rawVal.toDouble()
                 "bridgeSupportRelFraction" -> bridgeSupportRelFraction = rawVal.toDouble()
+                "deltaAssign" -> deltaAssign = rawVal.toDouble()
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
@@ -1315,6 +1319,7 @@ class HeadlessBenchmarkRunner(
             secondaryMassFloor = secondaryMassFloor,
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
+            deltaAssign = deltaAssign,
             numIterations = numIterations,
             runBaselines = runBaselines
         )
