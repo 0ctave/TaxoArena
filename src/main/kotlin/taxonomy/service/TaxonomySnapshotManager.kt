@@ -158,6 +158,8 @@ data class SnapshotSettings(
     val bridgeSupportFloor: Double = 50.0,
     val bridgeSupportRelFraction: Double = 0.10,
     val deltaAssign: Double = 0.20,
+    val maxLeafAssignments: Int = 5,
+    val refitMuPerIteration: Boolean = false,
     val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
@@ -188,6 +190,8 @@ data class SnapshotSettings(
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
             deltaAssign = deltaAssign,
+            maxLeafAssignments = maxLeafAssignments,
+            refitMuPerIteration = refitMuPerIteration,
             assignmentGap = assignmentGap,
             emaAlpha = emaAlpha
         )
@@ -515,6 +519,8 @@ class TaxonomySnapshotManager(
             bridgeSupportFloor = config.formalism.bridgeSupportFloor,
             bridgeSupportRelFraction = config.formalism.bridgeSupportRelFraction,
             deltaAssign = config.formalism.deltaAssign,
+            maxLeafAssignments = config.formalism.maxLeafAssignments,
+            refitMuPerIteration = config.formalism.refitMuPerIteration,
             assignmentGap = config.formalism.assignmentGap,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

@@ -82,7 +82,9 @@ data class HeadlessCliConfig(
     val secondaryMassFloor: Double? = null,
     val bridgeSupportFloor: Double? = null,
     val bridgeSupportRelFraction: Double? = null,
-    val deltaAssign: Double? = null
+    val deltaAssign: Double? = null,
+    val maxLeafAssignments: Int? = null,
+    val refitMuPerIteration: Boolean? = null
 )
 
 @Component
@@ -171,6 +173,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.bridgeSupportFloor?.let { config.formalism.bridgeSupportFloor = it }
         cliConfig.bridgeSupportRelFraction?.let { config.formalism.bridgeSupportRelFraction = it }
         cliConfig.deltaAssign?.let { config.formalism.deltaAssign = it }
+        cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
+        cliConfig.refitMuPerIteration?.let { config.formalism.refitMuPerIteration = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
@@ -1190,6 +1194,8 @@ class HeadlessBenchmarkRunner(
         var bridgeSupportFloor: Double? = null
         var bridgeSupportRelFraction: Double? = null
         var deltaAssign: Double? = null
+        var maxLeafAssignments: Int? = null
+        var refitMuPerIteration: Boolean? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
@@ -1269,6 +1275,8 @@ class HeadlessBenchmarkRunner(
                 "bridgeSupportFloor" -> bridgeSupportFloor = rawVal.toDouble()
                 "bridgeSupportRelFraction" -> bridgeSupportRelFraction = rawVal.toDouble()
                 "deltaAssign" -> deltaAssign = rawVal.toDouble()
+                "maxLeafAssignments" -> maxLeafAssignments = rawVal.toInt()
+                "refitMuPerIteration" -> refitMuPerIteration = rawVal.toBoolean()
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
@@ -1320,6 +1328,8 @@ class HeadlessBenchmarkRunner(
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
             deltaAssign = deltaAssign,
+            maxLeafAssignments = maxLeafAssignments,
+            refitMuPerIteration = refitMuPerIteration,
             numIterations = numIterations,
             runBaselines = runBaselines
         )
