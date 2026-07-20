@@ -33,23 +33,31 @@ class TaxonomyMerger(
 
     private val log = LoggerFactory.getLogger("taxonomy.Merger")
 
-    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2) {
-        pruneUnrelevantNodes(root)
-        mergeSimilarSiblings(root)
+    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2, learningPhase: Boolean = false) {
+        if (learningPhase) {
+            pruneUnrelevantNodes(root)
+            prunePassthroughNodes(root)
+            pruneUnrelevantNodes(root)
+            removeStaleParentRefs(root)
+            invalidateAncestorCache()
+        } else {
+            pruneUnrelevantNodes(root)
+            mergeSimilarSiblings(root)
 
-        if (config.formalism.enableBridging) {
-            insertBridgingParents(root, currentIteration)
+            if (config.formalism.enableBridging) {
+                insertBridgingParents(root, currentIteration)
+            }
+
+            mergeRedundantNodes(root)
+
+            do {} while (prunePassthroughNodes(root))
+            pruneUnrelevantNodes(root)
+            removeStaleParentRefs(root)
+
+            invalidateAncestorCache()
+            val ancestorMapFinal = buildAncestorMap(root)  // ← rebuild after structural changes
+            transitiveReduction(root, ancestorMapFinal)
         }
-
-        mergeRedundantNodes(root)
-
-        do {} while (prunePassthroughNodes(root))
-        pruneUnrelevantNodes(root)
-        removeStaleParentRefs(root)
-
-        invalidateAncestorCache()
-        val ancestorMapFinal = buildAncestorMap(root)  // ← rebuild after structural changes
-        transitiveReduction(root, ancestorMapFinal)
     }
 
     fun prunePassthroughNodesPublic(root: GraphNode) {
@@ -101,11 +109,17 @@ class TaxonomyMerger(
             "Cannot fuse nodes at different dims: ${target.label}(${target.sliceDim}) vs ${source.label}(${source.sliceDim})"
         }
 
-        // 1. Combine queries & weights
-        target.queries.addAll(source.queries)
-        for ((q, w) in source.queryWeights) {
-            target.queryWeights[q] = (target.queryWeights[q] ?: 0.0) + w
+        val allQueries = (target.queries + source.queries).distinctBy { it.rawText }
+        val allWeights = mutableMapOf<String, Double>()
+        for ((q, w) in target.queryWeights) {
+            allWeights[q] = (allWeights[q] ?: 0.0) + w
         }
+        for ((q, w) in source.queryWeights) {
+            allWeights[q] = (allWeights[q] ?: 0.0) + w
+        }
+
+        target.queries.clear()
+        target.queryWeights.clear()
         target.residualQueries.addAll(source.residualQueries)
 
         // 2. Blend parameters
@@ -136,6 +150,28 @@ class TaxonomyMerger(
                 child.parents.add(target)
                 target.crossLinkChildren.add(child)
             }
+        }
+
+        // If target has children, distribute all queries to children to maintain internal composite separation
+        if (target.children.isNotEmpty()) {
+            val activeChildren = target.children.toList()
+            for (q in allQueries) {
+                val w = allWeights[q.rawText] ?: 1.0
+                val bestChild = activeChildren.maxByOrNull { child ->
+                    if (child.vmfMu.isEmpty()) -Double.MAX_VALUE
+                    else StatisticsUtils.dotProduct(q.projectTo(child.sliceDim), child.vmfMu)
+                }
+                if (bestChild != null) {
+                    bestChild.queries.add(q)
+                    bestChild.queryWeights[q.rawText] = (bestChild.queryWeights[q.rawText] ?: 0.0) + w
+                } else {
+                    target.queries.add(q)
+                    target.queryWeights[q.rawText] = (target.queryWeights[q.rawText] ?: 0.0) + w
+                }
+            }
+        } else {
+            target.queries.addAll(allQueries)
+            target.queryWeights.putAll(allWeights)
         }
 
         // 6. Clean up source

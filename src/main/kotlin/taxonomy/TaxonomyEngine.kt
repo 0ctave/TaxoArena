@@ -236,7 +236,7 @@ class TaxonomyEngine(
                         )
 
                         val optimizeTime = measureTimeMillis {
-                            ops.optimizeHierarchy(root, i)
+                            ops.optimizeHierarchy(root, i, learningPhase = true)
                         }
                         perfTracker.recordTime("Phase 5: Hierarchy Optimization", optimizeTime)
                         taxonomyService.notifyGraphUpdated(true)
@@ -290,6 +290,16 @@ class TaxonomyEngine(
                     break
                 }
             }
+
+            // ── FINALIZATION PHASE ──────────────────────────────────────────
+            log.info("=== STARTING FINALIZATION PHASE ===")
+            val finalizationTime = measureTimeMillis {
+                // 1. Run full topology optimization (bridges, fusions, transitive reduction)
+                ops.optimizeHierarchy(root, totalIters, learningPhase = false)
+                // 2. Refit bounds after final structural changes
+                ops.fitNodeRecursive(root, isFinalIteration = true)
+            }
+            log.info("Finalization phase completed in ${finalizationTime}ms.")
 
             if (config.execution.enableLabeling) {
                 log.info("Performing post-pass labeling on all nodes.")

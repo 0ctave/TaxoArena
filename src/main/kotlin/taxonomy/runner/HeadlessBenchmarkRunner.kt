@@ -56,6 +56,8 @@ data class HeadlessCliConfig(
     val minClusterSize: Int? = null,
     val separationEpsilon: Double? = null,
     val cosineTau: Double? = null,
+    val routingSoftmaxTau: Double? = null,
+    val leafAcceptanceScale: Double? = null,
     val assignmentGap: Double? = null,
     val assignmentCosineGap: Double? = null,
     val tauFunnelFloor: Double? = null,
@@ -142,6 +144,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.minClusterSize?.let { config.formalism.minClusterSize = it }
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.cosineTau?.let { config.formalism.cosineTau = it }
+        cliConfig.routingSoftmaxTau?.let { config.formalism.routingSoftmaxTau = it }
+        cliConfig.leafAcceptanceScale?.let { config.formalism.leafAcceptanceScale = it }
         cliConfig.assignmentGap?.let { config.formalism.assignmentGap = it }
         cliConfig.assignmentCosineGap?.let { config.formalism.assignmentCosineGap = it }
         cliConfig.tauFunnelFloor?.let { config.formalism.tauFunnelFloor = it }
@@ -1157,6 +1161,8 @@ class HeadlessBenchmarkRunner(
         var minClusterSize: Int? = null
         var separationEpsilon: Double? = null
         var cosineTau: Double? = null
+        var routingSoftmaxTau: Double? = null
+        var leafAcceptanceScale: Double? = null
         var assignmentGap: Double? = null
         var emaAlpha: Double? = null
         var enableLabeling: Boolean? = null
@@ -1229,6 +1235,8 @@ class HeadlessBenchmarkRunner(
                 "minClusterSize" -> minClusterSize = rawVal.toInt()
                 "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
                 "cosineTau" -> cosineTau = rawVal.toDouble()
+                "routingSoftmaxTau" -> routingSoftmaxTau = rawVal.toDouble()
+                "leafAcceptanceScale" -> leafAcceptanceScale = rawVal.toDouble()
                 "assignmentGap" -> assignmentGap = rawVal.toDouble()
                 "emaAlpha" -> emaAlpha = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
@@ -1272,6 +1280,8 @@ class HeadlessBenchmarkRunner(
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
             cosineTau = cosineTau,
+            routingSoftmaxTau = routingSoftmaxTau,
+            leafAcceptanceScale = leafAcceptanceScale,
             assignmentGap = assignmentGap,
             assignmentCosineGap = assignmentCosineGap,
             tauFunnelFloor = tauFunnelFloor,
@@ -1326,6 +1336,8 @@ class HeadlessBenchmarkRunner(
             config.formalism.minClusterSize,
             config.formalism.separationEpsilon,
             config.formalism.cosineTau,
+            config.formalism.routingSoftmaxTau,
+            config.formalism.leafAcceptanceScale,
             config.formalism.assignmentCosineGap,
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,

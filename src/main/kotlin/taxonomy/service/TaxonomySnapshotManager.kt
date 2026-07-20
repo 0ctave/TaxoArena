@@ -152,6 +152,8 @@ data class SnapshotSettings(
     val separationEpsilon: Double,
     val minClusterSize: Int,
     val cosineTau: Double,
+    val routingSoftmaxTau: Double = 1.0,
+    val leafAcceptanceScale: Double = 1.0,
     val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
@@ -176,6 +178,8 @@ data class SnapshotSettings(
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
             cosineTau = cosineTau,
+            routingSoftmaxTau = routingSoftmaxTau,
+            leafAcceptanceScale = leafAcceptanceScale,
             assignmentGap = assignmentGap,
             emaAlpha = emaAlpha
         )
@@ -497,6 +501,8 @@ class TaxonomySnapshotManager(
             separationEpsilon = config.formalism.separationEpsilon,
             minClusterSize = config.formalism.minClusterSize,
             cosineTau = config.formalism.cosineTau,
+            routingSoftmaxTau = config.formalism.routingSoftmaxTau,
+            leafAcceptanceScale = config.formalism.leafAcceptanceScale,
             assignmentGap = config.formalism.assignmentGap,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

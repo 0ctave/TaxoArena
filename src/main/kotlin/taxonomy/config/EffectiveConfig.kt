@@ -53,6 +53,8 @@ data class EffectiveConfig(
         val minClusterSize: Int = 25,
         val separationEpsilon: Double = 0.04,
         val cosineTau: Double = 2.0,
+        val routingSoftmaxTau: Double = 1.0,
+        val leafAcceptanceScale: Double = 1.0,
         val assignmentGap: Double = 0.05,
         val assignmentCosineGap: Double = 0.03,
         val deltaAssign: Double = 0.20,

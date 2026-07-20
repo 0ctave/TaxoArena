@@ -87,7 +87,7 @@ class TaxonomyTrickler(
             }
 
             // Temperature-scaled softmax
-            val tau = config.formalism.cosineTau.coerceAtLeast(0.01)
+            val tau = config.formalism.routingSoftmaxTau.coerceAtLeast(0.01)
             val tempScores = DoubleArray(scores.size) { scores[it] / tau }
             val maxTemp = tempScores.maxOrNull() ?: 0.0
             val sumExp = tempScores.sumOf { exp(it - maxTemp) }
@@ -150,7 +150,7 @@ class TaxonomyTrickler(
                     if (activeChildren.isNotEmpty()) activeChildren.map { it.vmfKappa }.average() else null
                 }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
 
-                val tauEffective = config.formalism.cosineTau.coerceAtLeast(0.01)
+                val tauEffective = config.formalism.leafAcceptanceScale.coerceAtLeast(0.01)
                 val marginNats = config.formalism.assignmentCosineGap * (siblingKappaEffective / tauEffective)
                 (bestLeafLogProb - logProb) <= marginNats
             }

@@ -90,6 +90,8 @@ class TaxonomyConfig {
         // Temperature for the softmax over sibling log-likelihoods at each tree
         // node during trickle routing.  Higher = softer (more spread).
         var cosineTau: Double = 2.0
+        var routingSoftmaxTau: Double = 1.0
+        var leafAcceptanceScale: Double = 1.0
 
         // Log-likelihood margin for leaf assignment.
         //
@@ -182,6 +184,8 @@ class TaxonomyConfig {
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
             cosineTau = formalism.cosineTau,
+            routingSoftmaxTau = formalism.routingSoftmaxTau,
+            leafAcceptanceScale = formalism.leafAcceptanceScale,
             assignmentGap = formalism.assignmentGap,
             assignmentCosineGap = formalism.assignmentCosineGap,
             deltaAssign = formalism.deltaAssign,
@@ -224,6 +228,8 @@ class TaxonomyConfig {
         formalism.minClusterSize = c.formalism.minClusterSize
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.cosineTau = c.formalism.cosineTau
+        formalism.routingSoftmaxTau = c.formalism.routingSoftmaxTau
+        formalism.leafAcceptanceScale = c.formalism.leafAcceptanceScale
         formalism.assignmentGap = c.formalism.assignmentGap
         formalism.assignmentCosineGap = c.formalism.assignmentCosineGap
         formalism.deltaAssign = c.formalism.deltaAssign

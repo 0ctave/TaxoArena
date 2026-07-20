@@ -42,7 +42,7 @@ class TaxonomyOperations(
 
     fun resetConceptCounter() = splitter.resetConceptCounter()
 
-    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2) = merger.optimizeHierarchy(root, currentIteration)
+    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2, learningPhase: Boolean = false) = merger.optimizeHierarchy(root, currentIteration, learningPhase)
 
     suspend fun prunePassthroughNodesPublic(root: GraphNode) = merger.prunePassthroughNodesPublic(root)
 
