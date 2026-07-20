@@ -117,6 +117,10 @@ class TaxonomyEngine(
                     }
                     if (embs.isNotEmpty()) {
                         node.queries.addAll(embs)
+                        for (q in embs) {
+                            node.queryWeights[q.rawText] = 1.0
+                            GraphNode.registerEmbedding(q)
+                        }
                         node.parents.add(root)
                         root.children.add(node)
                     }

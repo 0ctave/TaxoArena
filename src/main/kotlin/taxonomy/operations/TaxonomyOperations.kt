@@ -88,12 +88,7 @@ class TaxonomyOperations(
                     destinations.forEach { leaf ->
                         val logWeight = routeResult.leaves[leaf] ?: 0.0
                         val weight = kotlin.math.exp(logWeight)
-                        synchronized(leaf.queryWeights) {
-                            leaf.queryWeights[emb.rawText] = (leaf.queryWeights[emb.rawText] ?: 0.0) + weight
-                            if (!leaf.queries.contains(emb)) {
-                                leaf.queries.add(emb)
-                            }
-                        }
+                        propagateWeightUpwards(leaf, emb, weight)
                     }
 
                     if (config.formalism.enableResidualRouting) {
@@ -264,6 +259,21 @@ class TaxonomyOperations(
             val childIsCross = i >= children.size
             buildTreeString(child, nextPrefix, childIsTail, sb, visited, childIsCross, policy)
         }
+    }
+
+    private fun propagateWeightUpwards(leaf: GraphNode, emb: Embedding, weight: Double) {
+        val visited = mutableSetOf<String>()
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            synchronized(node.queryWeights) {
+                node.queryWeights[emb.rawText] = (node.queryWeights[emb.rawText] ?: 0.0) + weight
+                if (!node.queries.contains(emb)) {
+                    node.queries.add(emb)
+                }
+            }
+            node.parents.forEach { walk(it) }
+        }
+        walk(leaf)
     }
 
 }

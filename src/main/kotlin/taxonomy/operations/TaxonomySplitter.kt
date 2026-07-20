@@ -344,6 +344,10 @@ class TaxonomySplitter(
             treeParentId = parent.id
         }
         newNode.queries.addAll(cluster)
+        for (q in cluster) {
+            newNode.queryWeights[q.rawText] = 1.0
+            GraphNode.registerEmbedding(q)
+        }
 
         return newNode
     }

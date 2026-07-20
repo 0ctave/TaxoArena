@@ -126,19 +126,6 @@ class TaxonomyTrickler(
                 val child = children[i]
                 val transitionProb = smoothedProbs[i]
                 val accumulatedWeight = currentLogProb + ln(transitionProb.coerceAtLeast(1e-300))
-
-                // Enregistrement de la masse souple dans le nœud cible :
-                synchronized(child.queryWeights) {
-                    val qId = query.rawText
-                    val currentMass = child.queryWeights[qId] ?: 0.0
-                    child.queryWeights[qId] = currentMass + exp(accumulatedWeight)
-
-                    // Maintain queries list compatibility
-                    if (!child.queries.any { it.rawText == query.rawText }) {
-                        child.queries.add(query)
-                    }
-                }
-
                 walk(child, accumulatedWeight)
             }
         }
