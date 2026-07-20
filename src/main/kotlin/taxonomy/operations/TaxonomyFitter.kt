@@ -303,12 +303,44 @@ class TaxonomyFitter(
         }
     }
 
+    private fun GraphNode.getRegionQueryWeights(): Map<String, Double> {
+        val weights = mutableMapOf<String, Double>()
+        val visited = mutableSetOf<String>()
+
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            for ((q, w) in node.queryWeights) {
+                weights[q] = (weights[q] ?: 0.0) + w
+            }
+            node.treeChildren.forEach { walk(it) }
+            node.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(this)
+        return weights
+    }
+
+    private fun getAdaptiveSliceDim(targetDim: Int, nEffective: Double): Int {
+        val prefixes = listOf(128, 256, 512, 1024).filter { it <= targetDim }
+        return prefixes.lastOrNull { it.toDouble() / nEffective.coerceAtLeast(1e-5) <= 8.0 } ?: 128
+    }
+
     fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) {
-        val d = node.sliceDim
         val parents = node.parents
+        
+        // 1. Get query weights in the region and total effective count
+        val queryWeightsMap = node.getRegionQueryWeights()
+        val nEffective = queryWeightsMap.values.sum()
+        
+        // 2. Adaptive MRL prefix selection
+        val targetDim = dimForDepth(node.depth)
+        val fitDim = getAdaptiveSliceDim(targetDim, nEffective)
+        node.sliceDim = fitDim
+        
+        // 3. Prior calculation (kappa0Parent)
         val avgKappaPrefixAtParent = if (parents.isNotEmpty()) {
             parents.map { parent ->
-                val parentQueries = parent.getAllQueriesInRegion()
+                val parentWeights = parent.getRegionQueryWeights()
+                val parentQueries = parentWeights.keys.mapNotNull { GraphNode.getEmbedding(it) }
                 computePrefixKappa(parent, parentQueries, config.formalism.dPrefix)
             }.average()
         } else {
@@ -316,136 +348,83 @@ class TaxonomyFitter(
         }
 
         val kappa0Parent = if (parents.isNotEmpty()) {
-            mapPrefixToPrior(node.depth, d, config.formalism.dPrefix, avgKappaPrefixAtParent)
+            mapPrefixToPrior(node.depth, fitDim, config.formalism.dPrefix, avgKappaPrefixAtParent)
         } else {
             config.formalism.defaultKappaPrior
         }
 
-        // ── n for NiW (always branch-based for routing confidence) ───────────────
-        val branchQueries = node.getAllQueriesInRegion()
-        val n = branchQueries.size
-        val kappaQueries = if (config.formalism.enableResidualRouting) {
-            branchQueries.filter { emb ->
-                val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
-                qId !in node.residualQueries
-            }.ifEmpty { branchQueries }
-        } else {
-            branchQueries
-        }
-
-        if (n == 0) {
-            node.vmfMu = FloatArray(d) { 0.0f }.apply { if (d > 0) this[0] = 1.0f }
+        if (nEffective <= 1e-4) {
+            node.vmfMu = FloatArray(fitDim) { 0.0f }.apply { if (fitDim > 0) this[0] = 1.0f }
             node.vmfKappa = 1e-3
-            node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
+            node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(fitDim, node.vmfKappa)
             node.niwM0 = node.vmfMu.copyOf()
             node.niwKappa0 = 1.0
-            node.niwNu0 = (d + 2).toDouble()
-            node.niwLambda = FloatArray(d) { (1.0 / d).toFloat() }
+            node.niwNu0 = (fitDim + 2).toDouble()
+            node.niwLambda = FloatArray(fitDim) { (1.0 / fitDim).toFloat() }
             node.phaseCompleted = node.phaseCompleted or PHASE_VMF_FIT or PHASE_NIW_FIT
             return
         }
 
-        // ── vMF fit ───────────────────────────────────────────────────────────────
-        // Three cases, in priority order:
-        //
-        // 1. Splitter already fitted vMF (PHASE_SPLIT_EVAL set): trust it.
-        //    Those values were fitted from the original embeddings at the correct
-        //    childDim during bisection. Re-computing would destroy the separation.
-        //
-        // 2. Internal node (has tree children, not yet fitted): fit vMF from the
-        //    weighted centroid of direct tree children's vmfMu vectors.
-        //    This gives the node a directional identity that is the geometric
-        //    parent of its children, rather than a blurred union of all subtree
-        //    queries (which collapses to near-uniform when sub-domains cancel out).
-        //
-        // 3. Leaf node (no tree children): fit vMF from node.queries directly.
-        //    Fall back to branchQueries only if node.queries is empty.
-        val muAlreadyFit = ((node.phaseCompleted and PHASE_SPLIT_EVAL) != 0) &&
-                !(config.formalism.refitMuPerIteration || isFinalIteration)
-
-        if (!muAlreadyFit) {
-            if (!node.isLeaf && node.children.isNotEmpty()) {
-                val fittedChildren = node.children.filter { it.vmfMu.isNotEmpty() }
-                if (fittedChildren.isNotEmpty()) {
-                    // --- Step 1: derive mu from weighted child means (unchanged) ---
-                    val childCounts = fittedChildren.associateWith { it.getRecursiveQueryCount().toDouble() }
-                    val totalChildN = childCounts.values.sum().coerceAtLeast(1.0)
-
-                    val weightedMu = DoubleArray(d)
-                    for (child in fittedChildren) {
-                        val w = if (fittedChildren.size == 1) 1.0
-                        else (childCounts[child] ?: 0.0) / totalChildN
-                        val childMu = StatisticsUtils.projectVector(child.vmfMu, d)
-                        for (i in 0 until d) weightedMu[i] += w * childMu[i]
-                    }
-                    var norm = 0.0
-                    for (i in 0 until d) norm += weightedMu[i] * weightedMu[i]
-                    norm = sqrt(norm)
-
-                    val mu = FloatArray(d) { i ->
-                        if (norm > 0.0) (weightedMu[i] / norm).toFloat() else 0.0f
-                    }
-                    if (norm == 0.0 && d > 0) mu[0] = 1.0f
-                    node.vmfMu = mu
-
-                    // --- Step 2: derive kappa from ACTUAL query alignment against mu ---
-                    // This measures "how broad is this domain really?" from the queries,
-                    // not from the child mean coherence (which is always high for 2 child-means).
-                    var dotSum = 0.0
-                    val kappaVecs = kappaQueries.map { it.projectTo(d) }
-                    for (vec in kappaVecs) {
-                        for (i in 0 until d) dotSum += mu[i] * vec[i]
-                    }
-                    val rBar = (dotSum / kappaVecs.size.coerceAtLeast(1)).coerceAtLeast(0.0)
-                    val rawKappa = StatisticsUtils.correctedKappa(rBar, d, kappaVecs.size)
-                    val rho = d.toDouble() / kappaVecs.size.coerceAtLeast(1)
-                    node.dOverN = rho
-                    val alphaD = dOverNAlpha(rho)
-                    val priorKappa = kappa0Parent.coerceAtLeast(1.0)
-                    node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
-                    node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
-
-                    if (rho > 10.0) {
-                        highDOverNCount.incrementAndGet()
-                        log.debug("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
-                    }
-                } else {
-                    fitVmfFromQueryList(node, node.queries.ifEmpty { branchQueries }, d, kappa0Parent)
-                }
-            } else {
-                val vmfSrc = node.queries.ifEmpty { branchQueries }
-                fitVmfFromQueryList(node, vmfSrc, d, kappa0Parent)
-            }
-        } else {
-            // mu trusted from splitter — recompute kappa from current branch to reflect
-            // who is actually here now, not who was here at split time
-            val muSize = node.vmfMu.size
-            val rBar = run {
-                val projected = kappaQueries.map { it.projectTo(muSize) }
-                var dot = 0.0
-                for (vec in projected) for (i in 0 until muSize) dot += node.vmfMu[i] * vec[i]
-                (dot / kappaQueries.size.coerceAtLeast(1)).coerceAtLeast(0.0)
-            }
-            val rawKappa = StatisticsUtils.correctedKappa(rBar, muSize, kappaQueries.size)
-            val rho = muSize.toDouble() / kappaQueries.size.coerceAtLeast(1)
-            node.dOverN = rho
-            val alphaD = dOverNAlpha(rho)
-            val priorKappa = kappa0Parent.coerceAtLeast(1.0)
-            node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
-            node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(muSize, node.vmfKappa)
-
-            if (rho > 10.0) {
-                highDOverNCount.incrementAndGet()
-                log.debug("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
+        // 4. Compute Weighted Centroid Vector (mu)
+        val sumVec = DoubleArray(fitDim)
+        for ((qText, w) in queryWeightsMap) {
+            val emb = GraphNode.getEmbedding(qText) ?: continue
+            val projected = emb.projectTo(fitDim) // systemic MRL projection & L2 normalization
+            for (i in 0 until fitDim) {
+                sumVec[i] += w * projected[i]
             }
         }
 
-        // ── NiW posterior ─────────────────────────────────────────────────────────
-        // Always recompute — NiW is used for routing and needs fresh sample stats.
-        // Project using the node's own sliceDim (same as vmfMu.size for consistency).
-        val fitDim = node.vmfMu.size   // use actual mu size, not sliceDim, to stay consistent
-        val projected = branchQueries.map { it.projectTo(fitDim) }
+        var normVec = 0.0
+        for (i in 0 until fitDim) normVec += sumVec[i] * sumVec[i]
+        normVec = sqrt(normVec)
 
+        val mu = FloatArray(fitDim) { i ->
+            if (normVec > 0.0) (sumVec[i] / normVec).toFloat() else 0.0f
+        }
+        if (normVec == 0.0 && fitDim > 0) mu[0] = 1.0f
+
+        // Apply EMA blending if oldMu exists and is compatible
+        val oldMu = node.vmfMu
+        if (oldMu.isNotEmpty() && oldMu.size == fitDim) {
+            val dot = StatisticsUtils.dotProduct(oldMu.map { it.toDouble() }.toDoubleArray(), mu)
+            if (dot >= 0.9975) {
+                node.vmfMu = oldMu
+            } else {
+                val emaAlpha = config.formalism.emaAlpha
+                val blended = DoubleArray(fitDim) { i -> (1.0 - emaAlpha) * mu[i].toDouble() + emaAlpha * oldMu[i].toDouble() }
+                var norm = 0.0
+                for (i in 0 until fitDim) norm += blended[i] * blended[i]
+                norm = sqrt(norm)
+                val newMu = FloatArray(fitDim) { i -> if (norm > 0.0) (blended[i] / norm).toFloat() else 0.0f }
+                if (norm == 0.0 && fitDim > 0) newMu[0] = 1.0f
+                node.vmfMu = newMu
+            }
+        } else {
+            node.vmfMu = mu
+        }
+
+        // 5. Compute Weighted Concentration (kappa)
+        val rBar = normVec / nEffective
+        node.dOverN = fitDim.toDouble() / nEffective
+        
+        val priorKappa = kappa0Parent.coerceAtLeast(1.0)
+        
+        if (nEffective < 2.0) {
+            node.vmfKappa = priorKappa
+        } else {
+            val rawKappa = StatisticsUtils.correctedKappa(rBar, fitDim, nEffective.toInt())
+            val rho = fitDim.toDouble() / nEffective
+            val alphaD = dOverNAlpha(rho)
+            node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
+        }
+        node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(fitDim, node.vmfKappa)
+
+        if (node.dOverN > 10.0) {
+            highDOverNCount.incrementAndGet()
+        }
+
+        // 6. NiW posterior (adapted to soft weighting queryWeights)
         val m0 = DoubleArray(fitDim)
         if (parents.isNotEmpty()) {
             for (parent in parents) {
@@ -466,35 +445,37 @@ class TaxonomyFitter(
 
         val kappa0 = 1.0
         val nu0 = (fitDim + 2).toDouble()
-        val lambda = 1.0 / (kappa0Parent.coerceAtLeast(1e-3) * fitDim)
+        val lambda = 1.0 / (priorKappa.coerceAtLeast(1e-3) * fitDim)
 
         val sampleMean = DoubleArray(fitDim)
-        for (vec in projected) for (i in 0 until fitDim) sampleMean[i] += vec[i]
-        for (i in 0 until fitDim) sampleMean[i] /= n.toDouble()
-
-        val effectiveN = if (node.isBridge) {
-            (config.formalism.minClusterSize * 1.5).coerceAtMost(n.toDouble())
-        } else {
-            n.toDouble()
+        for ((qText, w) in queryWeightsMap) {
+            val emb = GraphNode.getEmbedding(qText) ?: continue
+            val proj = emb.projectTo(fitDim)
+            for (i in 0 until fitDim) {
+                sampleMean[i] += w * proj[i]
+            }
         }
+        for (i in 0 until fitDim) sampleMean[i] /= nEffective
 
-        val kappaN = kappa0 + effectiveN
-        val nuN = nu0 + effectiveN
+        val kappaN = kappa0 + nEffective
+        val nuN = nu0 + nEffective
 
         val mN = FloatArray(fitDim) { i ->
-            ((kappa0 * m0[i] + effectiveN * sampleMean[i]) / kappaN).toFloat()
+            ((kappa0 * m0[i] + nEffective * sampleMean[i]) / kappaN).toFloat()
         }
 
         val lambdaN = FloatArray(fitDim)
-        for (vec in projected) {
+        for ((qText, w) in queryWeightsMap) {
+            val emb = GraphNode.getEmbedding(qText) ?: continue
+            val proj = emb.projectTo(fitDim)
             for (i in 0 until fitDim) {
-                val diff = vec[i] - sampleMean[i]
-                lambdaN[i] += (diff * diff).toFloat()
+                val diff = proj[i] - sampleMean[i]
+                lambdaN[i] += (w * diff * diff).toFloat()
             }
         }
         for (i in 0 until fitDim) {
             val meanDiff = sampleMean[i] - m0[i]
-            val updatePart = (kappa0 * effectiveN / kappaN) * meanDiff * meanDiff
+            val updatePart = (kappa0 * nEffective / kappaN) * meanDiff * meanDiff
             lambdaN[i] = (lambda + lambdaN[i] + updatePart).toFloat()
         }
 

@@ -28,9 +28,10 @@ data class GraphNode(
 
     val parents: MutableSet<GraphNode> = java.util.concurrent.ConcurrentHashMap.newKeySet(),
 
-    // Unified Data Space:
-    // If isLeaf == true: Holds the explicit data for this domain.
-    // If isLeaf == false: Holds the residual "unmapped/outlier" queries that failed to trickle to children.
+    // Soft routing query weights map (rawText -> weight)
+    val queryWeights: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap(),
+
+    // Unified Data Space (retained for backward compatibility and list access)
     var queries: MutableList<Embedding> = Collections.synchronizedList(ArrayList()),
 
     // Immutable sliceDim based on depth
@@ -38,7 +39,7 @@ data class GraphNode(
 
     // vMF self-model (single component, fitted at this node's sliceDim)
     var vmfMu: FloatArray = FloatArray(0),      // Unit-norm mean direction, shape [sliceDim]
-    var vmfKappa: Double = 0.0,                 // Concentration, bias-corrected
+    var vmfKappa: Double = 1.0,                 // Concentration, bias-corrected
     var vmfLogNormalizer: Double = 0.0,          // log C_d(kappa), precomputed
 
     // NiW posterior (for soft membership scoring at inference)
@@ -63,6 +64,13 @@ data class GraphNode(
     val residualConfidences: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap(),
     var dOverN: Double = 0.0
 ) {
+    companion object {
+        val EmbeddingRegistry = java.util.concurrent.ConcurrentHashMap<String, Embedding>()
+        fun registerEmbedding(emb: Embedding) {
+            EmbeddingRegistry[emb.rawText] = emb
+        }
+        fun getEmbedding(rawText: String): Embedding? = EmbeddingRegistry[rawText]
+    }
     // isLeaf is true iff this node has NO tree children.
     // Cross-link children are irrelevant to leaf status.
     val isLeaf: Boolean get() = children.isEmpty() && !isBridge
@@ -100,10 +108,18 @@ data class GraphNode(
 
         fun walk(node: GraphNode) {
             if (!visitedNodes.add(node.id)) return
-            synchronized(node.queries) {  // ← add this
-                for (q in node.queries) {
+            if (node.queryWeights.isNotEmpty()) {
+                for (text in node.queryWeights.keys) {
+                    val q = getEmbedding(text) ?: continue
                     val isNew = if (q.queryId >= 0) seenIds.add(q.queryId) else seenTexts.add(q.rawText)
                     if (isNew) allQueries.add(q)
+                }
+            } else {
+                synchronized(node.queries) {
+                    for (q in node.queries) {
+                        val isNew = if (q.queryId >= 0) seenIds.add(q.queryId) else seenTexts.add(q.rawText)
+                        if (isNew) allQueries.add(q)
+                    }
                 }
             }
             node.treeChildren.forEach { walk(it) }
@@ -126,10 +142,18 @@ data class GraphNode(
 
         fun walk(node: GraphNode) {
             if (!visitedNodes.add(node.id)) return
-            synchronized(node.queries) {
-                for (q in node.queries) {
+            if (node.queryWeights.isNotEmpty()) {
+                for (text in node.queryWeights.keys) {
+                    val q = getEmbedding(text) ?: continue
                     val isNew = if (q.queryId >= 0) seenIds.add(q.queryId) else seenTexts.add(q.rawText)
                     if (isNew) allQueries.add(q)
+                }
+            } else {
+                synchronized(node.queries) {
+                    for (q in node.queries) {
+                        val isNew = if (q.queryId >= 0) seenIds.add(q.queryId) else seenTexts.add(q.rawText)
+                        if (isNew) allQueries.add(q)
+                    }
                 }
             }
             node.treeChildren.forEach { walk(it) }
@@ -149,9 +173,16 @@ data class GraphNode(
 
         fun walk(node: GraphNode) {
             if (!visited.add(node.id)) return
-            synchronized(node.queries) {  // ← add this
-                node.queries.forEach { q ->
-                    if (q.queryId >= 0) bitSet.set(q.queryId) else fallbackSet.add(q.rawText)
+            if (node.queryWeights.isNotEmpty()) {
+                node.queryWeights.keys.forEach { text ->
+                    val q = getEmbedding(text)
+                    if (q != null && q.queryId >= 0) bitSet.set(q.queryId) else fallbackSet.add(text)
+                }
+            } else {
+                synchronized(node.queries) {
+                    node.queries.forEach { q ->
+                        if (q.queryId >= 0) bitSet.set(q.queryId) else fallbackSet.add(q.rawText)
+                    }
                 }
             }
             node.children.forEach { walk(it) }

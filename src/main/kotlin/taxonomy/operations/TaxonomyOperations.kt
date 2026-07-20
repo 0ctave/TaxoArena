@@ -80,12 +80,22 @@ class TaxonomyOperations(
                 for (emb in chunk) {
                     val originals = groundTruthMap[emb.rawText]
                     val routeResult = trickler.routeQuery(emb, root, currentIteration, originals)
+                    GraphNode.registerEmbedding(emb)
                     val destinations = routeResult.leaves.keys.toList().ifEmpty {
                         log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
                         listOf(root)
                     }
-                    destinations.forEach { it.queries.add(emb) }
-                    
+                    destinations.forEach { leaf ->
+                        val logWeight = routeResult.leaves[leaf] ?: 0.0
+                        val weight = kotlin.math.exp(logWeight)
+                        synchronized(leaf.queryWeights) {
+                            leaf.queryWeights[emb.rawText] = (leaf.queryWeights[emb.rawText] ?: 0.0) + weight
+                            if (!leaf.queries.contains(emb)) {
+                                leaf.queries.add(emb)
+                            }
+                        }
+                    }
+
                     if (config.formalism.enableResidualRouting) {
                         for (hit in routeResult.residualHits) {
                             synchronized(hit.node.residualQueries) {
@@ -102,6 +112,7 @@ class TaxonomyOperations(
     fun clearGraphQueries(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
         if (!visited.add(node.id)) return
         node.queries.clear()
+        node.queryWeights.clear()
         node.residualQueries.clear()
         node.residualConfidences.clear()
         node.children.forEach { clearGraphQueries(it, visited) }

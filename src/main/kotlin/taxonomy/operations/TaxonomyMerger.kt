@@ -41,8 +41,7 @@ class TaxonomyMerger(
             insertBridgingParents(root, currentIteration)
         }
 
-        val ancestorMap = buildAncestorMap(root)  // ← build once
-        evaluateCrossLinks(root, ancestorMap)
+        mergeRedundantNodes(root)
 
         do {} while (prunePassthroughNodes(root))
         pruneUnrelevantNodes(root)
@@ -96,8 +95,12 @@ class TaxonomyMerger(
             "Cannot fuse nodes at different dims: ${target.label}(${target.sliceDim}) vs ${source.label}(${source.sliceDim})"
         }
 
-        // 1. Combine queries
+        // 1. Combine queries & weights
         target.queries.addAll(source.queries)
+        for ((q, w) in source.queryWeights) {
+            target.queryWeights[q] = (target.queryWeights[q] ?: 0.0) + w
+        }
+        target.residualQueries.addAll(source.residualQueries)
 
         // 2. Blend parameters
         blendVmfAndNiw(target, source)
@@ -134,6 +137,7 @@ class TaxonomyMerger(
         source.children.clear()
         source.crossLinkChildren.clear()
         source.queries.clear()
+        source.queryWeights.clear()
     }
 
     private fun pruneUnrelevantNodes(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
@@ -333,49 +337,36 @@ class TaxonomyMerger(
      * After this fix: isLeaf = children.isEmpty() is unaffected by cross-links.
      * All tree leaf nodes remain leaves. The trickler distributes correctly.
      */
-    private suspend fun evaluateCrossLinks(root: GraphNode, ancestorMap: Map<String, Set<String>>) {
-        val allNodes = getAllNodes(root).filter { it.depth > 0 }
-        val allNodeById = allNodes.associateBy { it.id }
+    private fun mergeRedundantNodes(root: GraphNode) {
+        val allNodes = getAllNodes(root).toList()
+        for (i in 0 until allNodes.size) {
+            for (j in i + 1 until allNodes.size) {
+                if (i >= allNodes.size || j >= allNodes.size) continue
+                val nodeA = allNodes[i]
+                val nodeB = allNodes[j]
+                if (nodeA.parents.isEmpty() || nodeB.parents.isEmpty()) continue
 
-        coroutineScope {
-            allNodes.map { node ->
-                async(Dispatchers.Default) {
-                    val directQueries = node.queries.toList()
-                    if (directQueries.isEmpty() || directQueries.size < config.formalism.minClusterSize) return@async
+                // Ne pas fusionner des nœuds de la même ascendance directe
+                if (isAncestor(nodeA, nodeB) || isAncestor(nodeB, nodeA)) continue
 
-                    // Fast pre-check: low-kappa nodes won't win majority vote
-                    if (node.vmfKappa < 0.5) return@async
+                val commonDim = minOf(nodeA.sliceDim, nodeB.sliceDim)
+                if (commonDim == 0 || nodeA.vmfMu.isEmpty() || nodeB.vmfMu.isEmpty()) continue
+                val muA = StatisticsUtils.projectVector(nodeA.vmfMu, commonDim) // FloatArray
+                val muB = nodeB.vmfMu.copyOf(commonDim) // FloatArray
 
-                    val potentialParents = allNodes.filter { pp ->
-                        node != pp &&
-                                !node.parents.contains(pp) &&
-                                pp.id !in (ancestorMap[node.id] ?: emptySet()) &&
-                                node.id !in (ancestorMap[pp.id] ?: emptySet()) &&
-                                pp.depth <= node.depth &&
-                                (node.depth - pp.depth) <= 3 &&
-                                getDepth1Ancestor(node, ancestorMap, allNodeById) !=
-                                getDepth1Ancestor(pp, ancestorMap, allNodeById)
-                    }
+                val similarity = StatisticsUtils.dotProduct(muA.map { it.toDouble() }.toDoubleArray(), muB)
 
-                    val links = mutableListOf<String>()
-                    for (pp in potentialParents) {
-                        var votes = 0
-                        for (q in directQueries) {
-                            val slicedA = q.projectTo(node.sliceDim)
-                            val slicedB = q.projectTo(pp.sliceDim)
-                            val cosA = StatisticsUtils.dotProduct(slicedA, node.vmfMu)
-                            val cosB = StatisticsUtils.dotProduct(slicedB, pp.vmfMu)
-                            if (cosB - cosA > 0.05) votes++
-                        }
-                        if (votes >= directQueries.size / 2) {
-                            links.add("'${node.label}' -> '${pp.label}'($votes/${directQueries.size})")
-                            synchronized(node) { node.parents.add(pp) }
-                            synchronized(pp) { pp.crossLinkChildren.add(node) }
-                        }
-                    }
-                    if (links.isNotEmpty()) log.info("[XL] Crosslinked: ${links.joinToString(", ")}")
+                // Si la similarité dépasse le seuil, les nœuds fusionnent leurs identités
+                // tout en conservant leurs parents respectifs (créant ainsi un DAG polyhiérarchique)
+                if (similarity > 0.92) {
+                    log.info("[Emergence] Fusion organique détectée entre '${nodeA.label}' and '${nodeB.label}' (Cos: $similarity)")
+                    nodeA.sliceDim = commonDim
+                    nodeB.sliceDim = commonDim
+                    nodeA.vmfMu = muA.map { it.toFloat() }.toFloatArray()
+                    nodeB.vmfMu = muB.map { it.toFloat() }.toFloatArray()
+                    fuseNodes(nodeA, nodeB)
                 }
-            }.awaitAll()
+            }
         }
     }
 

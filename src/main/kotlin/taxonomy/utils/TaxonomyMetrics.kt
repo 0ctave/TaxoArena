@@ -147,17 +147,7 @@ class TaxonomyMetrics(
 
         // ── Residuals: queries stuck in internal nodes, never reaching a leaf ──
         val leafQueryTexts     = queryToEmbeddings.keys
-        val internalQueryTexts = mutableSetOf<String>()
-        allNodes.filter { !it.isLeaf }.forEach { node ->
-            node.queries.forEach { internalQueryTexts.add(it.rawText) }
-        }
-        val hasResiduals = allNodes.filter { !it.isLeaf }.any { it.residualQueries.isNotEmpty() }
-        val residualQueries = if (hasResiduals) {
-            allNodes.filter { !it.isLeaf }.flatMap { it.residualQueries }.toSet().size
-        } else {
-            (internalQueryTexts - leafQueryTexts).size
-        }
-
+        val residualQueries    = (allQueryTexts - leafQueryTexts).size
         val totalUnique        = maxOf(1, allQueryTexts.size)
         val residualRatio      = residualQueries.toDouble() / totalUnique.toDouble()
 

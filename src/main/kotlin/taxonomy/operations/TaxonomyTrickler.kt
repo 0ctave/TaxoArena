@@ -115,12 +115,31 @@ class TaxonomyTrickler(
             val smoothedProbs = DoubleArray(K) { (rawProbs[it] + laplaceEps) / (1.0 + K * laplaceEps) }
             val logSmoothed = DoubleArray(K) { ln(smoothedProbs[it].coerceAtLeast(1e-300)) }
 
+            // Register the query embedding for MRL-projection lookup
+            GraphNode.registerEmbedding(query)
+
             val maxLogSoftmax = logSoftmax.maxOrNull() ?: 0.0
             val bestIndices = children.indices
                 .filter { (maxLogSoftmax - logSoftmax[it]) <= config.formalism.deltaAssign }
 
             for (i in bestIndices) {
-                walk(children[i], currentLogProb + logSmoothed[i])
+                val child = children[i]
+                val transitionProb = smoothedProbs[i]
+                val accumulatedWeight = currentLogProb + ln(transitionProb.coerceAtLeast(1e-300))
+
+                // Enregistrement de la masse souple dans le nœud cible :
+                synchronized(child.queryWeights) {
+                    val qId = query.rawText
+                    val currentMass = child.queryWeights[qId] ?: 0.0
+                    child.queryWeights[qId] = currentMass + exp(accumulatedWeight)
+
+                    // Maintain queries list compatibility
+                    if (!child.queries.any { it.rawText == query.rawText }) {
+                        child.queries.add(query)
+                    }
+                }
+
+                walk(child, accumulatedWeight)
             }
         }
 
