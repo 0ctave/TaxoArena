@@ -30,8 +30,16 @@ maxDepth          = 8
 minClusterSize    = 25
 separationEpsilon = 0.04
 cosineTau         = 2.0
-assignmentGap     = 0.05
+tauFunnelFloor    = 0.90
+# assignmentGap is deprecated/unused in favor of assignmentCosineGap
+# assignmentGap     = 0.05
 emaAlpha          = 0.7
+
+# ── Adaptive soft-membership params ──────────────────────────────────────────
+assignmentCosineGap     = 0.03
+deltaAssign             = 0.20
+maxLeafAssignments      = 5
+refitMuPerIteration     = false
 
 # ── DAG-Max flags: ALL OFF ───────────────────────────────────────────────────
 enableStableQuestionIds = false

@@ -301,6 +301,63 @@ instability of the fixed-point iteration for the very high concentration
 parameters ($\kappa \gg 1$) that arise in high-dimensional
 embedding spaces.
 
+
+\subsection*{Overlapping, Polyhierarchical, and Cross-Domain Taxonomies}
+
+The taxonomy models reviewed above---TaxoGen, CoRel, and the vMF node
+model---all assume that each item belongs to exactly one node at each
+level of the hierarchy.
+This assumption is convenient for statistical fitting but is not a
+structural property of real query corpora: a query about the
+thermodynamics of a chemical reaction is legitimately a member of both
+a physics-oriented and a chemistry-oriented sub-domain, and forcing an
+exclusive assignment discards this evidence.
+\textit{Soft} or \textit{overlapping} hierarchical clustering methods
+address this by allowing an item to hold non-trivial membership in
+more than one cluster, typically through a fuzzy or probabilistic
+membership function rather than a hard partition~\parencite{fuzzyhc1969}.
+Applied to a directed hierarchy, this relaxation produces a
+\textit{polyhierarchy}: a taxonomy in which a node may have more
+than one parent, so that the structure is a directed acyclic graph
+(DAG) rather than a tree~\parencite{polyhierarchy2006}.
+Polyhierarchies are well established in knowledge organisation---for
+instance, a single subject heading in a controlled vocabulary
+routinely appears under more than one broader term---but their use in
+corpus-induced, embedding-driven taxonomy construction remains sparse:
+existing induction methods (TaxoGen, CoRel) produce trees, and the
+DAG structure in taxonomy-induction pipelines is typically imposed
+post hoc rather than learned from overlap evidence in the embedding
+space.
+
+A related but distinct mechanism is \textit{cross-domain bridging}:
+rather than softening membership everywhere, a bridging step
+identifies a small number of structurally overlapping node pairs
+across otherwise separate branches of the hierarchy and inserts an
+explicit edge (or a shared child) connecting them, while leaving the
+remainder of the hierarchy as a tree.
+This is a more conservative departure from strict tree structure than
+global soft clustering, since it introduces polyhierarchy only where
+the embedding geometry provides positive evidence of genuine overlap
+(e.g. high cross-cluster cosine similarity coupled with low
+within-cluster purity loss), rather than allowing every item a
+non-trivial membership everywhere.
+TaxoArena's construction pipeline combines both ideas but keeps them
+statistically separate: query assignment during vMF/NiW fitting
+remains exclusive (Section~\ref{sec:taxonomy-construction}, node
+model), so that the concentration and covariance estimates at each
+node stay clean, while polyhierarchy is introduced afterward, at the
+topology-optimisation stage, through two distinct bridge-insertion
+mechanisms---residual-routing bridges within a branch and
+coherence-gated cross-domain bridges between branches---each admitted
+only under an explicit coherence and distinctness gate.
+This design is formalised in Chapter~\ref{ch:methodology}
+(topology optimisation) and distinguishes TaxoArena from both the
+fully-soft polyhierarchy literature, where membership is fuzzy
+throughout, and from the strictly exclusive tree literature (TaxoGen,
+CoRel, HiAGM, HiTIN), where no cross-branch edge can be represented
+at all.
+
+
 \textit{Matryoshka Representation Learning} (MRL)~\parencite{kusupati2022mrl}
 achieves this by optimising a single embedding function jointly across a
 schedule of nested prefix dimensions
@@ -532,7 +589,13 @@ guideline-generation mechanism whose design is specified in Chapter~\ref{ch:syst
 to occupy a position between keyword-based centroid
 descriptions (no semantic calibration) and MemAlign (requires gold
 labels); whether it achieves adequate calibration is an empirical question rather than a structural guarantee.
-The pairwise preference observations produced by such a judge---one verdict per comparison, with ties represented as half-wins to each model---constitute the observations consumed by the ranking models reviewed in the following section.
+
+The pairwise preference observations produced by such a judge---one
+verdict per comparison, with ties represented as half-wins to each
+model, following the tie-as-half-win convention introduced for
+paired-comparison models by Davidson~\parencite{davidson1970}---constitute
+the observations consumed by the ranking models reviewed in the
+following section.
 
 
 
@@ -830,13 +893,19 @@ Learned routing systems require per-domain capability profiles that
 no existing system can produce without presupposing a fixed
 taxonomy~(\S\ref{sec:routing}).
 
-TaxoArena addresses this compound problem through three integrated
-contributions: a label-bootstrapped, corpus-induced geometric taxonomy---seeded from
-MMLU-Pro ground-truth labels as a warm start but refined entirely by
-embedding geometry---that produces the coherent sub-domains required
-by both the ranking model and the domain judge; a reference-informed, answer-key-blind arena that
-produces the per-domain profiles required by routing; and an active
-scheduler that achieves near-optimal sample complexity within each
-leaf's comparison graph.
+TaxoArena addresses this compound problem through two integrated
+contributions: a label-bootstrapped, corpus-induced geometric
+taxonomy---seeded from MMLU-Pro ground-truth labels as a warm start
+but refined entirely by embedding geometry, and admitting
+polyhierarchy only through gated bridge insertion rather than through
+unconstrained soft membership---that produces the coherent sub-domains
+required by both the ranking model and the domain judge; and a
+reference-informed, answer-key-blind arena that produces the
+per-domain profiles required by routing.
+An active, uncertainty-driven scheduler keeps the judge-call cost of
+the arena tractable within each leaf's comparison graph, but is
+treated as a supporting mechanism for the second contribution rather
+than as an independent contribution in its own right (see
+Section~\ref{sec:research-goal}).
 The system design is specified in Chapter~\ref{ch:system-architecture};
 the formal foundations are derived in Chapter~\ref{ch:methodology}.
