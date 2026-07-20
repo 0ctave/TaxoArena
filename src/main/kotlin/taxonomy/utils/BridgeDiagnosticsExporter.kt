@@ -24,30 +24,34 @@ class BridgeDiagnosticsExporter(
         log.info("Generating bridge and soft routing diagnostics...")
         File(outputDir).mkdirs()
 
+        // Cache all categories to prevent millions of SQLite queries (performance fix)
+        val queryCategories = uniqueEmbs.associate { it.rawText to (datasetFetcher.getDetailsForQuery(it.rawText)?.category ?: "Other") }
+
         // 1. Run trickle routing to gather fresh routing details for all queries
         val routingResults = uniqueEmbs.associateWith { emb ->
             trickler.routeQuery(emb, root, currentIteration = config.execution.numIterations)
         }
 
         // 2. Export secondary_membership_dump.csv (top 200 most ambiguous)
-        exportSecondaryMembershipDump(routingResults, outputDir)
+        exportSecondaryMembershipDump(routingResults, queryCategories, outputDir)
 
         // 3. Export residual_bridge_readiness.csv
-        exportResidualBridgeReadiness(root, routingResults, outputDir)
+        exportResidualBridgeReadiness(root, routingResults, queryCategories, outputDir)
 
         // 4. Export bridge_candidate_audit.csv and bridge_rejection_summary.csv
-        exportBridgeCandidateAuditAndSummary(root, outputDir)
+        exportBridgeCandidateAuditAndSummary(root, queryCategories, outputDir)
     }
 
     private fun exportSecondaryMembershipDump(
         routingResults: Map<Embedding, RoutingResult>,
+        queryCategories: Map<String, String>,
         outputDir: String
     ) {
         val file = File(outputDir, "secondary_membership_dump.csv")
         val records = mutableListOf<SecondaryMembershipRecord>()
 
         for ((emb, res) in routingResults) {
-            val trueDomain = datasetFetcher.getDetailsForQuery(emb.rawText)?.category ?: "Other"
+            val trueDomain = queryCategories[emb.rawText] ?: "Other"
             val sortedLeaves = res.leaves.entries.sortedByDescending { it.value }
 
             val pLeaf = if (sortedLeaves.isNotEmpty()) sortedLeaves[0] else null
@@ -125,6 +129,7 @@ class BridgeDiagnosticsExporter(
     private fun exportResidualBridgeReadiness(
         root: GraphNode,
         routingResults: Map<Embedding, RoutingResult>,
+        queryCategories: Map<String, String>,
         outputDir: String
     ) {
         val file = File(outputDir, "residual_bridge_readiness.csv")
@@ -148,7 +153,7 @@ class BridgeDiagnosticsExporter(
                     qId in residualQueryStrings
                 }
 
-                val categories = matchingEmbs.map { datasetFetcher.getDetailsForQuery(it.rawText)?.category ?: "Other" }
+                val categories = matchingEmbs.map { queryCategories[it.rawText] ?: "Other" }
                 val catCounts = categories.groupingBy { it }.eachCount()
                 val residualDomains = "\"${catCounts.keys.joinToString(";")}\""
 
@@ -216,7 +221,11 @@ class BridgeDiagnosticsExporter(
         log.info("Exported residual bridge readiness metrics for ${internalNodes.size} nodes.")
     }
 
-    private fun exportBridgeCandidateAuditAndSummary(root: GraphNode, outputDir: String) {
+    private fun exportBridgeCandidateAuditAndSummary(
+        root: GraphNode,
+        queryCategories: Map<String, String>,
+        outputDir: String
+    ) {
         val auditFile = File(outputDir, "bridge_candidate_audit.csv")
         val summaryFile = File(outputDir, "bridge_rejection_summary.csv")
 
@@ -271,7 +280,7 @@ class BridgeDiagnosticsExporter(
 
                 // Member domains & entropy
                 val catCounts = (uWeights.keys + vWeights.keys).map {
-                    datasetFetcher.getDetailsForQuery(it)?.category ?: "Other"
+                    queryCategories[it] ?: "Other"
                 }.groupingBy { it }.eachCount()
                 val memberDomains = "\"${catCounts.keys.joinToString(";")}\""
 
