@@ -82,7 +82,8 @@ class BridgeDiagnosticsExporter(
 
             val routedToResidual = res.residualHits.isNotEmpty()
             val candidateBridgePair = if (pLeaf != null && sLeaf != null) {
-                "\"${pLeaf.key.label ?: pLeaf.key.id} <-> ${sLeaf.key.label ?: sLeaf.key.id}\""
+                val pairStr = "${pLeaf.key.label ?: pLeaf.key.id} <-> ${sLeaf.key.label ?: sLeaf.key.id}"
+                "\"${pairStr.replace("\"", "\"\"")}\""
             } else {
                 "None"
             }
@@ -155,7 +156,8 @@ class BridgeDiagnosticsExporter(
 
                 val categories = matchingEmbs.map { queryCategories[it.rawText] ?: "Other" }
                 val catCounts = categories.groupingBy { it }.eachCount()
-                val residualDomains = "\"${catCounts.keys.joinToString(";")}\""
+                val rawResidualDomains = catCounts.keys.joinToString(";")
+                val residualDomains = "\"${rawResidualDomains.replace("\"", "\"\"")}\""
 
                 // Entropy
                 val totalCat = catCounts.values.sum().toDouble()
@@ -207,11 +209,14 @@ class BridgeDiagnosticsExporter(
                 val topSecondaryLeafIds = "\"${topSecondaries.joinToString(";") { it.key }}\""
                 val topSecondaryLeafMasses = "\"${topSecondaries.joinToString(";") { String.format(Locale.US, "%.2f", it.value) }}\""
 
+                val rawLabel = node.label ?: node.id
+                val escLabel = rawLabel.replace("\"", "\"\"")
+
                 writer.write(
                     String.format(
                         Locale.US,
                         "%s,\"%s\",%d,%d,%d,%d,%.4f,%s,%.4f,%.4f,%.4f,%.4f,%d,%d,%.4f,%s,%s\n",
-                        node.id, node.label ?: node.id, node.depth, regionQueryCount, localQueryCount, residualCount,
+                        node.id, escLabel, node.depth, regionQueryCount, localQueryCount, residualCount,
                         residualRate, residualDomains, domainEntropy, avgBestConf, avgSecondConf, avgConfGap,
                         secondMatchCount, thirdMatchCount, avgSecondaryMass, topSecondaryLeafIds, topSecondaryLeafMasses
                     )
@@ -256,7 +261,8 @@ class BridgeDiagnosticsExporter(
                 val v = pair.second
                 val candidateId = "cand_${u.id.take(4)}_${v.id.take(4)}"
                 val sourceNodeId = "${u.id}_${v.id}"
-                val sourceLabel = "${u.label ?: u.id} + ${v.label ?: v.id}"
+                val rawSourceLabel = "${u.label ?: u.id} + ${v.label ?: v.id}"
+                val sourceLabel = "\"${rawSourceLabel.replace("\"", "\"\"")}\""
                 val sourceDepth = maxOf(u.depth, v.depth)
 
                 // 1. LCA & Depth-1 cross-domain check
@@ -270,7 +276,8 @@ class BridgeDiagnosticsExporter(
                 val vWeights = v.queryWeights
                 val sharedQueries = uWeights.keys.intersect(vWeights.keys)
                 val sharedQueryCount = sharedQueries.size
-                val sharedQuerySample = "\"${sharedQueries.take(5).joinToString(";")}\""
+                val rawSharedQuerySample = sharedQueries.take(5).joinToString(";")
+                val sharedQuerySample = "\"${rawSharedQuerySample.replace("\"", "\"\"")}\""
 
                 val sharedWeights = sharedQueries.map { minOf(uWeights[it] ?: 0.0, vWeights[it] ?: 0.0) }
                 val secondaryMassSum = sharedWeights.sum()
@@ -283,7 +290,8 @@ class BridgeDiagnosticsExporter(
                 val catCounts = (uWeights.keys + vWeights.keys).map {
                     queryCategories[it] ?: "Other"
                 }.groupingBy { it }.eachCount()
-                val memberDomains = "\"${catCounts.keys.joinToString(";")}\""
+                val rawMemberDomains = catCounts.keys.joinToString(";")
+                val memberDomains = "\"${rawMemberDomains.replace("\"", "\"\"")}\""
 
                 val totalCat = catCounts.values.sum().toDouble()
                 var domainEntropy = 0.0
