@@ -24,12 +24,12 @@ def check_hard_gates(row, bridge_depths, gates_spec):
         
     # 4. MaxAssignmentCapRate
     cap_rate = float(row.get("MaxAssignmentCapRate", 0.0))
-    le_val = gates_spec.get("hard", {}).get("MaxAssignmentCapRate_le", 0.20)
+    le_val = gates_spec.get("gates", {}).get("hard", {}).get("MaxAssignmentCapRate_le", 0.20)
     if cap_rate > le_val:
         reasons.append(f"MaxAssignmentCapRate = {cap_rate:.4f} > {le_val}")
         
     # 5. has_depth2_sourceB
-    if gates_spec.get("hard", {}).get("has_depth2_sourceB", False):
+    if gates_spec.get("gates", {}).get("hard", {}).get("has_depth2_sourceB", False):
         # We need at least 1 Source-B bridge with depth >= 2
         # bridge_depths contains the depths of Source-B bridges
         has_depth_2 = any(d >= 2 for d in bridge_depths)
@@ -38,19 +38,19 @@ def check_hard_gates(row, bridge_depths, gates_spec):
             
     # 6. SmallLeafFraction
     small_leaf_frac = float(row.get("SmallLeafFraction", 0.0))
-    le_val = gates_spec.get("hard", {}).get("SmallLeafFraction_le", 0.50)
+    le_val = gates_spec.get("gates", {}).get("hard", {}).get("SmallLeafFraction_le", 0.50)
     if small_leaf_frac > le_val:
         reasons.append(f"SmallLeafFraction = {small_leaf_frac:.4f} > {le_val}")
         
     # 7. SelectedNodeStarvedLeafFraction
     starved_frac = float(row.get("SelectedNodeStarvedLeafFraction", 0.0))
-    le_val = gates_spec.get("hard", {}).get("SelectedNodeStarvedLeafFraction_le", 0.20)
+    le_val = gates_spec.get("gates", {}).get("hard", {}).get("SelectedNodeStarvedLeafFraction_le", 0.20)
     if starved_frac > le_val:
         reasons.append(f"SelectedNodeStarvedLeafFraction = {starved_frac:.4f} > {le_val}")
         
     # 8. SourceBPerAnchorMean
     sb_mean = float(row.get("SourceBPerAnchorMean", 0.0))
-    le_val = gates_spec.get("hard", {}).get("SourceBPerAnchorMean_le", 3.0)
+    le_val = gates_spec.get("gates", {}).get("hard", {}).get("SourceBPerAnchorMean_le", 3.0)
     if sb_mean > le_val:
         reasons.append(f"SourceBPerAnchorMean = {sb_mean:.4f} > {le_val}")
         
@@ -61,7 +61,7 @@ def check_soft_gates(row, gates_spec):
     
     # 1. AvgMatchCount band
     avg_match = float(row.get("AvgMatchCount", 0.0))
-    band = gates_spec.get("soft", {}).get("AvgMatchCount_band", [1.0, 4.0])
+    band = gates_spec.get("gates", {}).get("soft", {}).get("AvgMatchCount_band", [1.0, 4.0])
     if not (band[0] <= avg_match <= band[1]):
         reasons.append(f"AvgMatchCount = {avg_match:.4f} outside band {band}")
         
@@ -69,32 +69,32 @@ def check_soft_gates(row, gates_spec):
     top1 = float(row.get("Top1Accuracy", 0.0))
     if top1 <= 1.0:
         top1 = top1 * 100.0
-    ge_val = gates_spec.get("soft", {}).get("Top1Accuracy_ge", 0.74)
+    ge_val = gates_spec.get("gates", {}).get("soft", {}).get("Top1Accuracy_ge", 0.74)
     threshold = ge_val if ge_val > 1.0 else ge_val * 100.0
     if top1 < threshold:
         reasons.append(f"Top1Accuracy = {top1:.2f}% < {threshold}%")
         
     # 3. RoutingECE_le
     ece = float(row.get("RoutingECE", 0.0))
-    le_val = gates_spec.get("soft", {}).get("RoutingECE_le", 0.15)
+    le_val = gates_spec.get("gates", {}).get("soft", {}).get("RoutingECE_le", 0.15)
     if ece > le_val:
         reasons.append(f"RoutingECE = {ece:.4f} > {le_val}")
         
     # 4. BorderlineRate band
     borderline = float(row.get("BorderlineRate", 0.0))
-    band = gates_spec.get("soft", {}).get("BorderlineRate_band", [0.20, 0.35])
+    band = gates_spec.get("gates", {}).get("soft", {}).get("BorderlineRate_band", [0.20, 0.35])
     if not (band[0] <= borderline <= band[1]):
         reasons.append(f"BorderlineRate = {borderline:.4f} outside band {band}")
         
     # 5. CrossAnchorMigrationRate band
     migration = float(row.get("CrossAnchorMigrationRate", 0.0))
-    band = gates_spec.get("soft", {}).get("CrossAnchorMigrationRate_band", [0.10, 0.30])
+    band = gates_spec.get("gates", {}).get("soft", {}).get("CrossAnchorMigrationRate_band", [0.10, 0.30])
     if not (band[0] <= migration <= band[1]):
         reasons.append(f"CrossAnchorMigrationRate = {migration:.4f} outside band {band}")
         
     # 6. CanonicalAdaptedJaccard band
     jaccard = float(row.get("CanonicalAdaptedJaccard", 0.0))
-    band = gates_spec.get("soft", {}).get("CanonicalAdaptedJaccard_band", [0.0, 1.0])
+    band = gates_spec.get("gates", {}).get("soft", {}).get("CanonicalAdaptedJaccard_band", [0.0, 1.0])
     if not (band[0] <= jaccard <= band[1]):
         reasons.append(f"CanonicalAdaptedJaccard = {jaccard:.4f} outside band {band}")
         
