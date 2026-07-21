@@ -71,9 +71,8 @@ data class GraphNode(
         }
         fun getEmbedding(rawText: String): Embedding? = EmbeddingRegistry[rawText]
     }
-    // isLeaf is true iff this node has NO tree children.
-    // Cross-link children are irrelevant to leaf status.
-    val isLeaf: Boolean get() = children.isEmpty() && !isBridge
+    // isLeaf is true iff this node has NO tree children and is not a bridge/multi-parent node.
+    val isLeaf: Boolean get() = children.isEmpty() && !isBridge && parents.size <= 1
 
     val treeChildren: MutableSet<GraphNode> get() = children
 

@@ -57,6 +57,13 @@ class TaxonomyMerger(
             invalidateAncestorCache()
             val ancestorMapFinal = buildAncestorMap(root)  // ← rebuild after structural changes
             transitiveReduction(root, ancestorMapFinal)
+
+            // Mark structural polyhierarchy bridge nodes
+            for (node in getAllNodes(root)) {
+                if (node.parents.size > 1 || node.crossLinkChildren.isNotEmpty()) {
+                    node.isBridge = true
+                }
+            }
         }
     }
 

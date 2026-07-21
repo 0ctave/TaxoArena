@@ -1039,7 +1039,7 @@ class HeadlessBenchmarkRunner(
             return queries
         }
 
-        val bridges = allNodes.filter { it.isBridge }
+        val bridges = allNodes.filter { it.isBridge || it.parents.size > 1 || it.crossLinkChildren.isNotEmpty() }
         file.bufferedWriter().use { writer ->
             writer.write("BridgeId,Label,MemberDomains,ChildLeafIds,Coverage,Entropy,JsDivergence,Depth\n")
             bridges.forEach { b ->
@@ -1453,9 +1453,9 @@ class HeadlessBenchmarkRunner(
         }
         walk(root)
 
-        val bridges = allNodes.filter { it.isBridge }
-        val sourceA = bridges.filter { !it.id.startsWith("bridge_sourceB_") }
-        val sourceB = bridges.filter { it.id.startsWith("bridge_sourceB_") }
+        val bridges = allNodes.filter { it.isBridge || it.parents.size > 1 || it.crossLinkChildren.isNotEmpty() }
+        val sourceA = bridges.filter { it.parents.size > 1 && !it.id.startsWith("bridge_sourceB_") }
+        val sourceB = bridges.filter { it.crossLinkChildren.isNotEmpty() || it.id.startsWith("bridge_sourceB_") }
 
         fun collectSubtreeQueries(node: GraphNode): List<Embedding> {
             val queries = mutableListOf<Embedding>()
@@ -1537,16 +1537,16 @@ class HeadlessBenchmarkRunner(
         val acyclic = checkAcyclic(root)
         val rootReachable = true
         val leafCount = allNodes.count { it.isLeaf }
-        val bridgeCount = allNodes.count { it.isBridge }
+        val bridges = allNodes.filter { it.isBridge || it.parents.size > 1 || it.crossLinkChildren.isNotEmpty() }
+        val bridgeCount = bridges.size
         val orphanCount = allNodes.count { it.id != root.id && it.parents.isEmpty() }
         
-        val bridges = allNodes.filter { it.isBridge }
-        val bridgeGroups = bridges.groupBy { it.crossLinkChildren.map { c -> c.id }.toSet() }
+        val bridgeGroups = bridges.groupBy { (it.children.map { c -> c.id } + it.crossLinkChildren.map { c -> c.id }).toSet() }
         val duplicateBridgeCount = bridgeGroups.values.filter { it.size > 1 }.sumOf { it.size - 1 }
         val residualCount = allNodes.sumOf { it.residualQueries.size }
 
-        val sourceA = bridges.filter { !it.id.startsWith("bridge_sourceB_") }
-        val sourceB = bridges.filter { it.id.startsWith("bridge_sourceB_") }
+        val sourceA = bridges.filter { it.parents.size > 1 && !it.id.startsWith("bridge_sourceB_") }
+        val sourceB = bridges.filter { it.crossLinkChildren.isNotEmpty() || it.id.startsWith("bridge_sourceB_") }
 
         val groundTruthMap = mutableMapOf<String, List<String>>()
         fun walkGt(n: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
