@@ -3,6 +3,7 @@ package taxonomy.utils
 import org.slf4j.LoggerFactory
 import taxonomy.model.GraphNode
 import kotlin.math.*
+import kotlinx.coroutines.*
 
 /**
  * Upgraded Statistical engine for vMF and NiW operations.
@@ -257,15 +258,27 @@ object StatisticsUtils {
         maxK: Int = 4,
         minClusterFrac: Double = 0.05,
         marginalEps: Double = 0.02
-    ): VmfMixture? {
+    ): VmfMixture? = runBlocking {
         val n = embeddings.size
-        if (n < 2) return null
+        if (n < 2) return@runBlocking null
+
+        val minSize = (n * minClusterFrac).toInt().coerceAtLeast(1)
+        val actualMaxK = minOf(maxK, n / minSize)
+        if (actualMaxK < 2) return@runBlocking null
+
+        // Concurrent candidate EM runs
+        val deferredMixtures = (2..actualMaxK).map { k ->
+            async(Dispatchers.Default) {
+                k to runVmfEm(embeddings, d, k, minClusterFrac)
+            }
+        }
+        val mixtures = deferredMixtures.map { it.await() }.toMap()
 
         var bestMixture: VmfMixture? = null
         var bestDasgupta = -Double.MAX_VALUE
 
-        for (k in 2..maxK) {
-            val mixture = runVmfEm(embeddings, d, k, minClusterFrac) ?: break
+        for (k in 2..actualMaxK) {
+            val mixture = mixtures[k] ?: break
 
             // Hard-assign for Dasgupta evaluation
             val clusters = Array(k) { mutableListOf<DoubleArray>() }
@@ -276,7 +289,6 @@ object StatisticsUtils {
             }
 
             // Reject if any cluster is below minimum size
-            val minSize = (n * minClusterFrac).toInt().coerceAtLeast(1)
             if (clusters.any { it.size < minSize }) {
                 log.debug("k-Means: k=$k rejected — cluster below minSize=$minSize")
                 break
@@ -368,7 +380,7 @@ object StatisticsUtils {
         val exps  = DoubleArray(k)
         var converged = false
         var finalIters = 0
-        for (iter in 0 until 200) {
+        for (iter in 0 until 50) {
             finalIters = iter + 1
             // ── E-step ───────────────────────────────────────────────────────
             var totalLikelihood = 0.0
@@ -394,7 +406,7 @@ object StatisticsUtils {
                 totalLikelihood += maxLP + ln(sumExp)
             }
 
-            if (abs(totalLikelihood - lastLikelihood) < 1e-5) {
+            if (abs(totalLikelihood - lastLikelihood) < 1e-4) {
                 converged = true
                 break
             }
