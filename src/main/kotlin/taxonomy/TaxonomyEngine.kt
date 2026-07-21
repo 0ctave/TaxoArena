@@ -147,7 +147,6 @@ class TaxonomyEngine(
             // --- NEW: Print Initial State ---
             log.info("Initial DAG Structure (Before Statistical Fitting)")
             ops.printHierarchy(root)
-            saveDot(root, "taxonomy_initial")
 
             val uniqueEmbs = root.children.flatMap { gatherAllEmbeddingsInBranch(it) }.distinctBy { it.rawText }
 
@@ -345,7 +344,6 @@ class TaxonomyEngine(
             // Final Exports
             if (config.execution.enableVisualization) {
                 visualizer.exportForVisualization(root, groundTruthMap, "taxonomy_visualization.json")
-                saveDot(root, "taxonomy_final")
             }
 
             // Log final performance report
@@ -375,15 +373,7 @@ class TaxonomyEngine(
         }
     }
 
-    private fun saveDot(root: GraphNode, filename: String) {
-        try {
-            val dot = ops.exportToDot(root)
-            File("$filename.dot").writeText(dot)
-            log.info("Graph exported to $filename.dot")
-        } catch (e: Exception) {
-            log.error("Failed to export DOT graph: ${e.message}")
-        }
-    }
+
 
     private fun gatherAllEmbeddingsInBranch(node: GraphNode, visited: MutableSet<String> = mutableSetOf()): List<Embedding> {
         if (visited.contains(node.id)) return emptyList()
