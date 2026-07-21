@@ -558,7 +558,7 @@ class HeadlessBenchmarkRunner(
         baseDir: File,
         currentSeed: Long,
         benchmarkReport: BenchmarkReport? = null,
-        hoistedFullByDomain: Map<String, List<taxonomy.dataset.MmluProQuery>>? = null,
+        hoistedFullByDomain: Map<String, List<taxonomy.dataset.MMLUQuery>>? = null,
         hoistedReservedByDomain: Map<String, List<Int>>? = null
     ): Map<String, Boolean> = runBlocking {
         log.info("Starting Headless Batch Trickle Validation for $condition...")

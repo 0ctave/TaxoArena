@@ -251,7 +251,7 @@ def cmd_generate(args):
         overrides = {
             "outputDir": output_dir.replace("\\", "/"),
             "seed": seed,
-            "runBaselines": True,
+            "runBaselines": r.get("stage") == "validate",
             "runTrickle": True,
             "runBenchmark": False,
             "runPipeline": True,
