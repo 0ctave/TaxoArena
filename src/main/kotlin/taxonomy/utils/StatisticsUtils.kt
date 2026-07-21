@@ -366,7 +366,10 @@ object StatisticsUtils {
 
         val logPs = DoubleArray(k)
         val exps  = DoubleArray(k)
+        var converged = false
+        var finalIters = 0
         for (iter in 0 until 200) {
+            finalIters = iter + 1
             // ── E-step ───────────────────────────────────────────────────────
             var totalLikelihood = 0.0
             for (i in 0 until n) {
@@ -391,7 +394,10 @@ object StatisticsUtils {
                 totalLikelihood += maxLP + ln(sumExp)
             }
 
-            if (abs(totalLikelihood - lastLikelihood) < 1e-5) break
+            if (abs(totalLikelihood - lastLikelihood) < 1e-5) {
+                converged = true
+                break
+            }
             lastLikelihood = totalLikelihood
 
             // ── M-step ───────────────────────────────────────────────────────
@@ -418,6 +424,11 @@ object StatisticsUtils {
                 kappas[c] = correctedKappa(rBar, d, sumR[c].roundToInt().coerceAtLeast(2))
                 logNorms[c] = logVmfNormalizer(d, kappas[c])
             }
+        }
+        if (converged) {
+            log.info("[VMF EM] K=$k, N=$n converged in $finalIters iterations")
+        } else {
+            log.info("[VMF EM] K=$k, N=$n did NOT converge in 200 iterations")
         }
 
         val components = (0 until k).map { c ->
