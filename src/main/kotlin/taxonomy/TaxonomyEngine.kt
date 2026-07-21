@@ -586,7 +586,6 @@ class TaxonomyEngine(
     }
 
     private fun logNodeDiagnostics(root: GraphNode, totalCorpusSize: Int) {
-        log.info("=== DAG INVARIANT & MASS CONSERVATION DIAGNOSTICS ===")
         val allNodes = mutableListOf<GraphNode>()
         fun walk(n: GraphNode, visited: MutableSet<String>) {
             if (!visited.add(n.id)) return
@@ -594,6 +593,16 @@ class TaxonomyEngine(
             n.children.forEach { walk(it, visited) }
         }
         walk(root, mutableSetOf())
+
+        val totalNodes = allNodes.size
+        val leafCount = allNodes.count { it.children.isEmpty() }
+        val totalLocalMass = allNodes.sumOf { it.queryWeights.values.sum() }
+
+        log.info(String.format(
+            java.util.Locale.US,
+            "=== DAG DIAGNOSTICS | Nodes: %d (%d leaves, %d internal) | Total Mass: %.2f ===",
+            totalNodes, leafCount, totalNodes - leafCount, totalLocalMass
+        ))
 
         for (n in allNodes) {
             val localMass = n.queryWeights.values.sum()
@@ -616,11 +625,13 @@ class TaxonomyEngine(
             val isLeaf = n.children.isEmpty()
             val queriesSize = n.queries.size
 
-            log.info(String.format(
-                java.util.Locale.US,
-                "Node ID: %s | Depth: %d | Leaf: %b | localMass: %.2f | localESS: %.2f | regionEff: %.2f | queriesSize: %d",
-                n.id, n.depth, isLeaf, localMass, localESS, regionEff, queriesSize
-            ))
+            if (log.isDebugEnabled) {
+                log.debug(String.format(
+                    java.util.Locale.US,
+                    "Node ID: %s | Depth: %d | Leaf: %b | localMass: %.2f | localESS: %.2f | regionEff: %.2f | queriesSize: %d",
+                    n.id, n.depth, isLeaf, localMass, localESS, regionEff, queriesSize
+                ))
+            }
 
             // Invariant Check Warnings
             if (regionEff > totalCorpusSize + 1e-4) {
