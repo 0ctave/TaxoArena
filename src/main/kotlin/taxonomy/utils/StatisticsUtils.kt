@@ -406,7 +406,7 @@ object StatisticsUtils {
                 totalLikelihood += maxLP + ln(sumExp)
             }
 
-            if (abs(totalLikelihood - lastLikelihood) < 1e-4) {
+            if (abs(totalLikelihood - lastLikelihood) / n < 1e-5) {
                 converged = true
                 break
             }
@@ -440,7 +440,7 @@ object StatisticsUtils {
         if (converged) {
             log.info("[VMF EM] K=$k, N=$n converged in $finalIters iterations")
         } else {
-            log.info("[VMF EM] K=$k, N=$n did NOT converge in 200 iterations")
+            log.info("[VMF EM] K=$k, N=$n did NOT converge in 50 iterations")
         }
 
         val components = (0 until k).map { c ->
