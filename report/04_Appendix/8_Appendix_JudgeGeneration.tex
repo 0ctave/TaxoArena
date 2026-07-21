@@ -1,0 +1,41 @@
+\chapter{Reference-Informed Judge Generation}\label{app:judge-generation}
+
+This appendix details the rubric-generation mechanics referenced in
+Chapter~\ref{ch:experimental-design}, \S\ref{sec:exp-arena}.
+
+\section{Generation Procedure}
+
+The judge rubric generation procedure (Section~\ref{subsec:judge}) is
+instantiated as follows. Representative-query packs are drawn from
+each leaf's construction pool at pack size $k = 5$; a leaf with fewer
+than 5 construction queries uses its full pool as a single pack. The
+map-step LLM and the reduce-step LLM are the same underlying model as
+the arena judge, Mistral-Large-3, to avoid introducing a second
+model's stylistic biases into the rubric; this choice is revisited as
+a limitation in Section~\ref{sec:arch-limits}. Guideline generation is
+a one-time cost per frozen snapshot: rubrics are computed once at
+snapshot-freeze time and reused for every subsequent arena run against
+that snapshot, regardless of which models are being compared.
+
+\section{Structural Template}\label{sec:judge-template-full}
+
+The global structural template---covering presentation order, tie
+handling, and output format---is fixed across all leaves. It governs
+only the shared scaffolding of the judge prompt; the leaf-specific
+reference-informed content (representative queries, answer-key
+context) is injected into this template at generation time and does
+not modify its structure.
+
+% Full verbatim template goes here — insert the JudgePrompts.kt /
+% GenericPairwiseJudgePrompt.kt template text (structural scaffold,
+% tie-handling instructions, output-format specification) as a
+% \begin{quote} or \lstlisting block once finalized from source.
+
+\section{Dual-Call Position-Reversal Protocol}
+
+Each logical comparison is realised as two judge calls with response
+position reversed between calls, per the dual-call protocol of
+Section~\ref{subsec:judge}. Disagreement between the two calls is
+resolved as a tie, with each candidate credited half a win
+(\parencite{davidson1970ties}), rather than resolved by a coin flip or
+discarded.
