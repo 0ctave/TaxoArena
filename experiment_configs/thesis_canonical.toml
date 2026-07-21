@@ -1,6 +1,6 @@
 # ══════════════════════════════════════════════════════════════════════════
 #  thesis_canonical.toml
-#  PURPOSE: Canonical thesis parameter configuration (Math sub-corpus only).
+#  PURPOSE: Canonical thesis parameter configuration (Full MMLU-Pro dataset).
 # ══════════════════════════════════════════════════════════════════════════
 
 datasetType   = "MMLU_PRO"
@@ -39,19 +39,17 @@ runBaselines   = true
 # ── Mode Switch: DAG_MAX ──────────────────────────────────────────────────────
 dagMode = "DAG_MAX"
 
-# ── Formalism Parameters ──────────────────────────────────────────────────────
+# ── Formalism Parameters (12-knob thesis set) ─────────────────────────────
 maxDepth                  = 8
 minClusterSize            = 50
 separationEpsilon         = 0.01
 routingSoftmaxTau         = 1.50
-assignmentCosineGap       = 0.15
-deltaAssign               = 1.0
+tauKappaScalingFactor     = 0.0    # Dynamic temperature power gamma (0.0 = unscaled, ablatable via {0.0, 0.5, 1.0})
+assignmentCosineGap       = 0.15   # Primary soft-membership margin (governs bridge formation)
+deltaAssign               = 1.0    # Residual soft-assignment threshold
 emaAlpha                  = 0.7
 fusionSimilarityThreshold = 0.92
 effectiveSupportFloor     = 2.0
 defaultKappaPrior         = 10.0
-secondaryMassFloor        = 0.5
-bridgeSupportFloor        = 1.0
-bridgeSupportRelFraction  = 0.01
 numIterations             = 35
 maxLeafAssignments        = 5
