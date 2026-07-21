@@ -252,19 +252,19 @@ object StatisticsUtils {
      * @param minClusterFrac Minimum fraction of n per cluster (default 0.05)
      * @param marginalEps    Min absolute Dasgupta improvement to accept k+1 (default 0.02)
      */
-    fun performVmfKMeans(
+    suspend fun performVmfKMeans(
         embeddings: List<DoubleArray>,
         d: Int,
         maxK: Int = 4,
         minClusterFrac: Double = 0.05,
         marginalEps: Double = 0.02
-    ): VmfMixture? = runBlocking {
+    ): VmfMixture? = coroutineScope {
         val n = embeddings.size
-        if (n < 2) return@runBlocking null
+        if (n < 2) return@coroutineScope null
 
         val minSize = (n * minClusterFrac).toInt().coerceAtLeast(1)
         val actualMaxK = minOf(maxK, n / minSize)
-        if (actualMaxK < 2) return@runBlocking null
+        if (actualMaxK < 2) return@coroutineScope null
 
         // Concurrent candidate EM runs
         val deferredMixtures = (2..actualMaxK).map { k ->
