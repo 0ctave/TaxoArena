@@ -203,12 +203,11 @@ def cmd_generate(args):
                         reader = csv.DictReader(f)
                         for row in reader:
                             if row["config_sha256"] == sha:
-                                factors = {
-                                    "assignmentCosineGap": float(row["assignmentCosineGap"]),
-                                    "tauFunnelFloor": float(row["tauFunnelFloor"]),
-                                    "fusionSimilarityThreshold": float(row["fusionSimilarityThreshold"]),
-                                    "splitThreshold": float(row["splitThreshold"])
-                                }
+                                factors = {}
+                                for f_key in spec.get("factors", {}).keys():
+                                    if f_key in row:
+                                        val_str = str(row[f_key])
+                                        factors[f_key] = float(val_str) if "." in val_str else int(val_str)
                                 sha_to_factors[sha] = factors
                                 break
                                 
@@ -252,7 +251,7 @@ def cmd_generate(args):
         overrides = {
             "outputDir": output_dir.replace("\\", "/"),
             "seed": seed,
-            "runBaselines": False,
+            "runBaselines": True,
             "runTrickle": True,
             "runBenchmark": False,
             "runPipeline": True,

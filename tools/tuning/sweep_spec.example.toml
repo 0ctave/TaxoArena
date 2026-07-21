@@ -1,6 +1,6 @@
 [base]
-config = "experiment_configs/dagmax_feature_on.toml"
-gradle_cmd = "gradlew.bat bootRun"  # For Windows execution
+config = "experiment_configs/thesis_canonical.toml"
+gradle_cmd = "./gradlew bootRun"
 extra_args = ""
 
 [output]
@@ -16,27 +16,18 @@ stage = "screen"
 seeds = [137, 2048]
 stage = "validate"
 
-# factor -> {level1, level2, level3}; mapped onto L9 columns A..D
+# Factor -> {level1, level2, level3}; mapped onto Taguchi L9 columns A..D
 [factors]
-assignmentCosineGap = [0.02, 0.03, 0.05]
-tauFunnelFloor      = [0.75, 0.80, 0.90]
-fusionSimilarityThreshold = [0.90, 0.92, 0.94]
-splitThreshold      = [0.01, 0.02, 0.03]  # Maps to separationEpsilon in generated TOML
+assignmentCosineGap = [0.10, 0.15, 0.20]
+deltaAssign         = [0.5, 1.0, 2.0]
+minClusterSize      = [50, 75, 100]
+routingSoftmaxTau   = [1.0, 1.5, 2.0]
 
 [gates.hard]
 Acyclic = true
 DuplicateBridgeCount = 0
 OrphanCount = 0
-MaxAssignmentCapRate_le = 0.20
-has_depth2_sourceB = true
-SmallLeafFraction_le = 0.50
-SelectedNodeStarvedLeafFraction_le = 0.20
-SourceBPerAnchorMean_le = 3.0
 
 [gates.soft]
-AvgMatchCount_band = [1.05, 1.30]
-Top1Accuracy_ge = 0.756
-RoutingECE_le = 0.25
-BorderlineRate_band = [0.20, 0.35]
-CrossAnchorMigrationRate_band = [0.10, 0.30]
-CanonicalAdaptedJaccard_band = [0.40, 0.70]
+AvgMatchCount_band = [1.5, 4.0]
+RoutingECE_le = 0.15
