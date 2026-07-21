@@ -533,17 +533,18 @@ def cmd_select(args):
         
         finalists_md_path = "tuning/finalists.md"
         with open(finalists_md_path, "w", encoding="utf-8") as f:
-            f.write("# TaxoArena — Tuning Finalists Summary\n\n")
+            f.write("# TaxoArena — Tuning Finalists & Architectural Report\n\n")
+            f.write("## 1. Executive Summary & Pareto Ranking\n\n")
             f.write("| Rank | Run ID | Stage | Seed | Hard | Soft | Dom | Top-1 Acc | AnyMatch | ECE | Borderline | Bridge Ratio | Migration | DeltaRho | SmallLeaf | SrcBDepth2 |\n")
             f.write("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
             for idx, r in enumerate(ranked[:10]):
                 hard_status = "PASSED" if r["hard_gates_passed"] else "FAILED"
                 soft_status = "PASSED" if r["soft_gates_passed"] else "FAILED"
                 
-                top1_val = float(r['Top1Accuracy'])
+                top1_val = float(r.get('Top1Accuracy', 0.0))
                 if top1_val <= 1.0:
                     top1_val *= 100.0
-                anymatch_val = float(r['AnyMatchAccuracy'])
+                anymatch_val = float(r.get('AnyMatchAccuracy', 0.0))
                 if anymatch_val <= 1.0:
                     anymatch_val *= 100.0
                 
@@ -557,14 +558,11 @@ def cmd_select(args):
                 leaf_cnt = float(r.get('LeafCount', 0))
                 total_nodes = float(r.get('TotalNodes', bridge_cnt + leaf_cnt + 1))
                 b_ratio = float(r.get('BridgeRatio', bridge_cnt / total_nodes if total_nodes > 0 else 0.0))
-                if b_ratio <= 1.0:
-                    b_ratio_str = f"{b_ratio * 100.0:.2f}%"
-                else:
-                    b_ratio_str = f"{b_ratio:.2f}%"
+                b_ratio_str = f"{b_ratio * 100.0:.2f}%" if b_ratio <= 1.0 else f"{b_ratio:.2f}%"
                 
-                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r['RoutingECE']):.4f} | {borderline:.4f} | {b_ratio_str} | {migration:.4f} | {delta_rho:.4f} | {small_leaf:.4f} | {sb_depth2} |\n")
+                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r.get('RoutingECE', 0.0)):.4f} | {borderline:.4f} | {b_ratio_str} | {migration:.4f} | {delta_rho:.4f} | {small_leaf:.4f} | {sb_depth2} |\n")
                 
-            f.write("\n## Gate Failure Explanations (Top 10 Runs)\n\n")
+            f.write("\n## 2. Gate Failure Explanations (Top 10 Runs)\n\n")
             for idx, r in enumerate(ranked[:10]):
                 if not r["hard_gates_passed"] or not r["soft_gates_passed"]:
                     f.write(f"### {idx+1}. Run: {r['run_id']}\n")
@@ -573,6 +571,78 @@ def cmd_select(args):
                     if not r["soft_gates_passed"]:
                         f.write(f"- **Soft Gate Failures**: {r['soft_gate_failures']}\n")
                     f.write("\n")
+
+            f.write("\n## 3. Categorized Metric Summaries (Top 5 Finalists)\n\n")
+            for idx, r in enumerate(ranked[:5]):
+                f.write(f"### Rank {idx+1}: {r['run_id']}\n\n")
+                f.write("**Config Factors**: `assignmentCosineGap`={}, `deltaAssign`={}, `minClusterSize`={}, `routingSoftmaxTau`={}\n\n".format(
+                    r.get("assignmentCosineGap", ""), r.get("deltaAssign", ""), r.get("minClusterSize", ""), r.get("routingSoftmaxTau", "")
+                ))
+                
+                # Category 1: Structural Integrity (Hard Gates)
+                f.write("#### A. Structural Integrity (Hard Gates)\n")
+                f.write("- **Acyclic**: {}\n".format(r.get("Acyclic", "")))
+                f.write("- **RootReachable**: {}\n".format(r.get("RootReachable", "")))
+                f.write("- **OrphanCount**: {}\n".format(r.get("OrphanCount", "")))
+                f.write("- **DuplicateBridgeCount**: {} *(excl. empty child sets)*\n".format(r.get("DuplicateBridgeCount", "")))
+                f.write("- **MaxAssignmentCapRate**: {}\n".format(r.get("MaxAssignmentCapRate", "")))
+                f.write("- **SmallLeafFraction**: {}\n".format(r.get("SmallLeafFraction", "")))
+                f.write("- **SelectedNodeStarvedLeafFraction**: {}\n".format(r.get("SelectedNodeStarvedLeafFraction", "")))
+                f.write("- **SourceBPerAnchorMean**: {}\n".format(r.get("SourceBPerAnchorMean", "")))
+                f.write("- **Topology Counts**: TotalNodes={}, LeafCount={}, BridgeCount={}, BridgeRatio={}, ResidualCount={}\n\n".format(
+                    r.get("TotalNodes", ""), r.get("LeafCount", ""), r.get("BridgeCount", ""), r.get("BridgeRatio", ""), r.get("ResidualCount", "")
+                ))
+
+                # Category 2: Taxonomy Quality (Pareto Objectives)
+                f.write("#### B. Taxonomy Quality (Pareto Objectives)\n")
+                f.write("- **WeightedLeafPurity**: {}\n".format(r.get("WeightedLeafPurity", "")))
+                f.write("- **DendrogramPurity**: {}\n".format(r.get("DendrogramPurity", "")))
+                f.write("- **SphericalSilhouette**: {}\n".format(r.get("SphericalSilhouette", "")))
+                f.write("- **DeltaRhoTotal**: {}\n".format(r.get("DeltaRhoTotal", "")))
+                f.write("- **CanonicalAdaptedJaccard**: {}\n".format(r.get("CanonicalAdaptedJaccard", "")))
+                f.write("- **TotalDasguptaCost**: {}\n".format(r.get("TotalDasguptaCost", "")))
+                f.write("- **RoutingECE**: {}\n".format(r.get("RoutingECE", "")))
+                f.write("- **BrierScore**: {}\n\n".format(r.get("BrierScore", "")))
+
+                # Category 3: Routing & Arena Performance (Soft Gates)
+                f.write("#### C. Routing & Arena Performance (Soft Gates)\n")
+                f.write("- **Top1Accuracy**: {}%\n".format(r.get("Top1Accuracy", "")))
+                f.write("- **AnyMatchAccuracy**: {}%\n".format(r.get("AnyMatchAccuracy", "")))
+                f.write("- **MacroF1**: {}\n".format(r.get("MacroF1", "")))
+                f.write("- **AvgMatchCount**: {}\n".format(r.get("AvgMatchCount", "")))
+                f.write("- **BorderlineRate**: {}\n".format(r.get("BorderlineRate", "")))
+                f.write("- **CrossAnchorMigrationRate**: {}\n\n".format(r.get("CrossAnchorMigrationRate", "")))
+
+                # Category 4: Bridge & Cross-Domain Diagnostics
+                f.write("#### D. Bridge & Cross-Domain Diagnostics\n")
+                f.write("- **SourceA_Count**: {}\n".format(r.get("SourceA_Count", "")))
+                f.write("- **SourceB_Count**: {}\n".format(r.get("SourceB_Count", "")))
+                f.write("- **SourceBDepth2Count**: {}\n".format(r.get("SourceBDepth2Count", "")))
+                f.write("- **SourceBPerAnchorMean**: {}\n".format(r.get("SourceBPerAnchorMean", "")))
+                f.write("- **RhoCanonicalHard**: {}, **RhoAdaptedHard**: {}, **RhoAdaptedSoft**: {}\n".format(
+                    r.get("RhoCanonicalHard", ""), r.get("RhoAdaptedHard", ""), r.get("RhoAdaptedSoft", "")
+                ))
+                f.write("- **DeltaRhoGeom**: {}, **DeltaRhoSoft**: {}\n\n".format(
+                    r.get("DeltaRhoGeom", ""), r.get("DeltaRhoSoft", "")
+                ))
+
+                # Category 5: Distributional / Balance Diagnostics
+                f.write("#### E. Distributional / Balance Diagnostics\n")
+                f.write("- **NormalisedSackinIndex**: {}\n".format(r.get("NormalisedSackinIndex", "")))
+                f.write("- **SoftDegreeMean**: {}\n".format(r.get("SoftDegreeMean", "")))
+                f.write("- **EntropyGuardRate**: {}\n".format(r.get("EntropyGuardRate", "")))
+                f.write("- **SoftEffSampleSize**: {}\n".format(r.get("SoftEffSampleSize", "")))
+                f.write("- **SelectedNodeP10QueryCount**: {}\n".format(r.get("SelectedNodeP10QueryCount", "")))
+                f.write("- **SelectedNodeLeafBalanceEntropy**: {}\n\n".format(r.get("SelectedNodeLeafBalanceEntropy", "")))
+
+                # Category 6: Config Traceability
+                f.write("#### F. Config Traceability\n")
+                f.write("- **SHA256**: `{}`\n".format(r.get("config_sha256", "")))
+                f.write("- **Hard Gates Passed**: {}, **Soft Gates Passed**: {}, **Dominance Count**: {}\n\n".format(
+                    r.get("hard_gates_passed", ""), r.get("soft_gates_passed", ""), r.get("dominance_count", "")
+                ))
+                f.write("---\n\n")
+
         print(f"Finalists Markdown Summary written to {finalists_md_path}")
     else:
         print("Warning: No results found to rank!")
