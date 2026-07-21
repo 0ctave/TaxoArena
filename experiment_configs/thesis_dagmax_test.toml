@@ -1,0 +1,45 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  thesis_dagmax_test.toml
+#  PURPOSE: Focused test run configuration for taxonomy DAG generation
+#           using the simplified 12-parameter thesis formalization, dynamic
+#           temperature scaling, and optimized bridge formation gates.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = ["gpt-4o-2024-08-06"]
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/thesis_dagmax_test"
+testRatio     = 0.3
+seed          = 42
+
+# ── Execution switches (DAG generation focused, no labeling/benchmark) ──
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false
+runBaselines   = false
+
+# ── Thesis Mode Switch ───────────────────────────────────────────────────
+dagMode = "DAG_MAX"   # Automatically enables stable IDs, residual routing & split gates, bridging, and refitting
+
+# ── Formalism Parameters (Thesis 12-knob set) ───────────────────────────
+maxDepth                  = 8
+minClusterSize            = 40
+separationEpsilon         = 0.01
+routingSoftmaxTau         = 1.50
+assignmentCosineGap       = 0.15
+deltaAssign               = 0.20
+emaAlpha                  = 0.7
+fusionSimilarityThreshold = 0.92
+effectiveSupportFloor     = 2.0
+hdlssThreshold            = 8.0
+defaultKappaPrior         = 10.0
+
+# ── Advanced Dynamic Routing & Diagnostic Controls ──────────────────────
+tauKappaScalingFactor     = 0.5    # Dynamic temperature scaling (sub-linear density dampener)
+secondaryMassFloor        = 0.5    # Diagnostic bridge readiness mass floor
+bridgeSupportFloor        = 1.0    # Absolute bridge support floor
+bridgeSupportRelFraction  = 0.01   # Relative bridge support fraction (1%)
+numIterations             = 35
