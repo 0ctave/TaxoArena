@@ -534,8 +534,8 @@ def cmd_select(args):
         finalists_md_path = "tuning/finalists.md"
         with open(finalists_md_path, "w", encoding="utf-8") as f:
             f.write("# TaxoArena — Tuning Finalists Summary\n\n")
-            f.write("| Rank | Run ID | Stage | Seed | Hard | Soft | Dom | Top-1 Acc | AnyMatch | ECE | Borderline | Migration | DeltaRho | SmallLeaf | SrcBDepth2 |\n")
-            f.write("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
+            f.write("| Rank | Run ID | Stage | Seed | Hard | Soft | Dom | Top-1 Acc | AnyMatch | ECE | Borderline | Bridge Ratio | Migration | DeltaRho | SmallLeaf | SrcBDepth2 |\n")
+            f.write("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
             for idx, r in enumerate(ranked[:10]):
                 hard_status = "PASSED" if r["hard_gates_passed"] else "FAILED"
                 soft_status = "PASSED" if r["soft_gates_passed"] else "FAILED"
@@ -552,8 +552,17 @@ def cmd_select(args):
                 delta_rho = float(r.get('DeltaRhoTotal', 0.0))
                 small_leaf = float(r.get('SmallLeafFraction', 0.0))
                 sb_depth2 = int(r.get('SourceBDepth2Count', 0))
+
+                bridge_cnt = float(r.get('BridgeCount', 0))
+                leaf_cnt = float(r.get('LeafCount', 0))
+                total_nodes = float(r.get('TotalNodes', bridge_cnt + leaf_cnt + 1))
+                b_ratio = float(r.get('BridgeRatio', bridge_cnt / total_nodes if total_nodes > 0 else 0.0))
+                if b_ratio <= 1.0:
+                    b_ratio_str = f"{b_ratio * 100.0:.2f}%"
+                else:
+                    b_ratio_str = f"{b_ratio:.2f}%"
                 
-                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r['RoutingECE']):.4f} | {borderline:.4f} | {migration:.4f} | {delta_rho:.4f} | {small_leaf:.4f} | {sb_depth2} |\n")
+                f.write(f"| {idx+1} | {r['run_id']} | {r['stage']} | {r['seed']} | {hard_status} | {soft_status} | {r['dominance_count']} | {top1_val:.2f}% | {anymatch_val:.2f}% | {float(r['RoutingECE']):.4f} | {borderline:.4f} | {b_ratio_str} | {migration:.4f} | {delta_rho:.4f} | {small_leaf:.4f} | {sb_depth2} |\n")
                 
             f.write("\n## Gate Failure Explanations (Top 10 Runs)\n\n")
             for idx, r in enumerate(ranked[:10]):

@@ -511,6 +511,8 @@ class TaxonomyMetrics(
         sb.append("|   Total Nodes:         ${r.totalNodes}\n")
         sb.append("|   Leaf Nodes:          ${r.leafNodes}\n")
         sb.append("|   Cross-Domain Nodes:  ${r.crossDomainNodes}\n")
+        val bridgeRatio = if (r.totalNodes > 0) (r.crossDomainNodes.toDouble() / r.totalNodes.toDouble()) * 100.0 else 0.0
+        sb.append("|   Bridge Node Ratio:   ${"%.2f%%".format(US, bridgeRatio)}\n")
         sb.append("|   Max Depth:           ${r.maxDepth}\n")
         sb.append("|   Avg Leaf Depth:      ${"%.2f".format(US, r.avgLeafDepth)}\n")
         sb.append("+----------------------------------------------------------\n")

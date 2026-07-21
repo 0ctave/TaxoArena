@@ -17,9 +17,36 @@ seeds = [137, 2048]
 stage = "validate"
 
 # Factor -> {level1, level2, level3}; mapped onto Taguchi L9 columns A..D
+#
+# deltaAssign widened from {0.5, 1.0, 2.0} to {1.0, 4.0, 10.0}: the previous
+# batch showed this factor dominates BorderlineRate/RoutingECE (|r|>0.85) with
+# 1.0 as the best near-miss, so the low level is anchored there instead of
+# re-probing 0.5 (already confirmed poor: high ECE, low borderline). 4.0 and
+# 10.0 extend well past the previously tested range to see whether the
+# borderline/ECE trade-off keeps moving monotonically, saturates, or starts
+# tripping MaxAssignmentCapRate_le (0.157 was already observed at
+# deltaAssign=2.0 combined with other factors at their upper levels — expect
+# more hard-gate failures at the top of this range, which is itself the
+# useful signal: it marks where deltaAssign stops being viable regardless of
+# calibration benefit).
+#
+# The other three factors are left at their original (not narrowed) levels
+# on purpose: this run is testing whether the deltaAssign effect holds up
+# across the full previously-explored space, not re-confirming what the
+# first L9 batch already established about them (minClusterSize -> leaf
+# count, r=-0.95; assignmentCosineGap -> Top1Accuracy/migration, weak on
+# borderline/ECE).
+#
+# fusionSimilarityThreshold is NOT included here — it's locked at 0.92 per
+# the canonical config and Ch5's "parameters locked across the L9 sweep"
+# table, and it's the actual lever for crossDomainNodes (the node-level
+# bridge/fusion metric), which deltaAssign does not touch per the code trace.
+# That's a separate, single-factor probe if you want it, not part of this
+# sweep -- folding it in here would mean documenting it as an unlocked
+# factor in Ch5, which is a bigger methodological change than this sweep.
 [factors]
 assignmentCosineGap = [0.10, 0.15, 0.20]
-deltaAssign         = [0.5, 1.0, 2.0]
+deltaAssign         = [1.0, 4.0, 10.0]
 minClusterSize      = [50, 75, 100]
 routingSoftmaxTau   = [1.0, 1.5, 2.0]
 
