@@ -66,7 +66,7 @@ class TaxonomyMetricsConsolidatedTest {
 
         val purity = dagDendrogramPurity(assignments, gt)
         assertTrue(purity < 1.0, "Cross-link must lower purity below the tree value, was $purity")
-        assertEquals(0.0, purity, 1e-9)
+        assertEquals(2.0 / 3.0, purity, 1e-9)
     }
 
     @Test

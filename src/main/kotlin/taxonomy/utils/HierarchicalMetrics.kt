@@ -115,24 +115,31 @@ fun dagDendrogramPurity(
     }
 
     val subtreeCache = HashMap<GraphNode, Set<GraphNode>>()
-    fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n, TraversalPolicy.TREE_ONLY) }
+    fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n, policy) }
 
-    var pure = 0
+    var pureSum = 0.0
     var total = 0
     for ((label, queries) in labelled) {
         for (i in queries.indices) for (j in i + 1 until queries.size) {
             val a = queryAssignments.getValue(queries[i])
             val b = queryAssignments.getValue(queries[j])
             val lca = shallowLCA(a, b, policy)
-            total++
             val subtree = subtreeOf(lca)
-            val allSameLabel = subtree.all { node ->
-                nodeToLabels[node]?.all { it == label } ?: true
+            var match = 0
+            var seen = 0
+            for (node in subtree) {
+                val labels = nodeToLabels[node] ?: continue
+                for (l in labels) {
+                    seen++
+                    if (l == label) match++
+                }
             }
-            if (allSameLabel) pure++
+            if (seen == 0) continue
+            total++
+            pureSum += match.toDouble() / seen
         }
     }
-    return if (total > 0) pure.toDouble() / total else 0.0
+    return if (total > 0) pureSum / total else 0.0
 }
 
 /**
