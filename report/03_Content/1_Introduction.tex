@@ -1,0 +1,362 @@
+\chapter{Introduction}\label{ch:introduction}
+
+\section{Motivation}\label{sec:motivation}
+
+\subsection{The Routing Problem and the Agentic Turn}\label{subsec:the-agentic-turn}
+
+The field of Artificial Intelligence is undergoing a structural shift
+from systems that respond to individual prompts towards systems that
+pursue goals autonomously across extended sequences of
+decisions~\parencite{wissuchek2025agentic}.
+This transition, the \textit{agentic turn}, marks the evolution of
+Large Language Models (LLMs) from passive text-generation interfaces
+into active participants within larger software
+pipelines~\parencite{haidemariam2025turn}, in which complex tasks are
+decomposed into sub-tasks and dispatched to specialised tools, APIs, or
+models~\parencite{schick2023toolformer, yao2023react}.
+The quality of this dispatch depends critically on one question:
+\textit{which model should handle a given sub-task?}
+
+Answering it requires a fine-grained, up-to-date capability map of the
+available models.
+Deployed agentic systems are now widespread in
+enterprise~\parencite{pwc2025survey}, yet the evaluation infrastructure
+needed to build such a map remains largely absent: current benchmark
+leaderboards report a single aggregate score per model, which conflates
+performance across semantically heterogeneous tasks and gives no signal
+about domain-specific strengths or failure modes.
+A routing decision based on a global score is, at best, a coarse
+approximation to the question the orchestrating agent actually needs
+answered.
+
+This thesis does not deploy a production router.
+It builds and validates the substrate such a router would consume:
+per-domain capability profiles at sufficient resolution to distinguish
+models that are equal on average but opposite at the margin.
+
+\subsection{The Evaluation Gap}\label{subsec:the-evaluation-gap}
+
+The rapid deployment of LLMs has outpaced the development of evaluation
+frameworks capable of distinguishing their capabilities at the
+resolution required for informed
+routing~\parencite{yan2025evaluation, shukla2025evaluating}.
+Two structural limitations characterise current practice.
+
+\subsubsection*{The Static Benchmark Problem}
+
+Traditional benchmarks such as MMLU~\parencite{hendrycks2021measuring}
+and its successor MMLU-Pro~\parencite{wang2024mmlupro} assess capability
+via fixed, editorially curated question sets organised into predefined
+subject categories.
+This design is brittle along two axes.
+First, as models improve, the hardest questions saturate:
+top-performing models converge toward indistinguishable scores, and the
+benchmark loses the ability to discriminate between closely performing
+systems~\parencite{simmering2025benchmarks}.
+Second, the category structure is fixed at construction time, so
+emerging capability dimensions---interdisciplinary topics, novel
+application domains, or sub-skills at the boundary between existing
+categories---have no representation unless the corpus is manually
+rebuilt, creating systematic blind spots.
+
+\subsubsection*{The Scalar Fallacy and Aggregation Bias}
+
+Even when evaluation signals are available, current ranking systems
+reduce multidimensional capability profiles to a single scalar score,
+such as an Elo rating or a weighted
+accuracy~\parencite{boubdir2024elo}.
+This \textit{Scalar Fallacy} produces \textit{Aggregation Bias}:
+averaging performance across all domains masks catastrophic failures in
+specific subgroups and obscures profiles that differ only in
+composition, not in mean~\parencite{shukla2025evaluating}.
+Two models with identical global scores may differ sharply in their
+domain profiles---one strong in formal reasoning and weak in applied
+sciences, the other the reverse---yet a global leaderboard assigns them
+identical routing priority for every task, when a routing policy should
+assign them to entirely different sub-tasks.
+
+\subsubsection*{A Routing Micro-Example}\label{subsec:routing-example}
+
+To make the cost concrete, consider two models whose MMLU-Pro accuracy
+is identical at the aggregate level---$0.72$ overall---but whose
+per-domain profiles are mirror images.
+Model~$A$ excels in formal domains: $0.91$ on Mathematics and $0.88$ on
+Physics, but only $0.55$ on History and $0.51$ on Philosophy.
+Model~$B$ is the reverse: $0.54$ on Mathematics and $0.50$ on Physics,
+but $0.92$ on History and $0.90$ on Philosophy.
+On any scalar leaderboard $A$ and $B$ are indistinguishable, and a router
+that trusts that single number dispatches both an integration problem
+and a historical-interpretation question to whichever model is
+nominally first.
+Yet the correct routing decision for a question requiring formal logical
+inference is $A$, and for textual-source interpretation is $B$, each
+with high confidence.
+The aggregate score throws away exactly the information the routing
+decision needs: the two models are \textit{equal on average and opposite
+at the margin}.
+A benchmark adequate for routing must therefore report capability at
+the resolution of individual semantic sub-domains and distinguish
+profiles that coincide in mean but differ in composition---the
+resolution requirement the framework developed in this thesis is
+designed to meet.
+
+\subsection{The Limits of Conventional Judging}\label{subsec:judging-limits}
+
+Measuring performance on knowledge-intensive tasks requires a judge.
+Expert human annotation remains the gold standard but is economically
+prohibitive at the scale required for continuous, multi-model,
+multi-domain evaluation~\parencite{li2026agencybench}.
+Automated scalar scoring introduces systematic calibration errors: the
+judge has no stable internal reference for what a given score means
+across domains, question types, or model generations.
+
+Pairwise comparison resolves this by reducing judgement to a local,
+contextualised question: is answer~A better than answer~B for this
+specific query~\parencite{zheng2024judging}?
+Yet LLM-as-a-judge systems exhibit biases even in pairwise mode:
+\textit{positional bias} systematically favours the answer presented
+first~\parencite{zheng2024judging}, and \textit{verbosity bias} favours
+longer answers regardless of quality~\parencite{li2024verbosity}.
+Beyond these, judges suffer from \emph{guideline incompleteness}: any
+finite rubric under-specifies the evaluation space, leaving cases where
+the judge falls back on undocumented heuristics.
+Evaluating within semantically homogeneous groups of questions reduces
+the verbosity--quality confound and enables the tighter, domain-specific
+rubrics a general-purpose judge cannot provide.
+
+\section{Problem Statement}\label{sec:problem-statement}
+
+The preceding discussion identifies four concrete, interconnected
+problems that remain unresolved in current evaluation practice, each a
+necessary precondition for the next; the two headline contributions of
+this thesis address them in pairs (Section~\ref{sec:research-goal}).
+
+\begin{enumerate}
+
+    \item \textbf{Fixed-corpus brittleness.}
+    Existing benchmarks use editorially defined categories that do not
+    adapt to the evolving capability space of LLMs.
+    A framework that uses editorial labels as a scaffold but refines
+    domain structure geometrically can discover capability dimensions
+    that matter without being permanently constrained by what the labels
+    presuppose.
+
+    \item \textbf{Scalar ranking and loss of capability resolution.}
+    Aggregating performance into a single score conceals the domain
+    structure of model capabilities, but routing requires per-domain
+    rankings, not global leaderboards.
+    A framework producing capability profiles---vectors of scores indexed
+    by semantic dimension---provides the resolution scalar rankings
+    discard.
+
+    \item \textbf{Incoherent domain boundaries.}
+    Induced evaluation structure is well-defined only if the resulting
+    domains are semantically precise and internally homogeneous.
+    A hierarchical decomposition of query space, derived from embedding
+    geometry and formalised as a directed acyclic graph (DAG) of semantic
+    sub-domains, provides principled boundaries whose extent is defined
+    by the data rather than by editorial judgement.
+
+    \item \textbf{Judging at scale with controllable bias.}
+    Automated evaluation must trade off between calibration, bias, and
+    domain sensitivity.
+    A framework combining pairwise comparison with bidirectional order
+    evaluation, domain-localised judging, and principled statistical
+    aggregation can control the known biases while remaining tractable---but
+    only if evaluation units are sufficiently homogeneous that outcomes
+    are exchangeable within each domain.
+
+\end{enumerate}
+
+\section{Approach and Thesis Statement}\label{sec:approach}
+
+TaxoArena works in three stages.
+First, the 14 MMLU-Pro domain labels seed top-level anchor nodes, which
+are then refined by embedding geometry: queries migrate to geometrically
+closer anchors, and each anchor is recursively split into a DAG of
+semantically coherent leaves.
+Second, each leaf induces a reference-informed judge rubric from
+construction-set queries and their correct answers.
+Third, held-out model responses are evaluated pairwise within leaves and
+aggregated via a Bradley--Terry model~\parencite{bradley1952rank,
+hunter2004mm} into per-domain capability profiles.
+
+This thesis designs, implements, and evaluates TaxoArena and tests a
+single, two-part claim.
+First, that answer-key-blind, domain-conditioned pairwise LLM
+judges---evaluating models on held-out queries routed through a
+geometrically induced semantic DAG---can recover the per-domain
+capability rankings that MMLU-Pro produces using ground-truth accuracy on
+selected high-support domain nodes.
+Second, that geometry-adapted domain groupings improve the fidelity of
+those rankings relative to the original editorial labels.
+
+\textbf{Position of the DAG.}
+The induced DAG is \textit{not} the contribution of this thesis; it is
+the instrument by which the per-domain ranking resolution required for
+routing is made available.
+The scientific content is the demonstration that this instrument---a
+geometrically induced, label-seeded semantic DAG coupled with
+reference-informed, answer-key-blind judging---is sufficient to recover
+ground-truth per-domain rankings, and that geometric adaptation of the
+domain partition adds fidelity over editorial labels.
+The DAG construction is therefore presented at the level needed to
+justify that the judge domains it produces are granular and internally
+coherent; its statistical derivations are deferred to
+Chapter~\ref{ch:methodology} and Appendix~\ref{app:numerics}.
+
+Two properties of the evaluation design are central to its validity.
+The \textit{judge-generation phase} uses correct MMLU-Pro answers from
+the construction query set to induce domain-specific rubrics; the system
+is \textit{reference-informed} at construction time.
+The \textit{arena evaluation phase} evaluates held-out responses without
+access to those queries' correct answers; the evaluation is
+\textit{answer-key-blind} at test time, and the MMLU-Pro accuracy oracle
+is revealed only after all matches are complete.
+The title term \textit{Dynamic Domains} refers to this dual property:
+domain boundaries are seeded from MMLU-Pro labels but subsequently
+adapted by geometric evidence---queries migrate to a geometrically more
+appropriate domain, and new sub-domain leaves emerge from recursive
+splitting---so the evaluation dimensions reflect the structure of the
+data rather than a fixed editorial taxonomy.
+
+\section{Contributions}\label{sec:research-goal}
+
+\begin{enumerate}
+
+    \item \textbf{Seed-guided geometric taxonomy construction.}
+    TaxoArena induces a semantic DAG over the full 14-domain MMLU-Pro
+    corpus by seeding 14 anchor nodes from ground-truth labels and then
+    letting embedding geometry refine them.
+    Queries migrate to geometrically closer anchors, producing an
+    \textit{adapted partition} that may diverge from the original
+    \textit{canonical} label partition; each anchor is recursively split
+    under a Dasgupta cost oracle~\parencite{dasgupta2016cost} into
+    internally coherent leaves, with polyhierarchical DAG edges added by
+    gated topology operations rather than by query multi-assignment
+    during fitting.
+    During construction each query is assigned exclusively to one sibling
+    per depth, keeping the vMF and NiW distribution fits statistically
+    clean.
+    This construction is the instrument that produces granular, internally
+    homogeneous judge domains; its statistical choices---a fixed
+    256-dimensional Matryoshka Representation Learning (MRL)
+    slice~\parencite{kusupati2022mrl}, a small-sample-corrected vMF
+    concentration estimator, and a unified separation threshold governing
+    splitting, merging, and passthrough-collapse---are defended as a
+    coherent set in Chapter~\ref{ch:methodology}.
+
+    \item \textbf{Reference-informed, answer-key-blind arena evaluation.}
+    For each leaf, TaxoArena generates a domain-specific judge by
+    presenting construction queries---with their correct answers---to an
+    LLM in a MapReduce induction pipeline, producing a rubric that
+    encodes what correct reasoning looks like in that sub-domain without
+    referencing specific answers.
+    Within each selected node the arena evaluates held-out model responses
+    pairwise using this rubric: each comparison is run in both answer
+    orders with analysis-before-verdict prompting, and disagreements
+    between the orderings are treated as ties.
+    Unlike the exclusive routing used during construction, arena routing
+    permits a held-out query to enter multiple sufficiently compatible
+    leaves, with verdicts attributed fractionally ($1/k$ per leaf for a
+    query entering $k$ leaves) when aggregating upward through the DAG,
+    preventing double-counting.
+    Results are aggregated via Bradley--Terry, producing coherent
+    per-leaf, per-domain, and corpus-wide capability profiles.
+
+\end{enumerate}
+
+An active matchmaking scheduler that prioritises model pairs with high
+rating uncertainty and declares per-leaf convergence from
+Bradley--Terry standard errors keeps judge-call cost tractable; it is an
+engineering component supporting Contribution~2 rather than an
+independent contribution
+(Section~\ref{sec:meth-scheduling} in Chapter~\ref{ch:methodology}).
+
+\section{Research Questions}\label{sec:research-questions}
+
+\begin{enumerate}
+
+    \item[\textbf{RQ1.}] Do answer-key-blind arena rankings agree with
+    ground-truth MMLU-Pro accuracy on held-out queries, on the selected
+    domain nodes?
+    \textit{Primary metrics: Kendall} $\tau$\textit{, pairwise-winner
+    accuracy, top-}$k$\textit{ Jaccard; Spearman} $\rho$
+    \textit{secondary, with bootstrap confidence intervals given the
+    small model count.}
+
+    \item[\textbf{RQ2.}] Does evaluation within geometry-adapted leaf
+    groupings improve ranking fidelity over flat MMLU-Pro domain
+    groupings?
+    \textit{Primary metric:} $\Delta\rho = \rho_{\text{adapted}} -
+    \rho_{\text{canonical}}$, reported per selected node.
+
+\end{enumerate}
+
+Two further analyses are reported as non-headline diagnostics rather
+than claims the thesis depends on: a construction-validity check that
+the induced DAG is geometrically coherent relative to unsupervised
+baselines (Weighted Leaf Purity, Spherical Silhouette, Dasgupta cost,
+Sackin index, Routing ECE), and an optional test of whether the adaptive
+scheduler recovers the same ranking at lower judge-call cost than random
+scheduling.
+
+\section{Scope and Validity}\label{sec:info-separation}
+
+This thesis evaluates the mechanism at high statistical power on
+selected high-support domain nodes rather than spreading the same
+judge-call budget thinly across all 14 domains: the arena roster is 12
+models on one or two ex-ante-selected nodes (Math), with the selection
+rule specified in Chapter~\ref{ch:experimental-design}.
+The reported arena results are therefore a selected-domain
+proof-of-concept, not a global validation across all MMLU-Pro domains;
+generalisation at matched power is identified as future work
+(Chapter~\ref{ch:conclusion}).
+
+Two properties secure the evaluation's validity.
+Construction and rubric induction use construction-set queries and their
+correct answers; the arena evaluates held-out responses without access
+to those queries' correct answers; and the MMLU-Pro accuracy oracle is
+revealed only after all matches are complete, so no arena-test signal
+can feed back into any system parameter.
+The three-way construction/tuning-validation/arena-test partition, the
+information-separation table, and the leakage analysis that enforces
+this boundary are specified in Chapter~\ref{ch:experimental-design}.
+
+\section{Thesis Structure}\label{sec:thesis-structure}
+
+The remainder of this thesis is organised as follows.
+
+Chapter~\ref{ch:literature-review} surveys five bodies of prior work:
+LLM evaluation benchmarks, hierarchical taxonomy construction,
+LLM-as-a-judge reliability, pairwise ranking models, and query routing,
+with each section concluding with the design choice it motivates.
+Chapter~\ref{ch:system-architecture} describes the system design as
+two coupled subsystems: a taxonomy construction pipeline (seed
+initialisation, iterative splitting and topology optimisation, and
+construction completion) and an arena evaluation subsystem (routing,
+per-leaf MapReduce judge-rubric induction, match scheduling,
+Bradley--Terry aggregation, and upward propagation).
+Chapter~\ref{ch:methodology} formalises the statistical and geometric
+foundations: the vMF node model with small-sample-corrected MLE, the
+fixed-dimension MRL slice, the Dasgupta cost oracle, the
+dynamic-temperature trickle-routing softmax, the Bradley--Terry
+likelihood and MM algorithm, the active scheduling utility, and the
+sufficient-statistic upward aggregation procedure; numerical-stability
+derivations are deferred to Appendix~\ref{app:numerics}.
+Chapter~\ref{ch:experimental-design} specifies the experimental
+configuration: corpus and domain selection, the three-way split protocol
+with pre-committed random seed, the L9 hyperparameter tuning protocol,
+the ex-ante domain-node selection rule, DAG and arena hyperparameters, the
+evaluated model set, judge configuration, baselines, and pre-specified
+metrics and thresholds.
+Chapter~\ref{ch:results} presents empirical results, covering DAG
+construction quality, the trickle-test routing diagnostic, arena ranking
+validity~(RQ1), and adapted-vs-canonical fidelity~(RQ2).
+Chapter~\ref{ch:discussion} interprets the findings, addresses the two
+research questions directly, and discusses construct validity and
+limitations---including the selected-domain, proof-of-concept scope of
+the arena evaluation.
+Chapter~\ref{ch:conclusion} summarises the contributions and outlines
+future work, including production router deployment, multi-corpus
+transfer, and online domain discovery.

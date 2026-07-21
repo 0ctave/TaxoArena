@@ -3,11 +3,12 @@
 
 This chapter formalises the statistical and algorithmic components
 that TaxoArena's implementation actually executes: the directional
-node model and its bias-corrected MLE, the Matryoshka embedding
-schedule, the migration rule, the Dasgupta splitting oracle, the
-trickle-routing softmax, the Bradley--Terry estimator and its MM
-solver, the active scheduling utility, the three-level stopping
-policy, and upward score aggregation.
+node model and its small-sample-corrected MLE, the fixed-dimension
+Matryoshka embedding slice, the migration rule, the Dasgupta splitting
+oracle, the dynamic-temperature trickle-routing softmax, the
+Bradley--Terry estimator and its MM solver, the active scheduling
+utility, the iteration-budget stopping policy, and upward score
+aggregation.
 Numerical-stability engineering that supports these computations but
 is not itself a modelling choice---log-Bessel evaluation at high
 dimension, the KDE bandwidth derivation, and the full Fisher
@@ -18,12 +19,12 @@ in Appendix~\ref{app:numerics}.
 
 Let $\mathcal{Q} = \{q_1, \ldots, q_N\}$ denote the corpus of
 $N$ MMLU-Pro queries under consideration, each with a full-dimensional
-MRL embedding $\mathbf{x}_i \in \mathbb{R}^{4096}$ stored at unit
+Matryoshka embedding $\mathbf{x}_i \in \mathbb{R}^{4096}$ stored at unit
 norm; the concrete value of $N$ and the domain scope are specified
 in Chapter~\ref{ch:experimental-design}.
 At depth $\ell$, the effective representation of $q_i$ is the prefix
-slice $\mathbf{x}_i^{(\ell)} \in \mathcal{S}^{d_\ell - 1}$
-(Section~\ref{sec:meth-mrl}).
+slice $\mathbf{x}_i^{(\ell)} \in \mathcal{S}^{d-1}$ of fixed dimension
+$d = 256$ (Section~\ref{sec:meth-mrl}).
 Each query carries a ground-truth domain label
 $y_i^{\text{MMLU}} \in \{D_1, \ldots, D_{14}\}$.
 
@@ -82,24 +83,40 @@ the normalised sample mean $\hat{\boldsymbol{\mu}} =
 \bar{\mathbf{x}} / \|\bar{\mathbf{x}}\|_2$.
 The Banerjee closed-form approximation~\parencite{banerjee2005vmf}
 \[
-\hat{\kappa}_{\text{Banerjee}}
+\hat{\kappa}_{\text{ML}}
 = \frac{\bar{R}\, d - \bar{R}^3}{1 - \bar{R}^2},
 \qquad \bar{R} = \|\bar{\mathbf{x}}\|_2,
 \]
 avoids iterative root-finding for $\kappa$ and is accurate for
-$d \geq 4$, $N \geq 5$.
-The estimator is biased upward in high dimensions at small sample
-sizes ($O(d/N)$ bias; approximately 27\% overestimation at depth-3
-leaves with $N \approx 20$, $d = 1024$).
-The mandatory Hornik--Grün correction~\parencite{hornik2014vmf}
+$d \geq 4$, $N \geq 5$, but is biased upward in high dimensions at
+small sample sizes---an $O(d/N)$ bias that becomes severe when the
+ratio $d/N$ is large.
+
+Two safeguards against this bias are applied, both reflecting what the
+implementation actually executes.
+First, the closed-form estimate is multiplied by a small-sample
+shrinkage factor
 \[
-\hat{\kappa}_{\text{corrected}}
-= \hat{\kappa}_{\text{Banerjee}} \cdot \frac{N - 1}{N(d - 2)}
+\hat{\kappa}
+= \hat{\kappa}_{\text{ML}} \cdot \frac{N - 1}{N + d - 2},
 \]
-is applied at every estimation call site.
-Numerically stable evaluation of $\log I_\nu(\kappa)$ at $d \geq 256$
-via the Debye asymptotic expansion is given in
-Appendix~\ref{app:numerics}.
+a multiplicative correction in the spirit of the high-accuracy
+$\kappa$ estimators of Hornik and Gr\"{u}n~\parencite{hornik2014vmf},
+which pulls the closed-form estimate down toward its small-sample
+expectation.
+Second, the implementation flags any node whose $d/N$ ratio exceeds
+$10$ as \textit{statistically unreliable}: when $d/N > 10$ the NiW
+prior (Section~\ref{sec:meth-vmf}) is allowed to dominate the
+posterior rather than the vMF MLE, and a warning is emitted.
+This diagnostic threshold is the operational basis for the
+joint choice of fixed dimension and minimum leaf size: at $d = 256$
+and $n_{\min} = 50$ (Section~\ref{sec:exp-hyperparams}), accepted
+leaves remain at $d/N \approx 5.1$, comfortably below the
+implementation's unreliable-estimator regime, so the fixed-dimension
+choice is made coherent with the minimum-cluster-size floor rather
+than asserted independently.
+Numerically stable evaluation of $\log I_\nu(\kappa)$ via the Debye
+asymptotic expansion is given in Appendix~\ref{app:numerics}.
 
 \subsection{NiW Auxiliary Regulariser}
 
@@ -116,54 +133,77 @@ nodes are flagged as geometric leaves and excluded from splitting.
 
 The prior mean is the parent's vMF centroid, the prior pseudocount is
 $\kappa_0 = 1.0$, the prior degrees of freedom are
-$\nu_0 = d_\ell + 2$, and the prior scale is
-$\boldsymbol{\Lambda}_0 = \lambda_0 \mathbf{I}_{d_\ell}$ with
-$\lambda_0 = 1/(\hat{\kappa}_{\text{parent}} d_\ell)$.
-At $d_\ell \geq 512$ a diagonal approximation to
-$\boldsymbol{\Lambda}_N$ is stored, reducing memory from $O(d^2)$ to
-$O(d)$ per node.
+$\nu_0 = d + 2$, and the prior scale is
+$\boldsymbol{\Lambda}_0 = \lambda_0 \mathbf{I}_{d}$ with
+$\lambda_0 = 1/(\hat{\kappa}_{\text{parent}} d)$.
+Because the construction fixes $d = 256$ at every depth
+(Section~\ref{sec:meth-mrl}), a diagonal approximation to
+$\boldsymbol{\Lambda}_N$ is stored at all depths, reducing memory from
+$O(d^2)$ to $O(d)$ per node and making cross-depth node comparisons
+directly valid without down-projection.
 The posterior update equations and the resulting Student-$t$
 predictive density are given in Appendix~\ref{app:numerics}; the
 predictive log-density is the scoring function used throughout
 routing, migration, and cross-link decisions.
+Node centroids are optionally smoothed across iterations by an
+exponential moving average with weight \texttt{emaAlpha}
+($\boldsymbol{\mu}^{(t)} = (1-\alpha)\,\hat{\boldsymbol{\mu}}^{(t)}
++ \alpha\,\boldsymbol{\mu}^{(t-1)}$), a numerical stabiliser on the
+centroid refit distinct from the $\kappa$ shrinkage above.
 
-\section{Matryoshka Embedding Schedule}\label{sec:meth-mrl}
+\section{Fixed-Dimension Matryoshka Embedding Slice}\label{sec:meth-mrl}
 
 MRL~\parencite{kusupati2022mrl} trains a single embedding model such
-that every prefix slice $\mathbf{x}_{1:d}$ is itself a meaningful
+that every prefix slice $\mathbf{x}_{1:m}$ is itself a meaningful
 embedding, allowing the full vector to be stored once and sliced at
 query time.
-TaxoArena's depth-dimension schedule is
+Its key property is \textit{coarse-to-fine information packing}: the
+most discriminative semantic directions are concentrated in the
+leading coordinates, so any prefix $\mathbf{x}_{1:m'}$ is a coherent
+lower-dimensional representation rather than a truncated artefact.
+
+TaxoArena uses a single fixed slice
 \[
-d(\ell) =
-\begin{cases}
-128 & \ell = 0, \\
-256 & \ell = 1, \\
-512 & \ell = 2, \\
-1024 & \ell \geq 3,
-\end{cases}
+d(\ell) = 256 \quad \text{for all depths } \ell,
 \]
-reflecting the coarse-to-fine information structure of MRL
-embeddings: domain-level distinctions are separable in 128
-dimensions, while sub-topic distinctions require the full
-1024-dimensional prefix.
+rather than a per-depth dimension schedule.
+The choice balances two pressures.
+A larger $d$ increases angular resolution and improves the
+discriminability of fine-grained sub-topic splits, but the vMF
+concentration estimate degrades as $d/N$ grows
+(Section~\ref{sec:meth-vmf}); at $d = 256$ the implementation's
+unreliability threshold ($d/N > 10$) is crossed only below $N \approx
+26$, so the $n_{\min} = 50$ floor keeps every fitted leaf outside the
+warning regime.
+Fixing a single dimension additionally means all nodes---across all
+depths---live on the same unit hypersphere, so sibling-merge,
+passthrough-collapse, and bridge-coherence comparisons require no
+cross-depth down-projection.
+The coarse-to-fine property of MRL is exploited not by widening the
+slice with depth but by the recursive structure itself: shallow nodes
+separate coarse domain-level directions, while deeper splits resolve
+progressively finer sub-topic structure within the same 256-dimensional
+geometry.
 Re-normalisation after slicing is mandatory, since MRL guarantees
 semantic meaningfulness of $\mathbf{x}_{1:d}$ but not unit norm:
 \(
 \mathbf{x}^{(\ell)}
-= \mathbf{x}_{1:d_\ell} / \|\mathbf{x}_{1:d_\ell}\|_2.
+= \mathbf{x}_{1:d} / \|\mathbf{x}_{1:d}\|_2.
 \)
+The dimension itself is ablated (A1, Section~\ref{sec:exp-tuning-protocol})
+at $\{128, 256, 512\}$ to confirm that $d = 256$ is a
+quality-stable operating point rather than a fragile one.
 
 \section{Seed Initialisation and Cross-Domain Migration}\label{sec:meth-migration}
 
 At iteration 0, each anchor $D_k$ is initialised with the canonical
-partition and a vMF/NiW self-model fit at $d(0) = 128$; the anchor's
+partition and a vMF/NiW self-model fit at $d = 256$; the anchor's
 identity, depth, and \texttt{isAnchor} flag are set once and never
 modified.
 
 For each query $q_i$, the domain score under anchor $D_k$ is the
 NiW log-posterior predictive
-$z_{D_k}(\mathbf{x}_i) = \log p_{\text{NiW}}(\mathbf{x}_i^{(0)} \mid D_k)$.
+$z_{D_k}(\mathbf{x}_i) = \log p_{\text{NiW}}(\mathbf{x}_i \mid D_k)$.
 Letting $D_{\text{seed}}(i)$ be $q_i$'s MMLU-Pro label and
 $D^*(i) = \arg\max_k z_{D_k}(\mathbf{x}_i)$, query $q_i$ migrates from
 $D_{\text{seed}}(i)$ to $D^*(i)$ iff
@@ -203,12 +243,23 @@ normalised cost delta reduces to
 using the efficient identity
 $W_L = \tfrac{1}{2}(\|\sum_{i \in S_L} \mathbf{x}_i\|_2^2 - N_L)$,
 which reduces cost computation to $O(N_L d)$.
-A split is accepted iff $\delta_{\text{Dasgupta}} > 0.02$ and both
-children satisfy $|S_L|, |S_R| \geq n_{\min} = 15$.
+A split is accepted iff
+$\delta_{\text{Dasgupta}} \geq \epsilon_{\text{sep}}$ (the
+\texttt{separationEpsilon} parameter) and both children satisfy
+$|S_L|, |S_R| \geq n_{\min}$, with the parent node's recursion depth
+hard-capped at $D_{\max}$.
 The threshold has no closed-form optimum and trades over-splitting
-against under-splitting; the bisecting procedure always proposes
-exactly two children, and $D_{\max} = 3$ hard-caps recursion depth.
-The greedy oracle provides no worst-case global-cost guarantee.
+against under-splitting; at its canonical value
+$\epsilon_{\text{sep}} = 0.01$ it functions primarily as a floor that
+rejects only near-zero-cost (essentially arbitrary) splits, since
+empirically observed deltas at accepted splits are an order of
+magnitude larger.
+The bisecting procedure always proposes exactly two children, and
+$D_{\max} = 8$ caps recursion depth.
+The greedy oracle provides no worst-case global-cost guarantee; the
+same $\epsilon_{\text{sep}}$ quantity is reused as the sibling-merge
+and passthrough-collapse threshold in Section~\ref{sec:meth-topology},
+unifying three topology gates under a single separability parameter.
 
 \section{Trickle Routing and Polyhierarchy}\label{sec:meth-routing}
 
@@ -218,56 +269,81 @@ child $c_k$ with probability
 \[
 P_{\text{con}}(c_k \mid \mathbf{x}, v)
 = \frac{\exp\!\left(\hat{\kappa}_{c_k} \hat{\boldsymbol{\mu}}_{c_k}^\top
-\mathbf{x}^{(\ell+1)} / \tau\right) p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_k)}
+\mathbf{x} / \tau_{\text{eff}}\right) p_{\text{NiW}}(\mathbf{x} \mid c_k)}
 {\sum_{j=1}^{K} \exp\!\left(\hat{\kappa}_{c_j} \hat{\boldsymbol{\mu}}_{c_j}^\top
-\mathbf{x}^{(\ell+1)} / \tau\right) p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_j)},
+\mathbf{x} / \tau_{\text{eff}}\right) p_{\text{NiW}}(\mathbf{x} \mid c_j)},
 \]
 combining the vMF concentration term with the NiW posterior
 predictive, computed in log-space with log-sum-exp for multi-path
 aggregation.
+The routing temperature is \textit{dynamic}: rather than a plain
+$\tau$, the softmax divides by
+\[
+\tau_{\text{eff}} = \tau \cdot \kappa^{\gamma},
+\]
+where $\tau$ is the \texttt{routingSoftmaxTau} parameter,
+$\kappa$ is the parent's mean child concentration, and
+$\gamma \in [0,1]$ is the \texttt{tauKappaScalingFactor}.
+At $\gamma = 0$ (the canonical value) the temperature reduces to the
+plain $\tau$; larger $\gamma$ lets concentration dampen the softmax,
+sharpening routing at high-$\kappa$ nodes.
+$\gamma$ is ablated at $\{0, 0.5, 1.0\}$
+(A11, Section~\ref{sec:exp-tuning-protocol}) as a standalone factor
+separate from the L9 design.
+
 At evaluation time, held-out queries
 $\mathbf{x} \in \mathcal{Q}_{\text{eval}}$ are routed using the NiW
-posterior predictive alone, with no $\hat{\kappa}\hat{\boldsymbol{\mu}}^\top\mathbf{x}$
-term:
+posterior predictive alone, with no
+$\hat{\kappa}\hat{\boldsymbol{\mu}}^\top\mathbf{x}$ term:
 \[
 P_{\text{eval}}(c_k \mid \mathbf{x}, v)
-= \frac{p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_k)}
-{\sum_{j=1}^{K} p_{\text{NiW}}(\mathbf{x}^{(\ell+1)} \mid c_j)}.
+= \frac{p_{\text{NiW}}(\mathbf{x} \mid c_k)}
+{\sum_{j=1}^{K} p_{\text{NiW}}(\mathbf{x} \mid c_j)}.
 \]
 This asymmetry is deliberate: the vMF term encodes the frozen
 snapshot's own directional geometry and is appropriate for the
 queries that shaped that geometry, whereas the NiW posterior
 predictive is a calibrated density that generalises to unseen queries
 without re-fitting.
-A depth-decaying confidence funnel retains a query at its current
-node as a leaf if its top assignment probability under the
-applicable routing distribution falls below the funnel threshold at
-that depth.
-The funnel is anchored at $\gamma_0 = 0.999$ at depth 0 and relaxes
-with depth, subject to a configurable floor
-$\text{tauFunnelFloor}$ (default $0.90$) that lower-bounds the
-depth-3 routing temperature so that leaf-level assignment remains
-appropriately permissive rather than over-confident.
+A depth-stratified residual gate retains a query at its current node
+as a leaf when its top assignment probability under the applicable
+routing distribution falls below a depth-dependent confidence floor:
+the floor is $0.999$ at depths $0$--$1$ (where routing is expected to
+be decisive) and $0.80$ at depth $\geq 2$ (where leaf-level assignment
+is appropriately permissive), further scaled by the branching factor
+$K$ so that the gate relaxes on highly branched nodes.
+Residual routing is applied only when \texttt{enableResidualRouting}
+is set and the node is at depth $\geq 2$, so the active residual gate
+operates on depth-2-and-deeper nodes; at depths $0$--$1$ the high
+$0.999$ floor is defined but residual retention is not invoked.
+Queries that fail this gate are recorded as residual hits and feed
+the Source-A bridges of Section~\ref{sec:meth-topology}.
 
 Primary assignment---the single best-scoring child used for fitting
 and for all downstream statistics under the primary-path
 convention---remains exclusive at every depth: exactly one child is
 designated primary per query per depth, regardless of how many
-children clear the funnel.
-Secondary assignment, which is the sole basis for the bridges
-introduced in Section~\ref{sec:meth-topology}, is granted whenever a
-query's assignment margin to a non-primary node clears the gate
+children clear the residual gate.
+Secondary, multi-leaf assignment is governed by two nat-margin gates
+on the accumulated log-probabilities of the routing walk.
+The \textit{walk-breadth gate} \texttt{deltaAssign} controls how many
+children the routing walk explores: a child is descended into only if
+its log-probability is within \texttt{deltaAssign} nats of the
+best sibling's.
+The \textit{leaf-qualification gate} determines which reached leaves a
+query is finally assigned to: a leaf $L'$ qualifies iff its accumulated
+log-probability is within
 \[
-\text{marginNats} = \text{assignmentCosineGap} \cdot
-\frac{\kappa_{\text{eff}}}{\tau_{\text{eff}}}
-> \delta_{\text{assign}},
+\text{margin} = \texttt{assignmentCosineGap} \cdot \kappa_{\text{eff}}
 \]
-where $\text{assignmentCosineGap}$ is the cosine gap between the
-query's best- and second-best-scoring node, and
-$\kappa_{\text{eff}}, \tau_{\text{eff}}$ are the fitted concentration
-and routing temperature at that depth (e.g.\ a gap of $0.03$ at
-$\kappa_{\text{eff}} = 100$, $\tau_{\text{eff}} = 2$ yields a margin
-of 1.5 nats).
+nats of the best leaf's, where $\kappa_{\text{eff}}$ is the mean
+concentration of the parent's children (coerced to $[1, 100]$).
+Qualifying leaves are capped at \texttt{maxLeafAssignments} per query.
+This gate directly scales the cosine gap by concentration---a query
+must clear a larger log-probability margin to enter a second leaf when
+the local geometry is sharply peaked ($\kappa$ large) than when it is
+diffuse---and it is the sole basis for the bridges introduced in
+Section~\ref{sec:meth-topology}.
 Secondary assignment never overrides or duplicates the primary
 assignment; it only creates candidate bridge evidence.
 MMLU-Pro labels are never used in either routing distribution; they
@@ -279,28 +355,31 @@ divergence metrics (Section~\ref{sec:meth-validation}).
 A sequence of anchor-exempt operations runs after each splitting
 phase.
 \textbf{Sibling merge} pools two nodes when their vMF
-Jensen--Shannon divergence falls below $\epsilon_{\text{sep}}$.
-\textbf{Starved-leaf pruning} removes a leaf with fewer than $0.2$
-times the mean sibling size, reassigning its members to the
+Jensen--Shannon divergence falls below $\epsilon_{\text{sep}}$ (the
+same \texttt{separationEpsilon} used by the splitting oracle).
+\textbf{Starved-leaf pruning} removes a physical leaf whose total
+branch query count falls below $0.2$ times the mean sibling size
+(floored at $5$), reassigning its members to the
 highest-likelihood sibling.
-\textbf{Passthrough collapse} promotes the sole child of a
-single-child, memberless internal node.
-\textbf{Soft-membership refitting} (\texttt{refitMuPerIteration})
-recomputes each node's vMF centroid from its full posterior-weighted
-membership rather than hard assignment alone, subject to a
-no-update band: once a node's dominant posterior mass exceeds a high
-threshold---$0.999$ at shallow depth, relaxing to $0.9975$ as depth
-increases---the centroid is frozen for that iteration, preventing
-noisy refitting once a node's membership has effectively stabilised.
-\textbf{Bridge insertion} replaces a single global cross-link
-threshold with two gated sources, both operating on the
-$\text{marginNats}$ quantity defined in
+\textbf{Passthrough collapse} bypasses a single-child internal node
+when its child's vMF JS-divergence falls below $\epsilon_{\text{sep}}$
+\emph{and} its member count is below $n_{\min}$, promoting the child
+up one level.
+\textbf{Soft-membership refitting} (\texttt{refitMuPerIteration},
+enabled under \texttt{DAG\_MAX} mode) recomputes each node's vMF
+centroid from its full posterior-weighted membership rather than hard
+assignment alone, subject to a no-update band: once a node's
+dominant posterior mass exceeds $0.9975$ the centroid is frozen for
+that iteration, preventing noisy refitting once a node's membership
+has effectively stabilised.
+\textbf{Bridge insertion} admits polyhierarchical edges from two
+gated sources, both operating on the leaf-qualification margin of
 Section~\ref{sec:meth-routing}.
 
 \textit{Source-A (residual bridges).}
 Residual leaves that received no primary queries after routing are
 retained as bridge targets: any query whose secondary NiW posterior
-score at a residual node clears the $\text{marginNats}$ gate is
+score at a residual node clears the leaf-qualification gate is
 linked to that node via a secondary edge, giving the residual node
 evaluable membership without altering the query's primary leaf.
 
@@ -308,12 +387,13 @@ evaluable membership without altering the query's primary leaf.
 For a query whose primary leaf is $L$, a candidate secondary edge to
 another leaf $L'$ (possibly under a different anchor) is proposed
 whenever $L'$'s NiW posterior score for the query clears the
-$\text{marginNats}$ gate.
+leaf-qualification gate.
 The candidate is accepted only if it passes four sequential gates:
 deduplication against existing edges; a coherence gate rejecting
-edges that would push $L'$'s internal coherence below $0.70$; a
-distinctness gate requiring the primary and secondary leaf profiles
-to remain at least $0.92$ cosine-distinct; and a combined cycle
+edges that would push $L'$'s internal coherence below the
+\texttt{fusionSimilarityThreshold} (default $0.92$); a distinctness
+gate requiring the primary and secondary leaf profiles to remain at
+least $0.92$ cosine-distinct; and a combined cycle
 check and cross-domain dominant-category gate that blocks bridges
 which would make a leaf's secondary membership dominate its
 primary-anchor identity.
@@ -388,9 +468,14 @@ This is the internally consistent reading of the utility term: entropy
 identifies ambiguity, and dividing by variance targets that ambiguity
 toward pairs where additional evidence is most informative rather than
 toward pairs that are simply noisy.
-$\alpha$ decays from $1.0$ to approximately $0.20$ as leaf maturity---a
-weighted combination of standard-error reduction and completed-pair
-fraction---approaches 1.
+The mixing parameter decays as
+$\alpha = 0.20 + 0.80\,\exp(-2.5\,\text{maturity})$, where
+\textit{maturity} is a weighted combination of standard-error
+reduction and completed-pair fraction, so $\alpha$ falls from $1.0$
+toward approximately $0.20$ as a leaf matures---exploration-dominated
+early, uncertainty-resolution-dominated late.
+This scheduler-internal $\alpha$ is distinct from the centroid
+\texttt{emaAlpha} of Section~\ref{sec:meth-vmf}.
 Within a scheduled pair, queries are selected by descending cosine
 similarity to the leaf's vMF centroid, prioritising representative
 queries.
@@ -412,6 +497,12 @@ $f_{\text{conv}} = \sum_{L \in \mathcal{C}} |Q_L| /
 \sum_{L \in \mathcal{L}} |Q_L|$ reaches $f^*$ for $R_{\text{stable}}$
 consecutive rounds, with a hard escape valve at $B_{\max}$ total judge
 calls.
+The taxonomy construction loop, by contrast, runs for a fixed
+iteration budget (\texttt{numIterations}, canonical $35$): there is no
+structural early-stopping gate in construction, and the structural
+edit distance between consecutive DAG snapshots is reported as a
+convergence \textit{diagnostic} (quiescence indicator) rather than a
+stopping criterion.
 
 \section{Upward Aggregation to GT Domains}\label{sec:meth-aggregation}
 
@@ -477,18 +568,21 @@ slightly underestimate.
 
 \section{Chapter Summary}
 
-This chapter formalised the vMF/NiW node model and its bias-corrected
-MLE, the MRL embedding schedule, the migration rule with its
-single-pass oscillation guard, the Dasgupta splitting oracle, the
-log-space trickle-routing softmax with confidence funnel and
-primary/secondary assignment distinction, the topological
-optimisation pass with soft-membership refitting and two-source
-bridge insertion, the half-win BT
-estimator with its MM solver and Fisher-information standard errors,
-the composite-utility active scheduler, the three-level stopping
-policy, sufficient-statistic pooling for upward aggregation under the
-primary-path and fractional-weight conventions, and the four
-rank-agreement validation metrics against MMLU-Pro.
+This chapter formalised the vMF/NiW node model with its
+small-sample-corrected MLE and the $d/N$-coherence rationale for the
+fixed $d = 256$ slice, the migration rule with its single-pass
+oscillation guard, the Dasgupta splitting oracle with its unified
+$\epsilon_{\text{sep}}$ topology gates, the log-space trickle-routing
+softmax with dynamic temperature $\tau_{\text{eff}} = \tau\kappa^{\gamma}$,
+the depth-stratified residual gate and the two nat-margin
+secondary-assignment gates, the topological optimisation pass with
+soft-membership refitting and two-source bridge insertion, the
+half-win BT estimator with its MM solver and Fisher-information
+standard errors, the composite-utility active scheduler, the
+three-level arena stopping policy alongside the fixed-iteration
+construction budget, sufficient-statistic pooling for upward
+aggregation under the primary-path and fractional-weight conventions,
+and the four rank-agreement validation metrics against MMLU-Pro.
 Numerical-stability procedures supporting these models---log-Bessel
 evaluation, the NiW posterior update algebra, the KDE bandwidth
 derivation, and the full Fisher information matrix---are given in

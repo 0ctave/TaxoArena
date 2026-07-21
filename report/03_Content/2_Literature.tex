@@ -1,0 +1,872 @@
+\chapter{Literature Review}\label{ch:literature-review}
+
+
+
+
+Five interdependent observations motivate the design of an automated,
+domain-structured LLM evaluation framework.
+
+
+First, existing evaluation benchmarks are structurally brittle: fixed
+corpora saturate, contaminate, and fail to adapt to the capability
+frontier.
+Second, the semantic structure of a query corpus is recoverable from
+embedding geometry, enabling taxonomy induction without editorial
+supervision.
+Third, automated pairwise judgments can be made reliable through bias
+control and reference-informed domain conditioning, provided the
+rubric-generation phase is distinguished from the answer-key-blind
+evaluation phase.
+Fourth, per-domain model rankings require a probabilistic pairwise
+model with explicit uncertainty quantification and a sample-efficient
+scheduler, and no existing system provides both within a
+corpus-induced taxonomy.
+Fifth, the downstream task of routing-aware model selection requires
+per-domain capability profiles that no existing system produces
+without presupposing a fixed taxonomy.
+
+
+This chapter surveys the relevant work in the order of that
+dependency: evaluation benchmarks and arena platforms
+(Section~\ref{sec:benchmarks}), hierarchical taxonomy construction
+(Section~\ref{sec:taxonomy-construction}), LLM-as-a-judge reliability
+(Section~\ref{sec:llm-as-a-judge}), and pairwise ranking models
+(Section~\ref{sec:ranking-models}).
+Section~\ref{sec:routing} closes the chapter by framing query routing
+as the target use case: the downstream task for which per-domain
+capability profiles are necessary and which existing routing systems
+cannot fulfil without a principled profiling layer.
+
+
+
+
+\section{LLM Evaluation Benchmarks}\label{sec:benchmarks}
+
+\subsection*{Static Benchmarks and Their Limitations}
+
+The first generation of Large Language Model (LLM) evaluation relied on
+static instruments such as \textit{Massive Multitask Language Understanding}
+(MMLU)~\parencite{hendrycks2021measuring} and the \textit{Holistic Evaluation
+of Language Models} (HELM) framework~\parencite{liang2022holistic}.
+MMLU uses over \num{15000} multiple-choice questions across 57 subjects to
+probe professional and academic competence; at release, the best-performing
+model (GPT-3, 175B) reached 43.9\% accuracy against an estimated human
+expert ceiling of 89.8\%~\parencite{hendrycks2021measuring}.
+HELM attempted a more multidimensional approach by evaluating 30 models
+across 42 scenarios and seven metrics---accuracy, calibration, robustness,
+fairness, bias, toxicity, and efficiency---making it the first large-scale
+effort to resist the reduction of model quality to a single
+number~\parencite{liang2022holistic}.
+
+Both frameworks share a structural fragility: the evaluation corpus and its
+categorical organisation are fixed at construction time.
+This creates three compounding failure modes.
+First, \textit{saturation}: as model capabilities advance, score
+distributions compress toward the ceiling and the benchmark loses
+discriminative power---frontier models now score between 97\% and 99\% on
+MMLU, rendering it unable to rank them against each
+other~\parencite{boubdir2024elo}.
+Second, \textit{contamination}: benchmark questions circulate online and
+enter training corpora; researchers found that ChatGPT and GPT-4 could guess
+missing answer options in MMLU at rates of 52\% and 57\% respectively,
+far above what genuine reasoning would predict~\parencite{deng2024contamination}.
+Third, \textit{categorical brittleness}: editorially defined subject
+categories cannot adapt to the capability space of new model generations,
+leaving blind spots at boundaries and failing to capture cross-domain
+dimensions that emerge only after the benchmark is fixed.
+HELM's fixed scenario taxonomy, despite its breadth, inherits the same
+limitation: its 42 scenarios were defined for the model generation of 2022
+and do not evolve with the capability frontier~\parencite{liang2022holistic}.
+
+\subsection*{From MMLU to MMLU-Pro}
+
+The saturation and contamination of MMLU motivated a line of progressively
+harder benchmarks.
+\textit{BIG-Bench Hard} (BBH)~\parencite{suzgun2022bigbench} addressed
+discriminability by extracting the 23 BIG-Bench tasks on which prior models
+had not outperformed average human raters, covering multi-step arithmetic,
+logical deduction, causal judgment, and temporal reasoning across 6,511
+examples.
+Crucially, BBH demonstrated that chain-of-thought (CoT) prompting enabled
+PaLM to surpass human-rater performance on 10 of those 23 tasks---a result
+that confirmed both the diagnostic value of the harder subset and the
+inadequacy of the four-choice format for measuring genuine
+reasoning~\parencite{suzgun2022bigbench}.
+
+\textit{MMLU-Pro}~\parencite{wang2024mmlupro} extends this logic directly to
+the MMLU lineage.
+It expands the answer set from four to ten options per question,
+eliminates trivial and noisy items from the original MMLU, and integrates
+reasoning-focused questions drawn from academic exams and textbooks across
+14 domains---including mathematics, physics, chemistry, engineering, law,
+and computer science---yielding \num{12000} rigorously curated
+items~\parencite{wang2024mmlupro}.
+The effect on model scores is substantial: accuracy drops by 16\% to 33\%
+relative to MMLU, and prompt sensitivity falls from 4--5\% to 2\%, indicating
+that MMLU-Pro is more robust to surface variation and more discriminative of
+underlying reasoning capability.
+
+The problem of contamination, however, persists even in harder benchmarks
+so long as questions are static.
+\textit{LiveBench}~\parencite{white2024livebench} addresses this
+structurally by refreshing its question pool on a rolling basis from
+recently published sources, substantially reducing contamination risk
+since questions are drawn from material published after common training
+cutoffs.
+This approach trades domain coverage for freshness, and its task set
+remains narrower than MMLU-Pro's 14-domain structure.
+The fundamental tension between depth of domain coverage (MMLU-Pro) and
+resistance to contamination (LiveBench) motivates an alternative
+approach: rather than fixing either the questions or the domains, a
+framework that induces its evaluation structure dynamically from the
+query corpus can avoid categorical brittleness, though its domain coverage
+remains bounded by the diversity of the supplied corpus.
+
+
+\subsection*{Pairwise Arena Evaluation Platforms}
+
+A parallel line of work addressed a complementary limitation of static
+benchmarks: the absence of human preference as an evaluation signal.
+\textit{Chatbot Arena}~\parencite{chiang2024chatbotarena}, introduced by
+Chiang et al.\ at UC Berkeley and LMSYS, is the canonical instance.
+Users submit a free-form prompt, receive responses from two anonymous models
+simultaneously, and vote for the preferred response; the platform has
+collected over 240K votes across more than 50 models as of early
+2024~\parencite{chiang2024chatbotarena}.
+Pairwise comparisons are aggregated using a Bradley--Terry model, and
+confidence intervals on the resulting coefficients are computed via the
+sandwich robust standard error, providing statistically grounded rankings
+with explicit uncertainty estimates.
+To improve sample efficiency, Chatbot Arena employs an adaptive sampling
+rule that allocates comparison budget proportionally to the reduction in
+confidence interval size---the platform reports that this requires 54\% fewer
+comparisons than random sampling to achieve the same precision on the win
+matrix~\parencite{chiang2024chatbotarena}.
+
+Recognising that a single global ranking conceals domain-specific
+capability variation, Arena has more recently constructed per-category
+leaderboards through an explicit taxonomy-building
+pipeline~\parencite{arena2025categories}.
+The methodology embeds prompts, clusters them at scale, uses an LLM to
+generate candidate category names and definitions, and iterates with
+human review toward two optimisation targets: coverage (at least 80\%
+of prompts assigned to a named category) and boundary clarity (category
+definitions remain mutually exclusive under re-labelling).
+This pipeline shares the high-level goal of inducing a domain structure
+from query data, but its design priorities---human interpretability and
+leaderboard presentation---differ from those of statistical evaluation
+rigour.
+
+The differences, however, are substantive.
+Arena's splitting criterion is a coverage percentage and a qualitative
+boundary-clarity judgment, both requiring human-in-the-loop validation;
+there is no information-theoretic objective function that makes the
+resulting partition verifiably near-optimal.
+Category nodes carry no statistical characterisation: there is no
+probability model over the queries assigned to a category, so membership
+decisions are hard and the coherence of a node cannot be measured.
+Cluster labelling is delegated to an LLM prompted to propose
+human-interpretable names, which optimises for presentation rather than
+for geometric separability.
+Finally, the process is shallow and manual: the Arena WebDev taxonomy
+contains seven categories constructed over several weeks of iterative
+refinement, whereas a principled recursive procedure would be required
+to scale to hundreds of semantic sub-domains.
+These limitations are not incidental---they reflect the fact that Arena's
+taxonomy was designed for human-readable leaderboard presentation rather
+than for statistical evaluation rigour.
+
+
+
+\section{Hierarchical Taxonomy Construction}\label{sec:taxonomy-construction}
+
+\subsection*{Supervised Hierarchical Text Classification}
+
+Hierarchical text classification (HTC) organises a document collection
+into a predefined taxonomy of classes, assigning labels at multiple
+levels of a tree or DAG simultaneously.
+Hierarchy-aware neural architectures such as
+HiAGM~\parencite{zhou2020hiagm} and HiTIN~\parencite{zhu2023hitin}
+improve on flat multi-label baselines by encoding the label hierarchy
+itself---as a propagated label graph or an entropy-derived coding
+tree---and show consistent gains on standard corpora.
+All such methods, however, share a critical dependency: the hierarchy
+must be supplied as supervision.
+The label tree for RCV1 was constructed by Reuters editors; the WoS
+hierarchy was constructed by domain librarians; neither process is
+reproducible, scalable to new domains, or verifiable in terms of
+coherence---the granularity, balance, and semantic separability of the
+nodes are editorial artefacts.
+This dependency defines the scope boundary for classification-based
+approaches: they assume an already-coherent taxonomy and learn to
+navigate it, but provide no method for constructing or validating
+that taxonomy in the first place.
+
+\subsection*{Unsupervised Taxonomy Induction}
+
+A distinct line of work removes the editorial dependency by constructing
+the taxonomy directly from corpus statistics.
+\textit{TaxoGen}~\parencite{zhang2018taxogen} builds a topic taxonomy
+in a recursive top-down fashion using two coupled modules: an
+\textit{adaptive spherical clustering} module that assigns terms to
+levels by jointly measuring their similarity to a sub-topic centroid
+and their discriminative concentration relative to sibling topics,
+and a \textit{local embedding} module that retrains term embeddings on
+the sub-corpus of each node before splitting, enhancing discriminative
+power at lower levels where global embeddings are too coarse.
+TaxoGen operates on term-level embeddings derived from word2vec and
+evaluates coherence using Davies--Bouldin index and human judgement,
+without a formal objective function governing the splitting decision.
+
+\textit{CoRel}~\parencite{huang2020corel} extends this paradigm to the
+seed-guided setting, where a user provides a partial skeleton taxonomy
+and CoRel completes it by learning a relation-transferring module that
+propagates the user's intended hierarchical relation along embedding
+paths and a concept-learning module that enriches each node with a
+cluster of coherent representative terms.
+While CoRel substantially improves taxonomic precision over unsupervised
+methods, it introduces a seed dependency that partially re-introduces the
+human-editorial bottleneck.
+TaxoArena shares the seed-guided starting point but differs in kind:
+the MMLU-Pro labels initialise anchor membership and are thereafter
+superseded by geometric evidence (migration, splitting, and topology
+operations), whereas CoRel's relation-transferring module permanently
+encodes the user-supplied skeleton as a structural prior throughout
+the construction process.
+
+Both approaches operate at the \textit{term level}---each node is a
+cluster of words or phrases extracted from a corpus.
+Applying them at the \textit{query level}---where each document is a
+full natural-language question and each node should characterise the
+distributional geometry of its member queries---requires a different
+statistical model, a different splitting criterion, and a different
+coherence measure, none of which are provided by the TaxoGen or CoRel
+frameworks.
+
+\subsection*{Spherical Embeddings and vMF Clustering}
+
+When text is encoded by a neural model and $\ell_2$-normalised to the
+unit hypersphere, cosine similarity becomes the natural inner product,
+and the von Mises--Fisher (vMF) distribution becomes the canonical
+probability model for directional data~\parencite{banerjee2005vmf}.
+The vMF density for a unit vector $\mathbf{x} \in \mathcal{S}^{d-1}$,
+with mean direction $\boldsymbol{\mu}$ and concentration $\kappa \geq 0$, is
+\begin{equation}
+    p(\mathbf{x};\boldsymbol{\mu},\kappa) =
+    C_d(\kappa)\exp\!\bigl(\kappa\,\boldsymbol{\mu}^\top\mathbf{x}\bigr),
+    \label{eq:vmf}
+\end{equation}
+where $C_d(\kappa)$ is a normalising constant involving a modified
+Bessel function of the first kind.
+Banerjee et al.\ showed that fitting a mixture of vMF distributions via
+EM is equivalent to minimising a Bregman divergence on the unit sphere,
+and Hornik and Gr\"{u}n derived high-order approximations for the
+concentration estimate that remain numerically stable in the
+high-$\kappa$, high-dimensional regime typical of neural embedding
+spaces~\parencite{banerjee2005vmf, hornik2014vmf}.
+The estimation details as they are used in this thesis---including the
+small-sample stabilisation of the concentration estimate---are
+developed in Chapter~\ref{ch:methodology}.
+
+
+\subsection*{Overlapping, Polyhierarchical, and Cross-Domain Taxonomies}
+
+The taxonomy models reviewed above---TaxoGen, CoRel, and the vMF node
+model---all assume that each item belongs to exactly one node at each
+level of the hierarchy.
+This assumption is convenient for statistical fitting but is not a
+structural property of real query corpora: a query about the
+thermodynamics of a chemical reaction is legitimately a member of both
+a physics-oriented and a chemistry-oriented sub-domain, and forcing an
+exclusive assignment discards this evidence.
+\textit{Soft} or \textit{overlapping} hierarchical clustering methods
+address this by allowing an item to hold non-trivial membership in
+more than one cluster, typically through a fuzzy or probabilistic
+membership function rather than a hard partition~\parencite{fuzzyhc1969}.
+Applied to a directed hierarchy, this relaxation produces a
+\textit{polyhierarchy}: a taxonomy in which a node may have more
+than one parent, so that the structure is a directed acyclic graph
+(DAG) rather than a tree~\parencite{polyhierarchy2006}.
+Polyhierarchies are well established in knowledge organisation---for
+instance, a single subject heading in a controlled vocabulary
+routinely appears under more than one broader term---but their use in
+corpus-induced, embedding-driven taxonomy construction remains sparse:
+existing induction methods (TaxoGen, CoRel) produce trees, and the
+DAG structure in taxonomy-induction pipelines is typically imposed
+post hoc rather than learned from overlap evidence in the embedding
+space.
+
+A related but distinct mechanism is \textit{cross-domain bridging}:
+rather than softening membership everywhere, a bridging step
+identifies a small number of structurally overlapping node pairs
+across otherwise separate branches of the hierarchy and inserts an
+explicit edge (or a shared child) connecting them, while leaving the
+remainder of the hierarchy as a tree.
+This is a more conservative departure from strict tree structure than
+global soft clustering, since it introduces polyhierarchy only where
+the embedding geometry provides positive evidence of genuine overlap,
+rather than allowing every item a non-trivial membership everywhere.
+TaxoArena combines both ideas but keeps them statistically separate:
+query assignment during distribution fitting remains exclusive, so
+that the concentration estimates at each node stay clean, while
+polyhierarchy is introduced afterward, at the topology-optimisation
+stage, through gated bridge insertion
+(Chapter~\ref{ch:methodology}).
+This design distinguishes TaxoArena from both the fully-soft
+polyhierarchy literature, where membership is fuzzy throughout, and
+from the strictly exclusive tree literature (TaxoGen, CoRel, HiAGM,
+HiTIN), where no cross-branch edge can be represented at all.
+
+\subsection*{Multi-Scale Embeddings}
+
+The recursive construction of a taxonomy additionally requires an
+embedding space in which both coarse domain-level distinctions and
+fine sub-topic distinctions are geometrically resolvable within the
+same representation.
+\textit{Matryoshka Representation Learning} (MRL)~\parencite{kusupati2022mrl}
+achieves this by optimising a single embedding function jointly across a
+schedule of nested prefix dimensions
+$\mathcal{M} = \{m_1, m_2, \ldots, m_L\}$ with $m_1 < m_2 < \ldots < m_L = d$,
+using a weighted sum of task losses evaluated at each prefix
+length~\parencite{kusupati2022mrl}.
+The key property is \textit{coarse-to-fine information packing}: because
+the prefix is optimised at every scale simultaneously, the most
+discriminative semantic directions are concentrated in the leading
+coordinates, making the prefix at any $m' < m_L$ a coherent lower-dimensional
+representation rather than a truncated artefact.
+TaxoArena exploits this property with a single fixed slice $d(\ell) = 256$
+at every recursion depth, rather than a per-depth dimension schedule: the
+coarse-to-fine progression from broad domain-level separation to
+fine-grained sub-topic resolution is realised by the recursive structure
+itself---shallow nodes separate coarse directions, deeper splits resolve
+finer structure within the same 256-dimensional geometry---not by widening
+the slice with depth.
+Fixing a single dimension additionally places every node, at every depth,
+on the same unit hypersphere, so sibling-merge, passthrough-collapse, and
+bridge-coherence comparisons are directly valid without cross-depth
+down-projection; it is also held coherent with the minimum-cluster-size
+floor so that each fitted leaf remains outside the regime in which the
+vMF concentration estimate becomes statistically unreliable
+(Chapter~\ref{ch:methodology}).
+MRL guarantees that the fixed prefix is a faithful lower-dimensional
+representation, so the splitting decision at depth $\ell$ is not
+confounded by the dimensional truncation artefacts that would arise
+from na\"ively slicing a standard embedding.
+
+\subsection*{Cost-Based Hierarchical Splitting}
+
+Classical hierarchical clustering algorithms---single linkage, average
+linkage, complete linkage---are specified procedurally rather than in
+terms of an objective function, making it impossible to reason about
+whether a given tree is near-optimal or to compare competing algorithms
+on principled grounds~\parencite{dasgupta2016cost}.
+Dasgupta introduced a cost function over binary trees that resolves this:
+given a weighted similarity graph $G = (V, E, w)$, the cost penalises
+partitions that separate similar item pairs high in the tree---cutting a
+high-weight edge at the root incurs a penalty proportional to $n$, whereas
+cutting it near a leaf incurs a penalty close to $1$~\parencite{dasgupta2016cost}.
+Dasgupta proved three properties of this cost function.
+First, on planted-partition data it behaves optimally in expectation,
+recovering the ground-truth clusters because any non-laminar top split
+incurs excess expected cost proportional to the inter-cluster separation.
+Second, the optimal tree is NP-hard to compute exactly.
+Third, the greedy top-down heuristic---repeatedly finding an
+approximate sparsest cut and recursing---achieves an
+$O(\alpha_n \log n)$ approximation ratio, where $\alpha_n$ is the
+approximation factor of the sparsest-cut oracle~\parencite{dasgupta2016cost}.
+
+Critically for taxonomy induction, the Dasgupta cost provides a
+formally grounded objective for evaluating competing hierarchies: a
+proposed split is geometrically motivated when it yields a measurable
+decrease in the cost function, in contrast to heuristic thresholds
+such as TaxoGen's Davies--Bouldin criterion, which lack a
+tree-global optimality interpretation.
+The Dasgupta framework does not itself define a local stopping rule;
+the normalised cost-delta threshold used as a split-acceptance
+criterion in TaxoArena is an adaptation introduced in this thesis
+and formalised in Chapter~\ref{ch:methodology}.
+
+\subsection*{Evaluation Metrics for Hierarchies}
+
+Hierarchy-aware classification metrics such as hierarchical precision,
+recall, and $h\!F_\beta$ penalise a misassignment in proportion to its
+taxonomic distance from the true node, by comparing the
+\textit{augmented label sets} (the label and all its ancestors) of the
+predicted and true nodes~\parencite{kosmopoulos2015hmetrics}.
+These measures apply equally to tree and DAG taxonomies, but they are
+\textit{reference-dependent}: they require a gold hierarchy against
+which predictions are scored.
+No gold DAG is defined for a corpus-induced taxonomy over MMLU-Pro,
+so this thesis validates structural quality primarily through
+reference-free coherence metrics---purity, silhouette, Dasgupta cost,
+and balance measures---as specified in
+Chapter~\ref{ch:experimental-design}.
+
+\bigskip
+\noindent
+The literature reviewed in this section identifies three requirements
+for the taxonomy construction component of an LLM evaluation framework:
+a node model that statistically characterises cluster geometry (vMF);
+a splitting criterion with a formal objective function rather than a
+heuristic threshold (Dasgupta cost); and an embedding space in which
+both coarse and fine-grained distinctions are geometrically resolvable
+(MRL).
+The supervised classification literature (HiAGM, HiTIN) requires an
+editorial hierarchy as input and therefore cannot serve as a construction
+method.
+The unsupervised induction literature (TaxoGen, CoRel) operates at the
+term level, lacks a formal splitting criterion, and does not produce a
+statistical node model.
+These gaps jointly define the requirements for a query-level unsupervised
+taxonomy construction method: a statistical node model over directional
+embeddings, a formally grounded splitting criterion, and a multi-scale
+embedding space.
+
+
+
+\section{LLM-as-a-Judge and Reliability}\label{sec:llm-as-a-judge}
+
+As human evaluation becomes a scalability bottleneck, the LLM-as-a-judge
+paradigm has emerged as the dominant approach to automated assessment of
+model outputs~\parencite{zheng2023judging}.
+This approach leverages the high-level reasoning capabilities of frontier
+models to evaluate the semantic quality of candidate responses; its
+reliability properties---and the conditions under which they hold---are
+therefore directly relevant to any evaluation framework that delegates
+comparison to an automated judge.
+
+\subsection*{The Judge Paradigm}
+
+The foundational distinction in automated judging is between
+\textit{pointwise} and \textit{pairwise} evaluation.
+Pointwise evaluation asks a judge model to assign an absolute score to a
+single response; pairwise evaluation presents two responses simultaneously
+and asks for a preference judgment~\parencite{zheng2023judging}.
+Zheng et al.\ introduced MT-Bench and Chatbot Arena to benchmark these
+paradigms against human preference, finding that pairwise evaluation
+achieves higher agreement with human raters and is more robust to
+prompt-formatting variation---a direct consequence of the relative nature
+of the task reducing the cognitive load of score calibration.
+The superior calibration of pairwise judgments is the primary empirical
+justification for preferring pairwise arena evaluation over pointwise
+scoring in automated benchmarks.
+
+\subsection*{Systematic Biases}
+
+A significant challenge in pairwise automated evaluation is the
+presence of systematic biases that distort preferences independently
+of response quality.
+
+\begin{itemize}
+    \item \textbf{Positional bias.}
+    Judges tend to favour the response presented first in the prompt,
+    independently of content~\parencite{zheng2024judging}.
+    Zheng et al.\ found that GPT-4 agreed with itself on only 85\% of
+    cases when the position of two responses was swapped, implying that
+    up to 15\% of pairwise outcomes are position-driven rather than
+    quality-driven.
+
+    \item \textbf{Verbosity bias.}
+    Models consistently assign higher scores to longer responses, even
+    when the additional content adds no reasoning
+    depth~\parencite{li2024verbosity, chen2024verbosity}.
+    This confound is particularly acute in knowledge-intensive QA,
+    where a model can pad a correct but terse answer with
+    confident-sounding elaboration to win a preference judgment it
+    should not have won.
+
+    \item \textbf{Self-preference bias.}
+    LLMs exhibit a tendency to favour outputs stylistically similar to
+    their own training distribution~\parencite{wataoka2025selfpreference}.
+    Recent evidence characterises this as a familiarity bias: a model
+    assigns lower perplexity to outputs close to its own distribution and
+    translates that fluency signal into a preference judgment, effectively
+    rewarding self-similarity rather than correctness.
+\end{itemize}
+
+Mitigation strategies include position-swapping with consistency checks,
+length-normalised scoring, and group-based polling to average out
+idiosyncratic preferences~\parencite{zheng2024judging}.
+Positional bias is the most tractable of the three: a single
+swap-and-consistency-check protocol identifies and discards
+position-driven verdicts at low cost.
+Verbosity bias is partially tractable through domain-specific prompt
+engineering that makes evaluation criteria explicit, though the
+effectiveness of this mitigation is an empirical question in any
+given domain.
+Self-preference bias remains the least tractable: it is structural
+rather than prompt-addressable, and its magnitude varies with the
+distance between the judging model's training distribution and
+those of the evaluated models.
+
+\subsection*{Domain Calibration}
+
+A judge prompted with a generic instruction to ``prefer the better
+answer'' applies implicit quality criteria drawn from its training
+distribution, which may not align with the domain-specific standards
+relevant to the query~\parencite{databricks2025memalign}.
+This misalignment is not merely a calibration error in the statistical
+sense; it changes the semantic content of the preference judgment.
+In mathematical reasoning, for instance, a judge without domain
+conditioning will prefer a fluent but incorrect derivation over a
+terse but correct one, conflating presentation quality with
+mathematical validity.
+
+Two recent approaches address this.
+\textit{MemAlign}~\parencite{databricks2025memalign} aligns synthetic
+judges with domain-specific standards using a dual-memory system: a
+semantic memory that stores general evaluation principles and an episodic
+memory that stores specific edge-case examples, together calibrating the
+judge against as few as 30--50 human gold labels without weight updates.
+\textit{Judge-wise Reinforcement Learning}~\parencite{huang2025thinkj}
+rewards the judge for providing explicit chain-of-thought justifications
+that are consistent with the final preference, making the evaluation
+process auditable and reducing the proportion of preference reversals
+attributable to surface features.
+Both approaches confirm that domain-specific judge conditioning
+substantially improves alignment with human expert ratings, at the cost
+of requiring either labelled examples or a reasoning-capable judge model.
+
+This defines a gap between the full MemAlign pipeline (which
+requires human preference labels) and the setting that arises in
+TaxoArena: the judge-generation phase has access to MMLU-Pro
+reference answers from the construction set but not to human
+preference annotations, while the arena evaluation phase has access
+to neither---a \textit{reference-informed, answer-key-blind} design
+that has not been systematically studied in the literature.
+
+
+\bigskip
+\noindent
+The three biases and the domain-calibration requirement jointly define
+the constraints on the judge design in any pairwise arena framework.
+Positional bias motivates presentation-order randomisation and
+consistency filtering.
+Verbosity bias motivates explicit per-domain evaluation criteria that
+do not reward length---though the assumption that prompt-level criteria
+suppress this bias must be validated empirically rather than asserted.
+Self-preference bias is acknowledged as a residual structural limitation
+that cannot be eliminated without rotating judge models.
+Together they motivate a taxonomy-unsupervised, reference-conditioned
+guideline-generation mechanism, specified in
+Chapter~\ref{ch:system-architecture}, that occupies a position between
+keyword-based centroid descriptions (no semantic calibration) and
+MemAlign (requires gold labels); whether it achieves adequate
+calibration is an empirical question rather than a structural
+guarantee.
+
+The pairwise preference observations produced by such a judge---one
+verdict per comparison, with ties represented as half-wins to each
+model, following the tie-as-half-win convention introduced for
+paired-comparison models by Davidson~\parencite{davidson1970ties}---constitute
+the observations consumed by the ranking models reviewed in the
+following section.
+
+
+
+\section{Pairwise Ranking Models}\label{sec:ranking-models}
+
+This section reviews the statistical foundations of pairwise ranking,
+establishes the limitations of the dominant scalar approach, and
+contextualises active scheduling within the theoretical literature on
+sample-efficient ranking.
+
+\subsection*{Elo and Its Limitations}
+
+The foundational framework for comparative evaluation is the \textit{Elo
+rating system}~\parencite{elo1978rating}.
+Developed for zero-sum games like chess, it assumes that an agent's performance
+is a random variable centred around a latent skill level $R$.
+The probability $E_A$ of agent $A$ defeating agent $B$ follows a logistic
+distribution~\parencite{ostasiewicz2022evaluation}:
+\begin{equation}
+    E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}
+    \label{eq:elo-expected}
+\end{equation}
+While Elo is robust for tracking stable skill levels over time, it suffers from
+several weaknesses in LLM evaluation contexts.
+It assumes static skill between matches and does not explicitly model uncertainty,
+leading to ranking instability in populations with high variance or sparse
+interaction data~\parencite{boubdir2024elo}.
+Furthermore, Elo ratings are fundamentally transitive, meaning they assume that
+if $A \succ B$ and $B \succ C$, then $A \succ C$; research indicates that LLMs
+frequently exhibit non-transitive preferences, rendering linear Elo leaderboards
+statistically misleading~\parencite{boubdir2024elo}.
+
+\subsection*{Bradley--Terry and Bayesian Extensions}
+
+The \textit{Bradley--Terry} (BT) model provides the formal probabilistic
+link for pairwise preferences, modelling the merit of each model as a
+latent parameter $\lambda_i > 0$~\parencite{bradley1952rank}.
+The probability that model $i$ is preferred over model $j$ is
+\begin{equation}
+    P(i \succ j) = \frac{\lambda_i}{\lambda_i + \lambda_j}
+    = \sigma(\theta_i - \theta_j),
+    \label{eq:bt}
+\end{equation}
+where $\theta_i = \log \lambda_i$ and $\sigma$ is the logistic function.
+The log-likelihood is strictly concave in $(\theta_i)$, and the MLE
+$\hat{\boldsymbol{\theta}}$ is obtained via iterative re-weighted least
+squares (IRLS) or the MM algorithm~\parencite{bradley1952rank}.
+The asymptotic covariance of $\hat{\boldsymbol{\theta}}$ is the inverse of
+the Fisher information matrix, yielding per-parameter standard errors
+$\hat{\sigma}_i$.
+A necessary condition for identifiability is that the comparison graph---the
+graph in which each node is a model and each edge represents at least one
+observed comparison---is connected; if the graph decomposes into two or more
+components, BT parameters are identified only up to an additive constant
+per component and cross-component comparisons cannot be
+inferred~\parencite{bradley1952rank}.
+
+This identifiability requirement is non-trivial in per-domain arenas,
+where the query pool at a leaf may be small and not all model pairs
+are guaranteed to receive a comparison; yet it becomes a structural
+advantage of the per-domain decomposition in TaxoArena: by restricting
+the comparison graph to the small, semantically coherent query pool of
+a single leaf, the bootstrap phase needs only $\binom{M}{2}$ initial
+comparisons---one per pair---to guarantee connectivity, a number that
+is tractable even for leaves with modest query populations.
+Graph connectivity is necessary but not sufficient for a finite
+unregularised MLE to exist: complete separation (one model
+winning every comparison against another) prevents convergence of
+the MM algorithm; the regularisation strategy used to handle this
+case is specified in Chapter~\ref{ch:methodology}.
+
+Bayesian rating systems such as
+\textit{TrueSkill}~\parencite{herbrich2007trueskill} and the
+Weng--Lin approximations implemented in
+OpenSkill~\parencite{weng2011bayesian, joshy2024openskill} represent
+skill as a Gaussian with explicit uncertainty and converge faster than
+Elo by weighting each match by its information gain.
+Their online-update design targets streaming match data; for a
+fixed-budget batch arena, the BT MLE with Fisher standard errors
+provides the same uncertainty quantification within a simpler and more
+interpretable estimation framework.
+
+\subsection*{Active Ranking and Sample Complexity}
+
+The na\"ive strategy for recovering a full ranking of $M$ models using pairwise
+comparisons is round-robin evaluation, requiring $\binom{M}{2}$ comparison
+pairs per leaf.
+\textit{Active ranking} addresses this by selecting, at each step, the
+comparison most likely to reduce global ranking uncertainty.
+
+The theoretical basis for this approach was established by Jamieson and
+Nowak~\parencite{jamieson2011activeranking}, who showed that if $n$ items can
+be embedded in a $d$-dimensional metric space consistent with the ranking, then
+a sequentially adaptive algorithm recovers the full ranking using only
+$O(d \log n)$ pairwise comparisons on average---an exponential reduction over
+the $\Theta(n^2)$ required by non-adaptive strategies.
+The same work proves that \textit{random} (non-adaptive) sampling requires
+almost all $\binom{n}{2}$ comparisons to identify the ranking with
+reasonable probability, establishing a fundamental separation between adaptive
+and non-adaptive query selection.
+The metric-space embedding assumption underlying this result---that model
+capabilities can be represented as points in a low-dimensional Euclidean
+space whose order is consistent with the true ranking---is an idealisation.
+LLM capabilities are likely not perfectly embeddable in a fixed
+low-dimensional metric space; restricting the ranking problem to a
+semantically coherent sub-domain reduces the effective intrinsic
+dimensionality and makes the metric-space assumption more defensible,
+which is a requirement for the theoretical guarantee to be practically
+meaningful.
+
+For the stochastic setting---where comparison outcomes are noisy Bernoulli
+random variables, as in an LLM judge---Heckel et al.~\parencite{heckel2019activeranking}
+derive finite-sample bounds under the Bradley--Terry model directly.
+Their main result characterises the number of comparisons required to
+distinguish two adjacent models in the ranking with error probability $\delta$:
+the sample complexity scales as $O(\Delta^{-2} \log(M/\delta))$, where
+$\Delta$ is the minimum separation between consecutive BT parameters.
+Two consequences follow.
+First, pairs whose BT parameters are close together require
+disproportionately many comparisons; a uniform budget allocation is
+therefore inefficient.
+Second, a confidence-interval-based allocation rule---scheduling
+comparisons for the pair with the largest overlap in BT confidence
+intervals---is near-optimal in the sense that it achieves the
+$O(\Delta^{-2} \log(M/\delta))$ bound without knowledge of
+$\Delta$~\parencite{heckel2019activeranking}.
+Heckel et al.\ further establish that imposing a parametric model (BTL,
+Thurstone) offers at most $O(\log n)$ improvement over non-parametric
+adaptive strategies for stochastic comparisons, indicating that the
+primary practical advantage of the BT model lies in its interpretability
+and its natural provision of a convergence criterion via standard errors,
+rather than in any asymptotic sample-complexity gain.
+
+\subsection*{Multidimensional Ranking and Intransitivity}
+
+A significant structural barrier in model evaluation is the presence of cyclic
+dominance, the ``Rock-Paper-Scissors'' effect, which occurs when models have
+specialised capabilities that excel in certain domains but fail in others,
+violating the transitivity assumption of scalar
+models~\parencite{balduzzi2018melo}.
+To model these interactions, current research utilises vectorised approaches.
+\textit{mELO}~\parencite{balduzzi2018melo} utilises Hodge Decomposition to
+separate model interactions into a transitive (scalar) component and a cyclic
+(skew-symmetric) component, allowing more accurate win-rate predictions where
+models exhibit diverse, niche strategies.
+The \textit{Blade-Chest model}~\parencite{chen2016bladechest} infers a
+$d$-dimensional representation for each model, modelling ``offence'' and
+``defence'' separately; by learning a dataset-specific metric space, it can
+represent any pairwise stochastic preference relation~\parencite{liu2024probabilistic}.
+Both approaches confirm that a single global ranking cannot faithfully
+represent the capability profile of models that excel in some domains
+and fail in others, and that direct interaction modelling can lead to more accurate predictions of pairwise outcomes.
+
+\bigskip
+\noindent
+Taken together, the ranking literature identifies three requirements for
+an arena evaluation framework: a probabilistic pairwise model with explicit
+uncertainty quantification and a connected comparison graph as a
+precondition for identifiability; an adaptive scheduler that concentrates
+comparisons on the hardest-to-distinguish pairs, achieving near-optimal
+sample complexity without knowledge of the true parameter separations; and
+a per-domain decomposition that makes the transitivity assumption locally
+defensible and reduces the effective dimensionality required by the
+Jamieson--Nowak metric-space bound.
+These requirements directly motivate the routing use case examined in
+Section~\ref{sec:routing}.
+
+
+\section{Query Routing as the Target Use Case}\label{sec:routing}
+
+This section frames query routing as the downstream task that per-domain
+capability profiles are designed to enable.
+It reviews the evidence that global rankings are insufficient for routing,
+surveys the learned routing systems that would consume per-domain profiles,
+and identifies the gap---the absence of a principled method for producing
+those profiles---that motivates the contribution of this thesis.
+
+\subsection*{The Routing Problem in Agentic Systems}
+
+In multi-model agentic systems, a query is dispatched to one of several
+candidate models based on an estimate of which model will perform best
+on that query.
+The optimal dispatch policy requires knowledge of each model's
+domain-conditional performance: if model $A$ outperforms model $B$ on
+mathematical reasoning but underperforms on legal analysis, a global
+ranking that averages across domains will systematically mis-route
+queries at both extremes.
+
+This observation motivates the concept of \textit{domain-centric
+evaluation}~\parencite{raju2024constructing}, in which a model's
+performance is disaggregated by subject matter rather than reported
+as a single aggregate score.
+Raju et al.\ demonstrate this on chat-assistant evaluation: by
+constructing high-separability domain-specific evaluation sets---using
+manual seed curation combined with embedding-based clustering---they
+show that model rankings are not stable across domains, and that a
+router informed by per-domain scores substantially reduces
+response-quality variance relative to global-rank routing.
+Meimandi and collaborators extend this to the agentic setting,
+framing the problem as \textit{positioning}: finding the domain
+sub-space in which each model occupies the highest-ranked
+position~\parencite{meimandi2025positioning}.
+Both bodies of work share a common dependency: they require that
+per-domain scores already exist and that the domain taxonomy is
+either given or constructed by hand, which limits reproducibility
+and scalability.
+
+\subsection*{Learned Routing from Preference Data}
+
+The cost-quality trade-off in model selection has motivated a parallel
+line of work on \textit{learned routers} that predict, prior to
+generation, which model will produce the preferred response.
+\textit{FrugalGPT}~\parencite{chen2023frugalgpt} operationalises this
+as a cascade: it queries an ordered sequence of models of increasing
+capability and stops when a learned confidence estimator judges the
+current response to be reliable, achieving reductions in inference
+cost of up to 98\% at matched accuracy on several NLP tasks by
+reserving the strongest model for the fraction of queries that require it.
+
+\textit{RouteLLM}~\parencite{ong2024routellm} addresses the same
+cost-quality trade-off through a trained binary routing function rather
+than a cascade.
+It trains four router architectures---a similarity-weighted Bradley--Terry
+model, a matrix factorisation model, a BERT classifier, and a causal LLM
+classifier---on 80K pairwise preference judgements from Chatbot Arena,
+learning to predict the probability that the stronger model wins on a
+given query.
+The similarity-weighted BT router is the most directly interpretable
+of the four architectures: it computes query-similarity-weighted BT
+coefficients at inference time and uses the resulting win probability
+as the routing signal, making its inputs---per-domain BT scores over
+a representative query set---explicit rather than latent.
+A critical finding is that routers trained solely on the global Arena
+preference distribution generalise poorly to domain-specific benchmarks
+such as MMLU and GSM8K, with performance close to random; significant
+improvement requires augmenting the training data with in-domain
+preference labels~\parencite{ong2024routellm}.
+This result is directly relevant to the motivation for per-domain
+profiling: a globally trained BT model does not encode the
+domain-conditional capability variation that accurate routing requires.
+
+\subsection*{Embedding-Based Model Selection}
+
+A complementary approach bypasses the preference-data requirement
+by representing models as embeddings in a learned query-performance
+space.
+\textit{EmbedLLM}~\parencite{zhuang2024embedllm} represents each model
+as a compact feature vector derived from its performance on a set of
+representative prompts, and routes new queries to the model whose
+embedding is geometrically closest to the query in a learned
+correctness space.
+\textit{UniRoute}~\parencite{somerstep2025uniroute} generalises this
+by learning a joint query-model embedding space in which routing reduces
+to a dot-product operation, enabling sub-millisecond dispatch at
+inference time.
+Both systems require an initialisation step in which each model is
+characterised over a representative query set; the quality of the
+resulting profile determines the upper bound on routing accuracy.
+
+A limitation shared by FrugalGPT, RouteLLM, EmbedLLM, and UniRoute
+is that the domain structure over which models are profiled is either
+absent (global ranking) or predefined by the benchmark used to construct
+the training set.
+None of these systems provide a method for inductively deriving the
+domain taxonomy from the query corpus itself, nor do they produce
+statistically characterised per-domain profiles that can be validated
+for coherence independently of routing accuracy.
+These two absences define the gap between the learned routing literature
+and the problem addressed in this thesis.
+
+\section*{Synthesis: Five Gaps and One Compound Problem}
+
+The five bodies of literature reviewed in this chapter converge on a
+single compound problem.
+Static benchmarks fail because their corpus and categorical structure
+are fixed at construction time, making them unable to track the
+capability frontier~(\S\ref{sec:benchmarks}).
+Taxonomy construction methods from NLP either require an editorial
+hierarchy as supervision or operate at the term level without a
+formal splitting criterion, and neither provides a statistical node
+model~(\S\ref{sec:taxonomy-construction}).
+LLM judges exhibit systematic positional, verbosity, and
+self-preference biases that are partially---but not fully---addressable
+through prompt engineering, and domain calibration without gold labels
+remains an open problem~(\S\ref{sec:llm-as-a-judge}).
+Pairwise ranking models provide the statistical foundations for
+per-domain arenas, but their sample-efficiency guarantees depend on a
+metric-space assumption that is only locally defensible within
+semantically coherent sub-domains~(\S\ref{sec:ranking-models}).
+Learned routing systems require per-domain capability profiles that
+no existing system can produce without presupposing a fixed
+taxonomy~(\S\ref{sec:routing}).
+
+TaxoArena addresses this compound problem through two integrated
+contributions: a label-bootstrapped, corpus-induced geometric
+taxonomy---seeded from MMLU-Pro ground-truth labels as a warm start
+but refined entirely by embedding geometry, and admitting
+polyhierarchy only through gated bridge insertion rather than through
+unconstrained soft membership---that produces the coherent sub-domains
+required by both the ranking model and the domain judge; and a
+reference-informed, answer-key-blind arena that produces the
+per-domain profiles required by routing.
+An active, uncertainty-driven scheduler keeps the judge-call cost of
+the arena tractable within each leaf's comparison graph, but is
+treated as a supporting mechanism for the second contribution rather
+than as an independent contribution in its own right (see
+Section~\ref{sec:research-goal}).
+The system design is specified in Chapter~\ref{ch:system-architecture};
+the formal foundations are derived in Chapter~\ref{ch:methodology}.
