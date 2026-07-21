@@ -186,14 +186,14 @@ data class SnapshotSettings(
             deltaAssign = deltaAssign,
             maxLeafAssignments = maxLeafAssignments,
             refitMuPerIteration = refitMuPerIteration,
+            tauKappaScalingFactor = tauKappaScalingFactor,
             dagMode = dagMode,
             emaAlpha = emaAlpha
         ),
         diagnostics = EffectiveConfig.Diagnostics(
             secondaryMassFloor = secondaryMassFloor,
             bridgeSupportFloor = bridgeSupportFloor,
-            bridgeSupportRelFraction = bridgeSupportRelFraction,
-            tauKappaScalingFactor = tauKappaScalingFactor
+            bridgeSupportRelFraction = bridgeSupportRelFraction
         )
     )
 }
@@ -519,7 +519,7 @@ class TaxonomySnapshotManager(
             deltaAssign = config.formalism.deltaAssign,
             maxLeafAssignments = config.formalism.maxLeafAssignments,
             refitMuPerIteration = config.formalism.refitMuPerIteration,
-            tauKappaScalingFactor = config.diagnostics.tauKappaScalingFactor,
+            tauKappaScalingFactor = config.formalism.tauKappaScalingFactor,
             dagMode = config.formalism.dagMode,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

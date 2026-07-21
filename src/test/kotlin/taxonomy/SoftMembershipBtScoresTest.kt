@@ -7,7 +7,7 @@ import taxonomy.service.DomainEvaluation
 import taxonomy.model.QueryBenchmarkResult
 import taxonomy.service.ValidationService
 
-class SoftMembershipAndPrefixPriorTest {
+class SoftMembershipBtScoresTest {
 
     @Test
     fun testSoftAdaptedBtScoresWithWeightedMemberships() {

@@ -66,6 +66,7 @@ data class EffectiveConfig(
         val refitMuPerIteration: Boolean = false,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
+        val tauKappaScalingFactor: Double = 0.0,
         val defaultKappaPrior: Double = 10.0
     )
 
@@ -73,7 +74,6 @@ data class EffectiveConfig(
     data class Diagnostics(
         val secondaryMassFloor: Double = 5.0,
         val bridgeSupportFloor: Double = 50.0,
-        val bridgeSupportRelFraction: Double = 0.10,
-        val tauKappaScalingFactor: Double = 0.0
+        val bridgeSupportRelFraction: Double = 0.10
     )
 }

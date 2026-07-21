@@ -122,6 +122,7 @@ class TaxonomyConfig {
 
         var fusionSimilarityThreshold: Double = 0.92
         var effectiveSupportFloor: Double = 2.0
+        var tauKappaScalingFactor: Double = 0.0
         var defaultKappaPrior: Double = 10.0
     }
 
@@ -131,7 +132,6 @@ class TaxonomyConfig {
         var secondaryMassFloor: Double = 5.0
         var bridgeSupportFloor: Double = 50.0
         var bridgeSupportRelFraction: Double = 0.10
-        var tauKappaScalingFactor: Double = 0.0
     }
 
     fun formatConfigReport(): String {
@@ -207,13 +207,13 @@ class TaxonomyConfig {
             refitMuPerIteration = formalism.refitMuPerIteration,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
+            tauKappaScalingFactor = formalism.tauKappaScalingFactor,
             defaultKappaPrior = formalism.defaultKappaPrior
         ),
         diagnostics = EffectiveConfig.Diagnostics(
             secondaryMassFloor = diagnostics.secondaryMassFloor,
             bridgeSupportFloor = diagnostics.bridgeSupportFloor,
-            bridgeSupportRelFraction = diagnostics.bridgeSupportRelFraction,
-            tauKappaScalingFactor = diagnostics.tauKappaScalingFactor
+            bridgeSupportRelFraction = diagnostics.bridgeSupportRelFraction
         )
     )
 
@@ -252,12 +252,12 @@ class TaxonomyConfig {
         formalism.refitMuPerIteration = c.formalism.refitMuPerIteration
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
+        formalism.tauKappaScalingFactor = c.formalism.tauKappaScalingFactor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
 
         diagnostics.secondaryMassFloor = c.diagnostics.secondaryMassFloor
         diagnostics.bridgeSupportFloor = c.diagnostics.bridgeSupportFloor
         diagnostics.bridgeSupportRelFraction = c.diagnostics.bridgeSupportRelFraction
-        diagnostics.tauKappaScalingFactor = c.diagnostics.tauKappaScalingFactor
     }
 }
 

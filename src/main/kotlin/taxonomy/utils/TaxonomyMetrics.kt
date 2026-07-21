@@ -192,8 +192,8 @@ class TaxonomyMetrics(
             }
         }
 
-        val queryToPrimaryLeaf = queryToLeavesList.mapValues { (_, ll) ->
-            ll.maxByOrNull { it.vmfKappa } ?: ll.first()
+        val queryToPrimaryLeaf = queryToLeavesList.mapValues { (queryText, ll) ->
+            ll.maxByOrNull { it.queryWeights[queryText] ?: 0.0 } ?: ll.first()
         }
 
         // NMI/ARI: collapse predicted assignment to depth-1 ancestor label so both
@@ -454,7 +454,7 @@ class TaxonomyMetrics(
         val leafQ = queryToLeavesList.keys
         for (text in leafQ) {
             val gtCat       = gt[text] ?: continue
-            val primaryLeaf = queryToLeavesList[text]?.maxByOrNull { it.vmfKappa } ?: continue
+            val primaryLeaf = queryToLeavesList[text]?.maxByOrNull { it.queryWeights[text] ?: 0.0 } ?: continue
             if (getDepth1Ancestors(primaryLeaf, policy).any { it.equals(gtCat, ignoreCase = true) }) recovered++
         }
         val recall = if (leafQ.isNotEmpty()) recovered.toDouble() / leafQ.size else 1.0

@@ -163,7 +163,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.secondaryMassFloor?.let { config.diagnostics.secondaryMassFloor = it }
         cliConfig.bridgeSupportFloor?.let { config.diagnostics.bridgeSupportFloor = it }
         cliConfig.bridgeSupportRelFraction?.let { config.diagnostics.bridgeSupportRelFraction = it }
-        cliConfig.tauKappaScalingFactor?.let { config.diagnostics.tauKappaScalingFactor = it }
+        cliConfig.tauKappaScalingFactor?.let { config.formalism.tauKappaScalingFactor = it }
         cliConfig.deltaAssign?.let { config.formalism.deltaAssign = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
         cliConfig.refitMuPerIteration?.let { config.formalism.refitMuPerIteration = it }
@@ -1182,7 +1182,6 @@ class HeadlessBenchmarkRunner(
         var enableResidualRouting: Boolean? = null
         var enableResidualSplitGate: Boolean? = null
         var enableBridging: Boolean? = null
-        var hdlssThreshold: Double? = null
         var fusionSimilarityThreshold: Double? = null
         var effectiveSupportFloor: Double? = null
         var secondaryMassFloor: Double? = null
@@ -1195,7 +1194,6 @@ class HeadlessBenchmarkRunner(
         var dagMode: String? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
-        var tauFunnelFloor: Double? = null
         var defaultKappaPrior: Double? = null
         var runBaselines = true
 
@@ -1276,6 +1274,7 @@ class HeadlessBenchmarkRunner(
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "defaultKappaPrior" -> defaultKappaPrior = rawVal.toDouble()
                 "runBaselines" -> runBaselines = rawVal.toBoolean()
+                else -> log.warn("[CONFIG WARN] Unknown or deprecated configuration key in TOML file: '$key' = '$rawVal'")
             }
         }
         return HeadlessCliConfig(
@@ -1360,7 +1359,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.assignmentCosineGap,
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,
-            config.diagnostics.tauKappaScalingFactor,
+            config.formalism.tauKappaScalingFactor,
             config.formalism.dagMode,
             config.formalism.emaAlpha,
             config.formalism.refitMuPerIteration,
