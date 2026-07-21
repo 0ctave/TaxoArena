@@ -35,35 +35,19 @@ runTrickle     = true
 judgeInduction = false
 enableLabeling = false
 
-# ── Core formalism ──────────────────────────────────────────────────────────
-maxDepth          = 8
-minClusterSize    = 15
-separationEpsilon = 0.08
-cosineTau         = 2.0
-tauFunnelFloor    = 0.90
-assignmentGap     = 0.05
-emaAlpha          = 0.7
+# ── Mode Switch: DAG_MAX ──────────────────────────────────────────────────────
+dagMode = "DAG_MAX"
 
-# ── DAG-Max flags: ALL ON ─────────────────────────────────────────────────────
-enableStableQuestionIds = true
-enableResidualRouting   = true
-enableResidualSplitGate = true
-enableBridging          = true
-
-# ── DAG-Max parameters ────────────────────────────────────────────────────────
-routeConfidenceTau      = 0.5
-bridgeSeparationCeiling = 0.20
-bridgeEntropyCap        = 1.05
-bridgeMaxArity          = 2
-bridgeParentBudget      = 1
-maxBridgeNodes          = 14
-maxBridgesPerDomainPair = 2
-bridgeCandidateTopK     = 10
-minBridgeCoverage       = 30  # 2 * minClusterSize = 30
+# ── Formalism Parameters ──────────────────────────────────────────────────────
+maxDepth                  = 8
+minClusterSize            = 15
+separationEpsilon         = 0.08
+routingSoftmaxTau         = 1.50
+assignmentCosineGap       = 0.15
+deltaAssign               = 0.20
+emaAlpha                  = 0.7
+fusionSimilarityThreshold = 0.92
+effectiveSupportFloor     = 2.0
+defaultKappaPrior         = 10.0
 numIterations           = 15
-
-# ── Adaptive soft-membership params ──────────────────────────────────────────
-assignmentCosineGap     = 0.20  # δ_assign
-deltaAssign             = 0.20  # branch-point descent gating δ_assign
 maxLeafAssignments      = 5
-refitMuPerIteration     = true
