@@ -115,7 +115,7 @@ fun dagDendrogramPurity(
     }
 
     val subtreeCache = HashMap<GraphNode, Set<GraphNode>>()
-    fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n, policy) }
+    fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n, TraversalPolicy.TREE_ONLY) }
 
     var pure = 0
     var total = 0

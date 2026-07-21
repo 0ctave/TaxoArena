@@ -319,7 +319,7 @@ class BridgeDiagnosticsExporter(
                 if (crossDomain) {
                     numPassCrossDomain++
                 }
-                if (secondaryMassSum >= config.formalism.secondaryMassFloor) {
+                if (secondaryMassSum >= config.diagnostics.secondaryMassFloor) {
                     numPassSecondaryMassFloor++
                 }
                 if (cosine in 0.3..0.95) {
@@ -332,8 +332,8 @@ class BridgeDiagnosticsExporter(
                 if (uESS >= 10.0 && vESS >= 10.0 && u.vmfKappa >= 1.0 && v.vmfKappa >= 1.0) {
                     numPassCoherenceGate++
                 }
-                val relFraction = config.formalism.bridgeSupportRelFraction * minOf(uMass, vMass)
-                if (secondaryMassSum >= config.formalism.bridgeSupportFloor && secondaryMassSum >= relFraction) {
+                val relFraction = config.diagnostics.bridgeSupportRelFraction * minOf(uMass, vMass)
+                if (secondaryMassSum >= config.diagnostics.bridgeSupportFloor && secondaryMassSum >= relFraction) {
                     numPassSupportFloor++
                 }
                 val cycleExists = isAncestor(u, v) || isAncestor(v, u)
@@ -353,8 +353,8 @@ class BridgeDiagnosticsExporter(
 
                 // Gate B: Secondary mass floor check
                 if (accepted) {
-                    if (secondaryMassSum < config.formalism.secondaryMassFloor) {
-                        rejectReason = "Shared support mass below soft floor ($secondaryMassSum < ${config.formalism.secondaryMassFloor})"
+                    if (secondaryMassSum < config.diagnostics.secondaryMassFloor) {
+                        rejectReason = "Shared support mass below soft floor ($secondaryMassSum < ${config.diagnostics.secondaryMassFloor})"
                         accepted = false
                     }
                 }
@@ -377,8 +377,8 @@ class BridgeDiagnosticsExporter(
 
                 // Gate E: Strict support floor check
                 if (accepted) {
-                    if (secondaryMassSum < config.formalism.bridgeSupportFloor || secondaryMassSum < relFraction) {
-                        rejectReason = "Strict support floor or relative fraction check failed ($secondaryMassSum < ${config.formalism.bridgeSupportFloor} or < ${(config.formalism.bridgeSupportRelFraction * 100).toInt()}% minLeafMass)"
+                    if (secondaryMassSum < config.diagnostics.bridgeSupportFloor || secondaryMassSum < relFraction) {
+                        rejectReason = "Strict support floor or relative fraction check failed ($secondaryMassSum < ${config.diagnostics.bridgeSupportFloor} or < ${(config.diagnostics.bridgeSupportRelFraction * 100).toInt()}% minLeafMass)"
                         accepted = false
                     }
                 }

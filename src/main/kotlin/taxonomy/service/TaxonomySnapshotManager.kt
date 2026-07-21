@@ -183,15 +183,17 @@ data class SnapshotSettings(
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
             routingSoftmaxTau = routingSoftmaxTau,
-            secondaryMassFloor = secondaryMassFloor,
-            bridgeSupportFloor = bridgeSupportFloor,
-            bridgeSupportRelFraction = bridgeSupportRelFraction,
             deltaAssign = deltaAssign,
             maxLeafAssignments = maxLeafAssignments,
             refitMuPerIteration = refitMuPerIteration,
-            tauKappaScalingFactor = tauKappaScalingFactor,
             dagMode = dagMode,
             emaAlpha = emaAlpha
+        ),
+        diagnostics = EffectiveConfig.Diagnostics(
+            secondaryMassFloor = secondaryMassFloor,
+            bridgeSupportFloor = bridgeSupportFloor,
+            bridgeSupportRelFraction = bridgeSupportRelFraction,
+            tauKappaScalingFactor = tauKappaScalingFactor
         )
     )
 }
@@ -511,13 +513,13 @@ class TaxonomySnapshotManager(
             separationEpsilon = config.formalism.separationEpsilon,
             minClusterSize = config.formalism.minClusterSize,
             routingSoftmaxTau = config.formalism.routingSoftmaxTau,
-            secondaryMassFloor = config.formalism.secondaryMassFloor,
-            bridgeSupportFloor = config.formalism.bridgeSupportFloor,
-            bridgeSupportRelFraction = config.formalism.bridgeSupportRelFraction,
+            secondaryMassFloor = config.diagnostics.secondaryMassFloor,
+            bridgeSupportFloor = config.diagnostics.bridgeSupportFloor,
+            bridgeSupportRelFraction = config.diagnostics.bridgeSupportRelFraction,
             deltaAssign = config.formalism.deltaAssign,
             maxLeafAssignments = config.formalism.maxLeafAssignments,
             refitMuPerIteration = config.formalism.refitMuPerIteration,
-            tauKappaScalingFactor = config.formalism.tauKappaScalingFactor,
+            tauKappaScalingFactor = config.diagnostics.tauKappaScalingFactor,
             dagMode = config.formalism.dagMode,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

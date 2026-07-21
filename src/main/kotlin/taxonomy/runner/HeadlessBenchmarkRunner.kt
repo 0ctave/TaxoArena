@@ -160,12 +160,12 @@ class HeadlessBenchmarkRunner(
         cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
         cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
         cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
-        cliConfig.secondaryMassFloor?.let { config.formalism.secondaryMassFloor = it }
-        cliConfig.bridgeSupportFloor?.let { config.formalism.bridgeSupportFloor = it }
-        cliConfig.bridgeSupportRelFraction?.let { config.formalism.bridgeSupportRelFraction = it }
+        cliConfig.secondaryMassFloor?.let { config.diagnostics.secondaryMassFloor = it }
+        cliConfig.bridgeSupportFloor?.let { config.diagnostics.bridgeSupportFloor = it }
+        cliConfig.bridgeSupportRelFraction?.let { config.diagnostics.bridgeSupportRelFraction = it }
+        cliConfig.tauKappaScalingFactor?.let { config.diagnostics.tauKappaScalingFactor = it }
         cliConfig.deltaAssign?.let { config.formalism.deltaAssign = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
-        cliConfig.tauKappaScalingFactor?.let { config.formalism.tauKappaScalingFactor = it }
         cliConfig.refitMuPerIteration?.let { config.formalism.refitMuPerIteration = it }
         cliConfig.dagMode?.let {
             config.formalism.dagMode = taxonomy.config.DagMode.valueOf(it.uppercase())
@@ -1360,15 +1360,15 @@ class HeadlessBenchmarkRunner(
             config.formalism.assignmentCosineGap,
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,
-            config.formalism.tauKappaScalingFactor,
+            config.diagnostics.tauKappaScalingFactor,
             config.formalism.dagMode,
             config.formalism.emaAlpha,
             config.formalism.refitMuPerIteration,
             config.formalism.fusionSimilarityThreshold,
             config.formalism.effectiveSupportFloor,
-            config.formalism.secondaryMassFloor,
-            config.formalism.bridgeSupportFloor,
-            config.formalism.bridgeSupportRelFraction
+            config.diagnostics.secondaryMassFloor,
+            config.diagnostics.bridgeSupportFloor,
+            config.diagnostics.bridgeSupportRelFraction
         ).joinToString(",")
         return String.format(java.util.Locale.US, "%08x", raw.hashCode())
     }

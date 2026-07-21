@@ -19,7 +19,8 @@ data class EffectiveConfig(
     val execution: Execution = Execution(),
     val dataset: Dataset = Dataset(),
     val llm: Llm = Llm(),
-    val formalism: Formalism = Formalism()
+    val formalism: Formalism = Formalism(),
+    val diagnostics: Diagnostics = Diagnostics()
 ) {
     @Serializable
     data class Execution(
@@ -65,10 +66,14 @@ data class EffectiveConfig(
         val refitMuPerIteration: Boolean = false,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
+        val defaultKappaPrior: Double = 10.0
+    )
+
+    @Serializable
+    data class Diagnostics(
         val secondaryMassFloor: Double = 5.0,
         val bridgeSupportFloor: Double = 50.0,
         val bridgeSupportRelFraction: Double = 0.10,
-        val tauKappaScalingFactor: Double = 0.0,
-        val defaultKappaPrior: Double = 10.0
+        val tauKappaScalingFactor: Double = 0.0
     )
 }

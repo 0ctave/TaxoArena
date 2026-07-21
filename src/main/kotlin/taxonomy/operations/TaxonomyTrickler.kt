@@ -88,7 +88,7 @@ class TaxonomyTrickler(
             }
 
             // Temperature-scaled softmax with dynamic inverse-variance scaling (tau_i)
-            val gamma = config.formalism.tauKappaScalingFactor.coerceIn(0.0, 1.0)
+            val gamma = config.diagnostics.tauKappaScalingFactor.coerceIn(0.0, 1.0)
             val dynamicTau = config.formalism.routingSoftmaxTau.coerceAtLeast(0.01) * siblingKappa.pow(gamma)
             val tempScores = DoubleArray(scores.size) { scores[it] / dynamicTau }
             val maxTemp = tempScores.maxOrNull() ?: 0.0

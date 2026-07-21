@@ -280,7 +280,7 @@ class TaxonomyMetrics(
 
         // κ profile by depth (renamed field)
         val kappaByDepth = allNodes
-            .filter { it.vmfKappa > 0.0 }
+            .filter { it.vmfKappa > 0.0 && it.queries.isNotEmpty() }
             .groupBy { it.depth }
             .mapValues { (_, nodes) -> nodes.map { it.vmfKappa }.average() }
 
