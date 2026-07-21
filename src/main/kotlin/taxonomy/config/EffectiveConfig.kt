@@ -49,6 +49,7 @@ data class EffectiveConfig(
 
     @Serializable
     data class Formalism(
+        val dagMode: DagMode = DagMode.DAG_MAX,
         val maxDepth: Int = 12,
         val minClusterSize: Int = 25,
         val separationEpsilon: Double = 0.04,
@@ -72,8 +73,8 @@ data class EffectiveConfig(
         val bridgeSupportFloor: Double = 50.0,
         val bridgeSupportRelFraction: Double = 0.10,
         val tauKappaScalingFactor: Double = 0.0,
-        val tauFunnelFloor: Double = 0.90,
+        val tauFunnelFloor: Double = 0.80,
         val defaultKappaPrior: Double = 10.0,
-        val dPrefix: Int = 64
+        val dPrefix: Int = 128
     )
 }

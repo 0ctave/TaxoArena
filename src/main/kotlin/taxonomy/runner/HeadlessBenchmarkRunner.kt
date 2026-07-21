@@ -85,7 +85,8 @@ data class HeadlessCliConfig(
     val deltaAssign: Double? = null,
     val maxLeafAssignments: Int? = null,
     val refitMuPerIteration: Boolean? = null,
-    val tauKappaScalingFactor: Double? = null
+    val tauKappaScalingFactor: Double? = null,
+    val dagMode: String? = null
 )
 
 @Component
@@ -177,6 +178,9 @@ class HeadlessBenchmarkRunner(
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
         cliConfig.tauKappaScalingFactor?.let { config.formalism.tauKappaScalingFactor = it }
         cliConfig.refitMuPerIteration?.let { config.formalism.refitMuPerIteration = it }
+        cliConfig.dagMode?.let {
+            config.formalism.dagMode = taxonomy.config.DagMode.valueOf(it.uppercase())
+        }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
@@ -1199,6 +1203,7 @@ class HeadlessBenchmarkRunner(
         var maxLeafAssignments: Int? = null
         var tauKappaScalingFactor: Double? = null
         var refitMuPerIteration: Boolean? = null
+        var dagMode: String? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
         var tauFunnelFloor: Double? = null
@@ -1281,6 +1286,7 @@ class HeadlessBenchmarkRunner(
                 "maxLeafAssignments" -> maxLeafAssignments = rawVal.toInt()
                 "tauKappaScalingFactor" -> tauKappaScalingFactor = rawVal.toDouble()
                 "refitMuPerIteration" -> refitMuPerIteration = rawVal.toBoolean()
+                "dagMode" -> dagMode = rawVal.trim().trim('"').trim('\'')
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
@@ -1335,6 +1341,7 @@ class HeadlessBenchmarkRunner(
             maxLeafAssignments = maxLeafAssignments,
             tauKappaScalingFactor = tauKappaScalingFactor,
             refitMuPerIteration = refitMuPerIteration,
+            dagMode = dagMode,
             numIterations = numIterations,
             runBaselines = runBaselines
         )
@@ -1377,6 +1384,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,
             config.formalism.tauKappaScalingFactor,
+            config.formalism.dagMode,
             config.formalism.emaAlpha,
             config.formalism.refitMuPerIteration,
             config.formalism.hdlssThreshold,

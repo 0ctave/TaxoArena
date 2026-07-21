@@ -4,6 +4,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
+import java.io.Serializable
+import kotlinx.serialization.Serializable as KotlinxSerializable
+
+@KotlinxSerializable
+enum class DagMode { TREE_BASELINE, DAG_MAX }
 
 /**
  * Defines the thermodynamic constraints and dynamic parameters of the domain inference space.
@@ -112,12 +117,24 @@ class TaxonomyConfig {
         var emaAlpha: Double = 0.7
         val gedThreshold: Double = 0.005
 
-        // ── DAG Maximization flags & parameters ────────────────────────────────
-        var enableStableQuestionIds: Boolean = false
-        var enableResidualRouting: Boolean = false
-        var enableResidualSplitGate: Boolean = false
-        var enableBridging: Boolean = false
-        var refitMuPerIteration: Boolean = false
+        // ── Mode Switch ──────────────────────────────────────────────────────
+        var dagMode: DagMode = DagMode.DAG_MAX
+            set(value) {
+                field = value
+                val isDag = (value == DagMode.DAG_MAX)
+                enableStableQuestionIds = isDag
+                enableResidualRouting = isDag
+                enableResidualSplitGate = isDag
+                enableBridging = isDag
+                refitMuPerIteration = isDag
+            }
+
+        // ── Internal boolean flags (mapped by dagMode, overrideable for regression)
+        var enableStableQuestionIds: Boolean = true
+        var enableResidualRouting: Boolean = true
+        var enableResidualSplitGate: Boolean = true
+        var enableBridging: Boolean = true
+        var refitMuPerIteration: Boolean = true
 
         var hdlssThreshold: Double = 8.0
         var fusionSimilarityThreshold: Double = 0.92
@@ -126,9 +143,9 @@ class TaxonomyConfig {
         var bridgeSupportFloor: Double = 50.0
         var bridgeSupportRelFraction: Double = 0.10
         var tauKappaScalingFactor: Double = 0.0
-        var tauFunnelFloor: Double = 0.90
+        var tauFunnelFloor: Double = 0.80
         var defaultKappaPrior: Double = 10.0
-        var dPrefix: Int = 64
+        var dPrefix: Int = 128
     }
 
     fun formatConfigReport(): String {
@@ -150,25 +167,18 @@ class TaxonomyConfig {
         sb.append("│   - Labeling Model:       ${llm.labelingModel}\n")
         sb.append("│   - Max Judge Generality: ${llm.maxJudgeGenerality}\n")
         sb.append("├── Advanced Mathematical Formalism Controls:\n")
+        sb.append("│   - DAG Mode:             ${formalism.dagMode}\n")
         sb.append("│   - Max Depth:            ${formalism.maxDepth}\n")
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
-        sb.append("│   - Split Threshold:      ${2 * formalism.minClusterSize} (= 2 × minClusterSize)\n")
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
-        sb.append("│   - Cosine Tau (legacy):  ${formalism.cosineTau}\n")
         sb.append("│   - Routing Softmax Tau:  ${formalism.routingSoftmaxTau}\n")
-        sb.append("│   - Leaf Acceptance Scale: ${formalism.leafAcceptanceScale}\n")
-        sb.append("│   - Tau Kappa Scaling Factor: ${formalism.tauKappaScalingFactor}\n")
         sb.append("│   - Assignment Cosine Gap:${formalism.assignmentCosineGap}\n")
         sb.append("│   - Delta Assign:         ${formalism.deltaAssign}\n")
-        sb.append("│   - Max Leaf Assignments: ${formalism.maxLeafAssignments}\n")
         sb.append("│   - EMA Alpha:            ${formalism.emaAlpha}\n")
-        sb.append("│   - HDLSS Threshold:      ${formalism.hdlssThreshold}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
-        sb.append("│   - Sec Mass Floor:       ${formalism.secondaryMassFloor}\n")
-        sb.append("│   - Bridge Support Floor: ${formalism.bridgeSupportFloor}\n")
-        sb.append("│   - Bridge Support Rel Frac: ${formalism.bridgeSupportRelFraction}\n")
-        sb.append("│   - Tau Funnel Floor:     ${formalism.tauFunnelFloor}\n")
+        sb.append("│   - HDLSS Threshold:      ${formalism.hdlssThreshold}\n")
+        sb.append("│   - Default Kappa Prior:  ${formalism.defaultKappaPrior}\n")
         sb.append("└──────────────────────────────────────────────────────────")
         return sb.toString()
     }
@@ -196,6 +206,7 @@ class TaxonomyConfig {
             judgeDomains = llm.judgeDomains
         ),
         formalism = EffectiveConfig.Formalism(
+            dagMode = formalism.dagMode,
             maxDepth = formalism.maxDepth,
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
@@ -244,6 +255,7 @@ class TaxonomyConfig {
         llm.maxJudgeGenerality = c.llm.maxJudgeGenerality
         llm.judgeDomains = c.llm.judgeDomains
 
+        formalism.dagMode = c.formalism.dagMode
         formalism.maxDepth = c.formalism.maxDepth
         formalism.minClusterSize = c.formalism.minClusterSize
         formalism.separationEpsilon = c.formalism.separationEpsilon

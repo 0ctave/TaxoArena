@@ -18,28 +18,25 @@ runPipeline    = true
 runBenchmark   = false
 runTrickle     = true
 judgeInduction = false
-enableLabeling = false
+enableLabeling = true
 
 # ── Core formalism ──────────────────────────────────────────────────────────
 maxDepth          = 8
 minClusterSize    = 40
 separationEpsilon = 0.01
-routingSoftmaxTau = 1.50
+routingSoftmaxTau = 2.0
 leafAcceptanceScale = 1.0
-tauFunnelFloor    = 0.70
+tauFunnelFloor    = 1.0
 emaAlpha          = 0.7
 
 # ── Adaptive soft-membership params (loosened for higher spread) ─────────────
-assignmentCosineGap     = 0.15
-deltaAssign             = 0.20
+assignmentCosineGap     = 0.25
+deltaAssign             = 2.0
 maxLeafAssignments      = 8
 refitMuPerIteration     = true
 
-# ── DAG-Max flags: ALL ON ─────────────────────────────────────────────────────
-enableStableQuestionIds = true
-enableResidualRouting   = true
-enableResidualSplitGate = true
-enableBridging          = true
+# ── Mode Switch: DAG_MAX ──────────────────────────────────────────────────────
+dagMode = "DAG_MAX"
 
 # ── Emergent Router parameters ────────────────────────────────────────────────
 hdlssThreshold = 8.0

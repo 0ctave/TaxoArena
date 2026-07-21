@@ -105,8 +105,7 @@ class TaxonomyTrickler(
             val bestChildResp = rawProbs.maxOrNull() ?: 0.0
             val baseTauAtDepth = when (node.depth) {
                 0, 1 -> 0.999
-                2 -> 0.80
-                else -> config.formalism.tauFunnelFloor.coerceAtMost(0.80)
+                else -> 0.80
             }
             val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
             if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < adaptiveTau) {
