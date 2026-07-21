@@ -13,6 +13,7 @@
 | 7 | L9_003_seed42 | screen | 42 | FAILED | FAILED | 0 | 69.58% | 89.75% | 0.0597 | 0.9986 | 16.00% | 0.3042 | 0.0000 | 0.0968 | 0 |
 | 8 | L9_005_seed42 | screen | 42 | FAILED | FAILED | 0 | 68.28% | 76.89% | 0.1535 | 0.5119 | 7.81% | 0.2553 | 0.0000 | 0.0000 | 0 |
 | 9 | L9_002_seed42 | screen | 42 | FAILED | FAILED | 0 | 68.22% | 81.92% | 0.1054 | 0.7517 | 13.54% | 0.2692 | 0.0000 | 0.0488 | 0 |
+| 10 | L9_001_seed42 | screen | 42 | FAILED | FAILED | 0 | 3.33% | 0.64% | 4.0000 | 0.7597 | 3.36% | 0.5894 | 0.0000 | 0.0000 | 4 |
 
 ## 2. Gate Failure Explanations (Top 10 Runs)
 
@@ -51,6 +52,10 @@
 ### 9. Run: L9_002_seed42
 - **Hard Gate Failures**: DuplicateBridgeCount = 6 > 0; MaxAssignmentCapRate = 0.4081 > 0.2
 - **Soft Gate Failures**: Top1Accuracy = 68.22% < 74.0%; BorderlineRate = 0.7517 outside band [0.2, 0.35]
+
+### 10. Run: L9_001_seed42
+- **Hard Gate Failures**: MaxAssignmentCapRate = 1.2753 > 0.2
+- **Soft Gate Failures**: AvgMatchCount = 0.1755 outside band [1.0, 4.0]; Top1Accuracy = 3.33% < 74.0%; RoutingECE = 4.0000 > 0.15; BorderlineRate = 0.7597 outside band [0.2, 0.35]; CrossAnchorMigrationRate = 0.5894 outside band [0.1, 0.3]; CanonicalAdaptedJaccard = 3913.2531 outside band [0.0, 1.0]
 
 
 ## 3. Categorized Metric Summaries (Top 5 Finalists)

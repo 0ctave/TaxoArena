@@ -552,7 +552,7 @@ def cmd_select(args):
                 migration = float(r.get('CrossAnchorMigrationRate', 0.0))
                 delta_rho = float(r.get('DeltaRhoTotal', 0.0))
                 small_leaf = float(r.get('SmallLeafFraction', 0.0))
-                sb_depth2 = int(r.get('SourceBDepth2Count', 0))
+                sb_depth2 = int(float(r.get('SourceBDepth2Count', 0)))
 
                 bridge_cnt = float(r.get('BridgeCount', 0))
                 leaf_cnt = float(r.get('LeafCount', 0))
