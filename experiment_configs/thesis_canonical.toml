@@ -22,7 +22,7 @@ models        = [
     "Llama-2-13b-hf",
     "Meta-Llama-3-70B-Instruct"
 ]
-category      = "math"
+category      = ""
 queryLimit    = 0
 outputDir     = "experiment_results/thesis_canonical"
 testRatio     = 0.3
@@ -40,8 +40,8 @@ dagMode = "DAG_MAX"
 
 # ── Formalism Parameters ──────────────────────────────────────────────────────
 maxDepth                  = 8
-minClusterSize            = 15
-separationEpsilon         = 0.08
+minClusterSize            = 40
+separationEpsilon         = 0.04
 routingSoftmaxTau         = 1.50
 assignmentCosineGap       = 0.15
 deltaAssign               = 0.20
@@ -49,5 +49,8 @@ emaAlpha                  = 0.7
 fusionSimilarityThreshold = 0.92
 effectiveSupportFloor     = 2.0
 defaultKappaPrior         = 10.0
-numIterations           = 15
-maxLeafAssignments      = 5
+secondaryMassFloor        = 0.5
+bridgeSupportFloor        = 1.0
+bridgeSupportRelFraction  = 0.01
+numIterations             = 35
+maxLeafAssignments        = 5

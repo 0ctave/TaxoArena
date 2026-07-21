@@ -209,8 +209,6 @@ class TaxonomyFitter(
         return weights
     }
 
-    private fun getAdaptiveSliceDim(targetDim: Int, nEffective: Double): Int = 256
-
     fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) {
         val parents = node.parents
         
