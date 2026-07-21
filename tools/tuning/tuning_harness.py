@@ -390,8 +390,8 @@ def cmd_collect(args):
     ledger_rows = []
     bridge_rows = []
     
-    extra_cols = ["run_id", "config_path", "output_dir", "config_sha256", "stage", "seed", 
-                  "assignmentCosineGap", "tauFunnelFloor", "fusionSimilarityThreshold", "splitThreshold"]
+    factor_keys = list(spec.get("factors", {}).keys())
+    extra_cols = ["run_id", "config_path", "output_dir", "config_sha256", "stage", "seed"] + factor_keys
                   
     for r in runs:
         run_id = r["run_id"]
@@ -413,10 +413,8 @@ def cmd_collect(args):
                 row["config_sha256"] = r["config_sha256"]
                 row["stage"] = r["stage"]
                 row["seed"] = seed
-                row["assignmentCosineGap"] = r["factors"]["assignmentCosineGap"]
-                row["tauFunnelFloor"] = r["factors"]["tauFunnelFloor"]
-                row["fusionSimilarityThreshold"] = r["factors"]["fusionSimilarityThreshold"]
-                row["splitThreshold"] = r["factors"]["splitThreshold"]
+                for f_k in factor_keys:
+                    row[f_k] = r.get("factors", {}).get(f_k, "")
                 
                 ledger_rows.append(row)
                 
@@ -522,12 +520,9 @@ def cmd_select(args):
     finalists_csv_path = "tuning/finalists.csv"
     os.makedirs(os.path.dirname(finalists_csv_path), exist_ok=True)
     if ranked:
-        fieldnames = ["run_id", "config_sha256", "stage", "seed", "hard_gates_passed", "soft_gates_passed", "dominance_count", 
-                      "hard_gate_failures", "soft_gate_failures",
-                      "assignmentCosineGap", "tauFunnelFloor", "fusionSimilarityThreshold", "splitThreshold"] + \
-                     [k for k in ranked[0].keys() if k not in ["run_id", "config_sha256", "stage", "seed", "hard_gates_passed", "soft_gates_passed", "dominance_count", 
-                                                              "hard_gate_failures", "soft_gate_failures",
-                                                              "assignmentCosineGap", "tauFunnelFloor", "fusionSimilarityThreshold", "splitThreshold"]]
+        factor_keys = list(spec.get("factors", {}).keys())
+        base_meta_keys = ["run_id", "config_sha256", "stage", "seed", "hard_gates_passed", "soft_gates_passed", "dominance_count", "hard_gate_failures", "soft_gate_failures"]
+        fieldnames = base_meta_keys + factor_keys + [k for k in ranked[0].keys() if k not in base_meta_keys and k not in factor_keys]
         with open(finalists_csv_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()

@@ -61,7 +61,7 @@ def check_soft_gates(row, gates_spec):
     
     # 1. AvgMatchCount band
     avg_match = float(row.get("AvgMatchCount", 0.0))
-    band = gates_spec.get("soft", {}).get("AvgMatchCount_band", [1.05, 1.30])
+    band = gates_spec.get("soft", {}).get("AvgMatchCount_band", [1.5, 4.0])
     if not (band[0] <= avg_match <= band[1]):
         reasons.append(f"AvgMatchCount = {avg_match:.4f} outside band {band}")
         
