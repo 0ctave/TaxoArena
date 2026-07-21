@@ -129,6 +129,7 @@ class TaxonomyConfig {
     var diagnostics: DiagnosticsConfig = DiagnosticsConfig()
 
     class DiagnosticsConfig {
+        var enableBridgeAnalysis: Boolean = false
         var secondaryMassFloor: Double = 5.0
         var bridgeSupportFloor: Double = 50.0
         var bridgeSupportRelFraction: Double = 0.10
@@ -211,6 +212,7 @@ class TaxonomyConfig {
             defaultKappaPrior = formalism.defaultKappaPrior
         ),
         diagnostics = EffectiveConfig.Diagnostics(
+            enableBridgeAnalysis = diagnostics.enableBridgeAnalysis,
             secondaryMassFloor = diagnostics.secondaryMassFloor,
             bridgeSupportFloor = diagnostics.bridgeSupportFloor,
             bridgeSupportRelFraction = diagnostics.bridgeSupportRelFraction
@@ -255,6 +257,7 @@ class TaxonomyConfig {
         formalism.tauKappaScalingFactor = c.formalism.tauKappaScalingFactor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
 
+        diagnostics.enableBridgeAnalysis = c.diagnostics.enableBridgeAnalysis
         diagnostics.secondaryMassFloor = c.diagnostics.secondaryMassFloor
         diagnostics.bridgeSupportFloor = c.diagnostics.bridgeSupportFloor
         diagnostics.bridgeSupportRelFraction = c.diagnostics.bridgeSupportRelFraction

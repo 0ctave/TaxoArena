@@ -332,13 +332,15 @@ class TaxonomyEngine(
             log.info("--- ${config.execution.numIterations}-Iteration Evolution Completed ---")
             ops.printHierarchy(root)
 
-            // Generate and export bridge and soft routing diagnostics
-            try {
-                val exporter = BridgeDiagnosticsExporter(config, datasetFetcher, trickler)
-                val outPath = (ExperimentOutputContext.activeBaseDir ?: File(".")).absolutePath
-                exporter.exportDiagnostics(root, uniqueEmbs, outPath)
-            } catch (e: Exception) {
-                log.warn("Failed to export bridge diagnostics: ${e.message}", e)
+            // Generate and export bridge and soft routing diagnostics (if enabled)
+            if (config.diagnostics.enableBridgeAnalysis) {
+                try {
+                    val exporter = BridgeDiagnosticsExporter(config, datasetFetcher, trickler)
+                    val outPath = (ExperimentOutputContext.activeBaseDir ?: File(".")).absolutePath
+                    exporter.exportDiagnostics(root, uniqueEmbs, outPath)
+                } catch (e: Exception) {
+                    log.warn("Failed to export bridge diagnostics: ${e.message}", e)
+                }
             }
             
             // Final Exports

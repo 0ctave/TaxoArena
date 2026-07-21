@@ -72,6 +72,7 @@ data class EffectiveConfig(
 
     @Serializable
     data class Diagnostics(
+        val enableBridgeAnalysis: Boolean = false,
         val secondaryMassFloor: Double = 5.0,
         val bridgeSupportFloor: Double = 50.0,
         val bridgeSupportRelFraction: Double = 0.10

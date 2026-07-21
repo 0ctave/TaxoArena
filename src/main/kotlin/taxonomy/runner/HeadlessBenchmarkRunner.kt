@@ -1260,6 +1260,7 @@ class HeadlessBenchmarkRunner(
                 "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
                 "enableBridging" -> enableBridging = rawVal.toBoolean()
+                "enableBridgeAnalysis" -> config.diagnostics.enableBridgeAnalysis = rawVal.toBoolean()
                 "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
                 "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
                 "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
