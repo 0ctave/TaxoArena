@@ -501,7 +501,10 @@ class TaxonomyMetrics(
     // ─────────────────────────────────────────────────────────────────────────
 
     fun printReport(config: TaxonomyConfig) {
-        val r  = generateReport()
+        printReport(config, generateReport())
+    }
+
+    fun printReport(config: TaxonomyConfig, r: Report) {
         val US = java.util.Locale.US
         val sb = StringBuilder()
         sb.append(config.formatConfigReport()).append("\n")

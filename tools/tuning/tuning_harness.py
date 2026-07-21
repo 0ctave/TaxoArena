@@ -255,7 +255,8 @@ def cmd_generate(args):
             "runTrickle": True,
             "runBenchmark": False,
             "runPipeline": True,
-            "numIterations": 35
+            "numIterations": 35,
+            "enableFinalMetrics": False
         }
         for k, v in factors.items():
             if k == "splitThreshold":

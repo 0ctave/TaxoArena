@@ -367,9 +367,12 @@ class TaxonomyEngine(
             )
 
             // GENERATE ARCHITECTURAL REPORT
-            val finalReport = TaxonomyMetrics(root, groundTruthMap)
-            finalReport.printReport(config)
-            taxonomyService.addIterationMetrics(reportToIterationMetrics("Final", finalReport.generateReport()))
+            if (config.execution.enableFinalMetrics) {
+                val finalReport = TaxonomyMetrics(root, groundTruthMap)
+                val report = finalReport.generateReport()
+                finalReport.printReport(config, report)
+                taxonomyService.addIterationMetrics(reportToIterationMetrics("Final", report))
+            }
             
             return@coroutineScope root
         } finally {
