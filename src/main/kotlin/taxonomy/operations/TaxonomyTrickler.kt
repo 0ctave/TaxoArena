@@ -9,6 +9,7 @@ import taxonomy.model.projectTo
 import taxonomy.utils.StatisticsUtils
 import kotlin.math.exp
 import kotlin.math.ln
+import kotlin.math.pow
 
 /**
  * Implements Phase 3: Trickle (Top-Down Restrictive Routing).
@@ -86,9 +87,10 @@ class TaxonomyTrickler(
                 scores[i] = f
             }
 
-            // Temperature-scaled softmax
-            val tau = config.formalism.routingSoftmaxTau.coerceAtLeast(0.01)
-            val tempScores = DoubleArray(scores.size) { scores[it] / tau }
+            // Temperature-scaled softmax with dynamic inverse-variance scaling (tau_i)
+            val gamma = config.formalism.tauKappaScalingFactor.coerceIn(0.0, 1.0)
+            val dynamicTau = config.formalism.routingSoftmaxTau.coerceAtLeast(0.01) * siblingKappa.pow(gamma)
+            val tempScores = DoubleArray(scores.size) { scores[it] / dynamicTau }
             val maxTemp = tempScores.maxOrNull() ?: 0.0
             val sumExp = tempScores.sumOf { exp(it - maxTemp) }
             val logSumExpVal = maxTemp + ln(sumExp.coerceAtLeast(1e-300))

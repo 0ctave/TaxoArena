@@ -84,7 +84,8 @@ data class HeadlessCliConfig(
     val bridgeSupportRelFraction: Double? = null,
     val deltaAssign: Double? = null,
     val maxLeafAssignments: Int? = null,
-    val refitMuPerIteration: Boolean? = null
+    val refitMuPerIteration: Boolean? = null,
+    val tauKappaScalingFactor: Double? = null
 )
 
 @Component
@@ -174,6 +175,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.bridgeSupportRelFraction?.let { config.formalism.bridgeSupportRelFraction = it }
         cliConfig.deltaAssign?.let { config.formalism.deltaAssign = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
+        cliConfig.tauKappaScalingFactor?.let { config.formalism.tauKappaScalingFactor = it }
         cliConfig.refitMuPerIteration?.let { config.formalism.refitMuPerIteration = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
 
@@ -1195,6 +1197,7 @@ class HeadlessBenchmarkRunner(
         var bridgeSupportRelFraction: Double? = null
         var deltaAssign: Double? = null
         var maxLeafAssignments: Int? = null
+        var tauKappaScalingFactor: Double? = null
         var refitMuPerIteration: Boolean? = null
         var numIterations: Int? = null
         var assignmentCosineGap: Double? = null
@@ -1276,6 +1279,7 @@ class HeadlessBenchmarkRunner(
                 "bridgeSupportRelFraction" -> bridgeSupportRelFraction = rawVal.toDouble()
                 "deltaAssign" -> deltaAssign = rawVal.toDouble()
                 "maxLeafAssignments" -> maxLeafAssignments = rawVal.toInt()
+                "tauKappaScalingFactor" -> tauKappaScalingFactor = rawVal.toDouble()
                 "refitMuPerIteration" -> refitMuPerIteration = rawVal.toBoolean()
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
@@ -1329,6 +1333,7 @@ class HeadlessBenchmarkRunner(
             bridgeSupportRelFraction = bridgeSupportRelFraction,
             deltaAssign = deltaAssign,
             maxLeafAssignments = maxLeafAssignments,
+            tauKappaScalingFactor = tauKappaScalingFactor,
             refitMuPerIteration = refitMuPerIteration,
             numIterations = numIterations,
             runBaselines = runBaselines
@@ -1371,6 +1376,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.assignmentCosineGap,
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,
+            config.formalism.tauKappaScalingFactor,
             config.formalism.emaAlpha,
             config.formalism.refitMuPerIteration,
             config.formalism.hdlssThreshold,

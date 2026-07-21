@@ -160,6 +160,7 @@ data class SnapshotSettings(
     val deltaAssign: Double = 0.20,
     val maxLeafAssignments: Int = 5,
     val refitMuPerIteration: Boolean = false,
+    val tauKappaScalingFactor: Double = 0.0,
     val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
@@ -192,6 +193,7 @@ data class SnapshotSettings(
             deltaAssign = deltaAssign,
             maxLeafAssignments = maxLeafAssignments,
             refitMuPerIteration = refitMuPerIteration,
+            tauKappaScalingFactor = tauKappaScalingFactor,
             assignmentGap = assignmentGap,
             emaAlpha = emaAlpha
         )
@@ -521,6 +523,7 @@ class TaxonomySnapshotManager(
             deltaAssign = config.formalism.deltaAssign,
             maxLeafAssignments = config.formalism.maxLeafAssignments,
             refitMuPerIteration = config.formalism.refitMuPerIteration,
+            tauKappaScalingFactor = config.formalism.tauKappaScalingFactor,
             assignmentGap = config.formalism.assignmentGap,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType

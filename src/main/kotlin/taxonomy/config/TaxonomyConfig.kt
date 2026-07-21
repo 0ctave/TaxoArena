@@ -125,6 +125,7 @@ class TaxonomyConfig {
         var secondaryMassFloor: Double = 5.0
         var bridgeSupportFloor: Double = 50.0
         var bridgeSupportRelFraction: Double = 0.10
+        var tauKappaScalingFactor: Double = 0.0
         var tauFunnelFloor: Double = 0.90
         var defaultKappaPrior: Double = 10.0
         var dPrefix: Int = 64
@@ -156,6 +157,7 @@ class TaxonomyConfig {
         sb.append("│   - Cosine Tau (legacy):  ${formalism.cosineTau}\n")
         sb.append("│   - Routing Softmax Tau:  ${formalism.routingSoftmaxTau}\n")
         sb.append("│   - Leaf Acceptance Scale: ${formalism.leafAcceptanceScale}\n")
+        sb.append("│   - Tau Kappa Scaling Factor: ${formalism.tauKappaScalingFactor}\n")
         sb.append("│   - Assignment Cosine Gap:${formalism.assignmentCosineGap}\n")
         sb.append("│   - Delta Assign:         ${formalism.deltaAssign}\n")
         sb.append("│   - Max Leaf Assignments: ${formalism.maxLeafAssignments}\n")
@@ -216,6 +218,7 @@ class TaxonomyConfig {
             secondaryMassFloor = formalism.secondaryMassFloor,
             bridgeSupportFloor = formalism.bridgeSupportFloor,
             bridgeSupportRelFraction = formalism.bridgeSupportRelFraction,
+            tauKappaScalingFactor = formalism.tauKappaScalingFactor,
             tauFunnelFloor = formalism.tauFunnelFloor,
             defaultKappaPrior = formalism.defaultKappaPrior,
             dPrefix = formalism.dPrefix
@@ -263,6 +266,7 @@ class TaxonomyConfig {
         formalism.secondaryMassFloor = c.formalism.secondaryMassFloor
         formalism.bridgeSupportFloor = c.formalism.bridgeSupportFloor
         formalism.bridgeSupportRelFraction = c.formalism.bridgeSupportRelFraction
+        formalism.tauKappaScalingFactor = c.formalism.tauKappaScalingFactor
         formalism.tauFunnelFloor = c.formalism.tauFunnelFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
         formalism.dPrefix = c.formalism.dPrefix
