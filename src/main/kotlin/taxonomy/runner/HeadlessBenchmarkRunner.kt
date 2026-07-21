@@ -1043,9 +1043,11 @@ class HeadlessBenchmarkRunner(
         file.bufferedWriter().use { writer ->
             writer.write("BridgeId,Label,MemberDomains,ChildLeafIds,Coverage,Entropy,JsDivergence,Depth\n")
             bridges.forEach { b ->
-                val memberDomains = b.crossLinkChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
-                val childLeafIds = b.crossLinkChildren.map { it.id }.joinToString(";")
-                val combinedQueries = b.crossLinkChildren.flatMap { collectSubtreeQueries(it) }.distinctBy { it.rawText }
+                // Bridge / Cross-link children: evaluate both tree children and cross-link children
+                val connectedChildren = (b.children + b.crossLinkChildren).distinctBy { it.id }
+                val memberDomains = connectedChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
+                val childLeafIds = connectedChildren.map { it.id }.joinToString(";")
+                val combinedQueries = connectedChildren.flatMap { collectSubtreeQueries(it) }.distinctBy { it.rawText }
                 val coverage = combinedQueries.size
                 val entropyVal = calculateGtEntropyForQueries(combinedQueries)
                 val jsDiv = b.bridgeJsDivergence
@@ -1478,9 +1480,10 @@ class HeadlessBenchmarkRunner(
             writer.write("SourceA_Count,${sourceA.size},N/A,N/A,N/A,N/A\n")
             writer.write("SourceB_Count,${sourceB.size},N/A,N/A,N/A,N/A\n")
             bridges.forEach { b ->
-                val bType = if (b.id.startsWith("bridge_sourceB_")) "SourceB" else "SourceA"
-                val memberDomains = b.crossLinkChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
-                val combinedQueries = b.crossLinkChildren.flatMap { collectSubtreeQueries(it) }.distinctBy { it.rawText }
+                val bType = if (b.id.startsWith("bridge_sourceB_") || b.crossLinkChildren.isNotEmpty()) "SourceB" else "SourceA"
+                val connectedChildren = (b.children + b.crossLinkChildren).distinctBy { it.id }
+                val memberDomains = connectedChildren.mapNotNull { it.originalCategory ?: it.label }.distinct().joinToString(";")
+                val combinedQueries = connectedChildren.flatMap { collectSubtreeQueries(it) }.distinctBy { it.rawText }
                 val coverage = combinedQueries.size
                 val topQueries = b.queries.take(10).map { it.rawText.replace(",", " ").replace("\n", " ").trim() }.joinToString(";")
                 writer.write("${escapeCsv(b.id)},$bType,${b.depth},$coverage,${escapeCsv(memberDomains)},${escapeCsv(topQueries)}\n")

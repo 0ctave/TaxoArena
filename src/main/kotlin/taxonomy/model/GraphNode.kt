@@ -76,6 +76,17 @@ data class GraphNode(
 
     val treeChildren: MutableSet<GraphNode> get() = children
 
+    /**
+     * Cross-link / Bridge children: non-tree directed polyhierarchy edges.
+     * "Bridge" and "Cross-link" refer to the exact same polyhierarchy concept.
+     */
+    val bridgeChildren: MutableSet<GraphNode> get() = crossLinkChildren
+
+    /**
+     * Boolean alias confirming whether this node is a cross-link bridge target / polyhierarchy node.
+     */
+    val isCrossLink: Boolean get() = isBridge
+
     // Proportional weight of this node as a component in its parent's vMF/NiW
     var proportionalWeight: Double = 1.0
 
