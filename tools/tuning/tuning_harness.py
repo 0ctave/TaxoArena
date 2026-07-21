@@ -313,6 +313,8 @@ def cmd_run(args):
     
     for r in runs:
         run_id = r["run_id"]
+        if args.stage and r.get("stage") != args.stage:
+            continue
         if only_runs and run_id not in only_runs:
             continue
             
@@ -659,6 +661,7 @@ def main():
     
     run_parser = subparsers.add_parser("run", help="Run pending configurations in manifest")
     run_parser.add_argument("--spec", default="tools/tuning/sweep_spec.example.toml", help="Path to sweep spec TOML")
+    run_parser.add_argument("--stage", choices=["screen", "validate"], help="Filter runs by stage (screen or validate)")
     run_parser.add_argument("--only", help="Comma-separated run IDs to run exclusively")
     run_parser.add_argument("--limit", type=int, help="Maximum number of runs to execute")
     
