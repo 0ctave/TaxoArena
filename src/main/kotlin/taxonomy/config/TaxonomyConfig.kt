@@ -30,6 +30,7 @@ class TaxonomyConfig {
         var enableVisualization: Boolean = true
         var enableTui: Boolean = true
         var enableLabeling: Boolean = false
+        var enableIterationMetrics: Boolean = false
 
         /**
          * Kill-switch for the pre-flight TTY probe done before the TUI enters the alt-screen.

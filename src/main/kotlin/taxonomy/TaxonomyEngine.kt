@@ -271,8 +271,10 @@ class TaxonomyEngine(
                 log.info("Iteration $i completed in ${iterationTime}ms.")
 
                 // Calculate and store iteration metrics
-                val iterMetrics = TaxonomyMetrics(root, groundTruthMap).generateReport()
-                taxonomyService.addIterationMetrics(reportToIterationMetrics("Iter $i", iterMetrics))
+                if (config.execution.enableIterationMetrics) {
+                    val iterMetrics = TaxonomyMetrics(root, groundTruthMap).generateReport()
+                    taxonomyService.addIterationMetrics(reportToIterationMetrics("Iter $i", iterMetrics))
+                }
 
                 logNodeDiagnostics(root, distilledData.size)
 
