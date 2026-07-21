@@ -20,29 +20,22 @@ runTrickle     = true
 judgeInduction = false
 enableLabeling = true
 
-# ── Core formalism ──────────────────────────────────────────────────────────
-maxDepth          = 8
-minClusterSize    = 40
-separationEpsilon = 0.01
-routingSoftmaxTau = 2.0
-leafAcceptanceScale = 1.0
-tauFunnelFloor    = 1.0
-emaAlpha          = 0.7
-
-# ── Adaptive soft-membership params (loosened for higher spread) ─────────────
-assignmentCosineGap     = 0.25
-deltaAssign             = 2.0
-maxLeafAssignments      = 8
-refitMuPerIteration     = true
-
 # ── Mode Switch: DAG_MAX ──────────────────────────────────────────────────────
 dagMode = "DAG_MAX"
 
-# ── Emergent Router parameters ────────────────────────────────────────────────
-hdlssThreshold = 8.0
+# ── Formalism Parameters (Loosened soft-membership) ──────────────────────────
+maxDepth                  = 8
+minClusterSize            = 50
+separationEpsilon         = 0.01
+routingSoftmaxTau         = 1.50
+assignmentCosineGap       = 0.20
+deltaAssign               = 2.0
+maxLeafAssignments        = 8
+emaAlpha                  = 0.7
 fusionSimilarityThreshold = 0.92
-effectiveSupportFloor = 2.0
-secondaryMassFloor = 0.5
-bridgeSupportFloor = 1.0
-bridgeSupportRelFraction = 0.01
-numIterations           = 35
+effectiveSupportFloor     = 2.0
+defaultKappaPrior         = 10.0
+secondaryMassFloor        = 0.5
+bridgeSupportFloor        = 1.0
+bridgeSupportRelFraction  = 0.01
+numIterations             = 35

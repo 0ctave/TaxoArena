@@ -16,7 +16,7 @@ models = [
     "Meta-Llama-3_1-8B-Instruct"
 ]
 
-category = "math"
+category = ""
 queryLimit = 0
 outputDir = "experiment_results/arena_core_m12"
 testRatio = 0.3
@@ -34,11 +34,16 @@ conditions = [
     "ORACLE"            # correctness ceiling — 0 judge calls
 ]
 
-maxDepth = 8
-minClusterSize = 40
-separationEpsilon = 0.08
-cosineTau = 2.0
-assignmentGap = 0.2
-emaAlpha = 0.5
-enableLabeling = true
-numIterations = 15
+dagMode                   = "DAG_MAX"
+maxDepth                  = 8
+minClusterSize            = 50
+separationEpsilon         = 0.01
+routingSoftmaxTau         = 1.50
+assignmentCosineGap       = 0.15
+deltaAssign               = 1.0
+emaAlpha                  = 0.7
+fusionSimilarityThreshold = 0.92
+effectiveSupportFloor     = 2.0
+defaultKappaPrior         = 10.0
+enableLabeling            = true
+numIterations             = 35

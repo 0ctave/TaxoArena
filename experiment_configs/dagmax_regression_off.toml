@@ -25,22 +25,19 @@ runTrickle     = true    # trickle validation → produces NoMatchRate baseline
 judgeInduction = false    # no LLM judge induction
 enableLabeling = false    # no LLM cluster labeling
 
-# ── Core formalism (code defaults; keep identical across the 3 configs) ──────
-maxDepth          = 8
-minClusterSize    = 25
-separationEpsilon = 0.04
-cosineTau         = 2.0
-tauFunnelFloor    = 0.90
-# assignmentGap is deprecated/unused in favor of assignmentCosineGap
-# assignmentGap     = 0.05
-emaAlpha          = 0.7
-
-# ── Adaptive soft-membership params ──────────────────────────────────────────
-assignmentCosineGap     = 0.03
-deltaAssign             = 0.20
-maxLeafAssignments      = 5
-refitMuPerIteration     = false
-
 # ── Mode Switch: TREE_BASELINE ─────────────────────────────────────────────
 dagMode = "TREE_BASELINE"
-numIterations           = 15
+
+# ── Core Formalism Parameters ──────────────────────────────────────────────
+maxDepth                  = 8
+minClusterSize            = 50
+separationEpsilon         = 0.01
+routingSoftmaxTau         = 1.50
+assignmentCosineGap       = 0.15
+deltaAssign               = 1.0
+emaAlpha                  = 0.7
+fusionSimilarityThreshold = 0.92
+effectiveSupportFloor     = 2.0
+defaultKappaPrior         = 10.0
+numIterations             = 35
+maxLeafAssignments        = 1
