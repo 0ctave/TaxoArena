@@ -312,7 +312,7 @@ object StatisticsUtils {
             }
         }
 
-        return bestMixture
+        bestMixture
     }
 
     /**
