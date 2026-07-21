@@ -443,11 +443,24 @@ class HeadlessBenchmarkRunner(
             if (cliConfig.runTrickle) {
                 val baseSnapshotId = snapshotId.substringBefore("_MAIN").substringBefore("_ORACLE").substringBefore("_C3").substringBefore("_C5").substringBefore("_GENERIC_JUDGE").substringBefore("_RANDOM_SCHEDULER").substringBefore("_KMEANS_BASELINE").substringBefore("_WARD_BASELINE").substringBefore("_RANDOMNULL_BASELINE")
 
+                // Hoist dataset fetch and reserved pool resolution above the validation loop
+                val hoistedReservedFile = File("reserved_test_queries.json")
+                val hoistedReservedByDomain: Map<String, List<Int>>? = if (hoistedReservedFile.exists()) {
+                    try {
+                        json.decodeFromString(hoistedReservedFile.readText())
+                    } catch (_: Throwable) { null }
+                } else null
+
+                val hoistedTargetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
+                val hoistedFullByDomain = try {
+                    datasetFetcher.fetchDataset(selectedDomains = hoistedTargetDomains)
+                } catch (_: Throwable) { null }
+
                 log.info("========================================")
                 log.info("RUNNING TRICKLE VALIDATION: MAIN")
                 log.info("========================================")
                 taxonomyService.setGraph(root)
-                val mainCorrect = runHeadlessTrickle(root, "MAIN", cliConfig, baseDir, currentSeed, reportsByCondition["MAIN"])
+                val mainCorrect = runHeadlessTrickle(root, "MAIN", cliConfig, baseDir, currentSeed, reportsByCondition["MAIN"], hoistedFullByDomain, hoistedReservedByDomain)
 
                 if (cliConfig.runBaselines) {
                     var kmeansCorrect: Map<String, Boolean>? = null
@@ -457,7 +470,7 @@ class HeadlessBenchmarkRunner(
                         log.info("RUNNING TRICKLE VALIDATION: KMEANS_BASELINE")
                         log.info("========================================")
                         taxonomyService.setGraph(kmeansRoot)
-                        kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["KMEANS_BASELINE"])
+                        kmeansCorrect = runHeadlessTrickle(kmeansRoot, "KMEANS_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["KMEANS_BASELINE"], hoistedFullByDomain, hoistedReservedByDomain)
                     }
 
                     var wardCorrect: Map<String, Boolean>? = null
@@ -467,7 +480,7 @@ class HeadlessBenchmarkRunner(
                         log.info("RUNNING TRICKLE VALIDATION: WARD_BASELINE")
                         log.info("========================================")
                         taxonomyService.setGraph(wardRoot)
-                        wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["WARD_BASELINE"])
+                        wardCorrect = runHeadlessTrickle(wardRoot, "WARD_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["WARD_BASELINE"], hoistedFullByDomain, hoistedReservedByDomain)
                     }
 
                     var randomNullCorrect: Map<String, Boolean>? = null
@@ -477,7 +490,7 @@ class HeadlessBenchmarkRunner(
                         log.info("RUNNING TRICKLE VALIDATION: RANDOMNULL_BASELINE")
                         log.info("========================================")
                         taxonomyService.setGraph(randomNullRoot)
-                        randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["RANDOMNULL_BASELINE"])
+                        randomNullCorrect = runHeadlessTrickle(randomNullRoot, "RANDOMNULL_BASELINE", cliConfig, baseDir, currentSeed, reportsByCondition["RANDOMNULL_BASELINE"], hoistedFullByDomain, hoistedReservedByDomain)
                     }
 
                     // McNemar significance comparisons between MAIN and the baselines
@@ -544,7 +557,9 @@ class HeadlessBenchmarkRunner(
         cliConfig: HeadlessCliConfig, 
         baseDir: File,
         currentSeed: Long,
-        benchmarkReport: BenchmarkReport? = null
+        benchmarkReport: BenchmarkReport? = null,
+        hoistedFullByDomain: Map<String, List<taxonomy.dataset.MmluProQuery>>? = null,
+        hoistedReservedByDomain: Map<String, List<Int>>? = null
     ): Map<String, Boolean> = runBlocking {
         log.info("Starting Headless Batch Trickle Validation for $condition...")
 
@@ -558,14 +573,16 @@ class HeadlessBenchmarkRunner(
             log.error("Failed to export structural/quality metrics for $condition: ${e.message}", e)
         }
 
-        val reservedFile = File("reserved_test_queries.json")
-        if (!reservedFile.exists()) {
-            log.warn("reserved_test_queries.json not found — cannot run trickle validation."); return@runBlocking emptyMap()
-        }
-        val reservedByDomain: Map<String, List<Int>> = try {
-            json.decodeFromString(reservedFile.readText())
-        } catch (t: Throwable) {
-            log.error("Failed to parse reserved set for trickle validation", t); return@runBlocking emptyMap()
+        val reservedByDomain: Map<String, List<Int>> = hoistedReservedByDomain ?: run {
+            val reservedFile = File("reserved_test_queries.json")
+            if (!reservedFile.exists()) {
+                log.warn("reserved_test_queries.json not found — cannot run trickle validation."); return@runBlocking emptyMap()
+            }
+            try {
+                json.decodeFromString(reservedFile.readText())
+            } catch (t: Throwable) {
+                log.error("Failed to parse reserved set for trickle validation", t); return@runBlocking emptyMap()
+            }
         }
 
         fun cleanText(s: String): String = s.replace("\r\n", "\n").replace("\r", "\n").trim()
@@ -586,7 +603,7 @@ class HeadlessBenchmarkRunner(
         log.info("Loaded $embeddedCount ground-truth categories directly from DAG queries.")
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
-        val fullByDomain = datasetFetcher.fetchDataset(selectedDomains = targetDomains)
+        val fullByDomain = hoistedFullByDomain ?: datasetFetcher.fetchDataset(selectedDomains = targetDomains)
         val reservedIds: Set<Int> = reservedByDomain.values.flatten().toSet()
         var databaseCount = 0
         for ((domain, queries) in fullByDomain) {
