@@ -275,11 +275,19 @@ def cmd_generate(args):
                 f.write(toml_text)
             
             if run_id in runs_by_id:
-                if runs_by_id[run_id]["config_sha256"] == r["config_sha256"]:
+                if runs_by_id[run_id]["config_sha256"] == r["config_sha256"] and not getattr(args, "clean", False):
                     r["status"] = runs_by_id[run_id]["status"]
                 runs_by_id[run_id] = r
             else:
                 runs_by_id[run_id] = r
+                
+            if getattr(args, "clean", False) and os.path.exists(output_dir):
+                import shutil
+                print(f"Wiping output directory for {run_id}: {output_dir}")
+                try:
+                    shutil.rmtree(output_dir)
+                except Exception as e:
+                    print(f"Warning: Failed to clean {output_dir}: {e}")
                 
     if not args.dry_run:
         new_manifest_list = sorted(list(runs_by_id.values()), key=lambda x: x["run_id"])
@@ -577,9 +585,8 @@ def cmd_select(args):
             f.write("\n## 3. Categorized Metric Summaries (Top 5 Finalists)\n\n")
             for idx, r in enumerate(ranked[:5]):
                 f.write(f"### Rank {idx+1}: {r['run_id']}\n\n")
-                f.write("**Config Factors**: `assignmentCosineGap`={}, `deltaAssign`={}, `minClusterSize`={}, `routingSoftmaxTau`={}\n\n".format(
-                    r.get("assignmentCosineGap", ""), r.get("deltaAssign", ""), r.get("minClusterSize", ""), r.get("routingSoftmaxTau", "")
-                ))
+                factor_kv = [f"`{k}`={r.get(k, '')}" for k in factor_keys]
+                f.write("**Config Factors**: {}\n\n".format(", ".join(factor_kv)))
                 
                 # Category 1: Structural Integrity (Hard Gates)
                 f.write("#### A. Structural Integrity (Hard Gates)\n")
@@ -658,6 +665,7 @@ def main():
     gen_parser.add_argument("--stage", default="screen", choices=["screen", "validate"], help="Stage of tuning: screen or validate")
     gen_parser.add_argument("--finalists", help="Comma-separated finalist config SHAs to validate (omit to use top from finalists.csv)")
     gen_parser.add_argument("--dry-run", action="store_true", help="Print configuration overrides without writing files")
+    gen_parser.add_argument("--clean", action="store_true", help="Force reset run status to pending and delete previous outputs")
     
     run_parser = subparsers.add_parser("run", help="Run pending configurations in manifest")
     run_parser.add_argument("--spec", default="tools/tuning/sweep_spec.example.toml", help="Path to sweep spec TOML")
