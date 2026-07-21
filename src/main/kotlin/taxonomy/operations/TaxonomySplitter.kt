@@ -499,8 +499,9 @@ class TaxonomySplitter(
                         )
                     }
 
-                    val newLabel = TaxoPrompts.parseClusterLabel(jsonResponse) ?: "Discovered Concept"
-                    node.label = newLabel
+                    val labelResult = TaxoPrompts.parseClusterLabelResult(jsonResponse)
+                    node.label = labelResult?.first ?: "Discovered Concept"
+                    node.description = labelResult?.second?.takeIf { it.isNotBlank() }
 
                     val finished = completed.incrementAndGet()
                     if (finished % 10 == 0 || finished == totalNodesToLabel) {

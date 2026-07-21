@@ -26,10 +26,10 @@ object JudgePrompts {
                 is JsonObject -> sp["role"]?.jsonPrimitive?.contentOrNull  // fallback for old runs
                 else -> null
             }
-            val rubric = root["rubric"]?.jsonPrimitive?.contentOrNull ?: ""
+            val rubric = root["rubric"]?.jsonPrimitive?.contentOrNull
 
-            if (systemPrompt.isNullOrBlank()) {
-                log.warn("Malformed JSON: system_prompt missing/blank. Raw input:\n$raw")
+            if (systemPrompt.isNullOrBlank() || rubric.isNullOrBlank()) {
+                log.warn("Malformed JSON: system_prompt or rubric missing/blank. Raw input:\n$raw")
                 return null
             }
 
@@ -49,7 +49,7 @@ object JudgePrompts {
     ): String {
         val items = corpusItems.joinToString("\n---\n")
         return """
-Task: Induce domain adjudication guidelines from a corpus of expert-verified multiple-choice problems in the specialized subdomain "${'$'}domainLabel".
+Task: Induce domain adjudication guidelines from a corpus of expert-verified multiple-choice problems in the specialized subdomain "$domainLabel".
 
 [Corpus Batch]
 $items

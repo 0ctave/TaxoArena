@@ -62,7 +62,8 @@ data class GraphNode(
     var bridgeJsDivergence: Double = 0.0,
     val residualQueries: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet(),
     val residualConfidences: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap(),
-    var dOverN: Double = 0.0
+    var dOverN: Double = 0.0,
+    var description: String? = null
 ) {
     companion object {
         val EmbeddingRegistry = java.util.concurrent.ConcurrentHashMap<String, Embedding>()

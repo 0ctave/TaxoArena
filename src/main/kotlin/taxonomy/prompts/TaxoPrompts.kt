@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory
 object TaxoPrompts {
 
     private val log = LoggerFactory.getLogger(TaxoPrompts::class.java)
+    private val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
     private const val JSON_STRICT = "IMPORTANT: Return ONLY raw JSON. No markdown. Output must start with { and end with }."
 
     /**
@@ -133,16 +134,19 @@ $JSON_STRICT
 """.trimIndent()
     }
 
-    fun parseClusterLabel(jsonResponse: String): String? {
+    fun parseClusterLabel(jsonResponse: String): String? = parseClusterLabelResult(jsonResponse)?.first
+
+    fun parseClusterLabelResult(jsonResponse: String): Pair<String, String>? {
         return try {
             val cleaned = stripCodeFences(jsonResponse)
-            val root = Json { ignoreUnknownKeys = true }.parseToJsonElement(cleaned).jsonObject
+            val root = json.parseToJsonElement(cleaned).jsonObject
             val label = root["label"]?.jsonPrimitive?.content
+            val desc = root["description"]?.jsonPrimitive?.content ?: ""
             if (label.isNullOrBlank()) {
                 log.warn("Malformed JSON: 'label' property is missing or empty. Raw input:\n$jsonResponse")
                 null
             } else {
-                label
+                label to desc
             }
         } catch (e: Exception) {
             log.warn("Malformed JSON parsing failed: ${e.message}. Raw input:\n$jsonResponse")
