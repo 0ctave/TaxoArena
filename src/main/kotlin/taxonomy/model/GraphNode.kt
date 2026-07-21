@@ -192,12 +192,7 @@ data class GraphNode(
     }
 }
 
-fun dimForDepth(depth: Int): Int = when {
-    depth <= 1 -> 128
-    depth == 2 -> 256
-    depth == 3 -> 512
-    else       -> 1024
-}
+fun dimForDepth(depth: Int): Int = 256
 
 // Phase completion flags
 const val PHASE_EMBEDDED = 1

@@ -75,6 +75,6 @@ data class EffectiveConfig(
         val tauKappaScalingFactor: Double = 0.0,
         val tauFunnelFloor: Double = 0.80,
         val defaultKappaPrior: Double = 10.0,
-        val dPrefix: Int = 128
+        val dPrefix: Int = 256
     )
 }

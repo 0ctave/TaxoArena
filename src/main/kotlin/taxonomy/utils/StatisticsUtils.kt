@@ -34,7 +34,8 @@ object StatisticsUtils {
 
     fun dotProduct(a: DoubleArray, b: FloatArray): Double {
         var sum = 0.0
-        for (i in a.indices) sum += a[i] * b[i]
+        val len = minOf(a.size, b.size)
+        for (i in 0 until len) sum += a[i] * b[i]
         return sum
     }
 

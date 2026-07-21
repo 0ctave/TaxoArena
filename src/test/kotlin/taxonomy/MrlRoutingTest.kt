@@ -53,19 +53,19 @@ class MrlRoutingTest {
     fun testTrickleRoutingWithFixedDimensions() {
         val root = GraphNode(label = "Root", depth = 0)
         val child = GraphNode(label = "Child", depth = 1).apply {
-            vmfMu = FloatArray(128) { 0.0f }.apply { this[0] = 1.0f }
+            vmfMu = FloatArray(256) { 0.0f }.apply { this[0] = 1.0f }
             vmfKappa = 10.0
-            vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(128, 10.0)
-            niwM0 = FloatArray(128) { 0.0f }.apply { this[0] = 1.0f }
+            vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(256, 10.0)
+            niwM0 = FloatArray(256) { 0.0f }.apply { this[0] = 1.0f }
             niwKappa0 = 10.0
-            niwNu0 = 130.0
-            niwLambda = FloatArray(128) { 1.0f }
+            niwNu0 = 260.0
+            niwLambda = FloatArray(256) { 1.0f }
         }
         root.children.add(child)
         child.parents.add(root)
 
-        // Setup a query embedding with 128 elements (all 0s except first element)
-        val vals = FloatArray(128) { 0.0f }.apply { this[0] = 2.0f } // non-unit norm
+        // Setup a query embedding with 256 elements (all 0s except first element)
+        val vals = FloatArray(256) { 0.0f }.apply { this[0] = 2.0f } // non-unit norm
         val embedding = Embedding(
             rawText = "test text",
             distilledText = "test text",
@@ -73,7 +73,7 @@ class MrlRoutingTest {
         )
 
         // 1. Verify projectTo normalizes correctly
-        val projected = embedding.projectTo(128)
+        val projected = embedding.projectTo(256)
         var norm = 0.0
         for (v in projected) norm += v * v
         assertEquals(1.0, kotlin.math.sqrt(norm), 1e-5)

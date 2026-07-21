@@ -145,7 +145,7 @@ class TaxonomyConfig {
         var tauKappaScalingFactor: Double = 0.0
         var tauFunnelFloor: Double = 0.80
         var defaultKappaPrior: Double = 10.0
-        var dPrefix: Int = 128
+        var dPrefix: Int = 256
     }
 
     fun formatConfigReport(): String {
