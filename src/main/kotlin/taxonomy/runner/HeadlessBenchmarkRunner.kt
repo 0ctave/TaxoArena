@@ -55,12 +55,8 @@ data class HeadlessCliConfig(
     val maxDepth: Int? = null,
     val minClusterSize: Int? = null,
     val separationEpsilon: Double? = null,
-    val cosineTau: Double? = null,
     val routingSoftmaxTau: Double? = null,
-    val leafAcceptanceScale: Double? = null,
-    val assignmentGap: Double? = null,
     val assignmentCosineGap: Double? = null,
-    val tauFunnelFloor: Double? = null,
     val defaultKappaPrior: Double? = null,
     val emaAlpha: Double? = null,
     val enableLabeling: Boolean? = null,
@@ -73,12 +69,10 @@ data class HeadlessCliConfig(
     val enableResidualRouting: Boolean? = null,
     val enableResidualSplitGate: Boolean? = null,
     val enableBridging: Boolean? = null,
-    val hdlssThreshold: Double? = null,
     val fusionSimilarityThreshold: Double? = null,
     val effectiveSupportFloor: Double? = null,
     val numIterations: Int? = null,
     val runBaselines: Boolean = true,
-    val dPrefix: Int? = null,
     val secondaryMassFloor: Double? = null,
     val bridgeSupportFloor: Double? = null,
     val bridgeSupportRelFraction: Double? = null,
@@ -151,12 +145,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.maxDepth?.let { config.formalism.maxDepth = it }
         cliConfig.minClusterSize?.let { config.formalism.minClusterSize = it }
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
-        cliConfig.cosineTau?.let { config.formalism.cosineTau = it }
         cliConfig.routingSoftmaxTau?.let { config.formalism.routingSoftmaxTau = it }
-        cliConfig.leafAcceptanceScale?.let { config.formalism.leafAcceptanceScale = it }
-        cliConfig.assignmentGap?.let { config.formalism.assignmentGap = it }
         cliConfig.assignmentCosineGap?.let { config.formalism.assignmentCosineGap = it }
-        cliConfig.tauFunnelFloor?.let { config.formalism.tauFunnelFloor = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.emaAlpha?.let { config.formalism.emaAlpha = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
@@ -168,7 +158,6 @@ class HeadlessBenchmarkRunner(
         cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
         cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
         cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
-        cliConfig.hdlssThreshold?.let { config.formalism.hdlssThreshold = it }
         cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
         cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
         cliConfig.secondaryMassFloor?.let { config.formalism.secondaryMassFloor = it }
@@ -1260,10 +1249,7 @@ class HeadlessBenchmarkRunner(
                 "maxDepth" -> maxDepth = rawVal.toInt()
                 "minClusterSize" -> minClusterSize = rawVal.toInt()
                 "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
-                "cosineTau" -> cosineTau = rawVal.toDouble()
                 "routingSoftmaxTau" -> routingSoftmaxTau = rawVal.toDouble()
-                "leafAcceptanceScale" -> leafAcceptanceScale = rawVal.toDouble()
-                "assignmentGap" -> assignmentGap = rawVal.toDouble()
                 "emaAlpha" -> emaAlpha = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
@@ -1276,7 +1262,6 @@ class HeadlessBenchmarkRunner(
                 "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
                 "enableBridging" -> enableBridging = rawVal.toBoolean()
-                "hdlssThreshold" -> hdlssThreshold = rawVal.toDouble()
                 "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
                 "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
                 "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
@@ -1289,7 +1274,6 @@ class HeadlessBenchmarkRunner(
                 "dagMode" -> dagMode = rawVal.trim().trim('"').trim('\'')
                 "numIterations" -> numIterations = rawVal.toInt()
                 "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
-                "tauFunnelFloor" -> tauFunnelFloor = rawVal.toDouble()
                 "defaultKappaPrior" -> defaultKappaPrior = rawVal.toDouble()
                 "runBaselines" -> runBaselines = rawVal.toBoolean()
             }
@@ -1313,12 +1297,8 @@ class HeadlessBenchmarkRunner(
             maxDepth = maxDepth,
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
-            cosineTau = cosineTau,
             routingSoftmaxTau = routingSoftmaxTau,
-            leafAcceptanceScale = leafAcceptanceScale,
-            assignmentGap = assignmentGap,
             assignmentCosineGap = assignmentCosineGap,
-            tauFunnelFloor = tauFunnelFloor,
             defaultKappaPrior = defaultKappaPrior,
             emaAlpha = emaAlpha,
             enableLabeling = enableLabeling,
@@ -1331,7 +1311,6 @@ class HeadlessBenchmarkRunner(
             enableResidualRouting = enableResidualRouting,
             enableResidualSplitGate = enableResidualSplitGate,
             enableBridging = enableBridging,
-            hdlssThreshold = hdlssThreshold,
             fusionSimilarityThreshold = fusionSimilarityThreshold,
             effectiveSupportFloor = effectiveSupportFloor,
             secondaryMassFloor = secondaryMassFloor,
@@ -1377,9 +1356,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.maxDepth,
             config.formalism.minClusterSize,
             config.formalism.separationEpsilon,
-            config.formalism.cosineTau,
             config.formalism.routingSoftmaxTau,
-            config.formalism.leafAcceptanceScale,
             config.formalism.assignmentCosineGap,
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,
@@ -1387,13 +1364,11 @@ class HeadlessBenchmarkRunner(
             config.formalism.dagMode,
             config.formalism.emaAlpha,
             config.formalism.refitMuPerIteration,
-            config.formalism.hdlssThreshold,
             config.formalism.fusionSimilarityThreshold,
             config.formalism.effectiveSupportFloor,
             config.formalism.secondaryMassFloor,
             config.formalism.bridgeSupportFloor,
-            config.formalism.bridgeSupportRelFraction,
-            config.formalism.tauFunnelFloor
+            config.formalism.bridgeSupportRelFraction
         ).joinToString(",")
         return String.format(java.util.Locale.US, "%08x", raw.hashCode())
     }

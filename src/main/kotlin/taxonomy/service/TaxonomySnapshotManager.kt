@@ -151,9 +151,7 @@ data class SnapshotSettings(
     val enableLabeling: Boolean,
     val separationEpsilon: Double,
     val minClusterSize: Int,
-    val cosineTau: Double,
     val routingSoftmaxTau: Double = 1.0,
-    val leafAcceptanceScale: Double = 1.0,
     val secondaryMassFloor: Double = 5.0,
     val bridgeSupportFloor: Double = 50.0,
     val bridgeSupportRelFraction: Double = 0.10,
@@ -162,7 +160,6 @@ data class SnapshotSettings(
     val refitMuPerIteration: Boolean = false,
     val tauKappaScalingFactor: Double = 0.0,
     val dagMode: taxonomy.config.DagMode = taxonomy.config.DagMode.DAG_MAX,
-    val assignmentGap: Double,
     val emaAlpha: Double,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
     /**
@@ -185,9 +182,7 @@ data class SnapshotSettings(
             maxDepth = maxDepth,
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
-            cosineTau = cosineTau,
             routingSoftmaxTau = routingSoftmaxTau,
-            leafAcceptanceScale = leafAcceptanceScale,
             secondaryMassFloor = secondaryMassFloor,
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
@@ -196,7 +191,6 @@ data class SnapshotSettings(
             refitMuPerIteration = refitMuPerIteration,
             tauKappaScalingFactor = tauKappaScalingFactor,
             dagMode = dagMode,
-            assignmentGap = assignmentGap,
             emaAlpha = emaAlpha
         )
     )
@@ -516,9 +510,7 @@ class TaxonomySnapshotManager(
             enableLabeling = config.execution.enableLabeling,
             separationEpsilon = config.formalism.separationEpsilon,
             minClusterSize = config.formalism.minClusterSize,
-            cosineTau = config.formalism.cosineTau,
             routingSoftmaxTau = config.formalism.routingSoftmaxTau,
-            leafAcceptanceScale = config.formalism.leafAcceptanceScale,
             secondaryMassFloor = config.formalism.secondaryMassFloor,
             bridgeSupportFloor = config.formalism.bridgeSupportFloor,
             bridgeSupportRelFraction = config.formalism.bridgeSupportRelFraction,
@@ -527,7 +519,6 @@ class TaxonomySnapshotManager(
             refitMuPerIteration = config.formalism.refitMuPerIteration,
             tauKappaScalingFactor = config.formalism.tauKappaScalingFactor,
             dagMode = config.formalism.dagMode,
-            assignmentGap = config.formalism.assignmentGap,
             emaAlpha = config.formalism.emaAlpha,
             datasetType = config.dataset.datasetType
         )

@@ -92,23 +92,7 @@ class TaxonomyConfig {
         var separationEpsilon: Double = 0.04
 
         // ── Routing ───────────────────────────────────────────────────────────
-        // Temperature for the softmax over sibling log-likelihoods at each tree
-        // node during trickle routing.  Higher = softer (more spread).
-        var cosineTau: Double = 2.0
         var routingSoftmaxTau: Double = 1.0
-        var leafAcceptanceScale: Double = 1.0
-
-        // Log-likelihood margin for leaf assignment.
-        //
-        // A query is assigned to every leaf whose vMF log-likelihood is within
-        // [assignmentMargin] nats of the best-scoring leaf.  This replaces the
-        // old hard cap (maxLeafAssignments) with a geometrically meaningful
-        // criterion: only plausible secondary matches are accepted.
-        //
-        // Intuition: at kappa ≈ 100 a margin of 1.0 nat ≈ Δcosine 0.01,
-        // so only leaves whose mean is within ~1° of the best match are included.
-        // Increase to allow more cross-domain overlap; decrease for stricter purity.
-        var assignmentGap: Double = 0.05
         var assignmentCosineGap: Double = 0.03
         var deltaAssign: Double = 0.20
         var maxLeafAssignments: Int = 5
@@ -136,16 +120,13 @@ class TaxonomyConfig {
         var enableBridging: Boolean = true
         var refitMuPerIteration: Boolean = true
 
-        var hdlssThreshold: Double = 8.0
         var fusionSimilarityThreshold: Double = 0.92
         var effectiveSupportFloor: Double = 2.0
         var secondaryMassFloor: Double = 5.0
         var bridgeSupportFloor: Double = 50.0
         var bridgeSupportRelFraction: Double = 0.10
         var tauKappaScalingFactor: Double = 0.0
-        var tauFunnelFloor: Double = 0.80
         var defaultKappaPrior: Double = 10.0
-        var dPrefix: Int = 256
     }
 
     fun formatConfigReport(): String {
@@ -177,7 +158,6 @@ class TaxonomyConfig {
         sb.append("│   - EMA Alpha:            ${formalism.emaAlpha}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
-        sb.append("│   - HDLSS Threshold:      ${formalism.hdlssThreshold}\n")
         sb.append("│   - Default Kappa Prior:  ${formalism.defaultKappaPrior}\n")
         sb.append("└──────────────────────────────────────────────────────────")
         return sb.toString()
@@ -210,10 +190,7 @@ class TaxonomyConfig {
             maxDepth = formalism.maxDepth,
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
-            cosineTau = formalism.cosineTau,
             routingSoftmaxTau = formalism.routingSoftmaxTau,
-            leafAcceptanceScale = formalism.leafAcceptanceScale,
-            assignmentGap = formalism.assignmentGap,
             assignmentCosineGap = formalism.assignmentCosineGap,
             deltaAssign = formalism.deltaAssign,
             maxLeafAssignments = formalism.maxLeafAssignments,
@@ -223,16 +200,13 @@ class TaxonomyConfig {
             enableResidualSplitGate = formalism.enableResidualSplitGate,
             enableBridging = formalism.enableBridging,
             refitMuPerIteration = formalism.refitMuPerIteration,
-            hdlssThreshold = formalism.hdlssThreshold,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
             secondaryMassFloor = formalism.secondaryMassFloor,
             bridgeSupportFloor = formalism.bridgeSupportFloor,
             bridgeSupportRelFraction = formalism.bridgeSupportRelFraction,
             tauKappaScalingFactor = formalism.tauKappaScalingFactor,
-            tauFunnelFloor = formalism.tauFunnelFloor,
-            defaultKappaPrior = formalism.defaultKappaPrior,
-            dPrefix = formalism.dPrefix
+            defaultKappaPrior = formalism.defaultKappaPrior
         )
     )
 
@@ -259,10 +233,7 @@ class TaxonomyConfig {
         formalism.maxDepth = c.formalism.maxDepth
         formalism.minClusterSize = c.formalism.minClusterSize
         formalism.separationEpsilon = c.formalism.separationEpsilon
-        formalism.cosineTau = c.formalism.cosineTau
         formalism.routingSoftmaxTau = c.formalism.routingSoftmaxTau
-        formalism.leafAcceptanceScale = c.formalism.leafAcceptanceScale
-        formalism.assignmentGap = c.formalism.assignmentGap
         formalism.assignmentCosineGap = c.formalism.assignmentCosineGap
         formalism.deltaAssign = c.formalism.deltaAssign
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
@@ -272,16 +243,13 @@ class TaxonomyConfig {
         formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate
         formalism.enableBridging = c.formalism.enableBridging
         formalism.refitMuPerIteration = c.formalism.refitMuPerIteration
-        formalism.hdlssThreshold = c.formalism.hdlssThreshold
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
         formalism.secondaryMassFloor = c.formalism.secondaryMassFloor
         formalism.bridgeSupportFloor = c.formalism.bridgeSupportFloor
         formalism.bridgeSupportRelFraction = c.formalism.bridgeSupportRelFraction
         formalism.tauKappaScalingFactor = c.formalism.tauKappaScalingFactor
-        formalism.tauFunnelFloor = c.formalism.tauFunnelFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
-        formalism.dPrefix = c.formalism.dPrefix
     }
 }
 

@@ -186,19 +186,19 @@ class TuiConfigFacade(
             kind = SettingKind.NUMBER
         ),
         SettingItem(
-            name = "Cosine Tau",
-            description = "Cosine routing temperature",
+            name = "Routing Softmax Tau",
+            description = "Routing softmax temperature",
             category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.cosineTau.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.cosineTau = it; true } ?: false },
+            getValue = { deps.config.formalism.routingSoftmaxTau.toString() },
+            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.routingSoftmaxTau = it; true } ?: false },
             kind = SettingKind.NUMBER
         ),
         SettingItem(
-            name = "Assignment Gap",
-            description = "Maximum leaf assignments",
+            name = "Assignment Cosine Gap",
+            description = "Leaf acceptance cosine margin",
             category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.assignmentGap.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.assignmentGap = it; true } ?: false },
+            getValue = { deps.config.formalism.assignmentCosineGap.toString() },
+            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.assignmentCosineGap = it; true } ?: false },
             kind = SettingKind.NUMBER
         ),
         SettingItem(

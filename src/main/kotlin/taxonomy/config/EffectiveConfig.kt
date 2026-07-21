@@ -53,10 +53,7 @@ data class EffectiveConfig(
         val maxDepth: Int = 12,
         val minClusterSize: Int = 25,
         val separationEpsilon: Double = 0.04,
-        val cosineTau: Double = 2.0,
         val routingSoftmaxTau: Double = 1.0,
-        val leafAcceptanceScale: Double = 1.0,
-        val assignmentGap: Double = 0.05,
         val assignmentCosineGap: Double = 0.03,
         val deltaAssign: Double = 0.20,
         val maxLeafAssignments: Int = 5,
@@ -66,15 +63,12 @@ data class EffectiveConfig(
         val enableResidualSplitGate: Boolean = false,
         val enableBridging: Boolean = false,
         val refitMuPerIteration: Boolean = false,
-        val hdlssThreshold: Double = 8.0,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
         val secondaryMassFloor: Double = 5.0,
         val bridgeSupportFloor: Double = 50.0,
         val bridgeSupportRelFraction: Double = 0.10,
         val tauKappaScalingFactor: Double = 0.0,
-        val tauFunnelFloor: Double = 0.80,
-        val defaultKappaPrior: Double = 10.0,
-        val dPrefix: Int = 256
+        val defaultKappaPrior: Double = 10.0
     )
 }

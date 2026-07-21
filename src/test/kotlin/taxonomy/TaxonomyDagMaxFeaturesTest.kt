@@ -990,11 +990,9 @@ class TaxonomyDagMaxFeaturesTest {
     fun `R17 - soft-membership margin unit check`() {
         val config = TaxonomyConfig()
         config.formalism.assignmentCosineGap = 0.03
-        config.formalism.cosineTau = 2.0
 
         val siblingKappaEffective = 100.0
-        val tauEffective = config.formalism.cosineTau.coerceAtLeast(0.01)
-        val marginNats = config.formalism.assignmentCosineGap * (siblingKappaEffective / tauEffective)
-        assertEquals(1.5, marginNats, 1e-5)
+        val marginNats = config.formalism.assignmentCosineGap * siblingKappaEffective
+        assertEquals(3.0, marginNats, 1e-5)
     }
 }
