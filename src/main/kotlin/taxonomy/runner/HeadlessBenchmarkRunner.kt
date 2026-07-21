@@ -1391,8 +1391,13 @@ class HeadlessBenchmarkRunner(
         val bridgeCount = allNodes.count { it.isBridge }
         val orphanCount = allNodes.count { it.id != root.id && it.parents.isEmpty() }
         
-        val bridges = allNodes.filter { it.isBridge }
-        val bridgeGroups = bridges.groupBy { it.crossLinkChildren.map { c -> c.id }.toSet() }
+        val bridges = allNodes.filter { it.isBridge || it.parents.size > 1 || it.crossLinkChildren.isNotEmpty() }
+        val validBridgesWithConnections = bridges.filter { b ->
+            b.parents.isNotEmpty() && (b.children.isNotEmpty() || b.crossLinkChildren.isNotEmpty())
+        }
+        val bridgeGroups = validBridgesWithConnections.groupBy { b ->
+            (b.parents.map { p -> p.id }.toSet()) to (b.children.map { c -> c.id } + b.crossLinkChildren.map { c -> c.id }).toSet()
+        }
         val duplicateBridgeCount = bridgeGroups.values.filter { it.size > 1 }.sumOf { it.size - 1 }
 
         val depthDist = allNodes.groupBy { it.depth }
@@ -1544,7 +1549,12 @@ class HeadlessBenchmarkRunner(
         val bridgeCount = bridges.size
         val orphanCount = allNodes.count { it.id != root.id && it.parents.isEmpty() }
         
-        val bridgeGroups = bridges.groupBy { (it.children.map { c -> c.id } + it.crossLinkChildren.map { c -> c.id }).toSet() }
+        val validBridgesWithConnections = bridges.filter { b ->
+            b.parents.isNotEmpty() && (b.children.isNotEmpty() || b.crossLinkChildren.isNotEmpty())
+        }
+        val bridgeGroups = validBridgesWithConnections.groupBy { b ->
+            (b.parents.map { p -> p.id }.toSet()) to (b.children.map { c -> c.id } + b.crossLinkChildren.map { c -> c.id }).toSet()
+        }
         val duplicateBridgeCount = bridgeGroups.values.filter { it.size > 1 }.sumOf { it.size - 1 }
         val residualCount = allNodes.sumOf { it.residualQueries.size }
 
