@@ -207,11 +207,14 @@ class TaxonomyOperations(
         val qCount = node.getRecursiveQueryCount()
         val directQ = node.queries.size
 
+        val parentNames = node.parents.mapNotNull { it.label }.filter { it.isNotBlank() }.distinct()
+        val parentsInfo = if (parentNames.size > 1) " [Bridge Parents: ${parentNames.joinToString(" & ")}]" else ""
+
         val vmfStats = if (node.vmfMu.isNotEmpty()) {
             " (kappa: ${"%.1f".format(java.util.Locale.US, node.vmfKappa)})"
         } else ""
 
-        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$cross$edgeType"
+        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$parentsInfo$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 
@@ -243,11 +246,14 @@ class TaxonomyOperations(
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
         val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent/Residual"
 
+        val parentNames = node.parents.mapNotNull { it.label }.filter { it.isNotBlank() }.distinct()
+        val parentsInfo = if (parentNames.size > 1) " [Bridge Parents: ${parentNames.joinToString(" & ")}]" else ""
+
         val vmfStats = if (node.vmfMu.isNotEmpty()) {
             " (vMF kappa: ${"%.3f".format(java.util.Locale.US, node.vmfKappa)})"
         } else ""
 
-        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$cross$edgeType"
+        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$parentsInfo$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 

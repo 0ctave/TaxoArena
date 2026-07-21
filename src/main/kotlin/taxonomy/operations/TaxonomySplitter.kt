@@ -457,9 +457,19 @@ class TaxonomySplitter(
                     // Representative subset from queryTexts for the prompt
                     val representativeSamples = queryTexts.shuffled().take(40)
 
+                    val parentLabelsList = parents
+                        .mapNotNull { it.label }
+                        .filter { it.isNotEmpty() && !it.startsWith("Emergent Concept") && !it.startsWith("Discovered Concept") }
+                        .distinct()
+                    val parentContextLabel = if (parentLabelsList.size > 1) {
+                        "Cross-Domain Polyhierarchy Bridge linking: ${parentLabelsList.joinToString(" AND ")}"
+                    } else {
+                        parentLabelsList.firstOrNull() ?: parents.find { it.id == treeParentId }?.label ?: "Universal Knowledge"
+                    }
+
                     val prompt = TaxoPrompts.clusterLabeling(
                         querySamples = representativeSamples,
-                        parentLabel = parents.find { it.id == treeParentId }?.label ?: "Universal Knowledge",
+                        parentLabel = parentContextLabel,
                         siblingLabels = siblingLabels,
                         branchHistory = lineage,
                         domainAnchors = domainAnchors,
