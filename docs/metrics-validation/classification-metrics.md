@@ -40,7 +40,7 @@ $$ H\text{-}F_1 = \frac{2 \cdot H\text{-}P \cdot H\text{-}R}{H\text{-}P + H\text
 These values are calculated per query and averaged over the dataset.
 
 > [!NOTE]
-> Hierarchical metrics are computed inside [TaxonomyMetrics.computeHierarchicalF1](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt). A recent PR (#48) plumbed the per-query true-leaf ground truth into this service, enabling live validation of classification quality.
+> Hierarchical metrics are computed inside [TaxonomyMetrics.computeHierarchicalF1](../../src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt). A recent PR (#48) plumbed the per-query true-leaf ground truth into this service, enabling live validation of classification quality.
 
 ---
 
@@ -67,4 +67,4 @@ EMAR provides a strict upper bound on routing safety. A high EMAR guarantees tha
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomyMetrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Code location for `computeHierarchicalF1` and EMAR calculation.
+*   [TaxonomyMetrics](../../src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Code location for `computeHierarchicalF1` and EMAR calculation.

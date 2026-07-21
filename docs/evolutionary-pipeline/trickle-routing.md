@@ -75,4 +75,4 @@ Queries that satisfy this gate are assigned to the leaf. If multiple leaves pass
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomyTrickler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyTrickler.kt): Contains the recursive routing logic and log-space softmax updates.
+*   [TaxonomyTrickler](../../src/main/kotlin/taxonomy/operations/TaxonomyTrickler.kt): Contains the recursive routing logic and log-space softmax updates.

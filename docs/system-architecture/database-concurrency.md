@@ -59,7 +59,7 @@ This instructs SQLite to wait for up to $30$ seconds (busy-retrying) for any loc
 
 ## 3. Core Leaderboard Database Schema
 
-Below is the SQL schema defined in [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt) to manage evaluation states:
+Below is the SQL schema defined in [TaxonomyRankingService](../../src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt) to manage evaluation states:
 
 ```sql
 -- Tracks pairwise contest statistics at specific nodes
@@ -117,5 +117,5 @@ This guarantees connections are returned to the OS, preventing connection leaks.
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Contains the schema definitions and JDBC transaction templates.
-*   [TaxonomyPersistence](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyPersistence.kt): Manages snapshot serializations and DB initializations.
+*   [TaxonomyRankingService](../../src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Contains the schema definitions and JDBC transaction templates.
+*   [TaxonomyPersistence](../../src/main/kotlin/taxonomy/service/TaxonomyPersistence.kt): Manages snapshot serializations and DB initializations.

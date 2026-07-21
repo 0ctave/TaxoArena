@@ -37,12 +37,12 @@ graph TD
 ```
 
 ### Core Services
-*   [TaxonomyEngine](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/TaxonomyEngine.kt): Entry point service that orchestrates the self-organizing pipeline.
-*   [TaxonomyFitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyFitter.kt): Fits spherical probability parameters.
-*   [TaxonomySplitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomySplitter.kt): Evaluates node split criteria.
-*   [TaxonomyMerger](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Optimizes DAG topologies and cross-links.
-*   [TaxonomyBenchmarkService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Manages active matchmaking and pairwise evaluations.
-*   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Interfaces with SQLite to save match verdicts, ratings, and Bradley-Terry parameters.
+*   [TaxonomyEngine](../../src/main/kotlin/taxonomy/TaxonomyEngine.kt): Entry point service that orchestrates the self-organizing pipeline.
+*   [TaxonomyFitter](../../src/main/kotlin/taxonomy/operations/TaxonomyFitter.kt): Fits spherical probability parameters.
+*   [TaxonomySplitter](../../src/main/kotlin/taxonomy/operations/TaxonomySplitter.kt): Evaluates node split criteria.
+*   [TaxonomyMerger](../../src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Optimizes DAG topologies and cross-links.
+*   [TaxonomyBenchmarkService](../../src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Manages active matchmaking and pairwise evaluations.
+*   [TaxonomyRankingService](../../src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Interfaces with SQLite to save match verdicts, ratings, and Bradley-Terry parameters.
 
 ---
 
@@ -85,6 +85,6 @@ This ensures that no more than `llmParallelism` API calls run concurrently, susp
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomyEngine](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/TaxonomyEngine.kt): Direct orchestrator using coroutines.
-*   [TaxonomyConfig](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/config/TaxonomyConfig.kt): Spring `@Configuration` declarations.
-*   [TaxonomyBenchmarkService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Code location for LLMPermit throttling.
+*   [TaxonomyEngine](../../src/main/kotlin/taxonomy/TaxonomyEngine.kt): Direct orchestrator using coroutines.
+*   [TaxonomyConfig](../../src/main/kotlin/taxonomy/config/TaxonomyConfig.kt): Spring `@Configuration` declarations.
+*   [TaxonomyBenchmarkService](../../src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Code location for LLMPermit throttling.

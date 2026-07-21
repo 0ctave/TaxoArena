@@ -1,8 +1,9 @@
 # Evaluation Metrics
 
-> **Scope** Paper §6 (Experiments) and appendix. Defines every metric used,
-> its citation, implementation status, and any open wiring/rename work.
-> Updated post PR #46 (commit `f257dcf`), June 2026.
+> **Scope** Paper §6 (Experiments) and appendix. Maps every metric to its paper
+> table, citation, and implementation status (✅ / 🔌 / 📋 / ⚠️). **Formal
+> definitions and code** live in [`../metrics-validation/`](../metrics-validation/);
+> this document is the status/mapping index, not a formula reference.
 
 ---
 
@@ -31,10 +32,13 @@ and vice versa. Well-defined; implementation stable.
 
 ### κ Profile by Depth ✅
 
-Reports mean vMF concentration `κ̄(d)` per depth level. Rising κ with depth
-indicates increasing intra-cluster coherence — the expected signature.
+Reports mean vMF concentration `κ̄(d)` per depth level, filtered to nodes that
+actually hold queries (empty parent shells are excluded). κ typically
+**decreases** with depth: root clusters are broad and tightly concentrated
+(observed depth-0 κ ≈ 175 at d = 256), while deeper nodes specialise and become
+more diffuse (depth-5 κ ≈ 72). This is the expected hierarchical signature.
 
-Typical observed values: depth-0 κ≈2, depth-3 κ≈44–75 depending on params.
+Formulas and code: see [`../metrics-validation/`](../metrics-validation/).
 
 ### Spherical Silhouette ✅
 
@@ -137,15 +141,22 @@ site — overlapping GT domain covering not yet wired.
 
 Adjusted Rand Index on flat partitions. Known to penalise polyhierarchy.
 
-### DAG Dendrogram Purity
+### DAG Dendrogram Purity ✅
 
-For a DAG, the LCA (Lowest Common Ancestor) is not unique. The implementation uses the *shallowest* LCA across all paths (conservative bound), following Monath et al. 2021.
+For a DAG, the LCA (Lowest Common Ancestor) is not unique. The implementation
+uses the *shallowest* LCA over the full DAG (conservative bound, Monath et al.
+2021), but tests **subtree purity over the tree skeleton only**
+(`TraversalPolicy.TREE_ONLY`) — i.e. cross-links/bridges are followed when
+finding common ancestors but **not** when expanding the purity-test subtree.
+This hybrid avoids the cross-link explosion that previously collapsed the metric
+toward 0.
 
-> [!WARNING]
-> **LCA Harshness Artifact:**
-> Because `dagDendrogramPurity` uses the shallowest LCA, any two same-label queries sitting in different subtrees will resolve to the root node (whose subtree spans all queries), making the pair count as impure. With data contamination and a large number of leaves (e.g. 134 leaves), most same-domain pairs are inevitably split across subtrees, causing the metric to collapse toward 0 (e.g. 0.0072). This acts as a measure of "are same-domain pairs kept under low LCAs," rather than overall quality of the taxonomy structure. It should be interpreted carefully alongside the flat Weighted Leaf Purity (which stays high at $\approx 0.725$).
+> **Interpretation:** because the shallowest LCA is used, same-label queries split
+> across distant subtrees still resolve to a high LCA and count as impure. Read
+> this metric alongside flat Weighted Leaf Purity, which is less sensitive to LCA
+> placement.
 
-**Implementation:** `dagDendrogramPurity` in `HierarchicalMetrics.kt` (PR #46).
+**Implementation:** `dagDendrogramPurity` in `HierarchicalMetrics.kt`.
 **Citation:** Monath, Zaheer, Dubey, Ahmed & McCallum 2021, AISTATS, PMLR 130 (DOI `10.48550/arXiv.2105.04024`).
 
 ### Weighted Leaf Purity (WLP) ⚠️

@@ -65,8 +65,9 @@ taxoadapt:
     enableLabeling: false
     enableLiveLabeling: false
   formalism:
-    splitDeltaThreshold: 0.04
-    assignmentGap: 0.10
+    separationEpsilon: 0.01
+    assignmentCosineGap: 0.15
+    deltaAssign: 1.0
   llm:
     labelingModel: "ministral-3:14b"
     judgeModel: "mistral-small:latest"

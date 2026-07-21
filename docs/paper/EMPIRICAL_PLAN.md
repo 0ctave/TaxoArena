@@ -43,17 +43,19 @@ at the canonical config (see `REPRODUCIBILITY.md §5`).
 
 | Experiment | Variable | Values | Metric focus |
 |------------|----------|--------|--------------|
-| **A1** — MRL schedule | Dimension schedule | `{128,256,512}`, `{128,512,1024}`, `{128,256,512,1024}` (default), uniform `{512}` | H-F1, Edge F1, Triplet Acc |
+| **A1** — Fixed dimension | `d` (MRL slice) | 128, **256 (default)**, 512 | H-F1, Edge F1, κ reliability (d/N) |
 | **A2** — Bias correction | Hornik–Grün correction | on (default), off | κ profile, Leaf Coherence |
 | **A3** — Overlapping NMI | NMI variant | Overlapping (default), disjoint Shannon | NMI value comparison |
-| **A4** — DAG vs Tree purity | Purity formula | DAG-Dendrogram (default), standard tree purity | Dendrogram Purity |
-| **A5** — Split threshold | `splitDeltaThreshold` | 0.01, 0.02, 0.04 (default), 0.08 | node count, H-F1 |
-| **A6** — Assignment gap | `assignmentGap` | 0.05, 0.10 (default), 0.20 | avg match count, ECE |
-| **A7** — Iteration count | `numIterations` | 10, 25 (default), 50 | convergence curve |
+| **A4** — DAG vs Tree purity | Purity formula | DAG-LCA + tree-skeleton subtree (default), standard tree purity | Dendrogram Purity |
+| **A5** — Split gate | `separationEpsilon` | 0.01, 0.02, 0.05, 0.10 | node count, H-F1 (near-inert: observed deltas ≈0.8) |
+| **A6** — Routing margin (joint) | `deltaAssign` × `assignmentCosineGap` | {1.0, 2.0, 3.0} × {0.10, 0.15, 0.20} | Macro F1, any-match, contamination, AvgMatch |
+| **A7** — Iteration count | `numIterations` | 10, 25, **35 (default)** | convergence curve |
 | **A8** — Reserved vs full | `reservedOnly` | true (default), false | all metrics |
 
-**A2** and **A3** are the two most important ablations: they directly justify the
-PR #46 corrections and quantify how much bias/wrong-formula affected previous runs.
+**A1**, **A2**, and **A6** are the most consequential: A1 justifies the fixed-d=256
+choice on d/N-coherence grounds (median leaf N≈105 → d/N≈2.4 at 256 vs ≈9.8 at 1024);
+A2 quantifies the Hornik–Grün correction; A6 sweeps the joint precision↔coverage
+frontier that drives every routing metric.
 
 ---
 

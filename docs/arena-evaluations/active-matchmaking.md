@@ -27,7 +27,7 @@ To optimize judge call efficiency, TaxoArena decouples query routing from matchm
 
 ## 3. Dual-Maturity Scheduling Utility
 
-Matchmaking is managed by [BtMatchScheduler](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt). Instead of purely optimizing rating uncertainty, the scheduler balances **global rank ordering** and **local rating resolution** via a composite utility:
+Matchmaking is managed by [BtMatchScheduler](../../src/main/kotlin/taxonomy/service/BtMatchScheduler.kt). Instead of purely optimizing rating uncertainty, the scheduler balances **global rank ordering** and **local rating resolution** via a composite utility:
 
 $$ \text{Utility}(i, j, L) = \left( \alpha \cdot U_{\text{structure}}(i, j) + (1 - \alpha) \cdot U_{\text{resolve}}(i, j, L) \right) \times \left( 1.0 - 0.3 \times \frac{n_{ij}}{\text{budget}_{\text{pair}}} \right) $$
 
@@ -77,7 +77,7 @@ Queries with higher centroid similarity are scheduled first, ensuring that LLM j
 
 ## 5. Difficulty-Weighted Stopping Policy
 
-The evaluation rounds run until the stopping criteria defined in [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt) are met.
+The evaluation rounds run until the stopping criteria defined in [BtStoppingPolicy](../../src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt) are met.
 
 ### Leaf Node Convergence (`isLeafConverged`)
 A leaf node $L$ is marked as converged if:
@@ -97,5 +97,5 @@ where $|Q_L|$ is the size of the pre-routed query pool for leaf $L$. This preven
 ---
 
 ## 🔗 Related Code References
-*   [BtMatchScheduler](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/BtMatchScheduler.kt): Implements entropy and KDE-based priority scheduling and query selection.
-*   [BtStoppingPolicy](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt): Computes leaf-level and difficulty-weighted global convergence.
+*   [BtMatchScheduler](../../src/main/kotlin/taxonomy/service/BtMatchScheduler.kt): Implements entropy and KDE-based priority scheduling and query selection.
+*   [BtStoppingPolicy](../../src/main/kotlin/taxonomy/service/BtStoppingPolicy.kt): Computes leaf-level and difficulty-weighted global convergence.

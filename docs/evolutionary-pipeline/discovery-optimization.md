@@ -11,7 +11,7 @@ When the query count of a leaf node $N$ exceeds a density threshold (typically $
 ### Dimensionality Projection (Power Iteration PCA)
 Raw vectors are in 4096-D. To compute stable statistical boundaries and avoid covariance singularities, we project vectors into a lower-dimensional subspace $d \in \{32, 64, 128\}$ based on query count.
 
-TaxoArena implements a lightweight **Power Iteration PCA** in [StatisticsUtils.pcaProject](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt) that does not require LAPACK:
+TaxoArena implements a lightweight **Power Iteration PCA** in [StatisticsUtils.pcaProject](../../src/main/kotlin/taxonomy/utils/StatisticsUtils.kt) that does not require LAPACK:
 1.  Subtract the empirical mean vector to center the data.
 2.  Iteratively extract the top eigenvectors.
 3.  Project the centered data onto the top-$k$ components and re-normalize onto the unit sphere.
@@ -87,5 +87,5 @@ it is pruned. Its queries are re-absorbed by its tree parent node, and its edges
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomySplitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomySplitter.kt): Implements PCA projection, vMF-k-Means, and Dasgupta split audits.
-*   [TaxonomyMerger](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Handles JS-divergence merges, passthrough collapsing, and starved node pruning.
+*   [TaxonomySplitter](../../src/main/kotlin/taxonomy/operations/TaxonomySplitter.kt): Implements PCA projection, vMF-k-Means, and Dasgupta split audits.
+*   [TaxonomyMerger](../../src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Handles JS-divergence merges, passthrough collapsing, and starved node pruning.

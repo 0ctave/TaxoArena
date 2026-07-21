@@ -37,7 +37,7 @@ The TaxoArena TUI is built using Kotlin and a text-based console interface libra
     *   Ranked list of evaluated models.
     *   Fitted log-strength scores ($\beta$).
     *   Standard error intervals ($\pm SE$) indicating estimation uncertainty.
-4.  **Live Logs Panel (Bottom Pane)**: Displays scrolling, colored system logs in real time. It is driven by [LogsPanel](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/tui/features/startup/LoadingPanel.kt) to monitor background fitting, routing, and matchmaking threads.
+4.  **Live Logs Panel (Bottom Pane)**: Displays scrolling, colored system logs in real time. It is driven by [LogsPanel](../../src/main/kotlin/taxonomy/tui/features/startup/LoadingPanel.kt) to monitor background fitting, routing, and matchmaking threads.
 
 ---
 
@@ -60,8 +60,8 @@ Navigation is governed by keyboard events mapped to specific pipeline operations
 
 To view the generated taxonomy in standard graph layouts, TaxoArena provides visualization utilities:
 
-*   **Kotlin Exporter**: [TaxonomyVisualizer](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyVisualizer.kt) sweeps the in-memory DAG and exports its structure in Graphviz DOT format.
-*   **Python Renderer**: The script [visualize_taxonomy.py](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/visualize_taxonomy.py) parses the `.dot` file. It color-codes nodes by depth, sizes nodes relative to their query count, and draws tree child edges as solid lines and cross-link parent edges as dashed lines.
+*   **Kotlin Exporter**: [TaxonomyVisualizer](../../src/main/kotlin/taxonomy/operations/TaxonomyVisualizer.kt) sweeps the in-memory DAG and exports its structure in Graphviz DOT format.
+*   **Python Renderer**: The script [visualize_taxonomy.py](../../visualize_taxonomy.py) parses the `.dot` file. It color-codes nodes by depth, sizes nodes relative to their query count, and draws tree child edges as solid lines and cross-link parent edges as dashed lines.
 *   **Command Line Execution**:
     ```powershell
     python visualize_taxonomy.py --input taxonomy_initial.dot --output taxonomy.png
@@ -72,6 +72,6 @@ This visualization pipeline allows researchers to inspect the self-organizing kn
 ---
 
 ## 🔗 Related Code References
-*   [LoadingPanel](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/tui/features/startup/LoadingPanel.kt): TUI view components.
-*   [TaxonomyVisualizer](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyVisualizer.kt): Generates Graphviz DOT representation of GraphNodes.
-*   [visualize_taxonomy.py](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/visualize_taxonomy.py): Python post-processing and rendering script.
+*   [LoadingPanel](../../src/main/kotlin/taxonomy/tui/features/startup/LoadingPanel.kt): TUI view components.
+*   [TaxonomyVisualizer](../../src/main/kotlin/taxonomy/operations/TaxonomyVisualizer.kt): Generates Graphviz DOT representation of GraphNodes.
+*   [visualize_taxonomy.py](../../visualize_taxonomy.py): Python post-processing and rendering script.

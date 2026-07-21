@@ -35,7 +35,7 @@ The overall **Spherical Silhouette** is the mean $s(x)$ across all queries:
 
 $$ \bar{S} = \frac{1}{n} \sum_{i=1}^n s(x_i) $$
 
-Values range within $[-1.0, 1.0]$. A positive value close to $1.0$ indicates that queries are tightly aligned with their cluster centroids and well-separated from neighboring domains. This is implemented in [StatisticsUtils.calculateSphericalSilhouette](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt).
+Values range within $[-1.0, 1.0]$. A positive value close to $1.0$ indicates that queries are tightly aligned with their cluster centroids and well-separated from neighboring domains. This is implemented in [StatisticsUtils.calculateSphericalSilhouette](../../src/main/kotlin/taxonomy/utils/StatisticsUtils.kt).
 
 ---
 
@@ -76,5 +76,5 @@ A lower Total Dasgupta Cost indicates a more structurally coherent hierarchy. Th
 ---
 
 ## 🔗 Related Code References
-*   [StatisticsUtils](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt): Computes spherical silhouette and the local Dasgupta split delta.
-*   [TaxonomyMetrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Computes overall quality metrics for the final reports.
+*   [StatisticsUtils](../../src/main/kotlin/taxonomy/utils/StatisticsUtils.kt): Computes spherical silhouette and the local Dasgupta split delta.
+*   [TaxonomyMetrics](../../src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Computes overall quality metrics for the final reports.

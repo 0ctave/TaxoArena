@@ -1,97 +1,90 @@
-# von Mises–Fisher (vMF) & Normal-Inverse-Wishart (NiW) Mathematical Fitting
+# vMF & NiW Fitting — Implementation Reference
 
-This document details the mathematical formulas, approximations, and algorithms used in **TaxoArena** for spherical statistical modeling. It covers the von Mises-Fisher (vMF) distribution fitting, small-sample bias corrections, log-Bessel computations, and the recursive updating of the Normal-Inverse-Wishart (NiW) posterior.
+> **Scope:** implementation details of the vMF fit and the Normal-Inverse-Wishart
+> posterior in TaxoArena. The statistical **derivations** (model, MLE, bias
+> correction, d/N-gated prior blend, OAS) live in
+> [`../paper/MATHEMATICAL_FOUNDATIONS.md`](../paper/MATHEMATICAL_FOUNDATIONS.md);
+> this document covers the numerical approximations, the recursive NiW update,
+> and the code locations. The embedding dimension is fixed at `d = 256`.
 
 ---
 
-## 1. The von Mises–Fisher (vMF) Model
+## 1. vMF Normalizer & Log-Bessel Approximation
 
-The von Mises-Fisher distribution models directional data on the unit hypersphere $S^{d-1} \subset \mathbb{R}^d$. For a unit vector $x \in S^{d-1}$, the probability density is defined as:
-
-$$ f(x \mid \mu, \kappa) = C_d(\kappa) \exp(\kappa \mu^T x) $$
-
-where:
-*   $\mu \in S^{d-1}$ is the unit mean direction vector ($\|\mu\| = 1$).
-*   $\kappa \ge 0$ is the concentration parameter.
-*   $C_d(\kappa)$ is the normalization constant.
-
-### Normalization Constant & Log-Bessel Approximation
-The normalization constant is given by:
-
-$$ C_d(\kappa) = \frac{\kappa^{d/2 - 1}}{(2\pi)^{d/2} I_{d/2 - 1}(\kappa)} $$
-
-where $I_{\nu}(\kappa)$ is the modified Bessel function of the first kind of order $\nu = d/2 - 1$. 
-
-In high dimensions (e.g., $d \ge 1024$), computing $I_{\nu}(\kappa)$ directly causes numerical overflow or underflow. TaxoArena evaluates the normalizer in log-space using the **Debye uniform asymptotic approximation**:
+The vMF density and its normalization constant are derived in
+[Mathematical Foundations §1.1](../paper/MATHEMATICAL_FOUNDATIONS.md). Evaluating
+the normalizer requires the modified Bessel function `I_ν(κ)` with
+`ν = d/2 − 1`. TaxoArena evaluates it in log-space via the **Debye uniform
+asymptotic approximation** (numerically stable, avoids overflow/underflow):
 
 $$ \ln C_d(\kappa) = \nu \ln \kappa - \frac{d}{2} \ln(2\pi) - \ln I_{\nu}(\kappa) $$
 
-where the Debye approximation of $\ln I_{\nu}(\kappa)$ is computed in [StatisticsUtils.logBesselI](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt):
+with the Debye approximation of `ln I_ν(κ)` computed in
+[`StatisticsUtils.logBesselI`](../../src/main/kotlin/taxonomy/utils/StatisticsUtils.kt):
 
 $$ \ln I_{\nu}(\kappa) \approx \nu \eta - \frac{1}{2} \ln(2\pi\nu) - \frac{1}{4} \ln(1 + z^2) $$
 
-where $z = \kappa/\nu$ and $\eta = \sqrt{1+z^2} + \ln\left(\frac{z}{1+\sqrt{1+z^2}}\right)$.
+where `z = κ/ν` and `η = √(1+z²) + ln(z / (1+√(1+z²)))`.
 
 ---
 
-## 2. Parameter Estimation & Bias Corrections
+## 2. Concentration Estimation (`StatisticsUtils.correctedKappa`)
 
-Given a set of $n$ unit-norm projected vectors $\{x_1, x_2, \dots, x_n\} \subset S^{d-1}$, the resultant sum vector is:
+Given `n` unit-norm projected vectors, the mean resultant length is
+`R̄ = ‖∑xᵢ‖/n` and the MLE for the mean direction is `μ = R/‖R‖`.
 
-$$ R = \sum_{i=1}^n x_i $$
+The concentration is estimated in three steps inside
+[`correctedKappa`](../../src/main/kotlin/taxonomy/utils/StatisticsUtils.kt):
 
-The mean resultant length is $\bar{R} = \frac{\|R\|}{n}$, and the Maximum Likelihood Estimate (MLE) for the mean direction is:
+1. **Banerjee closed-form MLE** (inverts `A_d(κ) = R̄`):
 
-$$ \mu = \frac{R}{\|R\|} $$
+   $$ \kappa_{ML} \approx \bar{R}\,\frac{d - \bar{R}^2}{1 - \bar{R}^2} $$
 
-### Banerjee Closed-Form Kappa Estimation
-The MLE for the concentration parameter $\kappa$ requires inverting the ratio of Bessel functions: $A_d(\kappa) = \bar{R}$. Because this is transcendental, we use the Banerjee closed-form approximation:
+2. **Hornik–Grün shrinkage** (single factor, the `O(d/N)` bias correction of
+   Hornik & Grün 2014, Eq. 9 — see
+   [Mathematical Foundations §1.2](../paper/MATHEMATICAL_FOUNDATIONS.md)):
 
-$$ \kappa_{ML} \approx \bar{R} \frac{d - \bar{R}^2}{1 - \bar{R}^2} $$
+   $$ \kappa_{HG} = \kappa_{ML} \cdot \frac{n - 1}{n + d - 2} $$
 
-### Small-Sample Shrinkage Correction
-To prevent over-concentration when the sample size $n$ is small relative to the dimension $d$, we scale $\kappa_{ML}$ by a shrinkage factor:
+3. **Clamp** to `[1e-3, 1e4]` (`κ_min` for the uniform/degenerate case when
+   `R̄ ≤ 0`; `κ_max` for the spike case when `R̄ ≥ 1`).
 
-$$ \kappa = \kappa_{ML} \cdot \left( \frac{n - 1}{n + d - 2} \right) $$
-
-This is capped at $\kappa_{max} = 10^4$ and floored at $\kappa_{min} = 10^{-3}$.
-
-### Hornik & Grün (2014) Bias Correction
-In high-dimensional spaces, the MLE $\hat{\kappa}$ carries a positive bias of order $O(d/n)$. At deeper levels of the taxonomy DAG (where $d$ is large and $n$ is small, e.g., $d=1024, n \approx 15 \dots 30$), $\kappa$ is over-estimated. This makes leaf nodes appear more cohesive than they are.
-
-Following Hornik & Grün (2014) (*Journal of Statistical Software*), when the ratio $d/n > 5.0$, we apply a second shrinkage step:
-
-$$ \kappa_{\text{corrected}} = \kappa \cdot \left( \frac{n - 1}{n + d - 2} \right) $$
-
-If $d/n > 10.0$, the estimation is flagged as unreliable, and the prior dominates. This is implemented in [StatisticsUtils.biasCorrectKappa](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt).
+A `WARN` is logged when `d/N > 10` (degenerate leaf regime); with `d = 256` and
+`minClusterSize = 50` this is rare. The separate **d/N-gated prior blend**
+(`(1−α_d)·κ_HG + α_d·κ_prior`, performed in `TaxonomyFitter`) is described in
+[Mathematical Foundations §1.2](../paper/MATHEMATICAL_FOUNDATIONS.md).
 
 ---
 
-## 3. Normal-Inverse-Wishart (NiW) Posterior Updates
+## 3. Normal-Inverse-Wishart (NiW) Diagonal Posterior
 
-To perform Bayesian soft routing, TaxoArena models the covariance structure of each node using a Normal-Inverse-Wishart (NiW) conjugate prior. This regularizes the covariance estimation in high dimensions where the sample covariance would otherwise be singular.
+TaxoArena models per-node directional variance with a Normal-Inverse-Wishart
+conjugate prior, stored in **diagonal (factored) form** as
+`GraphNode.niwLambda` for `O(d)` time and space. The prior parameters are derived
+from the parent node's vMF mean `μ_parent` and concentration `κ_parent`:
 
-For a node $N$, we project the query vectors onto the node's slice dimension $d$. We calculate the prior parameters $(m_0, \kappa_0, \nu_0, \Lambda)$ using the parent node's vMF mean vector $\mu_{parent}$ and concentration $\kappa_{parent}$:
-*   $\kappa_0 = 1.0$
-*   $\nu_0 = d + 2$
-*   $\Lambda = \frac{1}{\bar{\kappa}_{parent} \cdot d}$ (acts as diagonal prior variance scale, where $\bar{\kappa}_{parent}$ is the average parent concentration)
+- `κ₀ = 1.0`
+- `ν₀ = d + 2`
+- `Λ = 1 / (κ̄_parent · d)` (diagonal prior variance scale, `κ̄_parent` = average
+  parent concentration)
 
-Given sample mean vector $\bar{x} = \frac{1}{n} \sum_{i=1}^n x_i$, the posterior parameters $(m_N, \kappa_N, \nu_N, \Lambda_N)$ are updated as follows:
+Given the sample mean `x̄ = (1/n)∑xᵢ`, the posterior parameters update as:
 
-$$ \kappa_N = \kappa_0 + n $$
+$$ \kappa_N = \kappa_0 + n, \qquad \nu_N = \nu_0 + n, \qquad m_N = \frac{\kappa_0 m_0 + n \bar{x}}{\kappa_N} $$
 
-$$ \nu_N = \nu_0 + n $$
+The diagonal posterior scale elements are:
 
-$$ m_N = \frac{\kappa_0 m_0 + n \bar{x}}{\kappa_N} $$
+$$ \Lambda_{N,i} = \Lambda + \sum_{j=1}^{n}(x_{j,i} - \bar{x}_i)^2 + \frac{\kappa_0\, n}{\kappa_N}(\bar{x}_i - m_{0,i})^2 $$
 
-For the scale matrix $\Lambda_N$, we assume a diagonal covariance structure to maintain computational efficiency in high dimensions ($O(d)$ time and space). The diagonal elements $\Lambda_{N, i}$ are updated as:
-
-$$ \Lambda_{N, i} = \Lambda + \sum_{j=1}^n (x_{j, i} - \bar{x}_i)^2 + \frac{\kappa_0 n}{\kappa_N} (\bar{x}_i - m_{0, i})^2 $$
-
-These diagonal posterior scale values represent the directional variance. They are saved in `GraphNode.niwLambda` and are used to compute the log-semantic volume and Mahalanobis distances.
+These diagonal values represent per-dimension directional variance and feed the
+log-semantic-volume and Mahalanobis-distance computations. The OAS-regularised
+initialisation of `Ψ₀` is covered in
+[Mathematical Foundations §4](../paper/MATHEMATICAL_FOUNDATIONS.md).
 
 ---
 
-## 🔗 Related Code References
-*   [StatisticsUtils](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/StatisticsUtils.kt): Implements Bessel ratios, Banerjee approximation, Hornik & Grün correction, and Debye approximation.
-*   [TaxonomyFitter](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyFitter.kt): Executes level-by-level vMF and NiW updates.
+## Related Code References
+
+- [`StatisticsUtils`](../../src/main/kotlin/taxonomy/utils/StatisticsUtils.kt) — Bessel ratios, Banerjee MLE, Hornik–Grün correction, Debye approximation.
+- [`TaxonomyFitter`](../../src/main/kotlin/taxonomy/operations/TaxonomyFitter.kt) — level-by-level vMF fits, d/N-gated prior blend, NiW diagonal updates.
+- [`GraphNode`](../../src/main/kotlin/taxonomy/model/GraphNode.kt) — `niwLambda` diagonal scale storage.

@@ -33,15 +33,15 @@ TaxoArena implements a **Directed Acyclic Graph (DAG)** topology allowing **poly
 ### Topological Separation: Tree vs. Cross-Links
 
 To maintain a clean structural skeleton for routing, TaxoArena distinguishes between two types of parent-child edges:
-1.  **Tree Edges**: Stored in [GraphNode.children](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/model/GraphNode.kt). These define the primary hierarchical skeleton. A node has at most one tree parent, which is tracked via `GraphNode.treeParentId`.
-2.  **Cross-Link Edges**: Stored in [GraphNode.crossLinkChildren](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/model/GraphNode.kt). These define the secondary polyhierarchical relationships.
+1.  **Tree Edges**: Stored in [GraphNode.children](../../src/main/kotlin/taxonomy/model/GraphNode.kt). These define the primary hierarchical skeleton. A node has at most one tree parent, which is tracked via `GraphNode.treeParentId`.
+2.  **Cross-Link Edges**: Stored in [GraphNode.crossLinkChildren](../../src/main/kotlin/taxonomy/model/GraphNode.kt). These define the secondary polyhierarchical relationships.
 
 > [!IMPORTANT]
 > A critical bug fix (resolved in PR #46) separates cross-link edges from primary tree child edges. If cross-links were added to `children`, it would cause `isLeaf = children.isEmpty()` to evaluate to `false` for terminal nodes that receive cross-links, preventing the trickle router from identifying them as active evaluation arenas. Maintaining `crossLinkChildren` separately ensures tree leaves remain recognized as leaves.
 
 ### Evaluation and Insertion of Cross-Links
 
-Cross-links are evaluated and inserted in a dedicated pass within the [TaxonomyMerger](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt):
+Cross-links are evaluated and inserted in a dedicated pass within the [TaxonomyMerger](../../src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt):
 1.  **Eligibility**: A node $N$ and a potential parent $P$ are eligible for cross-linking if:
     *   $N \neq P$
     *   $P$ is not an ancestor of $N$, and $N$ is not an ancestor of $P$ (preventing cycles).
@@ -64,7 +64,7 @@ Cross-links are evaluated and inserted in a dedicated pass within the [TaxonomyM
 
 Polyhierarchy can introduce redundant edges. For instance, if there exist edges $A \to B$, $B \to C$, and a direct edge $A \to C$, the direct edge is redundant because the relationship is already transitively captured via $B$.
 
-TaxoArena runs a **transitive reduction** post-pass inside [TaxonomyMerger.transitiveReduction](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt):
+TaxoArena runs a **transitive reduction** post-pass inside [TaxonomyMerger.transitiveReduction](../../src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt):
 *   For each node $C$, we collect its parent set.
 *   We construct an ancestor map listing all ancestors for every node in the DAG.
 *   If parent $P_1$ is an ancestor of another parent $P_2$ (meaning $P_1 \in \text{Ancestors}(P_2)$), then the direct edge $P_1 \to C$ is redundant and is severed.
@@ -73,5 +73,5 @@ TaxoArena runs a **transitive reduction** post-pass inside [TaxonomyMerger.trans
 ---
 
 ## 🔗 Related Code References
-*   [GraphNode](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/model/GraphNode.kt): Node data class.
-*   [TaxonomyMerger](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Contains the cross-linking and transitive reduction implementations.
+*   [GraphNode](../../src/main/kotlin/taxonomy/model/GraphNode.kt): Node data class.
+*   [TaxonomyMerger](../../src/main/kotlin/taxonomy/operations/TaxonomyMerger.kt): Contains the cross-linking and transitive reduction implementations.

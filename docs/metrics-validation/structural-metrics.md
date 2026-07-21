@@ -56,4 +56,4 @@ $$ \tilde{S}(T) = \frac{1}{\left| \text{Leaves} \right|} \sum_{l \in \text{Leave
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomyMetrics](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Computes structural metrics for snapshot logging.
+*   [TaxonomyMetrics](../../src/main/kotlin/taxonomy/utils/TaxonomyMetrics.kt): Computes structural metrics for snapshot logging.

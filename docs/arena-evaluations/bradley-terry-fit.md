@@ -34,7 +34,7 @@ To find the Maximum Likelihood Estimate (MLE) of the log-strengths $s$, we maxim
 
 $$ \mathcal{L}(s) = \sum_{i=1}^{K} \sum_{j \neq i} \left[ w'_{ij} s_i - w'_{ij} \ln(\exp(s_i) + \exp(s_j)) \right] $$
 
-Direct maximization requires solving nonlinear equations. TaxoArena implements the **Minorization-Maximization (MM)** algorithm in [BtMmFitter.fit](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt). The MM algorithm constructs a tight lower bound (surrogate function) and maximizes it iteratively, guaranteeing global and monotonic convergence.
+Direct maximization requires solving nonlinear equations. TaxoArena implements the **Minorization-Maximization (MM)** algorithm in [BtMmFitter.fit](../../src/main/kotlin/taxonomy/service/BtMmFitter.kt). The MM algorithm constructs a tight lower bound (surrogate function) and maximizes it iteratively, guaranteeing global and monotonic convergence.
 
 The update equation for the strength parameter $\pi_i^{(t+1)}$ at iteration $t+1$ is:
 
@@ -90,5 +90,5 @@ with a fallback value of $10.0$ if $F_{ii} = 0$.
 ---
 
 ## 🔗 Related Code References
-*   [BtMmFitter](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/BtMmFitter.kt): Implements the MM fitting algorithm, Gauss-Jordan matrix inversion, and full Fisher Information standard error estimator.
-*   [TaxonomyRankingService](file:///Z:/FAC/TUBerlin/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Handles saving and loading of `NodeBtState` objects from the SQLite database.
+*   [BtMmFitter](../../src/main/kotlin/taxonomy/service/BtMmFitter.kt): Implements the MM fitting algorithm, Gauss-Jordan matrix inversion, and full Fisher Information standard error estimator.
+*   [TaxonomyRankingService](../../src/main/kotlin/taxonomy/service/TaxonomyRankingService.kt): Handles saving and loading of `NodeBtState` objects from the SQLite database.

@@ -90,34 +90,36 @@ Stores a model's local or global rating (OpenSkill baseline).
 
 ## 4. System Settings & Configuration
 
-The configuration parameters are managed via a nested YAML setup (mapped to `TaxonomyConfig` in Kotlin). Below is a comprehensive specification of these settings:
+The configuration parameters are managed via TOML (mapped to `TaxonomyConfig` in Kotlin). The canonical experiment is [`experiment_configs/thesis_canonical.toml`](../../experiment_configs/thesis_canonical.toml); the parameter set below is the simplified thesis surface (12 formalism knobs + `dagMode` + a diagnostics block).
 
-```yaml
-taxonomy:
-  formalism:
-    minClusterSize: 40            # Minimum queries required to keep a node or trigger a split ($N_{min}$)
-    maxDepth: 8                  # Maximum allowable depth of the taxonomy DAG ($D_{max}$)
-    separationEpsilon: 0.04      # JS-divergence distinctness threshold ($\epsilon$) for sibling merging
-    assignmentCosineGap: 0.03    # Soft routing assignment cosine gap threshold
-    cosineTau: 2.0               # Temperature ($\tau$) for softmax routing probabilities
-    emaAlpha: 0.7                # Decay rate ($\alpha_{EMA}$) for vMF concentration parameters
-    hdlssThreshold: 8.0          # d/N ratio limit for backing off to lower MRL dimension prefixes
-    fusionSimilarityThreshold: 0.92  # Cosine similarity threshold for organic node fusion
-    effectiveSupportFloor: 2.0   # Minimum effective query count required for fitting vMF variance
-    biasCorrectionThreshold: 5.0 # Ratio $d/N$ above which kappa bias correction is applied
-  llm:
-    labelingModel: "gemini-2.5-flash"  # Model used for generating domain-specialized labels
-    judgeModel: "gemini-2.5-pro"        # Model instantiated for pairwise trajectory evaluation
-    apiBaseUrl: "https://api.provider.com"
-  execution:
-    enableLabeling: true         # Enable/disable cluster naming via LLM
-    enableLiveLabeling: false    # Generate labels during execution or post-pass
-    llmParallelism: 8            # Maximum concurrent requests to the LLM API
+```toml
+dagMode = "DAG_MAX"   # enables stable IDs, residual routing, split gates, bridging, refit
+
+# ── Formalism (12 knobs) ──
+maxDepth                  = 8      # Maximum allowable depth of the taxonomy DAG (D_max)
+minClusterSize            = 50     # Minimum queries to keep a node or trigger a split (N_min); d/N coherence floor
+separationEpsilon         = 0.01   # Dasgupta delta gate for accepting a split (epsilon)
+routingSoftmaxTau         = 1.50   # Sibling softmax temperature (tau)
+assignmentCosineGap       = 0.15   # Leaf-acceptance margin in nats (gap)
+deltaAssign               = 1.0    # Internal-node traversal margin (multi-path breadth)
+maxLeafAssignments        = 5      # Safety cap on leaves per query
+emaAlpha                  = 0.7    # Decay rate (alpha_EMA) for vMF concentration smoothing
+fusionSimilarityThreshold = 0.92   # Cosine similarity threshold for organic node fusion
+effectiveSupportFloor     = 2.0    # Minimum effective N before falling back to the prior kappa
+defaultKappaPrior         = 10.0   # Neutral kappa prior for root / orphan / empty nodes
+
+# ── Diagnostics (affect only the bridge diagnostics exporter, not the algorithm) ──
+secondaryMassFloor        = 5.0
+bridgeSupportFloor         = 50.0
+bridgeSupportRelFraction   = 0.10
+tauKappaScalingFactor      = 0.0    # gamma in dynamicTau = tau * kappa^gamma (0 = off)
 ```
+
+The MRL embedding dimension is fixed at `d = 256` for all depths — see [Mathematical Foundations](../paper/MATHEMATICAL_FOUNDATIONS.md) for the d/N coherence justification.
 
 ---
 
-## 🔗 Related Code References
-*   [DataModels.kt](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/model/DataModels.kt): Core embedding, metrics, and GMM models.
-*   [BenchmarkModels.kt](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/model/BenchmarkModels.kt): Rating, BT state, and matchmaking models.
-*   [TaxonomyConfig.kt](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/config/TaxonomyConfig.kt): Spring configuration classes.
+## Related Code References
+*   [DataModels.kt](../../src/main/kotlin/taxonomy/model/DataModels.kt): Core embedding, metrics, and GMM models.
+*   [BenchmarkModels.kt](../../src/main/kotlin/taxonomy/model/BenchmarkModels.kt): Rating, BT state, and matchmaking models.
+*   [TaxonomyConfig.kt](../../src/main/kotlin/taxonomy/config/TaxonomyConfig.kt): Spring configuration classes.

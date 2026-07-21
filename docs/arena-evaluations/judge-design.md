@@ -75,5 +75,5 @@ Output your step-by-step comparison, assign a final verdict (Winner: Agent 1 / A
 ---
 
 ## 🔗 Related Code References
-*   [TaxonomyBenchmarkService](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Handles matchmaking execution, runs pairwise comparisons, and parses judge outputs.
-*   [TaxoPrompts](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/src/main/kotlin/taxonomy/prompts/TaxoPrompts.kt): Contains the template builders for judge prompt synthesis.
+*   [TaxonomyBenchmarkService](../../src/main/kotlin/taxonomy/service/TaxonomyBenchmarkService.kt): Handles matchmaking execution, runs pairwise comparisons, and parses judge outputs.
+*   [TaxoPrompts](../../src/main/kotlin/taxonomy/prompts/TaxoPrompts.kt): Contains the template builders for judge prompt synthesis.

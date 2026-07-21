@@ -69,17 +69,24 @@ testRatio = 0.3
 seed = 42
 
 # Pipeline execution controls
-runPipeline = true        # Runs GMM splitting and trickle routing from scratch
-judgeInduction = true     # Generates contrastive leaf judge prompts
+runPipeline    = true     # Constructs the taxonomy DAG from scratch (vMF-k-means splits + trickle routing)
+runTrickle     = true     # Runs trickle routing validation
+judgeInduction = false    # Generates contrastive leaf judge prompts (off for taxonomy-only runs)
+runBaselines   = true     # Generates Flat k-means / HAC Ward / Random-Null baseline snapshots
 
-# Topology constraints
-maxDepth = 3
-minClusterSize = 15
-separationEpsilon = 0.08
-cosineTau = 2.0
-assignmentGap = 0.2
-emaAlpha = 0.5
-enableLabeling = true
+# Topology + formalism (see experiment_configs/thesis_canonical.toml for the full 12-knob set)
+dagMode               = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 50
+separationEpsilon     = 0.01
+routingSoftmaxTau     = 1.50
+assignmentCosineGap   = 0.15
+deltaAssign           = 1.0
+emaAlpha              = 0.7
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+numIterations         = 35
+enableLabeling        = false
 ```
 
 ### Headless Configuration Parameters Reference
@@ -94,7 +101,7 @@ The following table provides a comprehensive reference for all options available
 | **`models`** | List of Strings | `[]` | Roster of model names to evaluate (must exactly match entries in `eval_results` table in `mmlu_pro_dataset_cache_v2.db`). |
 | **`conditions`** | List of Strings | `[]` | Sequential conditions to evaluate (supports: `MAIN`, `C3`, `C5`, `RANDOM_SCHEDULER`, `ROUND_ROBIN`, `KMEANS_BASELINE`, `WARD_BASELINE`, `RANDOMNULL_BASELINE`). |
 | **`outputDir`** | String | `experiment_results_old` | Target directory where validation CSVs, JSONs, and LaTeX leaderboards are saved. |
-| **`runPipeline`** | Boolean | `true` | When `true`, constructs the taxonomy DAG from scratch using GMM splitting and trickle routing. |
+| **`runPipeline`** | Boolean | `true` | When `true`, constructs the taxonomy DAG from scratch using vMF-k-means splitting and trickle routing. |
 | **`judgeInduction`** | Boolean | `true` | When `true`, runs MapReduce prompt induction to generate custom, contrastive leaf judge prompts. |
 | **`runBenchmark`** | Boolean | `true` | When `true`, executes the back-to-back benchmarking evaluations for each condition in `conditions`. |
 | **`runTrickle`** | Boolean | `false` | When `true`, runs additional trickle routing validation tests. |
@@ -108,17 +115,19 @@ The following table provides a comprehensive reference for all options available
 | **`questionsPerRound`** | Integer | `12` | Batch size of queries adjudicated in each active matchmaking round. |
 | **`reservedOnly`** | Boolean | `true` | If `true`, restricts evaluations to `Q_test` (preserving strict training/testing separation). |
 | **`enableLabeling`** | Boolean | `true` | Enables post-evolution LLM synthesis of semantic node labels. |
-| **`maxDepth`** | Integer | `3` | Maximum depth allowed for the generated Taxonomy DAG tree structure. |
-| **`minClusterSize`** | Integer | `15` | Minimum number of queries required to form a distinct category leaf node. |
-| **`separationEpsilon`** | Double | `0.08` | Separation margin threshold between cluster centroids. |
-| **`cosineTau`** | Double | `2.0` | Soft-clustering cosine temperature scaling parameter ($\tau$). |
-| **`assignmentGap`** | Double | `0.2` | Minimum gap constraint for hard cluster assignment boundaries. |
-| **`emaAlpha`** | Double | `0.5` | Exponential moving average rate ($\alpha$) for centering cluster updates. |
+| **`maxDepth`** | Integer | `8` | Maximum depth allowed for the generated taxonomy DAG. |
+| **`minClusterSize`** | Integer | `50` | Minimum queries to keep a node or trigger a split; also the d/N coherence floor at d=256. |
+| **`separationEpsilon`** | Double | `0.01` | Dasgupta delta gate: a split is accepted when its delta exceeds this value. |
+| **`routingSoftmaxTau`** | Double | `1.50` | Sibling softmax temperature for trickle routing. |
+| **`assignmentCosineGap`** | Double | `0.15` | Leaf-acceptance margin in nats (precision ↔ coverage). |
+| **`deltaAssign`** | Double | `1.0` | Internal-node traversal margin controlling multi-path breadth. |
+| **`emaAlpha`** | Double | `0.7` | Exponential moving average rate for vMF concentration smoothing. |
+| **`dagMode`** | Enum | `DAG_MAX` | Mode switch (`DAG_MAX` enables residual routing, split gates, bridging, refit; `TREE_BASELINE` for the ablation row). |
 
 ---
 
 ### Step 2: Generate the Dataset Split and Taxonomy
-Run the boot task passing the config file to initiate the GMM splitting, trickle routing, judge prompt induction, and database logging:
+Run the boot task passing the config file to initiate the vMF-k-means splitting, trickle routing, judge prompt induction, and database logging:
 
 ```bash
 ./gradlew bootRun --args="--config experiment_pipeline_config.toml"
@@ -130,7 +139,7 @@ Run the boot task passing the config file to initiate the GMM splitting, trickle
 > On subsequent evaluation runs, set `runPipeline = false` and pass the generated `snapshotId` (e.g. `20260717_021530_Headless_Run`) to ensure the exact same taxonomy structure and test pool are reused without regeneration.
 
 ### Step 3: Automated Baseline Generation (Under the Hood)
-When the pipeline starts with `runPipeline = true`, it automatically invokes the Python script [generate_baselines.py](file:///Z:/FAC/TUBerlin/THESIS/TaxoArena/scripts/generate_baselines.py) as a subprocess. This script:
+When the pipeline starts with `runPipeline = true`, it automatically invokes the Python script [generate_baselines.py](../../scripts/generate_baselines.py) as a subprocess. This script:
 1. Loads the Qwen3 embeddings for all queries in the dataset from `embeddings_cache.db` (handling big-endian JVM binary byte order).
 2. Normalizes and clusters the embeddings using `scikit-learn` KMeans ($k=17$) and AgglomerativeClustering with Ward linkage.
 3. Generates the flat structures and centroid vectors, saving `_baseline_kmeans`, `_baseline_ward`, and `_baseline_randomnull` graphs as snapshot entries in `snapshots.db` under the base snapshot prefix.
