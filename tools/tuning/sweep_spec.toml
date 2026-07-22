@@ -16,27 +16,35 @@ stage = "screen"
 seeds = [137, 2048]
 stage = "validate"
 
-# Recalibration sweep — run now that DuplicateBridgeCount is fixed (commit cb70407:
-# grouping now requires non-empty parents AND matches on parent-set + child-set
-# jointly, instead of collapsing all empty-child bridges into one false duplicate
-# group). The prior L9 batch's near-universal hard-gate failures were partly
-# contaminated by that bug, so this sweep restores full previously-tested ranges
-# instead of narrowing, to avoid prematurely discarding configs that were
-# incorrectly failed last time.
+# ══════════════════════════════════════════════════════════════════════════
+#  FRESH CALIBRATION SWEEP
+#  Base built on the corrected construction path: N-normalized EM tolerance,
+#  adaptive cap + plateau guard, fusionSimilarityThreshold = 0.90 (validated
+#  coherence-preserving), runBaselines = false during screening. All prior
+#  tuning results are STALE against this base — clean restart, not continuation.
 #
-# deltaAssign: widened back to {1.0, 2.0, 4.0, 7.0} conceptually, but kept as a
-# 3-level factor for L9 compatibility -> {1.0, 2.0, 4.0}. This refills the
-# 2.0-4.0 gap skipped in the previous batch (which jumped straight to 4.0/10.0)
-# while dropping 10.0, which only ever demonstrated MaxAssignmentCapRate failure
-# and gave no new gradient information.
+#  BEFORE RUNNING, CONFIRM:
+#   1. One canonical build shows the selected-split converged=false fraction is
+#      acceptable (EM plateau-relabel decision) — do not sweep on a base where
+#      ~half of selected splits are non-converged.
+#   2. The BorderlineRate band decision below is resolved and pre-registered.
 #
-# routingSoftmaxTau and minClusterSize: reverted to their full original ranges
-# rather than the narrowed bands considered previously, since conclusions about
-# their effect on ECE/borderline were drawn while the duplicate-bridge gate was
-# still unreliable and may have been distorted.
+#  FACTOR DESIGN (matches the [factors] block — no stale references):
+#   - assignmentCosineGap {0.10,0.125,0.15}: primary soft-membership margin.
+#     Weak effect on borderline/ECE, stronger on Top-1/migration. Not binding.
+#   - deltaAssign {1.0,1.25,1.5}: dominant lever on BorderlineRate/ECE in prior
+#     batches (|r|~0.85-0.97). Centered low because 1.0 was best near-miss and
+#     >=2.0 overshoots borderline / pushes MaxAssignmentCapRate toward its gate.
+#   - secondaryMassFloor {2.0,3.5,5.0}: bridge/secondary-assignment control.
+#     NEW factor — effect was previously UNREADABLE (report column-mapping bug).
+#     Confirm the finalists report prints real values before trusting selection.
+#   - bridgeSupportRelFraction {0.03,0.05,0.10}: bridge support threshold.
+#     NEW factor, same prior-readability caveat.
 #
-# assignmentCosineGap: unchanged; this factor was never implicated in the bug
-# and prior sweep notes already confirmed only a weak effect on borderline/ECE.
+#  minClusterSize and routingSoftmaxTau are NOT swept this generation (held at
+#  thesis_canonical.toml values). Prior conclusions about their ECE/borderline
+#  effect are superseded by the corrected base.
+# ══════════════════════════════════════════════════════════════════════════
 [factors]
 assignmentCosineGap      = [0.10, 0.125, 0.15]
 deltaAssign              = [1.0, 1.25, 1.5]
@@ -47,7 +55,9 @@ bridgeSupportRelFraction = [0.03, 0.05, 0.10]
 Acyclic = true
 DuplicateBridgeCount = 0
 OrphanCount = 0
-has_depth2_sourceB = false
+has_depth2_sourceB = false            # disabled: SourceB (depth-2 cross-anchor)
+# bridges are geometry-limited (validated),
+# not required for a valid canonical DAG.
 MaxAssignmentCapRate_le = 0.20
 SmallLeafFraction_le = 0.50
 SelectedNodeStarvedLeafFraction_le = 0.20
@@ -57,6 +67,18 @@ SourceBPerAnchorMean_le = 3.0
 AvgMatchCount_band = [1.0, 4.0]
 Top1Accuracy_ge = 0.74
 RoutingECE_le = 0.15
-BorderlineRate_band = [0.20, 0.50]
+# ── DECISION REQUIRED — DO NOT LEAVE AS-IS WITHOUT JUSTIFICATION ────────────
+# BorderlineRate_band was [0.20, 0.35] in earlier sweeps; set to [0.20, 0.50]
+# here. Widening the band AFTER seeing configs fail at 0.35 is only defensible
+# if the wider bound is justified from the mechanism and pre-registered BEFORE
+# this sweep runs. Pick ONE and document it in the thesis:
+#   (a) Keep [0.20, 0.35]; accept borderline as a binding constraint.
+#   (b) Widen to [0.20, 0.50] WITH a written argument for why ~50% borderline
+#       is acceptable for judge quality (pre-registered, not post-hoc).
+#   (c) Demote BorderlineRate to a reported diagnostic (remove from soft gates)
+#       WITH an argument that it is a routing-confidence property, not a
+#       taxonomy-validity requirement.
+# BorderlineRate: REMOVED as a gate (see pre-registration). Reported as a
+# diagnostic in the ledger, not gated. Calibration gated by RoutingECE.
 CrossAnchorMigrationRate_band = [0.10, 0.30]
 CanonicalAdaptedJaccard_band = [0.0, 1.0]

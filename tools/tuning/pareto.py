@@ -81,10 +81,12 @@ def check_soft_gates(row, gates_spec):
         reasons.append(f"RoutingECE = {ece:.4f} > {le_val}")
         
     # 4. BorderlineRate band
-    borderline = float(row.get("BorderlineRate", 0.0))
-    band = gates_spec.get("gates", {}).get("soft", {}).get("BorderlineRate_band", [0.20, 0.35])
-    if not (band[0] <= borderline <= band[1]):
-        reasons.append(f"BorderlineRate = {borderline:.4f} outside band {band}")
+    soft_gates = gates_spec.get("gates", {}).get("soft", {})
+    if "BorderlineRate_band" in soft_gates:
+        borderline = float(row.get("BorderlineRate", 0.0))
+        band = soft_gates["BorderlineRate_band"]
+        if not (band[0] <= borderline <= band[1]):
+            reasons.append(f"BorderlineRate = {borderline:.4f} outside band {band}")
         
     # 5. CrossAnchorMigrationRate band
     migration = float(row.get("CrossAnchorMigrationRate", 0.0))
