@@ -138,8 +138,12 @@ class TaxonomyPersistence(
 
         log.info("Loading Vector-Offloaded taxonomy from $path...")
         val serialized = json.decodeFromString<SerializedGraph>(file.readText())
+        return loadFromSerialized(serialized)
+    }
+
+    fun loadFromSerialized(serialized: SerializedGraph): GraphNode? {
         val isLegacy = serialized.version < 2
-        log.info("Loaded serialized graph version: ${serialized.version} (legacy: $isLegacy)")
+        log.info("Loading serialized graph from memory version: ${serialized.version} (legacy: $isLegacy)")
 
         val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
         val queryRowMap: Map<String, CachedQuery> = embeddingCache.getQueriesBatch(allQueryIds)

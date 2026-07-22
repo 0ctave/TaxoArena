@@ -419,4 +419,44 @@ class TaxonomyMetricsConsolidatedTest {
         val y = mapOf("b1" to "p", "b2" to "q")
         assertEquals(0.0, ShannonNmi.compute(x, y), 1e-12)
     }
+
+    @Test
+    fun case_insensitive_category_matching_test() {
+        // Build mock hierarchy: Root -> Parent (depth 1, "computer science") -> Leaf (depth 2)
+        val root = node("root", 0)
+        val parent = node("computer science", 1)
+        val leaf = node("Algorithms", 2)
+        link(root, parent)
+        link(parent, leaf)
+
+        // Simulate anchorsOf logic: Walk up parents to depth 1
+        fun getAnchors(n: GraphNode): Set<String> {
+            val result = mutableSetOf<String>()
+            val stack = ArrayDeque<GraphNode>().apply { add(n) }
+            val seen = mutableSetOf<String>()
+            while (stack.isNotEmpty()) {
+                val cur = stack.removeFirst()
+                if (!seen.add(cur.id)) continue
+                if (cur.depth == 1) {
+                    result.add(cur.originalCategory ?: cur.label ?: "")
+                    continue
+                }
+                stack.addAll(cur.parents)
+            }
+            return result
+        }
+
+        val anchors = getAnchors(leaf)
+        assertTrue(anchors.contains("computer science"))
+
+        // Simulate routeFn filter logic with case-insensitive equals
+        val selected = setOf("Computer Science") // mismatch in casing
+        val matchesCaseInsensitive = anchors.any { anchor ->
+            selected.any { it.equals(anchor, ignoreCase = true) }
+        }
+        val matchesCaseSensitive = anchors.any { it in selected }
+
+        assertTrue(matchesCaseInsensitive, "Case-insensitive check must succeed")
+        assertTrue(!matchesCaseSensitive, "Case-sensitive check would have failed and caused 'Total Queries: 0' bug")
+    }
 }

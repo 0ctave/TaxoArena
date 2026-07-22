@@ -253,6 +253,7 @@ class TaxonomySnapshotManager(
         ignoreUnknownKeys = true
         encodeDefaults = true 
     }
+    private var lastSyncedReservedQueriesJson: String? = null
     
     private val dbUrl = if (System.getProperty("java.class.path")?.contains("junit") == true ||
         System.getProperty("org.gradle.test.worker") != null
@@ -726,22 +727,29 @@ class TaxonomySnapshotManager(
             val graph = json.decodeFromString<SerializedGraph>(serializedGraphJson)
             
             // Restore reserved_test_queries.json
-            if (!reservedQueriesStr.isNullOrEmpty()) {
-                try {
-                    val reservedFile = File("reserved_test_queries.json")
-                    // Validate deserialization to make sure it's valid JSON map
-                    val reservedQueries = safeDecodeReservedIds(reservedQueriesStr)
-                    val prettyJson = Json { prettyPrint = true }
-                    reservedFile.writeText(prettyJson.encodeToString(reservedQueries))
-                    log.info("Successfully restored reserved_test_queries.json from snapshot $snapshotId with ${reservedQueries.size} domains.")
+            // Restore reserved_test_queries.json
+            val reservedQueriesStrClean = reservedQueriesStr?.trim()
+            if (!reservedQueriesStrClean.isNullOrEmpty()) {
+                if (reservedQueriesStrClean != lastSyncedReservedQueriesJson) {
                     try {
-                        evalLoader.syncReservedPool(reservedFile)
-                        log.info("Re-synced is_reserved flags for snapshot $snapshotId")
+                        val reservedFile = File("reserved_test_queries.json")
+                        // Validate deserialization to make sure it's valid JSON map
+                        val reservedQueries = safeDecodeReservedIds(reservedQueriesStrClean)
+                        val prettyJson = Json { prettyPrint = true }
+                        reservedFile.writeText(prettyJson.encodeToString(reservedQueries))
+                        log.info("Successfully restored reserved_test_queries.json from snapshot $snapshotId with ${reservedQueries.size} domains.")
+                        try {
+                            evalLoader.syncReservedPool(reservedFile)
+                            lastSyncedReservedQueriesJson = reservedQueriesStrClean
+                            log.info("Re-synced is_reserved flags for snapshot $snapshotId")
+                        } catch (e: Exception) {
+                            log.warn("syncReservedPool failed after loading snapshot $snapshotId: ${e.message}")
+                        }
                     } catch (e: Exception) {
-                        log.warn("syncReservedPool failed after loading snapshot $snapshotId: ${e.message}")
+                        log.error("Failed to restore reserved_test_queries.json from snapshot $snapshotId", e)
                     }
-                } catch (e: Exception) {
-                    log.error("Failed to restore reserved_test_queries.json from snapshot $snapshotId", e)
+                } else {
+                    log.info("Skipping redundant reserved pool sync for snapshot $snapshotId; already synced.")
                 }
             } else {
                 // If there's no reserved_queries saved, delete the file so it falls back to splitting
@@ -749,16 +757,11 @@ class TaxonomySnapshotManager(
                 if (reservedFile.exists()) {
                     reservedFile.delete()
                 }
+                lastSyncedReservedQueriesJson = null
                 log.warn("No reserved queries found in snapshot $snapshotId database entry. Cleaned up reserved_test_queries.json.")
             }
 
-            val tempFile = File("temp_graph_load.tmp")
-            val root = try {
-                tempFile.writeText(json.encodeToString(graph))
-                persistence.load(tempFile.absolutePath)
-            } finally {
-                if (tempFile.exists()) tempFile.delete()
-            }
+            val root = persistence.loadFromSerialized(graph)
             if (root != null) {
                 assignQueryIds(root, config.formalism.enableStableQuestionIds)
             }

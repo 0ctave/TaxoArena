@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import dev.langchain4j.model.chat.request.json.JsonSchema
+import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.EmbeddingCache
 import taxonomy.dataset.ModelEvalStore
@@ -42,7 +43,7 @@ class TaxonomyArenaServiceTest {
 
         val mockOps = mock(TaxonomyOperations::class.java)
         val expectedEmb = Embedding(queryText, queryText, floatArrayOf(0.1f, 0.2f))
-        `when`(mockOps.routeQuery(expectedEmb, node, 2, null)).thenReturn(mapOf(node to 1.0))
+        `when`(mockOps.routeQuery(expectedEmb, node, 2, null, true)).thenReturn(mapOf(node to 1.0))
 
         val mockEvalStore = mock(ModelEvalStore::class.java)
         val mockRankingService = mock(TaxonomyRankingService::class.java)
@@ -79,7 +80,8 @@ class TaxonomyArenaServiceTest {
             mockEmbeddingCache,
             mockOps,
             mockEvalStore,
-            mockRankingService
+            mockRankingService,
+            TaxonomyPerformanceTracker()
         )
 
         // Act
@@ -126,7 +128,7 @@ class TaxonomyArenaServiceTest {
 
         val mockOps = mock(TaxonomyOperations::class.java)
         val expectedEmb = Embedding(queryText, queryText, floatArrayOf(0.1f, 0.2f))
-        `when`(mockOps.routeQuery(expectedEmb, node, 2, null)).thenReturn(mapOf(node to 1.0))
+        `when`(mockOps.routeQuery(expectedEmb, node, 2, null, true)).thenReturn(mapOf(node to 1.0))
 
         val mockEvalStore = mock(ModelEvalStore::class.java)
         val mockRankingService = mock(TaxonomyRankingService::class.java)
@@ -163,7 +165,8 @@ class TaxonomyArenaServiceTest {
             mockEmbeddingCache,
             mockOps,
             mockEvalStore,
-            mockRankingService
+            mockRankingService,
+            TaxonomyPerformanceTracker()
         )
 
         // Act
@@ -206,7 +209,7 @@ class TaxonomyArenaServiceTest {
 
         val mockOps = mock(TaxonomyOperations::class.java)
         val expectedEmb = Embedding(queryText, queryText, floatArrayOf(0.1f, 0.2f))
-        `when`(mockOps.routeQuery(expectedEmb, node, 2, null)).thenReturn(mapOf(node to 1.0))
+        `when`(mockOps.routeQuery(expectedEmb, node, 2, null, true)).thenReturn(mapOf(node to 1.0))
 
         val mockEvalStore = mock(ModelEvalStore::class.java)
         val mockRankingService = mock(TaxonomyRankingService::class.java)
@@ -244,7 +247,8 @@ class TaxonomyArenaServiceTest {
             mockEmbeddingCache,
             mockOps,
             mockEvalStore,
-            mockRankingService
+            mockRankingService,
+            TaxonomyPerformanceTracker()
         )
 
         // Act & Assert (Should not throw JsonDecodingException)
@@ -282,7 +286,7 @@ class TaxonomyArenaServiceTest {
 
         val mockOps = mock(TaxonomyOperations::class.java)
         val expectedEmb = Embedding(queryText, queryText, floatArrayOf(0.1f, 0.2f))
-        `when`(mockOps.routeQuery(expectedEmb, node, 2, null)).thenReturn(mapOf(node to 1.0))
+        `when`(mockOps.routeQuery(expectedEmb, node, 2, null, true)).thenReturn(mapOf(node to 1.0))
 
         val mockEvalStore = mock(ModelEvalStore::class.java)
         val mockRankingService = mock(TaxonomyRankingService::class.java)
@@ -318,7 +322,8 @@ class TaxonomyArenaServiceTest {
             mockEmbeddingCache,
             mockOps,
             mockEvalStore,
-            mockRankingService
+            mockRankingService,
+            TaxonomyPerformanceTracker()
         )
 
         // Act & Assert (Should succeed using regex fallback)

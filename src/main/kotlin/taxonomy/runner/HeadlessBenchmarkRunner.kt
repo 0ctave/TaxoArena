@@ -217,6 +217,7 @@ class HeadlessBenchmarkRunner(
                 }
                 log.info("Loading dataset for domains: $targetDomains")
                 val dataset = datasetFetcher.fetchDataset(
+                    maxQueries = cliConfig.queryLimit.takeIf { it > 0 } ?: Int.MAX_VALUE,
                     selectedDomains = targetDomains
                 )
                 log.info("Splitting dataset into train/test (ratio=${cliConfig.testRatio}, seed=$currentSeed)...")
@@ -300,6 +301,7 @@ class HeadlessBenchmarkRunner(
                     datasetFetcher.downloadDataset()
                 }
                 val dataset = datasetFetcher.fetchDataset(
+                    maxQueries = cliConfig.queryLimit.takeIf { it > 0 } ?: Int.MAX_VALUE,
                     selectedDomains = targetDomains
                 )
                 datasetFetcher.splitTrainTest(dataset, testRatio = cliConfig.testRatio, seed = currentSeed)
@@ -685,7 +687,9 @@ class HeadlessBenchmarkRunner(
                     placements
                 } else {
                     placements.filter { (leaf, _) ->
-                        anchorsOf(leaf, anchorCache).any { it in selected }
+                        anchorsOf(leaf, anchorCache).any { anchor ->
+                            selected.any { it.equals(anchor, ignoreCase = true) }
+                        }
                     }
                 }
                 if (kept.isEmpty() && placements.isNotEmpty()) {

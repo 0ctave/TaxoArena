@@ -201,13 +201,13 @@ class MMLUDatasetFetcher(
 
     private suspend fun fetchMmluPro(maxQueries: Int, selectedDomains: List<String>): Map<String, List<MMLUQuery>> {
         val table = "mmlu_pro"
-        val limit = if (selectedDomains.isNotEmpty()) 100000 else maxQueries
+        val limit = maxQueries
         val totalInDb = getDbCount(table)
         val allRows = loadFromDb(table, limit, selectedDomains)
 
         if (selectedDomains.isNotEmpty()) {
             log.info("Loaded ${allRows.size} MMLU Pro queries from local cache for domains: ${selectedDomains.joinToString(", ")}.")
-            return finalizeData(allRows, "MMLU Pro")
+            return finalizeData(allRows.take(maxQueries), "MMLU Pro")
         }
 
         val cachedDistinctCategories = allRows.mapNotNull { it.category }.toSet().size

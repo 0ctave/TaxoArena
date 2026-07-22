@@ -95,9 +95,22 @@ class TaxonomyConfig {
 
         // ── Routing ───────────────────────────────────────────────────────────
         var routingSoftmaxTau: Double = 1.0
+
+        // WARNING: Despite "Cosine" in its name, this is a NATS (log-probability) margin
+        // used exclusively by BridgeDiagnosticsExporter (Gate C) as the "bridge-candidate
+        // distinctness bound" to check if secondary leaf log-prob is within this gap of the primary.
+        // It is NOT used in primary routing decisions.
         var assignmentCosineGap: Double = 0.03
+
+        // Tighter log-softmax margin coefficient used to shape the DAG during construction.
+        // Scaled adaptive-wise: effectiveMargin = constructionMargin * siblingKappa.
         var constructionMargin: Double = 0.20
+
+        // Looser log-softmax margin coefficient used during arena-time routing for evaluation.
+        // Scaled adaptive-wise: effectiveMargin = arenaMargin * siblingKappa.
         var arenaMargin: Double = 0.40
+
+        // Alias for constructionMargin to maintain compatibility with legacy scripts.
         var deltaAssign: Double
             get() = constructionMargin
             set(value) { constructionMargin = value }

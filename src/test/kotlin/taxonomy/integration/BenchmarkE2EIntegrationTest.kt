@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
 import taxonomy.config.TaxonomyConfig
+import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.dataset.EmbeddingCache
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.dataset.ModelEvalLoader
@@ -93,13 +94,14 @@ class BenchmarkE2EIntegrationTest {
         taxService: TaxonomyService,
         embCache: EmbeddingCache
     ) : TaxonomyArenaService(
-        mock(TaxonomyConfig::class.java),
+        TaxonomyConfig(),
         taxService,
         mock(TaxonomyLlmClient::class.java),
         embCache,
         ops,
         mock(ModelEvalStore::class.java),
         mock(TaxonomyRankingService::class.java),
+        TaxonomyPerformanceTracker()
     ) {
         override suspend fun evaluateWithPrecomputedTraces(
             query: String,
@@ -197,7 +199,8 @@ class BenchmarkE2EIntegrationTest {
             org.mockito.ArgumentMatchers.any(Embedding::class.java) ?: Embedding("", "", floatArrayOf()),
             org.mockito.ArgumentMatchers.any(GraphNode::class.java) ?: dummyRoot,
             org.mockito.ArgumentMatchers.anyInt(),
-            org.mockito.ArgumentMatchers.any()
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.anyBoolean()
         )).thenReturn(mapOf(dummyRoot to 1.0))
     }
 
@@ -211,7 +214,9 @@ class BenchmarkE2EIntegrationTest {
             rankingService = rankingService,
             datasetFetcher = datasetFetcher,
             taxonomyService = mockTaxonomyService,
-            evalStore = store
+            evalStore = store,
+            config = TaxonomyConfig(),
+            perfTracker = TaxonomyPerformanceTracker()
         )
     }
 
