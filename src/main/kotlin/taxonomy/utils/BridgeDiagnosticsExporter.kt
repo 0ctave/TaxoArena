@@ -78,7 +78,8 @@ class BridgeDiagnosticsExporter(
                 Double.POSITIVE_INFINITY
             }
 
-            val withinBand = sLeaf != null && marginNats <= config.formalism.assignmentCosineGap
+            val bridgeDiagnosticBand = 0.15
+            val withinBand = sLeaf != null && marginNats <= bridgeDiagnosticBand
 
             val routedToResidual = res.residualHits.isNotEmpty()
             val candidateBridgePair = if (pLeaf != null && sLeaf != null) {

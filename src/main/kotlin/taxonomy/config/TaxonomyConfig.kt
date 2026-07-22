@@ -96,11 +96,7 @@ class TaxonomyConfig {
         // ── Routing ───────────────────────────────────────────────────────────
         var routingSoftmaxTau: Double = 1.0
 
-        // WARNING: Despite "Cosine" in its name, this is a NATS (log-probability) margin
-        // used exclusively by BridgeDiagnosticsExporter (Gate C) as the "bridge-candidate
-        // distinctness bound" to check if secondary leaf log-prob is within this gap of the primary.
-        // It is NOT used in primary routing decisions.
-        var assignmentCosineGap: Double = 0.03
+
 
         // Tighter log-softmax margin coefficient used to shape the DAG during construction.
         // Scaled adaptive-wise: effectiveMargin = constructionMargin * siblingKappa.
@@ -180,7 +176,6 @@ class TaxonomyConfig {
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
         sb.append("│   - Routing Softmax Tau:  ${formalism.routingSoftmaxTau}\n")
-        sb.append("│   - Assignment Cosine Gap:${formalism.assignmentCosineGap}\n")
         sb.append("│   - Delta Assign:         ${formalism.deltaAssign}\n")
         sb.append("│   - EMA Alpha:            ${formalism.emaAlpha}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
@@ -218,7 +213,6 @@ class TaxonomyConfig {
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
             routingSoftmaxTau = formalism.routingSoftmaxTau,
-            assignmentCosineGap = formalism.assignmentCosineGap,
             deltaAssign = formalism.deltaAssign,
             constructionMargin = formalism.constructionMargin,
             arenaMargin = formalism.arenaMargin,
@@ -268,7 +262,6 @@ class TaxonomyConfig {
         formalism.minClusterSize = c.formalism.minClusterSize
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.routingSoftmaxTau = c.formalism.routingSoftmaxTau
-        formalism.assignmentCosineGap = c.formalism.assignmentCosineGap
         formalism.constructionMargin = c.formalism.constructionMargin
         formalism.arenaMargin = c.formalism.arenaMargin
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments

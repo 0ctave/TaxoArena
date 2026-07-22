@@ -57,7 +57,6 @@ data class HeadlessCliConfig(
     val minClusterSize: Int? = null,
     val separationEpsilon: Double? = null,
     val routingSoftmaxTau: Double? = null,
-    val assignmentCosineGap: Double? = null,
     val defaultKappaPrior: Double? = null,
     val emaAlpha: Double? = null,
     val enableLabeling: Boolean? = null,
@@ -152,7 +151,6 @@ class HeadlessBenchmarkRunner(
         cliConfig.minClusterSize?.let { config.formalism.minClusterSize = it }
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.routingSoftmaxTau?.let { config.formalism.routingSoftmaxTau = it }
-        cliConfig.assignmentCosineGap?.let { config.formalism.assignmentCosineGap = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.emaAlpha?.let { config.formalism.emaAlpha = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
@@ -1257,7 +1255,6 @@ class HeadlessBenchmarkRunner(
         var refitMuPerIteration: Boolean? = null
         var dagMode: String? = null
         var numIterations: Int? = null
-        var assignmentCosineGap: Double? = null
         var defaultKappaPrior: Double? = null
         var runBaselines = true
         var enableProfiling: Boolean? = null
@@ -1344,7 +1341,6 @@ class HeadlessBenchmarkRunner(
                 "refitMuPerIteration" -> refitMuPerIteration = rawVal.toBoolean()
                 "dagMode" -> dagMode = rawVal.trim().trim('"').trim('\'')
                 "numIterations" -> numIterations = rawVal.toInt()
-                "assignmentCosineGap" -> assignmentCosineGap = rawVal.toDouble()
                 "defaultKappaPrior" -> defaultKappaPrior = rawVal.toDouble()
                 "runBaselines" -> runBaselines = rawVal.toBoolean()
                 else -> log.warn("[CONFIG WARN] Unknown or deprecated configuration key in TOML file: '$key' = '$rawVal'")
@@ -1370,7 +1366,6 @@ class HeadlessBenchmarkRunner(
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
             routingSoftmaxTau = routingSoftmaxTau,
-            assignmentCosineGap = assignmentCosineGap,
             defaultKappaPrior = defaultKappaPrior,
             emaAlpha = emaAlpha,
             enableLabeling = enableLabeling,
@@ -1433,7 +1428,6 @@ class HeadlessBenchmarkRunner(
             config.formalism.minClusterSize,
             config.formalism.separationEpsilon,
             config.formalism.routingSoftmaxTau,
-            config.formalism.assignmentCosineGap,
             config.formalism.deltaAssign,
             config.formalism.maxLeafAssignments,
             config.formalism.tauKappaScalingFactor,

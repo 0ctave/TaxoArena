@@ -193,14 +193,7 @@ class TuiConfigFacade(
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.routingSoftmaxTau = it; true } ?: false },
             kind = SettingKind.NUMBER
         ),
-        SettingItem(
-            name = "Assignment Cosine Gap",
-            description = "Leaf acceptance cosine margin",
-            category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.assignmentCosineGap.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.assignmentCosineGap = it; true } ?: false },
-            kind = SettingKind.NUMBER
-        ),
+
         SettingItem(
             name = "EMA Alpha",
             description = "Dynamic calibration factor",

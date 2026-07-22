@@ -51,13 +51,14 @@ seed          = 42      # construction seed; finalist seeds (137, 2048) validate
 # this config's stability separately
 
 # ── Pipeline / evaluation switches ──────────────────────────────────────────
-runPipeline    = true    # build the DAG
-runBenchmark   = false   # arena runs as a SEPARATE step against the persisted
-# snapshot (MAIN must run first to emit frozen triples)
-runTrickle     = true    # produce the routing/validity ledger (purity, ECE, etc.)
-judgeInduction = false   # judges are induced in the arena step, not here
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true          # needed — produces the ECE/routing metrics
+runBaselines   = false         # skip for the pilot (save ~90s)
+enableFinalMetrics = true       # REQUIRED — you need metrics to validate
 enableLabeling = false   # LLM cluster labeling off for the structural build
-runBaselines   = false
+judgeInduction = false   # judges are induced in the arena step, not here
+
 
 # ── Construction mode ───────────────────────────────────────────────────────
 dagMode = "DAG_MAX"      # full polyhierarchy: enables bridging (multi-parent
@@ -108,12 +109,6 @@ numIterations         = 35     # max evolution passes. Early-stopping typically
 maxLeafAssignments    = 5      # max leaves a single query may be softly assigned
 # to during arena-time routing (multi-membership cap).
 
-# ── Calibrated factors (winning L9 configuration) ───────────────────────────
-assignmentCosineGap       = 0.15   # [L9] soft-membership margin: how close a
-# secondary leaf must be (in cosine) to the best
-# to also receive the query. Code default 0.03;
-# 0.15 is the winning value. Weak effect on ECE,
-# stronger on Top-1 / cross-anchor migration.
 
 deltaAssign               = 0.002   # [L9] log-softmax margin controlling routing-walk
 # breadth (how softly a query trickles into

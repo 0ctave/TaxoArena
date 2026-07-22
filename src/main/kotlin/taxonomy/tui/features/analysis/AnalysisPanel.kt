@@ -231,7 +231,6 @@ fun ConfigSnapshotPanel(
     add("  Min cluster  ${config.formalism.minClusterSize}")
     add("  Sep. epsilon ${config.formalism.separationEpsilon}")
     add("  Softmax tau  ${config.formalism.routingSoftmaxTau}")
-    add("  Assign. gap  ${config.formalism.assignmentCosineGap}")
     add("  EMA alpha    ${config.formalism.emaAlpha}")
 
     ScrollablePanelContent(
