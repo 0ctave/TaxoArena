@@ -104,18 +104,16 @@ class TaxonomyTrickler(
             }
             if (children.isEmpty()) return
 
-            val scores = DoubleArray(children.size)
+            val K = children.size
+            val vmfScores = DoubleArray(K)
 
-            var kappaSum = 0.0
-            for (c in children) kappaSum += c.vmfKappa
-            val siblingKappa = (kappaSum / children.size.coerceAtLeast(1)).coerceIn(1.0, 100.0)
-
-            val sharedLogNorm = StatisticsUtils.logVmfNormalizer(children[0].sliceDim, siblingKappa)
-
+            // 1. Score each child i using its own kappa and Normalizer (Issue A)
+            val siblingKappas = mutableListOf<Double>()
             for (i in children.indices) {
                 val child = children[i]
                 val slicedX = embedding.projectTo(child.sliceDim)
-                var f = sharedLogNorm + siblingKappa * StatisticsUtils.dotProduct(slicedX, child.vmfMu)
+                val logNorm = StatisticsUtils.logVmfNormalizer(child.sliceDim, child.vmfKappa)
+                var f = logNorm + child.vmfKappa * StatisticsUtils.dotProduct(slicedX, child.vmfMu)
 
                 // Ground Truth bias (iter == 1 only, governed by opts)
                 val isOriginal = opts.originalCategories?.any { it.equals(child.label, ignoreCase = true) } ?: false
@@ -123,29 +121,28 @@ class TaxonomyTrickler(
                     f += ln(1.0 / 0.7)
                 }
 
-                scores[i] = f
+                vmfScores[i] = f
+                siblingKappas.add(child.vmfKappa)
             }
 
-            // Temperature-scaled softmax with dynamic inverse-variance scaling (tau_i)
+            val siblingKappa = siblingKappas.average().coerceIn(1.0, 100.0)
+
+            // Temperature-scaled softmax with dynamic inverse-variance scaling (tau)
             val gamma = config.formalism.tauKappaScalingFactor.coerceIn(0.0, 1.0)
             val dynamicTau = config.formalism.routingSoftmaxTau.coerceAtLeast(0.01) * siblingKappa.pow(gamma)
-            val tempScores = DoubleArray(scores.size) { scores[it] / dynamicTau }
+            val tempScores = DoubleArray(K) { vmfScores[it] / dynamicTau }
             val maxTemp = tempScores.maxOrNull() ?: 0.0
             val sumExp = tempScores.sumOf { exp(it - maxTemp) }
             val logSumExpVal = maxTemp + ln(sumExp.coerceAtLeast(1e-300))
 
-            val logSoftmax = DoubleArray(scores.size) { tempScores[it] - logSumExpVal }
+            val responsibilities = DoubleArray(K) { exp(tempScores[it] - logSumExpVal) }
 
-            val K = children.size
-            val laplaceEps = 0.05 / K
-            val rawProbs = DoubleArray(K) { exp(logSoftmax[it]) }
-
-            // Residual routing check: stop walk if best child responsibility is below adaptive threshold
+            // 2. Residual routing check: stop walk if best child responsibility is below adaptive threshold (Issue D)
             if (config.formalism.enableResidualRouting && node.depth >= 2) {
-                val bestChildResp = rawProbs.maxOrNull() ?: 0.0
-                val baseTauAtDepth = 0.80
-                val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
-                if (bestChildResp < adaptiveTau) {
+                val bestChildResp = responsibilities.maxOrNull() ?: 0.0
+                val residualC = 1.6
+                val adaptiveThreshold = (residualC / K).coerceAtMost(0.80)
+                if (bestChildResp < adaptiveThreshold) {
                     if (!opts.readOnly) {
                         val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
                         residualHits.add(ResidualHit(node, qId, bestChildResp))
@@ -154,37 +151,27 @@ class TaxonomyTrickler(
                 }
             }
 
-            val smoothedProbs = DoubleArray(K) { (rawProbs[it] + laplaceEps) / (1.0 + K * laplaceEps) }
-
             // Register the query embedding for MRL-projection lookup
             GraphNode.registerEmbedding(embedding)
 
-            // SINGLE MARGIN RULE: assign to every child within an effective margin of the best
-            val maxLogSoftmax = logSoftmax.maxOrNull() ?: 0.0
+            // 3. Beam: retain B = { i : (max_j log r_j - log r_i) <= delta * siblingKappa } (Issue B)
             val effectiveMargin = opts.margin * (if (opts.kappaAdaptive) siblingKappa else 1.0)
-
             val bestIndices = children.indices
-                .filter { (maxLogSoftmax - logSoftmax[it]) <= effectiveMargin }
+                .filter { (maxTemp - tempScores[it]) <= effectiveMargin }
+
+            // 4. Renormalize over the beam to eliminate path-depth bias (Issue C)
+            val beamSumExp = bestIndices.sumOf { exp(tempScores[it] - maxTemp) }
+            val logBeamSumExp = maxTemp + ln(beamSumExp.coerceAtLeast(1e-300))
 
             for (i in bestIndices) {
                 val child = children[i]
-                val transitionProb = smoothedProbs[i]
-                val accumulatedWeight = currentLogProb + ln(transitionProb.coerceAtLeast(1e-300))
+                val logTransitionProb = tempScores[i] - logBeamSumExp
+                val accumulatedWeight = currentLogProb + logTransitionProb
                 walk(child, accumulatedWeight)
             }
         }
 
         walk(root, 0.0)
-
-        // Local vMF log-likelihood calculator to measure node fit without depth bias
-        fun getVmfLogLikelihood(node: GraphNode): Double {
-            if (node.vmfMu.isEmpty() || node.vmfKappa <= 0.0) {
-                return -100.0 // fallback default low score
-            }
-            val slicedX = embedding.projectTo(node.sliceDim)
-            val logNorm = StatisticsUtils.logVmfNormalizer(node.sliceDim, node.vmfKappa)
-            return logNorm + node.vmfKappa * StatisticsUtils.dotProduct(slicedX, node.vmfMu)
-        }
 
         // 1. Gather all candidates (both leaf candidates and fallback internal nodes)
         val candidates = mutableMapOf<GraphNode, Double>()
@@ -222,10 +209,10 @@ class TaxonomyTrickler(
             .take(opts.maxAssignments)
             .map { it.key }
 
-        // 3. For top candidates, compute local vMF fit scores to eliminate path-depth bias
+        // 3. For top candidates, retain their properly normalized path log-probabilities
         val results = mutableMapOf<GraphNode, Double>()
         topCandidates.forEach { node ->
-            results[node] = getVmfLogLikelihood(node)
+            results[node] = logProbMap.getValue(node.id)
         }
 
         // Normalize allNodes and memberships maps to sum to 1.0 in probability space
