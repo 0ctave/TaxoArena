@@ -154,7 +154,7 @@ class TaxonomyTrickler(
             // Register the query embedding for MRL-projection lookup
             GraphNode.registerEmbedding(embedding)
 
-            // 3. Beam: retain B = { i : (max_j log r_j - log r_i) <= delta * siblingKappa } (Issue B)
+            // 3. Beam: retain B = { i : (maxTemp - tempScores[i]) <= delta * siblingKappa } (mathematically equivalent to max_j log r_j - log r_i) (Issue B)
             val effectiveMargin = opts.margin * (if (opts.kappaAdaptive) siblingKappa else 1.0)
             val bestIndices = children.indices
                 .filter { (maxTemp - tempScores[it]) <= effectiveMargin }
