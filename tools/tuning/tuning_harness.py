@@ -657,6 +657,31 @@ def cmd_select(args):
     else:
         print("Warning: No results found to rank!")
 
+def cmd_pipeline(args):
+    # Ensure all required attributes are present on args
+    if not hasattr(args, "dry_run"):
+        args.dry_run = False
+    if not hasattr(args, "only"):
+        args.only = None
+    if not hasattr(args, "limit"):
+        args.limit = None
+        
+    print(f"=== [Pipeline] Starting Tuning Stage: {args.stage} ===")
+    
+    print("\n=== [Pipeline Step 1/4] Generating configurations ===")
+    cmd_generate(args)
+    
+    print("\n=== [Pipeline Step 2/4] Running configurations ===")
+    cmd_run(args)
+    
+    print("\n=== [Pipeline Step 3/4] Collecting results ===")
+    cmd_collect(args)
+    
+    print("\n=== [Pipeline Step 4/4] Selecting optimal configurations ===")
+    cmd_select(args)
+    
+    print("\n=== [Pipeline] Stage Completed Successfully! ===")
+
 def main():
     parser = argparse.ArgumentParser(description="TaxoArena Phase 3 Tuning Harness")
     subparsers = parser.add_subparsers(dest="command")
@@ -680,6 +705,12 @@ def main():
     sel_parser = subparsers.add_parser("select", help="Perform Pareto front selection and hard-gate filtering")
     sel_parser.add_argument("--spec", default="tools/tuning/sweep_spec.example.toml", help="Path to sweep spec TOML")
     
+    pipe_parser = subparsers.add_parser("pipeline", help="Run a full tuning pipeline (generate -> run -> collect -> select) in one command")
+    pipe_parser.add_argument("--spec", default="tools/tuning/sweep_spec.example.toml", help="Path to sweep spec TOML")
+    pipe_parser.add_argument("--stage", default="screen", choices=["screen", "validate"], help="Stage of tuning: screen or validate")
+    pipe_parser.add_argument("--clean", action="store_true", help="Clean previous run data before starting")
+    pipe_parser.add_argument("--finalists", help="Comma-separated finalist config SHAs to validate (omit to use top from finalists.csv)")
+    
     args = parser.parse_args()
     
     if args.command == "generate":
@@ -690,6 +721,8 @@ def main():
         cmd_collect(args)
     elif args.command == "select":
         cmd_select(args)
+    elif args.command == "pipeline":
+        cmd_pipeline(args)
     else:
         parser.print_help()
 
