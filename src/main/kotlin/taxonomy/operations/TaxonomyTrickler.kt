@@ -69,7 +69,7 @@ class TaxonomyTrickler(
             maxAssignments = config.formalism.maxLeafAssignments,
             readOnly = isInference,
             kappaAdaptive = true,
-            enableGtBias = (currentIteration <= 1),
+            enableGtBias = (config.formalism.enableGtWarmStart && currentIteration <= 1),
             originalCategories = originalCategories
         )
         val res = trickle(query, root, opts)
@@ -140,14 +140,17 @@ class TaxonomyTrickler(
             val laplaceEps = 0.05 / K
             val rawProbs = DoubleArray(K) { exp(logSoftmax[it]) }
 
-            // Residual routing check (only if not readOnly)
-            if (!opts.readOnly && config.formalism.enableResidualRouting && node.depth >= 2) {
+            // Residual routing check: stop walk if best child responsibility is below adaptive threshold
+            if (config.formalism.enableResidualRouting && node.depth >= 2) {
                 val bestChildResp = rawProbs.maxOrNull() ?: 0.0
                 val baseTauAtDepth = 0.80
                 val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
                 if (bestChildResp < adaptiveTau) {
-                    val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
-                    residualHits.add(ResidualHit(node, qId, bestChildResp))
+                    if (!opts.readOnly) {
+                        val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
+                        residualHits.add(ResidualHit(node, qId, bestChildResp))
+                    }
+                    return
                 }
             }
 
@@ -173,20 +176,25 @@ class TaxonomyTrickler(
 
         walk(root, 0.0)
 
+        // Local vMF log-likelihood calculator to measure node fit without depth bias
+        fun getVmfLogLikelihood(node: GraphNode): Double {
+            if (node.vmfMu.isEmpty() || node.vmfKappa <= 0.0) {
+                return -100.0 // fallback default low score
+            }
+            val slicedX = embedding.projectTo(node.sliceDim)
+            val logNorm = StatisticsUtils.logVmfNormalizer(node.sliceDim, node.vmfKappa)
+            return logNorm + node.vmfKappa * StatisticsUtils.dotProduct(slicedX, node.vmfMu)
+        }
+
+        // 1. Gather all candidates (both leaf candidates and fallback internal nodes)
+        val candidates = mutableMapOf<GraphNode, Double>()
+
         // Find leaf candidates
         val leafCandidates = logProbMap
             .filterKeys { id -> nodeMap[id]?.isLeaf == true }
             .map { (id, logProb) -> nodeMap.getValue(id) to logProb }
             .toMap()
-
-        val qualifiedLeaves = leafCandidates.entries
-            .sortedByDescending { it.value }
-            .take(opts.maxAssignments)
-
-        val results = mutableMapOf<GraphNode, Double>()
-        qualifiedLeaves.forEach { (leaf, logProb) ->
-            results[leaf] = logProb
-        }
+        candidates.putAll(leafCandidates)
 
         // Internal nodes fallback if no active children reached
         for ((nodeId, logProb) in logProbMap) {
@@ -199,13 +207,25 @@ class TaxonomyTrickler(
                     node.children
                 }
                 if (!activeChildren.any { logProbMap.containsKey(it.id) }) {
-                    results[node] = logProb
+                    candidates[node] = logProb
                 }
             }
         }
 
-        if (results.isEmpty()) {
-            results[root] = 0.0
+        if (candidates.isEmpty()) {
+            candidates[root] = 0.0
+        }
+
+        // 2. Sort candidates by joint path logProb and cap to maxAssignments
+        val topCandidates = candidates.entries
+            .sortedByDescending { it.value }
+            .take(opts.maxAssignments)
+            .map { it.key }
+
+        // 3. For top candidates, compute local vMF fit scores to eliminate path-depth bias
+        val results = mutableMapOf<GraphNode, Double>()
+        topCandidates.forEach { node ->
+            results[node] = getVmfLogLikelihood(node)
         }
 
         // Normalize allNodes and memberships maps to sum to 1.0 in probability space

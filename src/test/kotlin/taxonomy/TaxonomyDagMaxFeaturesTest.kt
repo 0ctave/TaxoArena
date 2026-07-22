@@ -960,7 +960,7 @@ class TaxonomyDagMaxFeaturesTest {
         val config = TaxonomyConfig()
         config.formalism.deltaAssign = 0.20  // branch-point descent gating margin
         config.formalism.assignmentCosineGap = 0.50  // log-space margin
-
+        config.formalism.enableResidualRouting = false
         val trickler = TaxonomyTrickler(config)
         val parent = node("parent", "Parent Domain", 2)
         val child1 = node("child1", "Child One", 3)
