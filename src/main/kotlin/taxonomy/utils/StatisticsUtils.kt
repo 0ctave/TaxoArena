@@ -458,8 +458,10 @@ object StatisticsUtils {
         }
         if (converged) {
             log.info("[VMF EM] K=$k, N=$n converged in $finalIters iterations")
+        } else if (patienceCount >= maxPatience) {
+            log.debug("[VMF EM] K=$k, N=$n plateaued/oscillated at $finalIters iterations (early exit)")
         } else {
-            log.warn("[VMF EM] K=$k, N=$n did NOT converge in $finalIters iterations (cap/plateau)")
+            log.warn("[VMF EM] K=$k, N=$n hit iteration cap at $finalIters iterations")
         }
 
         val components = (0 until k).map { c ->

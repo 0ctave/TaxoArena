@@ -251,7 +251,7 @@ class TaxonomySplitter(
             return
         }
 
-        log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)}) -> Spawning $k children")
+        log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)}, converged=${mixture.converged}) -> Spawning $k children")
 
         // ── Create children and wire topology ────────────────────────────────
         val allSpawnedLeaves = mutableListOf<GraphNode>()
