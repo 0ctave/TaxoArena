@@ -164,10 +164,14 @@ object BatchTrickleEvaluator {
         val matchCounts = mutableListOf<Int>()
         var processed = 0
         for ((trueDomain, text) in testQueries) {
+            val rawRoute = routeFn(text)
+            if (rawRoute.size == 1 && rawRoute[0].first == "OUT_OF_SCOPE") {
+                continue
+            }
             support[trueDomain] = (support[trueDomain] ?: 0) + 1
             gtMap[text] = trueDomain
 
-            val matched = routeFn(text).mapNotNull { (leafId, conf) ->
+            val matched = rawRoute.mapNotNull { (leafId, conf) ->
                 perLeafDomains[leafId]?.let { it to conf }
             }
             matchCounts.add(matched.size)
@@ -199,7 +203,7 @@ object BatchTrickleEvaluator {
             onProgress(processed, testQueries.size, top1Correct.toDouble() / processed)
         }
 
-        val n = testQueries.size.toDouble()
+        val n = processed.toDouble()
         val perDomain = LinkedHashMap<String, DomainF1>()
         var f1Sum = 0.0
         for (domain in support.keys) {
@@ -216,7 +220,7 @@ object BatchTrickleEvaluator {
         val eceVal = taxonomy.utils.computeRoutingECE(predictedMap, gtMap)
 
         val p = top1Correct.toDouble() / n
-        val num = testQueries.size
+        val num = processed
         val z = 1.96
         val wilsonLow = if (num > 0) {
             val val1 = p + (z * z) / (2.0 * num)
@@ -241,7 +245,7 @@ object BatchTrickleEvaluator {
         }
 
         return BatchTrickleTestResults(
-            totalQueries = testQueries.size,
+            totalQueries = processed,
             top1Accuracy = top1Correct / n,
             top1WilsonLow = wilsonLow,
             top1WilsonHigh = wilsonHigh,

@@ -453,7 +453,7 @@ class HeadlessBenchmarkRunner(
 
                 val hoistedTargetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
                 val hoistedFullByDomain = try {
-                    datasetFetcher.fetchDataset(selectedDomains = hoistedTargetDomains)
+                    datasetFetcher.fetchDataset(selectedDomains = emptyList())
                 } catch (_: Throwable) { null }
 
                 log.info("========================================")
@@ -603,7 +603,7 @@ class HeadlessBenchmarkRunner(
         log.info("Loaded $embeddedCount ground-truth categories directly from DAG queries.")
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
-        val fullByDomain = hoistedFullByDomain ?: datasetFetcher.fetchDataset(selectedDomains = targetDomains)
+        val fullByDomain = hoistedFullByDomain ?: datasetFetcher.fetchDataset(selectedDomains = emptyList())
         val reservedIds: Set<Int> = reservedByDomain.values.flatten().toSet()
         var databaseCount = 0
         for ((domain, queries) in fullByDomain) {
@@ -641,17 +641,34 @@ class HeadlessBenchmarkRunner(
         }
 
         log.info("Routing ${testQueries.size} test queries...")
+        val selected: Set<String> =
+            if (cliConfig.domains.isNotEmpty()) cliConfig.domains.toSet()
+            else cliConfig.category?.let { setOf(it) } ?: emptySet()
+        val anchorCache = HashMap<String, Set<String>>()
+
         val out = taxonomy.tui.service.BatchTrickleEvaluator.computeBatchTrickleMetrics(
             perLeafDomains = profiles,
             testQueries = testQueries,
             routeFn = { text ->
-                try {
+                val placements = try {
                     runBlocking {
-                        taxonomyService.routeQueryToLeaves(text).map { it.first.id to it.second }
+                        taxonomyService.routeQueryToLeaves(text)
                     }
                 } catch (t: Throwable) {
                     log.warn("Routing query failed: {}", t.message)
                     emptyList()
+                }
+                val kept = if (selected.isEmpty()) {
+                    placements
+                } else {
+                    placements.filter { (leaf, _) ->
+                        anchorsOf(leaf, anchorCache).any { it in selected }
+                    }
+                }
+                if (kept.isEmpty() && placements.isNotEmpty()) {
+                    listOf("OUT_OF_SCOPE" to -1.0)
+                } else {
+                    kept.map { (leaf, conf) -> leaf.id to conf }
                 }
             }
         )
@@ -1807,6 +1824,29 @@ class HeadlessBenchmarkRunner(
         val rootLogger = context.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as? ch.qos.logback.classic.Logger ?: return
         rootLogger.detachAppender(appender)
         appender.stop()
+    }
+
+    private fun anchorsOf(
+        node: GraphNode,
+        cache: MutableMap<String, Set<String>> = HashMap()
+    ): Set<String> {
+        cache[node.id]?.let { return it }
+        val result = LinkedHashSet<String>()
+        val seen = HashSet<String>()
+        val stack = ArrayDeque<GraphNode>()
+        stack.addLast(node)
+        while (stack.isNotEmpty()) {
+            val cur = stack.removeLast()
+            if (!seen.add(cur.id)) continue
+            if (cur.depth == 1) {
+                (cur.originalCategory ?: cur.label)?.let { result.add(it) }
+                // depth-1 is an anchor; do not walk above it
+                continue
+            }
+            for (p in cur.parents) stack.addLast(p)
+        }
+        cache[node.id] = result
+        return result
     }
 }
 

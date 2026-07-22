@@ -45,6 +45,29 @@ class TaxonomyBenchmarkService(
         return list
     }
 
+    private fun anchorsOf(
+        node: GraphNode,
+        cache: MutableMap<String, Set<String>> = HashMap()
+    ): Set<String> {
+        cache[node.id]?.let { return it }
+        val result = LinkedHashSet<String>()
+        val seen = HashSet<String>()
+        val stack = ArrayDeque<GraphNode>()
+        stack.addLast(node)
+        while (stack.isNotEmpty()) {
+            val cur = stack.removeLast()
+            if (!seen.add(cur.id)) continue
+            if (cur.depth == 1) {
+                (cur.originalCategory ?: cur.label)?.let { result.add(it) }
+                // depth-1 is an anchor; do not walk above it
+                continue
+            }
+            for (p in cur.parents) stack.addLast(p)
+        }
+        cache[node.id] = result
+        return result
+    }
+
     private fun propagateOutcome(
         leafId: String,
         modelA: String,
@@ -125,7 +148,7 @@ class TaxonomyBenchmarkService(
 
         val matrix = evalStore.getResultsMatrix(
             models = modelNames,
-            category = req.category,
+            category = null,
             reservedOnly = req.reservedOnly,
             limit = req.queryLimit,
             minModelCount = 2
@@ -178,7 +201,11 @@ class TaxonomyBenchmarkService(
         val nodeToQueries = mutableMapOf<String, MutableList<Int>>()
         val queryToLeaves = mutableMapOf<Int, MutableList<String>>()
         val queryToSoftRouting = java.util.Collections.synchronizedMap(mutableMapOf<Int, TaxonomyArenaService.SoftRoutingResult>())
+        val targetCategory = req.category
+        val anchorCache = HashMap<String, Set<String>>()
         var outlierCount = 0
+        var scopedOutCount = 0
+
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
             val softResult = arenaService.routeToLeavesSoft(sample.questionText, frozenLeafIds, sample.category)
@@ -187,12 +214,22 @@ class TaxonomyBenchmarkService(
                 log.debug("qId=$qId is an outlier — no leaf match, skipping")
                 return@forEach
             }
+            
+            // Scope check: Keep only if primaryLeaf is under targetCategory (if targetCategory is set)
+            if (targetCategory != null && targetCategory.isNotBlank()) {
+                val leafAnchors = anchorsOf(softResult.primaryLeaf, anchorCache)
+                if (targetCategory.lowercase() !in leafAnchors.map { it.lowercase() }) {
+                    scopedOutCount++
+                    return@forEach
+                }
+            }
+
             queryToSoftRouting[qId] = softResult
             val leaf = softResult.primaryLeaf
             nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
             queryToLeaves.getOrPut(qId) { mutableListOf() }.add(leaf.id)
         }
-        log.info("Pre-routing complete: ${matrix.size - outlierCount} questions routed, $outlierCount outliers discarded")
+        log.info("Pre-routing complete: ${matrix.size - outlierCount - scopedOutCount} questions routed, $outlierCount outliers discarded, $scopedOutCount out-of-scope domain queries filtered")
 
         val params = buildSchedulingParams(
             numModels = modelNames.size,
