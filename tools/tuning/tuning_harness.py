@@ -666,21 +666,66 @@ def cmd_pipeline(args):
     if not hasattr(args, "limit"):
         args.limit = None
         
-    print(f"=== [Pipeline] Starting Tuning Stage: {args.stage} ===")
+    original_stage = args.stage
     
-    print("\n=== [Pipeline Step 1/4] Generating configurations ===")
-    cmd_generate(args)
-    
-    print("\n=== [Pipeline Step 2/4] Running configurations ===")
-    cmd_run(args)
-    
-    print("\n=== [Pipeline Step 3/4] Collecting results ===")
-    cmd_collect(args)
-    
-    print("\n=== [Pipeline Step 4/4] Selecting optimal configurations ===")
-    cmd_select(args)
-    
-    print("\n=== [Pipeline] Stage Completed Successfully! ===")
+    if original_stage == "full":
+        print("=== [Pipeline] Starting FULL Tuning Loop (Screen -> Validate) ===")
+        
+        # --- PHASE 1: SCREENING ---
+        print("\n==================================================")
+        print("=== PHASE 1: L9 SCREENING SWEEP ===")
+        print("==================================================")
+        
+        args.stage = "screen"
+        print("\n=== [Pipeline Step 1.1] Generating L9 screening configs ===")
+        cmd_generate(args)
+        
+        print("\n=== [Pipeline Step 1.2] Running L9 screening sweep ===")
+        cmd_run(args)
+        
+        print("\n=== [Pipeline Step 1.3] Collecting L9 screening results ===")
+        cmd_collect(args)
+        
+        print("\n=== [Pipeline Step 1.4] Selecting finalists from Pareto front ===")
+        cmd_select(args)
+        
+        # --- PHASE 2: VALIDATION ---
+        print("\n==================================================")
+        print("=== PHASE 2: FINALIST VALIDATION SWEEP ===")
+        print("==================================================")
+        
+        args.stage = "validate"
+        # Force clean only for the validation generation stage to wipe validation outputs,
+        # but do not wipe screening outputs.
+        print("\n=== [Pipeline Step 2.1] Generating validation configs for finalists ===")
+        cmd_generate(args)
+        
+        print("\n=== [Pipeline Step 2.2] Running validation sweep ===")
+        cmd_run(args)
+        
+        print("\n=== [Pipeline Step 2.3] Collecting validation results ===")
+        cmd_collect(args)
+        
+        print("\n=== [Pipeline Step 2.4] Selecting final robust configurations ===")
+        cmd_select(args)
+        
+        print("\n=== [Pipeline] Full Tuning Loop Completed Successfully! ===")
+    else:
+        print(f"=== [Pipeline] Starting Tuning Stage: {args.stage} ===")
+        
+        print("\n=== [Pipeline Step 1/4] Generating configurations ===")
+        cmd_generate(args)
+        
+        print("\n=== [Pipeline Step 2/4] Running configurations ===")
+        cmd_run(args)
+        
+        print("\n=== [Pipeline Step 3/4] Collecting results ===")
+        cmd_collect(args)
+        
+        print("\n=== [Pipeline Step 4/4] Selecting optimal configurations ===")
+        cmd_select(args)
+        
+        print("\n=== [Pipeline] Stage Completed Successfully! ===")
 
 def main():
     parser = argparse.ArgumentParser(description="TaxoArena Phase 3 Tuning Harness")
@@ -707,7 +752,7 @@ def main():
     
     pipe_parser = subparsers.add_parser("pipeline", help="Run a full tuning pipeline (generate -> run -> collect -> select) in one command")
     pipe_parser.add_argument("--spec", default="tools/tuning/sweep_spec.example.toml", help="Path to sweep spec TOML")
-    pipe_parser.add_argument("--stage", default="screen", choices=["screen", "validate"], help="Stage of tuning: screen or validate")
+    pipe_parser.add_argument("--stage", default="full", choices=["screen", "validate", "full"], help="Stage of tuning: screen, validate, or full")
     pipe_parser.add_argument("--clean", action="store_true", help="Clean previous run data before starting")
     pipe_parser.add_argument("--finalists", help="Comma-separated finalist config SHAs to validate (omit to use top from finalists.csv)")
     
