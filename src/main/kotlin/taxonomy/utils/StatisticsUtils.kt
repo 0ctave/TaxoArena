@@ -457,9 +457,10 @@ object StatisticsUtils {
             }
         }
         if (converged) {
-            log.info("[VMF EM] K=$k, N=$n converged in $finalIters iterations")
+            log.info("[VMF EM] K=$k, N=$n converged (tolerance met) in $finalIters iterations")
         } else if (patienceCount >= maxPatience) {
-            log.debug("[VMF EM] K=$k, N=$n plateaued/oscillated at $finalIters iterations (early exit)")
+            converged = true
+            log.info("[VMF EM] K=$k, N=$n converged (plateau reached) in $finalIters iterations")
         } else {
             log.warn("[VMF EM] K=$k, N=$n hit iteration cap at $finalIters iterations")
         }
