@@ -365,34 +365,39 @@ class TaxonomyMetrics(
             query to node
         }.toMap()
 
+    private val depth1Cache = HashMap<Pair<String, TraversalPolicy>, Set<String>>()
+
     fun getDepth1Ancestors(node: GraphNode, policy: TraversalPolicy = TraversalPolicy.TREE_ONLY): Set<String> {
-        val ancestors = mutableSetOf<String>()
-        val visited   = mutableSetOf<String>()
-        fun walk(n: GraphNode) {
-            if (!visited.add(n.id)) return
-            if (n.depth == 1) {
-                // Prefer originalCategory (frozen at bootstrap) over label (may be LLM-renamed).
-                (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
-            }
-            else {
-                when (policy) {
-                    TraversalPolicy.TREE_ONLY -> {
-                        val treeParent = n.parents.find { it.id == n.treeParentId } ?: n.parents.firstOrNull()
-                        if (treeParent != null) {
-                            walk(treeParent)
+        val key = Pair(node.id, policy)
+        return depth1Cache.getOrPut(key) {
+            val ancestors = mutableSetOf<String>()
+            val visited   = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                if (n.depth == 1) {
+                    // Prefer originalCategory (frozen at bootstrap) over label (may be LLM-renamed).
+                    (n.originalCategory ?: n.label)?.let { ancestors.add(it) }
+                }
+                else {
+                    when (policy) {
+                        TraversalPolicy.TREE_ONLY -> {
+                            val treeParent = n.parents.find { it.id == n.treeParentId } ?: n.parents.firstOrNull()
+                            if (treeParent != null) {
+                                walk(treeParent)
+                            }
                         }
-                    }
-                    TraversalPolicy.BRIDGE_ONLY -> {
-                        n.parents.filter { it.isBridge }.forEach { walk(it) }
-                    }
-                    TraversalPolicy.DAG_BOTH -> {
-                        n.parents.forEach { walk(it) }
+                        TraversalPolicy.BRIDGE_ONLY -> {
+                            n.parents.filter { it.isBridge }.forEach { walk(it) }
+                        }
+                        TraversalPolicy.DAG_BOTH -> {
+                            n.parents.forEach { walk(it) }
+                        }
                     }
                 }
             }
+            walk(node)
+            ancestors
         }
-        walk(node)
-        return ancestors
     }
 
     // ─────────────────────────────────────────────────────────────────────────

@@ -794,9 +794,13 @@ class HeadlessBenchmarkRunner(
             log.error("Failed to generate migration flow matrix: ${e.message}", e)
         }
 
-        // 3. Compute and export WARD/MAIN diagnostics
+        // 3. Compute and export WARD/MAIN diagnostics & build calibration maps in a single loop
         val correctnessMap = HashMap<String, Boolean>()
+        val predictedMap = HashMap<String, Map<String, Double>>()
+        val gtMap = HashMap<String, String>()
+        val matchCounts = mutableListOf<Int>()
         var diagWriter: java.io.BufferedWriter? = null
+
         try {
             if (condition.equals("WARD_BASELINE", ignoreCase = true) || condition.equals("MAIN", ignoreCase = true)) {
                 val diagFile = File(trickleDir, "${condition}_routing_diagnostics.txt")
@@ -805,6 +809,7 @@ class HeadlessBenchmarkRunner(
             }
 
             for ((trueDomain, text) in testQueries) {
+                gtMap[text] = trueDomain
                 val matched = try {
                     runBlocking {
                         taxonomyService.routeQueryToLeaves(text).mapNotNull { (leaf, conf) ->
@@ -813,6 +818,13 @@ class HeadlessBenchmarkRunner(
                     }
                 } catch (t: Throwable) {
                     emptyList()
+                }
+
+                matchCounts.add(matched.size)
+                if (matched.isNotEmpty()) {
+                    val domainConf = matched.groupBy { it.first.dominantDomain }
+                        .mapValues { (_, list) -> list.maxOf { it.second } }
+                    predictedMap[text] = domainConf
                 }
 
                 val isCorrect = if (matched.isEmpty()) {
@@ -850,28 +862,6 @@ class HeadlessBenchmarkRunner(
         }
 
         try {
-            val predictedMap = HashMap<String, Map<String, Double>>()
-            val gtMap = HashMap<String, String>()
-            val matchCounts = mutableListOf<Int>()
-            for ((trueDomain, text) in testQueries) {
-                gtMap[text] = trueDomain
-                val matched = try {
-                    runBlocking {
-                        taxonomyService.routeQueryToLeaves(text).mapNotNull { (leaf, conf) ->
-                            profiles[leaf.id]?.let { it to conf }
-                        }
-                    }
-                } catch (t: Throwable) {
-                    emptyList()
-                }
-                matchCounts.add(matched.size)
-                if (matched.isNotEmpty()) {
-                    val domainConf = matched.groupBy { it.first.dominantDomain }
-                        .mapValues { (_, list) -> list.maxOf { it.second } }
-                    predictedMap[text] = domainConf
-                }
-            }
-
             val brierVal = computeBrierScore(predictedMap, gtMap, profiles.values)
             val maxLeafAssignments = config.formalism.maxLeafAssignments
             val maxAssignmentCapRate = if (testQueries.isNotEmpty()) {
@@ -922,6 +912,16 @@ class HeadlessBenchmarkRunner(
         val testTexts = testQueries.map { it.second }.toSet()
         val embeddings = embeddingCache.getBatch(testTexts)
 
+        // Precompute and normalize leaf centroids to avoid redundant double array allocations in the hot loop
+        val normalizedCentroids = leaves.mapNotNull { leaf ->
+            val profile = profiles[leaf.id] ?: return@mapNotNull null
+            val centroid = leaf.vmfMu
+            if (centroid.isEmpty()) return@mapNotNull null
+            val doubleCentroid = DoubleArray(centroid.size) { centroid[it].toDouble() }
+            val normCentroid = l2Normalize(doubleCentroid)
+            profile to normCentroid
+        }
+
         var top1Correct = 0
         var top3Correct = 0
         var top5Correct = 0
@@ -933,12 +933,7 @@ class HeadlessBenchmarkRunner(
             val doubleEmb = DoubleArray(emb.size) { emb[it].toDouble() }
             val normEmb = l2Normalize(doubleEmb)
 
-            val scoredLeaves = leaves.mapNotNull { leaf ->
-                val profile = profiles[leaf.id] ?: return@mapNotNull null
-                val centroid = leaf.vmfMu
-                if (centroid.isEmpty()) return@mapNotNull null
-                val doubleCentroid = DoubleArray(centroid.size) { centroid[it].toDouble() }
-                val normCentroid = l2Normalize(doubleCentroid)
+            val scoredLeaves = normalizedCentroids.map { (profile, normCentroid) ->
                 val dot = dotProduct(normEmb, normCentroid)
                 profile to dot
             }.sortedByDescending { it.second }

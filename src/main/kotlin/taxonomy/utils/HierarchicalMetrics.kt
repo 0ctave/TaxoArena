@@ -117,23 +117,44 @@ fun dagDendrogramPurity(
     val subtreeCache = HashMap<GraphNode, Set<GraphNode>>()
     fun subtreeOf(n: GraphNode) = subtreeCache.getOrPut(n) { subtreeNodes(n, policy) }
 
+    // Precompute subtree label counts and total counts per node
+    val subtreeLabelCounts = HashMap<GraphNode, Map<String, Int>>()
+    val subtreeTotalCounts = HashMap<GraphNode, Int>()
+
+    fun getSubtreeLabelCounts(n: GraphNode): Map<String, Int> {
+        return subtreeLabelCounts.getOrPut(n) {
+            val subNodes = subtreeOf(n)
+            val counts = HashMap<String, Int>()
+            var totalCount = 0
+            for (subNode in subNodes) {
+                val labels = nodeToLabels[subNode] ?: continue
+                for (l in labels) {
+                    counts[l] = (counts[l] ?: 0) + 1
+                    totalCount++
+                }
+            }
+            subtreeTotalCounts[n] = totalCount
+            counts
+        }
+    }
+
+    // Cache LCA lookup per unique node pairs
+    val lcaCache = HashMap<Pair<String, String>, GraphNode>()
+    fun getLca(nodeA: GraphNode, nodeB: GraphNode): GraphNode {
+        val key = if (nodeA.id < nodeB.id) Pair(nodeA.id, nodeB.id) else Pair(nodeB.id, nodeA.id)
+        return lcaCache.getOrPut(key) { shallowLCA(nodeA, nodeB, policy) }
+    }
+
     var pureSum = 0.0
     var total = 0
     for ((label, queries) in labelled) {
         for (i in queries.indices) for (j in i + 1 until queries.size) {
             val a = queryAssignments.getValue(queries[i])
             val b = queryAssignments.getValue(queries[j])
-            val lca = shallowLCA(a, b, policy)
-            val subtree = subtreeOf(lca)
-            var match = 0
-            var seen = 0
-            for (node in subtree) {
-                val labels = nodeToLabels[node] ?: continue
-                for (l in labels) {
-                    seen++
-                    if (l == label) match++
-                }
-            }
+            val lca = getLca(a, b)
+            val counts = getSubtreeLabelCounts(lca)
+            val seen = subtreeTotalCounts[lca] ?: 0
+            val match = counts[label] ?: 0
             if (seen == 0) continue
             total++
             pureSum += match.toDouble() / seen
