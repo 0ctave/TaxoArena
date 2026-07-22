@@ -68,7 +68,7 @@ class TaxonomyTrickler(
             margin = margin,
             maxAssignments = config.formalism.maxLeafAssignments,
             readOnly = isInference,
-            kappaAdaptive = true,
+            kappaAdaptive = false,
             enableGtBias = (config.formalism.enableGtWarmStart && currentIteration <= 1),
             originalCategories = originalCategories
         )
