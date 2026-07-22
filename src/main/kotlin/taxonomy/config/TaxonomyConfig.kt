@@ -96,7 +96,11 @@ class TaxonomyConfig {
         // ── Routing ───────────────────────────────────────────────────────────
         var routingSoftmaxTau: Double = 1.0
         var assignmentCosineGap: Double = 0.03
-        var deltaAssign: Double = 0.20
+        var constructionMargin: Double = 0.20
+        var arenaMargin: Double = 0.40
+        var deltaAssign: Double
+            get() = constructionMargin
+            set(value) { constructionMargin = value }
         var maxLeafAssignments: Int = 5
 
         // ── Merging / convergence ─────────────────────────────────────────────
@@ -121,6 +125,7 @@ class TaxonomyConfig {
         var enableResidualSplitGate: Boolean = true
         var enableBridging: Boolean = true
         var refitMuPerIteration: Boolean = true
+        var enableGtWarmStart: Boolean = true
 
         var fusionSimilarityThreshold: Double = 0.92
         var effectiveSupportFloor: Double = 2.0
@@ -201,6 +206,8 @@ class TaxonomyConfig {
             routingSoftmaxTau = formalism.routingSoftmaxTau,
             assignmentCosineGap = formalism.assignmentCosineGap,
             deltaAssign = formalism.deltaAssign,
+            constructionMargin = formalism.constructionMargin,
+            arenaMargin = formalism.arenaMargin,
             maxLeafAssignments = formalism.maxLeafAssignments,
             emaAlpha = formalism.emaAlpha,
             enableStableQuestionIds = formalism.enableStableQuestionIds,
@@ -208,6 +215,7 @@ class TaxonomyConfig {
             enableResidualSplitGate = formalism.enableResidualSplitGate,
             enableBridging = formalism.enableBridging,
             refitMuPerIteration = formalism.refitMuPerIteration,
+            enableGtWarmStart = formalism.enableGtWarmStart,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
             tauKappaScalingFactor = formalism.tauKappaScalingFactor,
@@ -246,7 +254,8 @@ class TaxonomyConfig {
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.routingSoftmaxTau = c.formalism.routingSoftmaxTau
         formalism.assignmentCosineGap = c.formalism.assignmentCosineGap
-        formalism.deltaAssign = c.formalism.deltaAssign
+        formalism.constructionMargin = c.formalism.constructionMargin
+        formalism.arenaMargin = c.formalism.arenaMargin
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
         formalism.emaAlpha = c.formalism.emaAlpha
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
@@ -254,6 +263,7 @@ class TaxonomyConfig {
         formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate
         formalism.enableBridging = c.formalism.enableBridging
         formalism.refitMuPerIteration = c.formalism.refitMuPerIteration
+        formalism.enableGtWarmStart = c.formalism.enableGtWarmStart
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
         formalism.tauKappaScalingFactor = c.formalism.tauKappaScalingFactor

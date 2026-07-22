@@ -358,7 +358,7 @@ class TaxonomyArenaService(
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector, category ?: "")
         // routeQuery already walks the DAG and returns the best-fit leaves
-        return ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) })
+        return ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) }, isInference = true)
             .keys
             .filter { node ->
                 if (frozenLeafIds != null) node.id in frozenLeafIds
@@ -379,7 +379,7 @@ class TaxonomyArenaService(
         val root = taxonomyService.getGraph() ?: return null
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector, category ?: "")
-        val routeResult = ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) })
+        val routeResult = ops.routeQuery(emb, root, currentIteration = 2, originalCategories = category?.let { listOf(it) }, isInference = true)
         
         val leafLogProbs = routeResult.filter { (node, _) ->
             if (frozenLeafIds != null) node.id in frozenLeafIds
@@ -402,8 +402,7 @@ class TaxonomyArenaService(
         val primaryLeaf = sortedCandidates.first().first
         
         // Entropy guard check before degree cap (fits in all sisters rule)
-        // K_cap = 3
-        val K_cap = 3
+        val K_cap = config.formalism.maxLeafAssignments
         if (sortedCandidates.size > K_cap) {
             val allProbs = sortedCandidates.map { it.second }
             if (isNearUniform(allProbs)) {
@@ -411,8 +410,8 @@ class TaxonomyArenaService(
             }
         }
         
-        // Apply degree cap: keep at most K_max secondaries (K_max = 2)
-        val K_max = 2
+        // Apply degree cap: keep at most K_max secondaries
+        val K_max = (config.formalism.maxLeafAssignments - 1).coerceAtLeast(1)
         val keptCandidates = sortedCandidates.take(1 + K_max)
         
         if (keptCandidates.size <= 1) {

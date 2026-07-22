@@ -77,6 +77,9 @@ data class HeadlessCliConfig(
     val bridgeSupportFloor: Double? = null,
     val bridgeSupportRelFraction: Double? = null,
     val deltaAssign: Double? = null,
+    val constructionMargin: Double? = null,
+    val arenaMargin: Double? = null,
+    val enableGtWarmStart: Boolean? = null,
     val maxLeafAssignments: Int? = null,
     val refitMuPerIteration: Boolean? = null,
     val tauKappaScalingFactor: Double? = null,
@@ -165,6 +168,9 @@ class HeadlessBenchmarkRunner(
         cliConfig.bridgeSupportRelFraction?.let { config.diagnostics.bridgeSupportRelFraction = it }
         cliConfig.tauKappaScalingFactor?.let { config.formalism.tauKappaScalingFactor = it }
         cliConfig.deltaAssign?.let { config.formalism.deltaAssign = it }
+        cliConfig.constructionMargin?.let { config.formalism.constructionMargin = it }
+        cliConfig.arenaMargin?.let { config.formalism.arenaMargin = it }
+        cliConfig.enableGtWarmStart?.let { config.formalism.enableGtWarmStart = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
         cliConfig.refitMuPerIteration?.let { config.formalism.refitMuPerIteration = it }
         cliConfig.dagMode?.let {
@@ -1224,6 +1230,9 @@ class HeadlessBenchmarkRunner(
         var bridgeSupportFloor: Double? = null
         var bridgeSupportRelFraction: Double? = null
         var deltaAssign: Double? = null
+        var constructionMargin: Double? = null
+        var arenaMargin: Double? = null
+        var enableGtWarmStart: Boolean? = null
         var maxLeafAssignments: Int? = null
         var tauKappaScalingFactor: Double? = null
         var refitMuPerIteration: Boolean? = null
@@ -1303,6 +1312,9 @@ class HeadlessBenchmarkRunner(
                 "bridgeSupportFloor" -> bridgeSupportFloor = rawVal.toDouble()
                 "bridgeSupportRelFraction" -> bridgeSupportRelFraction = rawVal.toDouble()
                 "deltaAssign" -> deltaAssign = rawVal.toDouble()
+                "constructionMargin" -> constructionMargin = rawVal.toDouble()
+                "arenaMargin" -> arenaMargin = rawVal.toDouble()
+                "enableGtWarmStart" -> enableGtWarmStart = rawVal.toBoolean()
                 "maxLeafAssignments" -> maxLeafAssignments = rawVal.toInt()
                 "tauKappaScalingFactor" -> tauKappaScalingFactor = rawVal.toDouble()
                 "refitMuPerIteration" -> refitMuPerIteration = rawVal.toBoolean()
@@ -1353,6 +1365,9 @@ class HeadlessBenchmarkRunner(
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
             deltaAssign = deltaAssign,
+            constructionMargin = constructionMargin,
+            arenaMargin = arenaMargin,
+            enableGtWarmStart = enableGtWarmStart,
             maxLeafAssignments = maxLeafAssignments,
             tauKappaScalingFactor = tauKappaScalingFactor,
             refitMuPerIteration = refitMuPerIteration,

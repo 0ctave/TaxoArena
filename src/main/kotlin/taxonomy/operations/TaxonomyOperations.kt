@@ -29,9 +29,10 @@ class TaxonomyOperations(
         query: Embedding,
         root: GraphNode,
         currentIteration: Int = 2,
-        originalCategories: List<String>? = null
+        originalCategories: List<String>? = null,
+        isInference: Boolean = false
     ): Map<GraphNode, Double> =
-        trickler.routeQuery(query, root, currentIteration, originalCategories).leaves
+        trickler.routeQuery(query, root, currentIteration, originalCategories, isInference).leaves
 
     suspend fun fitNodeRecursive(node: GraphNode, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, isFinalIteration)
 

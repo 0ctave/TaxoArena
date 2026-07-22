@@ -29,6 +29,28 @@ data class ResidualHit(
 )
 
 @Service
+data class TrickleOptions(
+    val margin: Double,
+    val maxAssignments: Int,
+    val readOnly: Boolean = true,
+    val kappaAdaptive: Boolean = true,
+    val enableGtBias: Boolean = false,
+    val originalCategories: List<String>? = null
+)
+
+data class TrickleResult(
+    val allNodes: Map<GraphNode, Double>,
+    val primary: GraphNode,
+    val memberships: Map<GraphNode, Double>,
+    val residualHits: List<ResidualHit> = emptyList()
+) {
+    fun leaves(): List<Pair<GraphNode, Double>> =
+        memberships.filterKeys { it.isLeaf }
+            .toList()
+            .sortedByDescending { it.second }
+}
+
+@Service
 class TaxonomyTrickler(
     private val config: TaxonomyConfig
 ) {
@@ -40,7 +62,25 @@ class TaxonomyTrickler(
         currentIteration: Int,
         originalCategories: List<String>? = null,
         isInference: Boolean = false
-        ): RoutingResult {
+    ): RoutingResult {
+        val margin = if (isInference) config.formalism.arenaMargin else config.formalism.constructionMargin
+        val opts = TrickleOptions(
+            margin = margin,
+            maxAssignments = config.formalism.maxLeafAssignments,
+            readOnly = isInference,
+            kappaAdaptive = true,
+            enableGtBias = (currentIteration <= 1),
+            originalCategories = originalCategories
+        )
+        val res = trickle(query, root, opts)
+        return RoutingResult(res.leaves().toMap(), res.residualHits)
+    }
+
+    fun trickle(
+        embedding: Embedding,
+        root: GraphNode,
+        opts: TrickleOptions
+    ): TrickleResult {
         val logProbMap = mutableMapOf<String, Double>()
         val nodeMap = mutableMapOf<String, GraphNode>()
         val residualHits = mutableListOf<ResidualHit>()
@@ -65,7 +105,6 @@ class TaxonomyTrickler(
             if (children.isEmpty()) return
 
             val scores = DoubleArray(children.size)
-            val gtBiasActive = currentIteration <= 1
 
             var kappaSum = 0.0
             for (c in children) kappaSum += c.vmfKappa
@@ -75,12 +114,12 @@ class TaxonomyTrickler(
 
             for (i in children.indices) {
                 val child = children[i]
-                val slicedX = query.projectTo(child.sliceDim)
+                val slicedX = embedding.projectTo(child.sliceDim)
                 var f = sharedLogNorm + siblingKappa * StatisticsUtils.dotProduct(slicedX, child.vmfMu)
 
-                // Ground Truth bias (iter == 1 only)
-                val isOriginal = originalCategories?.any { it.equals(child.label, ignoreCase = true) } ?: false
-                if (gtBiasActive && isOriginal) {
+                // Ground Truth bias (iter == 1 only, governed by opts)
+                val isOriginal = opts.originalCategories?.any { it.equals(child.label, ignoreCase = true) } ?: false
+                if (opts.enableGtBias && isOriginal) {
                     f += ln(1.0 / 0.7)
                 }
 
@@ -101,27 +140,28 @@ class TaxonomyTrickler(
             val laplaceEps = 0.05 / K
             val rawProbs = DoubleArray(K) { exp(logSoftmax[it]) }
 
-            // pre-smoothing best-child responsibility
-            val bestChildResp = rawProbs.maxOrNull() ?: 0.0
-            val baseTauAtDepth = when (node.depth) {
-                0, 1 -> 0.999
-                else -> 0.80
-            }
-            val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
-            if (config.formalism.enableResidualRouting && node.depth >= 2 && bestChildResp < adaptiveTau) {
-                val qId = if (query.queryId != -1) query.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(query.rawText)
-                residualHits.add(ResidualHit(node, qId, bestChildResp))
+            // Residual routing check (only if not readOnly)
+            if (!opts.readOnly && config.formalism.enableResidualRouting && node.depth >= 2) {
+                val bestChildResp = rawProbs.maxOrNull() ?: 0.0
+                val baseTauAtDepth = 0.80
+                val adaptiveTau = (baseTauAtDepth * (2.0 / K)).coerceAtMost(baseTauAtDepth)
+                if (bestChildResp < adaptiveTau) {
+                    val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
+                    residualHits.add(ResidualHit(node, qId, bestChildResp))
+                }
             }
 
             val smoothedProbs = DoubleArray(K) { (rawProbs[it] + laplaceEps) / (1.0 + K * laplaceEps) }
-            val logSmoothed = DoubleArray(K) { ln(smoothedProbs[it].coerceAtLeast(1e-300)) }
 
             // Register the query embedding for MRL-projection lookup
-            GraphNode.registerEmbedding(query)
+            GraphNode.registerEmbedding(embedding)
 
+            // SINGLE MARGIN RULE: assign to every child within an effective margin of the best
             val maxLogSoftmax = logSoftmax.maxOrNull() ?: 0.0
+            val effectiveMargin = opts.margin * (if (opts.kappaAdaptive) siblingKappa else 1.0)
+
             val bestIndices = children.indices
-                .filter { (maxLogSoftmax - logSoftmax[it]) <= config.formalism.deltaAssign }
+                .filter { (maxLogSoftmax - logSoftmax[it]) <= effectiveMargin }
 
             for (i in bestIndices) {
                 val child = children[i]
@@ -133,34 +173,22 @@ class TaxonomyTrickler(
 
         walk(root, 0.0)
 
-
-        // --- assignmentMargin filter ---
+        // Find leaf candidates
         val leafCandidates = logProbMap
             .filterKeys { id -> nodeMap[id]?.isLeaf == true }
             .map { (id, logProb) -> nodeMap.getValue(id) to logProb }
             .toMap()
 
-        val bestLeafLogProb = leafCandidates.values.maxOrNull() ?: Double.NEGATIVE_INFINITY
+        val qualifiedLeaves = leafCandidates.entries
+            .sortedByDescending { it.value }
+            .take(opts.maxAssignments)
 
         val results = mutableMapOf<GraphNode, Double>()
-        val qualifiedLeaves = leafCandidates.entries
-            .filter { (leaf, logProb) ->
-                val parent = leaf.parents.find { it.id == leaf.treeParentId } ?: leaf.parents.firstOrNull()
-                val siblingKappaEffective = parent?.let { p ->
-                    val activeChildren = p.children
-                    if (activeChildren.isNotEmpty()) activeChildren.map { it.vmfKappa }.average() else null
-                }?.coerceIn(1.0, 100.0) ?: leaf.vmfKappa.coerceIn(1.0, 100.0)
-
-                val marginNats = config.formalism.assignmentCosineGap * siblingKappaEffective
-                (bestLeafLogProb - logProb) <= marginNats
-            }
-            .sortedByDescending { it.value }
-            .take(config.formalism.maxLeafAssignments)
-
         qualifiedLeaves.forEach { (leaf, logProb) ->
             results[leaf] = logProb
         }
 
+        // Internal nodes fallback if no active children reached
         for ((nodeId, logProb) in logProbMap) {
             val node = nodeMap[nodeId] ?: continue
             if (node.isBridge) continue
@@ -180,15 +208,25 @@ class TaxonomyTrickler(
             results[root] = 0.0
         }
 
-        // Normalize to log-probabilities that sum to 1
-        val maxLog = results.values.maxOrNull() ?: 0.0
-        val sumExpVal = results.values.sumOf { exp(it - maxLog) }
-        val logSumExpFinal = maxLog + ln(sumExpVal.coerceAtLeast(1e-300))
-
-        val leavesMap = results.mapValues { (_, logProb) ->
-            logProb - logSumExpFinal
+        // Normalize allNodes and memberships maps to sum to 1.0 in probability space
+        fun normalizeLogProbs(raw: Map<GraphNode, Double>): Map<GraphNode, Double> {
+            if (raw.isEmpty()) return emptyMap()
+            val maxL = raw.values.maxOrNull() ?: 0.0
+            val sumE = raw.values.sumOf { exp(it - maxL) }
+            val logSumExpFinal = maxL + ln(sumE.coerceAtLeast(1e-300))
+            return raw.mapValues { (_, logProb) -> logProb - logSumExpFinal }
         }
 
-        return RoutingResult(leavesMap, residualHits)
+        val normalizedMemberships = normalizeLogProbs(results)
+        val normalizedAllNodes = normalizeLogProbs(logProbMap.mapKeys { nodeMap.getValue(it.key) })
+
+        val primaryNode = normalizedMemberships.maxByOrNull { it.value }?.key ?: root
+
+        return TrickleResult(
+            allNodes = normalizedAllNodes,
+            primary = primaryNode,
+            memberships = normalizedMemberships,
+            residualHits = residualHits
+        )
     }
 }
