@@ -107,9 +107,6 @@ class TaxonomyConfig {
         var arenaMargin: Double = 0.40
 
         // Alias for constructionMargin to maintain compatibility with legacy scripts.
-        var deltaAssign: Double
-            get() = constructionMargin
-            set(value) { constructionMargin = value }
         var maxLeafAssignments: Int = 5
 
         // ── Merging / convergence ─────────────────────────────────────────────
@@ -125,7 +122,6 @@ class TaxonomyConfig {
                 enableResidualRouting = isDag
                 enableResidualSplitGate = isDag
                 enableBridging = isDag
-                refitMuPerIteration = isDag
             }
 
         // ── Internal boolean flags (mapped by dagMode, overrideable for regression)
@@ -133,7 +129,6 @@ class TaxonomyConfig {
         var enableResidualRouting: Boolean = true
         var enableResidualSplitGate: Boolean = true
         var enableBridging: Boolean = true
-        var refitMuPerIteration: Boolean = true
         var enableGtWarmStart: Boolean = false
 
         var fusionSimilarityThreshold: Double = 0.92
@@ -176,7 +171,6 @@ class TaxonomyConfig {
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
         sb.append("│   - Routing Softmax Tau:  ${formalism.routingSoftmaxTau}\n")
-        sb.append("│   - Delta Assign:         ${formalism.deltaAssign}\n")
         sb.append("│   - EMA Alpha:            ${formalism.emaAlpha}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
@@ -213,7 +207,6 @@ class TaxonomyConfig {
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
             routingSoftmaxTau = formalism.routingSoftmaxTau,
-            deltaAssign = formalism.deltaAssign,
             constructionMargin = formalism.constructionMargin,
             arenaMargin = formalism.arenaMargin,
             maxLeafAssignments = formalism.maxLeafAssignments,
@@ -222,7 +215,6 @@ class TaxonomyConfig {
             enableResidualRouting = formalism.enableResidualRouting,
             enableResidualSplitGate = formalism.enableResidualSplitGate,
             enableBridging = formalism.enableBridging,
-            refitMuPerIteration = formalism.refitMuPerIteration,
             enableGtWarmStart = formalism.enableGtWarmStart,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
@@ -270,7 +262,6 @@ class TaxonomyConfig {
         formalism.enableResidualRouting = c.formalism.enableResidualRouting
         formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate
         formalism.enableBridging = c.formalism.enableBridging
-        formalism.refitMuPerIteration = c.formalism.refitMuPerIteration
         formalism.enableGtWarmStart = c.formalism.enableGtWarmStart
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor

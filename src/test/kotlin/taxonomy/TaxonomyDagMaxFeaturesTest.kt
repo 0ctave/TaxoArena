@@ -958,7 +958,7 @@ class TaxonomyDagMaxFeaturesTest {
     @Test
     fun `R16 - log-space adaptive soft-membership and branch-point descent gating`() {
         val config = TaxonomyConfig()
-        config.formalism.deltaAssign = 0.20  // branch-point descent gating margin
+        config.formalism.constructionMargin = 0.20  // branch-point descent gating margin
         config.formalism.enableResidualRouting = false
         val trickler = TaxonomyTrickler(config)
         val parent = node("parent", "Parent Domain", 2)
