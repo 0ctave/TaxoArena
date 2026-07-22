@@ -1,0 +1,43 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  profile_test.toml — FAST PROFILING TEST CONFIGURATION
+#
+#  Kicks off a minimal, hyper-fast run of the entire pipeline to verify
+#  the new hierarchical performance stats and per-iteration timeline.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+# Just 2 models to keep LLM judge/BT fitting extremely fast
+models        = [
+    "gpt-4o-2024-08-06",
+    "gpt-4o-mini"
+]
+
+# Run a single domain with a low query limit to keep data loading fast
+category      = "Computer Science"
+queryLimit    = 20
+outputDir     = "tuning/runs/profile_test"
+testRatio     = 0.3
+seed          = 42
+
+# Enable profiling and run all validation and baseline stages
+runPipeline             = true
+runBenchmark            = false
+runTrickle              = true
+runBaselines            = true
+enableProfiling         = true
+enableLabeling          = false
+enableFinalMetrics      = true
+
+# Formalism and iteration limits
+numIterations           = 3
+minClusterSize          = 25
+maxDepth                = 4
+maxLeafAssignments      = 2
+constructionMargin      = 0.002
+arenaMargin             = 0.004
+enableGtWarmStart       = false
+secondaryMassFloor      = 2.0
+bridgeSupportRelFraction = 0.03
+fusionSimilarityThreshold = 0.90
+dagMode                 = "DAG_MAX"

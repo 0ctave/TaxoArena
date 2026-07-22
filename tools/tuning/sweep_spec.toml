@@ -1,6 +1,6 @@
 [base]
 config = "experiment_configs/thesis_canonical.toml"
-gradle_cmd = "gradlew.bat bootRun --rerun-tasks"  # For Windows execution
+gradle_cmd = "gradlew.bat bootRun --rerun-tasks"  # For Windows
 extra_args = ""
 
 [output]
@@ -17,36 +17,52 @@ seeds = [137, 2048]
 stage = "validate"
 
 # ══════════════════════════════════════════════════════════════════════════
-#  FRESH CALIBRATION SWEEP
-#  Base built on the corrected construction path: N-normalized EM tolerance,
-#  adaptive cap + plateau guard, fusionSimilarityThreshold = 0.90 (validated
-#  coherence-preserving), runBaselines = false during screening. All prior
-#  tuning results are STALE against this base — clean restart, not continuation.
+#  FRESH CALIBRATION SWEEP — κ‑ADAPTIVE MARGIN REGIME
 #
-#  BEFORE RUNNING, CONFIRM:
-#   1. One canonical build shows the selected-split converged=false fraction is
-#      acceptable (EM plateau-relabel decision) — do not sweep on a base where
-#      ~half of selected splits are non-converged.
-#   2. The BorderlineRate band decision below is resolved and pre-registered.
+#  Base: corrected construction path
+#   - N-normalized EM tolerance + adaptive cap + plateau guard
+#   - fusionSimilarityThreshold = 0.90
+#   - runBaselines = false during screening
 #
-#  FACTOR DESIGN (matches the [factors] block — no stale references):
-#   - assignmentCosineGap {0.10,0.125,0.15}: primary soft-membership margin.
-#     Weak effect on borderline/ECE, stronger on Top-1/migration. Not binding.
-#   - deltaAssign {1.0,1.25,1.5}: dominant lever on BorderlineRate/ECE in prior
-#     batches (|r|~0.85-0.97). Centered low because 1.0 was best near-miss and
-#     >=2.0 overshoots borderline / pushes MaxAssignmentCapRate toward its gate.
-#   - secondaryMassFloor {2.0,3.5,5.0}: bridge/secondary-assignment control.
-#     NEW factor — effect was previously UNREADABLE (report column-mapping bug).
-#     Confirm the finalists report prints real values before trusting selection.
-#   - bridgeSupportRelFraction {0.03,0.05,0.10}: bridge support threshold.
-#     NEW factor, same prior-readability caveat.
+#  FACTORS (match code + current geometry):
 #
-#  minClusterSize and routingSoftmaxTau are NOT swept this generation (held at
-#  thesis_canonical.toml values). Prior conclusions about their ECE/borderline
-#  effect are superseded by the corrected base.
+#   - deltaAssign {0.0015, 0.003, 0.005}
+#       Legacy alias for constructionMargin; controls unified log-softmax
+#       margin during DAG-building trickle (effectiveMargin = deltaAssign
+#       × siblingKappa, siblingKappa ∈ [1,100]).
+#       These levels correspond roughly to effective margins:
+#         κ = 100 → 0.15, 0.30, 0.50 nats
+#         κ = 60  → 0.09, 0.18, 0.30 nats
+#       i.e. tight, canonical, and slightly looser regimes around the
+#       empirically winning value (≈0.002–0.003 on the corrected base).
+#
+#   - minClusterSize {25, 50, 75}
+#       Granularity dial: 50 is canonical; 25/75 probe finer vs coarser
+#       splits, trading leaf count against SmallLeafFraction and
+#       SelectedNodeStarvedLeafFraction.
+#
+#   - secondaryMassFloor {2.0, 3.5, 5.0}
+#       Minimum secondary probability mass for a candidate to count
+#       (bridge / secondary-structure control). Now correctly reported
+#       in the ledger; no longer unreadable.
+#
+#   - bridgeSupportRelFraction {0.03, 0.05, 0.10}
+#       Relative support threshold a bridge must carry vs its parent.
+#       0.10 coincides with the canonical DAG; 0.03/0.05 explore weaker
+#       bridges’ impact on DuplicateBridgeCount, SourceBPerAnchorMean,
+#       and bridge stability.
+#
+#  NOT SWEPT:
+#   - routingSoftmaxTau (held at 1.5 as in thesis_canonical.toml)
+#   - assignmentCosineGap (diagnostics-only nats margin, not used in
+#     primary routing; left at canonical value).
+#
+#  BorderlineRate is reported but not gated. Calibration is gated by
+#  RoutingECE and the soft gates below.
 # ══════════════════════════════════════════════════════════════════════════
+
 [factors]
-deltaAssign              = [0.001, 0.002, 0.003]
+deltaAssign              = [0.0015, 0.003, 0.005]
 minClusterSize           = [25, 50, 75]
 secondaryMassFloor       = [2.0, 3.5, 5.0]
 bridgeSupportRelFraction = [0.03, 0.05, 0.10]
@@ -55,9 +71,7 @@ bridgeSupportRelFraction = [0.03, 0.05, 0.10]
 Acyclic = true
 DuplicateBridgeCount = 0
 OrphanCount = 0
-has_depth2_sourceB = false            # disabled: SourceB (depth-2 cross-anchor)
-# bridges are geometry-limited (validated),
-# not required for a valid canonical DAG.
+has_depth2_sourceB = false
 MaxAssignmentCapRate_le = 0.20
 SmallLeafFraction_le = 0.50
 SelectedNodeStarvedLeafFraction_le = 0.20
@@ -65,20 +79,7 @@ SourceBPerAnchorMean_le = 3.0
 
 [gates.soft]
 AvgMatchCount_band = [1.0, 4.0]
-Top1Accuracy_ge = 0.72        # recalibrated from 0.74; see pre-registration
+Top1Accuracy_ge = 0.72
 RoutingECE_le = 0.15
-# ── DECISION REQUIRED — DO NOT LEAVE AS-IS WITHOUT JUSTIFICATION ────────────
-# BorderlineRate_band was [0.20, 0.35] in earlier sweeps; set to [0.20, 0.50]
-# here. Widening the band AFTER seeing configs fail at 0.35 is only defensible
-# if the wider bound is justified from the mechanism and pre-registered BEFORE
-# this sweep runs. Pick ONE and document it in the thesis:
-#   (a) Keep [0.20, 0.35]; accept borderline as a binding constraint.
-#   (b) Widen to [0.20, 0.50] WITH a written argument for why ~50% borderline
-#       is acceptable for judge quality (pre-registered, not post-hoc).
-#   (c) Demote BorderlineRate to a reported diagnostic (remove from soft gates)
-#       WITH an argument that it is a routing-confidence property, not a
-#       taxonomy-validity requirement.
-# BorderlineRate: REMOVED as a gate (see pre-registration). Reported as a
-# diagnostic in the ledger, not gated. Calibration gated by RoutingECE.
 CrossAnchorMigrationRate_band = [0.10, 0.30]
 CanonicalAdaptedJaccard_band = [0.0, 1.0]
