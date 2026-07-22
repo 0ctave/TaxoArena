@@ -229,7 +229,7 @@ object StatisticsUtils {
      * EM implementation for Bisecting vMF-k-Means (k=2, kept for compatibility).
      */
     data class VmfParameters(val mu: FloatArray, val kappa: Double, val logNormalizer: Double)
-    data class VmfMixture(val pi: DoubleArray, val components: List<VmfParameters>, val responsibilities: List<DoubleArray>)
+    data class VmfMixture(val pi: DoubleArray, val components: List<VmfParameters>, val responsibilities: List<DoubleArray>, val converged: Boolean = true)
 
     fun performVmfBisection(
         embeddings: List<DoubleArray>,
@@ -380,7 +380,12 @@ object StatisticsUtils {
         val exps  = DoubleArray(k)
         var converged = false
         var finalIters = 0
-        for (iter in 0 until 50) {
+        var bestLikelihood = -Double.MAX_VALUE
+        var patienceCount = 0
+        val maxPatience = 10
+        val maxIters = 150
+
+        for (iter in 0 until maxIters) {
             finalIters = iter + 1
             // ── E-step ───────────────────────────────────────────────────────
             var totalLikelihood = 0.0
@@ -406,10 +411,24 @@ object StatisticsUtils {
                 totalLikelihood += maxLP + ln(sumExp)
             }
 
-            if (abs(totalLikelihood - lastLikelihood) / n < 1e-5) {
+            val delta = abs(totalLikelihood - lastLikelihood)
+            if (delta / n < 1e-5) {
                 converged = true
                 break
             }
+
+            // Plateau / oscillation guard
+            if (totalLikelihood > bestLikelihood + 1e-6) {
+                bestLikelihood = totalLikelihood
+                patienceCount = 0
+            } else {
+                patienceCount++
+                if (patienceCount >= maxPatience) {
+                    log.debug("[VMF EM] Early exit due to plateau/oscillation at iteration $finalIters (no likelihood improvement for $maxPatience iterations)")
+                    break
+                }
+            }
+
             lastLikelihood = totalLikelihood
 
             // ── M-step ───────────────────────────────────────────────────────
@@ -440,7 +459,7 @@ object StatisticsUtils {
         if (converged) {
             log.info("[VMF EM] K=$k, N=$n converged in $finalIters iterations")
         } else {
-            log.info("[VMF EM] K=$k, N=$n did NOT converge in 50 iterations")
+            log.warn("[VMF EM] K=$k, N=$n did NOT converge in $finalIters iterations (cap/plateau)")
         }
 
         val components = (0 until k).map { c ->
@@ -448,7 +467,7 @@ object StatisticsUtils {
         }
         val responsibilities = (0 until n).map { i -> R[i].copyOf() }
 
-        return VmfMixture(pis, components, responsibilities)
+        return VmfMixture(pis, components, responsibilities, converged)
     }
 
     /**
