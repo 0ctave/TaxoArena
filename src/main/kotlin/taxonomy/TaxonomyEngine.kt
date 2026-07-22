@@ -267,7 +267,7 @@ class TaxonomyEngine(
                         )
 
                         val refitTime = measureTimeMillis {
-                            ops.fitNodeRecursive(root, isFinalIteration = (i == totalIters))
+                            ops.fitNodeRecursive(root, currentIteration = i, isFinalIteration = (i == totalIters))
                         }
                         perfTracker.recordTime("construction.phase2_refit", refitTime, 1L)
                         perfTracker.recordTime("construction.phase2_refit@iter=$i", refitTime, 1L)

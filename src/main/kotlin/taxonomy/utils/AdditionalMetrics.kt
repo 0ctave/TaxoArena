@@ -199,13 +199,19 @@ fun computeRoutingECE(
     if (n == 0) return 0.0
 
     var ece = 0.0
-    for (b in 0 until bins) {
+    val binRepList = mutableListOf<String>()
+    for (b in bins - 1 downTo 0) {
         val c = binCount[b]
         if (c == 0) continue
         val acc = binAccSum[b] / c
         val conf = binConfSum[b] / c
         ece += (c.toDouble() / n) * abs(acc - conf)
+
+        val minBinVal = b.toDouble() / bins
+        val maxBinVal = (b + 1).toDouble() / bins
+        binRepList.add("[${"%.1f".format(java.util.Locale.US, minBinVal)},${"%.1f".format(java.util.Locale.US, maxBinVal)}]:${"%.2f".format(java.util.Locale.US, conf)}/${"%.2f".format(java.util.Locale.US, acc)}")
     }
+    additionalMetricsLog.info("[CALIB]  ECE=${"%.4f".format(java.util.Locale.US, ece)}, reliability_bins={${binRepList.joinToString(", ")}}")
     return ece
 }
 

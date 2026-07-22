@@ -29,6 +29,7 @@ data class LeafDomainProfile(
  * is a thin orchestrator that builds these inputs from the live DAG and dataset.
  */
 object BatchTrickleEvaluator {
+    private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.BatchTrickleEvaluator")
 
     /**
      * Walk every (tree) leaf reachable from [root], deduplicating by id since the graph is a DAG.
@@ -162,6 +163,9 @@ object BatchTrickleEvaluator {
         val predictedMap = HashMap<String, Map<String, Double>>()
         val gtMap = HashMap<String, String>()
         val matchCounts = mutableListOf<Int>()
+        val postSums = mutableListOf<Double>()
+        val depthsList = mutableListOf<Double>()
+        val weightsList = mutableListOf<Double>()
         var processed = 0
         for ((trueDomain, text) in testQueries) {
             val rawRoute = routeFn(text)
@@ -175,6 +179,14 @@ object BatchTrickleEvaluator {
                 perLeafDomains[leafId]?.let { it to conf }
             }
             matchCounts.add(matched.size)
+            if (matched.isNotEmpty()) {
+                val sum = matched.sumOf { it.second }
+                postSums.add(sum)
+                for ((profile, conf) in matched) {
+                    depthsList.add(profile.depth.toDouble())
+                    weightsList.add(conf)
+                }
+            }
 
             if (matched.isEmpty()) {
                 noMatch++
@@ -219,6 +231,17 @@ object BatchTrickleEvaluator {
         val macroF1 = if (support.isNotEmpty()) f1Sum / support.size else 0.0
         val eceVal = taxonomy.utils.computeRoutingECE(predictedMap, gtMap)
 
+        val avgPostSum = if (postSums.isNotEmpty()) postSums.average() else 0.0
+        val multiLeafCount = matchCounts.count { it > 1 }
+        val multiLeafRate = if (matchCounts.isNotEmpty()) multiLeafCount.toDouble() / matchCounts.size else 0.0
+        val countDistribution = matchCounts.groupBy { it }
+            .mapValues { it.value.size.toDouble() / matchCounts.size }
+            .entries.sortedBy { it.key }
+            .joinToString(", ") { "${it.key}:${"%.2f".format(java.util.Locale.US, it.value)}" }
+        val correlation = pearsonCorrelation(depthsList, weightsList)
+
+        log.info("[ROUTE]  posterior_sum≈${"%.4f".format(java.util.Locale.US, avgPostSum)}, membership_depth_corr=${"%.4f".format(java.util.Locale.US, correlation)}, multi_leaf_rate=${"%.4f".format(java.util.Locale.US, multiLeafRate)}, dist={$countDistribution}")
+
         val p = top1Correct.toDouble() / n
         val num = processed
         val z = 1.96
@@ -259,5 +282,24 @@ object BatchTrickleEvaluator {
             avgMatchCountEval = avgMatchCountEval,
             medianNodesPerQueryEval = medianNodesPerQueryEval,
         )
+    }
+
+    private fun pearsonCorrelation(x: List<Double>, y: List<Double>): Double {
+        if (x.size != y.size || x.isEmpty()) return 0.0
+        val n = x.size
+        val meanX = x.average()
+        val meanY = y.average()
+        var num = 0.0
+        var denX = 0.0
+        var denY = 0.0
+        for (i in 0 until n) {
+            val dx = x[i] - meanX
+            val dy = y[i] - meanY
+            num += dx * dy
+            denX += dx * dx
+            denY += dy * dy
+        }
+        val denom = kotlin.math.sqrt(denX) * kotlin.math.sqrt(denY)
+        return if (denom > 0.0) num / denom else 0.0
     }
 }

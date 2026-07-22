@@ -34,7 +34,7 @@ class TaxonomyOperations(
     ): Map<GraphNode, Double> =
         trickler.routeQuery(query, root, currentIteration, originalCategories, isInference).leaves
 
-    suspend fun fitNodeRecursive(node: GraphNode, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, isFinalIteration)
+    suspend fun fitNodeRecursive(node: GraphNode, currentIteration: Int = 0, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, currentIteration, isFinalIteration)
 
     suspend fun splitNodesRecursive(node: GraphNode) = splitter.splitNodesRecursive(node)
 

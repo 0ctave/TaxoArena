@@ -21,10 +21,25 @@ class TaxonomyFitter(
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.Fitter")
     private val highDOverNCount = java.util.concurrent.atomic.AtomicInteger(0)
+    private val muHistory = java.util.concurrent.ConcurrentHashMap<String, MutableList<FloatArray>>()
+    private val driftSums = java.util.concurrent.CopyOnWriteArrayList<Double>()
+    private val oscillationCount = java.util.concurrent.atomic.AtomicInteger(0)
+    private val earlyOutCount = java.util.concurrent.atomic.AtomicInteger(0)
+    private val totalMuCount = java.util.concurrent.atomic.AtomicInteger(0)
 
-    suspend fun fitNodeRecursive(root: GraphNode, isFinalIteration: Boolean = false) = withContext(Dispatchers.Default) {
+    private val kappaList = java.util.concurrent.CopyOnWriteArrayList<Double>()
+    private val alphaList = java.util.concurrent.CopyOnWriteArrayList<Double>()
+
+    suspend fun fitNodeRecursive(root: GraphNode, currentIteration: Int = 0, isFinalIteration: Boolean = false) = withContext(Dispatchers.Default) {
         log.info("Starting level-by-level parallel vMF/NiW fitting...")
         highDOverNCount.set(0)
+
+        driftSums.clear()
+        oscillationCount.set(0)
+        earlyOutCount.set(0)
+        totalMuCount.set(0)
+        kappaList.clear()
+        alphaList.clear()
 
         val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
         val visited = mutableSetOf<String>()
@@ -61,6 +76,27 @@ class TaxonomyFitter(
         if (highCount > 0) {
             log.info("[FITTER] $highCount nodes had high d/N ratio (> 10.0) and were prior-dominated")
         }
+
+        if (currentIteration > 0) {
+            val driftAvg = if (driftSums.isNotEmpty()) driftSums.average() else 0.0
+            val oscVal = oscillationCount.get()
+            val totalMu = totalMuCount.get()
+            val earlyOutVal = earlyOutCount.get()
+            val earlyOutRate = if (totalMu > 0) earlyOutVal.toDouble() / totalMu else 0.0
+
+            log.info("[FIT-μ]  iter=$currentIteration: mean_MLE_drift=${"%.3f".format(java.util.Locale.US, driftAvg)}, oscillating_nodes=$oscVal/$totalMu, earlyout_rate=${"%.2f".format(java.util.Locale.US, earlyOutRate)}")
+
+            val priorDominated = alphaList.count { it > 0.5 }
+            val totalAlpha = alphaList.size
+            val pct = if (totalAlpha > 0) (priorDominated.toDouble() / totalAlpha * 100.0) else 0.0
+            val sortedK = kappaList.sorted()
+            val medianK = if (sortedK.isNotEmpty()) sortedK[sortedK.size / 2] else 0.0
+            val sortedAlpha = alphaList.sorted()
+            val medianAlpha = if (sortedAlpha.isNotEmpty()) sortedAlpha[sortedAlpha.size / 2] else 0.0
+
+            log.info("[FIT-κ]  iter=$currentIteration: prior_dominated=$priorDominated/$totalAlpha (${"%.1f".format(java.util.Locale.US, pct)}%), median_kfinal=${"%.2f".format(java.util.Locale.US, medianK)}, median_alpha=${"%.2f".format(java.util.Locale.US, medianAlpha)}")
+        }
+
         log.info("[FITTER] Fitting complete ($depthsCount depths, $totalNodesFitted nodes)")
 
         // 2. Diagnostics logging per run
@@ -263,7 +299,10 @@ class TaxonomyFitter(
         val oldMu = node.vmfMu
         if (oldMu.isNotEmpty() && oldMu.size == fitDim) {
             val dot = StatisticsUtils.dotProduct(oldMu.map { it.toDouble() }.toDoubleArray(), mu)
+            driftSums.add(dot)
+            totalMuCount.incrementAndGet()
             if (dot >= 0.9975) {
+                earlyOutCount.incrementAndGet()
                 node.vmfMu = oldMu
             } else {
                 val emaAlpha = config.formalism.emaAlpha
@@ -275,25 +314,43 @@ class TaxonomyFitter(
                 if (norm == 0.0 && fitDim > 0) newMu[0] = 1.0f
                 node.vmfMu = newMu
             }
+
+            // Oscillation detection: dot with mu_{t-2} > dot with mu_{t-1}
+            val history = muHistory[node.id]
+            if (history != null && history.size >= 2) {
+                val mu_t_minus_2 = history[history.size - 2]
+                val mu_t_minus_1 = oldMu
+                val dot_t_minus_2 = StatisticsUtils.dotProduct(mu_t_minus_2.map { it.toDouble() }.toDoubleArray(), mu)
+                val dot_t_minus_1 = StatisticsUtils.dotProduct(mu_t_minus_1.map { it.toDouble() }.toDoubleArray(), mu)
+                if (dot_t_minus_2 > dot_t_minus_1) {
+                    oscillationCount.incrementAndGet()
+                }
+            }
         } else {
             node.vmfMu = mu
         }
+        muHistory.getOrPut(node.id) { mutableListOf() }.add(node.vmfMu.copyOf())
 
         // 5. Compute Weighted Concentration (kappa)
         val rBar = normVec / nEffective
         node.dOverN = fitDim.toDouble() / nEffective
-        
+
         val priorKappa = kappa0Parent.coerceAtLeast(1.0)
-        
-        if (nEffective < config.formalism.effectiveSupportFloor) {
+
+        val alphaD = if (nEffective < config.formalism.effectiveSupportFloor) {
             node.vmfKappa = priorKappa
+            1.0
         } else {
             val rawKappa = StatisticsUtils.correctedKappa(rBar, fitDim, nEffective.toInt())
             val rho = fitDim.toDouble() / nEffective
-            val alphaD = dOverNAlpha(rho)
-            node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
+            val a = dOverNAlpha(rho)
+            node.vmfKappa = (1.0 - a) * rawKappa + a * priorKappa
+            a
         }
         node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(fitDim, node.vmfKappa)
+
+        kappaList.add(node.vmfKappa)
+        alphaList.add(alphaD)
 
         if (node.dOverN > 10.0) {
             highDOverNCount.incrementAndGet()
