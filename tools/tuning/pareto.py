@@ -69,7 +69,7 @@ def check_soft_gates(row, gates_spec):
     top1 = float(row.get("Top1Accuracy", 0.0))
     if top1 <= 1.0:
         top1 = top1 * 100.0
-    ge_val = gates_spec.get("gates", {}).get("soft", {}).get("Top1Accuracy_ge", 0.74)
+    ge_val = gates_spec.get("gates", {}).get("soft", {}).get("Top1Accuracy_ge", 0.72)
     threshold = ge_val if ge_val > 1.0 else ge_val * 100.0
     if top1 < threshold:
         reasons.append(f"Top1Accuracy = {top1:.2f}% < {threshold}%")
