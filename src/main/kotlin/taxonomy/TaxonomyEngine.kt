@@ -63,6 +63,7 @@ class TaxonomyEngine(
             )
 
             val distilledData: List<Triple<String, String, String>>
+            var allTextsCount = 0L
             val phase1Time = measureTimeMillis {
                 distilledData = dataset.flatMap { (category, queries) ->
                     queries.map { rawText ->
@@ -71,12 +72,13 @@ class TaxonomyEngine(
                 }
 
                 val allTexts = distilledData.map { it.third }.distinct()
+                allTextsCount = allTexts.size.toLong()
                 embeddingCache.precompute(allTexts) { current, total ->
                     taxonomyService.updateEmbeddingProgress(current, total)
                 }
                 taxonomyService.clearEmbeddingProgress()
             }
-            perfTracker.recordTime("Phase 1: Precomputing Embeddings", phase1Time)
+            perfTracker.recordTime("construction.phase1_precompute", phase1Time, allTextsCount)
 
             // ── Dimension fast-fail ──────────────────────────────────────────
             // Validate that the embedding model produces vectors with enough
@@ -138,7 +140,7 @@ class TaxonomyEngine(
                 ops.fitNodeRecursive(root)
                 taxonomyService.notifyGraphUpdated()
             }
-            perfTracker.recordTime("Bootstrap Fitting", bootstrapTime)
+            perfTracker.recordTime("construction.phase2_bootstrap", bootstrapTime, 1L)
 
             // Ground truth map
             val groundTruthMap = distilledData.groupBy({ it.second }, { it.first })
@@ -179,7 +181,8 @@ class TaxonomyEngine(
                             ops.clearGraphQueries(root)
                             ops.reassignQueries(root, uniqueEmbs, groundTruthMap, i)
                         }
-                        perfTracker.recordTime("Phase 3: Trickle Routing", trickleTime)
+                        perfTracker.recordTime("construction.phase3_trickle", trickleTime, uniqueEmbs.size.toLong())
+                        perfTracker.recordTime("construction.phase3_trickle@iter=$i", trickleTime, uniqueEmbs.size.toLong())
                         taxonomyService.notifyGraphUpdated()
 
                         // Phase 3c: Pre-split passthrough collapse
@@ -200,7 +203,8 @@ class TaxonomyEngine(
                         val pruneTime = measureTimeMillis {
                             ops.prunePassthroughNodesPublic(root)
                         }
-                        perfTracker.recordTime("Phase 3c: Passthrough Collapse", pruneTime)
+                        perfTracker.recordTime("construction.phase3c_collapse", pruneTime, 1L)
+                        perfTracker.recordTime("construction.phase3c_collapse@iter=$i", pruneTime, 1L)
                         taxonomyService.notifyGraphUpdated(true)
 
                         // Phase 4: Discover (Adaptive Splitting)
@@ -221,7 +225,8 @@ class TaxonomyEngine(
                         val splitTime = measureTimeMillis {
                             ops.splitNodesRecursive(root)
                         }
-                        perfTracker.recordTime("Phase 4: Adaptive Splitting", splitTime)
+                        perfTracker.recordTime("construction.phase4_split", splitTime, 1L)
+                        perfTracker.recordTime("construction.phase4_split@iter=$i", splitTime, 1L)
                         taxonomyService.notifyGraphUpdated(true)
 
                         // Phase 5: Optimize (Structural Refinement)
@@ -242,7 +247,8 @@ class TaxonomyEngine(
                         val optimizeTime = measureTimeMillis {
                             ops.optimizeHierarchy(root, i, learningPhase = true)
                         }
-                        perfTracker.recordTime("Phase 5: Hierarchy Optimization", optimizeTime)
+                        perfTracker.recordTime("construction.phase5_optimize", optimizeTime, 1L)
+                        perfTracker.recordTime("construction.phase5_optimize@iter=$i", optimizeTime, 1L)
                         taxonomyService.notifyGraphUpdated(true)
                         
                         // Final Refit after optimization
@@ -263,7 +269,8 @@ class TaxonomyEngine(
                         val refitTime = measureTimeMillis {
                             ops.fitNodeRecursive(root, isFinalIteration = (i == totalIters))
                         }
-                        perfTracker.recordTime("Refit after Optimization", refitTime)
+                        perfTracker.recordTime("construction.phase2_refit", refitTime, 1L)
+                        perfTracker.recordTime("construction.phase2_refit@iter=$i", refitTime, 1L)
                         taxonomyService.notifyGraphUpdated()
                     }
                 }
@@ -326,7 +333,7 @@ class TaxonomyEngine(
                         taxonomyService.updateLabelingProgress(current, total)
                     }
                 }
-                perfTracker.recordTime("Post-Pass Labeling", postLabelTime)
+                perfTracker.recordTime("construction.post_labeling", postLabelTime, 1L)
                 taxonomyService.notifyGraphUpdated()
             }
 

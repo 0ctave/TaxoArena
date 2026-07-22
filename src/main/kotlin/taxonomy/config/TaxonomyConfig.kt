@@ -125,7 +125,7 @@ class TaxonomyConfig {
         var enableResidualSplitGate: Boolean = true
         var enableBridging: Boolean = true
         var refitMuPerIteration: Boolean = true
-        var enableGtWarmStart: Boolean = true
+        var enableGtWarmStart: Boolean = false
 
         var fusionSimilarityThreshold: Double = 0.92
         var effectiveSupportFloor: Double = 2.0
@@ -140,6 +140,7 @@ class TaxonomyConfig {
         var secondaryMassFloor: Double = 5.0
         var bridgeSupportFloor: Double = 50.0
         var bridgeSupportRelFraction: Double = 0.10
+        var enableProfiling: Boolean = false
     }
 
     fun formatConfigReport(): String {
@@ -225,7 +226,8 @@ class TaxonomyConfig {
             enableBridgeAnalysis = diagnostics.enableBridgeAnalysis,
             secondaryMassFloor = diagnostics.secondaryMassFloor,
             bridgeSupportFloor = diagnostics.bridgeSupportFloor,
-            bridgeSupportRelFraction = diagnostics.bridgeSupportRelFraction
+            bridgeSupportRelFraction = diagnostics.bridgeSupportRelFraction,
+            enableProfiling = diagnostics.enableProfiling
         )
     )
 
@@ -273,6 +275,7 @@ class TaxonomyConfig {
         diagnostics.secondaryMassFloor = c.diagnostics.secondaryMassFloor
         diagnostics.bridgeSupportFloor = c.diagnostics.bridgeSupportFloor
         diagnostics.bridgeSupportRelFraction = c.diagnostics.bridgeSupportRelFraction
+        diagnostics.enableProfiling = c.diagnostics.enableProfiling
     }
 }
 

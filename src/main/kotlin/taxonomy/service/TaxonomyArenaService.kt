@@ -1,5 +1,6 @@
 package taxonomy.service
 
+import taxonomy.utils.TaxonomyPerformanceTracker
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -99,6 +100,7 @@ class TaxonomyArenaService(
     val ops: TaxonomyOperations,
     private val evalStore: ModelEvalStore,
     val rankingService: TaxonomyRankingService,
+    private val perfTracker: TaxonomyPerformanceTracker
 ) {
     fun setNodeLeaderboard(leaderboard: AggregatedLeaderboard?) {
         _state.update { it.copy(nodeLeaderboard = leaderboard) }
@@ -472,7 +474,7 @@ class TaxonomyArenaService(
         val isC5 = condition.equals("C5", ignoreCase = true) || condition.equals("GENERIC_PAIRV2", ignoreCase = true)
         val res1: ParseResult
         val res2: ParseResult
-
+        val startLlm = System.currentTimeMillis()
         if (isC5) {
             val systemPrompt = GenericPairwiseJudgePrompt.SYSTEM_PROMPT
             
@@ -515,6 +517,10 @@ class TaxonomyArenaService(
 
             res1 = parseJudgeResponse(p1.await())
             res2 = parseJudgeResponse(p2.await())
+        }
+        val endLlm = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("arena.judge.dual_call", endLlm - startLlm, 1L)
         }
 
         val vote1 = res1.winner

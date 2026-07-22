@@ -25,6 +25,7 @@ import taxonomy.TaxonomyEngine
 import taxonomy.service.TaxonomyJudgeService
 import taxonomy.model.ModelRank
 import taxonomy.model.Embedding
+import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.utils.ReportGenerator
 import taxonomy.dataset.EmbeddingCache
 import java.io.File
@@ -83,7 +84,8 @@ data class HeadlessCliConfig(
     val maxLeafAssignments: Int? = null,
     val refitMuPerIteration: Boolean? = null,
     val tauKappaScalingFactor: Double? = null,
-    val dagMode: String? = null
+    val dagMode: String? = null,
+    val enableProfiling: Boolean? = null
 )
 
 @Component
@@ -100,7 +102,8 @@ class HeadlessBenchmarkRunner(
     private val taxonomyEngine: TaxonomyEngine,
     private val judgeService: TaxonomyJudgeService,
     private val embeddingCache: EmbeddingCache,
-    private val arenaService: TaxonomyArenaService
+    private val arenaService: TaxonomyArenaService,
+    private val perfTracker: TaxonomyPerformanceTracker
 ) : CommandLineRunner {
 
     private val log = LoggerFactory.getLogger("taxonomy.HeadlessRunner")
@@ -177,6 +180,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.dagMode = taxonomy.config.DagMode.valueOf(it.uppercase())
         }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
+        cliConfig.enableProfiling?.let { config.diagnostics.enableProfiling = it }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
         if (targetDomains.isNotEmpty()) {
@@ -185,6 +189,7 @@ class HeadlessBenchmarkRunner(
 
         val seeds = if (cliConfig.seeds.isNotEmpty()) cliConfig.seeds else listOf(cliConfig.seed)
         for (currentSeed in seeds) {
+            perfTracker.clear()
             val baseDir = File(cliConfig.outputDir + "/seed_$currentSeed")
             baseDir.mkdirs()
             taxonomy.model.ExperimentOutputContext.activeBaseDir = baseDir
@@ -242,21 +247,23 @@ class HeadlessBenchmarkRunner(
                 log.info("Successfully generated and saved snapshot. Snapshot ID: $snapshotId")
 
                 // Generate baseline snapshots via Python subprocess
-                try {
-                    log.info("Generating baseline snapshots via Python subprocess...")
-                    val pb = ProcessBuilder("python", "scripts/generate_baselines.py")
-                    pb.directory(File("."))
-                    pb.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                    pb.redirectError(ProcessBuilder.Redirect.INHERIT)
-                    val process = pb.start()
-                    val exitCode = process.waitFor()
-                    if (exitCode == 0) {
-                        log.info("Baseline snapshots successfully generated.")
-                    } else {
-                        log.error("Baseline generation failed with exit code $exitCode")
+                if (cliConfig.runBaselines) {
+                    try {
+                        log.info("Generating baseline snapshots via Python subprocess...")
+                        val pb = ProcessBuilder("python", "scripts/generate_baselines.py")
+                        pb.directory(File("."))
+                        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                        pb.redirectError(ProcessBuilder.Redirect.INHERIT)
+                        val process = pb.start()
+                        val exitCode = process.waitFor()
+                        if (exitCode == 0) {
+                            log.info("Baseline snapshots successfully generated.")
+                        } else {
+                            log.error("Baseline generation failed with exit code $exitCode")
+                        }
+                    } catch (e: Exception) {
+                        log.error("Failed to run baseline generator: ${e.message}", e)
                     }
-                } catch (e: Exception) {
-                    log.error("Failed to run baseline generator: ${e.message}", e)
                 }
             } else {
                 log.info("Loading pre-existing snapshot: $snapshotId")
@@ -546,6 +553,15 @@ class HeadlessBenchmarkRunner(
                 // Restore active root graph for downstream benchmark
                 taxonomyService.setGraph(root)
             }
+            
+            // Print and Save Performance Report
+            if (config.diagnostics.enableProfiling) {
+                val perfReportFile = File(baseDir, "performance_report.json")
+                perfTracker.exportJsonReport(perfReportFile)
+                log.info("Performance report JSON written to ${perfReportFile.absolutePath}")
+                val printedReport = perfTracker.printReport()
+                log.info(printedReport)
+            }
             } finally {
                 try {
                     stopFileLogging(seedAppender)
@@ -567,6 +583,7 @@ class HeadlessBenchmarkRunner(
         hoistedFullByDomain: Map<String, List<taxonomy.dataset.MMLUQuery>>? = null,
         hoistedReservedByDomain: Map<String, List<Int>>? = null
     ): Map<String, Boolean> = runBlocking {
+        val startVal = System.currentTimeMillis()
         log.info("Starting Headless Batch Trickle Validation for $condition...")
 
         val validationDir = File(baseDir, "validation")
@@ -884,7 +901,10 @@ class HeadlessBenchmarkRunner(
         } catch (e: Exception) {
             log.error("Failed to compute and export calibration/ledger metrics for $condition: ${e.message}", e)
         }
-
+        val endVal = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("arena.validation.$condition", endVal - startVal, testQueries.size.toLong())
+        }
         return@runBlocking correctnessMap
     }
 
@@ -1241,6 +1261,7 @@ class HeadlessBenchmarkRunner(
         var assignmentCosineGap: Double? = null
         var defaultKappaPrior: Double? = null
         var runBaselines = true
+        var enableProfiling: Boolean? = null
 
         val lines = mutableListOf<String>()
         var inArray = false
@@ -1306,6 +1327,10 @@ class HeadlessBenchmarkRunner(
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
                 "enableBridging" -> enableBridging = rawVal.toBoolean()
                 "enableBridgeAnalysis" -> config.diagnostics.enableBridgeAnalysis = rawVal.toBoolean()
+                "enableProfiling" -> {
+                    config.diagnostics.enableProfiling = rawVal.toBoolean()
+                    enableProfiling = rawVal.toBoolean()
+                }
                 "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
                 "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
                 "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
@@ -1373,7 +1398,8 @@ class HeadlessBenchmarkRunner(
             refitMuPerIteration = refitMuPerIteration,
             dagMode = dagMode,
             numIterations = numIterations,
-            runBaselines = runBaselines
+            runBaselines = runBaselines,
+            enableProfiling = enableProfiling
         )
     }
 
@@ -1486,7 +1512,12 @@ class HeadlessBenchmarkRunner(
         }
         walkGt(root)
 
+        val startGen = System.currentTimeMillis()
         val reportObj = taxonomy.utils.TaxonomyMetrics(root, groundTruthMap).generateReport()
+        val endGen = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("construction.finalization.generate_report", endGen - startGen, 1L)
+        }
 
         file.bufferedWriter().use { writer ->
             writer.write("Metric,Value\n")
@@ -1624,7 +1655,12 @@ class HeadlessBenchmarkRunner(
         }
         walkGt(root)
 
+        val startGen = System.currentTimeMillis()
         val reportObj = taxonomy.utils.TaxonomyMetrics(root, groundTruthMap).generateReport()
+        val endGen = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("construction.finalization.generate_report", endGen - startGen, 1L)
+        }
 
         val configHash = computeConfigHash()
         val commitSha = getGitCommitSha()

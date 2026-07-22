@@ -5,6 +5,8 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import taxonomy.utils.TaxonomyPerformanceTracker
+import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.dataset.ModelEvalResult
@@ -24,7 +26,9 @@ class TaxonomyBenchmarkService(
     private val rankingService: TaxonomyRankingService,
     private val datasetFetcher: MMLUDatasetFetcher,
     private val taxonomyService: TaxonomyService,
-    private val evalStore: ModelEvalStore
+    private val evalStore: ModelEvalStore,
+    private val config: TaxonomyConfig,
+    private val perfTracker: TaxonomyPerformanceTracker
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.BenchmarkService")
     private val dbWriteDispatcher = Dispatchers.IO.limitedParallelism(1)
@@ -206,6 +210,7 @@ class TaxonomyBenchmarkService(
         var outlierCount = 0
         var scopedOutCount = 0
 
+        val routeStart = System.currentTimeMillis()
         matrix.forEach { (qId, modelResults) ->
             val sample = modelResults.values.firstOrNull() ?: return@forEach
             val softResult = arenaService.routeToLeavesSoft(sample.questionText, frozenLeafIds, sample.category)
@@ -228,6 +233,10 @@ class TaxonomyBenchmarkService(
             val leaf = softResult.primaryLeaf
             nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
             queryToLeaves.getOrPut(qId) { mutableListOf() }.add(leaf.id)
+        }
+        val routeEnd = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("arena.routing.pre_route", routeEnd - routeStart, matrix.size.toLong())
         }
         log.info("Pre-routing complete: ${matrix.size - outlierCount - scopedOutCount} questions routed, $outlierCount outliers discarded, $scopedOutCount out-of-scope domain queries filtered")
 
@@ -424,8 +433,13 @@ class TaxonomyBenchmarkService(
                 pairStatsMap[leafId] = adjustedNodePairs.toMutableList()
                 
                 if (adjustedNodePairs.isNotEmpty()) {
+                    val fitStart = System.currentTimeMillis()
                     val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
                     val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
+                    val fitEnd = System.currentTimeMillis()
+                    if (config.diagnostics.enableProfiling) {
+                        perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
+                    }
                     val state = NodeBtState(
                         nodeId = leafId,
                         btScores = scores,
@@ -578,20 +592,35 @@ class TaxonomyBenchmarkService(
             else n.children.forEach { walk(it) }
         }
         walk(root)
+        val aggStart = System.currentTimeMillis()
         currentAggregated = rankingService.aggregateLeafScores(leafIds, snapshotId, nodeToQuestions = nodeToQueries)
+        val aggEnd = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("arena.ranking.propagate", aggEnd - aggStart, 1L)
+        }
         publishProgress(true)
 
-        while (round < params.maxRounds && !stoppingPolicy.shouldStop(
-            btStates = btStates,
-            pairStats = pairStatsMap,
-            targetLeafIds = targetLeafIds,
-            models = modelNames,
-            round = round,
-            totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons }.toInt(),
-            nodeToQueries = nodeToQueries,
-            condition = req.condition,
-            mainConditionTotalComparisons = mainConditionTotalComparisons
-        )) {
+        fun checkStoppingPolicy(): Boolean {
+            val start = System.currentTimeMillis()
+            val res = stoppingPolicy.shouldStop(
+                btStates = btStates,
+                pairStats = pairStatsMap,
+                targetLeafIds = targetLeafIds,
+                models = modelNames,
+                round = round,
+                totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons }.toInt(),
+                nodeToQueries = nodeToQueries,
+                condition = req.condition,
+                mainConditionTotalComparisons = mainConditionTotalComparisons
+            )
+            val end = System.currentTimeMillis()
+            if (config.diagnostics.enableProfiling) {
+                perfTracker.recordTime("arena.stopping_policy.check", end - start, 1L)
+            }
+            return res
+        }
+
+        while (round < params.maxRounds && !checkStoppingPolicy()) {
             completedAtStartOfRound.set(completedResults.size)
             // Update globally resolved pairs in stoppingPolicy
             stoppingPolicy.globallyResolvedPairs.clear()
@@ -963,8 +992,13 @@ class TaxonomyBenchmarkService(
                     pairStatsMap[nodeId] = adjustedNodePairs.toMutableList()
 
                     if (adjustedNodePairs.isNotEmpty()) {
+                        val fitStart = System.currentTimeMillis()
                         val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
                         val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
+                        val fitEnd = System.currentTimeMillis()
+                        if (config.diagnostics.enableProfiling) {
+                            perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
+                        }
                         val state = NodeBtState(
                             nodeId = nodeId,
                             btScores = scores,
@@ -1005,7 +1039,12 @@ class TaxonomyBenchmarkService(
                 else n.children.forEach { walk(it) }
             }
             walk(root)
+            val aggStart = System.currentTimeMillis()
             val aggregated = rankingService.aggregateLeafScores(leafIds, snapshotId, nodeToQuestions = nodeToQueries)
+            val aggEnd = System.currentTimeMillis()
+            if (config.diagnostics.enableProfiling) {
+                perfTracker.recordTime("arena.ranking.propagate", aggEnd - aggStart, 1L)
+            }
             if (aggregated.ranks.isNotEmpty()) {
                 log.info("--- Bradley-Terry Ratings (Round $round) [aggregated root] ---")
                 aggregated.ranks.forEach { mr ->

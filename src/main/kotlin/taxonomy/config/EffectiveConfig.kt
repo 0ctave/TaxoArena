@@ -66,7 +66,7 @@ data class EffectiveConfig(
         val enableResidualSplitGate: Boolean = false,
         val enableBridging: Boolean = false,
         val refitMuPerIteration: Boolean = false,
-        val enableGtWarmStart: Boolean = true,
+        val enableGtWarmStart: Boolean = false,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
         val tauKappaScalingFactor: Double = 0.0,
@@ -78,6 +78,7 @@ data class EffectiveConfig(
         val enableBridgeAnalysis: Boolean = false,
         val secondaryMassFloor: Double = 5.0,
         val bridgeSupportFloor: Double = 50.0,
-        val bridgeSupportRelFraction: Double = 0.10
+        val bridgeSupportRelFraction: Double = 0.10,
+        val enableProfiling: Boolean = false
     )
 }

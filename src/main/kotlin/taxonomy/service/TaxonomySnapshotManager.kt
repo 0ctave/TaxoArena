@@ -155,6 +155,7 @@ data class SnapshotSettings(
     val secondaryMassFloor: Double = 5.0,
     val bridgeSupportFloor: Double = 50.0,
     val bridgeSupportRelFraction: Double = 0.10,
+    val enableProfiling: Boolean = false,
     val deltaAssign: Double = 0.20,
     val constructionMargin: Double = 0.20,
     val arenaMargin: Double = 0.40,
@@ -199,7 +200,8 @@ data class SnapshotSettings(
         diagnostics = EffectiveConfig.Diagnostics(
             secondaryMassFloor = secondaryMassFloor,
             bridgeSupportFloor = bridgeSupportFloor,
-            bridgeSupportRelFraction = bridgeSupportRelFraction
+            bridgeSupportRelFraction = bridgeSupportRelFraction,
+            enableProfiling = enableProfiling
         )
     )
 }
@@ -242,7 +244,8 @@ private const val MAX_LOG_TRACE = 5000
 class TaxonomySnapshotManager(
     private val config: TaxonomyConfig,
     private val persistence: TaxonomyPersistence,
-    private val evalLoader: ModelEvalLoader
+    private val evalLoader: ModelEvalLoader,
+    private val perfTracker: TaxonomyPerformanceTracker
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.SnapshotManager")
     private val json = Json { 
@@ -496,6 +499,7 @@ class TaxonomySnapshotManager(
     }
 
     fun saveSnapshot(root: GraphNode, description: String, logsToSave: List<String>? = null): DagSnapshot {
+        val startSave = System.currentTimeMillis()
         val timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         val fileTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
         val sanitizedDesc = description.replace(Regex("[^a-zA-Z0-9_]"), "_").take(20)
@@ -522,6 +526,7 @@ class TaxonomySnapshotManager(
             secondaryMassFloor = config.diagnostics.secondaryMassFloor,
             bridgeSupportFloor = config.diagnostics.bridgeSupportFloor,
             bridgeSupportRelFraction = config.diagnostics.bridgeSupportRelFraction,
+            enableProfiling = config.diagnostics.enableProfiling,
             deltaAssign = config.formalism.deltaAssign,
             constructionMargin = config.formalism.constructionMargin,
             arenaMargin = config.formalism.arenaMargin,
@@ -599,6 +604,10 @@ class TaxonomySnapshotManager(
             log.error("Failed to save snapshot $snapshotId into DB", e)
         }
         
+        val endSave = System.currentTimeMillis()
+        if (config.diagnostics.enableProfiling) {
+            perfTracker.recordTime("persistence.snapshot_save", endSave - startSave, 1L)
+        }
         return snapshot
     }
 
@@ -698,6 +707,7 @@ class TaxonomySnapshotManager(
     }
 
     fun loadSnapshot(snapshotId: String): GraphNode? {
+        val startLoad = System.currentTimeMillis()
         try {
             var graphStr: String? = null
             var reservedQueriesStr: String? = null
@@ -751,6 +761,10 @@ class TaxonomySnapshotManager(
             }
             if (root != null) {
                 assignQueryIds(root, config.formalism.enableStableQuestionIds)
+            }
+            val endLoad = System.currentTimeMillis()
+            if (config.diagnostics.enableProfiling) {
+                perfTracker.recordTime("persistence.snapshot_load", endLoad - startLoad, 1L)
             }
             return root
         } catch (e: Exception) {

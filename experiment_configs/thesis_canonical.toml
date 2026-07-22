@@ -57,10 +57,7 @@ runBenchmark   = false   # arena runs as a SEPARATE step against the persisted
 runTrickle     = true    # produce the routing/validity ledger (purity, ECE, etc.)
 judgeInduction = false   # judges are induced in the arena step, not here
 enableLabeling = false   # LLM cluster labeling off for the structural build
-runBaselines   = true    # TRUE for the FINAL build: generates the Ward / KMeans /
-# RandomNull reference DAGs this canonical DAG is compared
-# against (the DendrogramPurity ladder — 0.48 vs ~0.14).
-# (In sweep configs this is false; here it is wanted.)
+runBaselines   = false
 
 # ── Construction mode ───────────────────────────────────────────────────────
 dagMode = "DAG_MAX"      # full polyhierarchy: enables bridging (multi-parent
@@ -118,11 +115,9 @@ assignmentCosineGap       = 0.15   # [L9] soft-membership margin: how close a
 # 0.15 is the winning value. Weak effect on ECE,
 # stronger on Top-1 / cross-anchor migration.
 
-deltaAssign               = 1.25   # [L9] log-softmax margin controlling routing-walk
+deltaAssign               = 0.002   # [L9] log-softmax margin controlling routing-walk
 # breadth (how softly a query trickles into
-# multiple branches). Code default 0.20; 1.25 is
-# the winning value. Dominant lever on borderline
-# rate / ECE (|r|~0.85-0.97); 1.25 balances
+# multiple branches). Code default 0.20; 1.25 was old; 0.002 is winning adaptive scale.
 # calibration against assignment-cap pressure.
 
 secondaryMassFloor        = 2.0    # [L9] minimum secondary probability mass for a
@@ -135,10 +130,10 @@ bridgeSupportRelFraction  = 0.10   # [L9] relative support a bridge must carry v
 # value coincides with default). Gates bridge
 # formation strength.
 
-fusionSimilarityThreshold = 0.90   # cosine threshold for fusing two nodes into a
-# multi-parent bridge. Code default 0.92; LOWERED
-# to 0.90 — validated to preserve coherence (WLP
-# 0.64->0.68, silhouette up, DuplicateBridge 0)
-# while forming same-anchor refinement bridges.
 # Cross-anchor bridging remains geometry-limited
 # (SourceB=0) — an honest, reported finding.
+fusionSimilarityThreshold = 0.90
+
+# Unified trickle settings
+enableGtWarmStart         = true
+arenaMargin               = 0.004

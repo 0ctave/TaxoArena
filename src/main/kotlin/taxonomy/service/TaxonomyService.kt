@@ -121,7 +121,7 @@ class TaxonomyService(
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
 
-        val results = ops.routeQuery(emb, currentRoot)
+        val results = ops.routeQuery(emb, currentRoot, isInference = true)
 
         log.info("Query matched ${results.size} nodes: ${results.keys.joinToString { it.label ?: it.id }}")
 
@@ -139,7 +139,7 @@ class TaxonomyService(
         val currentRoot = getGraph() ?: return@coroutineScope emptyList<Pair<GraphNode, Double>>()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
-        ops.routeQuery(emb, currentRoot).entries
+        ops.routeQuery(emb, currentRoot, isInference = true).entries
             .filter { it.key.isLeaf }
             .map { it.key to exp(it.value).coerceIn(0.0, 1.0) }
             .sortedByDescending { it.second }
