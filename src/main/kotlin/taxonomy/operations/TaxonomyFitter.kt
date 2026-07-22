@@ -118,8 +118,7 @@ class TaxonomyFitter(
             while (queueDiag.isNotEmpty()) {
                 val node = queueDiag.removeFirst()
                 if (!visitedDiag.add(node.id)) continue
-                
-                val d = node.sliceDim
+
                 val branchQueries = node.getAllQueriesInRegion()
                 val n = branchQueries.size
                 
@@ -177,58 +176,6 @@ class TaxonomyFitter(
         }
     }
 
-    private fun fitVmfFromQueryList(node: GraphNode, queries: List<Embedding>, d: Int, kappa0Parent: Double) {
-        val n = queries.size
-        if (n == 0) return
-
-        val projected = queries.map { it.projectTo(d) }
-
-        val sumVec = DoubleArray(d)
-        for (vec in projected) for (i in 0 until d) sumVec[i] += vec[i]
-
-        var normVec = 0.0
-        for (i in 0 until d) normVec += sumVec[i] * sumVec[i]
-        normVec = sqrt(normVec)
-
-        val mu = FloatArray(d) { i ->
-            if (normVec > 0.0) (sumVec[i] / normVec).toFloat() else 0.0f
-        }
-        if (normVec == 0.0 && d > 0) mu[0] = 1.0f
-
-        val oldMu = node.vmfMu
-        if (oldMu.isNotEmpty() && oldMu.size == d) {
-            val dot = StatisticsUtils.dotProduct(oldMu.map { it.toDouble() }.toDoubleArray(), mu)
-            if (dot >= 0.9975) {
-                node.vmfMu = oldMu
-            } else {
-                val emaAlpha = config.formalism.emaAlpha
-                val blended = DoubleArray(d) { i -> (1.0 - emaAlpha) * mu[i].toDouble() + emaAlpha * oldMu[i].toDouble() }
-                var norm = 0.0
-                for (i in 0 until d) norm += blended[i] * blended[i]
-                norm = sqrt(norm)
-                val newMu = FloatArray(d) { i -> if (norm > 0.0) (blended[i] / norm).toFloat() else 0.0f }
-                if (norm == 0.0 && d > 0) newMu[0] = 1.0f
-                node.vmfMu = newMu
-            }
-        } else {
-            node.vmfMu = mu
-        }
-
-        val rBar = normVec / n
-        val rho = d.toDouble() / n.coerceAtLeast(1)
-        node.dOverN = rho
-        val alphaD = dOverNAlpha(rho)
-        val rawKappa = StatisticsUtils.correctedKappa(rBar, d, n)
-        val priorKappa = kappa0Parent.coerceAtLeast(1.0)
-        node.vmfKappa = (1.0 - alphaD) * rawKappa + alphaD * priorKappa
-        node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(d, node.vmfKappa)
-
-        if (rho > 10.0) {
-            highDOverNCount.incrementAndGet()
-            log.debug("[FITTER] High d/N (${"%.2f".format(rho)}) at node ${node.id} (${node.label}). rawKappa=${"%.2f".format(rawKappa)}, priorKappa=${"%.2f".format(priorKappa)}, newKappa=${"%.2f".format(node.vmfKappa)}")
-        }
-    }
-
     private fun GraphNode.getRegionQueryWeights(): Map<String, Double> {
         val weights = mutableMapOf<String, Double>()
         val visited = mutableSetOf<String>()
@@ -265,7 +212,7 @@ class TaxonomyFitter(
         }
 
         if (nEffective <= 1e-4) {
-            node.vmfMu = FloatArray(fitDim) { 0.0f }.apply { if (fitDim > 0) this[0] = 1.0f }
+            node.vmfMu = FloatArray(fitDim) { 0.0f }.apply { this[0] = 1.0f }
             node.vmfKappa = 1e-3
             node.vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(fitDim, node.vmfKappa)
             node.niwM0 = node.vmfMu.copyOf()
@@ -293,7 +240,7 @@ class TaxonomyFitter(
         val mu = FloatArray(fitDim) { i ->
             if (normVec > 0.0) (sumVec[i] / normVec).toFloat() else 0.0f
         }
-        if (normVec == 0.0 && fitDim > 0) mu[0] = 1.0f
+        if (normVec == 0.0) mu[0] = 1.0f
 
         // Apply EMA blending if oldMu exists and is compatible
         val oldMu = node.vmfMu
@@ -311,7 +258,7 @@ class TaxonomyFitter(
                 for (i in 0 until fitDim) norm += blended[i] * blended[i]
                 norm = sqrt(norm)
                 val newMu = FloatArray(fitDim) { i -> if (norm > 0.0) (blended[i] / norm).toFloat() else 0.0f }
-                if (norm == 0.0 && fitDim > 0) newMu[0] = 1.0f
+                if (norm == 0.0) newMu[0] = 1.0f
                 node.vmfMu = newMu
             }
 
@@ -370,9 +317,9 @@ class TaxonomyFitter(
             }
             m0Norm = sqrt(m0Norm)
             if (m0Norm > 0.0) for (i in 0 until fitDim) m0[i] /= m0Norm
-            else if (fitDim > 0) m0[0] = 1.0
+            else m0[0] = 1.0
         } else {
-            if (fitDim > 0) m0[0] = 1.0
+            m0[0] = 1.0
         }
 
         val kappa0 = 1.0
