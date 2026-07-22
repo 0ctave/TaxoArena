@@ -110,9 +110,9 @@ maxLeafAssignments    = 5      # max leaves a single query may be softly assigne
 # to during arena-time routing (multi-membership cap).
 
 
-deltaAssign               = 0.002   # [L9] log-softmax margin controlling routing-walk
+constructionMargin        = 0.20   # [L9] log-softmax margin controlling routing-walk
 # breadth (how softly a query trickles into
-# multiple branches). Code default 0.20; 1.25 was old; 0.002 is winning adaptive scale.
+# multiple branches). Code default 0.20; 1.25 was old.
 # calibration against assignment-cap pressure.
 
 secondaryMassFloor        = 2.0    # [L9] minimum secondary probability mass for a
@@ -127,9 +127,9 @@ bridgeSupportRelFraction  = 0.10   # [L9] relative support a bridge must carry v
 
 # Cross-anchor bridging remains geometry-limited
 # (SourceB=0) — an honest, reported finding.
+# Unified trickle settings
 fusionSimilarityThreshold = 0.90
 
-# Unified trickle settings
 enableGtWarmStart         = false
-arenaMargin               = 0.004
+arenaMargin               = 0.40
 enableProfiling           = true

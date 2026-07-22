@@ -17,7 +17,7 @@ seeds = [137, 2048]
 stage = "validate"
 
 # ══════════════════════════════════════════════════════════════════════════
-#  FRESH CALIBRATION SWEEP — κ‑ADAPTIVE MARGIN REGIME
+#  FRESH CALIBRATION SWEEP — UNSCALED MARGIN REGIME
 #
 #  Base: corrected construction path
 #   - N-normalized EM tolerance + adaptive cap + plateau guard
@@ -26,15 +26,10 @@ stage = "validate"
 #
 #  FACTORS (match code + current geometry):
 #
-#   - deltaAssign {0.0015, 0.003, 0.005}
-#       Legacy alias for constructionMargin; controls unified log-softmax
-#       margin during DAG-building trickle (effectiveMargin = deltaAssign
-#       × siblingKappa, siblingKappa ∈ [1,100]).
-#       These levels correspond roughly to effective margins:
-#         κ = 100 → 0.15, 0.30, 0.50 nats
-#         κ = 60  → 0.09, 0.18, 0.30 nats
+#   - constructionMargin {0.15, 0.30, 0.50}
+#       Controls unified log-softmax margin during DAG-building trickle (unscaled).
 #       i.e. tight, canonical, and slightly looser regimes around the
-#       empirically winning value (≈0.002–0.003 on the corrected base).
+#       empirically winning value (≈0.20–0.30 nats).
 #
 #   - minClusterSize {25, 50, 75}
 #       Granularity dial: 50 is canonical; 25/75 probe finer vs coarser
@@ -62,7 +57,7 @@ stage = "validate"
 # ══════════════════════════════════════════════════════════════════════════
 
 [factors]
-deltaAssign              = [0.0015, 0.003, 0.005]
+constructionMargin       = [0.15, 0.30, 0.50]
 minClusterSize           = [25, 50, 75]
 secondaryMassFloor       = [2.0, 3.5, 5.0]
 bridgeSupportRelFraction = [0.03, 0.05, 0.10]

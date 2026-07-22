@@ -1,0 +1,60 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  thesis_canonical_no_gt.toml — CANONICAL DAG BUILD (NO GT BIAS ABLATION)
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf",
+    "Meta-Llama-3-70B-Instruct"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/thesis_canonical_no_gt"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true
+judgeInduction = false
+enableLabeling = false
+runBaselines   = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 50
+separationEpsilon     = 0.01
+routingSoftmaxTau     = 1.50
+tauKappaScalingFactor = 0.0
+emaAlpha              = 0.7
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+numIterations         = 35
+maxLeafAssignments    = 5
+
+# Calibrated factors
+constructionMargin        = 0.20
+secondaryMassFloor        = 2.0
+bridgeSupportRelFraction  = 0.10
+fusionSimilarityThreshold = 0.90
+
+# GT Bias ablation flag
+enableGtWarmStart         = false
+arenaMargin               = 0.40
