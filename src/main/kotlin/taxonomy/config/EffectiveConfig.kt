@@ -56,6 +56,7 @@ data class EffectiveConfig(
         val separationEpsilon: Double = 0.04,
         val membershipFloor: Double = 0.10,
         val routingBeamGamma: Double = 0.15,
+        val descentMargin: Double = 0.0,
         val maxLeafAssignments: Int = 5,
         val enableStableQuestionIds: Boolean = true,
         val enableResidualRouting: Boolean = true,

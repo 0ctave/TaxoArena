@@ -181,7 +181,7 @@ class TaxonomyTrickler(
                     val dot = StatisticsUtils.dotProduct(childX, child.vmfMu)
                     if (dot > bestChildDot) bestChildDot = dot
                 }
-                if (bestChildDot < parentDot) {
+                if (bestChildDot < parentDot - config.formalism.descentMargin) {
                     if (config.formalism.enableResidualRouting && node.depth >= 1 && !opts.readOnly) {
                         val sumExpAll = vmfScores.sumOf { exp(it - maxScore) }
                         val bestChildResp = 1.0 / sumExpAll.coerceAtLeast(1.0)

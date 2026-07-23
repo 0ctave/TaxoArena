@@ -58,6 +58,7 @@ data class HeadlessCliConfig(
     val separationEpsilon: Double? = null,
     val membershipFloor: Double? = null,
     val routingBeamGamma: Double? = null,
+    val descentMargin: Double? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
@@ -147,6 +148,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
+        cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -1218,6 +1220,7 @@ class HeadlessBenchmarkRunner(
         var separationEpsilon: Double? = null
         var membershipFloor: Double? = null
         var routingBeamGamma: Double? = null
+        var descentMargin: Double? = null
         var cosineTau: Double? = null
         var leafAcceptanceScale: Double? = null
         var assignmentGap: Double? = null
@@ -1296,6 +1299,7 @@ class HeadlessBenchmarkRunner(
                 "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
                 "membershipFloor" -> membershipFloor = rawVal.toDouble()
                 "routingBeamGamma" -> routingBeamGamma = rawVal.toDouble()
+                "descentMargin" -> descentMargin = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
                 "datasetType" -> datasetType = rawVal.trim('"', '\'')
@@ -1347,6 +1351,7 @@ class HeadlessBenchmarkRunner(
             separationEpsilon = separationEpsilon,
             membershipFloor = membershipFloor,
             routingBeamGamma = routingBeamGamma,
+            descentMargin = descentMargin,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,
@@ -1404,6 +1409,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.separationEpsilon,
             config.formalism.membershipFloor,
             config.formalism.routingBeamGamma,
+            config.formalism.descentMargin,
             config.formalism.maxLeafAssignments,
             config.formalism.dagMode,
             config.formalism.fusionSimilarityThreshold,
