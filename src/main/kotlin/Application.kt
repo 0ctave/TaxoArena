@@ -75,6 +75,7 @@ fun main(args: Array<String>) {
     }
 
     val app = SpringApplication(TaxoAdaptApplication::class.java)
+    app.webApplicationType = org.springframework.boot.WebApplicationType.NONE
     // Surface context-start failures loudly on the real stderr instead of exiting silently.
     app.addListeners(
         ApplicationListener<ApplicationFailedEvent> { ev ->
