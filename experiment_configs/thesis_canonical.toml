@@ -2,21 +2,8 @@
 #  thesis_canonical.toml — FINAL CANONICAL DAG BUILD
 #
 #  This config builds the single canonical taxonomy reported in the thesis.
-#  It encodes the seed-validated winning configuration from the L9 calibration
-#  (run val_69af462a: top result on BOTH finalist seeds 137 & 2048), on the
-#  corrected construction pipeline (converged EM, fixed bridge + dendrogram
-#  metrics).
-#
-#  This is NOT a sweep base. The four calibrated factors below are set to their
-#  winning values, not swept. Build once; the resulting snapshot is the
-#  canonical DAG the arena evaluates.
-#
-#  Pipeline provenance (all fixes applied): EM convergence normalized by N with
-#  adaptive iteration cap (150) + plateau guard; DuplicateBridge / SourceA/B
-#  metrics computed from real multi-parent structure; DendrogramPurity computed
-#  fractionally with consistent traversal policy. Confirmed on this base:
-#  0 selected splits on non-converged fits, all 14 domains split with strong
-#  Dasgupta deltas, early-stopping at a stable fixed point (~iter 15 of 35).
+#  It encodes the seed-validated winning configuration on the corrected
+#  construction pipeline.
 # ══════════════════════════════════════════════════════════════════════════
 
 datasetType   = "MMLU_PRO"
@@ -46,90 +33,48 @@ category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filt
 queryLimit    = 0       # 0 = no cap; use the full corpus
 outputDir     = "experiment_results/thesis_canonical"
 testRatio     = 0.3     # frozen 70/30 stratified split; the 30% held-out pool is
-# reserved for arena evaluation and excluded from construction
-seed          = 42      # construction seed; finalist seeds (137, 2048) validated
-# this config's stability separately
+                        # reserved for arena evaluation and excluded from construction
+seed          = 42      # construction seed
 
 # ── Pipeline / evaluation switches ──────────────────────────────────────────
-runPipeline    = true
-runBenchmark   = false
-runTrickle     = true          # needed — produces the ECE/routing metrics
-runBaselines   = false         # skip for the pilot (save ~90s)
-enableFinalMetrics = true       # REQUIRED — you need metrics to validate
-enableLabeling = false   # LLM cluster labeling off for the structural build
-judgeInduction = false   # judges are induced in the arena step, not here
-
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true          # needed — produces the ECE/routing metrics
+runBaselines       = false         # skip for the pilot (save ~90s)
+enableFinalMetrics = true          # REQUIRED — you need metrics to validate
+enableLabeling     = false         # LLM cluster labeling off for structural build
+judgeInduction     = false         # judges are induced in the arena step
 
 # ── Construction mode ───────────────────────────────────────────────────────
-dagMode = "DAG_MAX"      # full polyhierarchy: enables bridging (multi-parent
-# nodes). DAG_MAX sets enableBridging = true.
+dagMode = "DAG_MAX"      # full polyhierarchy: enables bridging (multi-parent nodes)
 
 # ── Formalism parameters ─────────────────────────────────────────────────────
-#  NOTE: several values below deliberately differ from the code defaults; the
-#  rationale is given per line. The four CALIBRATED factors are marked [L9].
+maxDepth              = 8      # max taxonomy depth (caps runaway recursion)
+minClusterSize        = 50     # min queries for a node to split further
+separationEpsilon     = 0.01   # chance-corrected separation floor for splits/merges
 
-maxDepth              = 8      # max taxonomy depth (code default 12). 8 is ample
-# given observed avg leaf depth ~3.2; caps runaway
-# recursion without truncating real structure.
+# ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
+membershipFloor       = 0.10   # min share of a query's own normalized membership for a leaf to count
+routingBeamGamma      = 0.15   # per-level relative beam width (fraction of best sibling responsibility)
 
-minClusterSize        = 50     # min queries for a node to split further (code
-# default 25). 50 raised to avoid over-fragmentation
-# into tiny, low-support leaves (keeps SmallLeafFraction
-# near 0). Governs leaf granularity (r=-0.95 w/ leaf count).
+# descentMargin: margin for the trickle-routing descent gate.
+# A query descends to children iff bestChildDot >= parentDot - descentMargin.
+# - Set to 0.0 (default) for strict direction comparison (Option A).
+# - Set to a small positive value (e.g., 0.05) to loosen descent and reduce residuals.
+# - Set to >= 1.0 (e.g., 2.0) to effectively disable the gate and descend always (Option B).
+descentMargin         = 0.0
 
-separationEpsilon     = 0.01   # JS-divergence floor for a passthrough collapse /
-# split acceptance (code default 0.04). Lowered to
-# allow finer legitimate separations at d=256.
+effectiveSupportFloor = 2.0    # min effective (soft) support for a node to be retained
+defaultKappaPrior     = 10.0   # NiW prior concentration when a node has too few points
 
-routingSoftmaxTau     = 1.50   # base temperature for the trickle-routing softmax
-# (code default 1.0). 1.5 softens routing slightly;
-# effective temperature is tau * kappa^gamma.
+numIterations         = 35     # max evolution passes. Early-stopping typically fires ~iter 15
+maxLeafAssignments    = 5      # max leaves a single query may be softly assigned to during arena evaluation
 
-tauKappaScalingFactor = 0.0    # gamma: exponent coupling routing temperature to
-# cluster concentration kappa (tau_eff = tau*kappa^gamma).
-# 0.0 = unscaled canonical setting; ablated separately
-# in {0.0, 0.5, 1.0} for the geometry-adaptation study.
-
-effectiveSupportFloor = 2.0    # min effective (soft) support for a node to be
-# retained (code default 2.0). Guards against
-# near-empty nodes surviving on fractional mass.
-
-defaultKappaPrior     = 10.0   # NiW prior concentration when a node has too few
-# points for a stable MLE (code default 10.0). Weak
-# prior; only dominates in the tiny-N regime.
-
-numIterations         = 35     # max evolution passes. Early-stopping typically
-# fires ~iter 15 at a stable fixed point; 35 is the
-# ceiling, rarely reached.
-
-maxLeafAssignments    = 5      # max leaves a single query may be softly assigned
-# to during arena-time routing (multi-membership cap).
-
-
-constructionMargin        = 0.20   # [L9] log-softmax margin controlling routing-walk
-# breadth (how softly a query trickles into
-# multiple branches). Code default 0.20; 1.25 was old.
-# calibration against assignment-cap pressure.
-
-secondaryMassFloor        = 2.0    # [L9] minimum secondary probability mass for a
-# secondary (bridge-candidate) assignment to count.
-# Code default 5.0; 2.0 is the winning value —
-# more permissive to secondary structure.
-
-bridgeSupportRelFraction  = 0.10   # [L9] relative support a bridge must carry vs its
-# parent to be admitted. Code default 0.10 (winning
-# value coincides with default). Gates bridge
-# formation strength.
-
-# Cross-anchor bridging remains geometry-limited
-# (SourceB=0) — an honest, reported finding.
-# Unified trickle settings
+# ── Merging / convergence ────────────────────────────────────────────────────
 fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false  # skips trickle-based reassignment on iteration 1, keeping bootstrap intact
 
-enableGtWarmStart         = false  # no longer needed: TaxonomyEngine now skips trickle-based
-# reassignment entirely on iteration 1, keeping the bootstrap's
-# 100% ground-truth query assignment intact for the first
-# split/optimize/refit pass instead of re-routing it through
-# embeddings and patching the drift with a soft bias.
-arenaMargin               = 0.40
+# ── Bridge Analysis & Diagnostics ─────────────────────────────────────────────
+secondaryMassFloor        = 2.0    # min secondary probability mass for a bridge assignment to count
+bridgeSupportRelFraction  = 0.10   # relative support a bridge must carry vs parent to be admitted
 enableProfiling           = true
