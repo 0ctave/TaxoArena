@@ -64,7 +64,18 @@ class TaxonomyOperations(
         byDepth.keys.sortedDescending().forEach { depth ->
             val nodesAtDepth = byDepth[depth]!!
             for (node in nodesAtDepth) {
-                tryProposal(dag, node, allEmbeddings, groundTruthMap, currentIteration, config.formalism.separationEpsilon) {
+                // Split threshold is 0 (veto, not toll): split QUALITY is already gated
+                // locally by the splitter itself — chance-corrected separation >= epsilon
+                // on the ROUTED partition, routing-sustainability, sibling distinctness.
+                // The global J check only needs to reject splits that degrade the DAG.
+                // A positive epsilon*pi_S bar double-charges the same question through a
+                // diluted lens: global J measures cells against the whole-corpus
+                // expectation, so refining an already-tight region gains far less
+                // globally than its local separation indicates (measured: Business,
+                // 620 q, local sep 0.058 = 5.8x epsilon, Delta J +0.00148, rejected
+                // every iteration at bar 0.00208 = epsilon*0.21 — domains stayed
+                // childless leaves and depth stalled at 3).
+                tryProposal(dag, node, allEmbeddings, groundTruthMap, currentIteration, 0.0) {
                     // splitSingleNode requires splitter to be called
                     splitter.splitSingleNode(node)
                 }
@@ -231,7 +242,44 @@ class TaxonomyOperations(
         }
         walkReg(root)
 
+        // 1. Capture structural state before action
+        val beforeNodes = registry.values.map { node ->
+            StructuralState(
+                id = node.id,
+                childrenIds = node.children.map { it.id }.toSet(),
+                crossLinkChildrenIds = node.crossLinkChildren.map { it.id }.toSet(),
+                parentsIds = node.parents.map { it.id }.toSet()
+            )
+        }.toSet()
+
         val backup = taxonomy.model.GraphStateBackup(root)
+
+        action()
+
+        // 2. Capture structural state after action
+        val postRegistry = mutableMapOf<String, GraphNode>()
+        fun walkRegPost(n: GraphNode) {
+            if (postRegistry.containsKey(n.id)) return
+            postRegistry[n.id] = n
+            n.children.forEach { walkRegPost(it) }
+            n.crossLinkChildren.forEach { walkRegPost(it) }
+        }
+        walkRegPost(root)
+
+        val afterNodes = postRegistry.values.map { node ->
+            StructuralState(
+                id = node.id,
+                childrenIds = node.children.map { it.id }.toSet(),
+                crossLinkChildrenIds = node.crossLinkChildren.map { it.id }.toSet(),
+                parentsIds = node.parents.map { it.id }.toSet()
+            )
+        }.toSet()
+
+        if (beforeNodes == afterNodes) {
+            // No structural change occurred at all (complete early exit, no log clutter)
+            backup.restore(registry)
+            return false
+        }
         
         if (currentIteration > 1) {
             assertMassConservation(root, allEmbeddings)
@@ -241,16 +289,19 @@ class TaxonomyOperations(
         val baseJ = if (cachedBaseJ != null) {
             cachedBaseJ!!
         } else {
+            // Restore backup to get back to base state, compute baseJ, then re-execute action
             val tempBackup = taxonomy.model.GraphStateBackup(root)
             clearGraphQueries(root)
             reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             val jVal = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
             tempBackup.restore(registry)
             cachedBaseJ = jVal
+            
+            // Re-execute action
+            action()
+            
             jVal
         }
-
-        action()
 
         root.updateAllShrinkages()
         clearGraphQueries(root)
@@ -278,7 +329,12 @@ class TaxonomyOperations(
             cachedBaseJ = newJ
             return true
         } else {
-            log.info("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} <= effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)}). Reverting.")
+            // Only print rejection log at INFO level if there is a non-trivial Delta J
+            if (kotlin.math.abs(deltaJ) > 1e-9) {
+                log.info("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} <= effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)}). Reverting.")
+            } else {
+                log.debug("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} <= effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)}). Reverting.")
+            }
             backup.restore(registry)
             return false
         }
@@ -527,3 +583,10 @@ class TaxonomyOperations(
     }
 
 }
+
+private data class StructuralState(
+    val id: String,
+    val childrenIds: Set<String>,
+    val crossLinkChildrenIds: Set<String>,
+    val parentsIds: Set<String>
+)
