@@ -63,6 +63,13 @@ class TaxonomyStabilizer(
                 currentRelations.add(node.id to child.id)
                 collect(child, visited)
             }
+            // Cross-link edges are structure too: an accepted (or later removed) bridge
+            // must show up as a ±relation in the GED line and break the convergence
+            // streak like any tree edit — otherwise bridge oscillation would be invisible.
+            for (child in node.crossLinkChildren) {
+                currentRelations.add(node.id to child.id)
+                collect(child, visited)
+            }
         }
         collect(root)
 

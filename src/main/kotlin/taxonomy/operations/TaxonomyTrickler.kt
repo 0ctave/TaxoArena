@@ -231,7 +231,9 @@ class TaxonomyTrickler(
         if (enableResidual || leafCandidates.isEmpty()) {
             for ((nodeId, logProb) in logProbMap) {
                 val node = nodeMap[nodeId] ?: continue
-                if (node.isBridge) continue
+                // No isBridge exclusion here: isBridge marks legitimate cross-link hosts
+                // (e.g. a domain node with a bridged child) whose residual pool must
+                // remain a valid destination, or its unrouted queries fall back to root.
                 if (!node.isLeaf) {
                     val activeChildren = if (config.formalism.enableBridging) {
                         node.children + node.crossLinkChildren

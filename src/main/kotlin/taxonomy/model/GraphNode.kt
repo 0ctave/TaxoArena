@@ -72,8 +72,13 @@ data class GraphNode(
         }
         fun getEmbedding(rawText: String): Embedding? = EmbeddingRegistry[rawText]
     }
-    // isLeaf is true iff this node has NO tree children and is not a bridge/multi-parent node.
-    val isLeaf: Boolean get() = children.isEmpty() && !isBridge && parents.size <= 1
+    // isLeaf is true iff this node has NO outgoing edges of either kind. Parent count is
+    // deliberately irrelevant: a leaf that gains a second parent through a cross-link
+    // proposal is still a leaf — it must remain a routing destination and a J-cell,
+    // now reachable from both branches. (The old `!isBridge && parents.size <= 1` clause
+    // silently orphaned every cross-link target: the moment a leaf was bridged it left
+    // the leaf set and could receive no membership at all.)
+    val isLeaf: Boolean get() = children.isEmpty() && crossLinkChildren.isEmpty()
 
     val treeChildren: MutableSet<GraphNode> get() = children
 

@@ -53,7 +53,7 @@ class TaxonomyMerger(
             mergeSimilarSiblingsWithProposals(dag, root, allEmbeddings, groundTruthMap, currentIteration, ops)
 
             if (config.formalism.enableBridging) {
-                insertBridgingParents(root, currentIteration)
+                proposeCrossLinksWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
             }
 
             mergeRedundantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
@@ -649,8 +649,133 @@ class TaxonomyMerger(
         }
     }
 
-    internal suspend fun insertBridgingParents(root: GraphNode, iteration: Int) {
-        // No-op: mergeRedundantNodes deleted
+    /**
+     * Cross-linking: the polyhierarchy GROWTH edit, generated from residual mass.
+     *
+     * fuseNodes is a shrink edit — it destroys one node identity and produces multi-parent
+     * bridges only as a side effect of redirecting the dead node's parents. A cross-link is
+     * the opposite: both identities survive, and a node N gains a SECOND parent P because
+     * P's residual queries demonstrably fit N. The Jensen-tight descent gate residualizes
+     * queries that sit near a region's centre but match none of its children — under a
+     * strict tree a genuinely cross-domain query (biostatistics between Math and Biology)
+     * can only pick one branch, fail to specialize there, and residualize. A cross-link
+     * gives it a legitimate second path: once N is in P's competition set, exactly the
+     * residuals with <mu_N, x> >= r_bar_P * <mu_P, x> start passing P's descent gate.
+     *
+     * Candidate generation is cheap (no re-routing): for each host P with a residual pool,
+     * count the residuals N would capture under the runtime gate formula. A candidate
+     * survives iff it captures >= secondaryMassFloor queries AND >= bridgeSupportRelFraction
+     * of P's pool. Guards: acyclicity (N must not be an ancestor of P), no
+     * ancestor/descendant or existing-parent redundancy (a grandparent link is the old #67
+     * degeneracy), and cross-domain-ness (P and N must live under disjoint depth-1 domains
+     * — an intra-branch second parent is exactly what transitive reduction exists to kill).
+     * Acceptance is the same global-J proposal gate as every other structural edit, with
+     * the SPLIT-side positive threshold: a growth edit must strictly improve J
+     * (shrink edits only need Delta J > -epsilon).
+     */
+    internal suspend fun proposeCrossLinksWithProposals(
+        dag: DagRoot,
+        allEmbeddings: List<Embedding>,
+        groundTruthMap: Map<String, List<String>>,
+        currentIteration: Int,
+        ops: TaxonomyOperations
+    ) {
+        val root = dag.node
+        val allNodes = getAllNodes(root).toList()
+
+        val embById = HashMap<String, Embedding>(allEmbeddings.size * 2)
+        for (emb in allEmbeddings) {
+            val key = if (emb.queryId != -1) emb.queryId.toString() else TextNormalizer.cleanText(emb.rawText)
+            embById[key] = emb
+        }
+
+        val massFloor = config.diagnostics.secondaryMassFloor
+        val relFraction = config.diagnostics.bridgeSupportRelFraction
+
+        val hosts = allNodes.filter { p ->
+            p.depth >= 1 && p.children.isNotEmpty() && p.vmfMu.isNotEmpty() &&
+                p.residualQueries.size >= massFloor
+        }.sortedByDescending { it.residualQueries.size }
+
+        for (host in hosts) {
+            val residuals = host.residualQueries.mapNotNull { qId ->
+                GraphNode.getEmbedding(qId) ?: embById[qId]
+            }
+            if (residuals.size < massFloor) continue
+
+            // Gate bar per residual: r_bar_P * <mu_P, x> — identical to the trickler's
+            // descent criterion, so "captured" here means "will actually descend at P
+            // once the edge exists", not a proxy similarity.
+            val bars = DoubleArray(residuals.size)
+            for (i in residuals.indices) {
+                val x = residuals[i].projectTo(host.vmfMu.size)
+                bars[i] = host.childCentroidShrinkage * StatisticsUtils.dotProduct(x, host.vmfMu)
+            }
+
+            val hostDomains = getDepth1Ancestors(host)
+            var ancestorMap = buildAncestorMap(root)
+            val attached = host.children + host.crossLinkChildren
+
+            val scored = allNodes.mapNotNull { cand ->
+                if (cand === host || cand.depth < 2 || cand.vmfMu.isEmpty()) return@mapNotNull null
+                if (cand.parents.isEmpty()) return@mapNotNull null
+                if (cand in attached || host in cand.parents) return@mapNotNull null
+                val candAnc = ancestorMap[cand.id] ?: emptySet()
+                val hostAnc = ancestorMap[host.id] ?: emptySet()
+                if (host.id in candAnc || cand.id in hostAnc) return@mapNotNull null
+                if (cand.parents.any { q -> q.id in hostAnc || host.id in (ancestorMap[q.id] ?: emptySet()) }) return@mapNotNull null
+                if (getDepth1Ancestors(cand).any { it in hostDomains }) return@mapNotNull null
+
+                var captured = 0
+                for (i in residuals.indices) {
+                    val x = residuals[i].projectTo(cand.vmfMu.size)
+                    if (StatisticsUtils.dotProduct(x, cand.vmfMu) >= bars[i]) captured++
+                }
+                if (captured < massFloor || captured < relFraction * residuals.size) null
+                else cand to captured
+            }.sortedByDescending { it.second }
+
+            // Each J evaluation is a full re-route — cap the expensive part per host.
+            for ((cand, captured) in scored.take(3)) {
+                // Re-check topological guards against the CURRENT graph: an earlier
+                // acceptance in this pass may have changed ancestor sets.
+                invalidateAncestorCache()
+                ancestorMap = buildAncestorMap(root)
+                val candAnc = ancestorMap[cand.id] ?: emptySet()
+                val hostAnc = ancestorMap[host.id] ?: emptySet()
+                if (host.id in candAnc || cand.id in hostAnc || host in cand.parents) continue
+
+                val fracOfPool = captured.toDouble() / residuals.size
+                log.info("[CROSS-LINK] proposing '${host.label}' -> '${cand.label}' (captures $captured/${residuals.size} residuals)")
+                // site = the TARGET node N, not the host: the acceptance rule is
+                // Delta J > epsilon * pi_N. pi scales the threshold to the mass the edit
+                // can actually move (N's cell composition + the captured pool); scaling by
+                // the whole host domain's mass makes the bar unreachable for any
+                // small-concept link no matter how genuinely it improves J.
+                val accepted = ops.tryProposal(
+                    dag = dag,
+                    site = cand,
+                    allEmbeddings = allEmbeddings,
+                    groundTruthMap = groundTruthMap,
+                    currentIteration = currentIteration,
+                    deltaThreshold = config.formalism.separationEpsilon
+                ) {
+                    host.crossLinkChildren.add(cand)
+                    cand.parents.add(host)
+                }
+                logBridgeResidual(
+                    iteration = currentIteration,
+                    candidateId = "${host.id}->${cand.id}",
+                    sourceNodes = "${host.label} -> ${cand.label}",
+                    size = captured,
+                    entropy = fracOfPool,
+                    div = 0.0,
+                    accepted = accepted,
+                    reason = "residual-capture cross-link"
+                )
+            }
+        }
+        invalidateAncestorCache()
     }
 
     private fun isAncestor(ancestor: GraphNode, descendant: GraphNode): Boolean {

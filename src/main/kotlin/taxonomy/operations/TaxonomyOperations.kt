@@ -186,7 +186,9 @@ class TaxonomyOperations(
     private fun computePairwiseDenom(root: GraphNode): Double {
         val leaves = mutableListOf<GraphNode>()
         val residualParents = mutableListOf<GraphNode>()
+        val visited = mutableSetOf<String>()
         fun walk(n: GraphNode) {
+            if (!visited.add(n.id)) return
             if (n.isLeaf) {
                 leaves.add(n)
             } else {
