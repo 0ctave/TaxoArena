@@ -1,11 +1,14 @@
-# DAG Construction Mechanisms — Current Design (2026-07-23)
+# DAG Construction Mechanisms — Current Design (2026-07-23, rev. 2)
 
 Authoritative description of the construction pipeline's decision mechanisms after the
-2026-07-23 redesign. Supersedes the corresponding sections of
-`evolutionary-pipeline/discovery-optimization.md` (kept for history). Validated by the
-first fully converged canonical run (seed 42): GED reached +0/−0 with the convergence
-streak starting at iteration 34, **zero** C3 invariant violations across the whole run,
-all 45 leaves ≥ minClusterSize, no wrapper chains, ECE a calibrated 0.22–0.32.
+2026-07-23 redesign and its same-day evolution (commits `bb534a2` → `3bf648e`:
+direction-only sibling competition, Jensen-tight descent gate, global-J proposal
+gating of all structural edits). Supersedes the corresponding sections of
+`evolutionary-pipeline/discovery-optimization.md` (kept for history). The redesign's
+first milestone run (seed 42, pre-proposal-gating code) reached GED +0/−0 with the
+convergence streak starting, **zero** C3 invariant violations, all leaves ≥
+minClusterSize, no wrapper chains, and a calibrated ECE of 0.22–0.32; the
+proposal-gated revision is still under calibration.
 
 ## 1. One separation score for every structural gate
 
@@ -28,10 +31,14 @@ dependence of the raw within/total ratio on k and on cluster sizes, so one
 
 - split acceptance (`TaxonomySplitter`),
 - k-selection inside vMF-EM (`performVmfKMeans` marginal improvement),
-- sibling merging (`TaxonomyMerger.mergeSimilarSiblings`, computed on branch-query
-  sufficient statistics),
+- sibling merging (`TaxonomyMerger`, computed on branch-query sufficient statistics),
 - sibling distinctness of new children,
-- residual-split viability.
+- residual-split viability,
+- and, lifted to the whole DAG, the **global objective J**
+  (`StatisticsUtils.computeDagSeparationJ`): the same chance-corrected score computed
+  over the full corpus with one cell per leaf plus one cell per internal node's
+  residual pool. J is the single number every structural proposal is judged against
+  (§5).
 
 It replaced two broken gates: the old "Dasgupta delta" `1 − Σ(n−n_c)W_c/(nW)` measured
 the *remaining*-cost fraction (~0.82 for every real split, leaving any ε below that
@@ -48,21 +55,28 @@ balanced 4-way split gives ~0.25/level; 0.25 × 0.3 < 0.10), which *forced* chai
 ~1.0-responsibility dominant children — the swallow/wrapper churn. The three jobs are
 now separated:
 
-1. **Descent-vs-residual gate (parameter-free).** At each internal node, descend iff
-   some child's mean direction matches the query at least as well as the node's own:
-   `max_c ⟨μ_c, x⟩ ≥ ⟨μ_p, x⟩`. This is the parent-vs-children Bayes factor at
-   threshold 1 in the shared-concentration limit. Directions, not densities: the
-   Hornik–Grün shrinkage `(n−1)/(n+d−2)` scales with n, so parents are fitted
-   systematically sharper than children and density comparisons carry tens of nats of
-   bias (measured: 56 % of the corpus residualized at anchors under the density form).
-   Queries at a region's own center that no child specializes in stay at the parent as
-   residuals — the honest residual semantics.
-2. **Per-level relative beam (`routingBeamGamma`, default 0.15).** A child stays on the
-   beam iff its responsibility is ≥ γ × the best sibling's. Relative-to-best is
-   scale-free and concentration-adaptive: 0.50/0.50 sharing keeps both children,
-   0.90/0.05 drops the tail — an absolute floor cannot distinguish those. The argmax
-   always passes, so the beam is never empty. Transition probabilities renormalize over
-   the beam.
+1. **Descent-vs-residual gate (parameter-free, Jensen-tight).** At each internal node,
+   descend iff `max_c ⟨μ_c, x⟩ ≥ r̄_p · ⟨μ_p, x⟩`, where
+   `r̄_p = ‖Σ_c w_c μ_c‖ ∈ [0,1]` is the resultant length of the children's weighted
+   centroid mix (`GraphNode.childCentroidShrinkage`, recomputed after every structural
+   change). Since the parent's direction is (approximately) the *normalized* mean of
+   its children's, the raw parent dot overstates what the children can collectively
+   achieve by exactly the factor 1/r̄_p; multiplying by r̄_p makes the comparison the
+   tight bound `max_c dot ≥ weighted-mean dot`. A query is residual only when its best
+   child does worse than the children's own weighted-average alignment — genuine
+   unexplained mass, not an artifact. Directions, not densities: the Hornik–Grün
+   shrinkage `(n−1)/(n+d−2)` scales with n, so parents are fitted systematically
+   sharper than children and density comparisons carry tens of nats of bias (measured:
+   56 % of the corpus residualized at anchors under the density form; the un-tightened
+   direction form still over-rejected ~40 %).
+2. **Direction-only sibling competition with a cosine beam (`routingBeamGamma`,
+   default 0.15).** Siblings are scored `κ̄ · ⟨μ_c, x⟩` with the *shared mean* κ̄ of the
+   level — per-child κ and normalizers are excluded from the competition, so a child
+   cannot win queries by concentration bookkeeping, only by direction. A child stays on
+   the beam iff `⟨μ_c, x⟩ ≥ max_sibling dot − γ` (an additive cosine margin).
+   Relative-to-best is scale-free and adapts to the realized competition: 0.50/0.50
+   sharing keeps both children, decisive wins drop the tail. The argmax always passes,
+   so the beam is never empty. Transition probabilities renormalize over the beam.
 3. **Final membership share (`membershipFloor`, default 0.10 — semantics changed).**
    After the walk, memberships are normalized over the leaves the query actually
    reached; a leaf counts iff it holds ≥ membershipFloor of *that query's own*
@@ -85,7 +99,10 @@ invariant ("internal hard queries are legal iff residual-flagged") holds by
 construction, and `getAllQueriesInRegion` can see the embedding — which is what lets
 the residual-split gate carve new children out of coherent residual mass. The previous
 implementation recorded only a naked ID: the weight vanished (≈130–330 mass leaked per
-iteration) and the residual-split mechanism could never recover the queries.
+iteration) and the residual-split mechanism could never recover the queries. With
+residual routing enabled, internal nodes holding residual pools are also legitimate
+membership destinations (`TrickleResult.leaves(enableResidual)`), and each pool counts
+as its own cell in the global objective J — residual mass is measured, not ignored.
 
 ## 4. Split proposal vs. split acceptance (`TaxonomySplitter`)
 
@@ -102,18 +119,27 @@ permanently). The in-pass "macro-concept decomposition" recursion was removed fo
 same reason: oversized children are re-evaluated next iteration under full
 trickle/collapse/refit feedback.
 
-## 5. Upward dissolution of sole children (`TaxonomyMerger.prunePassthroughNodes`)
+## 5. Global-J proposal gating of every structural edit (`TaxonomyMerger` + `tryProposal`)
 
-A parent's **only** tree child separates no pair of queries its parent doesn't already
-separate — inserting it changes the hierarchy objective by exactly zero, however many
-children it has. Such a child is dissolved upward: its children are hoisted to the
-parent, its queries move up (residual-flagged while the parent stays internal), and the
-loop repeats while exactly one tree child remains, so whole chains flatten in one pass.
-This subsumes the old chain-middle bypass and — critically — removes the "swallow"
-wrapper (a generalist child that captured 100 % of its parent's population, observed as
-`Business → #107 (0/690)`), while preserving the parent's identity (GT anchors keep
-their label and anchor role). Bridged children (multiple parents) and depth ≤ 1 are
-left alone. Starvation pruning uses the flat `branch < minClusterSize` floor —
+Structural refinement no longer applies edits by local rules alone. Every candidate
+edit is a **proposal**, evaluated empirically against the global objective J:
+
+1. snapshot the DAG state (`GraphStateBackup` — topology, parameters, populations);
+2. apply the edit tentatively, recompute shrinkages, clear and fully **re-route every
+   query** through the modified DAG;
+3. compute `J = computeDagSeparationJ(root, allEmbeddings)`;
+4. restore the snapshot; commit the best-scoring option only if it beats the status quo
+   within a small hysteresis (`ΔJ > −separationEpsilon`).
+
+Proposal sites: starved-leaf handling (three-way choice: keep / prune-absorb into
+parent / merge into nearest sibling — the argmax by J wins), sibling merging, redundant
+merges, and **upward dissolution of sole children**. The dissolution itself is
+unchanged in mechanics — a parent's only tree child is hoisted away (children re-parented
+up, queries residual-flagged upward, chains flatten in one pass, GT anchors keep their
+identity, bridged children and depth ≤ 1 excluded) — but it now commits only when the
+full re-route confirms J does not degrade. This replaces both the old "unconditional
+below depth 1" rule and any per-edit heuristic thresholds: one objective, measured, not
+predicted. Starved-leaf detection uses the flat `branch < minClusterSize` floor —
 symmetric with the split floor: big enough to be born ⇒ big enough to live.
 
 ## 6. Supporting changes
@@ -133,25 +159,29 @@ symmetric with the split floor: big enough to be born ⇒ big enough to live.
 
 | Parameter | Meaning | Canonical |
 |---|---|---|
-| `separationEpsilon` | Min chance-corrected separation for any structural accept | 0.01 (calibrate) |
-| `routingBeamGamma` | Per-level beam width as fraction of best sibling responsibility | 0.15 (calibrate) |
+| `separationEpsilon` | Min chance-corrected separation for splits; also the proposal hysteresis (an edit may lower global J by at most ε) | 0.01 (calibrate) |
+| `routingBeamGamma` | Per-level beam: additive cosine margin below the best sibling's dot | 0.15 (calibrate) |
 | `membershipFloor` | Min share of a query's own membership for a leaf to count | 0.10 (calibrate) |
 | `minClusterSize` | Birth floor (routed) and survival floor, same number | 50 |
 
 Removed entirely: `emaAlpha`, `routingSoftmaxTau`, `tauKappaScalingFactor`,
 `assignmentCosineGap`, `deltaAssign`, dynamic-temperature γ, κ-adaptive margins.
-The descent gate has no parameter.
+The descent gate has no parameter (`descentMargin` exists in config plumbing but is
+superseded by the Jensen-tight `r̄_p` factor and currently unused). The
+proposal-acceptance decisions have no parameters of their own — they reuse
+`separationEpsilon` as hysteresis and measure J directly.
 
 ## 8. Known open items
 
-- **Residual volume (design fork, undecided):** at the converged equilibrium ~45 % of
-  the corpus rests as residuals at internal nodes — the direction gate's honest verdict
-  that domain centers don't decompose. Option A (current): tight specialist leaves,
-  ~55 % arena coverage. Option B: drop the gate, descend always, let beam + share floor
-  spread central queries; restore residuals later as an explicit outlier test.
+- **Residual volume (design fork, undecided):** under the pre-proposal milestone run
+  ~45 % of the corpus rested as residuals at internal nodes. The Jensen-tight gate and
+  proposal-gated refinement change this balance; re-measure at the next converged run
+  before revisiting the Option A (tight leaves, partial coverage) vs Option B (descend
+  always, spread central mass) decision.
 - The parent's μ fit includes its residual-flagged queries (κ excludes them); this
   feedback slightly favors re-residualizing the same queries.
-- Sibling merging has fired 0 times at `sep < ε = 0.01`; the merge threshold likely
-  needs its own (higher) calibrated value.
-- The convergence streak needs `numIterations` ≥ ~45 to complete after the structure
-  stabilizes (~iteration 33).
+- Proposal evaluation is expensive (full re-route per candidate edit per iteration);
+  fine for the current corpus, worth batching or caching if the corpus grows.
+- Post-proposal-gating runs still show GED churn of ±10–25 ops/iteration at 50
+  iterations; convergence-streak completion under the new refinement loop is not yet
+  demonstrated and is the next calibration target.
