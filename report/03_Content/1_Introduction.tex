@@ -11,9 +11,9 @@ decisions~\parencite{wissuchek2025agentic}.
 This transition, the \textit{agentic turn}, marks the evolution of
 Large Language Models (LLMs) from passive text-generation interfaces
 into active participants within larger software
-pipelines~\parencite{haidemariam2025turn}, in which complex tasks are
+pipelines, in which complex tasks are
 decomposed into sub-tasks and dispatched to specialised tools, APIs, or
-models~\parencite{schick2023toolformer, yao2023react}.
+models~\parencite{yao2023react}.
 The quality of this dispatch depends critically on one question:
 \textit{which model should handle a given sub-task?}
 
@@ -38,8 +38,8 @@ models that are equal on average but opposite at the margin.
 
 The rapid deployment of LLMs has outpaced the development of evaluation
 frameworks capable of distinguishing their capabilities at the
-resolution required for informed
-routing~\parencite{yan2025evaluation, shukla2025evaluating}.
+resolution required for informed routing---the diagnosis this section
+develops and the literature review substantiates.
 Two structural limitations characterise current practice.
 
 \subsubsection*{The Static Benchmark Problem}
@@ -52,7 +52,7 @@ This design is brittle along two axes.
 First, as models improve, the hardest questions saturate:
 top-performing models converge toward indistinguishable scores, and the
 benchmark loses the ability to discriminate between closely performing
-systems~\parencite{simmering2025benchmarks}.
+systems~\parencite{boubdir2024elo}.
 Second, the category structure is fixed at construction time, so
 emerging capability dimensions---interdisciplinary topics, novel
 application domains, or sub-skills at the boundary between existing
@@ -68,7 +68,7 @@ accuracy~\parencite{boubdir2024elo}.
 This \textit{Scalar Fallacy} produces \textit{Aggregation Bias}:
 averaging performance across all domains masks catastrophic failures in
 specific subgroups and obscures profiles that differ only in
-composition, not in mean~\parencite{shukla2025evaluating}.
+composition, not in mean~\parencite{raju2024constructing}.
 Two models with identical global scores may differ sharply in their
 domain profiles---one strong in formal reasoning and weak in applied
 sciences, the other the reverse---yet a global leaderboard assigns them
@@ -105,18 +105,18 @@ designed to meet.
 Measuring performance on knowledge-intensive tasks requires a judge.
 Expert human annotation remains the gold standard but is economically
 prohibitive at the scale required for continuous, multi-model,
-multi-domain evaluation~\parencite{li2026agencybench}.
+multi-domain evaluation~\parencite{zheng2023judging}.
 Automated scalar scoring introduces systematic calibration errors: the
 judge has no stable internal reference for what a given score means
 across domains, question types, or model generations.
 
 Pairwise comparison resolves this by reducing judgement to a local,
 contextualised question: is answer~A better than answer~B for this
-specific query~\parencite{zheng2024judging}?
+specific query~\parencite{zheng2023judging}?
 Yet LLM-as-a-judge systems exhibit biases even in pairwise mode:
 \textit{positional bias} systematically favours the answer presented
-first~\parencite{zheng2024judging}, and \textit{verbosity bias} favours
-longer answers regardless of quality~\parencite{li2024verbosity}.
+first~\parencite{zheng2023judging}, and \textit{verbosity bias} favours
+longer answers regardless of quality~\parencite{chen2024verbosity}.
 Beyond these, judges suffer from \emph{guideline incompleteness}: any
 finite rubric under-specifies the evaluation space, leaving cases where
 the judge falls back on undocumented heuristics.
@@ -231,20 +231,25 @@ data rather than a fixed editorial taxonomy.
     Queries migrate to geometrically closer anchors, producing an
     \textit{adapted partition} that may diverge from the original
     \textit{canonical} label partition; each anchor is recursively split
-    under a Dasgupta cost oracle~\parencite{dasgupta2016cost} into
+    under a chance-corrected separation score---accepting a proposed
+    partition only when its within-cluster scatter is sufficiently below
+    that expected under a uniformly random same-size partition---into
     internally coherent leaves, with polyhierarchical DAG edges added by
     gated topology operations rather than by query multi-assignment
     during fitting.
-    During construction each query is assigned exclusively to one sibling
-    per depth, keeping the vMF and NiW distribution fits statistically
-    clean.
+    During construction each query holds weighted membership in every
+    sibling whose posterior responsibility clears a fixed membership
+    floor; the distribution fits use these normalised soft weights, while
+    a \textit{primary} (argmax) assignment is retained as a bookkeeping
+    convention for aggregation.
     This construction is the instrument that produces granular, internally
     homogeneous judge domains; its statistical choices---a fixed
     256-dimensional Matryoshka Representation Learning (MRL)
     slice~\parencite{kusupati2022mrl}, a small-sample-corrected vMF
     concentration estimator, and a unified separation threshold governing
-    splitting, merging, and passthrough-collapse---are defended as a
-    coherent set in Chapter~\ref{ch:methodology}.
+    splitting, merging, sibling distinctness, and residual-split
+    viability---are defended as a coherent set in
+    Chapter~\ref{ch:methodology}.
 
     \item \textbf{Reference-informed, answer-key-blind arena evaluation.}
     For each leaf, TaxoArena generates a domain-specific judge by
@@ -256,11 +261,14 @@ data rather than a fixed editorial taxonomy.
     pairwise using this rubric: each comparison is run in both answer
     orders with analysis-before-verdict prompting, and disagreements
     between the orderings are treated as ties.
-    Unlike the exclusive routing used during construction, arena routing
-    permits a held-out query to enter multiple sufficiently compatible
-    leaves, with verdicts attributed fractionally ($1/k$ per leaf for a
-    query entering $k$ leaves) when aggregating upward through the DAG,
-    preventing double-counting.
+    Arena routing, like construction routing, permits a query to enter
+    multiple sufficiently compatible leaves (capped by a per-query
+    assignment limit); when a held-out query enters $k$ leaves, its
+    verdicts contribute with weight $1/k$ to each leaf's win-count
+    matrix, preventing the same comparison from being double-counted.
+    This leaf-level fractional weighting is distinct from leaf-to-ancestor
+    aggregation, which pools sufficient statistics under a primary-path
+    convention (Chapter~\ref{ch:system-architecture}).
     Results are aggregated via Bradley--Terry, producing coherent
     per-leaf, per-domain, and corpus-wide capability profiles.
 
@@ -288,20 +296,22 @@ independent contribution
     \item[\textbf{RQ2.}] Does evaluation within geometry-adapted leaf
     groupings improve ranking fidelity over flat MMLU-Pro domain
     groupings?
-    \textit{Primary metric:} $\Delta\rho = \rho_{\text{adapted}} -
-    \rho_{\text{canonical}}$, reported per selected node.
+    \textit{Primary metric:} $\Delta\tau = \tau_{\text{adapted}} -
+    \tau_{\text{canonical}}$ (Kendall-based), reported per selected
+    node; $\Delta\rho$ (Spearman-based) secondary.
 
 \end{enumerate}
 
 Two further analyses are reported as non-headline diagnostics rather
 than claims the thesis depends on: a construction-validity check that
 the induced DAG is geometrically coherent relative to unsupervised
-baselines (Weighted Leaf Purity, Spherical Silhouette, Dasgupta cost,
-Sackin index, Routing ECE), and an optional test of whether the adaptive
+baselines (Dendrogram Purity, Weighted Leaf Purity, Spherical
+Silhouette, Total Dasgupta Cost, Sackin index, Routing ECE), and an
+optional test of whether the adaptive
 scheduler recovers the same ranking at lower judge-call cost than random
 scheduling.
 
-\section{Scope and Validity}\label{sec:info-separation}
+\section{Scope and Validity}\label{sec:intro-scope}
 
 This thesis evaluates the mechanism at high statistical power on
 selected high-support domain nodes rather than spreading the same
@@ -337,13 +347,15 @@ initialisation, iterative splitting and topology optimisation, and
 construction completion) and an arena evaluation subsystem (routing,
 per-leaf MapReduce judge-rubric induction, match scheduling,
 Bradley--Terry aggregation, and upward propagation).
-Chapter~\ref{ch:methodology} formalises the statistical and geometric
-foundations: the vMF node model with small-sample-corrected MLE, the
-fixed-dimension MRL slice, the Dasgupta cost oracle, the
-dynamic-temperature trickle-routing softmax, the Bradley--Terry
-likelihood and MM algorithm, the active scheduling utility, and the
-sufficient-statistic upward aggregation procedure; numerical-stability
-derivations are deferred to Appendix~\ref{app:numerics}.
+Chapter~\ref{ch:methodology} formalises the arena's statistical
+machinery---the Bradley--Terry likelihood and MM algorithm, the active
+scheduling utility, and the sufficient-statistic upward aggregation
+procedure---and summarises the taxonomy-construction formalism (the
+vMF node model with small-sample-corrected MLE, the fixed-dimension
+MRL slice, the chance-corrected separation score, and the
+membership-floor trickle routing), whose full treatment is deferred to
+Appendix~\ref{app:dag-formalism}; numerical-stability derivations are
+deferred to Appendix~\ref{app:numerics}.
 Chapter~\ref{ch:experimental-design} specifies the experimental
 configuration: corpus and domain selection, the three-way split protocol
 with pre-committed random seed, the L9 hyperparameter tuning protocol,

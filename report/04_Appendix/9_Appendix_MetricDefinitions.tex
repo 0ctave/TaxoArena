@@ -1,0 +1,144 @@
+\chapter{Formal Metric Definitions}\label{app:metrics}
+
+This appendix gives closed-form definitions for the taxonomy-quality
+and structural-characterisation metrics named in
+Section~\ref{sec:exp-metrics} and used in
+Chapter~\ref{ch:results}. It does not cover the arena/ranking metrics
+(Bradley--Terry scores, Kendall $\tau$, Spearman $\rho$,
+pairwise-winner accuracy, top-$k$ Jaccard), which are already
+formalised in Section~\ref{sec:meth-bt} and
+Section~\ref{sec:meth-validation}.
+
+\section{Spherical Silhouette Coefficient}\label{sec:app-metrics-silhouette}
+
+Standard silhouette coefficients use Euclidean distance; for
+L2-normalised embeddings on the unit hypersphere, cosine-based
+angular distance is the geometrically appropriate analogue. For two
+unit vectors $x, y \in \mathcal{S}^{d-1}$, the angular distance is
+\[
+d_\theta(x, y) = \arccos(x^\top y).
+\]
+For each query embedding $x$ with assigned node $A$ and nearest
+neighbouring node $B \neq A$ (by centroid distance),
+\[
+a(x) = \arccos(x^\top \mu_A), \qquad
+b(x) = \min_{B \neq A} \arccos(x^\top \mu_B), \qquad
+s(x) = \frac{b(x) - a(x)}{\max(a(x), b(x))},
+\]
+with $s(x) = 0$ when $\max(a(x), b(x)) = 0$. The reported Spherical
+Silhouette is the mean $\bar{S} = \frac{1}{n}\sum_i s(x_i)$, with
+range $[-1, 1]$; values close to $1$ indicate queries tightly aligned
+with their own node centroid and well separated from the nearest
+neighbouring node.
+
+\section{Total Dasgupta Cost}\label{sec:app-metrics-dasgupta}
+
+The full-tree Dasgupta cost complements the per-split
+chance-corrected separation score used during construction
+(Appendix~\ref{app:dag-formalism}, \S\ref{sec:meth-split}). For similarity
+matrix $W$ with $w_{ij} = \max(x_i^\top x_j, 0)$ (cosine similarity,
+clipped to remove negative weights arising from MRL prefix
+mismatches) and completed hierarchy $T$,
+\[
+\text{cost}(T) = \sum_{i \neq j} w_{ij} \, |\text{Leaves}(\text{LCA}_T(i,j))|,
+\]
+where $\text{LCA}_T(i,j)$ is the lowest common ancestor of queries
+$i$ and $j$ in $T$ and $|\text{Leaves}(\cdot)|$ counts the leaves
+descending from it \parencite{dasgupta2016cost}. Similar query pairs
+that split deep in the hierarchy incur a low penalty; pairs that
+split at the root are penalised by the full leaf count. A lower Total
+Dasgupta Cost indicates a more structurally coherent hierarchy; unlike
+the per-split chance-corrected separation acceptance test of
+Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-split})---which is
+not a Dasgupta quantity---it is a genuine
+whole-tree Dasgupta-cost measure, computed on a fixed dataset and
+comparable across configurations and
+baselines (Section~\ref{sec:exp-baselines}).
+
+\section{Normalised Sackin Index}\label{sec:app-metrics-sackin}
+
+The Sackin index $S(T) = \sum_{\ell \in \text{Leaves}} \text{depth}(\ell)$
+sums leaf depths; it is a standard tree-balance statistic in
+phylogenetics. To remove its dependence on leaf count, the
+\textbf{Normalised Sackin Index} is the mean leaf depth,
+\[
+\tilde{S}(T) = \frac{1}{|\text{Leaves}|} \sum_{\ell \in \text{Leaves}} \text{depth}(\ell).
+\]
+A low $\tilde{S}(T)$ indicates a flat hierarchy that splits early and
+close to the root; a high $\tilde{S}(T)$ indicates a deep, uneven
+hierarchy in which some domains decompose much further than others.
+
+\section{Average Match Count}\label{sec:app-metrics-avgmatch}
+
+In the polyhierarchical DAG (Section~\ref{sec:arch-dag}), a query can
+be assigned to more than one leaf. Writing $\mathcal{L}(q)$ for the
+set of leaves query $q$ is assigned to,
+\[
+\text{AvgMatch} = \frac{1}{N} \sum_{i=1}^{N} |\mathcal{L}(q_i)|.
+\]
+$\text{AvgMatch} = 1.0$ means the taxonomy behaves as a strict tree
+for routing purposes; $\text{AvgMatch} > 1.0$ confirms that
+soft-routing and bridge insertion (Appendix~\ref{app:dag-formalism},
+\S\ref{sec:meth-topology})
+are actively producing multi-membership.
+
+\section{Weighted Leaf Purity}\label{sec:app-metrics-wlp}
+
+Weighted Leaf Purity (WLP) is not a standard named metric in the
+taxonomy-induction literature; it is defined here as a size-weighted
+average of per-leaf label purity against the MMLU-Pro ground-truth
+label. For leaf $\ell$ with member set $Q_\ell$ and ground-truth label
+function $\text{gt}(\cdot)$,
+\[
+\text{purity}(\ell) = \max_{c} \frac{|\{q \in Q_\ell : \text{gt}(q) = c\}|}{|Q_\ell|},
+\qquad
+\text{WLP} = \sum_{\ell \in \text{Leaves}} \frac{|Q_\ell|}{N} \, \text{purity}(\ell).
+\]
+Because WLP flat-tests each leaf directly rather than through a
+DAG lowest-common-ancestor traversal, it is a useful complement to
+the LCA-sensitive Dendrogram Purity of
+Section~\ref{sec:app-metrics-dendrogram-purity}.
+
+\section{DAG Dendrogram Purity}\label{sec:app-metrics-dendrogram-purity}
+
+Standard dendrogram purity is defined over a tree, where the lowest
+common ancestor (LCA) of two leaves is unique. In a DAG, a node can
+have more than one parent (Appendix~\ref{app:dag-formalism},
+\S\ref{sec:meth-topology}), so the
+LCA of two queries is not in general unique. The implementation
+resolves this with the \emph{shallowest} LCA taken over the full
+DAG (a conservative bound), but tests subtree purity only over the
+tree-skeleton (primary-edge) structure---cross-links are followed
+when locating the common ancestor but not when enumerating the
+purity-test subtree's members. This hybrid avoids the metric
+collapsing toward its floor value under heavy cross-linking. Because
+the shallowest-LCA convention means same-label queries split across
+distant subtrees still resolve to a high, impure ancestor, Dendrogram
+Purity should be read alongside the flat Weighted Leaf Purity of
+Section~\ref{sec:app-metrics-wlp}, which is insensitive to LCA
+placement.
+
+\section{Routing Expected Calibration Error}\label{sec:app-metrics-ece}
+
+Routing ECE tests whether the soft-routing distribution's confidence
+is calibrated against its accuracy, evaluated at \emph{domain}
+granularity. For each query, its normalized leaf membership weights
+(the real trickle weights of Appendix~\ref{app:dag-formalism},
+\S\ref{sec:meth-routing}) are aggregated onto each leaf's depth-1
+domain ancestors, yielding a per-query distribution over domain
+categories in the same label space as the MMLU-Pro category strings;
+the query's \emph{confidence} is the maximum domain mass and its
+prediction is correct when that argmax domain matches the query's
+MMLU-Pro category. Queries are grouped
+into $B$ equal-width confidence bins; for bin $b$ with queries
+$\mathcal{B}_b$, $\text{acc}(\mathcal{B}_b)$ is the fraction of
+correct predictions in the bin and $\text{conf}(\mathcal{B}_b)$ is
+the bin's mean confidence. Then
+\[
+\text{ECE} = \sum_{b=1}^{B} \frac{|\mathcal{B}_b|}{N} \left| \text{acc}(\mathcal{B}_b) - \text{conf}(\mathcal{B}_b) \right|,
+\]
+the standard expected-calibration-error construction adapted from
+temperature-scaling calibration analysis to the domain-aggregated
+trickle-routing distribution. Lower Routing ECE
+indicates a routing distribution whose confidence is a trustworthy
+proxy for correctness.

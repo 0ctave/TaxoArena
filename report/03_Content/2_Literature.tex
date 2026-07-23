@@ -63,9 +63,9 @@ categorical organisation are fixed at construction time.
 This creates three compounding failure modes.
 First, \textit{saturation}: as model capabilities advance, score
 distributions compress toward the ceiling and the benchmark loses
-discriminative power---frontier models now score between 97\% and 99\% on
-MMLU, rendering it unable to rank them against each
-other~\parencite{boubdir2024elo}.
+discriminative power---frontier models now cluster in the high 80s to
+low 90s (approximately 88--92\%) on MMLU, rendering it unable to rank
+them against each other~\parencite{boubdir2024elo}.
 Second, \textit{contamination}: benchmark questions circulate online and
 enter training corpora; researchers found that ChatGPT and GPT-4 could guess
 missing answer options in MMLU at rates of 52\% and 57\% respectively,
@@ -306,16 +306,22 @@ This is a more conservative departure from strict tree structure than
 global soft clustering, since it introduces polyhierarchy only where
 the embedding geometry provides positive evidence of genuine overlap,
 rather than allowing every item a non-trivial membership everywhere.
-TaxoArena combines both ideas but keeps them statistically separate:
-query assignment during distribution fitting remains exclusive, so
-that the concentration estimates at each node stay clean, while
-polyhierarchy is introduced afterward, at the topology-optimisation
-stage, through gated bridge insertion
+TaxoArena combines both ideas under a bounded form of soft membership:
+query assignment during distribution fitting is weighted
+multi-membership, but a fixed posterior-responsibility floor admits
+only children with non-negligible responsibility, so each node's
+concentration estimate is fit on normalised weights over a small
+admitted set rather than on diffuse membership everywhere; a
+\textit{primary} (argmax) assignment is retained as a bookkeeping
+convention, and node-level polyhierarchy is introduced at the
+topology-optimisation stage through gated bridge insertion
 (Chapter~\ref{ch:methodology}).
-This design distinguishes TaxoArena from both the fully-soft
-polyhierarchy literature, where membership is fuzzy throughout, and
-from the strictly exclusive tree literature (TaxoGen, CoRel, HiAGM,
-HiTIN), where no cross-branch edge can be represented at all.
+This floor-bounded design is closer to the fuzzy-clustering tradition
+than a hard partition, but it differs from the fully-soft
+polyhierarchy literature, where every item holds non-trivial
+membership everywhere, and from the strictly exclusive tree literature
+(TaxoGen, CoRel, HiAGM, HiTIN), where no cross-branch edge can be
+represented at all.
 
 \subsection*{Multi-Scale Embeddings}
 
@@ -382,9 +388,13 @@ decrease in the cost function, in contrast to heuristic thresholds
 such as TaxoGen's Davies--Bouldin criterion, which lack a
 tree-global optimality interpretation.
 The Dasgupta framework does not itself define a local stopping rule;
-the normalised cost-delta threshold used as a split-acceptance
-criterion in TaxoArena is an adaptation introduced in this thesis
-and formalised in Chapter~\ref{ch:methodology}.
+TaxoArena instead accepts a proposed split via a chance-corrected
+separation score---comparing the partition's within-cluster scatter
+against its expectation under a uniformly random same-size
+partition---a criterion introduced in this thesis and formalised in
+Chapter~\ref{ch:methodology}; it carries no Dasgupta optimality
+interpretation, and the Dasgupta cost is retained only as a
+whole-tree evaluation metric.
 
 \subsection*{Evaluation Metrics for Hierarchies}
 
@@ -407,8 +417,8 @@ Chapter~\ref{ch:experimental-design}.
 The literature reviewed in this section identifies three requirements
 for the taxonomy construction component of an LLM evaluation framework:
 a node model that statistically characterises cluster geometry (vMF);
-a splitting criterion with a formal objective function rather than a
-heuristic threshold (Dasgupta cost); and an embedding space in which
+a splitting criterion with an explicit, chance-corrected acceptance
+statistic rather than a heuristic threshold; and an embedding space in which
 both coarse and fine-grained distinctions are geometrically resolvable
 (MRL).
 The supervised classification literature (HiAGM, HiTIN) requires an
@@ -460,7 +470,7 @@ of response quality.
 \begin{itemize}
     \item \textbf{Positional bias.}
     Judges tend to favour the response presented first in the prompt,
-    independently of content~\parencite{zheng2024judging}.
+    independently of content~\parencite{zheng2023judging}.
     Zheng et al.\ found that GPT-4 agreed with itself on only 85\% of
     cases when the position of two responses was swapped, implying that
     up to 15\% of pairwise outcomes are position-driven rather than
@@ -469,7 +479,7 @@ of response quality.
     \item \textbf{Verbosity bias.}
     Models consistently assign higher scores to longer responses, even
     when the additional content adds no reasoning
-    depth~\parencite{li2024verbosity, chen2024verbosity}.
+    depth~\parencite{chen2024verbosity}.
     This confound is particularly acute in knowledge-intensive QA,
     where a model can pad a correct but terse answer with
     confident-sounding elaboration to win a preference judgment it
@@ -486,7 +496,7 @@ of response quality.
 
 Mitigation strategies include position-swapping with consistency checks,
 length-normalised scoring, and group-based polling to average out
-idiosyncratic preferences~\parencite{zheng2024judging}.
+idiosyncratic preferences~\parencite{zheng2023judging}.
 Positional bias is the most tractable of the three: a single
 swap-and-consistency-check protocol identifies and discards
 position-driven verdicts at low cost.
@@ -578,7 +588,7 @@ rating system}~\parencite{elo1978rating}.
 Developed for zero-sum games like chess, it assumes that an agent's performance
 is a random variable centred around a latent skill level $R$.
 The probability $E_A$ of agent $A$ defeating agent $B$ follows a logistic
-distribution~\parencite{ostasiewicz2022evaluation}:
+distribution~\parencite{boubdir2024elo}:
 \begin{equation}
     E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}
     \label{eq:elo-expected}
@@ -635,7 +645,7 @@ case is specified in Chapter~\ref{ch:methodology}.
 Bayesian rating systems such as
 \textit{TrueSkill}~\parencite{herbrich2007trueskill} and the
 Weng--Lin approximations implemented in
-OpenSkill~\parencite{weng2011bayesian, joshy2024openskill} represent
+OpenSkill~\parencite{weng2011bayesian} represent
 skill as a Gaussian with explicit uncertainty and converge faster than
 Elo by weighting each match by its information gain.
 Their online-update design targets streaming match data; for a
@@ -709,7 +719,7 @@ models exhibit diverse, niche strategies.
 The \textit{Blade-Chest model}~\parencite{chen2016bladechest} infers a
 $d$-dimensional representation for each model, modelling ``offence'' and
 ``defence'' separately; by learning a dataset-specific metric space, it can
-represent any pairwise stochastic preference relation~\parencite{liu2024probabilistic}.
+represent any pairwise stochastic preference relation.
 Both approaches confirm that a single global ranking cannot faithfully
 represent the capability profile of models that excel in some domains
 and fail in others, and that direct interaction modelling can lead to more accurate predictions of pairwise outcomes.
@@ -759,11 +769,7 @@ manual seed curation combined with embedding-based clustering---they
 show that model rankings are not stable across domains, and that a
 router informed by per-domain scores substantially reduces
 response-quality variance relative to global-rank routing.
-Meimandi and collaborators extend this to the agentic setting,
-framing the problem as \textit{positioning}: finding the domain
-sub-space in which each model occupies the highest-ranked
-position~\parencite{meimandi2025positioning}.
-Both bodies of work share a common dependency: they require that
+This line of work carries a common dependency: it requires that
 per-domain scores already exist and that the domain taxonomy is
 either given or constructed by hand, which limits reproducibility
 and scalability.

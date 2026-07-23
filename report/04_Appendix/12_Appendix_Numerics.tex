@@ -1,0 +1,151 @@
+\chapter{Numerical Methods}\label{app:numerics}
+
+This appendix collects the numerical-stability derivations referenced
+from Chapters~\ref{ch:introduction} and~\ref{ch:methodology} and from
+Appendix~\ref{app:dag-formalism}.
+Each subsection documents what the implementation actually computes
+(\texttt{StatisticsUtils}, \texttt{TaxonomyFitter},
+\texttt{BtMatchScheduler}, \texttt{BtMmFitter}), not an idealised
+variant.
+
+\section{Log-Bessel Evaluation at High Dimension}\label{sec:num-bessel}
+
+The vMF normaliser $C_d(\kappa) = \kappa^{d/2-1} / \left((2\pi)^{d/2}
+I_{d/2-1}(\kappa)\right)$ requires the modified Bessel function
+$I_\nu(\kappa)$ at order $\nu = d/2 - 1 = 127$ for $d = 256$, far
+outside the range where direct series evaluation is stable.
+The implementation evaluates $\log I_\nu(\kappa)$ by the uniform
+(Debye-type) asymptotic approximation for large order: with
+$z = \kappa / \nu$, $t = \sqrt{1 + z^2}$, and
+$\eta = t + \log\!\left(z / (1 + t)\right)$,
+\[
+\log I_\nu(\kappa)
+\approx \nu\,\eta
+- \tfrac{1}{2}\log\!\left(2\pi\nu\right)
+- \tfrac{1}{4}\log\!\left(1 + z^2\right),
+\]
+which is the leading term of the uniform asymptotic expansion of
+$I_\nu(\nu z)$ and is accurate to well below the tolerance of any
+routing or fitting decision for the $\nu$ used here.
+For near-zero argument ($\kappa \leq 10^{-4}$), the small-argument
+limit $\log I_\nu(\kappa) \approx \nu \log(\kappa/2) -
+\log\Gamma(\nu + 1)$ is used instead, with $\log\Gamma$ evaluated by
+the Lanczos approximation; in the same regime the vMF log-normaliser
+falls back to the uniform-distribution surface term
+$\log\Gamma(d/2) - (d/2)\log\pi - \log 2$.
+The Bessel ratio required by the concentration MLE
+(Appendix~\ref{app:dag-formalism}),
+\[
+A_d(\kappa) = \frac{I_{d/2}(\kappa)}{I_{d/2-1}(\kappa)}
+= \exp\!\left(\log I_{d/2}(\kappa) - \log I_{d/2-1}(\kappa)\right),
+\]
+is computed as the exponential of the difference of two log-Bessel
+evaluations and clamped to $[0, 1]$, its analytic range.
+The same ratio's derivative,
+$A_d'(\kappa) = 1 - A_d(\kappa)^2 - \tfrac{d-1}{\kappa} A_d(\kappa)$,
+drives the Newton--Raphson refinement of
+$\hat{\kappa}$ described in Appendix~\ref{app:dag-formalism}.
+
+\section{NiW Posterior Update and Student-$t$ Predictive}\label{sec:num-niw}
+
+Each node stores a diagonal Normal-inverse-Wishart posterior over its
+member embeddings (weighted by the trickle weights $w_i$ with
+effective count $n = \sum_i w_i$).
+The prior is
+$m_0$ = the normalised mean of the parents' vMF centroids (the first
+basis vector at the root), pseudocount $\kappa_0 = 1$, degrees of
+freedom $\nu_0 = d + 2$, and scale
+$\boldsymbol{\Lambda}_0 = \lambda_0 \mathbf{I}_d$ with $\lambda_0 =
+1/(\kappa_{\text{parent}}\, d)$, where $\kappa_{\text{parent}}$ is
+the parent-anchored prior concentration.
+With weighted sample mean
+$\bar{\mathbf{x}} = \tfrac{1}{n}\sum_i w_i \mathbf{x}_i$, the
+conjugate updates are
+\[
+\kappa_N = \kappa_0 + n,
+\qquad
+\nu_N = \nu_0 + n,
+\qquad
+m_N = \frac{\kappa_0 m_0 + n \bar{\mathbf{x}}}{\kappa_N},
+\]
+and, per coordinate $j$ (the implementation stores only the diagonal
+of the scale matrix),
+\[
+\Lambda_{N,j}
+= \lambda_0
++ \sum_i w_i \left(x_{ij} - \bar{x}_j\right)^2
++ \frac{\kappa_0 n}{\kappa_N}\left(\bar{x}_j - m_{0,j}\right)^2 .
+\]
+The corresponding posterior predictive is a multivariate Student-$t$
+with $\nu_N - d + 1$ degrees of freedom, location $m_N$, and (diagonal)
+scale $\boldsymbol{\Lambda}_N (\kappa_N + 1) / (\kappa_N (\nu_N - d +
+1))$.
+In the current implementation this predictive is not used for
+routing---routing is vMF-based
+(Appendix~\ref{app:dag-formalism})---and the stored posterior serves
+diagnostic roles, notably the leaf log-semantic volume
+$\sum_j \log \Lambda_{N,j}$ tracked by the convergence stabiliser.
+
+\section{KDE Bandwidth for the Scheduler Valley Weight}\label{sec:num-kde}
+
+The match scheduler's density-aware pair weight rewards pairs whose
+score midpoint falls in a low-density region of the current
+Bradley--Terry score distribution.
+Given the $n$ current scores with sample standard deviation
+$\hat{\sigma}$, the kernel bandwidth follows Silverman's rule of
+thumb for Gaussian kernels,
+\[
+h = 1.06\, \hat{\sigma}\, n^{-1/5},
+\]
+floored at $10^{-4}$; the density at a pair's midpoint
+$m = (s_i + s_j)/2$ is the Gaussian kernel density estimate
+\[
+\hat{f}(m) = \frac{1}{n h \sqrt{2\pi}}
+\sum_{k=1}^{n} \exp\!\left(-\frac{(s_k - m)^2}{2h^2}\right),
+\]
+normalised by the maximum density attained at any score point, and
+the valley weight is $1 - \hat{f}(m)/\hat{f}_{\max}$, floored at
+$0.1$ so no pair is fully suppressed.
+Two gap-based guards precede the density term: a pair whose score gap
+exceeds $4(\hat{\sigma}_i + \hat{\sigma}_j)$ is suppressed entirely
+(already decided), and a pair below the noise floor
+$0.15(\hat{\sigma}_i + \hat{\sigma}_j)$ is linearly ramped
+(indistinguishable at current precision).
+
+\section{Observed Fisher Information for BT Standard Errors}\label{sec:num-fisher}
+
+The Bradley--Terry log-likelihood over pairs with comparison counts
+$n_{ij}$ and win probabilities
+$p_{ij} = \sigma(s_i - s_j)$ has observed information matrix
+\[
+\mathcal{I}(\mathbf{s})
+= \sum_{i < j} n_{ij}\, p_{ij} (1 - p_{ij})\,
+(\mathbf{e}_i - \mathbf{e}_j)(\mathbf{e}_i - \mathbf{e}_j)^\top,
+\]
+i.e.\ $\mathcal{I}_{ii} = \sum_{j \neq i} n_{ij} p_{ij}(1-p_{ij})$
+and $\mathcal{I}_{ij} = -\,n_{ij} p_{ij}(1-p_{ij})$, evaluated at the
+MM fixed point $\hat{\mathbf{s}}$.
+$\mathcal{I}$ is singular with rank deficiency one (row sums vanish),
+reflecting the additive-constant non-identifiability that the
+zero-sum constraint $\sum_i s_i = 0$ removes.
+The implementation resolves the singularity by inverting the
+rank-completed matrix $\mathcal{I} + \mathbf{1}\mathbf{1}^\top$
+(Gauss--Jordan with partial pivoting) and recovering the
+constrained covariance as
+\[
+\operatorname{Var}(\hat{s}_i)
+= \left[(\mathcal{I} + \mathbf{1}\mathbf{1}^\top)^{-1}\right]_{ii}
+- \frac{1}{K},
+\]
+where $K$ is the number of models; adding
+$\mathbf{1}\mathbf{1}^\top$ is equivalent to imposing the sum-to-zero
+constraint, and subtracting $1/K$ removes the artificial variance the
+completion introduces along the constrained direction.
+If the completed matrix is numerically singular, the implementation
+falls back to the diagonal approximation
+$\operatorname{Var}(\hat{s}_i) \approx 1/\mathcal{I}_{ii}$.
+Reported standard errors are
+$\hat{\sigma}_i = \sqrt{\operatorname{Var}(\hat{s}_i)}$, floored at
+$0.01$; because comparisons sharing a query are treated as
+independent, these standard errors slightly underestimate the true
+uncertainty (Section~\ref{sec:meth-assumptions}).

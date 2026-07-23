@@ -94,17 +94,22 @@ class TaxonomyConfig {
         var separationEpsilon: Double = 0.04
 
         // ── Routing ───────────────────────────────────────────────────────────
-        // Minimum posterior responsibility (softmax of each child's own vMF log-density,
-        // temperature=1 — the true Bayesian mixture posterior, no artificial softening) for a
-        // child to count as a genuine membership destination. Replaces the old
-        // constructionMargin/arenaMargin/kappaAdaptive/tauKappaScalingFactor knobs: those
-        // thresholded a raw nats gap whose practical width depended on local kappa (needing
-        // per-region recalibration to behave consistently), instead of a probability, which
-        // means the same thing everywhere in the tree. Also doubles as the cumulative-path
-        // pruning floor (stop descending once a path's product-of-responsibilities from the
-        // root drops below this) and the residual-routing trigger (no child clears the floor
-        // -> this position is residual), so one number now does the job three knobs used to.
+        // Final membership share: after the trickle walk, a query's memberships are
+        // normalized over the leaves it actually reached, and a leaf counts as a genuine
+        // destination iff it holds at least this fraction of THAT query's own membership.
+        // Self-normalized, so its meaning is invariant to tree depth and fan-out — unlike
+        // the previous absolute product-vs-floor test, which made balanced structure
+        // unreachable below depth 2 and forced dominant-child (wrapper) chains.
         var membershipFloor: Double = 0.10
+
+        // Per-level relative beam: a child stays on the beam iff its responsibility is at
+        // least this fraction of the BEST sibling's. Relative-to-best is scale-free and
+        // concentration-adaptive: 0.50/0.50 sharing survives (both within gamma of best)
+        // while 0.90/0.05 drops the tail — an absolute floor cannot distinguish the two.
+        // Descent-vs-residual needs no parameter at all: the walk descends only where some
+        // child explains the query at least as well as the parent's own vMF component does
+        // (a parent-vs-children Bayes factor at threshold 1).
+        var routingBeamGamma: Double = 0.15
 
         // Judge-call-cost bound for arena-time evaluation only (how many leaves a single held-out
         // query may be scored against) — an engineering constraint, not a geometric-correctness
@@ -171,6 +176,7 @@ class TaxonomyConfig {
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
         sb.append("│   - Membership Floor:     ${formalism.membershipFloor}\n")
+        sb.append("│   - Routing Beam Gamma:   ${formalism.routingBeamGamma}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
         sb.append("│   - Default Kappa Prior:  ${formalism.defaultKappaPrior}\n")
@@ -206,6 +212,7 @@ class TaxonomyConfig {
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
             membershipFloor = formalism.membershipFloor,
+            routingBeamGamma = formalism.routingBeamGamma,
             maxLeafAssignments = formalism.maxLeafAssignments,
             enableStableQuestionIds = formalism.enableStableQuestionIds,
             enableResidualRouting = formalism.enableResidualRouting,
@@ -249,6 +256,7 @@ class TaxonomyConfig {
         formalism.minClusterSize = c.formalism.minClusterSize
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.membershipFloor = c.formalism.membershipFloor
+        formalism.routingBeamGamma = c.formalism.routingBeamGamma
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
         formalism.enableResidualRouting = c.formalism.enableResidualRouting

@@ -93,16 +93,28 @@ class TaxonomyOperations(
                             }
                         }
                     } else if (config.formalism.enableResidualRouting) {
-                        // No leaf reached at all: attribute the query to residualQueries on the
-                        // node the walk actually converged to (guaranteed non-leaf), not to
-                        // `.queries` on root. Hard-assigning it to root here is what produced the
-                        // persistent C3 invariant violations (root: non-empty hard queries, empty
-                        // residualQueries) and unconserved mass in the post-2026-07-22 pipeline.
-                        log.debug("Query '${emb.rawText.take(40)}' reached no leaf — recording as residual at ${routeResult.primary.label ?: routeResult.primary.id}")
+                        // No leaf reached at all: the query must still be RETAINED, not just
+                        // flagged. Attribute it to the node the walk converged to (guaranteed
+                        // non-leaf) with full weight AND the residual flag: the weight keeps
+                        // total mass conserved, the embedding in `.queries` makes the query
+                        // visible to getAllQueriesInRegion so the residual-split gate can carve
+                        // a new child out of coherent residual mass, and the residualQueries
+                        // entry keeps the C3 invariant satisfied (internal hard queries are
+                        // legal exactly when they are residual-flagged). The previous version
+                        // recorded only the naked ID — the query lost its weight (mass leaked
+                        // every iteration) and its embedding never entered the region, so the
+                        // residual-split mechanism could never recover it.
+                        log.debug("Query '${emb.rawText.take(40)}' reached no leaf — retained as residual at ${routeResult.primary.label ?: routeResult.primary.id}")
                         val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
                         synchronized(routeResult.primary.residualQueries) {
                             routeResult.primary.residualQueries.add(qId)
                             routeResult.primary.residualConfidences[qId] = 0.0
+                        }
+                        synchronized(routeResult.primary.queryWeights) {
+                            routeResult.primary.queryWeights.merge(emb.rawText, 1.0, Double::plus)
+                            if (!routeResult.primary.queries.contains(emb)) {
+                                routeResult.primary.queries.add(emb)
+                            }
                         }
                     } else {
                         // Residual routing disabled entirely: preserve the old hard-assignment-to-root

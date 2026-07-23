@@ -1,19 +1,60 @@
 \chapter{Taxonomy Tuning Protocol and Ablations}\label{app:tuning-protocol}
 
 This appendix details the mechanics behind the canonical hyperparameters
-and construction ablations referenced in Chapter~\ref{ch:experimental-design}
-(see Table~\ref{tab:hyperparams} for the selected values).
+and construction ablations referenced in
+Chapter~\ref{ch:experimental-design}; Table~\ref{tab:hyperparams}
+lists the selected values.
+
+\begin{table}[h]
+\centering
+\caption{Canonical taxonomy construction hyperparameters.}
+\label{tab:hyperparams}
+\begin{tabular}{lll}
+\toprule
+Parameter & Symbol/Name & Value \\
+\midrule
+Embedding dimension & $d$ & 256 (fixed) \\
+Maximum recursion depth & $D_{\max}$ & 8 \\
+Minimum cluster size & $n_{\min}$ & 50 \\
+Unified separation threshold & $\epsilon_{\text{sep}}$ (\texttt{separationEpsilon}) & 0.01 \\
+Membership floor\textsuperscript{a} & \texttt{membershipFloor} & 0.10 \\
+Max leaf assignments (arena-time cap) & \texttt{maxLeafAssignments} & 5 \\
+Fusion threshold & \texttt{fusionSimilarityThreshold} & 0.90 \\
+Iteration budget & \texttt{numIterations} & 35 \\
+DAG mode & \texttt{dagMode} & \texttt{DAG\_MAX} \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize \textsuperscript{a}One parameter, three roles: child
+admission (posterior responsibility floor), cumulative-path
+probability bound, and residual-routing trigger.
+Values are current canonical settings; final values
+follow the calibration study conducted after the DAG-construction
+pipeline is frozen.
+% TODO(calibration): finalize once DAG construction is frozen
+\end{table}
 
 \section{Hyperparameter Selection Protocol}\label{sec:exp-tuning-protocol}
 
-The canonical values in Table~\ref{tab:hyperparams} are not
-hand-picked; they are the output of an L9($3^4$) orthogonal-array
-design over four factors---\texttt{minClusterSize},
+The L9($3^4$) orthogonal-array sweep documented here is
+\textbf{historical}: it was conducted on a predecessor
+parameterisation of the routing layer, and three of its four
+factors---\texttt{routingSoftmaxTau}, \texttt{assignmentCosineGap},
+and \texttt{deltaAssign}---were subsequently removed when routing was
+unified under the single \texttt{membershipFloor} parameter
+(Appendix~\ref{app:dag-formalism}).
+Its protocol and gates are retained because they informed the
+surviving canonical values (notably \texttt{minClusterSize}) and
+because the selection machinery will be reused for the tuning study
+of the current parameter set.
+% TODO(calibration): finalize once DAG construction is frozen —
+% document the membershipFloor/separationEpsilon tuning study here.
+The design covered four factors---\texttt{minClusterSize},
 \texttt{routingSoftmaxTau}, \texttt{assignmentCosineGap}, and
 \texttt{deltaAssign}---each tested at three levels, run against a
 Pareto selection procedure (\texttt{tools/tuning/pareto.py}) driven by
 the harness \texttt{tools/tuning/tuning\_harness.py}.
-The L9 levels are \texttt{minClusterSize} $\in \{50, 75, 100\}$,
+The L9 levels were \texttt{minClusterSize} $\in \{50, 75, 100\}$,
 \texttt{routingSoftmaxTau} $\in \{1.0, 1.5, 2.0\}$,
 \texttt{assignmentCosineGap} $\in \{0.10, 0.15, 0.20\}$, and
 \texttt{deltaAssign} $\in \{0.5, 1.0, 2.0\}$.
@@ -26,7 +67,10 @@ Table~\ref{tab:pareto-gates}, whose outcome is recorded per candidate
 but does not exclude it. All hard-gate survivors are then ranked by
 Pareto dominance count over twelve coherence and calibration
 objectives---five maximised (Weighted Leaf Purity, Dendrogram Purity,
-Spherical Silhouette, $\Delta\rho_{\text{total}}$,
+Spherical Silhouette, total migration volume $m_{\text{total}}$ (the
+fraction of queries whose anchor assignment changed relative to the
+canonical partition; \emph{not} the RQ2 fidelity metric $\Delta\rho$,
+which no tuning gate ever observes),
 canonical--adapted Jaccard) and seven minimised (Total Dasgupta Cost,
 Routing ECE, Brier score, no-match rate, small-leaf fraction,
 $\kappa$-shrinkage mean, selected-node starved-leaf
@@ -74,7 +118,7 @@ Locked parameter & Value \\
 \midrule
 $D_{\max}$ & 8 \\
 \texttt{effectiveSupportFloor} & 2.0 \\
-\texttt{fusionSimilarityThreshold} & 0.92 \\
+\texttt{fusionSimilarityThreshold} & 0.90 \\
 \texttt{defaultKappaPrior} & 10.0 \\
 \texttt{maxLeafAssignments} & 5 \\
 \texttt{dagMode} & \texttt{DAG\_MAX} \\
@@ -84,10 +128,12 @@ $d$ & 256 (except A1) \\
 \end{tabular}
 \end{table}
 
-The dynamic-temperature exponent $\gamma$ is \textbf{not} part of the
-L9 design: because $\tau_{\text{eff}} = \tau\kappa^{\gamma}$ couples
-non-linearly to $\kappa$, it is ablated as a standalone factor at
-$\{0, 0.5, 1.0\}$ (A11) rather than orthogonally. No reserved-arena-set
+The dynamic-temperature exponent $\gamma$ was \textbf{not} part of the
+L9 design: because $\tau_{\text{eff}} = \tau\kappa^{\gamma}$ coupled
+non-linearly to $\kappa$, it was ablated as a standalone factor at
+$\{0, 0.5, 1.0\}$ (A11) rather than orthogonally; like the other
+temperature knobs, $\gamma$ has since been removed along with the
+mechanism it controlled, so A11 is historical. No reserved-arena-set
 label, accuracy, or judge verdict is used by either the hard or soft
 gates at any point in the L9/Pareto procedure; this is the mechanism
 by which the tuning/test-leakage boundary is enforced in practice, not
@@ -108,16 +154,16 @@ hyperparameter or structural choice while holding all others fixed.
 ID & Factor & Levels tested \\
 \midrule
 A1 & Embedding dimension $d$ & $\{128, 256, 512\}$; canonical $= 256$ \\
-A2 & $\kappa$ small-sample shrinkage & On (canonical) vs. off \\
+A2 & $\kappa$ estimator corrections (Newton--Raphson refinement, Hornik--Gr\"un shrinkage, parent-anchored EB blend) & On (canonical) vs. off \\
 A3$^\dagger$ & NMI variant & Overlapping vs. disjoint Shannon entropy \\
 A4$^\dagger$ & Purity formula & DAG-dendrogram purity vs. standard tree purity \\
 A5 & Separation threshold $\epsilon_{\text{sep}}$ & $\{0.01, 0.05, 0.10, 0.30\}$ \\
-A6 & \texttt{deltaAssign} $\times$ \texttt{assignmentCosineGap} (joint) & $\{0.5,1.0,2.0\} \times \{0.10,0.15,0.20\}$ \\
+A6$^\ddagger$ & \texttt{deltaAssign} $\times$ \texttt{assignmentCosineGap} (joint; historical) & $\{0.5,1.0,2.0\} \times \{0.10,0.15,0.20\}$ \\
 A7 & Iteration count & $\{10, 25, 50\}$ \\
 A8 & Query set scope & Reserved (arena-excluded) vs. full corpus \\
 A9 & Soft-membership refitting \texttt{refitMuPerIteration} & On (canonical) vs. off \\
 A10 & Bridging / Source-A-B \texttt{enableBridging} & On (canonical) vs. off; Source-A only vs. Source-B only vs. both \\
-A11 & Dynamic-temperature exponent $\gamma$ & $\{0.0, 0.5, 1.0\}$; canonical $= 0.0$ \\
+A11$^\ddagger$ & Dynamic-temperature exponent $\gamma$ (historical) & $\{0.0, 0.5, 1.0\}$; canonical $= 0.0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -131,12 +177,16 @@ already-constructed taxonomy, rather than a system parameter that
 changes the taxonomy itself. They are retained as
 \textit{reporting-sensitivity analyses}, testing whether headline
 quality conclusions are an artefact of a specific metric definition.
-A6 is a joint sweep of the two nat-margin secondary-assignment gates
-because they jointly determine multi-leaf assignment and bridge
-admission; a one-factor-at-a-time sweep would miss their interaction.
-A9, A10, and A11 isolate the \texttt{DAG\_MAX}-specific mechanisms
-(soft-membership refitting, two-source bridging, and the dynamic
-routing temperature) whose marginal contribution to taxonomy quality
+A6 and A11 (marked $\ddagger$) are \textit{historical}: they ablated
+the two nat-margin secondary-assignment gates and the dynamic routing
+temperature of the predecessor routing parameterisation, all of which
+were removed when routing was unified under \texttt{membershipFloor};
+their rows are retained for provenance, and an equivalent ablation of
+the current parameter set is pending.
+% TODO(calibration): finalize once DAG construction is frozen
+A9 and A10 isolate the \texttt{DAG\_MAX}-specific mechanisms
+(soft-membership refitting and two-source bridging) whose marginal
+contribution to taxonomy quality
 and bridge coverage needs to be demonstrated, not merely described.
 
 \section{Optional Secondary Diagnostics}\label{sec:appendix-optional-diagnostics}

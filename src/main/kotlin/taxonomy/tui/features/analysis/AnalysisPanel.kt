@@ -231,6 +231,7 @@ fun ConfigSnapshotPanel(
     add("  Min cluster  ${config.formalism.minClusterSize}")
     add("  Sep. epsilon ${config.formalism.separationEpsilon}")
     add("  Member floor ${config.formalism.membershipFloor}")
+    add("  Beam gamma ${config.formalism.routingBeamGamma}")
 
     ScrollablePanelContent(
         pWidth = width,

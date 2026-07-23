@@ -204,11 +204,32 @@ class TaxonomyMetrics(
             getDepth1Ancestors(leaf, policy).firstOrNull() ?: leaf.id
         }
 
-        // Predicted covering: the set of leaves each query is assigned to.
-        // Used for routing ECE; overlapping NMI now uses groundTruthLeaves path.
-        val predictedCover = queryToLeavesList.mapValues { (_, ll) ->
-            ll.associate { it.id to 1.0 }
+        // Predicted domain distribution for routing calibration: each query's leaf
+        // memberships (real trickle weights, normalized per query) aggregated onto the
+        // leaves' depth-1 domain categories. Prediction and ground truth then live in
+        // the same label space. The previous wiring hard-coded every leaf's membership
+        // to 1.0 and compared leaf IDs against depth-1 anchor IDs — conf ≡ 1, acc ≡ 0,
+        // pinning ECE at exactly 1.0 by construction.
+        val predictedDomains: Map<String, Map<String, Double>> = queryToLeavesList.mapValues { (queryText, ll) ->
+            val weights = ll.map { (it.queryWeights[queryText] ?: 0.0).coerceAtLeast(0.0) }
+            val totalW = weights.sum()
+            val dist = mutableMapOf<String, Double>()
+            ll.forEachIndexed { idx, leaf ->
+                val w = if (totalW > 0.0) weights[idx] / totalW else 1.0 / ll.size
+                val domains = getDepth1Ancestors(leaf, policy)
+                if (domains.isNotEmpty()) {
+                    val share = w / domains.size
+                    for (domain in domains) {
+                        val key = domain.lowercase()
+                        dist[key] = (dist[key] ?: 0.0) + share
+                    }
+                }
+            }
+            dist
         }
+        val domainGroundTruth: Map<String, String> = gtSimple
+            .filterValues { it != "Unknown" }
+            .mapValues { it.value.lowercase() }
 
         // Per-query true-leaf ground truth: each query's MMLU-Pro category resolves to the
         // depth-1 node whose originalCategory matches. originalCategory is frozen at bootstrap
@@ -293,9 +314,9 @@ class TaxonomyMetrics(
         val totalDasguptaCost = computeTotalDasguptaCost(root, queryEmbeddings)
         val tripletAccuracy   = computeTripletAccuracy(root, queryEmbeddings)
         val normalisedSackin  = computeNormalisedSackin(root)
-        // routingECE receives the same groundTruthLeaves map (node IDs) now that
-        // the GT plumbing is complete — no longer silently 0.0 after M1.
-        val routingECE        = computeRoutingECE(predictedCover, groundTruthLeaves.mapValues { it.value.id })
+        // Calibration of the routed domain distribution against MMLU-Pro categories,
+        // both sides in the same (lowercased category-string) label space.
+        val routingECE        = computeRoutingECE(predictedDomains, domainGroundTruth)
 
         return Report(
             totalNodes            = allNodes.size,

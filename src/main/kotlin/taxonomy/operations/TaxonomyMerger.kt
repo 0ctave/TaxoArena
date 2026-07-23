@@ -128,6 +128,9 @@ class TaxonomyMerger(
         target.queries.clear()
         target.queryWeights.clear()
         target.residualQueries.addAll(source.residualQueries)
+        for ((q, c) in source.residualConfidences) {
+            target.residualConfidences.putIfAbsent(q, c)
+        }
 
         // 2. Blend parameters
         blendVmfAndNiw(target, source)
@@ -187,6 +190,8 @@ class TaxonomyMerger(
         source.crossLinkChildren.clear()
         source.queries.clear()
         source.queryWeights.clear()
+        source.residualQueries.clear()
+        source.residualConfidences.clear()
     }
 
     private fun pruneUnrelevantNodes(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
@@ -280,31 +285,41 @@ class TaxonomyMerger(
 
         log.debug("Evaluating sibling merges for parent '${node.label}' with ${children.size} children...")
 
-        // 1. Parallel pairwise vMF JS-divergence calculations
+        // 1. Pairwise chance-corrected separation over each sibling's branch queries —
+        // the same dimensionless scale that gates splits, so the split gate and the
+        // merge gate can no longer disagree about what "separated" means. Two siblings
+        // whose union looks like a random partition of one population (sep < ε) merge;
+        // the old κ-scaled vMF divergence became unsatisfiable at high κ and let
+        // near-duplicate siblings coexist indefinitely.
         val siblingMergeThreshold = config.formalism.separationEpsilon
-        val pairsToMerge = coroutineScope {
-            val jobs = mutableListOf<Deferred<Triple<GraphNode, GraphNode, Double>?>>()
-            for (i in 0 until children.size) {
-                for (j in i + 1 until children.size) {
-                    val nodeA = children[i]
-                    val nodeB = children[j]
-                    if (nodeA.vmfMu.isEmpty() || nodeB.vmfMu.isEmpty()) continue
-                    jobs.add(async(Dispatchers.Default) {
-                        val commonDim = minOf(nodeA.vmfMu.size, nodeB.vmfMu.size)
-                        val muA = StatisticsUtils.projectVector(nodeA.vmfMu, commonDim)
-                        val muB = StatisticsUtils.projectVector(nodeB.vmfMu, commonDim)
-                        val div = StatisticsUtils.vmfJsDivergence(
-                            muA,
-                            nodeA.vmfKappa,
-                            muB,
-                            nodeB.vmfKappa,
-                            commonDim
-                        )
-                        if (div < siblingMergeThreshold) Triple(nodeA, nodeB, div) else null
-                    })
+        val statsDim = dimForDepth(node.depth + 1)
+        val statsByChild = coroutineScope {
+            children.map { child ->
+                async(Dispatchers.Default) {
+                    val branchQueries = child.getAllQueriesInBranch().distinctBy { it.rawText }
+                    val stats = if (branchQueries.isEmpty()) null else {
+                        val sum = DoubleArray(statsDim)
+                        for (emb in branchQueries) {
+                            val v = emb.projectTo(statsDim)
+                            for (i in 0 until statsDim) sum[i] += v[i]
+                        }
+                        StatisticsUtils.ClusterStats(branchQueries.size.toDouble(), sum)
+                    }
+                    child to stats
                 }
+            }.awaitAll().toMap()
+        }
+
+        val pairsToMerge = mutableListOf<Triple<GraphNode, GraphNode, Double>>()
+        for (i in 0 until children.size) {
+            for (j in i + 1 until children.size) {
+                val nodeA = children[i]
+                val nodeB = children[j]
+                val statsA = statsByChild[nodeA] ?: continue
+                val statsB = statsByChild[nodeB] ?: continue
+                val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
+                if (sep < siblingMergeThreshold) pairsToMerge.add(Triple(nodeA, nodeB, sep))
             }
-            jobs.awaitAll().filterNotNull()
         }
 
         if (pairsToMerge.isEmpty()) return
@@ -496,64 +511,76 @@ class TaxonomyMerger(
             if (prunePassthroughNodes(child, visited)) anyPruned = true
         }
 
-        val nodesToBypass = node.treeChildren.filter { child ->
-            if (child.treeChildren.size != 1 || child.depth <= 1) return@filter false
-            val grandchild = child.treeChildren.first()
+        // A parent's ONLY tree child separates no pair of queries its parent doesn't
+        // already separate — inserting it between the parent and its grandchildren
+        // changes the hierarchy objective by exactly zero, however many children the
+        // child itself has. So the child is dissolved UPWARD: its children are
+        // hoisted to this node and its queries become this node's (residual-flagged
+        // while the node stays internal). This subsumes the old chain-middle bypass
+        // (child with exactly one grandchild) and — critically — also removes the
+        // "swallow" wrapper: a generalist child that captured 100% of its parent's
+        // population (observed: anchors at topShare 1.00 with a single emergent twin
+        // holding the whole domain), which the old rule never matched. Dissolving the
+        // twin keeps the parent's identity (GT anchors keep their label/anchor role)
+        // and returns the un-partitioned population to the parent's residual pool,
+        // where the residual-split gate can carve genuine specialists again.
+        // The loop keeps dissolving while exactly one tree child remains, so whole
+        // chains flatten into this node in one pass. Bridged children (multiple
+        // parents) and depth ≤ 1 children (GT anchors under root) are left alone.
+        while (node.treeChildren.size == 1) {
+            val child = node.treeChildren.first()
+            if (child.depth <= 1 || child.parents.size > 1) break
 
-            val commonDim = minOf(child.sliceDim, grandchild.sliceDim)
-            val mu1 = StatisticsUtils.projectVector(child.vmfMu, commonDim)
-            val mu2 = StatisticsUtils.projectVector(grandchild.vmfMu, commonDim)
-            val div = StatisticsUtils.vmfJsDivergence(mu1, child.vmfKappa, mu2, grandchild.vmfKappa, commonDim)
+            log.info("[COLLAPSE] dissolving sole child '${child.label}' into '${node.label}' (${child.treeChildren.size} grandchildren hoisted)")
+            anyPruned = true
 
-            div < config.formalism.separationEpsilon && child.queries.size < config.formalism.minClusterSize
+            // Hoist the child's queries, weights, and residual bookkeeping up.
+            node.queries.addAll(child.queries)
+            for ((q, w) in child.queryWeights) {
+                node.queryWeights[q] = (node.queryWeights[q] ?: 0.0) + w
+            }
+            node.residualQueries.addAll(child.residualQueries)
+            for ((q, c) in child.residualConfidences) {
+                node.residualConfidences.putIfAbsent(q, c)
+            }
+
+            // Hoist grandchildren as this node's direct tree children.
+            node.children.remove(child)
+            child.treeChildren.toList().forEach { grandchild ->
+                node.children.add(grandchild)
+                grandchild.parents.remove(child)
+                grandchild.parents.add(node)
+                grandchild.treeParentId = node.id
+                recomputeDepths(grandchild, node.depth + 1)
+            }
+
+            // Cross-link children re-attach to this node.
+            child.crossLinkChildren.toList().forEach { clChild ->
+                clChild.parents.remove(child)
+                if (!clChild.parents.contains(node)) {
+                    clChild.parents.add(node)
+                    node.crossLinkChildren.add(clChild)
+                }
+            }
+
+            child.parents.clear()
+            child.children.clear()
+            child.crossLinkChildren.clear()
+            child.queries.clear()
+            child.queryWeights.clear()
+            child.residualQueries.clear()
+            child.residualConfidences.clear()
         }
 
-        if (nodesToBypass.isNotEmpty()) anyPruned = true
-
-        for (passthrough in nodesToBypass) {
-            val grandchild = passthrough.treeChildren.first()
-            log.info("[COLLAPSE] '${passthrough.label}' -> '${grandchild.label}'")
-
-            // Move residual queries down
-            grandchild.queries.addAll(passthrough.queries)
-            for ((q, w) in passthrough.queryWeights) {
-                grandchild.queryWeights[q] = (grandchild.queryWeights[q] ?: 0.0) + w
-            }
-
-            // Re-parent grandchild under node (the passthrough's parent)
-            node.children.remove(passthrough)
-            node.children.add(grandchild)
-
-            grandchild.treeParentId = node.id
-
-            grandchild.parents.remove(passthrough)
-            grandchild.parents.add(node)
-
-            recomputeDepths(grandchild, node.depth + 1)
-
-            // Handle passthrough's other tree parents
-            passthrough.parents.toList().forEach { p ->
-                if (p != node) {
-                    p.children.remove(passthrough)
-                    p.children.add(grandchild)
-                    grandchild.parents.add(p)
+        // Hard queries held by an internal node must carry the residual flag so the
+        // C3 invariant stays satisfied until the next trickle re-routes them.
+        if (node.treeChildren.isNotEmpty() && node.queries.isNotEmpty()) {
+            for (emb in node.queries) {
+                val qId = if (emb.queryId != -1) emb.queryId.toString() else TextNormalizer.cleanText(emb.rawText)
+                if (node.residualQueries.add(qId)) {
+                    node.residualConfidences.putIfAbsent(qId, 0.0)
                 }
             }
-
-            passthrough.crossLinkChildren.toList().forEach { clChild ->
-                clChild.parents.remove(passthrough)
-                // Only add if grandchild is not already a tree/cross-link parent of clChild
-                if (!clChild.parents.contains(grandchild)) {
-                    clChild.parents.add(grandchild)
-                    grandchild.crossLinkChildren.add(clChild)  // ← cross-link, NOT children
-                }
-            }
-
-            passthrough.parents.clear()
-            passthrough.children.clear()
-            passthrough.crossLinkChildren.clear()
-            passthrough.queries.clear()
-            passthrough.queryWeights.clear()
         }
 
         return anyPruned

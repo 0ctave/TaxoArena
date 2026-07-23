@@ -57,6 +57,7 @@ data class HeadlessCliConfig(
     val minClusterSize: Int? = null,
     val separationEpsilon: Double? = null,
     val membershipFloor: Double? = null,
+    val routingBeamGamma: Double? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
@@ -145,6 +146,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.minClusterSize?.let { config.formalism.minClusterSize = it }
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
+        cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -1215,6 +1217,7 @@ class HeadlessBenchmarkRunner(
         var minClusterSize: Int? = null
         var separationEpsilon: Double? = null
         var membershipFloor: Double? = null
+        var routingBeamGamma: Double? = null
         var cosineTau: Double? = null
         var leafAcceptanceScale: Double? = null
         var assignmentGap: Double? = null
@@ -1292,6 +1295,7 @@ class HeadlessBenchmarkRunner(
                 "minClusterSize" -> minClusterSize = rawVal.toInt()
                 "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
                 "membershipFloor" -> membershipFloor = rawVal.toDouble()
+                "routingBeamGamma" -> routingBeamGamma = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
                 "datasetType" -> datasetType = rawVal.trim('"', '\'')
@@ -1342,6 +1346,7 @@ class HeadlessBenchmarkRunner(
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
             membershipFloor = membershipFloor,
+            routingBeamGamma = routingBeamGamma,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,
@@ -1398,6 +1403,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.minClusterSize,
             config.formalism.separationEpsilon,
             config.formalism.membershipFloor,
+            config.formalism.routingBeamGamma,
             config.formalism.maxLeafAssignments,
             config.formalism.dagMode,
             config.formalism.fusionSimilarityThreshold,

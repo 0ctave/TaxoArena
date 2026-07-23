@@ -143,107 +143,77 @@ object StatisticsUtils {
     }
 
     /**
-     * Dasgupta Cost Delta for split validation in O(N) using vector-sum identities.
-     *
-     * W(S) proxy = N_S² − ‖sumS‖²
-     *
-     * For unit-norm vectors, this proxy is always ≥ 0 (since ‖sumS‖ ≤ N_S by
-     * Cauchy-Schwarz), is 0 when all vectors are identical, and grows with
-     * within-cluster dissimilarity — exactly the property needed to detect a
-     * beneficial split. The formula is self-consistent (same expression used for
-     * before and after), so the delta ratio is well-defined and monotone.
-     *
-     * Note: this is NOT the canonical Dasgupta off-diagonal sum Σ_{i≠j} xi·xj;
-     * the canonical form equals ‖sumS‖²−N_S (opposite sign, positive for
-     * coherent clusters). The proxy N_S²−‖sumS‖² behaves inversely — it is large
-     * for *incoherent* clusters — which is what the split oracle wants: high
-     * before-cost relative to after-cost. This was the working formula prior to
-     * commit c4c0658 and is restored here.
+     * Sufficient statistics of one cluster for separation scoring: member count and
+     * un-normalized vector sum. W(S) = n² − ‖sum‖² is recoverable from these alone.
      */
-    fun calculateDasguptaDelta(
-        left: List<DoubleArray>,
-        right: List<DoubleArray>
-    ): Double {
-        val nL = left.size.toDouble()
-        val nR = right.size.toDouble()
-        if (nL == 0.0 || nR == 0.0) return 0.0
+    data class ClusterStats(val n: Double, val sum: DoubleArray)
 
-        val d = left[0].size
-        val n = nL + nR
-
-        val sumL = DoubleArray(d)
-        for (v in left) for (i in 0 until d) sumL[i] += v[i]
-
-        val sumR = DoubleArray(d)
-        for (v in right) for (i in 0 until d) sumR[i] += v[i]
-
-        var normL2 = 0.0
-        var normR2 = 0.0
-        var normTotal2 = 0.0
-        for (i in 0 until d) {
-            normL2 += sumL[i] * sumL[i]
-            normR2 += sumR[i] * sumR[i]
-            val t = sumL[i] + sumR[i]
-            normTotal2 += t * t
+    /**
+     * Chance-corrected separation score of a candidate partition of unit vectors.
+     *
+     * W(S) = |S|² − ‖Σx‖² = Σ_{i≠j∈S} (1 − xᵢ·xⱼ) is the total pairwise cosine
+     * dissimilarity of S. For a partition {S_c}, the observed within-cluster scatter
+     * is Σ_c W(S_c); under a uniformly random partition into the same sizes its
+     * exact expectation is E = W(S) · Σ_c n_c(n_c−1) / (n(n−1)), because each
+     * unordered pair lands inside cluster c with probability n_c(n_c−1)/(n(n−1)).
+     *
+     *   score = 1 − Σ_c W(S_c) / E
+     *
+     * = 1 for a perfect partition (each cluster internally identical), ≈ 0 for a
+     * random partition, negative for an anti-clustered one, and exactly 0 for the
+     * degenerate k=1 "partition" — so a non-separating (wrapper) candidate can never
+     * clear a positive threshold. The chance correction removes the mechanical
+     * dependence the raw within/total ratio has on k and on the cluster-size
+     * profile, so one separationEpsilon means the same thing for split acceptance,
+     * sibling merging, and sibling distinctness everywhere in the tree.
+     *
+     * Replaces two structurally broken gates: the former "Dasgupta delta"
+     * 1 − Σ_c(n−n_c)W_c/(nW), which measured the *remaining*-cost fraction
+     * (≈0.8 for every real split, leaving any epsilon below that inert), and the
+     * κ-scaled vMF divergence, whose magnitude grew with κ and became
+     * unsatisfiable exactly where merge/collapse decisions mattered most.
+     */
+    fun chanceCorrectedSeparation(clusters: List<List<DoubleArray>>): Double {
+        val stats = clusters.filter { it.isNotEmpty() }.map { cluster ->
+            val d = cluster[0].size
+            val sum = DoubleArray(d)
+            for (v in cluster) for (i in 0 until d) sum[i] += v[i]
+            ClusterStats(cluster.size.toDouble(), sum)
         }
-
-        // Proxy: N² − ‖sum‖²  (always ≥ 0 for unit-norm vectors; large = incoherent)
-        val wL     = nL * nL - normL2
-        val wR     = nR * nR - normR2
-        val wTotal = n  * n  - normTotal2
-
-        if (wTotal <= 1e-10) return 0.0
-
-        val cAfter  = nR * wL + nL * wR
-        val cBefore = n  * wTotal
-
-        return 1.0 - cAfter / cBefore
+        return chanceCorrectedSeparation(stats)
     }
 
     /**
-     * Dasgupta Cost Delta for k >= 2 clusters (general form).
-     *
-     * Uses the same W proxy as calculateDasguptaDelta: W(S) = N_S² − ‖sumS‖².
-     * C_after  = Σ_c (n − n_c) · W(c)
-     * C_before = n · W(all)
-     * Delta    = 1 − C_after / C_before   (positive = split helps)
-     *
-     * Mathematically identical to calculateDasguptaDelta for k=2.
+     * Same score computed from precomputed per-cluster sufficient statistics —
+     * O(k·d), so pairwise sibling comparisons don't re-scan query vectors.
      */
-    fun calculateDasguptaDeltaK(clusters: List<List<DoubleArray>>): Double {
-        val n = clusters.sumOf { it.size }.toDouble()
-        if (n < 2.0 || clusters.isEmpty()) return 0.0
-        val d = clusters.firstOrNull { it.isNotEmpty() }?.firstOrNull()?.size ?: return 0.0
+    @JvmName("chanceCorrectedSeparationFromStats")
+    fun chanceCorrectedSeparation(clusters: List<ClusterStats>): Double {
+        val nonEmpty = clusters.filter { it.n > 0.0 }
+        if (nonEmpty.isEmpty()) return 0.0
+        val d = nonEmpty[0].sum.size
+        val n = nonEmpty.sumOf { it.n }
+        if (n < 2.0) return 0.0
 
         val sumTotal = DoubleArray(d)
-        for (cluster in clusters) {
-            for (v in cluster) {
-                for (i in 0 until d) {
-                    sumTotal[i] += v[i]
-                }
+        var wWithin = 0.0
+        var pairFrac = 0.0
+        for (c in nonEmpty) {
+            var normC2 = 0.0
+            for (i in 0 until d) {
+                sumTotal[i] += c.sum[i]
+                normC2 += c.sum[i] * c.sum[i]
             }
+            wWithin += c.n * c.n - normC2
+            pairFrac += c.n * (c.n - 1.0)
         }
         var normTotal2 = 0.0
         for (i in 0 until d) normTotal2 += sumTotal[i] * sumTotal[i]
         val wTotal = n * n - normTotal2
-        if (wTotal <= 1e-10) return 0.0
 
-        var cAfter = 0.0
-        for (cluster in clusters) {
-            val nc = cluster.size.toDouble()
-            if (nc == 0.0) continue
-            val sumC = DoubleArray(d)
-            for (v in cluster) {
-                for (i in 0 until d) {
-                    sumC[i] += v[i]
-                }
-            }
-            var normC2 = 0.0
-            for (i in 0 until d) normC2 += sumC[i] * sumC[i]
-            val wC = nc * nc - normC2
-            cAfter += (n - nc) * wC
-        }
-        return 1.0 - cAfter / (n * wTotal)
+        val expectedWithin = wTotal * pairFrac / (n * (n - 1.0))
+        if (expectedWithin <= 1e-10) return 0.0
+        return 1.0 - wWithin / expectedWithin
     }
 
     /**
@@ -261,8 +231,9 @@ object StatisticsUtils {
      * k-ary vMF mixture selection.
      *
      * Tries k = 2, 3, ..., maxK using vMF-EM with k-means++ initialization.
-     * Selects the highest k whose Dasgupta delta improves by at least marginalEps
-     * over the previous k. All clusters must have >= minClusterFrac * n members.
+     * Selects the highest k whose chance-corrected separation improves by at least
+     * marginalEps over the previous k. All clusters must have >= minClusterFrac * n
+     * members.
      *
      * Returns the winning VmfMixture (responsibilities has k columns).
      * Returns null if even k=2 collapses.
@@ -271,7 +242,7 @@ object StatisticsUtils {
      * @param d              Dimension
      * @param maxK           Maximum number of clusters to try (default 4)
      * @param minClusterFrac Minimum fraction of n per cluster (default 0.05)
-     * @param marginalEps    Min absolute Dasgupta improvement to accept k+1 (default 0.02)
+     * @param marginalEps    Min absolute separation improvement to accept k+1 (default 0.02)
      */
     suspend fun performVmfKMeans(
         embeddings: List<DoubleArray>,
@@ -315,18 +286,18 @@ object StatisticsUtils {
                 break
             }
 
-            val delta = calculateDasguptaDeltaK(clusters.map { it.toList() })
+            val delta = chanceCorrectedSeparation(clusters.map { it.toList() })
             val improvement = delta - bestDasgupta
 
             if (bestMixture == null) {
-                // k=2: always accept (caller will apply its own Dasgupta epsilon check)
+                // k=2: always accept (caller will apply its own separation epsilon check)
                 bestMixture = mixture
                 bestDasgupta = delta
-                log.debug("k-Means: k=2 selected, Dasgupta=${"%.4f".format(delta)}")
+                log.debug("k-Means: k=2 selected, separation=${"%.4f".format(delta)}")
             } else if (improvement >= marginalEps) {
                 bestMixture = mixture
                 bestDasgupta = delta
-                log.debug("k-Means: k=$k selected (improvement=${"%.4f".format(improvement)}), Dasgupta=${"%.4f".format(delta)}")
+                log.debug("k-Means: k=$k selected (improvement=${"%.4f".format(improvement)}), separation=${"%.4f".format(delta)}")
             } else {
                 log.debug("k-Means: k=$k rejected (improvement=${"%.4f".format(improvement)} < eps=${"%.4f".format(marginalEps)})")
                 break

@@ -99,34 +99,19 @@ class TaxonomySplitter(
                 
                 if (residualEmbeddings.size >= minClusterSize) {
                     val resDim = node.sliceDim
-                    val projectedRes = residualEmbeddings.map { it.projectTo(resDim) }
-                    val resCentroid = DoubleArray(resDim)
-                    for (vec in projectedRes) {
-                        for (i in 0 until resDim) resCentroid[i] += vec[i]
-                    }
-                    var resNorm = 0.0
-                    for (i in 0 until resDim) resNorm += resCentroid[i] * resCentroid[i]
-                    resNorm = kotlin.math.sqrt(resNorm)
-                    val resMu = FloatArray(resDim) { i -> if (resNorm > 0.0) (resCentroid[i] / resNorm).toFloat() else 0.0f }
-                    if (resNorm == 0.0 && resDim > 0) resMu[0] = 1.0f
+                    val resStats = clusterStats(residualEmbeddings, resDim)
 
-                    var resDotSum = 0.0
-                    for (vec in projectedRes) {
-                        for (i in 0 until resDim) resDotSum += resMu[i] * vec[i]
-                    }
-                    val resRBar = (resDotSum / projectedRes.size.coerceAtLeast(1)).coerceAtLeast(0.0)
-                    val resKappa = StatisticsUtils.correctedKappa(resRBar, resDim, projectedRes.size)
-
+                    // Residual cluster is viable iff it separates from every sibling on
+                    // the same chance-corrected scale that gates splits and merges.
                     val siblings = node.parents.flatMap { it.children }.filter { it.id != node.id }
                     viable = siblings.isEmpty() || siblings.all { sib ->
-                        val commonDim = minOf(resDim, sib.vmfMu.size)
-                        if (commonDim > 0) {
-                            val projResMu = StatisticsUtils.projectVector(resMu, commonDim)
-                            val projSibMu = StatisticsUtils.projectVector(sib.vmfMu, commonDim)
-                            val div = StatisticsUtils.vmfJsDivergence(projResMu, resKappa, projSibMu, sib.vmfKappa, commonDim)
-                            div >= config.formalism.separationEpsilon
-                        } else {
-                            true
+                        val sibQueries = sib.getAllQueriesInBranch().distinctBy { it.rawText }
+                        if (sibQueries.isEmpty()) true
+                        else {
+                            val sep = StatisticsUtils.chanceCorrectedSeparation(
+                                listOf(resStats, clusterStats(sibQueries, resDim))
+                            )
+                            sep >= config.formalism.separationEpsilon
                         }
                     }
                 }
@@ -198,51 +183,89 @@ class TaxonomySplitter(
 
         val k = mixture.components.size
 
-        // ── Hard-assign queries to clusters ──────────────────────────────────
-        val clusters         = Array(k) { mutableListOf<Embedding>() }
-        val clustersProjected = Array(k) { mutableListOf<DoubleArray>() }
+        // ── Hard-assign queries to EM clusters (proposal only) ───────────────
+        val clusters = Array(k) { mutableListOf<Embedding>() }
 
         for (i in targetQueries.indices) {
             val resp = mixture.responsibilities[i]
             val best = resp.indices.maxByOrNull { resp[it] } ?: 0
             clusters[best].add(targetQueries[i])
-            clustersProjected[best].add(pcaProjected[i])
         }
 
-        // ── Floor check ───────────────────────────────────────────────────────
+        // ── EM floor pre-check (cheap early-out before any 256-dim work) ──────
         if (clusters.any { it.size < minClusterSize }) {
             log.debug("Split Floor Rejected: a cluster is below minClusterSize=$minClusterSize (sizes: ${clusters.map { it.size }}).")
             return
         }
 
-        // ── k-way Dasgupta validation ─────────────────────────────────────────
-        val deltaNorm = StatisticsUtils.calculateDasguptaDeltaK(clustersProjected.map { it.toList() })
-        node.dasguptaDeltaNorm = deltaNorm
+        // ── Fit proposal vMFs, then re-assign in ROUTING geometry ────────────
+        // EM clustering in the PCA subspace only *proposes* children; from the next
+        // iteration onward each child's population is decided by the trickler's
+        // level-local vMF posterior at fitDim. Populating and gating the split with
+        // the clustering assignment let children be born with >= minClusterSize
+        // queries that routing immediately took away — pruned as starved within 1-2
+        // iterations, driving a permanent split/prune oscillation (~60 spawned/~40
+        // pruned per iteration, 63% of pruned nodes dead within 2 iterations of
+        // birth). Assigning here with the same posterior the trickler applies makes
+        // the birth state a routing fixed point at this level: a split only happens
+        // if routing will sustain every child it creates.
+        val proposalVmfs = clusters.map { cluster -> fitVmfParams(cluster, childDim) }
+
+        val routedClusters = Array(k) { mutableListOf<Embedding>() }
+        for (q in targetQueries) {
+            val x = q.projectTo(childDim)
+            var best = 0
+            var bestScore = Double.NEGATIVE_INFINITY
+            for (idx in proposalVmfs.indices) {
+                val vmf = proposalVmfs[idx]
+                val score = vmf.logNormalizer + vmf.kappa * StatisticsUtils.dotProduct(x, vmf.mu)
+                if (score > bestScore) {
+                    bestScore = score
+                    best = idx
+                }
+            }
+            routedClusters[best].add(q)
+        }
+
+        if (routedClusters.any { it.size < minClusterSize }) {
+            log.debug("Split Rejected: not routing-sustainable (routed sizes: ${routedClusters.map { it.size }}, floor=$minClusterSize)")
+            return
+        }
+
+        // Refit each child on the population routing actually gives it
+        val childVmfs = routedClusters.map { cluster -> fitVmfParams(cluster, childDim) }
+
+        // ── k-way separation validation on the ROUTED partition ──────────────
+        val sepScore = StatisticsUtils.chanceCorrectedSeparation(
+            routedClusters.map { cluster -> cluster.map { it.projectTo(childDim) } }
+        )
+        node.dasguptaDeltaNorm = sepScore
 
         val requiredEps = if (targetQueries.size < 2 * minClusterSize)
             2.0 * config.formalism.separationEpsilon
         else
             config.formalism.separationEpsilon
 
-        log.debug("Eval '${node.label}': k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
+        log.debug("Eval '${node.label}': k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
 
-        if (deltaNorm < requiredEps) {
-            log.debug("Split Rejected: delta ${"%.3f".format(java.util.Locale.US, deltaNorm)} insufficient")
+        if (sepScore < requiredEps) {
+            log.debug("Split Rejected: separation ${"%.3f".format(java.util.Locale.US, sepScore)} insufficient")
             return
         }
 
-        // ── Fit child vMF in target dimension ────────────────────────────────
-        val childVmfs = clusters.map { cluster -> fitVmfParams(cluster, childDim) }
-
-        // ── Sibling distinctness guard ────────────────────────────────────────
+        // ── Sibling distinctness guard (same scale as the split/merge gates) ──
         val siblingMergeThreshold = config.formalism.separationEpsilon
-        val isUnique = childVmfs.all { newVmf ->
+        val isUnique = routedClusters.all { cluster ->
+            val newStats = clusterStats(cluster, childDim)
             node.children.all { sibling ->
-                val projSiblingMu = StatisticsUtils.projectVector(sibling.vmfMu, childDim)
-                val div = StatisticsUtils.vmfJsDivergence(
-                    newVmf.mu, newVmf.kappa, projSiblingMu, sibling.vmfKappa, childDim
-                )
-                div >= siblingMergeThreshold
+                val sibQueries = sibling.getAllQueriesInBranch().distinctBy { it.rawText }
+                if (sibQueries.isEmpty()) true
+                else {
+                    val sep = StatisticsUtils.chanceCorrectedSeparation(
+                        listOf(newStats, clusterStats(sibQueries, childDim))
+                    )
+                    sep >= siblingMergeThreshold
+                }
             }
         }
 
@@ -251,31 +274,31 @@ class TaxonomySplitter(
             return
         }
 
-        log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, delta=${"%.3f".format(java.util.Locale.US, deltaNorm)}, converged=${mixture.converged}) -> Spawning $k children")
+        log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)}, routed=${routedClusters.map { it.size }}, converged=${mixture.converged}) -> Spawning $k children")
 
         // ── Create children and wire topology ────────────────────────────────
-        val allSpawnedLeaves = mutableListOf<GraphNode>()
-
-        for (idx in clusters.indices) {
-            val cluster = clusters[idx]
+        // Oversized children are NOT re-split in this pass: immediate recursion peeled
+        // depth mechanically before trickle/collapse/refit could ever evaluate the new
+        // level, manufacturing wrapper spines. The bottom-up sweep revisits every node
+        // next iteration, so a genuinely oversized child splits then — under feedback.
+        for (idx in routedClusters.indices) {
+            val cluster = routedClusters[idx]
             val vmf = childVmfs[idx]
 
-            // Normal child
             val child = createNodeFromCluster(cluster, node, vmf)
             node.children.add(child)
             child.parents.add(node)
             fitter.fitSingleNode(child)
-            allSpawnedLeaves.add(child)
         }
+    }
 
-        // ── Macro-concept decomposition (lowered threshold: 3x instead of 5x) ─
-        val macroThreshold = threshold * 3
-        for (child in allSpawnedLeaves) {
-            if (child.queries.size > macroThreshold && child.depth < config.formalism.maxDepth) {
-                log.info("Decomposing macro-cluster '${child.label}' immediately (${child.queries.size} q)")
-                splitSingleNode(child)
-            }
+    private fun clusterStats(embeddings: List<Embedding>, dim: Int): StatisticsUtils.ClusterStats {
+        val sum = DoubleArray(dim)
+        for (emb in embeddings) {
+            val v = emb.projectTo(dim)
+            for (i in 0 until dim) sum[i] += v[i]
         }
+        return StatisticsUtils.ClusterStats(embeddings.size.toDouble(), sum)
     }
 
     fun selectRepresentativeQueries(

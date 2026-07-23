@@ -170,6 +170,7 @@ data class SnapshotSettings(
     val enableGtWarmStart: Boolean = true,
     val tauKappaScalingFactor: Double = 0.0,
     val membershipFloor: Double = 0.10,
+    val routingBeamGamma: Double = 0.15,
     val dagMode: taxonomy.config.DagMode = taxonomy.config.DagMode.DAG_MAX,
     // Removed: EMA blending of mu across iterations. Matched-config A/B runs showed
     // it amplifies oscillation and prior-domination rather than stabilizing the fit.
@@ -198,6 +199,7 @@ data class SnapshotSettings(
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
             membershipFloor = membershipFloor,
+            routingBeamGamma = routingBeamGamma,
             maxLeafAssignments = maxLeafAssignments,
             enableGtWarmStart = enableGtWarmStart,
             dagMode = dagMode
@@ -541,6 +543,7 @@ class TaxonomySnapshotManager(
             enableGtWarmStart = config.formalism.enableGtWarmStart,
             tauKappaScalingFactor = 0.0,
             membershipFloor = config.formalism.membershipFloor,
+            routingBeamGamma = config.formalism.routingBeamGamma,
             dagMode = config.formalism.dagMode,
             emaAlpha = 0.0,
             datasetType = config.dataset.datasetType

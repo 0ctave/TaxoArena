@@ -48,7 +48,6 @@ class TaxonomyDagMaxFeaturesTest {
     fun `R1 - residual detection and kappa exclusion`() {
         val config = TaxonomyConfig()
         config.formalism.enableResidualRouting = true
-        config.formalism.membershipFloor = 0.6 // 0.6 so a 50/50 split (0.5 each) clears neither
 
         val trickler = TaxonomyTrickler(config)
         val parent = node("parent", "Parent Domain", 2)
@@ -66,9 +65,14 @@ class TaxonomyDagMaxFeaturesTest {
         child2.vmfKappa = 10.0
         child2.sliceDim = 2
 
-        // A query query close to (1,0) should route to child1 with high confidence.
-        // A query at (0.7, 0.7) normalized has dot product of 0.7 to both, hence responsibilities around 0.5 each.
-        // Let's test a query that lies far away or in between.
+        // Parent's own component points straight at the midway direction: for a midway
+        // query, the parent explains it BETTER than either child (dot 1.0 vs 0.707 at
+        // equal kappa), so the parameter-free descent gate (some child must beat the
+        // parent's own density) fails and the query is recorded as residual at parent.
+        parent.vmfMu = floatArrayOf(0.707f, 0.707f)
+        parent.vmfKappa = 10.0
+        parent.sliceDim = 2
+
         val query = Embedding("midway", "midway", floatArrayOf(0.707f, 0.707f))
         query.queryId = 101
 

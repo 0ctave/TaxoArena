@@ -55,6 +55,7 @@ data class EffectiveConfig(
         val minClusterSize: Int = 25,
         val separationEpsilon: Double = 0.04,
         val membershipFloor: Double = 0.10,
+        val routingBeamGamma: Double = 0.15,
         val maxLeafAssignments: Int = 5,
         val enableStableQuestionIds: Boolean = true,
         val enableResidualRouting: Boolean = true,

@@ -1,0 +1,650 @@
+\chapter{DAG Construction Formalism}\label{app:dag-formalism}
+
+This appendix gives the full architectural and mathematical detail
+behind the taxonomy construction pipeline summarised in
+Section~\ref{sec:arch-taxonomy} (Chapter~\ref{ch:system-architecture})
+and Section~\ref{sec:meth-construction-summary}
+(Chapter~\ref{ch:methodology}). The DAG construction pipeline is a
+necessary prerequisite that the arena evaluation runs on, not the
+thesis's own headline contribution; this appendix exists so the exact
+mechanics are preserved and traceable without requiring the reader to
+work through them before reaching the arena's methodology and
+results.
+
+\section{Construction Pipeline Walkthrough}\label{sec:app-dag-pipeline}
+
+\subsection{Seed Initialisation from Ground-Truth Domains}
+
+Before iterative refinement begins, each corpus query is assigned to
+the anchor node corresponding to its MMLU-Pro ground-truth domain label.
+This creates 14 depth-0 partitions---one per MMLU-Pro domain---each
+instantiated as a \texttt{GraphNode} with \texttt{isAnchor = true},
+\texttt{depth = 0}, and an initial member set $Q_D^{\text{canonical}}$
+equal to the set of queries carrying label $D$.
+
+The anchor flag enforces three invariants at the data-model level.
+First, anchor nodes are exempt from all destructive topology
+operations: \texttt{TaxonomyMerger} raises a
+\texttt{TopologyViolationException} if any merge, prune, or collapse
+operation targets an anchor.
+Second, anchor nodes are never removed from the DAG; they appear in
+every serialised snapshot with the same UUID and depth.
+Third, the anchor's \texttt{sliceDim} is fixed at $d = 256$, the
+single embedding dimension used at every depth
+(Section~\ref{subsec:dim-schedule}).
+
+The ground-truth label assignment serves as initialisation only.
+The trickle routing phase may reassign a query to a geometrically more
+appropriate anchor, so that the adapted partition
+$Q_D^{\text{adapted}}$ at the end of construction need not equal
+$Q_D^{\text{canonical}}$.
+The distinction is recorded explicitly in the snapshot and is
+material for the validation comparison: the comparison is performed
+using $Q_D^{\text{adapted}}$, which reflects the geometry-corrected
+membership rather than the editorial label.
+
+\subsection{Iterative Six-Phase Refinement Loop}
+
+After anchor initialisation, \texttt{TaxonomyEngine} executes a
+six-phase loop over the current DAG state.
+Each iteration processes all non-converged nodes; the loop runs for
+a fixed iteration budget, with completion semantics defined in
+Section~\ref{subsec:quiescence}.
+Table~\ref{tab:pipeline} summarises the phases.
+
+\begin{table}[h]
+\centering
+\caption{Taxonomy construction phases, implementing classes, and outputs.}
+\label{tab:pipeline}
+\begin{tabular}{clll}
+\toprule
+Phase & Responsibility & Implementing class & Output \\
+\midrule
+1 & MRL prefix selection and $\ell_2$-normalisation
+& \texttt{EmbeddingService}
+& Normalised slice matrix $X \in \mathbb{R}^{N \times 256}$ \\
+2 & vMF MLE and NiW posterior fitting
+& \texttt{TaxonomyFitter}
+& $(\hat{\boldsymbol{\mu}}, \hat{\kappa})$ per node;
+NiW hyperparameters $(m_N, \kappa_N, \nu_N, \Lambda_N)$ \\
+3 & Soft routing (skipped in iteration 1)
+& \texttt{TaxonomyTrickler}
+& Updated weighted member sets; residual hits \\
+4 & Adaptive splitting
+& \texttt{TaxonomySplitter}
+& New child nodes where the separation score $s \geq \epsilon_{\text{sep}}$ \\
+5 & Topological optimisation
+& \texttt{TaxonomyMerger}
+& Merged siblings; pruned starved leaves;
+cross-links; transitive reduction \\
+6 & Convergence check
+& \texttt{TaxonomyEngine}
+& GED quiescence streak; early stop or next iteration \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Phase 1 --- Embedding selection.}
+At every depth, \texttt{EmbeddingService} extracts the fixed
+256-dimensional prefix slice from the pre-computed MRL vectors and
+$\ell_2$-normalises each row to the unit hypersphere.
+
+\textbf{Phase 2 --- vMF/NiW fitting.}
+\texttt{TaxonomyFitter} fits a single-component vMF to each node's
+member embeddings, producing the directional centroid
+$(\hat{\boldsymbol{\mu}}, \hat{\kappa})$, and subsequently a
+Normal-inverse-Wishart posterior used for Bayesian membership scoring
+in Phase~3.
+Statistical detail is given in Section~\ref{sec:meth-vmf}.
+
+\textbf{Phase 3 --- Trickle routing.}
+\texttt{TaxonomyTrickler} routes each query down the DAG by scoring
+each child with its own vMF log-density and taking a temperature-1
+softmax over the siblings; every child whose posterior responsibility
+clears the \texttt{membershipFloor} is admitted as a weighted
+membership destination (Section~\ref{sec:meth-routing}).
+Positions where no child clears the floor are recorded as residual
+hits.
+This phase is skipped entirely in iteration~1: the ground-truth
+bootstrap assignment is kept for the first split/optimise/refit pass,
+and geometric reassignment starts at iteration~2
+(Section~\ref{subsec:migration}).
+DAG polyhierarchy arises from Phase~5 topology operations, not from
+construction-time routing.
+
+\textbf{Phase 4 --- Adaptive splitting.}
+\texttt{TaxonomySplitter} proposes partitions of non-anchor
+nodes via vMF-EM clustering in a PCA-projected subspace, accepting only
+splits whose chance-corrected separation score
+(Section~\ref{sec:meth-split}) clears the threshold
+$\epsilon_{\text{sep}}$ and all of whose children satisfy a minimum
+size constraint $n_{\min}$ (values in
+Chapter~\ref{ch:experimental-design}).
+
+\textbf{Phase 5 --- Topological optimisation.}
+\texttt{TaxonomyMerger} executes a sequence of anchor-exempt
+operations: merge of similar siblings (chance-corrected separation
+below $\epsilon_{\text{sep}}$); pruning of starved leaves with queries
+reassigned to the nearest sibling; removal of structurally redundant
+single-child nodes (Section~\ref{sec:meth-topology});
+soft-membership refitting via \texttt{refitMuPerIteration}, subject to
+a no-update band that freezes a node's centroid once its refit
+direction agrees with the previous one to within cosine $0.9975$; and
+bridge
+insertion from two distinct sources, followed by transitive reduction
+to maintain the minimal DAG.
+Bridge insertion replaces a single global cross-link threshold with
+two gated sources described in
+Section~\ref{subsec:polyhierarchy}: \textit{Source-A} residual-node
+routing and \textit{Source-B} cross-domain bridging.
+
+\textbf{Phase 6 --- Convergence check.}
+At the end of each iteration, \texttt{TaxonomyEngine} computes the
+graph edit distance to the preceding iteration's DAG and either stops
+construction early once the structure has been quiescent for five
+consecutive iterations, triggers the next iteration, or, when the
+budget is exhausted, serialises the DAG as an immutable snapshot
+(Section~\ref{subsec:quiescence}).
+
+\subsection{Cross-Domain Migration}\label{subsec:migration}\label{sec:meth-migration}
+
+At bootstrap, each anchor $D_k$ is initialised with the canonical
+partition---every query placed on its ground-truth anchor with weight
+$1.0$---and a vMF/NiW self-model fit at $d = 256$; the anchor's
+identity, depth, and \texttt{isAnchor} flag are set once and never
+modified.
+
+This bootstrap assignment is deliberately preserved through the first
+construction iteration: Phase~3 trickle reassignment is skipped in
+iteration~1, so the first split/optimise/refit pass operates on the
+pure ground-truth partition, and geometric reassignment starts at
+iteration~2, once real sub-domain structure exists for routing to act
+on.
+(Re-routing immediately in iteration~1---even with a ground-truth
+bias nudge, \texttt{enableGtWarmStart}, which is disabled---let
+queries drift onto merely-similar wrong anchors before any structure
+existed; the iteration-1 skip removes the need for any such bias.)
+From iteration~2 onward, queries are reassigned by the standard
+membership-floor trickle routing of Section~\ref{sec:meth-routing};
+\textit{migration} is emergent from this re-routing rather than a
+separately gated mechanism with its own margin, and the
+\textit{adapted partition} $Q_{D_k}^{\text{adapted}}$ is defined as
+the anchor-level assignment after construction completes.
+Anchor nodes are exempt from all destructive topology operations
+regardless of migration volume, enforced by a
+\texttt{TopologyViolationException} at the data-model level.
+
+Three downstream effects follow from migration.
+First, the vMF self-model of each anchor is refit in Phase~2 of
+subsequent iterations on $Q_{D_k}^{\text{adapted}}$, not
+$Q_{D_k}^{\text{canonical}}$.
+Second, all sub-domain structure induced below anchor $D_k$ is built
+from $Q_{D_k}^{\text{adapted}}$, meaning that a query that migrated
+into $D_k$ may reach a leaf that is thematically distant from its
+MMLU-Pro label.
+Third, the validation comparison (Section~\ref{sec:meth-validation})
+is performed using $Q_{D_k}^{\text{adapted}}$ at the anchor level.
+The migration rate
+$m_{D_k} = |Q_{D_k}^{\text{adapted}} \setminus
+Q_{D_k}^{\text{canonical}}| / |Q_{D_k}^{\text{canonical}}|$ is
+reported as a diagnostic descriptor: it quantifies the fraction of
+queries that changed anchor assignment and contextualises the
+interpretation of the validation comparison.
+The primary RQ2 metric is the fidelity difference
+$\Delta\tau = \tau_{\text{adapted}} - \tau_{\text{canonical}}$---the
+Kendall rank-agreement gain from using geometry-corrected rather than
+editorial-label partitions when computing anchor-level accuracy---with
+the Spearman-based $\Delta\rho$ reported secondarily.
+
+\subsection{Completion and Quiescence Semantics}\label{subsec:quiescence}
+
+Construction termination is criterion-based with a budget ceiling:
+the loop runs for at most \texttt{numIterations} iterations (value
+specified in Chapter~\ref{ch:experimental-design}), and a structural
+early-stopping gate---enabled in the canonical configuration
+(\texttt{enableEarlyStopping})---can terminate it earlier.
+At the end of each iteration, the \texttt{TaxonomyStabilizer} computes
+the graph edit distance (GED) between the current DAG
+$\mathcal{G}^{(t)}$ and the preceding iteration's
+$\mathcal{G}^{(t-1)}$, counting node additions and deletions plus
+parent--child edge additions and deletions, and normalises it by the
+current edge count.
+After a minimum iteration count (proportional to the number of
+domains, floored at $5$), an iteration counts as quiescent when this
+relative GED falls at or below the quiescence threshold
+(\texttt{gedThreshold}, $0.005$); construction stops early once five
+consecutive iterations are quiescent.
+A leaf-level log-semantic-volume trajectory is additionally tracked as
+a convergence diagnostic.
+If the streak never completes, the budget is exhausted and the
+snapshot is frozen as-is; downstream analyses can distinguish
+quiescent from still-evolving taxonomies from the recorded GED
+trajectory.
+
+\section{Directional Node Model}\label{sec:meth-vmf}
+
+\subsection{von Mises--Fisher Density and MLE}
+
+The vMF distribution on $\mathcal{S}^{d-1}$ with mean direction
+$\boldsymbol{\mu}$ and concentration $\kappa \geq 0$ has density
+\[
+p(\mathbf{x} \mid \boldsymbol{\mu}, \kappa)
+= C_d(\kappa) \exp\!\left(\kappa \boldsymbol{\mu}^\top \mathbf{x}\right),
+\qquad
+C_d(\kappa) = \frac{\kappa^{d/2 - 1}}{(2\pi)^{d/2}\, I_{d/2 - 1}(\kappa)}.
+\]
+Given $N$ unit-vector observations, the MLE of $\boldsymbol{\mu}$ is
+the normalised sample mean $\hat{\boldsymbol{\mu}} =
+\bar{\mathbf{x}} / \|\bar{\mathbf{x}}\|_2$.
+The Banerjee closed-form approximation~\parencite{banerjee2005vmf}
+\[
+\hat{\kappa}_{0}
+= \frac{\bar{R}\, d - \bar{R}^3}{1 - \bar{R}^2},
+\qquad \bar{R} = \|\bar{\mathbf{x}}\|_2,
+\]
+avoids iterative root-finding for $\kappa$ and is accurate for
+$d \geq 4$, $N \geq 5$, but is only an approximation to the true MLE
+and is biased upward in high dimensions at
+small sample sizes---an $O(d/N)$ bias that becomes severe when the
+ratio $d/N$ is large.
+
+Three refinements are applied, all reflecting what the
+implementation actually executes.
+First, the closed-form value seeds up to five Newton--Raphson steps
+on the exact likelihood equation $A_d(\kappa) = \bar{R}$, where
+$A_d(\kappa) = I_{d/2}(\kappa)/I_{d/2-1}(\kappa)$, using
+$A_d'(\kappa) = 1 - A_d(\kappa)^2 - \tfrac{d-1}{\kappa}A_d(\kappa)$;
+the seed is close enough that convergence typically occurs within one
+or two steps, yielding $\hat{\kappa}_{\text{ML}}$.
+Second, the refined estimate is multiplied by a small-sample
+shrinkage factor
+\[
+\hat{\kappa}
+= \hat{\kappa}_{\text{ML}} \cdot \frac{N - 1}{N + d - 2},
+\]
+a multiplicative correction in the spirit of the high-accuracy
+$\kappa$ estimators of Hornik and Gr\"{u}n~\parencite{hornik2014vmf},
+which pulls the estimate down toward its small-sample
+expectation.
+Third, the shrunk estimate is blended with a parent-anchored
+empirical-Bayes prior $\kappa_{\text{parent}}$ (the mean of the
+node's parents' concentrations, or a default prior at the root):
+\[
+\kappa_{\text{final}}
+= (1 - \alpha(\rho))\,\hat{\kappa}
++ \alpha(\rho)\,\kappa_{\text{parent}},
+\qquad
+\alpha(\rho) =
+\begin{cases}
+0 & \rho \leq 2,\\
+(\rho - 2)/8 & 2 < \rho \leq 10,\\
+1 & \rho > 10,
+\end{cases}
+\]
+where $\rho = d/n$ is the dimension-to-effective-sample-size ratio,
+so a node's own data dominate when it is well supported and the
+parent prior takes over smoothly as support thins.
+The joint choice of fixed dimension and minimum leaf size should be
+read against this ramp honestly: at $d = 256$ and $n_{\min} = 50$
+(Section~\ref{sec:exp-env}), a minimum-size leaf sits at
+$\rho \approx 5.1$ and hence at a blend weight of
+$\alpha \approx 0.39$---partially prior-anchored, not comfortably
+outside any special regime; only nodes with $n \gtrsim 128$ are
+estimated from their own data alone, and the fully prior-dominated
+$\rho > 10$ regime is additionally logged with a warning.
+Numerically stable evaluation of $\log I_\nu(\kappa)$ via the Debye
+asymptotic expansion is given in Appendix~\ref{app:numerics}.
+
+\subsection{NiW Auxiliary Regulariser}
+
+A Normal-inverse-Wishart (NiW) posterior is fit to each node's member
+embeddings as an auxiliary Bayesian summary of the node's local
+geometry; it no longer participates in routing, which is vMF-based
+throughout (Section~\ref{sec:meth-routing}).
+The NiW is \textit{not} the conjugate prior for the vMF---the vMF's
+conjugate is the vMF itself~\parencite{gopal2014mises}---but is used
+as an engineering regulariser whose posterior predictive is a
+multivariate Student-$t$, accurate when $\kappa$ is moderate to large
+so that the tangent-plane approximation to $\mathcal{S}^{d-1}$ holds.
+At near-uniform nodes ($\kappa < 1$) the approximation degrades; such
+nodes are flagged as geometric leaves and excluded from splitting.
+
+The prior mean is the parent's vMF centroid, the prior pseudocount is
+$\kappa_0 = 1.0$, the prior degrees of freedom are
+$\nu_0 = d + 2$, and the prior scale is
+$\boldsymbol{\Lambda}_0 = \lambda_0 \mathbf{I}_{d}$ with
+$\lambda_0 = 1/(\hat{\kappa}_{\text{parent}} d)$.
+Because the construction fixes $d = 256$ at every depth
+(Section~\ref{sec:meth-mrl}), a diagonal approximation to
+$\boldsymbol{\Lambda}_N$ is stored at all depths, reducing memory from
+$O(d^2)$ to $O(d)$ per node and making cross-depth node comparisons
+directly valid without down-projection.
+The posterior update equations and the resulting Student-$t$
+predictive density are given in Appendix~\ref{app:numerics}; in the
+current implementation the stored posterior serves diagnostic roles
+(notably the leaf log-semantic-volume convergence diagnostic of
+Section~\ref{subsec:quiescence}), while all routing, migration, and
+bridge-admission decisions operate on the vMF responsibilities of
+Section~\ref{sec:meth-routing}.
+Node centroids are refit directly to the fresh weighted MLE each
+iteration; an earlier exponential-moving-average smoothing of the
+centroid was removed after matched A/B runs showed it amplifies
+oscillation rather than damping it.
+
+\section{Fixed-Dimension Matryoshka Embedding Slice}\label{sec:meth-mrl}
+
+MRL~\parencite{kusupati2022mrl} trains a single embedding model such
+that every prefix slice $\mathbf{x}_{1:m}$ is itself a meaningful
+embedding, allowing the full vector to be stored once and sliced at
+query time.
+Its key property is \textit{coarse-to-fine information packing}: the
+most discriminative semantic directions are concentrated in the
+leading coordinates, so any prefix $\mathbf{x}_{1:m'}$ is a coherent
+lower-dimensional representation rather than a truncated artefact.
+
+TaxoArena uses a single fixed slice
+\[
+d(\ell) = 256 \quad \text{for all depths } \ell,
+\]
+rather than a per-depth dimension schedule.
+The choice balances two pressures.
+A larger $d$ increases angular resolution and improves the
+discriminability of fine-grained sub-topic splits, but the vMF
+concentration estimate degrades as $d/N$ grows
+(Section~\ref{sec:meth-vmf}); at $d = 256$ the fully prior-dominated
+regime ($d/N > 10$) is crossed only below $N \approx
+26$, and the $n_{\min} = 50$ floor keeps every fitted leaf above
+that---though a minimum-size leaf still sits on the empirical-Bayes
+blend ramp ($\alpha \approx 0.39$), i.e.\ partially prior-anchored
+(Section~\ref{sec:meth-vmf}).
+Fixing a single dimension additionally means all nodes---across all
+depths---live on the same unit hypersphere, so sibling-merge,
+passthrough-collapse, and bridge-coherence comparisons require no
+cross-depth down-projection.
+The coarse-to-fine property of MRL is exploited not by widening the
+slice with depth but by the recursive structure itself: shallow nodes
+separate coarse domain-level directions, while deeper splits resolve
+progressively finer sub-topic structure within the same 256-dimensional
+geometry.
+(One qualification: split \emph{proposals} are clustered in a
+PCA-projected subspace of 32, 64, or 128 dimensions depending on
+cluster size, Section~\ref{sec:meth-split}; all fitting, routing, and
+acceptance decisions remain at the fixed 256 dimensions.)
+Re-normalisation after slicing is mandatory, since MRL guarantees
+semantic meaningfulness of $\mathbf{x}_{1:d}$ but not unit norm:
+\(
+\mathbf{x}^{(\ell)}
+= \mathbf{x}_{1:d} / \|\mathbf{x}_{1:d}\|_2.
+\)
+The dimension itself is ablated (A1, Section~\ref{sec:appendix-ablations})
+at $\{128, 256, 512\}$ to confirm that $d = 256$ is a
+quality-stable operating point rather than a fragile one.
+
+\section{Fixed Embedding Dimension}\label{subsec:dim-schedule}
+
+The effective embedding dimension is fixed at $d = 256$ for every
+recursion depth: the coarse-to-fine progression from domain-level
+separation to fine sub-topic structure is carried by the recursion
+itself, not by a per-depth dimension schedule, exploiting the
+multi-scale property of MRL embeddings~\parencite{kusupati2022mrl}
+reviewed in Chapter~\ref{ch:literature-review}.
+The fixed dimension places every node, at every depth, on the same
+unit hypersphere, so sibling-merge, passthrough-collapse, and
+bridge-coherence comparisons are directly valid without cross-depth
+projection; its coherence with the minimum-cluster-size floor, which
+keeps every fitted leaf outside the regime where the vMF concentration
+estimate becomes unreliable, is established in
+Section~\ref{sec:meth-vmf}.
+
+\section{Adaptive Splitting Oracle}\label{sec:meth-split}
+
+Split proposals are generated by vMF-EM clustering with a spherical
+$k$-means$++$-style initialisation: the first centroid is the node's
+normalised sample centroid and subsequent centroids are chosen by
+maximin cosine distance to the existing centres, avoiding the
+dual-collapse failure mode of random initialisation in high
+dimensions.
+For efficiency, the clustering itself runs in a PCA-projected
+subspace whose dimension depends on cluster size (32 dimensions below
+100 members, 64 below 500, 128 otherwise); the resulting partition is
+then re-fit and evaluated in the fixed 256-dimensional routing
+geometry, so no acceptance decision is made in the reduced space.
+
+A proposed partition $\{S_c\}$ of a node's members is accepted or
+rejected by a \emph{chance-corrected separation score}.
+For a set $S$ of unit vectors, define the total pairwise cosine
+dissimilarity
+\[
+W(S) = |S|^2 - \Big\|\sum_{\mathbf{x} \in S} \mathbf{x}\Big\|_2^2
+= \sum_{i \neq j \in S} \left(1 - \mathbf{x}_i^\top \mathbf{x}_j\right),
+\]
+computable in $O(|S|\,d)$ from the member sum alone.
+The observed within-cluster scatter of the partition is
+$\sum_c W(S_c)$; under a uniformly random partition of the same $n$
+points into the same cluster sizes $\{n_c\}$, its exact expectation is
+\[
+\mathbb{E}\Big[\sum_c W(S_c)\Big]
+= W(S_{\text{total}}) \cdot
+\sum_c \frac{n_c (n_c - 1)}{n (n - 1)},
+\]
+because each unordered pair lands inside cluster $c$ with probability
+$n_c(n_c-1)/(n(n-1))$.
+The score is
+\[
+s = 1 - \frac{\sum_c W(S_c)}
+{\mathbb{E}\left[\sum_c W(S_c)\right]},
+\]
+which equals $1$ for a perfect partition (each cluster internally
+identical), is approximately $0$ for a random partition, negative for
+an anti-clustered one, and exactly $0$ for the degenerate $k = 1$
+``partition''---so a non-separating wrapper can never clear a
+positive threshold.
+The chance correction removes the mechanical dependence a raw
+within/total ratio has on $k$ and on the cluster-size profile, so a
+single threshold means the same thing everywhere in the tree.
+This score is \emph{not} a Dasgupta cost delta and carries no
+Dasgupta optimality interpretation; Dasgupta's cost
+\parencite{dasgupta2016cost} is retained only as the whole-tree
+Total Dasgupta Cost evaluation metric (Appendix~\ref{app:metrics}).
+
+A split is accepted iff
+$s \geq \epsilon_{\text{sep}}$ (the
+\texttt{separationEpsilon} parameter) and every child satisfies
+$|S_c| \geq n_{\min}$, with the parent node's recursion depth
+hard-capped at $D_{\max}$.
+The threshold has no closed-form optimum and trades over-splitting
+against under-splitting; its canonical value is
+$\epsilon_{\text{sep}} = 0.01$, subject to final calibration.
+% TODO(calibration): finalize once DAG construction is frozen
+The clustering proposes a small number of children ($k \geq 2$),
+and $D_{\max} = 8$ caps recursion depth.
+The greedy acceptance rule provides no worst-case global guarantee;
+the \emph{same} score at the \emph{same}
+$\epsilon_{\text{sep}}$ also gates sibling merging, sibling
+distinctness, and residual-split viability
+(Section~\ref{sec:meth-topology}), unifying these decisions under a
+single dimensionless separability scale.
+
+\section{Polyhierarchy and Cross-Links}\label{subsec:polyhierarchy}
+
+The DAG structure---as distinct from a tree---arises exclusively from
+topology operations in Phase~5; construction-time routing is weighted
+multi-membership (Section~\ref{sec:meth-routing}), with the
+\textit{primary} leaf defined as the argmax of the normalised
+membership weights---a bookkeeping convention for aggregation, not an
+exclusivity property of the fits.
+
+Node-level polyhierarchy is introduced by two gated bridge sources,
+both of which operate on the same admission rule as routing: a leaf
+$L'$ qualifies as a secondary membership destination for a query iff
+its posterior responsibility clears the \texttt{membershipFloor}
+along the routing walk.
+There is no separate concentration-scaled margin; the floor is a
+probability and means the same thing everywhere in the tree.
+(At arena time, qualifying leaves are additionally capped at
+\texttt{maxLeafAssignments} per query as a judge-call-cost bound.)
+
+\textbf{Source-A: residual bridges.}
+Residual nodes (Section~\ref{sec:arch-dag}) that receive no primary
+queries after routing are nonetheless retained as bridge targets: any
+query whose secondary membership at a residual node clears
+the floor is linked to that node via a secondary
+edge, giving the residual node evaluable membership without altering
+any query's primary leaf.
+
+\textbf{Source-B: cross-domain bridges.}
+After each splitting phase, \texttt{TaxonomyMerger} evaluates
+candidate secondary edges between a query's primary leaf $L$ and every
+other leaf $L'$ (including leaves under a different anchor) whose
+secondary membership for $q$ clears the floor.
+A candidate edge is inserted only if it passes four sequential gates:
+deduplication against existing edges; a coherence gate, thresholded
+at \texttt{fusionSimilarityThreshold} (canonical $0.90$), rejecting
+edges where the resulting secondary membership would degrade $L'$'s
+internal coherence below that value; a distinctness gate, on the same
+\texttt{fusionSimilarityThreshold} scale, requiring the
+primary and secondary leaf profiles to remain
+cosine-distinct; and a cycle check combined with a cross-domain
+dominant-category gate that blocks bridges which would make a leaf's
+secondary membership dominate its primary-anchor identity.
+A directed edge is added from the lowest common ancestor of $L$ and
+$L'$ to $L'$ when all gates pass, giving $L'$ a second parent in the
+DAG while $L$ retains its terminal (leaf) status and its status as
+$q$'s primary leaf.
+This preserves the invariant that a leaf node has no outgoing
+parent-child edges.
+A transitive reduction sweep follows both sources to maintain the
+minimal DAG.
+
+Evaluation-time multi-leaf assignment of held-out queries---the same
+membership-floor trickle, applied read-only to the frozen snapshot
+and capped at \texttt{maxLeafAssignments}---is
+distinct from this node-level polyhierarchy: it does not modify the
+frozen DAG topology but determines which leaves a given query
+contributes comparisons to during the arena run
+(Section~\ref{sec:arch-arena}).
+
+\section{Trickle Routing and Polyhierarchy}\label{sec:meth-routing}
+
+At node $v$ with children $\{c_1, \ldots, c_K\}$, a query embedding
+$\mathbf{x}$ is scored against each child by that child's own vMF
+log-density,
+\[
+f_k(\mathbf{x})
+= \log C_d(\hat{\kappa}_{c_k})
++ \hat{\kappa}_{c_k} \hat{\boldsymbol{\mu}}_{c_k}^\top \mathbf{x},
+\]
+and the routing distribution is the temperature-1 softmax of these
+log-densities,
+\[
+r_k(\mathbf{x})
+= \frac{\exp f_k(\mathbf{x})}{\sum_{j=1}^{K} \exp f_j(\mathbf{x})},
+\]
+computed in log-space with log-sum-exp for multi-path aggregation.
+This is the true Bayesian mixture posterior responsibility under
+equal component priors: each child's fitted $\hat{\kappa}$ already
+determines how sharp or soft its boundary is, so no separate
+temperature or concentration-scaling knob is applied on top of it.
+
+A single probability-scale parameter governs three decisions.
+A child is admitted as a genuine membership destination iff
+$r_k \geq \texttt{membershipFloor}$ (canonical value $0.10$, subject
+to final calibration).
+% TODO(calibration): finalize once DAG construction is frozen
+Per-level transition probabilities are renormalised over the admitted
+set, and the walk accumulates each path's log-probability from the
+root; the \emph{same} floor bounds the cumulative path probability,
+so a branch is not descended once its path probability decays below
+the floor.
+Finally, if \emph{no} child clears the floor, the position is
+residual by construction: when \texttt{enableResidualRouting} is set
+and the node is at depth $\geq 2$, the event is recorded as a
+residual hit and feeds the Source-A bridges of
+Section~\ref{sec:meth-topology}.
+Terminology: a \textit{residual query} is a query retained at an
+internal position because no child cleared the floor for it; a
+\textit{residual node} (Section~\ref{sec:arch-dag}) is a leaf that
+holds no primary queries---the two are related but distinct, and
+Source-A bridges connect the former to the latter.
+
+Membership weights over the reached leaves are normalised per query,
+and the \textit{primary} leaf is the argmax of these weights---a
+bookkeeping convention used for aggregation under the primary-path
+convention, not an exclusivity property of the fits, which use the
+full normalised weights.
+Held-out queries at evaluation time are routed by exactly the same
+distribution, applied read-only to the frozen snapshot, with the
+reached-leaf set additionally capped at \texttt{maxLeafAssignments}
+per query as a judge-call-cost bound; there is no separate
+evaluation-time scoring model.
+MMLU-Pro labels are never used in the routing distribution; they
+are inspected only afterward, for the canonical-versus-adapted
+divergence metrics (Section~\ref{sec:meth-validation}).
+
+\section{Topological Optimisation}\label{sec:meth-topology}
+
+A sequence of anchor-exempt operations runs after each splitting
+phase.
+\textbf{Sibling merge} pools two nodes when the chance-corrected
+separation score of the two-cluster partition they form falls below
+$\epsilon_{\text{sep}}$ (the same \texttt{separationEpsilon} and the
+same score used by the splitting gate, so split and merge cannot
+disagree about what ``separated'' means).
+Historically this gate compared a $\kappa$-scaled symmetrised-KL
+surrogate---often labelled a ``vMF JS divergence,'' although no
+closed form for the vMF Jensen--Shannon divergence exists---whose
+magnitude grew with $\kappa$ and became unsatisfiable exactly where
+merge decisions mattered most; that surrogate no longer gates
+anything.
+\textbf{Starved-leaf pruning} removes a physical leaf whose total
+branch query count falls far below the mean sibling size,
+reassigning its members to the
+highest-likelihood sibling.
+% TODO(calibration): finalize once DAG construction is frozen
+\textbf{Redundant single-child removal} eliminates a parent's sole
+tree child: such a node separates no pair of queries its parent does
+not already separate, so its marginal contribution to the hierarchy
+objective is exactly zero, and it is removed unconditionally on
+structural grounds.
+% TODO(calibration): finalize once DAG construction is frozen
+\textbf{Soft-membership refitting} (\texttt{refitMuPerIteration},
+enabled under \texttt{DAG\_MAX} mode) recomputes each node's vMF
+centroid from its full posterior-weighted membership rather than hard
+assignment alone, subject to a no-update band: once a node's fresh
+refit direction agrees with the previous one to within cosine
+$0.9975$ the centroid is left unchanged for
+that iteration, preventing noisy refitting once a node's membership
+has effectively stabilised.
+\textbf{Bridge insertion} admits polyhierarchical edges from two
+gated sources, both operating on the membership floor of
+Section~\ref{sec:meth-routing}.
+
+\textit{Source-A (residual bridges).}
+Residual leaves that received no primary queries after routing are
+retained as bridge targets: any query whose secondary membership at
+a residual node clears the floor is
+linked to that node via a secondary edge, giving the residual node
+evaluable membership without altering the query's primary leaf.
+
+\textit{Source-B (cross-domain bridges).}
+For a query whose primary leaf is $L$, a candidate secondary edge to
+another leaf $L'$ (possibly under a different anchor) is proposed
+whenever $L'$'s secondary membership for the query clears the
+floor.
+The candidate is accepted only if it passes four sequential gates:
+deduplication against existing edges; a coherence gate rejecting
+edges that would push $L'$'s internal coherence below the
+\texttt{fusionSimilarityThreshold} (canonical $0.90$); a distinctness
+gate, on the same \texttt{fusionSimilarityThreshold} scale, requiring
+the primary and secondary leaf profiles to remain
+cosine-distinct; and a combined cycle
+check and cross-domain dominant-category gate that blocks bridges
+which would make a leaf's secondary membership dominate its
+primary-anchor identity.
+When all gates pass, a directed edge is added from the lowest common
+ancestor of $L$ and $L'$ to $L'$, giving $L'$ a second parent while
+$L$ retains both its terminal (leaf) status and its status as the
+query's primary leaf.
+
+A transitive reduction sweep follows both bridge sources to maintain
+the minimal DAG invariant.

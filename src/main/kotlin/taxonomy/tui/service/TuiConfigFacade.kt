@@ -187,10 +187,18 @@ class TuiConfigFacade(
         ),
         SettingItem(
             name = "Membership Floor",
-            description = "Minimum posterior responsibility to count as a genuine membership",
+            description = "Minimum share of a query's own normalized membership for a leaf to count",
             category = "Clustering & Routing (VMF)",
             getValue = { deps.config.formalism.membershipFloor.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.membershipFloor = it; true } ?: false },
+            kind = SettingKind.NUMBER
+        ),
+        SettingItem(
+            name = "Routing Beam Gamma",
+            description = "Per-level beam: child stays iff responsibility >= gamma x best sibling's",
+            category = "Clustering & Routing (VMF)",
+            getValue = { deps.config.formalism.routingBeamGamma.toString() },
+            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.routingBeamGamma = it; true } ?: false },
             kind = SettingKind.NUMBER
         )
     )

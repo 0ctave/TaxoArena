@@ -1,7 +1,7 @@
 \chapter{Experimental Setup}\label{ch:experimental-design}
 
 This chapter specifies the concrete configuration under which the
-architecture of Chapter~\ref{ch:architecture} and the methodology of
+architecture of Chapter~\ref{ch:system-architecture} and the methodology of
 Chapter~\ref{ch:methodology} are instantiated for the experiments
 reported in Chapter~\ref{ch:results}. Full taxonomy-tuning mechanics
 and the construction ablation matrix are documented in
@@ -21,8 +21,9 @@ condition answers which research question and with which metric.
         \toprule
         RQ & Question & Primary condition(s) & Primary metric \\
         \midrule
-        RQ1 & Does the induced arena ranking agree with the precomputed
-        MMLU-Pro model ranking on the selected domain node(s)?
+        RQ1 & Does the induced arena ranking agree with the MMLU-Pro
+        model ranking computed post hoc on held-out queries, on the
+        selected domain node(s)?
         & C1 (main condition), \S\ref{sec:exp-arena-conditions}
         & Kendall $\tau$, pairwise-winner accuracy, top-$k$ Jaccard,
         Spearman $\rho$ (secondary) \\
@@ -31,7 +32,8 @@ condition answers which research question and with which metric.
         rank-agreement with ground-truth accuracy relative to the editorial
         (canonical) partition?
         & C1 vs.\ C2, \S\ref{sec:meth-aggregation}
-        & $\Delta\rho = \rho_{\text{adapted}} - \rho_{\text{canonical}}$ \\
+        & $\Delta\tau = \tau_{\text{adapted}} - \tau_{\text{canonical}}$
+        ($\Delta\rho$ secondary) \\
         \addlinespace
         DQ1 & (Construction-validity diagnostic, not a headline RQ.) Does
         seed-guided geometric refinement produce a taxonomy of useful
@@ -64,41 +66,22 @@ the Discussion and revisited in Section~\ref{sec:future-work}.
 The pipeline is implemented in Kotlin on Spring Boot, backed by
 SQLite in WAL mode (Section~\ref{sec:arch-infra}). Embeddings are
 produced by Qwen3-Embedding served locally via Ollama; the judge
-model is Mistral-Large-3, accessed via an Azure OpenAI endpoint.
-Every run is seeded from $\{42, 137, 2048\}$. Table~\ref{tab:hyperparams}
-lists the canonical \texttt{TaxonomyConfig} values used throughout;
-these are selected by the L9/Pareto tuning protocol detailed in full
-in Appendix~\ref{app:tuning-protocol}, not hand-picked.\footnote{The
-four diagnostic bridge-export parameters (\texttt{secondaryMassFloor},
+model is Mistral-Large-3, deployed on Azure AI and accessed through
+the Azure OpenAI-compatible client.
+Every run is seeded from $\{42, 137, 2048\}$. The canonical
+\texttt{TaxonomyConfig} values used throughout are tabulated in
+Appendix~\ref{app:tuning-protocol} (Table~\ref{tab:hyperparams}),
+alongside the tuning protocol that produced them; their provenance is
+the historical L9/Pareto sweep, conducted on a predecessor
+parameterisation, plus subsequent unification of the routing
+parameters under \texttt{membershipFloor}, and final values follow
+the pending calibration study.\footnote{The
+three diagnostic bridge-export parameters (\texttt{secondaryMassFloor},
     \texttt{bridgeSupportFloor}, \texttt{bridgeSupportRelFraction}) do not
     affect DAG topology, routing, or any DQ1/RQ1/RQ2 metric and are
-    omitted from the table. Exact commit SHA and environment lockfile are
-    recorded in \texttt{REPRODUCIBILITY.md}.}
-
-\begin{table}[h]
-    \centering
-    \caption{Canonical taxonomy construction hyperparameters.}
-    \label{tab:hyperparams}
-    \begin{tabular}{lll}
-        \toprule
-        Parameter & Symbol/Name & Value \\
-        \midrule
-        Embedding dimension & $d$ & 256 (fixed) \\
-        Maximum recursion depth & $D_{\max}$ & 8 \\
-        Minimum cluster size & $n_{\min}$ & 50 \\
-        Dasgupta split threshold & $\epsilon_{\text{sep}}$ & 0.01 \\
-        Routing temperature & $\tau$ & 1.5 \\
-        Dynamic-temperature exponent & $\gamma$ & 0.0 \\
-        Assignment cosine gap & \texttt{assignmentCosineGap} & 0.15 \\
-        Walk-breadth nat margin & \texttt{deltaAssign} & 1.0 \\
-        Max leaf assignments & \texttt{maxLeafAssignments} & 5 \\
-        Centroid EMA smoothing & \texttt{emaAlpha} & 0.7 \\
-        Fusion threshold & \texttt{fusionSimilarityThreshold} & 0.92 \\
-        Iteration budget & \texttt{numIterations} & 35 \\
-        DAG mode & \texttt{dagMode} & \texttt{DAG\_MAX} \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+    omitted from the table. Run identifiers, seeds, and realised call
+    counts are recorded in the experiment manifest
+    (\texttt{manifest.json}) emitted with each run.}
 
 \section{Datasets and Split Protocol}\label{sec:exp-datasets}
 
@@ -107,7 +90,11 @@ questions across 14 domains with human-verified reference answers,
 used in two roles: it supplies the ground-truth domain labels that
 seed the 14 anchor nodes, and it supplies the per-domain accuracy
 scores used as the external validation signal
-(Section~\ref{sec:meth-validation}). AG News~\parencite{zhang2015agnews}
+(Section~\ref{sec:meth-validation}). All 14 MMLU-Pro categories seed
+anchors, including the semantically heterogeneous \textit{Other}
+category, which is retained as a geometric anchor: its queries remain
+routable mass and may migrate toward coherent anchors, and it is not
+an arena selection candidate. AG News~\parencite{zhang2015agnews}
 serves only as a pipeline sanity check, verifying that embedding,
 vMF fitting, and splitting execute correctly on an independently
 labelled corpus; it is not used for anchor seeding or arena
@@ -115,7 +102,8 @@ evaluation.
 
 Taxonomy \textbf{construction} runs on the full 14-domain corpus
 simultaneously, a precondition for the cross-domain bridging
-machinery of \S\ref{sec:meth-topology} to be exercised meaningfully.
+machinery of Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-topology})
+to be exercised meaningfully.
 The \textbf{arena} evaluates 12 models on one or two ex-ante-selected,
 high-support domain nodes, chosen before observing any $\rho$ or
 $\Delta\rho$ result under a fixed rule: (i) high held-out query
@@ -221,7 +209,7 @@ generic-judge quality.
 \subsection{Information Separation Protocol}\label{sec:exp-info-separation}
 
 Table~\ref{tab:info-separation} makes concrete the answer-key-blind
-design asserted in Chapters~\ref{ch:architecture} and
+design asserted in Chapters~\ref{ch:system-architecture} and
 \ref{ch:methodology}: at every pipeline phase, only the data marked
 \checkmark{} is accessible to the corresponding component.
 
@@ -296,7 +284,8 @@ Section~\ref{sec:exp-metrics}.
 
 \textbf{Taxonomy quality (DQ1):} Dendrogram Purity, Weighted Leaf
 Purity, Spherical Silhouette, Total Dasgupta Cost, Normalised Sackin
-Index, and Routing ECE.
+Index, and Routing ECE; formal definitions for all six are given in
+Appendix~\ref{app:metrics}.
 
 \textbf{Arena quality (RQ1/RQ2):} per-leaf and per-anchor BT scores
 with Fisher information standard errors; Spearman $\rho$ and Kendall
