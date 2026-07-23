@@ -449,12 +449,12 @@ object StatisticsUtils {
             }
         }
         if (converged) {
-            log.info("[VMF EM] K=$k, N=$n converged (tolerance met) in $finalIters iterations")
+            log.debug("[VMF EM] K=$k, N=$n converged (tolerance met) in $finalIters iterations")
         } else if (patienceCount >= maxPatience) {
             converged = true
-            log.info("[VMF EM] K=$k, N=$n converged (plateau reached) in $finalIters iterations")
+            log.debug("[VMF EM] K=$k, N=$n converged (plateau reached) in $finalIters iterations")
         } else {
-            log.warn("[VMF EM] K=$k, N=$n hit iteration cap at $finalIters iterations")
+            log.debug("[VMF EM] K=$k, N=$n hit iteration cap at $finalIters iterations")
         }
 
         val components = (0 until k).map { c ->
