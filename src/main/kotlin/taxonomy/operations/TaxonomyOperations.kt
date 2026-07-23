@@ -267,6 +267,7 @@ class TaxonomyOperations(
         val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent"
         val qCount = node.getRecursiveQueryCount()
         val directQ = node.queries.size
+        val softMass = node.getRecursiveSoftMass()
 
         val parentNames = node.parents.mapNotNull { it.label }.filter { it.isNotBlank() }.distinct()
         val parentsInfo = if (parentNames.size > 1) " [Bridge Parents: ${parentNames.joinToString(" & ")}]" else ""
@@ -276,7 +277,8 @@ class TaxonomyOperations(
         } else ""
         val chainNote = if (chainSkipped > 0) " [⋯ $chainSkipped wrapper level${if (chainSkipped > 1) "s" else ""} collapsed]" else ""
 
-        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$parentsInfo$chainNote$cross$edgeType"
+        val metrics = "q_dir=$directQ, q_rec=$qCount, mass=${"%.1f".format(java.util.Locale.US, softMass)}"
+        val nodeLabel = "${node.label} [$metrics, $type]$vmfStats$parentsInfo$chainNote$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 
@@ -310,6 +312,10 @@ class TaxonomyOperations(
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
         val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent/Residual"
 
+        val directQ = node.queries.size
+        val qCount = node.getRecursiveQueryCount()
+        val softMass = node.getRecursiveSoftMass()
+
         val parentNames = node.parents.mapNotNull { it.label }.filter { it.isNotBlank() }.distinct()
         val parentsInfo = if (parentNames.size > 1) " [Bridge Parents: ${parentNames.joinToString(" & ")}]" else ""
 
@@ -318,7 +324,8 @@ class TaxonomyOperations(
         } else ""
         val chainNote = if (chainSkipped > 0) " [⋯ $chainSkipped wrapper level${if (chainSkipped > 1) "s" else ""} collapsed]" else ""
 
-        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$parentsInfo$chainNote$cross$edgeType"
+        val metrics = "q_dir=$directQ, q_rec=$qCount, mass=${"%.1f".format(java.util.Locale.US, softMass)}"
+        val nodeLabel = "${node.label} [$metrics - $type]$vmfStats$parentsInfo$chainNote$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 

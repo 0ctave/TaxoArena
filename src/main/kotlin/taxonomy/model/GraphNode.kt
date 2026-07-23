@@ -201,6 +201,19 @@ data class GraphNode(
         walk(this)
         return bitSet.cardinality() + fallbackSet.size
     }
+
+    fun getRecursiveSoftMass(): Double {
+        val visited = mutableSetOf<String>()
+        var sum = 0.0
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            sum += node.queryWeights.values.sum()
+            node.treeChildren.forEach { walk(it) }
+            node.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(this)
+        return sum
+    }
 }
 
 fun dimForDepth(depth: Int): Int = 256
