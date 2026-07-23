@@ -125,7 +125,11 @@ class TaxonomySplitter(
             }
         }
 
-        val targetQueries = if (isDiffuse && config.formalism.enableResidualSplitGate) {
+        // Stable input order: queryWeights is a ConcurrentHashMap, whose key iteration
+        // order varies run-to-run with parallel insertion history. EM/PCA consume this
+        // list order (floating-point sums, argmax ties), so an unstable order breaks
+        // seed reproducibility at decision boundaries. Sort by queryId (rawText fallback).
+        val targetQueries = (if (isDiffuse && config.formalism.enableResidualSplitGate) {
             val allSubtreeQueries = node.getAllQueriesInRegion()
             allSubtreeQueries.filter { emb ->
                 val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
@@ -133,7 +137,7 @@ class TaxonomySplitter(
             }.ifEmpty { localWeights.keys.mapNotNull { GraphNode.getEmbedding(it) } }
         } else {
             localWeights.keys.mapNotNull { GraphNode.getEmbedding(it) }
-        }
+        }).sortedWith(compareBy({ it.queryId }, { it.rawText }))
 
         log.debug("Scanning '${node.label}' (${targetQueries.size} q) for split...")
 
@@ -333,21 +337,24 @@ class TaxonomySplitter(
         val outerCount = (targetSamples * 0.2).toInt().coerceAtLeast(3)
         val middleCount = (targetSamples - innerCount - outerCount).coerceAtLeast(3)
 
+        // Seeded shuffles: representative sampling feeds LLM labeling only, but an
+        // unseeded shuffle still makes labels non-reproducible across runs.
+        val sampleRng = kotlin.random.Random(n * 31 + depth)
         val innerCore = sortedByDistance
             .take((n / 10).coerceAtLeast(innerCount))
-            .shuffled()
+            .shuffled(sampleRng)
             .take(innerCount)
 
         val outerBoundary = sortedByDistance
             .takeLast((n / 10).coerceAtLeast(outerCount))
-            .shuffled()
+            .shuffled(sampleRng)
             .take(outerCount)
 
         val middleStart = n / 10
         val middleEnd = (9 * n) / 10
         val middleShell = sortedByDistance
             .subList(middleStart, middleEnd)
-            .shuffled()
+            .shuffled(sampleRng)
             .take(middleCount)
 
         return (innerCore + middleShell + outerBoundary)
@@ -478,7 +485,7 @@ class TaxonomySplitter(
                         .map { it.key }
 
                     // Representative subset from queryTexts for the prompt
-                    val representativeSamples = queryTexts.shuffled().take(40)
+                    val representativeSamples = queryTexts.shuffled(kotlin.random.Random(queryTexts.size)).take(40)
 
                     val parentLabelsList = parents
                         .mapNotNull { it.label }

@@ -148,6 +148,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
+        cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -1408,6 +1409,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.separationEpsilon,
             config.formalism.membershipFloor,
             config.formalism.routingBeamGamma,
+            config.formalism.descentMargin,
             config.formalism.maxLeafAssignments,
             config.formalism.dagMode,
             config.formalism.fusionSimilarityThreshold,

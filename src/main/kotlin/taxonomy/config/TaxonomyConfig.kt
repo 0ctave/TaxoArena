@@ -111,6 +111,14 @@ class TaxonomyConfig {
         // (a parent-vs-children Bayes factor at threshold 1).
         var routingBeamGamma: Double = 0.15
 
+        // Descent-gate slack (the residual-loosening knob). The parameter-free gate
+        // residualizes a query at node p iff max_c <mu_c,x> < r_bar_p * <mu_p,x>
+        // (Jensen-tight bound). With margin d the bar becomes (r_bar_p - d) * <mu_p,x>:
+        // 0.0 keeps the exact tight bound; each increment admits queries whose best
+        // child is slightly worse than the children's weighted-mean alignment, pushing
+        // domain-central generalists into their nearest child instead of the residual
+        // pool. Trade-off: fewer measured residuals vs. slightly diluted leaf purity.
+        var descentMargin: Double = 0.0
 
         // Judge-call-cost bound for arena-time evaluation only (how many leaves a single held-out
         // query may be scored against) — an engineering constraint, not a geometric-correctness
@@ -176,6 +184,7 @@ class TaxonomyConfig {
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
         sb.append("│   - Membership Floor:     ${formalism.membershipFloor}\n")
         sb.append("│   - Routing Beam Gamma:   ${formalism.routingBeamGamma}\n")
+        sb.append("│   - Descent Margin:       ${formalism.descentMargin}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
         sb.append("│   - Default Kappa Prior:  ${formalism.defaultKappaPrior}\n")
@@ -212,6 +221,7 @@ class TaxonomyConfig {
             separationEpsilon = formalism.separationEpsilon,
             membershipFloor = formalism.membershipFloor,
             routingBeamGamma = formalism.routingBeamGamma,
+            descentMargin = formalism.descentMargin,
             maxLeafAssignments = formalism.maxLeafAssignments,
             enableStableQuestionIds = formalism.enableStableQuestionIds,
             enableResidualRouting = formalism.enableResidualRouting,
@@ -256,6 +266,7 @@ class TaxonomyConfig {
         formalism.separationEpsilon = c.formalism.separationEpsilon
         formalism.membershipFloor = c.formalism.membershipFloor
         formalism.routingBeamGamma = c.formalism.routingBeamGamma
+        formalism.descentMargin = c.formalism.descentMargin
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
         formalism.enableResidualRouting = c.formalism.enableResidualRouting

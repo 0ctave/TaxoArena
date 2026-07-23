@@ -42,6 +42,17 @@ data class Embedding(
     val groundTruthCategory: String = "",
     var queryId: Int = -1
 ) {
+    // Cached L2-normalized projection (see Embedding.projectTo). dimForDepth is flat
+    // (256), so every routing/fitting/J call projects each embedding to the SAME dim —
+    // without the cache every trickle walk re-allocates and re-normalizes this array
+    // per query per node, tens of millions of times per re-route. Single volatile ref
+    // keeps the (dim, vec) pair atomic; a concurrent first computation is a benign race
+    // (both threads produce identical arrays). The cached array is SHARED — callers
+    // must treat projectTo results as read-only (all current call sites do).
+    internal class Projection(val dim: Int, val vec: DoubleArray)
+    @kotlinx.serialization.Transient
+    @Volatile
+    internal var cachedProjection: Projection? = null
 
     val dimensions: Int get() = values.size
 
@@ -179,9 +190,12 @@ data class IterationMetrics(
 }
 
 fun Embedding.projectTo(targetDim: Int): DoubleArray {
+    cachedProjection?.let { if (it.dim == targetDim) return it.vec }
     val sliced = values.copyOf(targetDim).map { it.toDouble() }.toDoubleArray()
     val norm   = kotlin.math.sqrt(sliced.sumOf { it * it })
-    return if (norm > 0.0) DoubleArray(targetDim) { sliced[it] / norm } else sliced
+    val result = if (norm > 0.0) DoubleArray(targetDim) { sliced[it] / norm } else sliced
+    cachedProjection = Embedding.Projection(targetDim, result)
+    return result
 }
 
 /**

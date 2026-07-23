@@ -224,8 +224,12 @@ class TaxonomyFitter(
         }
 
         // 4. Compute Weighted Centroid Vector (mu)
+        // Sorted iteration: the map derives from ConcurrentHashMaps filled by parallel
+        // routing, so its order varies run-to-run; float summation order changes mu at
+        // the last bit, which flips boundary decisions downstream. Sorting makes the
+        // fit bit-reproducible.
         val sumVec = DoubleArray(fitDim)
-        for ((qText, w) in queryWeightsMap) {
+        for ((qText, w) in queryWeightsMap.entries.sortedBy { it.key }) {
             val emb = GraphNode.getEmbedding(qText) ?: continue
             val projected = emb.projectTo(fitDim) // systemic MRL projection & L2 normalization
             for (i in 0 until fitDim) {

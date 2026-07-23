@@ -12,7 +12,13 @@ import java.util.*
  * evaluateCrossLinks() must NOT cause a node to lose its leaf status.
  */
 data class GraphNode(
-    val id: String = UUID.randomUUID().toString(),
+    // Deterministic, monotonic ids. Node sets (children/parents/crossLinkChildren) are
+    // hash sets keyed by id, so id values determine every traversal order — and with
+    // them EM input assembly, proposal enumeration order, and which of two comparable
+    // edits lands first. Random UUIDs made all of that differ run-to-run at a fixed
+    // seed. Counter ids are reproducible as long as node CREATION order is (it is:
+    // bootstrap and per-depth proposal loops are sequential). Reset per pipeline run.
+    val id: String = nextNodeId(),
     var label: String?,
     var originalCategory: String? = null,
     var depth: Int,
@@ -71,6 +77,10 @@ data class GraphNode(
             EmbeddingRegistry[emb.rawText] = emb
         }
         fun getEmbedding(rawText: String): Embedding? = EmbeddingRegistry[rawText]
+
+        private val idCounter = java.util.concurrent.atomic.AtomicLong(0L)
+        fun nextNodeId(): String = "n" + "%08d".format(idCounter.incrementAndGet())
+        fun resetIdCounter() = idCounter.set(0L)
     }
     // isLeaf is true iff this node has NO outgoing edges of either kind. Parent count is
     // deliberately irrelevant: a leaf that gains a second parent through a cross-link

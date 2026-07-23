@@ -643,8 +643,15 @@ object StatisticsUtils {
         val components = mutableListOf<DoubleArray>()
         var residual = centered.map { it.copyOf() }
 
-        repeat(k) {
-            var vec = DoubleArray(d) { java.util.concurrent.ThreadLocalRandom.current().nextDouble() - 0.5 }
+        repeat(k) { comp ->
+            // Deterministic init: ThreadLocalRandom here made every run's split proposals
+            // start from different vectors, so the "fixed seed" runs produced different
+            // DAGs (observed: 66-69 leaves, 94-275 residuals across identical-code
+            // seed-42 runs). Seeding from the problem shape keeps runs reproducible;
+            // the init only needs to be non-orthogonal to the top eigenvector, which
+            // holds for any fixed pseudo-random vector (orthogonality is measure-zero).
+            val rng = java.util.Random(0x5EEDL + comp * 7919L + d * 104729L + n * 31L)
+            var vec = DoubleArray(d) { rng.nextDouble() - 0.5 }
             repeat(30) {
                 val proj = DoubleArray(d)
                 for (row in residual) {

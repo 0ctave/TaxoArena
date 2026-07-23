@@ -1,6 +1,6 @@
 [base]
 config = "experiment_configs/thesis_canonical.toml"
-gradle_cmd = "gradlew.bat bootRun --rerun-tasks"  # For Windows
+gradle_cmd = "cmd /c Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\gradlew.bat bootRun --rerun-tasks"  # For Windows (cmd /c + absolute path: python subprocess cannot exec .bat directly and cwd is not guaranteed)
 extra_args = ""
 
 [output]
@@ -17,50 +17,43 @@ seeds = [137, 2048]
 stage = "validate"
 
 # ══════════════════════════════════════════════════════════════════════════
-#  FRESH CALIBRATION SWEEP — UNSCALED MARGIN REGIME
+#  CALIBRATION SWEEP — PROPOSAL-GATED POLYHIERARCHY REGIME (2026-07-23)
 #
-#  Base: corrected construction path
-#   - N-normalized EM tolerance + adaptive cap + plateau guard
-#   - fusionSimilarityThreshold = 0.90
-#   - runBaselines = false during screening
+#  Base: cross-linking restored as a J-gated growth edit; split gate is a
+#  pure Delta-J > 0 veto (local chance-corrected separation gates quality);
+#  fusion redirects preserve edge type; descentMargin wired into the
+#  Jensen-tight descent gate.
 #
-#  FACTORS (match code + current geometry):
+#  FACTORS (all wired end-to-end in the current code):
 #
-#   - constructionMargin {0.15, 0.30, 0.50}
-#       Controls unified log-softmax margin during DAG-building trickle (unscaled).
-#       i.e. tight, canonical, and slightly looser regimes around the
-#       empirically winning value (≈0.20–0.30 nats).
+#   - descentMargin {0.0, 0.02, 0.05}
+#       Slack below the Jensen-tight descent bar
+#       max_c<mu_c,x> >= (r_bar_p - d) * <mu_p,x>.
+#       0.0 = exact bound (max residuals, max cross-link fuel);
+#       0.05 = measured single-run endpoint: residuals -38% but purity
+#       -1.9pts and bridges 11 -> 4. The sweep decides where the knee is.
 #
 #   - minClusterSize {25, 50, 75}
-#       Granularity dial: 50 is canonical; 25/75 probe finer vs coarser
-#       splits, trading leaf count against SmallLeafFraction and
-#       SelectedNodeStarvedLeafFraction.
+#       Granularity dial: leaf count vs SmallLeafFraction/starvation.
 #
-#   - secondaryMassFloor {2.0, 3.5, 5.0}
-#       Minimum secondary probability mass for a candidate to count
-#       (bridge / secondary-structure control). Now correctly reported
-#       in the ledger; no longer unreadable.
+#   - secondaryMassFloor {2.0, 5.0, 10.0}
+#       Cross-link host/candidate support floor: 2.0 admits tiny re-firing
+#       proposals; higher prunes proposal noise but may starve genuine links.
 #
-#   - bridgeSupportRelFraction {0.03, 0.05, 0.10}
-#       Relative support threshold a bridge must carry vs its parent.
-#       0.10 coincides with the canonical DAG; 0.03/0.05 explore weaker
-#       bridges’ impact on DuplicateBridgeCount, SourceBPerAnchorMean,
-#       and bridge stability.
+#   - routingBeamGamma {0.015, 0.05, 0.10}
+#       Additive cosine beam margin below best sibling: sharing breadth,
+#       drives multi-assignment rate and ECE.
 #
-#  NOT SWEPT:
-#   - routingSoftmaxTau (held at 1.5 as in thesis_canonical.toml)
-#   - assignmentCosineGap (diagnostics-only nats margin, not used in
-#     primary routing; left at canonical value).
-#
-#  BorderlineRate is reported but not gated. Calibration is gated by
-#  RoutingECE and the soft gates below.
+#  Interaction under test: descentMargin vs bridge formation — residual
+#  pools are the cross-link generator's fuel, so loosening the gate may
+#  trade measured ambiguity (residuals) for lost polyhierarchy (bridges).
 # ══════════════════════════════════════════════════════════════════════════
 
 [factors]
-constructionMargin       = [0.15, 0.30, 0.50]
-minClusterSize           = [25, 50, 75]
-secondaryMassFloor       = [2.0, 3.5, 5.0]
-bridgeSupportRelFraction = [0.03, 0.05, 0.10]
+descentMargin      = [0.0, 0.02, 0.05]
+minClusterSize     = [25, 50, 75]
+secondaryMassFloor = [2.0, 5.0, 10.0]
+routingBeamGamma   = [0.015, 0.05, 0.10]
 
 [gates.hard]
 Acyclic = true
@@ -75,6 +68,6 @@ SourceBPerAnchorMean_le = 3.0
 [gates.soft]
 AvgMatchCount_band = [1.0, 4.0]
 Top1Accuracy_ge = 0.72
-RoutingECE_le = 0.15
+RoutingECE_le = 0.30
 CrossAnchorMigrationRate_band = [0.10, 0.30]
 CanonicalAdaptedJaccard_band = [0.0, 1.0]

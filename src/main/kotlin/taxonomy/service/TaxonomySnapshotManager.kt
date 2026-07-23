@@ -201,6 +201,7 @@ data class SnapshotSettings(
             separationEpsilon = separationEpsilon,
             membershipFloor = membershipFloor,
             routingBeamGamma = routingBeamGamma,
+            descentMargin = descentMargin,
             maxLeafAssignments = maxLeafAssignments,
             enableGtWarmStart = enableGtWarmStart,
             dagMode = dagMode
@@ -545,7 +546,7 @@ class TaxonomySnapshotManager(
             tauKappaScalingFactor = 0.0,
             membershipFloor = config.formalism.membershipFloor,
             routingBeamGamma = config.formalism.routingBeamGamma,
-            descentMargin = 0.0,
+            descentMargin = config.formalism.descentMargin,
             dagMode = config.formalism.dagMode,
             emaAlpha = 0.0,
             datasetType = config.dataset.datasetType

@@ -44,6 +44,7 @@ class TaxonomyEngine(
         log.info(config.formatConfigReport())
         perfTracker.clear()
         ops.resetConceptCounter()
+        GraphNode.resetIdCounter()
         taxonomyService.clearMetricsHistory()
 
         val totalIters = config.execution.numIterations

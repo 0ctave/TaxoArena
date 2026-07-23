@@ -285,21 +285,19 @@ class TaxonomyOperations(
             assertMassConservation(root, allEmbeddings)
         }
 
-        // Fix baseline J asymmetry (I4): compute baseJ on freshly-routed query assignments
         val baseJ = if (cachedBaseJ != null) {
             cachedBaseJ!!
         } else {
             // Restore backup to get back to base state, compute baseJ, then re-execute action
-            val tempBackup = taxonomy.model.GraphStateBackup(root)
+            backup.restore(registry)
             clearGraphQueries(root)
             reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             val jVal = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
-            tempBackup.restore(registry)
-            cachedBaseJ = jVal
             
             // Re-execute action
             action()
             
+            cachedBaseJ = jVal
             jVal
         }
 

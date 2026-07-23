@@ -31,6 +31,29 @@ class TaxonomyMerger(
     private var cachedAncestorMap: Map<String, Set<String>>? = null
     private var ancestorMapRootId: String? = null
 
+    // Negative-result memo for cross-link proposals. A rejected (host, cand) pair is
+    // re-generated and re-J-evaluated (a full re-route each) EVERY iteration even when
+    // nothing changed — measured ~10-15 identical rejected proposals per iteration in
+    // the converged tail, ~3s/iteration of pure repetition. When the edge topology
+    // fingerprint AND the candidate's (captured, poolSize) counts are identical, the
+    // J evaluation is deterministic, so skipping the re-evaluation is lossless. Any
+    // topology change (accepted proposal, split, prune) changes the fingerprint and
+    // clears the memo. Assumption made explicit: with identical topology and identical
+    // routing counts, the per-iteration mu refit is at a fixed point (earlyout_rate
+    // ~0.96 at convergence), so the cached rejection remains valid.
+    private val rejectedCrossLinks = HashSet<String>()
+    private var rejectedCrossLinksFingerprint: Int = 0
+
+    private fun edgeTopologyFingerprint(root: GraphNode): Int {
+        val edges = mutableListOf<String>()
+        for (n in getAllNodes(root)) {
+            n.children.forEach { edges.add("${n.id}>${it.id}") }
+            n.crossLinkChildren.forEach { edges.add("${n.id}~${it.id}") }
+        }
+        edges.sort()
+        return edges.hashCode()
+    }
+
     private val log = LoggerFactory.getLogger("taxonomy.Merger")
 
     suspend fun optimizeHierarchy(
@@ -371,9 +394,10 @@ class TaxonomyMerger(
             .sortedBy { it.second }
 
         val n = sortedByDistance.size
-        val innerCore = sortedByDistance.take(n / 10).shuffled().take(7)
-        val middleShell = sortedByDistance.subList(n / 10, (9 * n) / 10).shuffled().take(7)
-        val outerBoundary = sortedByDistance.takeLast(n / 10).shuffled().take(6)
+        val sampleRng = kotlin.random.Random(n)
+        val innerCore = sortedByDistance.take(n / 10).shuffled(sampleRng).take(7)
+        val middleShell = sortedByDistance.subList(n / 10, (9 * n) / 10).shuffled(sampleRng).take(7)
+        val outerBoundary = sortedByDistance.takeLast(n / 10).shuffled(sampleRng).take(6)
 
         return (innerCore + middleShell + outerBoundary).map { it.first.rawText }.distinct()
     }
@@ -690,6 +714,13 @@ class TaxonomyMerger(
         val root = dag.node
         val allNodes = getAllNodes(root).toList()
 
+        // Rejection memo: valid only while the edge topology is unchanged.
+        val fingerprint = edgeTopologyFingerprint(root)
+        if (fingerprint != rejectedCrossLinksFingerprint) {
+            rejectedCrossLinks.clear()
+            rejectedCrossLinksFingerprint = fingerprint
+        }
+
         val embById = HashMap<String, Embedding>(allEmbeddings.size * 2)
         for (emb in allEmbeddings) {
             val key = if (emb.queryId != -1) emb.queryId.toString() else TextNormalizer.cleanText(emb.rawText)
@@ -752,6 +783,14 @@ class TaxonomyMerger(
                 val hostAnc = ancestorMap[host.id] ?: emptySet()
                 if (host.id in candAnc || cand.id in hostAnc || host in cand.parents) continue
 
+                // Skip candidates already rejected under this exact topology and with
+                // identical capture counts — the J outcome is deterministic.
+                val memoKey = "${host.id}>${cand.id}#$captured/${residuals.size}"
+                if (memoKey in rejectedCrossLinks) {
+                    log.debug("[CROSS-LINK] memo-skip '${host.label}' -> '${cand.label}' ($captured/${residuals.size})")
+                    continue
+                }
+
                 val fracOfPool = captured.toDouble() / residuals.size
                 log.info("[CROSS-LINK] proposing '${host.label}' -> '${cand.label}' (captures $captured/${residuals.size} residuals)")
                 // site = the TARGET node N, not the host: the acceptance rule is
@@ -780,6 +819,13 @@ class TaxonomyMerger(
                     accepted = accepted,
                     reason = "residual-capture cross-link"
                 )
+                if (accepted) {
+                    // Topology changed: every cached rejection is stale.
+                    rejectedCrossLinks.clear()
+                    rejectedCrossLinksFingerprint = edgeTopologyFingerprint(root)
+                } else {
+                    rejectedCrossLinks.add(memoKey)
+                }
             }
         }
         invalidateAncestorCache()
