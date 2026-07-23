@@ -94,19 +94,21 @@ class TaxonomyConfig {
         var separationEpsilon: Double = 0.04
 
         // ── Routing ───────────────────────────────────────────────────────────
-        var routingSoftmaxTau: Double = 1.0
+        // Minimum posterior responsibility (softmax of each child's own vMF log-density,
+        // temperature=1 — the true Bayesian mixture posterior, no artificial softening) for a
+        // child to count as a genuine membership destination. Replaces the old
+        // constructionMargin/arenaMargin/kappaAdaptive/tauKappaScalingFactor knobs: those
+        // thresholded a raw nats gap whose practical width depended on local kappa (needing
+        // per-region recalibration to behave consistently), instead of a probability, which
+        // means the same thing everywhere in the tree. Also doubles as the cumulative-path
+        // pruning floor (stop descending once a path's product-of-responsibilities from the
+        // root drops below this) and the residual-routing trigger (no child clears the floor
+        // -> this position is residual), so one number now does the job three knobs used to.
+        var membershipFloor: Double = 0.10
 
-
-
-        // Tighter log-softmax margin coefficient used to shape the DAG during construction.
-        // Scaled adaptive-wise: effectiveMargin = constructionMargin * siblingKappa.
-        var constructionMargin: Double = 0.20
-
-        // Looser log-softmax margin coefficient used during arena-time routing for evaluation.
-        // Scaled adaptive-wise: effectiveMargin = arenaMargin * siblingKappa.
-        var arenaMargin: Double = 0.40
-
-        // Alias for constructionMargin to maintain compatibility with legacy scripts.
+        // Judge-call-cost bound for arena-time evaluation only (how many leaves a single held-out
+        // query may be scored against) — an engineering constraint, not a geometric-correctness
+        // knob. Construction-time membership is unbounded, driven purely by membershipFloor.
         var maxLeafAssignments: Int = 5
 
         // ── Merging / convergence ─────────────────────────────────────────────
@@ -132,7 +134,6 @@ class TaxonomyConfig {
 
         var fusionSimilarityThreshold: Double = 0.92
         var effectiveSupportFloor: Double = 2.0
-        var tauKappaScalingFactor: Double = 0.0
         var defaultKappaPrior: Double = 10.0
     }
 
@@ -169,7 +170,7 @@ class TaxonomyConfig {
         sb.append("│   - Max Depth:            ${formalism.maxDepth}\n")
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
-        sb.append("│   - Routing Softmax Tau:  ${formalism.routingSoftmaxTau}\n")
+        sb.append("│   - Membership Floor:     ${formalism.membershipFloor}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
         sb.append("│   - Default Kappa Prior:  ${formalism.defaultKappaPrior}\n")
@@ -204,9 +205,7 @@ class TaxonomyConfig {
             maxDepth = formalism.maxDepth,
             minClusterSize = formalism.minClusterSize,
             separationEpsilon = formalism.separationEpsilon,
-            routingSoftmaxTau = formalism.routingSoftmaxTau,
-            constructionMargin = formalism.constructionMargin,
-            arenaMargin = formalism.arenaMargin,
+            membershipFloor = formalism.membershipFloor,
             maxLeafAssignments = formalism.maxLeafAssignments,
             enableStableQuestionIds = formalism.enableStableQuestionIds,
             enableResidualRouting = formalism.enableResidualRouting,
@@ -215,7 +214,6 @@ class TaxonomyConfig {
             enableGtWarmStart = formalism.enableGtWarmStart,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
-            tauKappaScalingFactor = formalism.tauKappaScalingFactor,
             defaultKappaPrior = formalism.defaultKappaPrior
         ),
         diagnostics = EffectiveConfig.Diagnostics(
@@ -250,9 +248,7 @@ class TaxonomyConfig {
         formalism.maxDepth = c.formalism.maxDepth
         formalism.minClusterSize = c.formalism.minClusterSize
         formalism.separationEpsilon = c.formalism.separationEpsilon
-        formalism.routingSoftmaxTau = c.formalism.routingSoftmaxTau
-        formalism.constructionMargin = c.formalism.constructionMargin
-        formalism.arenaMargin = c.formalism.arenaMargin
+        formalism.membershipFloor = c.formalism.membershipFloor
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
         formalism.enableResidualRouting = c.formalism.enableResidualRouting
@@ -261,7 +257,6 @@ class TaxonomyConfig {
         formalism.enableGtWarmStart = c.formalism.enableGtWarmStart
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
-        formalism.tauKappaScalingFactor = c.formalism.tauKappaScalingFactor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
 
         diagnostics.enableBridgeAnalysis = c.diagnostics.enableBridgeAnalysis

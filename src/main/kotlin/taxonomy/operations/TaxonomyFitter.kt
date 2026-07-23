@@ -199,8 +199,8 @@ class TaxonomyFitter(
         val queryWeightsMap = node.getRegionQueryWeights()
         val nEffective = queryWeightsMap.values.sum()
         
-        // 2. Fixed 256-dim MRL slice selection
-        val fitDim = 256
+        // 2. Fixed MRL slice selection (single source of truth: dimForDepth)
+        val fitDim = dimForDepth(node.depth)
         node.sliceDim = fitDim
         
         // 3. Prior calculation (kappa0Parent)

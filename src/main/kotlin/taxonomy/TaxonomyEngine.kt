@@ -178,8 +178,19 @@ class TaxonomyEngine(
                         )
 
                         val trickleTime = measureTimeMillis {
-                            ops.clearGraphQueries(root)
-                            ops.reassignQueries(root, uniqueEmbs, groundTruthMap, i)
+                            // Skip on the first iteration: the bootstrap step above already
+                            // assigned every query to its ground-truth anchor with weight 1.0.
+                            // Re-routing immediately via embedding-based trickle (even with the
+                            // enableGtBias nudge) let queries drift onto merely-similar wrong
+                            // anchors before any real structure existed, inflating some anchors
+                            // several-fold over their true ground-truth size. Keeping the
+                            // ground-truth assignment for the first split/optimize/refit pass and
+                            // only starting trickle-based reassignment from iteration 2 removes
+                            // the need for that bias entirely.
+                            if (i > 1) {
+                                ops.clearGraphQueries(root)
+                                ops.reassignQueries(root, uniqueEmbs, groundTruthMap, i)
+                            }
                         }
                         perfTracker.recordTime("construction.phase3_trickle", trickleTime, uniqueEmbs.size.toLong())
                         perfTracker.recordTime("construction.phase3_trickle@iter=$i", trickleTime, uniqueEmbs.size.toLong())
@@ -284,6 +295,10 @@ class TaxonomyEngine(
                 }
 
                 logNodeDiagnostics(root, distilledData.size)
+
+                if (config.diagnostics.enableProfiling) {
+                    dumpIterationSnapshot(root, i)
+                }
 
                 // Print intermediate DAG structure / changes to save log size
                 val currentDagState = captureDagState(root)
@@ -644,6 +659,57 @@ class TaxonomyEngine(
             if (!isLeaf && n.queries.isNotEmpty() && n.residualQueries.isEmpty()) {
                 log.warn("WARNING: Internal Node ${n.id} (${n.label}) violates C3! Has non-empty hard queries size ($queriesSize) but empty residualQueries.")
             }
+        }
+    }
+
+    /**
+     * Appends one JSON line per iteration to `dag_snapshots.jsonl` in the active experiment
+     * output dir: the full node list with enough fields (id, label, depth, parent/child ids,
+     * kappa, direct/residual/subtree query counts) to reconstruct topology, detect single-child
+     * chains, and inspect query repartition per iteration without re-parsing the text log's
+     * diff-only iteration entries (only iteration 1 and the final state get a full text dump;
+     * everything in between is a diff). One line = one iteration = independently parseable.
+     */
+    private fun dumpIterationSnapshot(root: GraphNode, iteration: Int) {
+        val baseDir = ExperimentOutputContext.activeBaseDir ?: File(".")
+        val outFile = File(baseDir, "dag_snapshots.jsonl")
+        try {
+            outFile.parentFile?.mkdirs()
+            val allNodes = mutableListOf<GraphNode>()
+            val visited = mutableSetOf<String>()
+            fun walk(n: GraphNode) {
+                if (!visited.add(n.id)) return
+                allNodes.add(n)
+                n.children.forEach { walk(it) }
+                n.crossLinkChildren.forEach { walk(it) }
+            }
+            walk(root)
+
+            fun esc(s: String?) = (s ?: "").replace("\\", "\\\\").replace("\"", "\\\"")
+
+            val sb = StringBuilder()
+            sb.append("{\"iteration\":").append(iteration).append(",\"nodes\":[")
+            allNodes.forEachIndexed { idx, n ->
+                if (idx > 0) sb.append(",")
+                sb.append("{")
+                sb.append("\"id\":\"").append(esc(n.id)).append("\",")
+                sb.append("\"label\":\"").append(esc(n.label)).append("\",")
+                sb.append("\"depth\":").append(n.depth).append(",")
+                sb.append("\"isLeaf\":").append(n.isLeaf).append(",")
+                sb.append("\"isBridge\":").append(n.isBridge).append(",")
+                sb.append("\"kappa\":").append(String.format(java.util.Locale.US, "%.4f", n.vmfKappa)).append(",")
+                sb.append("\"directQueries\":").append(n.queries.size).append(",")
+                sb.append("\"residualQueries\":").append(n.residualQueries.size).append(",")
+                sb.append("\"subtreeQueries\":").append(n.getRecursiveQueryCount()).append(",")
+                sb.append("\"parentIds\":[").append(n.parents.joinToString(",") { "\"${esc(it.id)}\"" }).append("],")
+                sb.append("\"childIds\":[").append(n.children.joinToString(",") { "\"${esc(it.id)}\"" }).append("]")
+                sb.append("}")
+            }
+            sb.append("]}")
+
+            outFile.appendText(sb.toString() + "\n")
+        } catch (e: Exception) {
+            log.warn("Failed to write DAG snapshot for iteration $iteration: ${e.message}")
         }
     }
 }

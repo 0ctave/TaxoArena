@@ -54,9 +54,7 @@ data class EffectiveConfig(
         val maxDepth: Int = 12,
         val minClusterSize: Int = 25,
         val separationEpsilon: Double = 0.04,
-        val routingSoftmaxTau: Double = 1.0,
-        val constructionMargin: Double = 0.20,
-        val arenaMargin: Double = 0.40,
+        val membershipFloor: Double = 0.10,
         val maxLeafAssignments: Int = 5,
         val enableStableQuestionIds: Boolean = true,
         val enableResidualRouting: Boolean = true,
@@ -65,7 +63,6 @@ data class EffectiveConfig(
         val enableGtWarmStart: Boolean = false,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
-        val tauKappaScalingFactor: Double = 0.0,
         val defaultKappaPrior: Double = 10.0
     )
 

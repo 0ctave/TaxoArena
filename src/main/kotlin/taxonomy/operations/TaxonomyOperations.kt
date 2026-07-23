@@ -212,6 +212,34 @@ class TaxonomyOperations(
         log.info(sb.toString())
     }
 
+    /**
+     * True iff [node] is a pure single-child pass-through wrapper for display purposes:
+     * exactly one tree child, no cross-links, no queries of its own (hard or residual),
+     * deep enough not to be a protected anchor. This is a printing-only concept -- it
+     * never touches the live tree, construction, or routing, and is independent of
+     * (deliberately looser than) TaxonomyMerger's own passthrough-collapse gate, which
+     * has to stay conservative for convergence reasons documented in
+     * docs/dag-chain-formation-handoff.md. Here we're only deciding what to print.
+     */
+    private fun isDisplayWrapper(node: GraphNode): Boolean =
+        node.treeChildren.size == 1 && node.crossLinkChildren.isEmpty() &&
+        node.queries.isEmpty() && node.residualQueries.isEmpty() && node.depth > 1
+
+    /**
+     * Walk forward from [start] through consecutive display-wrapper levels, returning
+     * the first node actually worth rendering and how many levels were skipped to reach
+     * it.
+     */
+    private fun collapseWrapperChain(start: GraphNode): Pair<GraphNode, Int> {
+        var current = start
+        var hops = 0
+        while (isDisplayWrapper(current)) {
+            current = current.treeChildren.first()
+            hops++
+        }
+        return current to hops
+    }
+
     private fun buildTreeStringCompact(
         node: GraphNode,
         prefix: String,
@@ -219,7 +247,8 @@ class TaxonomyOperations(
         sb: java.lang.StringBuilder,
         visited: MutableSet<String>,
         isCrossEdge: Boolean = false,
-        policy: TraversalPolicy = TraversalPolicy.DAG_BOTH
+        policy: TraversalPolicy = TraversalPolicy.DAG_BOTH,
+        chainSkipped: Int = 0
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
@@ -233,8 +262,9 @@ class TaxonomyOperations(
         val vmfStats = if (node.vmfMu.isNotEmpty()) {
             " (kappa: ${"%.1f".format(java.util.Locale.US, node.vmfKappa)})"
         } else ""
+        val chainNote = if (chainSkipped > 0) " [⋯ $chainSkipped wrapper level${if (chainSkipped > 1) "s" else ""} collapsed]" else ""
 
-        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$parentsInfo$cross$edgeType"
+        val nodeLabel = "${node.label} [q=$directQ/$qCount, $type]$vmfStats$parentsInfo$chainNote$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 
@@ -245,11 +275,12 @@ class TaxonomyOperations(
         val crossLinks = if (policy == TraversalPolicy.BRIDGE_ONLY || policy == TraversalPolicy.DAG_BOTH) node.crossLinkChildren.toList() else emptyList()
         val allChildren = children + crossLinks
         for (i in allChildren.indices) {
-            val child = allChildren[i]
+            val rawChild = allChildren[i]
             val childIsTail = i == allChildren.size - 1
             val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "│   "
             val childIsCross = i >= children.size
-            buildTreeStringCompact(child, nextPrefix, childIsTail, sb, visited, childIsCross, policy)
+            val (displayChild, skipped) = if (childIsCross) rawChild to 0 else collapseWrapperChain(rawChild)
+            buildTreeStringCompact(displayChild, nextPrefix, childIsTail, sb, visited, childIsCross, policy, skipped)
         }
     }
 
@@ -260,7 +291,8 @@ class TaxonomyOperations(
         sb: java.lang.StringBuilder,
         visited: MutableSet<String>,
         isCrossEdge: Boolean = false,
-        policy: TraversalPolicy = TraversalPolicy.DAG_BOTH
+        policy: TraversalPolicy = TraversalPolicy.DAG_BOTH,
+        chainSkipped: Int = 0
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
@@ -272,8 +304,9 @@ class TaxonomyOperations(
         val vmfStats = if (node.vmfMu.isNotEmpty()) {
             " (vMF kappa: ${"%.3f".format(java.util.Locale.US, node.vmfKappa)})"
         } else ""
+        val chainNote = if (chainSkipped > 0) " [⋯ $chainSkipped wrapper level${if (chainSkipped > 1) "s" else ""} collapsed]" else ""
 
-        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$parentsInfo$cross$edgeType"
+        val nodeLabel = "${node.label} [${node.queries.size} q - $type]$vmfStats$parentsInfo$chainNote$cross$edgeType"
         val connector = if (node.depth == 0) "" else if (isTail) "└── " else "├── "
         sb.append(prefix).append(connector).append(nodeLabel).append("\n")
 
@@ -284,11 +317,12 @@ class TaxonomyOperations(
         val crossLinks = if (policy == TraversalPolicy.BRIDGE_ONLY || policy == TraversalPolicy.DAG_BOTH) node.crossLinkChildren.toList() else emptyList()
         val allChildren = children + crossLinks
         for (i in allChildren.indices) {
-            val child = allChildren[i]
+            val rawChild = allChildren[i]
             val childIsTail = i == allChildren.size - 1
             val nextPrefix = prefix + if (node.depth == 0) "" else if (isTail) "    " else "│   "
             val childIsCross = i >= children.size
-            buildTreeString(child, nextPrefix, childIsTail, sb, visited, childIsCross, policy)
+            val (displayChild, skipped) = if (childIsCross) rawChild to 0 else collapseWrapperChain(rawChild)
+            buildTreeString(displayChild, nextPrefix, childIsTail, sb, visited, childIsCross, policy, skipped)
         }
     }
 

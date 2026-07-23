@@ -186,11 +186,11 @@ class TuiConfigFacade(
             kind = SettingKind.NUMBER
         ),
         SettingItem(
-            name = "Routing Softmax Tau",
-            description = "Routing softmax temperature",
+            name = "Membership Floor",
+            description = "Minimum posterior responsibility to count as a genuine membership",
             category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.routingSoftmaxTau.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.routingSoftmaxTau = it; true } ?: false },
+            getValue = { deps.config.formalism.membershipFloor.toString() },
+            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.membershipFloor = it; true } ?: false },
             kind = SettingKind.NUMBER
         )
     )

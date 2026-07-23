@@ -151,6 +151,12 @@ data class SnapshotSettings(
     val enableLabeling: Boolean,
     val separationEpsilon: Double,
     val minClusterSize: Int,
+    // Removed: routingSoftmaxTau/constructionMargin/arenaMargin/tauKappaScalingFactor/
+    // kappaAdaptive. Those thresholded a raw nats gap whose practical width depended on local
+    // vMF kappa, needing per-region recalibration to behave consistently and never quite doing
+    // so. Replaced by membershipFloor: a posterior-probability threshold on each child's own
+    // (temperature=1, true Bayesian) responsibility, which means the same thing everywhere in
+    // the tree. Kept here (defaulted) only so legacy snapshot rows still deserialize.
     val routingSoftmaxTau: Double = 1.0,
     val secondaryMassFloor: Double = 5.0,
     val bridgeSupportFloor: Double = 50.0,
@@ -163,6 +169,7 @@ data class SnapshotSettings(
     val refitMuPerIteration: Boolean = false,
     val enableGtWarmStart: Boolean = true,
     val tauKappaScalingFactor: Double = 0.0,
+    val membershipFloor: Double = 0.10,
     val dagMode: taxonomy.config.DagMode = taxonomy.config.DagMode.DAG_MAX,
     // Removed: EMA blending of mu across iterations. Matched-config A/B runs showed
     // it amplifies oscillation and prior-domination rather than stabilizing the fit.
@@ -190,12 +197,9 @@ data class SnapshotSettings(
             maxDepth = maxDepth,
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
-            routingSoftmaxTau = routingSoftmaxTau,
-            constructionMargin = constructionMargin,
-            arenaMargin = arenaMargin,
+            membershipFloor = membershipFloor,
             maxLeafAssignments = maxLeafAssignments,
             enableGtWarmStart = enableGtWarmStart,
-            tauKappaScalingFactor = tauKappaScalingFactor,
             dagMode = dagMode
         ),
         diagnostics = EffectiveConfig.Diagnostics(
@@ -524,18 +528,19 @@ class TaxonomySnapshotManager(
             enableLabeling = config.execution.enableLabeling,
             separationEpsilon = config.formalism.separationEpsilon,
             minClusterSize = config.formalism.minClusterSize,
-            routingSoftmaxTau = config.formalism.routingSoftmaxTau,
+            routingSoftmaxTau = 1.0,
             secondaryMassFloor = config.diagnostics.secondaryMassFloor,
             bridgeSupportFloor = config.diagnostics.bridgeSupportFloor,
             bridgeSupportRelFraction = config.diagnostics.bridgeSupportRelFraction,
             enableProfiling = config.diagnostics.enableProfiling,
             deltaAssign = 0.0,
-            constructionMargin = config.formalism.constructionMargin,
-            arenaMargin = config.formalism.arenaMargin,
+            constructionMargin = 0.0,
+            arenaMargin = 0.0,
             maxLeafAssignments = config.formalism.maxLeafAssignments,
             refitMuPerIteration = true,
             enableGtWarmStart = config.formalism.enableGtWarmStart,
-            tauKappaScalingFactor = config.formalism.tauKappaScalingFactor,
+            tauKappaScalingFactor = 0.0,
+            membershipFloor = config.formalism.membershipFloor,
             dagMode = config.formalism.dagMode,
             emaAlpha = 0.0,
             datasetType = config.dataset.datasetType

@@ -213,20 +213,25 @@ class TaxonomyMerger(
                 allChildren.map { branchSizes[it] ?: 0 }.average()
 
             val isPhysicalLeaf = child.children.isEmpty() && child.crossLinkChildren.isEmpty()
-            // Absolute floor tied to minClusterSize (not an arbitrary constant) so starvation
-            // reflects the same tunable the split-time floor uses, not just local sibling context.
-            val absoluteFloor = config.formalism.minClusterSize.toDouble() * 0.5
-            val isStarved = isPhysicalLeaf && totalQueriesInBranch < (siblingAvg * 0.2).coerceAtLeast(absoluteFloor)
+            // Hard floor tied directly to minClusterSize — the same parameter that already
+            // governs the split-time floor (a fresh split is rejected if any resulting cluster
+            // would be smaller than this). Symmetric and elegant: no leaf should survive below
+            // the size a split was ever allowed to create it at, full stop, no separate relative
+            // sibling-average heuristic or extra constant needed.
+            val isStarved = isPhysicalLeaf && totalQueriesInBranch < config.formalism.minClusterSize
 
-            // NOTE: no longer vetoed when pruning would leave the parent with a single child.
-            // That veto created a deadlock with prunePassthroughNodes (called right after this
-            // pass in optimizeHierarchy): a starved leaf was never removed because doing so would
-            // leave a single-child parent, but a single-child parent is exactly the precondition
-            // prunePassthroughNodes needs to collapse it. The precondition could never occur, so
-            // starved leaves in 2-child splits survived forever. prunePassthroughNodes already
-            // handles the resulting single-child parent gracefully (collapses it if similar enough
-            // to its lone child and under minClusterSize itself; otherwise leaves it as a
-            // legitimate single-child branch point).
+            // wouldLeaveParentSingleChild veto removed. Traced a specific violating node
+            // (Emergent Concept #66 in the 4-domain diagnostic) through the raw structural-change
+            // log: each C3 violation it produced was a genuine one-iteration blip (orphaned mass
+            // from a pruned sibling folded onto it, then correctly cleared and re-routed by the
+            // very next trickle pass) — not a permanent deadlock. The apparent non-convergence
+            // came from pruning volume: with the veto gone, far more 2-child-parent cases prune
+            // per iteration, so *some* node is always mid-blip, which the GED-based convergence
+            // check (needs zero structural change for 5 consecutive iterations) never tolerates
+            // within a 35-iteration budget — even though every individual change is legitimate,
+            // self-correcting cleanup. See numIterations note on the diagnostic config: this
+            // needs a larger iteration budget to let that cleanup fully settle, not a different
+            // pruning rule.
             isTrulyDead || isStarved
         }
 

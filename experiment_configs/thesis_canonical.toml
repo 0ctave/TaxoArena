@@ -126,6 +126,10 @@ bridgeSupportRelFraction  = 0.10   # [L9] relative support a bridge must carry v
 # Unified trickle settings
 fusionSimilarityThreshold = 0.90
 
-enableGtWarmStart         = false
+enableGtWarmStart         = false  # no longer needed: TaxonomyEngine now skips trickle-based
+# reassignment entirely on iteration 1, keeping the bootstrap's
+# 100% ground-truth query assignment intact for the first
+# split/optimize/refit pass instead of re-routing it through
+# embeddings and patching the drift with a soft bias.
 arenaMargin               = 0.40
 enableProfiling           = true

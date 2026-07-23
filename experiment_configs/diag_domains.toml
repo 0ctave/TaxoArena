@@ -1,0 +1,54 @@
+# diag_domains.toml — Incremental domain-count diagnostic for DAG construction health.
+#
+# Purpose: isolate whether construction issues (mass/leaf-sum mismatch, C3 violations,
+# non-convergence) are present at the simplest possible case (1 domain) or only emerge
+# as domain count / tree depth grows. Edit `domains` and `membershipFloor` below and
+# re-run at each step; everything else mirrors thesis_canonical.toml.
+#
+# Step 1: domains = ["Computer Science"]
+# Step 2: domains = ["Computer Science", "Math"]
+# Step 3: domains = ["Computer Science", "Math", "History", "Philosophy"]
+# ... increase toward all 14 as each step checks out.
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+]
+
+domains       = ["Math"]
+queryLimit    = 0
+outputDir     = "experiment_results/diag_domains"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline    = true
+runBenchmark   = false
+runTrickle     = true
+runBaselines   = false
+enableFinalMetrics = true
+enableLabeling = false
+judgeInduction = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 50
+separationEpsilon     = 0.01
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+numIterations         = 80
+maxLeafAssignments    = 5
+
+# Posterior-probability admission floor for construction+arena trickle routing (replaces
+# constructionMargin/arenaMargin/kappaAdaptive/tauKappaScalingFactor). This is the value
+# being calibrated across the domain-count diagnostic steps.
+membershipFloor           = 0.10
+
+secondaryMassFloor        = 2.0
+bridgeSupportRelFraction  = 0.10
+fusionSimilarityThreshold = 0.90
+
+enableGtWarmStart         = false
+enableProfiling           = true

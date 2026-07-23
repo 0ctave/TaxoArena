@@ -48,7 +48,7 @@ class TaxonomyDagMaxFeaturesTest {
     fun `R1 - residual detection and kappa exclusion`() {
         val config = TaxonomyConfig()
         config.formalism.enableResidualRouting = true
-// [STALE FORK PARAM]         config.formalism.routeConfidenceTau = 0.6 // Set to 0.6 so 0.5 is strictly less than 0.6
+        config.formalism.membershipFloor = 0.6 // 0.6 so a 50/50 split (0.5 each) clears neither
 
         val trickler = TaxonomyTrickler(config)
         val parent = node("parent", "Parent Domain", 2)
@@ -82,7 +82,7 @@ class TaxonomyDagMaxFeaturesTest {
         }
 
         // Since midway query falls between, bestChildResp will be around 0.5.
-        // Since bestChildResp <= routeConfidenceTau (0.6), it should record a residual hit at parent
+        // Since neither child clears membershipFloor (0.6), it should record a residual hit at parent.
         assertTrue(result.residualHits.any { it.node.id == parent.id && it.questionId == "101" })
 
         // Check kappa exclusion
@@ -958,7 +958,7 @@ class TaxonomyDagMaxFeaturesTest {
     @Test
     fun `R16 - log-space adaptive soft-membership and branch-point descent gating`() {
         val config = TaxonomyConfig()
-        config.formalism.constructionMargin = 0.20  // branch-point descent gating margin
+        config.formalism.membershipFloor = 0.10  // posterior-probability admission floor
         config.formalism.enableResidualRouting = false
         val trickler = TaxonomyTrickler(config)
         val parent = node("parent", "Parent Domain", 2)

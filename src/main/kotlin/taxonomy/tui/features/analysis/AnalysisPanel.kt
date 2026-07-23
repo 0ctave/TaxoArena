@@ -230,7 +230,7 @@ fun ConfigSnapshotPanel(
     add("  Max depth    ${config.formalism.maxDepth}")
     add("  Min cluster  ${config.formalism.minClusterSize}")
     add("  Sep. epsilon ${config.formalism.separationEpsilon}")
-    add("  Softmax tau  ${config.formalism.routingSoftmaxTau}")
+    add("  Member floor ${config.formalism.membershipFloor}")
 
     ScrollablePanelContent(
         pWidth = width,

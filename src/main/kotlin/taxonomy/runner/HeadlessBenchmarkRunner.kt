@@ -56,7 +56,7 @@ data class HeadlessCliConfig(
     val maxDepth: Int? = null,
     val minClusterSize: Int? = null,
     val separationEpsilon: Double? = null,
-    val routingSoftmaxTau: Double? = null,
+    val membershipFloor: Double? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
@@ -75,11 +75,8 @@ data class HeadlessCliConfig(
     val secondaryMassFloor: Double? = null,
     val bridgeSupportFloor: Double? = null,
     val bridgeSupportRelFraction: Double? = null,
-    val constructionMargin: Double? = null,
-    val arenaMargin: Double? = null,
     val enableGtWarmStart: Boolean? = null,
     val maxLeafAssignments: Int? = null,
-    val tauKappaScalingFactor: Double? = null,
     val dagMode: String? = null,
     val enableProfiling: Boolean? = null
 )
@@ -147,7 +144,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.maxDepth?.let { config.formalism.maxDepth = it }
         cliConfig.minClusterSize?.let { config.formalism.minClusterSize = it }
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
-        cliConfig.routingSoftmaxTau?.let { config.formalism.routingSoftmaxTau = it }
+        cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -163,9 +160,6 @@ class HeadlessBenchmarkRunner(
         cliConfig.secondaryMassFloor?.let { config.diagnostics.secondaryMassFloor = it }
         cliConfig.bridgeSupportFloor?.let { config.diagnostics.bridgeSupportFloor = it }
         cliConfig.bridgeSupportRelFraction?.let { config.diagnostics.bridgeSupportRelFraction = it }
-        cliConfig.tauKappaScalingFactor?.let { config.formalism.tauKappaScalingFactor = it }
-        cliConfig.constructionMargin?.let { config.formalism.constructionMargin = it }
-        cliConfig.arenaMargin?.let { config.formalism.arenaMargin = it }
         cliConfig.enableGtWarmStart?.let { config.formalism.enableGtWarmStart = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
         cliConfig.dagMode?.let {
@@ -1220,8 +1214,8 @@ class HeadlessBenchmarkRunner(
         var maxDepth: Int? = null
         var minClusterSize: Int? = null
         var separationEpsilon: Double? = null
+        var membershipFloor: Double? = null
         var cosineTau: Double? = null
-        var routingSoftmaxTau: Double? = null
         var leafAcceptanceScale: Double? = null
         var assignmentGap: Double? = null
         var enableLabeling: Boolean? = null
@@ -1239,11 +1233,8 @@ class HeadlessBenchmarkRunner(
         var secondaryMassFloor: Double? = null
         var bridgeSupportFloor: Double? = null
         var bridgeSupportRelFraction: Double? = null
-        var constructionMargin: Double? = null
-        var arenaMargin: Double? = null
         var enableGtWarmStart: Boolean? = null
         var maxLeafAssignments: Int? = null
-        var tauKappaScalingFactor: Double? = null
         var dagMode: String? = null
         var numIterations: Int? = null
         var defaultKappaPrior: Double? = null
@@ -1300,7 +1291,7 @@ class HeadlessBenchmarkRunner(
                 "maxDepth" -> maxDepth = rawVal.toInt()
                 "minClusterSize" -> minClusterSize = rawVal.toInt()
                 "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
-                "routingSoftmaxTau" -> routingSoftmaxTau = rawVal.toDouble()
+                "membershipFloor" -> membershipFloor = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
                 "datasetType" -> datasetType = rawVal.trim('"', '\'')
@@ -1322,11 +1313,8 @@ class HeadlessBenchmarkRunner(
                 "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
                 "bridgeSupportFloor" -> bridgeSupportFloor = rawVal.toDouble()
                 "bridgeSupportRelFraction" -> bridgeSupportRelFraction = rawVal.toDouble()
-                "constructionMargin" -> constructionMargin = rawVal.toDouble()
-                "arenaMargin" -> arenaMargin = rawVal.toDouble()
                 "enableGtWarmStart" -> enableGtWarmStart = rawVal.toBoolean()
                 "maxLeafAssignments" -> maxLeafAssignments = rawVal.toInt()
-                "tauKappaScalingFactor" -> tauKappaScalingFactor = rawVal.toDouble()
                 "dagMode" -> dagMode = rawVal.trim().trim('"').trim('\'')
                 "numIterations" -> numIterations = rawVal.toInt()
                 "defaultKappaPrior" -> defaultKappaPrior = rawVal.toDouble()
@@ -1353,7 +1341,7 @@ class HeadlessBenchmarkRunner(
             maxDepth = maxDepth,
             minClusterSize = minClusterSize,
             separationEpsilon = separationEpsilon,
-            routingSoftmaxTau = routingSoftmaxTau,
+            membershipFloor = membershipFloor,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,
@@ -1370,11 +1358,8 @@ class HeadlessBenchmarkRunner(
             secondaryMassFloor = secondaryMassFloor,
             bridgeSupportFloor = bridgeSupportFloor,
             bridgeSupportRelFraction = bridgeSupportRelFraction,
-            constructionMargin = constructionMargin,
-            arenaMargin = arenaMargin,
             enableGtWarmStart = enableGtWarmStart,
             maxLeafAssignments = maxLeafAssignments,
-            tauKappaScalingFactor = tauKappaScalingFactor,
             dagMode = dagMode,
             numIterations = numIterations,
             runBaselines = runBaselines,
@@ -1412,9 +1397,8 @@ class HeadlessBenchmarkRunner(
             config.formalism.maxDepth,
             config.formalism.minClusterSize,
             config.formalism.separationEpsilon,
-            config.formalism.routingSoftmaxTau,
+            config.formalism.membershipFloor,
             config.formalism.maxLeafAssignments,
-            config.formalism.tauKappaScalingFactor,
             config.formalism.dagMode,
             config.formalism.fusionSimilarityThreshold,
             config.formalism.effectiveSupportFloor,

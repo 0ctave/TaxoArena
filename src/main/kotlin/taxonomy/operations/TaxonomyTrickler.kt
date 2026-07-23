@@ -9,12 +9,19 @@ import taxonomy.model.projectTo
 import taxonomy.utils.StatisticsUtils
 import kotlin.math.exp
 import kotlin.math.ln
-import kotlin.math.pow
 
 /**
  * Implements Phase 3: Trickle (Top-Down Restrictive Routing).
- * Routes queries down the DAG using log-space temperature-scaled softmax,
- * then prunes results to within [assignmentMargin] nats of the best leaf.
+ *
+ * Routes queries down the DAG using each child's own vMF posterior responsibility
+ * (softmax of its log-density at temperature=1 — the true Bayesian mixture posterior,
+ * no artificial softening). A child is a genuine membership destination iff its
+ * responsibility clears [TaxonomyConfig.FormalismConfig.membershipFloor]; the same floor
+ * bounds cumulative path probability (stop descending once a path's product of
+ * per-level responsibilities decays below it) and triggers residual routing (no child
+ * clears the floor -> this position is residual). One probability-scale parameter
+ * governs all three, and it means the same thing everywhere in the tree regardless of
+ * local vMF concentration — unlike the previous nats-margin-times-kappa scheme.
  */
 data class RoutingResult(
     val leaves: Map<GraphNode, Double>,
@@ -35,10 +42,9 @@ data class ResidualHit(
 
 @Service
 data class TrickleOptions(
-    val margin: Double,
+    val membershipFloor: Double,
     val maxAssignments: Int,
     val readOnly: Boolean = true,
-    val kappaAdaptive: Boolean = true,
     val enableGtBias: Boolean = false,
     val originalCategories: List<String>? = null
 )
@@ -68,12 +74,13 @@ class TaxonomyTrickler(
         originalCategories: List<String>? = null,
         isInference: Boolean = false
     ): RoutingResult {
-        val margin = if (isInference) config.formalism.arenaMargin else config.formalism.constructionMargin
+        // Construction and arena share the same posterior-probability floor: both should mean
+        // "genuine membership" the same way. maxLeafAssignments (arena-only, a judge-call-cost
+        // bound) is enforced downstream in TaxonomyArenaService, not here.
         val opts = TrickleOptions(
-            margin = margin,
+            membershipFloor = config.formalism.membershipFloor,
             maxAssignments = config.formalism.maxLeafAssignments,
             readOnly = isInference,
-            kappaAdaptive = false,
             enableGtBias = (config.formalism.enableGtWarmStart && currentIteration <= 1),
             originalCategories = originalCategories
         )
@@ -112,8 +119,9 @@ class TaxonomyTrickler(
             val K = children.size
             val vmfScores = DoubleArray(K)
 
-            // 1. Score each child i using its own kappa and Normalizer (Issue A)
-            val siblingKappas = mutableListOf<Double>()
+            // 1. Score each child with its own vMF log-density (its own kappa and normalizer —
+            // a component with tighter concentration or a better directional match scores higher
+            // on its own terms, not relative to a shared/averaged sibling kappa).
             for (i in children.indices) {
                 val child = children[i]
                 val slicedX = embedding.projectTo(child.sliceDim)
@@ -127,58 +135,52 @@ class TaxonomyTrickler(
                 }
 
                 vmfScores[i] = f
-                siblingKappas.add(child.vmfKappa)
             }
 
-            val siblingKappa = siblingKappas.average().coerceIn(1.0, 100.0)
+            // 2. True Bayesian posterior responsibility — softmax of the raw vMF log-densities,
+            // temperature=1, no artificial softening. The fitted kappa of each child already
+            // determines how sharp or soft its boundary should be; no separate calibration knob
+            // (routingSoftmaxTau / tauKappaScalingFactor) is needed on top of that.
+            val maxScore = vmfScores.maxOrNull() ?: 0.0
+            val sumExp = vmfScores.sumOf { exp(it - maxScore) }
+            val logSumExpVal = maxScore + ln(sumExp.coerceAtLeast(1e-300))
+            val responsibilities = DoubleArray(K) { exp(vmfScores[it] - logSumExpVal) }
 
-            // Temperature-scaled softmax with dynamic inverse-variance scaling (tau)
-            val gamma = config.formalism.tauKappaScalingFactor.coerceIn(0.0, 1.0)
-            val dynamicTau = config.formalism.routingSoftmaxTau.coerceAtLeast(0.01) * siblingKappa.pow(gamma)
-            val tempScores = DoubleArray(K) { vmfScores[it] / dynamicTau }
-            val maxTemp = tempScores.maxOrNull() ?: 0.0
-            val sumExp = tempScores.sumOf { exp(it - maxTemp) }
-            val logSumExpVal = maxTemp + ln(sumExp.coerceAtLeast(1e-300))
+            // 3. Membership: a child is a genuine destination iff its responsibility clears
+            // membershipFloor — a probability, so this means the same thing everywhere in the
+            // tree regardless of local kappa. If nothing clears it, this position is residual by
+            // construction (no separate residual threshold needed).
+            val bestIndices = children.indices.filter { responsibilities[it] >= opts.membershipFloor }
 
-            val responsibilities = DoubleArray(K) { exp(tempScores[it] - logSumExpVal) }
-
-            // 2. Residual routing check: record a low-confidence hit for diagnostics, but keep
-            // walking the beam below regardless. Hard-stopping here (added in the 2026-07-22
-            // trickle rework) starves this whole subtree of any leaf destination for that query;
-            // TrickleResult.leaves() then filters the only reachable candidate out (it's
-            // non-leaf), RoutingResult.leaves comes back empty, and the caller
-            // (TaxonomyOperations.reassignQueries) falls back to dumping the query onto the
-            // root with hard weight 1.0 — completely outside residualQueries accounting. Since
-            // residual routing is gated to depth >= 2, the root itself can never receive a
-            // ResidualHit, so this manifested as the root perpetually violating the C3 invariant
-            // (non-empty hard queries, empty residualQueries) and injecting unconserved mass.
-            if (config.formalism.enableResidualRouting && node.depth >= 2) {
-                val bestChildResp = responsibilities.maxOrNull() ?: 0.0
-                val residualC = 1.6
-                val adaptiveThreshold = (residualC / K).coerceAtMost(0.80)
-                if (bestChildResp < adaptiveThreshold && !opts.readOnly) {
+            if (bestIndices.isEmpty()) {
+                if (config.formalism.enableResidualRouting && node.depth >= 2 && !opts.readOnly) {
+                    val bestChildResp = responsibilities.maxOrNull() ?: 0.0
                     val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
                     residualHits.add(ResidualHit(node, qId, bestChildResp))
                 }
+                return
             }
 
             // Register the query embedding for MRL-projection lookup
             GraphNode.registerEmbedding(embedding)
 
-            // 3. Beam: retain B = { i : (maxTemp - tempScores[i]) <= delta * siblingKappa } (mathematically equivalent to max_j log r_j - log r_i) (Issue B)
-            val effectiveMargin = opts.margin * (if (opts.kappaAdaptive) siblingKappa else 1.0)
-            val bestIndices = children.indices
-                .filter { (maxTemp - tempScores[it]) <= effectiveMargin }
+            // 4. Renormalize over the admitted set so per-level probabilities sum to 1 (avoids
+            // path-depth bias from carrying the excluded tail's mass down the tree).
+            val beamSumExp = bestIndices.sumOf { exp(vmfScores[it] - maxScore) }
+            val logBeamSumExp = maxScore + ln(beamSumExp.coerceAtLeast(1e-300))
 
-            // 4. Renormalize over the beam to eliminate path-depth bias (Issue C)
-            val beamSumExp = bestIndices.sumOf { exp(tempScores[it] - maxTemp) }
-            val logBeamSumExp = maxTemp + ln(beamSumExp.coerceAtLeast(1e-300))
-
+            val logFloor = ln(opts.membershipFloor.coerceAtLeast(1e-300))
             for (i in bestIndices) {
                 val child = children[i]
-                val logTransitionProb = tempScores[i] - logBeamSumExp
+                val logTransitionProb = vmfScores[i] - logBeamSumExp
                 val accumulatedWeight = currentLogProb + logTransitionProb
-                walk(child, accumulatedWeight)
+                // Cumulative-path pruning: stop descending once this path's own probability from
+                // the root (not just this level's) has decayed below the floor. A numerical
+                // safety valve against fan-out at deep trees, not a semantic cap — it discards
+                // only what's already provably negligible.
+                if (accumulatedWeight >= logFloor) {
+                    walk(child, accumulatedWeight)
+                }
             }
         }
 
