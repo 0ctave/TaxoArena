@@ -119,6 +119,34 @@ class TaxonomyMerger(
         target.niwLambda = lambdaN
     }
 
+    private fun renormalizeQueryWeights(root: GraphNode) {
+        val leaves = mutableListOf<GraphNode>()
+        val visited = mutableSetOf<String>()
+        fun walk(n: GraphNode) {
+            if (!visited.add(n.id)) return
+            if (n.isLeaf) leaves.add(n)
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+
+        val totalWeights = mutableMapOf<String, Double>()
+        for (leaf in leaves) {
+            for ((q, w) in leaf.queryWeights) {
+                totalWeights[q] = (totalWeights[q] ?: 0.0) + w
+            }
+        }
+
+        for (leaf in leaves) {
+            for (q in leaf.queryWeights.keys.toList()) {
+                val tot = totalWeights[q] ?: 1.0
+                if (tot > 0.0) {
+                    leaf.queryWeights[q] = leaf.queryWeights[q]!! / tot
+                }
+            }
+        }
+    }
+
     private fun fuseNodes(target: GraphNode, source: GraphNode) {
         require(target.sliceDim == source.sliceDim) {
             "Cannot fuse nodes at different dims: ${target.label}(${target.sliceDim}) vs ${source.label}(${source.sliceDim})"
@@ -127,10 +155,10 @@ class TaxonomyMerger(
         val allQueries = (target.queries + source.queries).distinctBy { it.rawText }
         val allWeights = mutableMapOf<String, Double>()
         for ((q, w) in target.queryWeights) {
-            allWeights[q] = maxOf(allWeights[q] ?: 0.0, w)
+            allWeights[q] = (allWeights[q] ?: 0.0) + w
         }
         for ((q, w) in source.queryWeights) {
-            allWeights[q] = maxOf(allWeights[q] ?: 0.0, w)
+            allWeights[q] = (allWeights[q] ?: 0.0) + w
         }
 
         target.queries.clear()
@@ -196,15 +224,15 @@ class TaxonomyMerger(
                     else StatisticsUtils.dotProduct(q.projectTo(child.sliceDim), child.vmfMu)
                 }
                  if (bestChild != null) {
-                    if (!bestChild.queries.contains(q)) {
+                    if (bestChild.queries.none { it.rawText == q.rawText }) {
                         bestChild.queries.add(q)
                     }
-                    bestChild.queryWeights[q.rawText] = maxOf(bestChild.queryWeights[q.rawText] ?: 0.0, w)
+                    bestChild.queryWeights[q.rawText] = (bestChild.queryWeights[q.rawText] ?: 0.0) + w
                 } else {
-                    if (!target.queries.contains(q)) {
+                    if (target.queries.none { it.rawText == q.rawText }) {
                         target.queries.add(q)
                     }
-                    target.queryWeights[q.rawText] = maxOf(target.queryWeights[q.rawText] ?: 0.0, w)
+                    target.queryWeights[q.rawText] = (target.queryWeights[q.rawText] ?: 0.0) + w
                 }
             }
         } else {
@@ -220,6 +248,16 @@ class TaxonomyMerger(
         source.queryWeights.clear()
         source.residualQueries.clear()
         source.residualConfidences.clear()
+
+        // 7. Renormalize query weights across leaves of the subtree to conserve mass
+        var rootNode = target
+        val visitedRoot = mutableSetOf<String>()
+        while (rootNode.parents.isNotEmpty()) {
+            val p = rootNode.parents.first()
+            if (!visitedRoot.add(p.id)) break
+            rootNode = p
+        }
+        renormalizeQueryWeights(rootNode)
     }
 
     private fun pruneSingleNodeTentatively(node: GraphNode, target: GraphNode) {

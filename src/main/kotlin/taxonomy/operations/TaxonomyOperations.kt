@@ -129,7 +129,7 @@ class TaxonomyOperations(
                             val weight = kotlin.math.exp(logWeight)
                             synchronized(leaf.queryWeights) {
                                 leaf.queryWeights.merge(emb.rawText, weight, Double::plus)
-                                if (!leaf.queries.contains(emb)) {
+                                if (leaf.queries.none { it.rawText == emb.rawText }) {
                                     leaf.queries.add(emb)
                                 }
                             }
@@ -154,7 +154,7 @@ class TaxonomyOperations(
                         }
                         synchronized(routeResult.primary.queryWeights) {
                             routeResult.primary.queryWeights.merge(emb.rawText, 1.0, Double::plus)
-                            if (!routeResult.primary.queries.contains(emb)) {
+                            if (routeResult.primary.queries.none { it.rawText == emb.rawText }) {
                                 routeResult.primary.queries.add(emb)
                             }
                         }
@@ -164,7 +164,7 @@ class TaxonomyOperations(
                         log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
                         synchronized(root.queryWeights) {
                             root.queryWeights.merge(emb.rawText, 1.0, Double::plus)
-                            if (!root.queries.contains(emb)) {
+                            if (root.queries.none { it.rawText == emb.rawText }) {
                                 root.queries.add(emb)
                             }
                         }
@@ -181,6 +181,33 @@ class TaxonomyOperations(
                 }
             }
         }.awaitAll()
+    }
+
+    private fun computePairwiseDenom(root: GraphNode): Double {
+        val leaves = mutableListOf<GraphNode>()
+        val residualParents = mutableListOf<GraphNode>()
+        fun walk(n: GraphNode) {
+            if (n.isLeaf) {
+                leaves.add(n)
+            } else {
+                if (n.residualQueries.isNotEmpty()) {
+                    residualParents.add(n)
+                }
+                n.children.forEach { walk(it) }
+            }
+        }
+        walk(root)
+
+        var pairFrac = 0.0
+        for (leaf in leaves) {
+            val cN = leaf.queryWeights.values.sum()
+            pairFrac += cN * (cN - 1.0)
+        }
+        for (parent in residualParents) {
+            val cN = parent.residualQueries.size.toDouble()
+            pairFrac += cN * (cN - 1.0)
+        }
+        return pairFrac
     }
 
     suspend fun tryProposal(
@@ -207,7 +234,19 @@ class TaxonomyOperations(
         if (currentIteration > 1) {
             assertMassConservation(root, allEmbeddings)
         }
-        val baseJ = cachedBaseJ ?: taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+
+        // Fix baseline J asymmetry (I4): compute baseJ on freshly-routed query assignments
+        val baseJ = if (cachedBaseJ != null) {
+            cachedBaseJ!!
+        } else {
+            val tempBackup = taxonomy.model.GraphStateBackup(root)
+            clearGraphQueries(root)
+            reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
+            val jVal = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+            tempBackup.restore(registry)
+            cachedBaseJ = jVal
+            jVal
+        }
 
         action()
 
@@ -221,12 +260,23 @@ class TaxonomyOperations(
         val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
         val deltaJ = newJ - baseJ
 
-        if (deltaJ > deltaThreshold) {
-            log.info("[ACCEPTED PROPOSAL] Delta J = ${"%.5f".format(deltaJ)} > ${"%.5f".format(deltaThreshold)}")
+        // Gate scale fix: compute effective local delta threshold
+        val denom = computePairwiseDenom(root)
+        val piS = if (denom > 1e-5 && site != root && site.depth > 0) {
+            val nS = site.getRecursiveSoftMass()
+            val numPairs = nS * (nS - 1.0)
+            (numPairs / denom).coerceAtMost(1.0)
+        } else {
+            1.0
+        }
+        val effThreshold = deltaThreshold * piS
+
+        if (deltaJ > effThreshold) {
+            log.info("[ACCEPTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} > effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)})")
             cachedBaseJ = newJ
             return true
         } else {
-            log.debug("[REJECTED PROPOSAL] Delta J = ${"%.5f".format(deltaJ)} <= ${"%.5f".format(deltaThreshold)}. Reverting.")
+            log.info("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} <= effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)}). Reverting.")
             backup.restore(registry)
             return false
         }

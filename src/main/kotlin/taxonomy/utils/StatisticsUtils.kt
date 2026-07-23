@@ -226,8 +226,10 @@ object StatisticsUtils {
 
         val leaves = mutableListOf<GraphNode>()
         val residualParents = mutableListOf<GraphNode>()
+        val visited = mutableSetOf<String>()
         
         fun walk(n: GraphNode) {
+            if (!visited.add(n.id)) return
             if (n.isLeaf) {
                 leaves.add(n)
             } else {
@@ -239,10 +241,7 @@ object StatisticsUtils {
         }
         walk(root)
 
-        val leafIds = leaves.map { it.id }.toSet()
-        val resIds = residualParents.map { it.id }.toSet()
-        
-        val cellCount = leafIds.size + resIds.size
+        val cellCount = leaves.size + residualParents.size
         if (cellCount < 2) return 0.0
         
         val d = 256

@@ -134,6 +134,23 @@ class TaxonomyEngine(
                     }
                 }
 
+                // Normalize bootstrap query weights across category leaves to conserve mass
+                val categoryLeaves = root.children.toList()
+                val bootstrapTotals = mutableMapOf<String, Double>()
+                for (leaf in categoryLeaves) {
+                    for ((q, w) in leaf.queryWeights) {
+                        bootstrapTotals[q] = (bootstrapTotals[q] ?: 0.0) + w
+                    }
+                }
+                for (leaf in categoryLeaves) {
+                    for (q in leaf.queryWeights.keys.toList()) {
+                        val tot = bootstrapTotals[q] ?: 1.0
+                        if (tot > 0.0) {
+                            leaf.queryWeights[q] = leaf.queryWeights[q]!! / tot
+                        }
+                    }
+                }
+
                 taxonomyService.setGraph(root)
                 taxonomyService.notifyGraphUpdated()
 

@@ -51,13 +51,11 @@ data class Embedding(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Embedding) return false
-        val thisId = if (queryId != -1) queryId else (TextNormalizer.cleanText(rawText).hashCode() and 0x7FFFFFFF)
-        val otherId = if (other.queryId != -1) other.queryId else (TextNormalizer.cleanText(other.rawText).hashCode() and 0x7FFFFFFF)
-        return thisId == otherId
+        return rawText == other.rawText
     }
 
     override fun hashCode(): Int {
-        return if (queryId != -1) queryId else (TextNormalizer.cleanText(rawText).hashCode() and 0x7FFFFFFF)
+        return rawText.hashCode()
     }
 }
 

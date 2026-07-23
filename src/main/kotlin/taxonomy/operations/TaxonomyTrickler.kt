@@ -62,8 +62,8 @@ data class TrickleResult(
     val memberships: Map<GraphNode, Double>,
     val residualHits: List<ResidualHit> = emptyList()
 ) {
-    fun leaves(): List<Pair<GraphNode, Double>> =
-        memberships.filterKeys { it.isLeaf }
+    fun leaves(enableResidual: Boolean = false): List<Pair<GraphNode, Double>> =
+        memberships.filterKeys { it.isLeaf || enableResidual }
             .toList()
             .sortedByDescending { it.second }
 }
@@ -105,7 +105,8 @@ class TaxonomyTrickler(
             originalCategories = originalCategories
         )
         val res = trickle(query, root, opts)
-        return RoutingResult(res.leaves().toMap(), res.residualHits, primary = res.primary)
+        val enableResidual = config.formalism.enableResidualRouting
+        return RoutingResult(res.leaves(enableResidual).toMap(), res.residualHits, primary = res.primary)
     }
 
     fun trickle(
@@ -226,17 +227,20 @@ class TaxonomyTrickler(
         candidates.putAll(leafCandidates)
 
         // Internal nodes fallback if no active children reached
-        for ((nodeId, logProb) in logProbMap) {
-            val node = nodeMap[nodeId] ?: continue
-            if (node.isBridge) continue
-            if (!node.isLeaf) {
-                val activeChildren = if (config.formalism.enableBridging) {
-                    node.children + node.crossLinkChildren
-                } else {
-                    node.children
-                }
-                if (!activeChildren.any { logProbMap.containsKey(it.id) }) {
-                    candidates[node] = logProb
+        val enableResidual = config.formalism.enableResidualRouting
+        if (enableResidual || leafCandidates.isEmpty()) {
+            for ((nodeId, logProb) in logProbMap) {
+                val node = nodeMap[nodeId] ?: continue
+                if (node.isBridge) continue
+                if (!node.isLeaf) {
+                    val activeChildren = if (config.formalism.enableBridging) {
+                        node.children + node.crossLinkChildren
+                    } else {
+                        node.children
+                    }
+                    if (!activeChildren.any { logProbMap.containsKey(it.id) }) {
+                        candidates[node] = logProb
+                    }
                 }
             }
         }
