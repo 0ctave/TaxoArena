@@ -83,14 +83,15 @@ class TaxonomyPerformanceTracker {
             return sb.toString()
         }
 
-        val totalTime = report.values.sumOf { it.totalMs }
+        val nonIterReport = report.filterKeys { !it.contains("@iter=") }
+        val totalTime = nonIterReport.values.sumOf { it.totalMs }
 
         // Section grouping
-        val constructionMetrics = report.filterKeys { 
+        val constructionMetrics = nonIterReport.filterKeys { 
             it.startsWith("construction.") || it.startsWith("Phase") || it.startsWith("Bootstrap") || it.startsWith("Refit") || it.startsWith("Post-Pass") 
         }
-        val arenaMetrics = report.filterKeys { it.startsWith("arena.") }
-        val persistenceMetrics = report.filterKeys { it.startsWith("persistence.") }
+        val arenaMetrics = nonIterReport.filterKeys { it.startsWith("arena.") }
+        val persistenceMetrics = nonIterReport.filterKeys { it.startsWith("persistence.") }
         
         val constructionTotal = constructionMetrics.values.sumOf { it.totalMs }
         val arenaTotal = arenaMetrics.values.sumOf { it.totalMs }

@@ -140,7 +140,7 @@ class TaxonomySplitter(
         val childDim =  dimForDepth(node.depth + 1)
         val minClusterSize = config.formalism.minClusterSize
 
-        val rawVectors = targetQueries.map { it.toDoubleArray() }
+        val rawVectors = targetQueries.map { it.projectTo(childDim) }
 
         val splitDim = when {
             targetQueries.size < 100 -> 32
