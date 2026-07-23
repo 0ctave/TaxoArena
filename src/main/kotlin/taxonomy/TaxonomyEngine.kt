@@ -100,6 +100,7 @@ class TaxonomyEngine(
             // ────────────────────────────────────────────────────────────────
 
             val root = GraphNode(label = rootLabel, depth = 0)
+            val dagRoot = DagRoot(root)
 
             // 2. Initial Structural Setup & Bootstrap Fitting
             taxonomyService.updateGenerationProgress(
@@ -188,8 +189,9 @@ class TaxonomyEngine(
                             // only starting trickle-based reassignment from iteration 2 removes
                             // the need for that bias entirely.
                             if (i > 1) {
+                                ops.invalidateCachedJ()
                                 ops.clearGraphQueries(root)
-                                ops.reassignQueries(root, uniqueEmbs, groundTruthMap, i)
+                                ops.reassignQueries(dagRoot, uniqueEmbs, groundTruthMap, i)
                             }
                         }
                         perfTracker.recordTime("construction.phase3_trickle", trickleTime, uniqueEmbs.size.toLong())
@@ -234,7 +236,7 @@ class TaxonomyEngine(
                         )
 
                         val splitTime = measureTimeMillis {
-                            ops.splitNodesRecursive(root, uniqueEmbs, groundTruthMap, i)
+                            ops.splitNodesRecursive(dagRoot, uniqueEmbs, groundTruthMap, i)
                         }
                         perfTracker.recordTime("construction.phase4_split", splitTime, 1L)
                         perfTracker.recordTime("construction.phase4_split@iter=$i", splitTime, 1L)
@@ -256,7 +258,7 @@ class TaxonomyEngine(
                         )
 
                         val optimizeTime = measureTimeMillis {
-                            ops.optimizeHierarchy(root, uniqueEmbs, groundTruthMap, i, learningPhase = true)
+                            ops.optimizeHierarchy(dagRoot, uniqueEmbs, groundTruthMap, i, learningPhase = false)
                         }
                         perfTracker.recordTime("construction.phase5_optimize", optimizeTime, 1L)
                         perfTracker.recordTime("construction.phase5_optimize@iter=$i", optimizeTime, 1L)
@@ -279,6 +281,7 @@ class TaxonomyEngine(
 
                         val refitTime = measureTimeMillis {
                             ops.fitNodeRecursive(root, currentIteration = i, isFinalIteration = (i == totalIters))
+                            ops.invalidateCachedJ()
                         }
                         perfTracker.recordTime("construction.phase2_refit", refitTime, 1L)
                         perfTracker.recordTime("construction.phase2_refit@iter=$i", refitTime, 1L)
@@ -322,9 +325,7 @@ class TaxonomyEngine(
             // ── FINALIZATION PHASE ──────────────────────────────────────────
             log.info("=== STARTING FINALIZATION PHASE ===")
             val finalizationTime = measureTimeMillis {
-                // 1. Run full topology optimization (bridges, fusions, transitive reduction)
-                ops.optimizeHierarchy(root, uniqueEmbs, groundTruthMap, totalIters, learningPhase = false)
-                // 2. Refit bounds after final structural changes
+                // 1. Refit bounds after final structural changes
                 ops.fitNodeRecursive(root, isFinalIteration = true)
             }
             log.info("Finalization phase completed in ${finalizationTime}ms.")

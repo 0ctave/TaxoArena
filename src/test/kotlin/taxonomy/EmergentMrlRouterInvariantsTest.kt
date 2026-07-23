@@ -89,7 +89,7 @@ class EmergentMrlRouterInvariantsTest {
 
         // Reassign
         kotlinx.coroutines.runBlocking {
-            ops.reassignQueries(root, listOf(emb), groundTruthMap = emptyMap(), currentIteration = 2)
+            ops.reassignQueries(DagRoot(root), listOf(emb), groundTruthMap = emptyMap(), currentIteration = 2)
         }
 
         // Mid and root queries lists must be empty (leaf-only ownership)

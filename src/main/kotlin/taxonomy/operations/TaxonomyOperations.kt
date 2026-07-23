@@ -10,6 +10,7 @@ import taxonomy.config.TaxonomyConfig
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
 import taxonomy.model.TraversalPolicy
+import taxonomy.model.DagRoot
 import kotlin.math.exp
 
 /**
@@ -24,6 +25,12 @@ class TaxonomyOperations(
     private val config: TaxonomyConfig
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.Operations")
+    
+    private var cachedBaseJ: Double? = null
+    
+    fun invalidateCachedJ() {
+        cachedBaseJ = null
+    }
 
     fun routeQuery(
         query: Embedding,
@@ -37,11 +44,12 @@ class TaxonomyOperations(
     suspend fun fitNodeRecursive(node: GraphNode, currentIteration: Int = 0, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, currentIteration, isFinalIteration)
 
     suspend fun splitNodesRecursive(
-        root: GraphNode,
+        dag: DagRoot,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int
     ) {
+        val root = dag.node
         val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
         val visited = mutableSetOf<String>()
         val queue = ArrayDeque<GraphNode>().apply { add(root) }
@@ -56,7 +64,7 @@ class TaxonomyOperations(
         byDepth.keys.sortedDescending().forEach { depth ->
             val nodesAtDepth = byDepth[depth]!!
             for (node in nodesAtDepth) {
-                tryProposal(root, allEmbeddings, groundTruthMap, currentIteration, config.formalism.separationEpsilon) {
+                tryProposal(dag, node, allEmbeddings, groundTruthMap, currentIteration, config.formalism.separationEpsilon) {
                     // splitSingleNode requires splitter to be called
                     splitter.splitSingleNode(node)
                 }
@@ -70,12 +78,12 @@ class TaxonomyOperations(
     fun resetConceptCounter() = splitter.resetConceptCounter()
 
     suspend fun optimizeHierarchy(
-        root: GraphNode,
+        dag: DagRoot,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int = 2,
         learningPhase: Boolean = false
-    ) = merger.optimizeHierarchy(root, allEmbeddings, groundTruthMap, currentIteration, learningPhase, this)
+    ) = merger.optimizeHierarchy(dag, allEmbeddings, groundTruthMap, currentIteration, learningPhase, this)
 
     suspend fun prunePassthroughNodesPublic(root: GraphNode) = merger.prunePassthroughNodesPublic(root)
 
@@ -100,11 +108,12 @@ class TaxonomyOperations(
      * closely-scoring leaves.
      */
     suspend fun reassignQueries(
-        root: GraphNode,
+        dag: DagRoot,
         embeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>> = emptyMap(),
         currentIteration: Int = 1
     ) = coroutineScope {
+        val root = dag.node
         root.updateAllShrinkages()
 
         val numCores = Runtime.getRuntime().availableProcessors()
@@ -175,13 +184,15 @@ class TaxonomyOperations(
     }
 
     suspend fun tryProposal(
-        root: GraphNode,
+        dag: DagRoot,
+        site: GraphNode,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int,
         deltaThreshold: Double,
         action: suspend () -> Unit
     ): Boolean {
+        val root = dag.node
         val registry = mutableMapOf<String, GraphNode>()
         fun walkReg(n: GraphNode) {
             if (registry.containsKey(n.id)) return
@@ -192,24 +203,69 @@ class TaxonomyOperations(
         walkReg(root)
 
         val backup = taxonomy.model.GraphStateBackup(root)
-        val baseJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+        
+        if (currentIteration > 1) {
+            assertMassConservation(root, allEmbeddings)
+        }
+        val baseJ = cachedBaseJ ?: taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
 
         action()
 
         root.updateAllShrinkages()
         clearGraphQueries(root)
-        reassignQueries(root, allEmbeddings, groundTruthMap, currentIteration)
+        reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
 
+        if (currentIteration > 1) {
+            assertMassConservation(root, allEmbeddings)
+        }
         val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
         val deltaJ = newJ - baseJ
 
         if (deltaJ > deltaThreshold) {
             log.info("[ACCEPTED PROPOSAL] Delta J = ${"%.5f".format(deltaJ)} > ${"%.5f".format(deltaThreshold)}")
+            cachedBaseJ = newJ
             return true
         } else {
             log.debug("[REJECTED PROPOSAL] Delta J = ${"%.5f".format(deltaJ)} <= ${"%.5f".format(deltaThreshold)}. Reverting.")
             backup.restore(registry)
             return false
+        }
+    }
+
+    fun assertMassConservation(root: GraphNode, allEmbeddings: List<Embedding>) {
+        val allNodes = mutableListOf<GraphNode>()
+        val visited = mutableSetOf<String>()
+        fun collect(n: GraphNode) {
+            if (!visited.add(n.id)) return
+            allNodes.add(n)
+            n.children.forEach { collect(it) }
+            n.crossLinkChildren.forEach { collect(it) }
+        }
+        collect(root)
+
+        val queryWeights = mutableMapOf<String, Double>()
+        for (node in allNodes) {
+            for ((q, w) in node.queryWeights) {
+                queryWeights[q] = (queryWeights[q] ?: 0.0) + w
+            }
+        }
+
+        val totalAssignedMass = queryWeights.values.sum()
+        if (totalAssignedMass == 0.0) return
+
+        // 1. Check for weight excess (> 1.01) on any query
+        val queryWithExcessWeight = queryWeights.filter { it.value > 1.01 }
+        if (queryWithExcessWeight.isNotEmpty()) {
+            val example = queryWithExcessWeight.entries.first()
+            throw AssertionError("Query weight excess detected: query '${example.key}' has weight ${example.value} > 1.01!")
+        }
+
+        // 2. Check total mass conservation
+        if (config.formalism.enableResidualRouting) {
+            val N = allEmbeddings.size.toDouble()
+            if (Math.abs(totalAssignedMass - N) > 1.5) {
+                throw AssertionError("Mass conservation violated: Total assigned mass is $totalAssignedMass but total corpus size N is $N. Difference: ${Math.abs(totalAssignedMass - N)}")
+            }
         }
     }
 

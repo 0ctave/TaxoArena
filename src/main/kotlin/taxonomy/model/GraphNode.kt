@@ -472,3 +472,12 @@ class GraphStateBackup(root: GraphNode) {
         }
     }
 }
+
+@JvmInline
+value class DagRoot(val node: GraphNode) {
+    init {
+        require(node.parents.isEmpty() && node.depth == 0) {
+            "DagRoot must be the true root of the taxonomy (no parents, depth 0), got node '${node.label}' with depth ${node.depth} and ${node.parents.size} parents"
+        }
+    }
+}

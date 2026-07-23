@@ -34,31 +34,32 @@ class TaxonomyMerger(
     private val log = LoggerFactory.getLogger("taxonomy.Merger")
 
     suspend fun optimizeHierarchy(
-        root: GraphNode,
+        dag: DagRoot,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int = 2,
         learningPhase: Boolean = false,
         ops: TaxonomyOperations
     ) {
+        val root = dag.node
         if (learningPhase) {
-            pruneUnrelevantNodesWithProposals(root, allEmbeddings, groundTruthMap, currentIteration, ops)
-            prunePassthroughNodes(root, allEmbeddings, groundTruthMap, currentIteration, ops)
-            pruneUnrelevantNodesWithProposals(root, allEmbeddings, groundTruthMap, currentIteration, ops)
+            pruneUnrelevantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
+            prunePassthroughNodes(dag, root, allEmbeddings, groundTruthMap, currentIteration, ops)
+            pruneUnrelevantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
             removeStaleParentRefs(root)
             invalidateAncestorCache()
         } else {
-            pruneUnrelevantNodesWithProposals(root, allEmbeddings, groundTruthMap, currentIteration, ops)
-            mergeSimilarSiblingsWithProposals(root, allEmbeddings, groundTruthMap, currentIteration, ops)
+            pruneUnrelevantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
+            mergeSimilarSiblingsWithProposals(dag, root, allEmbeddings, groundTruthMap, currentIteration, ops)
 
             if (config.formalism.enableBridging) {
                 insertBridgingParents(root, currentIteration)
             }
 
-            mergeRedundantNodesWithProposals(root, allEmbeddings, groundTruthMap, currentIteration, ops)
+            mergeRedundantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
 
-            do {} while (prunePassthroughNodes(root, allEmbeddings, groundTruthMap, currentIteration, ops))
-            pruneUnrelevantNodesWithProposals(root, allEmbeddings, groundTruthMap, currentIteration, ops)
+            do {} while (prunePassthroughNodes(dag, root, allEmbeddings, groundTruthMap, currentIteration, ops))
+            pruneUnrelevantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
             removeStaleParentRefs(root)
 
             invalidateAncestorCache()
@@ -126,15 +127,19 @@ class TaxonomyMerger(
         val allQueries = (target.queries + source.queries).distinctBy { it.rawText }
         val allWeights = mutableMapOf<String, Double>()
         for ((q, w) in target.queryWeights) {
-            allWeights[q] = (allWeights[q] ?: 0.0) + w
+            allWeights[q] = maxOf(allWeights[q] ?: 0.0, w)
         }
         for ((q, w) in source.queryWeights) {
-            allWeights[q] = (allWeights[q] ?: 0.0) + w
+            allWeights[q] = maxOf(allWeights[q] ?: 0.0, w)
         }
 
         target.queries.clear()
         target.queryWeights.clear()
-        target.residualQueries.addAll(source.residualQueries)
+        
+        val newResQueries = (target.residualQueries + source.residualQueries).distinct()
+        target.residualQueries.clear()
+        target.residualQueries.addAll(newResQueries)
+
         for ((q, c) in source.residualConfidences) {
             target.residualConfidences.putIfAbsent(q, c)
         }
@@ -148,6 +153,18 @@ class TaxonomyMerger(
                 parent.children.remove(source)
                 parent.children.add(target)
                 target.parents.add(parent)
+            }
+        }
+
+        // Clean up target.parents to remove degenerate ancestor parent edges
+        val allParents = target.parents.toList()
+        for (p1 in allParents) {
+            for (p2 in allParents) {
+                if (p1.id != p2.id && isAncestor(p1, p2)) {
+                    target.parents.remove(p1)
+                    p1.children.remove(target)
+                    p1.crossLinkChildren.remove(target)
+                }
             }
         }
 
@@ -178,12 +195,16 @@ class TaxonomyMerger(
                     if (child.vmfMu.isEmpty()) -Double.MAX_VALUE
                     else StatisticsUtils.dotProduct(q.projectTo(child.sliceDim), child.vmfMu)
                 }
-                if (bestChild != null) {
-                    bestChild.queries.add(q)
-                    bestChild.queryWeights[q.rawText] = (bestChild.queryWeights[q.rawText] ?: 0.0) + w
+                 if (bestChild != null) {
+                    if (!bestChild.queries.contains(q)) {
+                        bestChild.queries.add(q)
+                    }
+                    bestChild.queryWeights[q.rawText] = maxOf(bestChild.queryWeights[q.rawText] ?: 0.0, w)
                 } else {
-                    target.queries.add(q)
-                    target.queryWeights[q.rawText] = (target.queryWeights[q.rawText] ?: 0.0) + w
+                    if (!target.queries.contains(q)) {
+                        target.queries.add(q)
+                    }
+                    target.queryWeights[q.rawText] = maxOf(target.queryWeights[q.rawText] ?: 0.0, w)
                 }
             }
         } else {
@@ -290,93 +311,7 @@ class TaxonomyMerger(
         }
     }
 
-    private suspend fun mergeSimilarSiblings(
-        node: GraphNode,
-        visited: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
-    ) {
-        if (visited.contains(node.id)) return
-        visited.add(node.id)
 
-        val currentChildren = node.children.toList()
-        coroutineScope {
-            currentChildren.map { child ->
-                async(Dispatchers.Default) {
-                    mergeSimilarSiblings(child, visited)
-                }
-            }
-        }.awaitAll()
-
-        val children = node.children.toList()
-        if (children.size < 2) return
-
-        log.debug("Evaluating sibling merges for parent '${node.label}' with ${children.size} children...")
-
-        // 1. Pairwise chance-corrected separation over each sibling's branch queries —
-        // the same dimensionless scale that gates splits, so the split gate and the
-        // merge gate can no longer disagree about what "separated" means. Two siblings
-        // whose union looks like a random partition of one population (sep < ε) merge;
-        // the old κ-scaled vMF divergence became unsatisfiable at high κ and let
-        // near-duplicate siblings coexist indefinitely.
-        val siblingMergeThreshold = config.formalism.separationEpsilon
-        val statsDim = dimForDepth(node.depth + 1)
-        val statsByChild = coroutineScope {
-            children.map { child ->
-                async(Dispatchers.Default) {
-                    val branchQueries = child.getAllQueriesInBranch().distinctBy { it.rawText }
-                    val stats = if (branchQueries.isEmpty()) null else {
-                        val sum = DoubleArray(statsDim)
-                        for (emb in branchQueries) {
-                            val v = emb.projectTo(statsDim)
-                            for (i in 0 until statsDim) sum[i] += v[i]
-                        }
-                        StatisticsUtils.ClusterStats(branchQueries.size.toDouble(), sum)
-                    }
-                    child to stats
-                }
-            }.awaitAll().toMap()
-        }
-
-        val pairsToMerge = mutableListOf<Triple<GraphNode, GraphNode, Double>>()
-        for (i in 0 until children.size) {
-            for (j in i + 1 until children.size) {
-                val nodeA = children[i]
-                val nodeB = children[j]
-                if (nodeA.depth <= 1 || nodeB.depth <= 1) continue
-                val statsA = statsByChild[nodeA] ?: continue
-                val statsB = statsByChild[nodeB] ?: continue
-                val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
-                if (sep < siblingMergeThreshold) pairsToMerge.add(Triple(nodeA, nodeB, sep))
-            }
-        }
-
-        if (pairsToMerge.isEmpty()) return
-
-        // 2. Build connected components using Union-Find
-        val uf = UnionFind(children)
-        for ((nodeA, nodeB, _) in pairsToMerge) {
-            uf.union(nodeA, nodeB)
-        }
-
-        val clusters = children.groupBy { uf.find(it) }.values.filter { it.size > 1 }
-        if (clusters.isEmpty()) return
-
-        log.info("[MERGE] Found ${clusters.size} groups under '${node.label}'")
-
-        for (cluster in clusters) {
-            val target = cluster[0]
-            val sources = cluster.subList(1, cluster.size)
-            val combinedQueries = cluster.flatMap { it.queries }.distinctBy { it.rawText }
-
-            val newLabel = cluster.joinToString(" & ") { it.label ?: "" }
-
-            log.info("[MERGE] Fused ${cluster.map { it.label }} -> '$newLabel'")
-            target.label = newLabel
-
-            for (source in sources) {
-                fuseNodes(target, source)
-            }
-        }
-    }
 
     private fun selectRepresentativeQueries(cluster: List<Embedding>): List<String> {
         if (cluster.isEmpty()) return emptyList()
@@ -443,39 +378,7 @@ class TaxonomyMerger(
      * After this fix: isLeaf = children.isEmpty() is unaffected by cross-links.
      * All tree leaf nodes remain leaves. The trickler distributes correctly.
      */
-    private fun mergeRedundantNodes(root: GraphNode) {
-        val allNodes = getAllNodes(root).toList()
-        for (i in 0 until allNodes.size) {
-            for (j in i + 1 until allNodes.size) {
-                if (i >= allNodes.size || j >= allNodes.size) continue
-                val nodeA = allNodes[i]
-                val nodeB = allNodes[j]
-                if (nodeA.depth <= 1 || nodeB.depth <= 1) continue
-                if (nodeA.parents.isEmpty() || nodeB.parents.isEmpty()) continue
 
-                // Ne pas fusionner des nœuds de la même ascendance directe
-                if (isAncestor(nodeA, nodeB) || isAncestor(nodeB, nodeA)) continue
-
-                val commonDim = minOf(nodeA.sliceDim, nodeB.sliceDim)
-                if (commonDim == 0 || nodeA.vmfMu.isEmpty() || nodeB.vmfMu.isEmpty()) continue
-                val muA = StatisticsUtils.projectVector(nodeA.vmfMu, commonDim) // FloatArray
-                val muB = nodeB.vmfMu.copyOf(commonDim) // FloatArray
-
-                val similarity = StatisticsUtils.dotProduct(muA.map { it.toDouble() }.toDoubleArray(), muB)
-
-                // Si la similarité dépasse le seuil, les nœuds fusionnent leurs identités
-                // tout en conservant leurs parents respectifs (créant ainsi un DAG polyhiérarchique)
-                if (similarity > config.formalism.fusionSimilarityThreshold) {
-                    log.info("[Emergence] Fusion organique détectée entre '${nodeA.label}' and '${nodeB.label}' (Cos: $similarity)")
-                    nodeA.sliceDim = commonDim
-                    nodeB.sliceDim = commonDim
-                    nodeA.vmfMu = muA.map { it.toFloat() }.toFloatArray()
-                    nodeB.vmfMu = muB.map { it.toFloat() }.toFloatArray()
-                    fuseNodes(nodeA, nodeB)
-                }
-            }
-        }
-    }
 
     /**
      * FIX: transitiveReduction must consider BOTH children and crossLinkChildren.
@@ -529,6 +432,7 @@ class TaxonomyMerger(
     }
 
     private suspend fun prunePassthroughNodes(
+        dag: DagRoot,
         node: GraphNode,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
@@ -543,20 +447,25 @@ class TaxonomyMerger(
 
         val currentChildren = node.treeChildren.toList()
         for (child in currentChildren) {
-            if (prunePassthroughNodes(child, allEmbeddings, groundTruthMap, currentIteration, ops, visited)) anyPruned = true
+            if (prunePassthroughNodes(dag, child, allEmbeddings, groundTruthMap, currentIteration, ops, visited)) anyPruned = true
         }
 
         while (node.treeChildren.size == 1) {
             val child = node.treeChildren.first()
             if (child.depth <= 1 || child.parents.size > 1) break
 
-            val collapsed = ops.tryProposal(root = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
+            val collapsed = ops.tryProposal(dag = dag, site = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
                 log.info("[COLLAPSE] dissolving sole child '${child.label}' into '${node.label}' (${child.treeChildren.size} grandchildren hoisted)")
-                node.queries.addAll(child.queries)
+                
+                node.queries = (node.queries + child.queries).distinctBy { it.rawText }.toMutableList()
                 for ((q, w) in child.queryWeights) {
-                    node.queryWeights[q] = (node.queryWeights[q] ?: 0.0) + w
+                    node.queryWeights[q] = maxOf(node.queryWeights[q] ?: 0.0, w)
                 }
-                node.residualQueries.addAll(child.residualQueries)
+                
+                val newResQueries = (node.residualQueries + child.residualQueries).distinct()
+                node.residualQueries.clear()
+                node.residualQueries.addAll(newResQueries)
+
                 for ((q, c) in child.residualConfidences) {
                     node.residualConfidences.putIfAbsent(q, c)
                 }
@@ -703,7 +612,7 @@ class TaxonomyMerger(
     }
 
     internal suspend fun insertBridgingParents(root: GraphNode, iteration: Int) {
-        mergeRedundantNodes(root)
+        // No-op: mergeRedundantNodes deleted
     }
 
     private fun isAncestor(ancestor: GraphNode, descendant: GraphNode): Boolean {
@@ -785,12 +694,13 @@ class TaxonomyMerger(
     }
 
     suspend fun pruneUnrelevantNodesWithProposals(
-        root: GraphNode,
+        dag: DagRoot,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int,
         ops: TaxonomyOperations
     ) {
+        val root = dag.node
         val visited = mutableSetOf<String>()
         val leaves = mutableListOf<GraphNode>()
 
@@ -827,7 +737,7 @@ class TaxonomyMerger(
             pruneSingleNodeTentatively(parent, child)
             root.updateAllShrinkages()
             ops.clearGraphQueries(root)
-            ops.reassignQueries(root, allEmbeddings, groundTruthMap, currentIteration)
+            ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             val J_prune = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
             backupPrune.restore(registry)
 
@@ -844,7 +754,7 @@ class TaxonomyMerger(
                 fuseNodes(nearestSibling, child)
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
-                ops.reassignQueries(root, allEmbeddings, groundTruthMap, currentIteration)
+                ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
                 val J_merge_val = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
                 J_merge = J_merge_val
                 backupMerge.restore(registry)
@@ -858,13 +768,13 @@ class TaxonomyMerger(
                 log.info("[ACCEPTED STARVED PRUNE] '${child.label}' pruned into '${parent.label}' (Delta J: ${J_prune - baseJ})")
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
-                ops.reassignQueries(root, allEmbeddings, groundTruthMap, currentIteration)
+                ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             } else if (bestJ == J_merge && J_merge > baseJ + deltaThreshold && nearestSibling != null) {
                 fuseNodes(nearestSibling, child)
                 log.info("[ACCEPTED STARVED MERGE] '${child.label}' merged into '${nearestSibling.label}' (Delta J: ${J_merge - baseJ})")
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
-                ops.reassignQueries(root, allEmbeddings, groundTruthMap, currentIteration)
+                ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             }
         }
 
@@ -872,6 +782,7 @@ class TaxonomyMerger(
     }
 
     private suspend fun mergeSimilarSiblingsWithProposals(
+        dag: DagRoot,
         node: GraphNode,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
@@ -884,7 +795,7 @@ class TaxonomyMerger(
 
         val currentChildren = node.children.toList()
         currentChildren.forEach { child ->
-            mergeSimilarSiblingsWithProposals(child, allEmbeddings, groundTruthMap, currentIteration, ops, visited)
+            mergeSimilarSiblingsWithProposals(dag, child, allEmbeddings, groundTruthMap, currentIteration, ops, visited)
         }
 
         val children = node.children.toList()
@@ -930,7 +841,7 @@ class TaxonomyMerger(
         for (cluster in clusters) {
             val target = cluster[0]
             val sources = cluster.subList(1, cluster.size)
-            ops.tryProposal(root = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
+            ops.tryProposal(dag = dag, site = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
                 for (source in sources) {
                     fuseNodes(target, source)
                 }
@@ -939,12 +850,13 @@ class TaxonomyMerger(
     }
 
     private suspend fun mergeRedundantNodesWithProposals(
-        root: GraphNode,
+        dag: DagRoot,
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int,
         ops: TaxonomyOperations
     ) {
+        val root = dag.node
         val allNodes = getAllNodes(root).toList()
         for (i in 0 until allNodes.size) {
             for (j in i + 1 until allNodes.size) {
@@ -962,7 +874,7 @@ class TaxonomyMerger(
                 val similarity = StatisticsUtils.dotProduct(muA.map { it.toDouble() }.toDoubleArray(), muB)
 
                 if (similarity > config.formalism.fusionSimilarityThreshold) {
-                    ops.tryProposal(root = root, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
+                    ops.tryProposal(dag = dag, site = root, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
                         fuseNodes(nodeA, nodeB)
                     }
                 }
