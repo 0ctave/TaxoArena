@@ -242,7 +242,10 @@ class TaxonomyFitter(
         }
         if (normVec == 0.0) mu[0] = 1.0f
 
-        // Apply EMA blending if oldMu exists and is compatible
+        // Track drift/oscillation diagnostics against the previous iteration's mu, then
+        // adopt the fresh MLE directly. EMA blending was removed: matched-config A/B runs
+        // (emaAlpha=0.7 vs 0.0) showed blending amplifies oscillation and prior-domination
+        // instead of stabilizing it, and never converges within the iteration budget.
         val oldMu = node.vmfMu
         if (oldMu.isNotEmpty() && oldMu.size == fitDim) {
             val dot = StatisticsUtils.dotProduct(oldMu.map { it.toDouble() }.toDoubleArray(), mu)
@@ -252,14 +255,7 @@ class TaxonomyFitter(
                 earlyOutCount.incrementAndGet()
                 node.vmfMu = oldMu
             } else {
-                val emaAlpha = config.formalism.emaAlpha
-                val blended = DoubleArray(fitDim) { i -> (1.0 - emaAlpha) * mu[i].toDouble() + emaAlpha * oldMu[i].toDouble() }
-                var norm = 0.0
-                for (i in 0 until fitDim) norm += blended[i] * blended[i]
-                norm = sqrt(norm)
-                val newMu = FloatArray(fitDim) { i -> if (norm > 0.0) (blended[i] / norm).toFloat() else 0.0f }
-                if (norm == 0.0) newMu[0] = 1.0f
-                node.vmfMu = newMu
+                node.vmfMu = mu
             }
 
             // Oscillation detection: dot with mu_{t-2} > dot with mu_{t-1}

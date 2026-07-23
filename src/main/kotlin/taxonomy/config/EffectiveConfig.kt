@@ -58,7 +58,6 @@ data class EffectiveConfig(
         val constructionMargin: Double = 0.20,
         val arenaMargin: Double = 0.40,
         val maxLeafAssignments: Int = 5,
-        val emaAlpha: Double = 0.7,
         val enableStableQuestionIds: Boolean = true,
         val enableResidualRouting: Boolean = true,
         val enableResidualSplitGate: Boolean = true,

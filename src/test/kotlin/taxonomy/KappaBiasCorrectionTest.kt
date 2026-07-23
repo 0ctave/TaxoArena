@@ -31,16 +31,23 @@ class KappaBiasCorrectionTest {
         val rBar = 0.8
         val d = 1024
         val n = 20
-        
+
         // Execute the correctedKappa calculation
         val corrected = StatisticsUtils.correctedKappa(rBar, d, n)
-        
-        val kappaML = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
+
+        val kappaMLClosedForm = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
         val expectedShrinkage = (n - 1).toDouble() / (n + d - 2).toDouble().coerceAtLeast(1.0)
-        val expected = (kappaML * expectedShrinkage).coerceIn(1e-3, 1e4)
-        
-        assertEquals(expected, corrected, 1e-6)
-        assertTrue(corrected < kappaML, "Bias correction must reduce the MLE, got $corrected vs $kappaML")
+
+        // correctedKappa now Newton-refines the Banerjee closed-form seed to the exact
+        // MLE (A_d(kappa) = rBar) before applying Hornik-Grün shrinkage, so it will no
+        // longer equal shrinkage * kappaMLClosedForm exactly. Recover the refined kappaML
+        // and verify it actually solves the vMF equation — that's the property the
+        // refinement is for, rather than pinning to the old approximation's output.
+        val kappaMLRefined = corrected / expectedShrinkage
+        assertEquals(rBar, StatisticsUtils.besselRatioAd(d, kappaMLRefined), 1e-4,
+            "Newton-refined kappaML must satisfy A_d(kappa) = rBar")
+
+        assertTrue(corrected < kappaMLClosedForm, "Bias correction must reduce the MLE, got $corrected vs $kappaMLClosedForm")
     }
 
     @Test

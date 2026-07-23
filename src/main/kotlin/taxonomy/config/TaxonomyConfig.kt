@@ -110,7 +110,6 @@ class TaxonomyConfig {
         var maxLeafAssignments: Int = 5
 
         // ── Merging / convergence ─────────────────────────────────────────────
-        var emaAlpha: Double = 0.7
         val gedThreshold: Double = 0.005
 
         // ── Mode Switch ──────────────────────────────────────────────────────
@@ -171,7 +170,6 @@ class TaxonomyConfig {
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
         sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
         sb.append("│   - Routing Softmax Tau:  ${formalism.routingSoftmaxTau}\n")
-        sb.append("│   - EMA Alpha:            ${formalism.emaAlpha}\n")
         sb.append("│   - Fusion Sim Threshold: ${formalism.fusionSimilarityThreshold}\n")
         sb.append("│   - Eff Support Floor:    ${formalism.effectiveSupportFloor}\n")
         sb.append("│   - Default Kappa Prior:  ${formalism.defaultKappaPrior}\n")
@@ -210,7 +208,6 @@ class TaxonomyConfig {
             constructionMargin = formalism.constructionMargin,
             arenaMargin = formalism.arenaMargin,
             maxLeafAssignments = formalism.maxLeafAssignments,
-            emaAlpha = formalism.emaAlpha,
             enableStableQuestionIds = formalism.enableStableQuestionIds,
             enableResidualRouting = formalism.enableResidualRouting,
             enableResidualSplitGate = formalism.enableResidualSplitGate,
@@ -257,7 +254,6 @@ class TaxonomyConfig {
         formalism.constructionMargin = c.formalism.constructionMargin
         formalism.arenaMargin = c.formalism.arenaMargin
         formalism.maxLeafAssignments = c.formalism.maxLeafAssignments
-        formalism.emaAlpha = c.formalism.emaAlpha
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
         formalism.enableResidualRouting = c.formalism.enableResidualRouting
         formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate

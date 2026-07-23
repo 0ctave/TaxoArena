@@ -13,12 +13,33 @@ object StatisticsUtils {
     private val unreliableKappaCount = java.util.concurrent.atomic.AtomicInteger(0)
 
     /**
-     * Banerjee closed-form kappa estimation with small-sample shrinkage correction.
+     * vMF kappa MLE: Banerjee closed-form estimate refined to the exact MLE via
+     * Newton-Raphson on A_d(kappa) = rBar (Sra 2012), then Hornik-Grün small-sample
+     * shrinkage correction. The closed-form estimate is only an approximation to the
+     * true MLE; refining it makes kappaML consistent with what the Hornik-Grün
+     * correction below is actually derived to correct.
      */
     fun correctedKappa(rBar: Double, d: Int, n: Int): Double {
         if (rBar >= 1.0) return 1e4   // Cap at kappa_max (degenerate spike)
         if (rBar <= 0.0) return 1e-3   // Floor at kappa_min (uniform)
-        val kappaML   = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
+
+        var kappa = rBar * (d - rBar * rBar) / (1.0 - rBar * rBar)
+
+        // Newton-Raphson refinement: A_d'(kappa) = 1 - A_d(kappa)^2 - ((d-1)/kappa)*A_d(kappa).
+        // The closed-form value above is already a good seed, so this converges in 1-2
+        // iterations; capped at 5 as a safety bound against pathological inputs.
+        for (i in 0 until 5) {
+            val ad = besselRatioAd(d, kappa)
+            val derivative = 1.0 - ad * ad - ((d - 1).toDouble() / kappa) * ad
+            if (abs(derivative) < 1e-9) break
+            val next = kappa - (ad - rBar) / derivative
+            if (!next.isFinite() || next <= 0.0) break
+            val converged = abs(next - kappa) < 1e-6 * kappa
+            kappa = next.coerceIn(1e-3, 1e6)
+            if (converged) break
+        }
+
+        val kappaML   = kappa.coerceIn(1e-3, 1e4)
         val shrinkage = (n - 1).toDouble() / (n + d - 2).toDouble().coerceAtLeast(1.0)
         if (n > 0 && d.toDouble() / n > 10.0) {
             val count = unreliableKappaCount.incrementAndGet()

@@ -213,11 +213,21 @@ class TaxonomyMerger(
                 allChildren.map { branchSizes[it] ?: 0 }.average()
 
             val isPhysicalLeaf = child.children.isEmpty() && child.crossLinkChildren.isEmpty()
-            val isStarved = isPhysicalLeaf && totalQueriesInBranch < (siblingAvg * 0.2).coerceAtLeast(5.0)
+            // Absolute floor tied to minClusterSize (not an arbitrary constant) so starvation
+            // reflects the same tunable the split-time floor uses, not just local sibling context.
+            val absoluteFloor = config.formalism.minClusterSize.toDouble() * 0.5
+            val isStarved = isPhysicalLeaf && totalQueriesInBranch < (siblingAvg * 0.2).coerceAtLeast(absoluteFloor)
 
-            val wouldLeaveParentSingleChild = (allChildren.size - 1) <= 1
-
-            isTrulyDead || (isStarved && !wouldLeaveParentSingleChild)
+            // NOTE: no longer vetoed when pruning would leave the parent with a single child.
+            // That veto created a deadlock with prunePassthroughNodes (called right after this
+            // pass in optimizeHierarchy): a starved leaf was never removed because doing so would
+            // leave a single-child parent, but a single-child parent is exactly the precondition
+            // prunePassthroughNodes needs to collapse it. The precondition could never occur, so
+            // starved leaves in 2-child splits survived forever. prunePassthroughNodes already
+            // handles the resulting single-child parent gracefully (collapses it if similar enough
+            // to its lone child and under minClusterSize itself; otherwise leaves it as a
+            // legitimate single-child branch point).
+            isTrulyDead || isStarved
         }
 
         if (nodesToPrune.isNotEmpty()) {

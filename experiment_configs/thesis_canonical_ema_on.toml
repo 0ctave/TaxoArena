@@ -1,4 +1,4 @@
-# thesis_canonical_ema_on.toml — Canonical DAG with EMA smoothing
+# thesis_canonical_ema_off.toml — Canonical DAG with pure MLE μ (no EMA)
 
 datasetType   = "MMLU_PRO"
 
@@ -21,9 +21,9 @@ models        = [
     "Meta-Llama-3-70B-Instruct"
 ]
 
-category      = ""
+domains = ["Computer Science", "Math", "History"]
 queryLimit    = 0
-outputDir     = "experiment_results/thesis_canonical_ema_on"
+outputDir     = "experiment_results/thesis_canonical_ema_off"
 testRatio     = 0.3
 seed          = 42
 
@@ -38,24 +38,21 @@ judgeInduction = false
 dagMode = "DAG_MAX"
 
 maxDepth              = 8
-minClusterSize        = 50
-separationEpsilon     = 0.01
+minClusterSize        = 75
+separationEpsilon     = 0.1
 routingSoftmaxTau     = 1.50
 tauKappaScalingFactor = 0.0
-
-# EMA smoothing of μ across iterations (heavy momentum: 70% old, 30% new).
-emaAlpha              = 0.7
 
 effectiveSupportFloor = 2.0
 defaultKappaPrior     = 10.0
 numIterations         = 35
 maxLeafAssignments    = 5
-constructionMargin        = 0.20
+constructionMargin        = 3.0
 
 secondaryMassFloor        = 2.0
 bridgeSupportRelFraction  = 0.10
 fusionSimilarityThreshold = 0.90
 
 enableGtWarmStart         = false
-arenaMargin               = 0.40
+arenaMargin               = 3.0
 enableProfiling           = true

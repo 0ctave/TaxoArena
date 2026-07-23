@@ -58,7 +58,6 @@ data class HeadlessCliConfig(
     val separationEpsilon: Double? = null,
     val routingSoftmaxTau: Double? = null,
     val defaultKappaPrior: Double? = null,
-    val emaAlpha: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
     val datasetType: String? = null,
@@ -150,7 +149,6 @@ class HeadlessBenchmarkRunner(
         cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
         cliConfig.routingSoftmaxTau?.let { config.formalism.routingSoftmaxTau = it }
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
-        cliConfig.emaAlpha?.let { config.formalism.emaAlpha = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
             config.dataset.datasetType = taxonomy.config.DatasetType.valueOf(it.uppercase())
@@ -1226,7 +1224,6 @@ class HeadlessBenchmarkRunner(
         var routingSoftmaxTau: Double? = null
         var leafAcceptanceScale: Double? = null
         var assignmentGap: Double? = null
-        var emaAlpha: Double? = null
         var enableLabeling: Boolean? = null
         var judgeInduction = false
         var datasetType: String? = null
@@ -1304,7 +1301,6 @@ class HeadlessBenchmarkRunner(
                 "minClusterSize" -> minClusterSize = rawVal.toInt()
                 "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
                 "routingSoftmaxTau" -> routingSoftmaxTau = rawVal.toDouble()
-                "emaAlpha" -> emaAlpha = rawVal.toDouble()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
                 "datasetType" -> datasetType = rawVal.trim('"', '\'')
@@ -1359,7 +1355,6 @@ class HeadlessBenchmarkRunner(
             separationEpsilon = separationEpsilon,
             routingSoftmaxTau = routingSoftmaxTau,
             defaultKappaPrior = defaultKappaPrior,
-            emaAlpha = emaAlpha,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,
             datasetType = datasetType,
@@ -1421,7 +1416,6 @@ class HeadlessBenchmarkRunner(
             config.formalism.maxLeafAssignments,
             config.formalism.tauKappaScalingFactor,
             config.formalism.dagMode,
-            config.formalism.emaAlpha,
             config.formalism.fusionSimilarityThreshold,
             config.formalism.effectiveSupportFloor,
             config.diagnostics.secondaryMassFloor,

@@ -164,7 +164,11 @@ data class SnapshotSettings(
     val enableGtWarmStart: Boolean = true,
     val tauKappaScalingFactor: Double = 0.0,
     val dagMode: taxonomy.config.DagMode = taxonomy.config.DagMode.DAG_MAX,
-    val emaAlpha: Double,
+    // Removed: EMA blending of mu across iterations. Matched-config A/B runs showed
+    // it amplifies oscillation and prior-domination rather than stabilizing the fit.
+    // Kept here (with a default) only so legacy snapshot rows that still carry this
+    // key deserialize cleanly; it is no longer read from or written to the live config.
+    val emaAlpha: Double = 0.7,
     val datasetType: DatasetType = DatasetType.MMLU_PRO,
     /**
      * Ground-truth category labels for the dataset used during this generation run.
@@ -192,8 +196,7 @@ data class SnapshotSettings(
             maxLeafAssignments = maxLeafAssignments,
             enableGtWarmStart = enableGtWarmStart,
             tauKappaScalingFactor = tauKappaScalingFactor,
-            dagMode = dagMode,
-            emaAlpha = emaAlpha
+            dagMode = dagMode
         ),
         diagnostics = EffectiveConfig.Diagnostics(
             secondaryMassFloor = secondaryMassFloor,
@@ -534,7 +537,7 @@ class TaxonomySnapshotManager(
             enableGtWarmStart = config.formalism.enableGtWarmStart,
             tauKappaScalingFactor = config.formalism.tauKappaScalingFactor,
             dagMode = config.formalism.dagMode,
-            emaAlpha = config.formalism.emaAlpha,
+            emaAlpha = 0.0,
             datasetType = config.dataset.datasetType
         )
         

@@ -138,7 +138,7 @@ class TaxonomySnapshotTest {
         ),
         settings = SnapshotSettings(
             selectedDomains = emptyList(), maxDepth = 8, enableLabeling = false,
-            separationEpsilon = 0.02, minClusterSize = 25, emaAlpha = 0.7,
+            separationEpsilon = 0.02, minClusterSize = 25,
         ),
         logTrace = logTrace,
     )

@@ -82,17 +82,36 @@ class TaxonomyOperations(
                     val originals = groundTruthMap[emb.rawText]
                     val routeResult = trickler.routeQuery(emb, root, currentIteration, originals)
                     GraphNode.registerEmbedding(emb)
-                    val destinations = routeResult.leaves.keys.toList().ifEmpty {
+                    if (routeResult.leaves.isNotEmpty()) {
+                        routeResult.leaves.forEach { (leaf, logWeight) ->
+                            val weight = kotlin.math.exp(logWeight)
+                            synchronized(leaf.queryWeights) {
+                                leaf.queryWeights.merge(emb.rawText, weight, Double::plus)
+                                if (!leaf.queries.contains(emb)) {
+                                    leaf.queries.add(emb)
+                                }
+                            }
+                        }
+                    } else if (config.formalism.enableResidualRouting) {
+                        // No leaf reached at all: attribute the query to residualQueries on the
+                        // node the walk actually converged to (guaranteed non-leaf), not to
+                        // `.queries` on root. Hard-assigning it to root here is what produced the
+                        // persistent C3 invariant violations (root: non-empty hard queries, empty
+                        // residualQueries) and unconserved mass in the post-2026-07-22 pipeline.
+                        log.debug("Query '${emb.rawText.take(40)}' reached no leaf — recording as residual at ${routeResult.primary.label ?: routeResult.primary.id}")
+                        val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                        synchronized(routeResult.primary.residualQueries) {
+                            routeResult.primary.residualQueries.add(qId)
+                            routeResult.primary.residualConfidences[qId] = 0.0
+                        }
+                    } else {
+                        // Residual routing disabled entirely: preserve the old hard-assignment-to-root
+                        // fallback so mass still lands somewhere.
                         log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
-                        listOf(root)
-                    }
-                    destinations.forEach { leaf ->
-                        val logWeight = routeResult.leaves[leaf] ?: 0.0
-                        val weight = kotlin.math.exp(logWeight)
-                        synchronized(leaf.queryWeights) {
-                            leaf.queryWeights.merge(emb.rawText, weight, Double::plus)
-                            if (!leaf.queries.contains(emb)) {
-                                leaf.queries.add(emb)
+                        synchronized(root.queryWeights) {
+                            root.queryWeights.merge(emb.rawText, 1.0, Double::plus)
+                            if (!root.queries.contains(emb)) {
+                                root.queries.add(emb)
                             }
                         }
                     }

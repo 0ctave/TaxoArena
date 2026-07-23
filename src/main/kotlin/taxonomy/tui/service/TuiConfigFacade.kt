@@ -192,15 +192,6 @@ class TuiConfigFacade(
             getValue = { deps.config.formalism.routingSoftmaxTau.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.routingSoftmaxTau = it; true } ?: false },
             kind = SettingKind.NUMBER
-        ),
-
-        SettingItem(
-            name = "EMA Alpha",
-            description = "Dynamic calibration factor",
-            category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.emaAlpha.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.emaAlpha = it; true } ?: false },
-            kind = SettingKind.NUMBER
         )
     )
 

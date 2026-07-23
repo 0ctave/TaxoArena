@@ -19,7 +19,12 @@ import kotlin.math.pow
 data class RoutingResult(
     val leaves: Map<GraphNode, Double>,
     val residualHits: List<ResidualHit>,
-    val trace: List<String> = emptyList()
+    val trace: List<String> = emptyList(),
+    // Best node the trickle actually converged to, leaf or not. When `leaves` is empty this is
+    // guaranteed non-leaf — callers should attribute the query to this node's residualQueries
+    // rather than hard-assigning it to root, or the C3 invariant (internal node with hard
+    // queries but no residualQueries) gets violated by construction.
+    val primary: GraphNode
 )
 
 data class ResidualHit(
@@ -73,7 +78,7 @@ class TaxonomyTrickler(
             originalCategories = originalCategories
         )
         val res = trickle(query, root, opts)
-        return RoutingResult(res.leaves().toMap(), res.residualHits)
+        return RoutingResult(res.leaves().toMap(), res.residualHits, primary = res.primary)
     }
 
     fun trickle(
@@ -137,17 +142,23 @@ class TaxonomyTrickler(
 
             val responsibilities = DoubleArray(K) { exp(tempScores[it] - logSumExpVal) }
 
-            // 2. Residual routing check: stop walk if best child responsibility is below adaptive threshold (Issue D)
+            // 2. Residual routing check: record a low-confidence hit for diagnostics, but keep
+            // walking the beam below regardless. Hard-stopping here (added in the 2026-07-22
+            // trickle rework) starves this whole subtree of any leaf destination for that query;
+            // TrickleResult.leaves() then filters the only reachable candidate out (it's
+            // non-leaf), RoutingResult.leaves comes back empty, and the caller
+            // (TaxonomyOperations.reassignQueries) falls back to dumping the query onto the
+            // root with hard weight 1.0 — completely outside residualQueries accounting. Since
+            // residual routing is gated to depth >= 2, the root itself can never receive a
+            // ResidualHit, so this manifested as the root perpetually violating the C3 invariant
+            // (non-empty hard queries, empty residualQueries) and injecting unconserved mass.
             if (config.formalism.enableResidualRouting && node.depth >= 2) {
                 val bestChildResp = responsibilities.maxOrNull() ?: 0.0
                 val residualC = 1.6
                 val adaptiveThreshold = (residualC / K).coerceAtMost(0.80)
-                if (bestChildResp < adaptiveThreshold) {
-                    if (!opts.readOnly) {
-                        val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
-                        residualHits.add(ResidualHit(node, qId, bestChildResp))
-                    }
-                    return
+                if (bestChildResp < adaptiveThreshold && !opts.readOnly) {
+                    val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
+                    residualHits.add(ResidualHit(node, qId, bestChildResp))
                 }
             }
 
