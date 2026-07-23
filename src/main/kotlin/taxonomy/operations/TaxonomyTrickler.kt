@@ -123,19 +123,27 @@ class TaxonomyTrickler(
             return maxVal + ln(exp(a - maxVal) + exp(b - maxVal))
         }
 
+        val pathVisited = mutableSetOf<String>()
         fun walk(node: GraphNode, currentLogProb: Double) {
+            if (!pathVisited.add(node.id)) return
             nodeMap[node.id] = node
             val existing = logProbMap[node.id]
             logProbMap[node.id] = if (existing == null) currentLogProb else logSumExp(existing, currentLogProb)
 
-            if (node.isLeaf) return
+            if (node.isLeaf) {
+                pathVisited.remove(node.id)
+                return
+            }
 
             val children = if (config.formalism.enableBridging) {
                 (node.children + node.crossLinkChildren).toList()
             } else {
                 node.children.toList()
             }
-            if (children.isEmpty()) return
+            if (children.isEmpty()) {
+                pathVisited.remove(node.id)
+                return
+            }
 
             val K = children.size
             val vmfScores = DoubleArray(K)
@@ -176,13 +184,18 @@ class TaxonomyTrickler(
                     val dot = StatisticsUtils.dotProduct(childX, child.vmfMu)
                     if (dot > bestChildDot) bestChildDot = dot
                 }
-                if (bestChildDot < node.childCentroidShrinkage * parentDot) {
+                // descentMargin is slack below the Jensen-tight bar: 0.0 = exact bound,
+                // higher admits queries whose best child is slightly worse than the
+                // children's weighted-mean alignment (fewer residuals, softer leaves).
+                val descentBar = (node.childCentroidShrinkage - config.formalism.descentMargin).coerceAtLeast(0.0)
+                if (bestChildDot < descentBar * parentDot) {
                     if (config.formalism.enableResidualRouting && node.depth >= 1 && !opts.readOnly) {
                         val sumExpAll = vmfScores.sumOf { exp(it - maxScore) }
                         val bestChildResp = 1.0 / sumExpAll.coerceAtLeast(1.0)
                         val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
                         residualHits.add(ResidualHit(node, qId, bestChildResp))
                     }
+                    pathVisited.remove(node.id)
                     return
                 }
             }
@@ -212,6 +225,7 @@ class TaxonomyTrickler(
                     walk(child, accumulatedWeight)
                 }
             }
+            pathVisited.remove(node.id)
         }
 
         walk(root, 0.0)

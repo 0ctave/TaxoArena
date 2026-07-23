@@ -120,28 +120,28 @@ class TaxonomyMerger(
     }
 
     private fun renormalizeQueryWeights(root: GraphNode) {
-        val leaves = mutableListOf<GraphNode>()
+        val allNodes = mutableListOf<GraphNode>()
         val visited = mutableSetOf<String>()
         fun walk(n: GraphNode) {
             if (!visited.add(n.id)) return
-            if (n.isLeaf) leaves.add(n)
+            allNodes.add(n)
             n.children.forEach { walk(it) }
             n.crossLinkChildren.forEach { walk(it) }
         }
         walk(root)
 
         val totalWeights = mutableMapOf<String, Double>()
-        for (leaf in leaves) {
-            for ((q, w) in leaf.queryWeights) {
+        for (node in allNodes) {
+            for ((q, w) in node.queryWeights) {
                 totalWeights[q] = (totalWeights[q] ?: 0.0) + w
             }
         }
 
-        for (leaf in leaves) {
-            for (q in leaf.queryWeights.keys.toList()) {
+        for (node in allNodes) {
+            for (q in node.queryWeights.keys.toList()) {
                 val tot = totalWeights[q] ?: 1.0
                 if (tot > 0.0) {
-                    leaf.queryWeights[q] = leaf.queryWeights[q]!! / tot
+                    node.queryWeights[q] = node.queryWeights[q]!! / tot
                 }
             }
         }
@@ -175,11 +175,18 @@ class TaxonomyMerger(
         // 2. Blend parameters
         blendVmfAndNiw(target, source)
 
-        // 3. Redirect tree parents with defensive copy
+        // 3. Redirect parent edges with defensive copy — preserving edge TYPE. The old
+        // code only did parent.children.remove(source) and unconditionally added target
+        // as a TREE child: a parent holding source as a cross-link child kept a live
+        // forward edge to the destroyed node (the trickler kept routing into the ghost,
+        // which re-accumulated queries as an orphan leaf), and cross-link edges were
+        // silently converted into tree edges on redirect.
         source.parents.toList().forEach { parent ->
             if (parent != target) {
-                parent.children.remove(source)
-                parent.children.add(target)
+                val wasTree = parent.children.remove(source)
+                val wasCross = parent.crossLinkChildren.remove(source)
+                if (wasTree) parent.children.add(target)
+                if (wasCross && !parent.children.contains(target)) parent.crossLinkChildren.add(target)
                 target.parents.add(parent)
             }
         }
