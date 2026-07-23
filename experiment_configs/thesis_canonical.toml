@@ -54,20 +54,14 @@ minClusterSize        = 50     # min queries for a node to split further
 separationEpsilon     = 0.01   # chance-corrected separation floor for splits/merges
 
 # ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
-membershipFloor       = 0.10   # min share of a query's own normalized membership for a leaf to count
-routingBeamGamma      = 0.15   # per-level relative beam width (fraction of best sibling responsibility)
+membershipFloor       = 0.25   # min share of a query's own normalized membership for a leaf to count
+routingBeamGamma      = 0.015  # per-level relative beam width (direct cosine margin from best sibling)
 
-# descentMargin: margin for the trickle-routing descent gate.
-# A query descends to children iff bestChildDot >= parentDot - descentMargin.
-# - Set to 0.0 (default) for strict direction comparison (Option A).
-# - Set to a small positive value (e.g., 0.05) to loosen descent and reduce residuals.
-# - Set to >= 1.0 (e.g., 2.0) to effectively disable the gate and descend always (Option B).
-descentMargin         = 0.0
 
 effectiveSupportFloor = 2.0    # min effective (soft) support for a node to be retained
 defaultKappaPrior     = 10.0   # NiW prior concentration when a node has too few points
 
-numIterations         = 35     # max evolution passes. Early-stopping typically fires ~iter 15
+numIterations         = 50     # max evolution passes. Early-stopping typically fires ~iter 15
 maxLeafAssignments    = 5      # max leaves a single query may be softly assigned to during arena evaluation
 
 # ── Merging / convergence ────────────────────────────────────────────────────

@@ -36,14 +36,46 @@ class TaxonomyOperations(
 
     suspend fun fitNodeRecursive(node: GraphNode, currentIteration: Int = 0, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, currentIteration, isFinalIteration)
 
-    suspend fun splitNodesRecursive(node: GraphNode) = splitter.splitNodesRecursive(node)
+    suspend fun splitNodesRecursive(
+        root: GraphNode,
+        allEmbeddings: List<Embedding>,
+        groundTruthMap: Map<String, List<String>>,
+        currentIteration: Int
+    ) {
+        val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
+        val visited = mutableSetOf<String>()
+        val queue = ArrayDeque<GraphNode>().apply { add(root) }
+
+        while (queue.isNotEmpty()) {
+            val n = queue.removeFirst()
+            if (!visited.add(n.id)) continue
+            byDepth.getOrPut(n.depth) { mutableListOf() }.add(n)
+            queue.addAll(n.children)
+        }
+
+        byDepth.keys.sortedDescending().forEach { depth ->
+            val nodesAtDepth = byDepth[depth]!!
+            for (node in nodesAtDepth) {
+                tryProposal(root, allEmbeddings, groundTruthMap, currentIteration, config.formalism.separationEpsilon) {
+                    // splitSingleNode requires splitter to be called
+                    splitter.splitSingleNode(node)
+                }
+            }
+        }
+    }
 
     suspend fun generateLabelsPostPass(root: GraphNode, onProgress: (Int, Int) -> Unit = { _, _ -> }) =
         splitter.generateLabelsPostPass(root, onProgress)
 
     fun resetConceptCounter() = splitter.resetConceptCounter()
 
-    suspend fun optimizeHierarchy(root: GraphNode, currentIteration: Int = 2, learningPhase: Boolean = false) = merger.optimizeHierarchy(root, currentIteration, learningPhase)
+    suspend fun optimizeHierarchy(
+        root: GraphNode,
+        allEmbeddings: List<Embedding>,
+        groundTruthMap: Map<String, List<String>>,
+        currentIteration: Int = 2,
+        learningPhase: Boolean = false
+    ) = merger.optimizeHierarchy(root, allEmbeddings, groundTruthMap, currentIteration, learningPhase, this)
 
     suspend fun prunePassthroughNodesPublic(root: GraphNode) = merger.prunePassthroughNodesPublic(root)
 
@@ -73,6 +105,7 @@ class TaxonomyOperations(
         groundTruthMap: Map<String, List<String>> = emptyMap(),
         currentIteration: Int = 1
     ) = coroutineScope {
+        root.updateAllShrinkages()
 
         val numCores = Runtime.getRuntime().availableProcessors()
         val chunkSize = maxOf(5, (embeddings.size + (numCores * 4) - 1) / (numCores * 4)).coerceAtMost(25)
@@ -140,6 +173,46 @@ class TaxonomyOperations(
             }
         }.awaitAll()
     }
+
+    suspend fun tryProposal(
+        root: GraphNode,
+        allEmbeddings: List<Embedding>,
+        groundTruthMap: Map<String, List<String>>,
+        currentIteration: Int,
+        deltaThreshold: Double,
+        action: suspend () -> Unit
+    ): Boolean {
+        val registry = mutableMapOf<String, GraphNode>()
+        fun walkReg(n: GraphNode) {
+            if (registry.containsKey(n.id)) return
+            registry[n.id] = n
+            n.children.forEach { walkReg(it) }
+            n.crossLinkChildren.forEach { walkReg(it) }
+        }
+        walkReg(root)
+
+        val backup = taxonomy.model.GraphStateBackup(root)
+        val baseJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+
+        action()
+
+        root.updateAllShrinkages()
+        clearGraphQueries(root)
+        reassignQueries(root, allEmbeddings, groundTruthMap, currentIteration)
+
+        val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+        val deltaJ = newJ - baseJ
+
+        if (deltaJ > deltaThreshold) {
+            log.info("[ACCEPTED PROPOSAL] Delta J = ${"%.5f".format(deltaJ)} > ${"%.5f".format(deltaThreshold)}")
+            return true
+        } else {
+            log.debug("[REJECTED PROPOSAL] Delta J = ${"%.5f".format(deltaJ)} <= ${"%.5f".format(deltaThreshold)}. Reverting.")
+            backup.restore(registry)
+            return false
+        }
+    }
+
 
     fun clearGraphQueries(node: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
         if (!visited.add(node.id)) return

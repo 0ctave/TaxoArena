@@ -2,6 +2,8 @@ package taxonomy.utils
 
 import org.slf4j.LoggerFactory
 import taxonomy.model.GraphNode
+import taxonomy.model.Embedding
+import taxonomy.model.projectTo
 import kotlin.math.*
 import kotlinx.coroutines.*
 
@@ -215,6 +217,97 @@ object StatisticsUtils {
         if (expectedWithin <= 1e-10) return 0.0
         return 1.0 - wWithin / expectedWithin
     }
+
+    fun computeDagSeparationJ(root: GraphNode, allEmbeddings: List<Embedding>): Double {
+        val embMap = allEmbeddings.associateBy {
+            if (it.queryId != -1) it.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(it.rawText)
+        }
+        val rawEmbMap = allEmbeddings.associateBy { it.rawText }
+
+        val leaves = mutableListOf<GraphNode>()
+        val residualParents = mutableListOf<GraphNode>()
+        
+        fun walk(n: GraphNode) {
+            if (n.isLeaf) {
+                leaves.add(n)
+            } else {
+                if (n.residualQueries.isNotEmpty()) {
+                    residualParents.add(n)
+                }
+                n.children.forEach { walk(it) }
+            }
+        }
+        walk(root)
+
+        val leafIds = leaves.map { it.id }.toSet()
+        val resIds = residualParents.map { it.id }.toSet()
+        
+        val cellCount = leafIds.size + resIds.size
+        if (cellCount < 2) return 0.0
+        
+        val d = 256
+        
+        val cellN = DoubleArray(cellCount)
+        val cellSum = Array(cellCount) { DoubleArray(d) }
+        
+        val cells = mutableListOf<String>()
+        leaves.forEach { cells.add(it.id) }
+        residualParents.forEach { cells.add(it.id + "_residual") }
+        val cellToIndex = cells.withIndex().associate { it.value to it.index }
+        
+        for (leaf in leaves) {
+            val cellIdx = cellToIndex[leaf.id] ?: continue
+            for ((text, weight) in leaf.queryWeights) {
+                val emb = GraphNode.getEmbedding(text) ?: continue
+                val proj = emb.projectTo(d)
+                cellN[cellIdx] += weight
+                for (j in 0 until d) {
+                    cellSum[cellIdx][j] += weight * proj[j]
+                }
+            }
+        }
+        for (parent in residualParents) {
+            val cellIdx = cellToIndex[parent.id + "_residual"] ?: continue
+            for (qIdOrText in parent.residualQueries) {
+                val emb = GraphNode.getEmbedding(qIdOrText) 
+                    ?: embMap[qIdOrText]
+                    ?: rawEmbMap[qIdOrText]
+                    ?: continue
+                val proj = emb.projectTo(d)
+                cellN[cellIdx] += 1.0
+                for (j in 0 until d) {
+                    cellSum[cellIdx][j] += proj[j]
+                }
+            }
+        }
+
+        val nonEmptyIndices = cellToIndex.values.filter { cellN[it] > 0.0 }
+        if (nonEmptyIndices.isEmpty()) return 0.0
+        val n = cellN.sum()
+        if (n < 2.0) return 0.0
+
+        val sumTotal = DoubleArray(d)
+        var wWithin = 0.0
+        var pairFrac = 0.0
+        for (c in nonEmptyIndices) {
+            var normC2 = 0.0
+            val cN = cellN[c]
+            for (i in 0 until d) {
+                sumTotal[i] += cellSum[c][i]
+                normC2 += cellSum[c][i] * cellSum[c][i]
+            }
+            wWithin += cN * cN - normC2
+            pairFrac += cN * (cN - 1.0)
+        }
+        var normTotal2 = 0.0
+        for (i in 0 until d) normTotal2 += sumTotal[i] * sumTotal[i]
+        val wTotal = n * n - normTotal2
+
+        val expectedWithin = wTotal * pairFrac / (n * (n - 1.0))
+        if (expectedWithin <= 1e-10) return 0.0
+        return 1.0 - wWithin / expectedWithin
+    }
+
 
     /**
      * EM implementation for Bisecting vMF-k-Means (k=2, kept for compatibility).

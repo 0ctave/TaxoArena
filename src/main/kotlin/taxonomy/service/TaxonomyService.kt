@@ -137,6 +137,7 @@ class TaxonomyService(
      */
     internal suspend fun routeQueryToLeaves(text: String): List<Pair<GraphNode, Double>> = coroutineScope {
         val currentRoot = getGraph() ?: return@coroutineScope emptyList<Pair<GraphNode, Double>>()
+        currentRoot.updateAllShrinkages()
         val vector = embeddingCache.getOrCreate(text)
         val emb = Embedding(text, text, vector)
         ops.routeQuery(emb, currentRoot, isInference = true).entries

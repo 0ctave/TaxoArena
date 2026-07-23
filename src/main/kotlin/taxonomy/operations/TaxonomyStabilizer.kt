@@ -90,14 +90,7 @@ class TaxonomyStabilizer(
         // 4. Decide convergence
         val isFirstIteration = prevVolume == null
 
-        val totalEdges = countEdges(root).coerceAtLeast(1)
-        val relativeGed = ged.toDouble() / totalEdges
-
-        val singleIterConverged = if (isFirstIteration) {
-            false
-        } else {
-            relativeGed <= config.formalism.gedThreshold
-        }
+        val singleIterConverged = !isFirstIteration && (ged == 0)
 
         if (iteration < minIterations(root)) {
             consecutiveConvergedCount = 0

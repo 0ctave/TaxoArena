@@ -232,7 +232,6 @@ fun ConfigSnapshotPanel(
     add("  Sep. epsilon ${config.formalism.separationEpsilon}")
     add("  Member floor ${config.formalism.membershipFloor}")
     add("  Beam gamma   ${config.formalism.routingBeamGamma}")
-    add("  Descent marg ${config.formalism.descentMargin}")
 
     ScrollablePanelContent(
         pWidth = width,

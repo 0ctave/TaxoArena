@@ -200,14 +200,6 @@ class TuiConfigFacade(
             getValue = { deps.config.formalism.routingBeamGamma.toString() },
             setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.routingBeamGamma = it; true } ?: false },
             kind = SettingKind.NUMBER
-        ),
-        SettingItem(
-            name = "Descent Margin",
-            description = "Margin for descent gate: descend iff bestChildDot >= parentDot - descentMargin (>= 1.0 to disable)",
-            category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.descentMargin.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.descentMargin = it; true } ?: false },
-            kind = SettingKind.NUMBER
         )
     )
 

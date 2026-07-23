@@ -98,6 +98,67 @@ data class GraphNode(
     // treeParentId: set once by the splitter, never cleared by merger or transitive reduction
     var treeParentId: String? = null
 
+    // Jensen-tight shrinkage factor r_bar_p for descent gate
+    var childCentroidShrinkage: Double = 1.0
+
+    fun updateChildCentroidShrinkage() {
+        val childrenList = children.toList()
+        if (childrenList.isEmpty()) {
+            childCentroidShrinkage = 1.0
+            return
+        }
+        val k = childrenList.size
+        val weights = DoubleArray(k)
+        var sumW = 0.0
+        for (i in 0 until k) {
+            val child = childrenList[i]
+            val mass = child.queryWeights.values.sum()
+            weights[i] = mass
+            sumW += mass
+        }
+        if (sumW > 0.0) {
+            for (i in 0 until k) {
+                weights[i] /= sumW
+            }
+        } else {
+            for (i in 0 until k) {
+                weights[i] = 1.0 / k
+            }
+        }
+        val dim = childrenList[0].vmfMu.size
+        if (dim == 0) {
+            childCentroidShrinkage = 1.0
+            return
+        }
+        val sumVector = DoubleArray(dim)
+        for (i in 0 until k) {
+            val child = childrenList[i]
+            if (child.vmfMu.size == dim) {
+                val w = weights[i]
+                for (j in 0 until dim) {
+                    sumVector[j] += w * child.vmfMu[j]
+                }
+            }
+        }
+        var sumSq = 0.0
+        for (j in 0 until dim) {
+            sumSq += sumVector[j] * sumVector[j]
+        }
+        childCentroidShrinkage = Math.sqrt(sumSq).coerceIn(0.0, 1.0)
+    }
+
+    fun updateAllShrinkages() {
+        val visited = mutableSetOf<String>()
+        fun walk(node: GraphNode) {
+            if (!visited.add(node.id)) return
+            node.updateChildCentroidShrinkage()
+            node.children.forEach { walk(it) }
+            node.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(this)
+    }
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is GraphNode) return false
@@ -320,4 +381,94 @@ fun GraphNode.allAncestors(): Set<String> {
     }
     traverse(this)
     return ancestors
+}
+
+class GraphStateBackup(root: GraphNode) {
+    private val nodeStates = mutableMapOf<String, NodeState>()
+    private val rootRef = root
+
+    class NodeState(
+        val children: List<String>,
+        val crossLinkChildren: List<String>,
+        val parents: List<String>,
+        val queryWeights: Map<String, Double>,
+        val queries: List<Embedding>,
+        val residualQueries: Set<String>,
+        val residualConfidences: Map<String, Double>,
+        val isBridge: Boolean,
+        val vmfMu: FloatArray,
+        val vmfKappa: Double,
+        val vmfLogNormalizer: Double,
+        val depth: Int,
+        val label: String?,
+        val originalCategory: String?,
+        val treeParentId: String?,
+        val childCentroidShrinkage: Double
+    )
+
+    init {
+        val visited = mutableSetOf<String>()
+        fun walk(n: GraphNode) {
+            if (!visited.add(n.id)) return
+            nodeStates[n.id] = NodeState(
+                children = n.children.map { it.id },
+                crossLinkChildren = n.crossLinkChildren.map { it.id },
+                parents = n.parents.map { it.id },
+                queryWeights = n.queryWeights.toMap(),
+                queries = n.queries.toList(),
+                residualQueries = n.residualQueries.toSet(),
+                residualConfidences = n.residualConfidences.toMap(),
+                isBridge = n.isBridge,
+                vmfMu = n.vmfMu.copyOf(),
+                vmfKappa = n.vmfKappa,
+                vmfLogNormalizer = n.vmfLogNormalizer,
+                depth = n.depth,
+                label = n.label,
+                originalCategory = n.originalCategory,
+                treeParentId = n.treeParentId,
+                childCentroidShrinkage = n.childCentroidShrinkage
+            )
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(rootRef)
+    }
+
+    fun restore(registry: Map<String, GraphNode>) {
+        for ((id, state) in nodeStates) {
+            val node = registry[id] ?: continue
+            node.children.clear()
+            node.crossLinkChildren.clear()
+            node.parents.clear()
+            node.queryWeights.clear()
+            node.queryWeights.putAll(state.queryWeights)
+            node.queries.clear()
+            node.queries.addAll(state.queries)
+            node.residualQueries.clear()
+            node.residualQueries.addAll(state.residualQueries)
+            node.residualConfidences.clear()
+            node.residualConfidences.putAll(state.residualConfidences)
+            node.isBridge = state.isBridge
+            node.vmfMu = state.vmfMu.copyOf()
+            node.vmfKappa = state.vmfKappa
+            node.vmfLogNormalizer = state.vmfLogNormalizer
+            node.depth = state.depth
+            node.label = state.label
+            node.originalCategory = state.originalCategory
+            node.treeParentId = state.treeParentId
+            node.childCentroidShrinkage = state.childCentroidShrinkage
+        }
+        for ((id, state) in nodeStates) {
+            val node = registry[id] ?: continue
+            state.children.forEach { cid ->
+                registry[cid]?.let { node.children.add(it) }
+            }
+            state.crossLinkChildren.forEach { cid ->
+                registry[cid]?.let { node.crossLinkChildren.add(it) }
+            }
+            state.parents.forEach { pid ->
+                registry[pid]?.let { node.parents.add(it) }
+            }
+        }
+    }
 }

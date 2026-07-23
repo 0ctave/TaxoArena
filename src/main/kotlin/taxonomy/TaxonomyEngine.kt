@@ -234,7 +234,7 @@ class TaxonomyEngine(
                         )
 
                         val splitTime = measureTimeMillis {
-                            ops.splitNodesRecursive(root)
+                            ops.splitNodesRecursive(root, uniqueEmbs, groundTruthMap, i)
                         }
                         perfTracker.recordTime("construction.phase4_split", splitTime, 1L)
                         perfTracker.recordTime("construction.phase4_split@iter=$i", splitTime, 1L)
@@ -256,7 +256,7 @@ class TaxonomyEngine(
                         )
 
                         val optimizeTime = measureTimeMillis {
-                            ops.optimizeHierarchy(root, i, learningPhase = true)
+                            ops.optimizeHierarchy(root, uniqueEmbs, groundTruthMap, i, learningPhase = true)
                         }
                         perfTracker.recordTime("construction.phase5_optimize", optimizeTime, 1L)
                         perfTracker.recordTime("construction.phase5_optimize@iter=$i", optimizeTime, 1L)
@@ -323,7 +323,7 @@ class TaxonomyEngine(
             log.info("=== STARTING FINALIZATION PHASE ===")
             val finalizationTime = measureTimeMillis {
                 // 1. Run full topology optimization (bridges, fusions, transitive reduction)
-                ops.optimizeHierarchy(root, totalIters, learningPhase = false)
+                ops.optimizeHierarchy(root, uniqueEmbs, groundTruthMap, totalIters, learningPhase = false)
                 // 2. Refit bounds after final structural changes
                 ops.fitNodeRecursive(root, isFinalIteration = true)
             }

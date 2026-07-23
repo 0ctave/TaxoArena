@@ -142,11 +142,13 @@ class TaxonomyTrickler(
             // 1. Score each child with its own vMF log-density (its own kappa and normalizer —
             // a component with tighter concentration or a better directional match scores higher
             // on its own terms, not relative to a shared/averaged sibling kappa).
+            val meanKappa = children.map { it.vmfKappa }.average().coerceAtLeast(1e-9)
+            val dots = DoubleArray(K)
             for (i in children.indices) {
                 val child = children[i]
                 val slicedX = embedding.projectTo(child.sliceDim)
-                val logNorm = StatisticsUtils.logVmfNormalizer(child.sliceDim, child.vmfKappa)
-                var f = logNorm + child.vmfKappa * StatisticsUtils.dotProduct(slicedX, child.vmfMu)
+                dots[i] = StatisticsUtils.dotProduct(slicedX, child.vmfMu)
+                var f = meanKappa * dots[i]
 
                 // Ground Truth bias (iter == 1 only, governed by opts)
                 val isOriginal = opts.originalCategories?.any { it.equals(child.label, ignoreCase = true) } ?: false
@@ -160,17 +162,9 @@ class TaxonomyTrickler(
             // 2. Descent-vs-residual gate: parent-vs-children Bayes factor at threshold 1,
             // evaluated in the shared-concentration limit — i.e. on DIRECTIONS only.
             // Descend iff some child's mean direction matches the query at least as well as
-            // this node's own: max_c <mu_c, x> >= <mu_p, x>. Comparing full densities here
-            // is systematically biased toward the parent: the Hornik-Grün shrinkage factor
-            // (n-1)/(n+d-2) scales with n, so a parent fitted on 4x the queries carries a
-            // structurally larger kappa than its children, and the bias (~tens of nats)
-            // dwarfs any honest evidence difference — observed as 56% of the corpus
-            // residualizing at the anchors. Under a locally-shared kappa the density
-            // comparison reduces exactly to the direction comparison, which is immune to
-            // that estimation artifact, still parameter-free, and keeps the honest residual
-            // semantics: queries at the parent's own center that no child specializes in
-            // stay at the parent.
+            // this node's own: max_c <mu_c, x> >= \bar{r}_p <mu_p, x>.
             val maxScore = vmfScores.maxOrNull() ?: 0.0
+            val maxDot = dots.maxOrNull() ?: 0.0
             if (node.vmfMu.isNotEmpty()) {
                 val parentX = embedding.projectTo(node.vmfMu.size)
                 val parentDot = StatisticsUtils.dotProduct(parentX, node.vmfMu)
@@ -181,7 +175,7 @@ class TaxonomyTrickler(
                     val dot = StatisticsUtils.dotProduct(childX, child.vmfMu)
                     if (dot > bestChildDot) bestChildDot = dot
                 }
-                if (bestChildDot < parentDot - config.formalism.descentMargin) {
+                if (bestChildDot < node.childCentroidShrinkage * parentDot) {
                     if (config.formalism.enableResidualRouting && node.depth >= 1 && !opts.readOnly) {
                         val sumExpAll = vmfScores.sumOf { exp(it - maxScore) }
                         val bestChildResp = 1.0 / sumExpAll.coerceAtLeast(1.0)
@@ -192,13 +186,9 @@ class TaxonomyTrickler(
                 }
             }
 
-            // 3. Per-level relative beam: a child stays on the beam iff its responsibility is
-            // within gamma of the BEST sibling's (equivalently, its log-density is within
-            // -ln(gamma) nats of the best). Relative-to-best is scale-free and adapts to the
-            // realized competition: genuine 0.50/0.50 sharing keeps both children, 0.90/0.05
-            // drops the tail. The argmax child always passes, so the beam is never empty.
-            val lnGamma = ln(config.formalism.routingBeamGamma.coerceIn(1e-6, 1.0))
-            val bestIndices = children.indices.filter { vmfScores[it] >= maxScore + lnGamma }
+            // 3. Per-level relative beam: a child stays on the beam iff its cosine distance
+            // is within routingBeamGamma of the BEST sibling's dot product.
+            val bestIndices = children.indices.filter { dots[it] >= maxDot - config.formalism.routingBeamGamma }
 
             // Register the query embedding for MRL-projection lookup
             GraphNode.registerEmbedding(embedding)
