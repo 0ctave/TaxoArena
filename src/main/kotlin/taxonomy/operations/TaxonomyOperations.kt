@@ -27,9 +27,11 @@ class TaxonomyOperations(
     private val log = LoggerFactory.getLogger("taxonomy.Operations")
     
     private var cachedBaseJ: Double? = null
+    private val rejectedProposalsCache = java.util.concurrent.ConcurrentHashMap.newKeySet<ProposalFingerprint>()
     
     fun invalidateCachedJ() {
         cachedBaseJ = null
+        rejectedProposalsCache.clear()
     }
 
     fun routeQuery(
@@ -258,6 +260,19 @@ class TaxonomyOperations(
         deltaThreshold: Double,
         action: suspend () -> Unit
     ): Boolean {
+        // Memoization check: identify if this exact proposal has been rejected in this iteration
+        val populationHash = site.queryWeights.entries.map { it.key.hashCode() xor it.value.hashCode() }.sum()
+        val fingerprint = ProposalFingerprint(
+            nodeId = site.id,
+            populationHash = populationHash,
+            muHash = site.vmfMu.contentHashCode(),
+            kappaHash = site.vmfKappa
+        )
+        if (rejectedProposalsCache.contains(fingerprint)) {
+            log.debug("[MEMOIZED REJECTION] Skip tryProposal for site '${site.label ?: site.id}'")
+            return false
+        }
+
         val root = dag.node
         val registry = mutableMapOf<String, GraphNode>()
         fun walkReg(n: GraphNode) {
@@ -319,14 +334,6 @@ class TaxonomyOperations(
             log.info("[PROPOSAL DIAG] ${lostIds.size} node(s) unreachable after action: $details")
         }
 
-        // NOTE: no mass assertion here. The post-action state is TENTATIVE by
-        // design — the proposal machinery evaluates it and either re-routes
-        // (acceptance path, asserted below on the settled state) or restores the
-        // backup (rejection). Asserting mid-transaction killed runs on legal
-        // tentative states (seed-2048 round-1 validation: a fusion's transient
-        // weight bookkeeping tripped it while the J gate was about to reject and
-        // restore that very state).
-
         val baseJ = if (cachedBaseJ != null) {
             cachedBaseJ!!
         } else {
@@ -353,28 +360,23 @@ class TaxonomyOperations(
         val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
         val deltaJ = newJ - baseJ
 
-        // Gate scale fix: compute effective local delta threshold
-        val denom = computePairwiseDenom(root)
-        val piS = if (denom > 1e-5 && site != root && site.depth > 0) {
-            val nS = site.getRecursiveSoftMass()
-            val numPairs = nS * (nS - 1.0)
-            (numPairs / denom).coerceAtMost(1.0)
-        } else {
-            1.0
-        }
-        val effThreshold = deltaThreshold * piS
+        // Lexicographic objective: accept iff deltaJ > tau OR (|deltaJ| <= tau AND deltaV < 0)
+        val deltaV = postRegistry.size - registry.size
+        val tau = 1e-6
+        val accepted = deltaJ > tau || (kotlin.math.abs(deltaJ) <= tau && deltaV < 0)
 
-        if (deltaJ > effThreshold) {
-            log.info("[ACCEPTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} > effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)})")
+        if (accepted) {
+            log.info("[ACCEPTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV")
+            rejectedProposalsCache.clear()
             cachedBaseJ = newJ
             return true
         } else {
-            // Only print rejection log at INFO level if there is a non-trivial Delta J
             if (kotlin.math.abs(deltaJ) > 1e-9) {
-                log.info("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} <= effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)}). Reverting.")
+                log.info("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
             } else {
-                log.debug("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.5f".format(deltaJ)} <= effThreshold = ${"%.5f".format(effThreshold)} (pi_S = ${"%.5f".format(piS)}). Reverting.")
+                log.debug("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
             }
+            rejectedProposalsCache.add(fingerprint)
             backup.restore(registry)
             return false
         }
@@ -647,4 +649,11 @@ private data class StructuralState(
     val childrenIds: Set<String>,
     val crossLinkChildrenIds: Set<String>,
     val parentsIds: Set<String>
+)
+
+private data class ProposalFingerprint(
+    val nodeId: String,
+    val populationHash: Int,
+    val muHash: Int,
+    val kappaHash: Double
 )

@@ -172,6 +172,8 @@ class TaxonomyEngine(
             val uniqueEmbs = root.children.flatMap { gatherAllEmbeddingsInBranch(it) }.distinctBy { it.rawText }
 
             stabilizer.reset()
+            val activeNodeHashes = mutableListOf<Int>()
+            var lastIterationJAfterRefit: Double? = null
 
             var previousDagState: Map<String, NodeState>? = null
             for (i in 1..totalIters) {
@@ -215,6 +217,9 @@ class TaxonomyEngine(
                         perfTracker.recordTime("construction.phase3_trickle", trickleTime, uniqueEmbs.size.toLong())
                         perfTracker.recordTime("construction.phase3_trickle@iter=$i", trickleTime, uniqueEmbs.size.toLong())
                         taxonomyService.notifyGraphUpdated()
+
+                        val jBeforeEdits = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
+                        val drift = if (lastIterationJAfterRefit != null) jBeforeEdits - lastIterationJAfterRefit!! else 0.0
 
                         // Phase 3c: Pre-split passthrough collapse
                         log.debug("Phase 3c: Pre-split passthrough collapse...")
@@ -281,6 +286,8 @@ class TaxonomyEngine(
                         perfTracker.recordTime("construction.phase5_optimize", optimizeTime, 1L)
                         perfTracker.recordTime("construction.phase5_optimize@iter=$i", optimizeTime, 1L)
                         taxonomyService.notifyGraphUpdated(true)
+
+                        val jAfterEdits = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
                         
                         // Final Refit after optimization
                         log.debug("Phase 2 Refit: Refitting bounds after optimization...")
@@ -304,6 +311,10 @@ class TaxonomyEngine(
                         perfTracker.recordTime("construction.phase2_refit", refitTime, 1L)
                         perfTracker.recordTime("construction.phase2_refit@iter=$i", refitTime, 1L)
                         taxonomyService.notifyGraphUpdated()
+
+                        val jAfterRefit = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
+                        lastIterationJAfterRefit = jAfterRefit
+                        log.info("[J-TRACK] Iteration $i | J_before_edits: ${"%.5f".format(jBeforeEdits)} (Drift from prev refit: ${"%.5f".format(drift)}) | J_after_edits: ${"%.5f".format(jAfterEdits)} (Edits Delta: ${"%.5f".format(jAfterEdits - jBeforeEdits)}) | J_after_refit: ${"%.5f".format(jAfterRefit)} (Refit Delta: ${"%.5f".format(jAfterRefit - jAfterEdits)})")
                     }
                 }
 
@@ -331,6 +342,24 @@ class TaxonomyEngine(
                     log.info(diffDagState(previousDagState!!, currentDagState, root))
                 }
                 previousDagState = currentDagState
+
+                // Topology cycle detection
+                val activeTopologyRepresentations = currentDagState.values.map { nodeState ->
+                    nodeState.id + "<-" + nodeState.parents.sorted().joinToString(",") + "->" + nodeState.children.sorted().joinToString(",")
+                }.sorted()
+                val topologyHash = activeTopologyRepresentations.hashCode()
+                
+                val k = 10
+                val cycleStartIndex = activeNodeHashes.lastIndexOf(topologyHash)
+                if (cycleStartIndex != -1 && (activeNodeHashes.size - cycleStartIndex) <= k) {
+                    val period = activeNodeHashes.size - cycleStartIndex
+                    log.warn("[CYCLE DETECTED] Limit cycle of period $period detected at iteration $i! Same topology state recurred from iteration ${cycleStartIndex + 1}.")
+                    if (config.execution.enableEarlyStopping) {
+                        log.info("Early stopping triggered in iteration $i due to limit cycle detection.")
+                        break
+                    }
+                }
+                activeNodeHashes.add(topologyHash)
 
                 // Phase 6: Stabilize Convergence Check
                 val stabilizationResult = stabilizer.evaluateConvergence(root, i)
