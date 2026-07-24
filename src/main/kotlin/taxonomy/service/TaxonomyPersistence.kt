@@ -40,7 +40,15 @@ data class SerialNode(
     val judgeModelVersion: String? = null,
     val isBridge: Boolean = false,
     val bridgeJsDivergence: Double = 0.0,
-    val residualQueries: List<String> = emptyList()
+    val residualQueries: List<String> = emptyList(),
+    // Soft membership weights, keyed by the same q_<hash> ids as queryIds. Without
+    // them a loaded snapshot loses the entire soft assignment: child mass sums come
+    // back as zero, so the recomputed Jensen descent-gate shrinkage degenerates and
+    // post-load routing diverges from the construction-time DAG.
+    val queryWeights: Map<String, Double> = emptyMap(),
+    // Residual confidences keyed exactly like residualQueries (question-id strings),
+    // so they are stored raw rather than hashed.
+    val residualConfidences: Map<String, Double> = emptyMap()
 )
 
 @Serializable
@@ -115,7 +123,9 @@ class TaxonomyPersistence(
                 judgeModelVersion = node.judgeModelVersion,
                 isBridge = node.isBridge,
                 bridgeJsDivergence = node.bridgeJsDivergence,
-                residualQueries = node.residualQueries.toList()
+                residualQueries = node.residualQueries.toList(),
+                queryWeights = node.queryWeights.entries.associate { (raw, w) -> "q_${hashQuery(raw)}" to w },
+                residualConfidences = node.residualConfidences.toMap()
             )
         }
 
@@ -145,7 +155,9 @@ class TaxonomyPersistence(
         val isLegacy = serialized.version < 2
         log.info("Loading serialized graph from memory version: ${serialized.version} (legacy: $isLegacy)")
 
-        val allQueryIds = serialized.nodes.flatMap { it.queryIds }.toSet()
+        // Include queryWeights keys so weights can be rehydrated even for entries
+        // whose q_<hash> id is not present in this node's own queryIds list.
+        val allQueryIds = serialized.nodes.flatMap { it.queryIds + it.queryWeights.keys }.toSet()
         val queryRowMap: Map<String, CachedQuery> = embeddingCache.getQueriesBatch(allQueryIds)
         val allDistilled = queryRowMap.values.map { it.distilledText }.toSet()
         val vectorMap = embeddingCache.getBatch(allDistilled)
@@ -193,6 +205,13 @@ class TaxonomyPersistence(
                     emb.queryId = resolvedId
                     queries.add(emb)
                 }
+
+                // Restore soft membership weights (q_<hash> -> raw text keys) and
+                // residual confidences (stored raw, keyed like residualQueries).
+                sNode.queryWeights.forEach { (qId, w) ->
+                    queryRowMap[qId]?.let { queryWeights[it.rawText] = w }
+                }
+                residualConfidences.putAll(sNode.residualConfidences)
             }
         }
 
@@ -203,7 +222,14 @@ class TaxonomyPersistence(
             sNode.parentIds.forEach { pId -> nodeMap[pId]?.let { node.parents.add(it) } }
         }
 
+        // Recompute the descent-gate shrinkage factors from the restored weights:
+        // the trickler reads childCentroidShrinkage directly at inference and the
+        // default (1.0) is the un-tightened Jensen bar, so a loaded snapshot would
+        // otherwise route differently from the constructed one.
+        val loadedRoot = nodeMap[serialized.rootId]
+        loadedRoot?.updateAllShrinkages()
+
         log.info("[DB] Successfully loaded and hydrated DAG with ${nodeMap.size} nodes.")
-        return nodeMap[serialized.rootId]
+        return loadedRoot
     }
 }
