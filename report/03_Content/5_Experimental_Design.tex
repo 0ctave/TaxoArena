@@ -48,18 +48,16 @@ condition answers which research question and with which metric.
 Two headline research questions---arena ranking agreement (RQ1) and
 the migration effect on that agreement (RQ2)---anchor the reported
 results. A third question originally framed as RQ3 (adaptive
-scheduling efficiency) is \textbf{demoted}: the scheduler is an
-engineering mechanism for judge-call economy, not a thesis-level
-contribution, and is reported only as an optional secondary
-diagnostic where informative (Appendix~\ref{app:tuning-protocol}).
+scheduling efficiency) is demoted to an optional secondary diagnostic
+(Section~\ref{sec:research-goal};
+Appendix~\ref{app:tuning-protocol}).
 Taxonomy quality, previously listed as RQ1, is correspondingly
 demoted to DQ1: a construction-validity prerequisite that must hold
 for RQ1/RQ2 to be meaningful, but not itself a primary claim.
 The scope of this thesis is a \textbf{selected-domain
 proof-of-concept}: the arena evaluates one or two ex-ante-selected,
 high-support domain nodes rather than all 14 MMLU-Pro domains at
-matched statistical power, a compute-budget trade-off restated in
-the Discussion and revisited in Section~\ref{sec:future-work}.
+matched statistical power---a compute-budget trade-off.
 
 \section{Implementation Environment}\label{sec:exp-env}
 
@@ -75,13 +73,15 @@ alongside the tuning protocol that produced them; their provenance is
 the historical L9/Pareto sweep, conducted on a predecessor
 parameterisation, plus subsequent unification of the routing
 parameters under \texttt{membershipFloor}, and final values follow
-the pending calibration study.\footnote{The
-three diagnostic bridge-export parameters (\texttt{secondaryMassFloor},
-    \texttt{bridgeSupportFloor}, \texttt{bridgeSupportRelFraction}) do not
-    affect DAG topology, routing, or any DQ1/RQ1/RQ2 metric and are
-    omitted from the table. Run identifiers, seeds, and realised call
-    counts are recorded in the experiment manifest
-    (\texttt{manifest.json}) emitted with each run.}
+the pending calibration study.\footnote{Two of the former
+    bridge-export diagnostics are now functional construction
+    parameters and appear in the table: \texttt{secondaryMassFloor}
+    (the residual-pool and capture floor of the cross-link generator)
+    and \texttt{bridgeSupportRelFraction} (the minimum fraction of a
+    host's residual pool a cross-link candidate must capture);
+    \texttt{bridgeSupportFloor} remains unused. Run identifiers,
+    seeds, and realised call counts are recorded in the experiment
+    manifest (\texttt{manifest.json}) emitted with each run.}
 
 \section{Datasets and Split Protocol}\label{sec:exp-datasets}
 
@@ -101,9 +101,10 @@ labelled corpus; it is not used for anchor seeding or arena
 evaluation.
 
 Taxonomy \textbf{construction} runs on the full 14-domain corpus
-simultaneously, a precondition for the cross-domain bridging
-machinery of Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-topology})
-to be exercised meaningfully.
+simultaneously, a precondition for the cross-link operator of
+Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-topology})---whose
+guards require host and target to lie under different anchors---to be
+exercised meaningfully.
 The \textbf{arena} evaluates 12 models on one or two ex-ante-selected,
 high-support domain nodes, chosen before observing any $\rho$ or
 $\Delta\rho$ result under a fixed rule: (i) high held-out query
@@ -126,7 +127,7 @@ on construction-internal metrics rather than as an explicit
 materialised subsample. No arena-test query is seen by any tuning
 gate under either realisation, so the no-leakage property holds;
 setting \texttt{testRatio}$=0.25$ and materialising the explicit split
-is a pending hardening step, not a correctness gap. Full detail in
+is pending. Full detail in
 Appendix~\ref{app:tuning-protocol}.} The arena-test fraction targets
 approximately 10 held-out queries at the smallest leaf under a
 selected node, the binding constraint given $\binom{12}{2}=66$ model
@@ -205,6 +206,12 @@ of domain-conditioned, reference-informed judging by holding the
 taxonomy and grouping fixed and varying only the judge prompt,
 addressing the concern that RQ1's result could be confounded with
 generic-judge quality.
+Because both conditions share the same judge model, the C1--C3
+contrast is additionally robust to judge-side benchmark
+contamination: any memorised MMLU-Pro content contributes to both
+conditions alike and is differenced out of the contrast, though not
+out of either condition's absolute agreement level
+(Section~\ref{sec:disc-limitations}).
 
 \subsection{Information Separation Protocol}\label{sec:exp-info-separation}
 
@@ -309,16 +316,14 @@ target for strong agreement, not a pass/fail criterion; results below
 it are still reported in full and scoped to the selected domain
 node(s), not treated as a global validation claim.
 
-\section{Chapter Summary}\label{sec:exp-summary}
-
-This chapter fixed the mapping from two headline research questions
-(RQ1, RQ2) and one construction-validity diagnostic (DQ1) to
-experimental condition and metric, then specified the implementation
-environment, dataset and split protocol, the arena's model roster,
-scheduling budget, and minimum defensible condition set (C1--C3), the
-information-separation protocol formalising the answer-key-blind
-design, DQ1's unsupervised baselines, and the statistical protocol
-used to interpret the results reported in Chapter~\ref{ch:results}.
-Full taxonomy-tuning mechanics, the ablation matrix, and optional
-secondary diagnostics are detailed in Appendix~\ref{app:tuning-protocol};
-judge rubric-generation mechanics in Appendix~\ref{app:judge-generation}.
+\bigskip
+\noindent
+The experimental configuration is now fully specified: conditions
+C1--C3 on ex-ante-selected domain nodes, a pre-committed split and
+seed set, and pre-specified metrics with bootstrap uncertainty.
+Chapter~\ref{ch:results} reports the outcomes---construction quality
+(DQ1), the routing diagnostic, and the RQ1/RQ2 arena results---and
+Chapter~\ref{ch:discussion} interprets them.
+Full taxonomy-tuning mechanics are detailed in
+Appendix~\ref{app:tuning-protocol}; judge rubric-generation mechanics
+in Appendix~\ref{app:judge-generation}.

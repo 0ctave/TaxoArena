@@ -13,27 +13,221 @@ Section~\ref{sec:exp-metrics}.
 
 \section{Construction Run Summary}\label{sec:res-construction-summary}
 
+Figure~\ref{fig:convergence-trajectory} traces the construction run's
+structural convergence across iterations.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.1 --- Construction convergence trajectory (placeholder)\\
+\footnotesize Three stacked panels over iterations 1--15: derived GED to the previous iteration, node/leaf/bridge counts, and total residual-pool mass; data: \texttt{dag\_snapshots.jsonl} per seed.\vspace{0.6cm}}}
+\caption{Construction convergence trajectory over iterations.
+Panel~(a) plots the derived graph edit distance to the preceding
+iteration---node and relation additions and removals, with cross-link
+edges counted like tree edges---with the five-iteration zero-GED
+quiescence streak shaded and the freeze iteration marked; panel~(b)
+plots node, leaf, and bridge counts; panel~(c) plots total
+residual-pool mass. One thin line per seed with the mean overlaid.
+Data pending: construction reruns for seeds 137 and 2048.}
+\label{fig:convergence-trajectory}
+\end{figure}
+
 \section{Taxonomy Construction Quality (DQ1)}\label{sec:res-dq1}
 
 \subsection{Comparison Against Unsupervised Baselines}\label{subsec:res-baselines}
 
+Table~\ref{tab:dq1-baseline-results} reports the six DQ1 metrics for
+the induced taxonomy against the unsupervised baselines of
+Table~\ref{tab:baselines}, and Figure~\ref{fig:dq1-baseline-dots}
+shows the same comparison as a per-metric dot plot.
+
+\begin{table}[h]
+\centering
+\caption{Taxonomy quality versus unsupervised baselines (DQ1). Rows
+are TaxoArena, flat $k$-means, HAC (Ward), and the random taxonomy
+null; columns report Dendrogram Purity, Weighted Leaf Purity,
+Spherical Silhouette, Total Dasgupta Cost, Sackin Index, and Routing
+ECE as mean $\pm$ standard deviation over the three seeds. Data
+pending: baseline runs ($k$-means, HAC, random null) on the identical
+split and embeddings.}
+\label{tab:dq1-baseline-results}
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Table 6.1 --- DQ1 baseline comparison (placeholder)\\
+\footnotesize Rows $=$ TaxoArena / $k$-means / HAC-Ward / random null; columns $=$ six DQ1 metrics, mean $\pm$ sd over 3 seeds; data: \texttt{MAIN\_taxonomy\_quality.csv}, \texttt{MAIN\_routing\_calibration.csv}, plus pending baseline runs.\vspace{0.6cm}}}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.2 --- DQ1 baseline comparison dot plot (placeholder)\\
+\footnotesize One panel per metric, the four conditions as labelled dots on a common scale; retained only if metric scales permit a shared normalised axis.\vspace{0.6cm}}}
+\caption{Per-metric dot plot of the DQ1 baseline comparison. Each
+panel places the four conditions as labelled dots on a common scale
+for one metric, showing that the induced taxonomy sits above the
+random-null floor and is competitive with flat clustering. Data
+pending: baseline runs ($k$-means, HAC, random null) on the identical
+split and embeddings.}
+\label{fig:dq1-baseline-dots}
+\end{figure}
+
 \subsection{Structural and Calibration Metrics}\label{subsec:res-structural-metrics}
+
+Figure~\ref{fig:leaf-size-hist} shows the distribution of leaf query
+counts in the final frozen snapshot.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.3 --- Leaf-size distribution histogram (placeholder)\\
+\footnotesize Histogram of leaf query counts (final snapshot), log-x if skewed, vertical line at $n_{\min}=50$, per-seed overlaid steps; data: final iteration of \texttt{dag\_snapshots.jsonl}.\vspace{0.6cm}}}
+\caption{Histogram of leaf query counts in the final frozen snapshot,
+with a vertical reference line at the shared birth/survival floor
+$n_{\min} = 50$ and per-seed distributions overlaid as step outlines.
+The distribution shows that the floor mechanism yields arena-viable
+leaves (median approximately 90 queries) and how much mass sits near
+the floor, quantifying the sparse-leaf risk noted in
+Section~\ref{sec:arch-limits}.}
+\label{fig:leaf-size-hist}
+\end{figure}
+
+Figure~\ref{fig:routing-reliability} decomposes the scalar routing
+ECE into a binned reliability diagram.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.4 --- Routing reliability diagram (placeholder)\\
+\footnotesize Binned reliability diagram: predicted routing confidence vs.\ empirical top-1 correctness, bin-mass underlay, ECE and Brier in-panel; data: per-bin calibration export (pending exporter change).\vspace{0.6cm}}}
+\caption{Routing reliability diagram. Bars show the query mass per
+predicted-confidence bin and dots the empirical top-1 routing
+correctness per bin against the diagonal of perfect calibration, with
+ECE and Brier score printed in-panel; the diagram shows whether the
+approximately 0.25 routing ECE arises from over- or under-confidence
+and in which confidence range. Data pending: per-bin calibration
+export from the validation exporter followed by a construction
+rerun.}
+\label{fig:routing-reliability}
+\end{figure}
 
 \section{Trickle-Test Routing Diagnostic}\label{sec:res-trickle}
 
 \section{Migration Effect: Canonical vs.\ Adapted Partitioning (RQ2)}\label{sec:res-rq2}
 
+Figure~\ref{fig:migration-heatmap} first establishes the migration
+volume on which RQ2 rests.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.5 --- Canonical-to-adapted migration flow heatmap (placeholder)\\
+\footnotesize $14\times14$ row-normalised heatmap: canonical MMLU-Pro domain (rows) vs.\ adapted anchor (columns); data: \texttt{validation/MAIN\_migration\_flow\_matrix.csv}.\vspace{0.6cm}}}
+\caption{Canonical-to-adapted migration flow between anchor domains.
+Rows are canonical MMLU-Pro domains, columns adapted anchors; each
+cell gives the row-normalised share of the row's queries assigned to
+that adapted anchor after construction, on a single-hue sequential
+scale with the diagonal visually de-emphasised so that off-diagonal
+migration is salient; cells at or above 2\% are labelled directly.}
+\label{fig:migration-heatmap}
+\end{figure}
+
+Figure~\ref{fig:rq2-dumbbell} then reports the RQ2 contrast itself.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.6 --- Adapted vs.\ canonical rank agreement per selected node (placeholder)\\
+\footnotesize Paired dumbbell per selected node and seed: $\tau_{\text{canonical}} \rightarrow \tau_{\text{adapted}}$, with $\Delta\tau$ bootstrap CI against a zero line; data: C1 ratings plus C2 re-aggregation.\vspace{0.6cm}}}
+\caption{Adapted versus canonical rank agreement per selected node
+(RQ2). For each selected node and seed, a dumbbell connects
+$\tau_{\text{canonical}}$ to $\tau_{\text{adapted}}$, and the right
+margin shows $\Delta\tau$ with its query-level bootstrap confidence
+interval crossing a zero reference line; a secondary panel row
+repeats the display for $\Delta\rho$. Data pending: C1 arena run and
+C2 re-aggregation of the same verdict set by MMLU-Pro label.}
+\label{fig:rq2-dumbbell}
+\end{figure}
+
 \section{Arena Ranking Validity (RQ1)}\label{sec:res-rq1}
 
 \subsection{Main Condition (C1)}\label{subsec:res-c1}
 
+Figure~\ref{fig:rq1-forest} presents the RQ1 headline comparison, and
+Table~\ref{tab:rq1-agreement} accompanies it with the pre-specified
+rank-agreement statistics.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.7 --- Arena BT ranking vs.\ MMLU-Pro accuracy forest plot (placeholder)\\
+\footnotesize Two aligned dot-with-CI columns for the 12 models on the selected Math node: BT log-strength $\theta$ (bootstrap 95\% CI) and MMLU-Pro held-out accuracy (binomial CI); data: \texttt{ratings.db} and \texttt{mmlu\_pro\_dataset\_cache\_v2.db}.\vspace{0.6cm}}}
+\caption{Arena Bradley--Terry ranking versus MMLU-Pro accuracy on the
+selected Math node (C1). The 12 models are ordered by held-out
+MMLU-Pro accuracy; the left column plots BT log-strength $\theta$
+with query-level bootstrap 95\% confidence intervals (2{,}000
+resamples), the right column MMLU-Pro accuracy with binomial
+confidence intervals, and light connecting lines make rank inversions
+visible as crossings. Per-seed estimates appear as small ticks around
+the three-seed mean. Data pending: C1 arena run on the selected Math
+node, seeds $\{42, 137, 2048\}$.}
+\label{fig:rq1-forest}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\caption{Rank-agreement statistics for the main condition (C1):
+Kendall $\tau$, pairwise-winner accuracy over the 66 model pairs, and
+top-$k$ Jaccard ($k \in \{3, 5\}$), each with bootstrap confidence
+intervals, reported as mean $\pm$ standard deviation over the three
+seeds. Data pending: C1 arena run.}
+\label{tab:rq1-agreement}
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Table 6.2 --- C1 rank-agreement statistics (placeholder)\\
+\footnotesize Compact companion table to Figure~\ref{fig:rq1-forest}: $\tau$, pairwise-winner accuracy, top-$k$ Jaccard with bootstrap CIs; data: C1 arena run.\vspace{0.6cm}}}
+\end{table}
+
 \subsection{Judge-Design Contribution (C3 vs.\ C1)}\label{subsec:res-c3}
+
+Figure~\ref{fig:c3-dumbbell} isolates the contribution of the
+reference-informed judge design.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.8 --- Judge-design contribution, C3 vs.\ C1 (placeholder)\\
+\footnotesize Dumbbell per metric ($\tau$, pairwise-winner accuracy): generic-template judge (C3) vs.\ reference-informed judge (C1), bootstrap CIs; data: C3 arena run.\vspace{0.6cm}}}
+\caption{Judge-design contribution (C3 versus C1). For each agreement
+metric (Kendall $\tau$ and pairwise-winner accuracy), a dumbbell
+connects the generic-template judge (C3) to the reference-informed
+judge (C1), with bootstrap confidence intervals showing whether
+leaf-specific reference-informed rubrics move rank agreement beyond
+CI overlap. Data pending: C3 arena run (second judge pass on the same
+snapshot and query pools).}
+\label{fig:c3-dumbbell}
+\end{figure}
 
 \subsection{Judge Reliability}\label{subsec:res-judge-reliability}
 
 \section{Aggregation Convention Sensitivity}\label{sec:res-aggregation}
 
 \section{Scheduling and Budget Efficiency}\label{sec:res-budget}
+
+Figure~\ref{fig:budget-fidelity} reports the optional scheduler
+diagnostic.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 6.9 --- Budget-fidelity curve (placeholder)\\
+\footnotesize Kendall $\tau$ against the post-hoc oracle vs.\ cumulative logical comparisons $B_{\text{logical}}$, adaptive vs.\ random scheduler, per-seed thin lines plus mean; data: per-round BT snapshots from \texttt{ratings.db}.\vspace{0.6cm}}}
+\caption{Budget-fidelity curve. Kendall $\tau$ of the interim ranking
+against the post-hoc oracle is plotted as a function of cumulative
+logical comparisons $B_{\text{logical}}$ for the adaptive and the
+random scheduler, with thin per-seed lines and the mean overlaid;
+vertical marks indicate leaves entering the \texttt{CONVERGED} state.
+Data pending: C1 arena run and the random-scheduler ablation (C4)
+with per-round BT snapshots.}
+\label{fig:budget-fidelity}
+\end{figure}
 
 \section{Ablation Results}\label{sec:res-ablations}
 

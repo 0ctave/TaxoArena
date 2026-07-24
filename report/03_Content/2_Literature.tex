@@ -172,9 +172,6 @@ Finally, the process is shallow and manual: the Arena WebDev taxonomy
 contains seven categories constructed over several weeks of iterative
 refinement, whereas a principled recursive procedure would be required
 to scale to hundreds of semantic sub-domains.
-These limitations are not incidental---they reflect the fact that Arena's
-taxonomy was designed for human-readable leaderboard presentation rather
-than for statistical evaluation rigour.
 
 
 
@@ -314,7 +311,7 @@ concentration estimate is fit on normalised weights over a small
 admitted set rather than on diffuse membership everywhere; a
 \textit{primary} (argmax) assignment is retained as a bookkeeping
 convention, and node-level polyhierarchy is introduced at the
-topology-optimisation stage through gated bridge insertion
+topology-optimisation stage through gated cross-link insertion
 (Chapter~\ref{ch:methodology}).
 This floor-bounded design is closer to the fuzzy-clustering tradition
 than a hard partition, but it differs from the fully-soft
@@ -553,17 +550,14 @@ the constraints on the judge design in any pairwise arena framework.
 Positional bias motivates presentation-order randomisation and
 consistency filtering.
 Verbosity bias motivates explicit per-domain evaluation criteria that
-do not reward length---though the assumption that prompt-level criteria
-suppress this bias must be validated empirically rather than asserted.
+do not reward length, whose effectiveness is an empirical question.
 Self-preference bias is acknowledged as a residual structural limitation
 that cannot be eliminated without rotating judge models.
 Together they motivate a taxonomy-unsupervised, reference-conditioned
 guideline-generation mechanism, specified in
 Chapter~\ref{ch:system-architecture}, that occupies a position between
 keyword-based centroid descriptions (no semantic calibration) and
-MemAlign (requires gold labels); whether it achieves adequate
-calibration is an empirical question rather than a structural
-guarantee.
+MemAlign (requires gold labels).
 
 The pairwise preference observations produced by such a judge---one
 verdict per comparison, with ties represented as half-wins to each
@@ -742,11 +736,10 @@ Section~\ref{sec:routing}.
 \section{Query Routing as the Target Use Case}\label{sec:routing}
 
 This section frames query routing as the downstream task that per-domain
-capability profiles are designed to enable.
-It reviews the evidence that global rankings are insufficient for routing,
-surveys the learned routing systems that would consume per-domain profiles,
-and identifies the gap---the absence of a principled method for producing
-those profiles---that motivates the contribution of this thesis.
+capability profiles are designed to enable, and identifies the gap that
+motivates the contribution of this thesis: such profiles do not
+currently exist, and the routing systems that would consume them
+presuppose a fixed taxonomy.
 
 \subsection*{The Routing Problem in Agentic Systems}
 
@@ -758,78 +751,39 @@ domain-conditional performance: if model $A$ outperforms model $B$ on
 mathematical reasoning but underperforms on legal analysis, a global
 ranking that averages across domains will systematically mis-route
 queries at both extremes.
+This observation motivates \textit{domain-centric
+evaluation}~\parencite{raju2024constructing}: Raju et al.\ show on
+chat-assistant evaluation that model rankings are not stable across
+domains, and that a router informed by per-domain scores substantially
+reduces response-quality variance relative to global-rank routing.
+This line of work, however, requires that per-domain scores already
+exist and that the domain taxonomy is either given or constructed by
+hand, which limits reproducibility and scalability.
 
-This observation motivates the concept of \textit{domain-centric
-evaluation}~\parencite{raju2024constructing}, in which a model's
-performance is disaggregated by subject matter rather than reported
-as a single aggregate score.
-Raju et al.\ demonstrate this on chat-assistant evaluation: by
-constructing high-separability domain-specific evaluation sets---using
-manual seed curation combined with embedding-based clustering---they
-show that model rankings are not stable across domains, and that a
-router informed by per-domain scores substantially reduces
-response-quality variance relative to global-rank routing.
-This line of work carries a common dependency: it requires that
-per-domain scores already exist and that the domain taxonomy is
-either given or constructed by hand, which limits reproducibility
-and scalability.
+\subsection*{Learned Routing Systems}
 
-\subsection*{Learned Routing from Preference Data}
+\textit{FrugalGPT}~\parencite{chen2023frugalgpt} routes by cascading
+through models of increasing capability until a learned confidence
+estimator accepts the current response, reducing inference cost by up
+to 98\% at matched accuracy.
+\textit{RouteLLM}~\parencite{ong2024routellm} instead trains binary
+routing functions---including a similarity-weighted Bradley--Terry
+router---on 80K pairwise preference judgements from Chatbot Arena.
+Critically, routers trained solely on the global preference
+distribution generalise poorly to domain-specific benchmarks such as
+MMLU and GSM8K unless the training data is augmented with in-domain
+preference labels~\parencite{ong2024routellm}: a globally trained BT
+model does not encode the domain-conditional capability variation
+that accurate routing requires.
+\textit{EmbedLLM}~\parencite{zhuang2024embedllm} and
+\textit{UniRoute}~\parencite{somerstep2025uniroute} route
+geometrically, representing each model by an embedding derived from
+its performance on a representative query set; the quality of that
+per-model profile bounds achievable routing accuracy.
 
-The cost-quality trade-off in model selection has motivated a parallel
-line of work on \textit{learned routers} that predict, prior to
-generation, which model will produce the preferred response.
-\textit{FrugalGPT}~\parencite{chen2023frugalgpt} operationalises this
-as a cascade: it queries an ordered sequence of models of increasing
-capability and stops when a learned confidence estimator judges the
-current response to be reliable, achieving reductions in inference
-cost of up to 98\% at matched accuracy on several NLP tasks by
-reserving the strongest model for the fraction of queries that require it.
-
-\textit{RouteLLM}~\parencite{ong2024routellm} addresses the same
-cost-quality trade-off through a trained binary routing function rather
-than a cascade.
-It trains four router architectures---a similarity-weighted Bradley--Terry
-model, a matrix factorisation model, a BERT classifier, and a causal LLM
-classifier---on 80K pairwise preference judgements from Chatbot Arena,
-learning to predict the probability that the stronger model wins on a
-given query.
-The similarity-weighted BT router is the most directly interpretable
-of the four architectures: it computes query-similarity-weighted BT
-coefficients at inference time and uses the resulting win probability
-as the routing signal, making its inputs---per-domain BT scores over
-a representative query set---explicit rather than latent.
-A critical finding is that routers trained solely on the global Arena
-preference distribution generalise poorly to domain-specific benchmarks
-such as MMLU and GSM8K, with performance close to random; significant
-improvement requires augmenting the training data with in-domain
-preference labels~\parencite{ong2024routellm}.
-This result is directly relevant to the motivation for per-domain
-profiling: a globally trained BT model does not encode the
-domain-conditional capability variation that accurate routing requires.
-
-\subsection*{Embedding-Based Model Selection}
-
-A complementary approach bypasses the preference-data requirement
-by representing models as embeddings in a learned query-performance
-space.
-\textit{EmbedLLM}~\parencite{zhuang2024embedllm} represents each model
-as a compact feature vector derived from its performance on a set of
-representative prompts, and routes new queries to the model whose
-embedding is geometrically closest to the query in a learned
-correctness space.
-\textit{UniRoute}~\parencite{somerstep2025uniroute} generalises this
-by learning a joint query-model embedding space in which routing reduces
-to a dot-product operation, enabling sub-millisecond dispatch at
-inference time.
-Both systems require an initialisation step in which each model is
-characterised over a representative query set; the quality of the
-resulting profile determines the upper bound on routing accuracy.
-
-A limitation shared by FrugalGPT, RouteLLM, EmbedLLM, and UniRoute
-is that the domain structure over which models are profiled is either
-absent (global ranking) or predefined by the benchmark used to construct
-the training set.
+A limitation shared by all four systems is that the domain structure
+over which models are profiled is either absent (global ranking) or
+predefined by the benchmark used to construct the training set.
 None of these systems provide a method for inductively deriving the
 domain taxonomy from the query corpus itself, nor do they produce
 statistically characterised per-domain profiles that can be validated
@@ -837,42 +791,21 @@ for coherence independently of routing accuracy.
 These two absences define the gap between the learned routing literature
 and the problem addressed in this thesis.
 
-\section*{Synthesis: Five Gaps and One Compound Problem}
+\section*{Synthesis}
 
 The five bodies of literature reviewed in this chapter converge on a
-single compound problem.
-Static benchmarks fail because their corpus and categorical structure
-are fixed at construction time, making them unable to track the
-capability frontier~(\S\ref{sec:benchmarks}).
-Taxonomy construction methods from NLP either require an editorial
-hierarchy as supervision or operate at the term level without a
-formal splitting criterion, and neither provides a statistical node
-model~(\S\ref{sec:taxonomy-construction}).
-LLM judges exhibit systematic positional, verbosity, and
-self-preference biases that are partially---but not fully---addressable
-through prompt engineering, and domain calibration without gold labels
-remains an open problem~(\S\ref{sec:llm-as-a-judge}).
-Pairwise ranking models provide the statistical foundations for
-per-domain arenas, but their sample-efficiency guarantees depend on a
-metric-space assumption that is only locally defensible within
-semantically coherent sub-domains~(\S\ref{sec:ranking-models}).
-Learned routing systems require per-domain capability profiles that
-no existing system can produce without presupposing a fixed
-taxonomy~(\S\ref{sec:routing}).
-
+single compound problem: no existing system produces statistically
+characterised per-domain capability profiles over a corpus-induced
+domain structure, yet both the ranking literature and the routing
+literature require exactly that substrate.
 TaxoArena addresses this compound problem through two integrated
 contributions: a label-bootstrapped, corpus-induced geometric
 taxonomy---seeded from MMLU-Pro ground-truth labels as a warm start
 but refined entirely by embedding geometry, and admitting
-polyhierarchy only through gated bridge insertion rather than through
-unconstrained soft membership---that produces the coherent sub-domains
-required by both the ranking model and the domain judge; and a
-reference-informed, answer-key-blind arena that produces the
+polyhierarchy only through gated cross-link insertion rather than
+through unconstrained soft membership---that produces the coherent
+sub-domains required by both the ranking model and the domain judge;
+and a reference-informed, answer-key-blind arena that produces the
 per-domain profiles required by routing.
-An active, uncertainty-driven scheduler keeps the judge-call cost of
-the arena tractable within each leaf's comparison graph, but is
-treated as a supporting mechanism for the second contribution rather
-than as an independent contribution in its own right (see
-Section~\ref{sec:research-goal}).
 The system design is specified in Chapter~\ref{ch:system-architecture};
 the formal foundations are derived in Chapter~\ref{ch:methodology}.

@@ -17,17 +17,23 @@ Embedding dimension & $d$ & 256 (fixed) \\
 Maximum recursion depth & $D_{\max}$ & 8 \\
 Minimum cluster size & $n_{\min}$ & 50 \\
 Unified separation threshold & $\epsilon_{\text{sep}}$ (\texttt{separationEpsilon}) & 0.01 \\
-Membership floor\textsuperscript{a} & \texttt{membershipFloor} & 0.10 \\
+Membership share floor\textsuperscript{a} & \texttt{membershipFloor} & 0.25 \\
+Routing beam margin & \texttt{routingBeamGamma} & 0.015 \\
+Descent-gate slack & \texttt{descentMargin} & 0.0 \\
+Cross-link support floor & \texttt{secondaryMassFloor} & 2.0 \\
+Cross-link pool fraction & \texttt{bridgeSupportRelFraction} & 0.10 \\
 Max leaf assignments (arena-time cap) & \texttt{maxLeafAssignments} & 5 \\
-Fusion threshold & \texttt{fusionSimilarityThreshold} & 0.90 \\
-Iteration budget & \texttt{numIterations} & 35 \\
+Fusion pre-filter threshold & \texttt{fusionSimilarityThreshold} & 0.90 \\
+Iteration budget & \texttt{numIterations} & 50 \\
 DAG mode & \texttt{dagMode} & \texttt{DAG\_MAX} \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\footnotesize \textsuperscript{a}One parameter, three roles: child
-admission (posterior responsibility floor), cumulative-path
-probability bound, and residual-routing trigger.
+\footnotesize \textsuperscript{a}Minimum share of a query's own
+normalised membership a reached destination must hold to count; the
+descent decision and sibling admission are governed separately by the
+parameter-free descent gate and the beam margin
+(Appendix~\ref{app:dag-formalism}).
 Values are current canonical settings; final values
 follow the calibration study conducted after the DAG-construction
 pipeline is frozen.
@@ -36,13 +42,21 @@ pipeline is frozen.
 
 \section{Hyperparameter Selection Protocol}\label{sec:exp-tuning-protocol}
 
-The L9($3^4$) orthogonal-array sweep documented here is
+The original L9($3^4$) orthogonal-array sweep documented here is
 \textbf{historical}: it was conducted on a predecessor
 parameterisation of the routing layer, and three of its four
 factors---\texttt{routingSoftmaxTau}, \texttt{assignmentCosineGap},
 and \texttt{deltaAssign}---were subsequently removed when routing was
-unified under the single \texttt{membershipFloor} parameter
-(Appendix~\ref{app:dag-formalism}).
+redesigned around the parameter-free descent gate, beam margin, and
+membership-share floor (Appendix~\ref{app:dag-formalism}).
+The current calibration sweep uses the same L9/Pareto machinery over
+the four live factors
+\texttt{descentMargin} $\times$ \texttt{minClusterSize} $\times$
+\texttt{secondaryMassFloor} $\times$ \texttt{routingBeamGamma};
+because construction is deterministic at a fixed seed
+(Appendix~\ref{app:dag-formalism}), screening comparisons across
+configurations are exact rather than confounded by run-to-run
+variance.
 Its protocol and gates are retained because they informed the
 surviving canonical values (notably \texttt{minClusterSize}) and
 because the selection machinery will be reused for the tuning study
@@ -91,10 +105,8 @@ Acyclic & \texttt{true} \\
 Duplicate bridges & $0$ \\
 Orphaned nodes & $0$ \\
 Assignment-cap rate & $\leq 0.20$ \\
-Source-B bridge at depth $\geq 2$ & present \\
 Small-leaf fraction & $\leq 0.50$ \\
 Starved-leaf fraction (selected node) & $\leq 0.20$ \\
-Source-B bridges per anchor (mean) & $\leq 3.0$ \\
 \midrule
 \multicolumn{2}{l}{\textit{Soft gates --- recorded, not excluding}} \\
 \midrule
@@ -139,6 +151,26 @@ gates at any point in the L9/Pareto procedure; this is the mechanism
 by which the tuning/test-leakage boundary is enforced in practice, not
 merely asserted.
 
+Figure~\ref{fig:calibration-sweep} summarises the sensitivity of the
+headline construction metrics to the four live calibration factors.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure A.1 --- Calibration sweep small multiples (placeholder)\\
+\footnotesize Dot-plot grid: four factor columns (\texttt{descentMargin}, \texttt{minClusterSize}, \texttt{secondaryMassFloor}, \texttt{routingBeamGamma}) $\times$ metric rows (Weighted Leaf Purity, Routing ECE, bridge count); data: \texttt{tuning/combined\_ledger.csv}.\vspace{0.6cm}}}
+\caption{Calibration sweep small multiples. Panels form a grid of the
+four live factors (\texttt{descentMargin}, \texttt{minClusterSize},
+\texttt{secondaryMassFloor}, \texttt{routingBeamGamma}) against
+headline construction metrics (Weighted Leaf Purity, Routing ECE,
+bridge count); each panel plots the metric against the factor's
+levels with one dot per run and seed encoded by marker shade. Flat
+panels indicate robustness to the factor; sloped panels identify the
+sensitivities that determined the canonical values of
+Table~\ref{tab:hyperparams}.}
+\label{fig:calibration-sweep}
+\end{figure}
+
 \section{Ablation Matrix}\label{sec:appendix-ablations}
 
 Table~\ref{tab:ablations} summarises the ablation experiments run
@@ -162,7 +194,7 @@ A6$^\ddagger$ & \texttt{deltaAssign} $\times$ \texttt{assignmentCosineGap} (join
 A7 & Iteration count & $\{10, 25, 50\}$ \\
 A8 & Query set scope & Reserved (arena-excluded) vs. full corpus \\
 A9 & Soft-membership refitting \texttt{refitMuPerIteration} & On (canonical) vs. off \\
-A10 & Bridging / Source-A-B \texttt{enableBridging} & On (canonical) vs. off; Source-A only vs. Source-B only vs. both \\
+A10 & Cross-linking \texttt{enableBridging} & On (canonical) vs. off (strict tree) \\
 A11$^\ddagger$ & Dynamic-temperature exponent $\gamma$ (historical) & $\{0.0, 0.5, 1.0\}$; canonical $= 0.0$ \\
 \bottomrule
 \end{tabular}

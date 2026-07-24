@@ -19,6 +19,90 @@ validity, threats to validity, and limitations.
 
 \subsection{Construct Validity}\label{subsec:disc-construct-validity}
 
-\section{Limitations}\label{sec:disc-limitations}
+\section{Limitations}\label{sec:disc-limitations}\label{sec:discussion-limitations}
+
+% TODO: integrate with results --- the three judge- and
+% statistics-facing limitations below were moved here from
+% Chapter 3 (Architectural Limitations) and must be discussed
+% against the observed arena outcomes; the four purely
+% architectural limitations remain in Section~\ref{sec:arch-limits}.
+
+\textbf{Judge-side benchmark contamination.}
+MMLU-Pro is a public benchmark, and its questions and answer keys
+plausibly appear in the pre-training corpora of contemporary LLMs;
+targeted probing has demonstrated recoverable benchmark content in
+modern models~\parencite{deng2024contamination}, and
+contamination-limited benchmark designs exist precisely because the
+problem is pervasive~\parencite{white2024livebench}.
+For this thesis the threat is specific: not that the \emph{evaluated}
+models saw the questions (that affects the MMLU-Pro accuracy oracle
+and the arena symmetrically), but that the \emph{judge} may recognise
+a held-out question and its correct answer from training.
+A memorising judge approximates the accuracy oracle directly, so
+judge contamination \emph{inflates} the RQ1 rank agreement for
+reasons unrelated to the evaluation mechanism---a validity threat
+that flatters the headline metric.
+The answer-key-blind protocol does not defend against it: the
+information is in the judge's weights, not in the prompt.
+
+The generic-judge condition C3---a shared structural template in the
+style of MT-Bench prompting~\parencite{zheng2023judging}, with no
+leaf-specific rubric---partially disciplines this threat, and the
+scope of that control must be stated precisely.
+Because C1 and C3 share the same judge model, any contamination
+contributes to both conditions alike, so the \emph{contrast}
+$\tau_{\text{C1}} - \tau_{\text{C3}}$ is contamination-robust
+evidence about the marginal value of reference-informed
+conditioning: a rubric gain that survives the control cannot be
+explained by memorised answer keys, which the generic judge also
+possesses.
+What C3 does \emph{not} do is bound the absolute level of either
+condition: if contamination is strong, both conditions report
+inflated agreement, and the absolute RQ1 claim inherits that
+inflation.
+The absolute agreement numbers are therefore interpreted as an upper
+bound on mechanism-attributable validity, while the C1--C3 contrast
+carries the contamination-robust part of the claim.
+A direct estimate of judge memorisation---for example, verdict
+consistency under paraphrased questions or a probe set published
+after the judge's training cutoff---is identified as future work.
+
+\textbf{Residual judge bias.}
+The dual-call protocol mitigates positional bias but leaves two
+biases architecturally unmitigated.
+\textit{Verbosity bias}: LLM judges tend to prefer longer responses
+independent of quality~\parencite{chen2024verbosity};
+the rubric includes no explicit length-normalisation criterion.
+\textit{Self-preference bias}: when the judge model coincides with an
+evaluated model, verdicts may favour the judge's own response
+style~\parencite{panickssery2024llm}; no judge-exclusion constraint
+is enforced.
+Their magnitude is bounded indirectly via the rank-stability analysis
+across different judge temperatures; a direct comparison against
+human preference annotations is identified as future work.
+
+\textbf{Tie approximation and dual-call budget accounting.}
+Ties are encoded as half-wins within the standard BT likelihood,
+which does not include Davidson's tie-propensity
+parameter~\parencite{davidson1970ties}; the approximation slightly
+underestimates tie frequency.
+Additionally, each logical comparison produces two API calls under the
+dual-call design; budget reporting distinguishes
+$B_{\text{logical}}$ (comparisons) from $B_{\text{API}} = 2 \cdot
+B_{\text{logical}}$ (judge calls).
+Convergence curves and efficiency comparisons are expressed in
+$B_{\text{logical}}$ to remain comparable with single-call systems.
+
+\textbf{Sparse-leaf risk at deep levels.}
+A leaf with a small held-out query pool may exhaust its comparison
+budget before the connectivity bootstrap achieves a fully connected
+comparison graph, since each query can serve multiple pairs but the
+number of pairs grows as $\binom{M}{2}$.
+Such leaves will terminate in state \texttt{BUDGET\_EXHAUSTED};
+their BT estimates enter the upward aggregation at full weight, which
+may inflate uncertainty at the ancestor level.
+The query-weighted convergence fraction $f_{\text{conv}}$ partially
+absorbs this: sparse leaves contribute little weight to the global
+condition.
 
 \section{Chapter Summary}\label{sec:disc-summary}

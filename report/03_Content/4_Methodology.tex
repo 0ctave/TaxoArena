@@ -1,16 +1,15 @@
 
 \chapter{Formal Foundations}\label{ch:methodology}
 
-This chapter formalises the statistical and algorithmic components
-that TaxoArena's implementation actually executes for the arena: the
-Bradley--Terry estimator and its MM solver, the active scheduling
-utility, the iteration-budget stopping policy, and upward score
-aggregation.
+This chapter formalises the statistical and algorithmic components of
+the arena: the Bradley--Terry estimator and its MM solver, the active
+scheduling utility, the iteration-budget stopping policy, and upward
+score aggregation.
 The taxonomy-construction formalism that feeds the arena---the
 directional node model, the fixed-dimension embedding slice, the
 iteration-1 bootstrap and emergent migration, the chance-corrected
-split-acceptance score, and the membership-floor trickle
-routing---is summarised in
+separation score with its global proposal gate, and the
+three-criterion trickle routing---is summarised in
 Section~\ref{sec:meth-construction-summary} and given in full in
 Appendix~\ref{app:dag-formalism}.
 Numerical-stability engineering that supports these computations but
@@ -43,16 +42,16 @@ topological optimisation) and to reference-informed guideline
 generation.
 $\mathcal{Q}_{\text{eval}}$ is reserved exclusively for held-out
 routing and arena evaluation and is never inspected during
-construction; this boundary is a methodological constraint on the
-experimental design, not a configuration choice, and is the basis of
-the answer-key-blind claim formalised in
+construction---the basis of the answer-key-blind design formalised in
 Table~\ref{tab:info-separation}.
 
 The anchor set $\mathcal{A} = \{D_1, \ldots, D_{14}\}$ is in
 one-to-one correspondence with the 14 MMLU-Pro domains; each anchor
-is a depth-0 node from which the pipeline induces a sub-tree of
+is a top-level node from which the pipeline induces a sub-structure of
 internal nodes and leaves $\mathcal{L}(D_k)$, with full leaf set
-$\mathcal{L} = \bigcup_k \mathcal{L}(D_k)$.
+$\mathcal{L} = \bigcup_k \mathcal{L}(D_k)$ (a cross-linked leaf with
+parents under two anchors belongs to $\mathcal{L}(D_k)$ of its
+designated tree parent).
 The membership map $\hat{D}(q_i)$ assigns each query to the anchor of
 its primary leaf after construction.
 
@@ -81,26 +80,32 @@ parent-anchored prior in the data-sparse regime), and accompanied by a
 Normal-inverse-Wishart (NiW) auxiliary posterior retained for
 diagnostic scoring.
 Construction begins by seeding 14 anchor nodes from MMLU-Pro
-ground-truth domain labels; this bootstrap assignment is kept intact
-through the first split/optimise/refit iteration, and geometric
-trickle reassignment starts at iteration~2, so cross-anchor migration
-is emergent from re-routing rather than a separate gated mechanism.
-Sub-domain structure is built by an adaptive splitting step
-that accepts a proposed partition only when its chance-corrected
-separation score clears a fixed threshold, followed by a
-topological-optimisation pass that merges near-duplicate siblings
-(under the same score), prunes starved leaves, removes structurally
-redundant single-child nodes, and
-inserts gated polyhierarchical cross-links between leaves whose
-embeddings remain close after routing.
+ground-truth domain labels; the bootstrap assignment is kept intact
+through the first iteration, and cross-anchor migration is emergent
+from re-routing thereafter (Appendix~\ref{app:dag-formalism}).
+Sub-domain structure is built by an adaptive splitting step whose
+proposals must clear a chance-corrected separation threshold and
+remain sustainable under routed re-assignment, followed by a
+topological-optimisation pass that fuses insufficiently separated
+siblings (under the same score), resolves starved leaves by a
+measured three-way choice, dissolves structurally redundant
+single-child nodes, and inserts polyhierarchical cross-links
+generated from residual pools.
+Every one of these structural edits is committed only after a
+global check: the edit is applied tentatively, all queries are
+re-routed, and a single corpus-wide separation objective must not
+degrade (splits), must strictly improve (cross-links), or must not
+be damaged beyond a small hysteresis (shrink edits).
 Both at construction time and for held-out queries, a query trickles
-down the DAG via a temperature-1 softmax of each child's own vMF
-log-density; a child is admitted iff its posterior responsibility
-clears the \texttt{membershipFloor}, and the same floor bounds
-cumulative path probability and triggers residual handling.
+down the DAG under three separated criteria: a parameter-free
+descent-versus-residual gate on directions, sibling competition
+within an additive cosine beam of the best-matching child, and a
+final per-query membership-share floor over the destinations
+actually reached; queries the gate declares unexplained are retained
+as measured residual mass rather than force-assigned.
 Full derivations---the vMF/NiW model, the fixed-dimension embedding
-rationale, the separation score, the routing softmax, and the
-topological-optimisation operators---are
+rationale, the separation score and proposal gate, the routing
+criteria, and the topology operators---are
 given in Appendix~\ref{app:dag-formalism}.
 
 \section{Bradley--Terry Estimation}\label{sec:meth-bt}
@@ -162,10 +167,6 @@ information relative to the pair's existing noise floor, and
 upweights pairs that are ambiguous \textit{despite} already having
 tight, well-estimated scores---the case where one more comparison is
 most likely to be decisive.
-This is the internally consistent reading of the utility term: entropy
-identifies ambiguity, and dividing by variance targets that ambiguity
-toward pairs where additional evidence is most informative rather than
-toward pairs that are simply noisy.
 The mixing parameter decays as
 $\alpha = 0.20 + 0.80\,\exp(-2.5\,\text{maturity})$, where
 \textit{maturity} is a weighted combination of standard-error
@@ -193,16 +194,17 @@ $f_{\text{conv}} = \sum_{L \in \mathcal{C}} |Q_L| /
 \sum_{L \in \mathcal{L}} |Q_L|$ reaches $f^*$ for $R_{\text{stable}}$
 consecutive rounds, with a hard escape valve at $B_{\max}$ total
 logical comparisons ($B_{\text{logical}}$;
-Section~\ref{sec:arch-limits}).
+Section~\ref{sec:disc-limitations}).
 The taxonomy construction loop, by contrast, runs under an iteration
-budget (\texttt{numIterations}, canonical $35$) with a structural
+budget (\texttt{numIterations}, canonical $50$) with a structural
 early-stopping gate: after a minimum number of iterations, the
-per-iteration graph edit distance to the preceding DAG (node and edge
-additions, deletions), normalised by the current edge count, is
-compared against a quiescence threshold, and construction stops once
-this relative edit distance stays below the threshold for five
-consecutive iterations; otherwise the budget is exhausted and the
+per-iteration graph edit distance to the preceding DAG is counted
+over node and edge additions and deletions---cross-link edges
+included, so polyhierarchy churn breaks quiescence like tree
+churn---and construction stops once five consecutive iterations show
+zero structural edits; otherwise the budget is exhausted and the
 snapshot is frozen as-is.
+Canonical runs converge at approximately iteration~15.
 
 \section{Upward Aggregation to GT Domains}\label{sec:meth-aggregation}
 
@@ -239,15 +241,11 @@ rank agreement with ground-truth accuracy.
 Ground-truth per-domain accuracy
 $A_{i,D_k} = |\{q \in Q_{D_k} : m_i(q) = y_q^{\text{MMLU}}\}| / |Q_{D_k}|$
 is computed on both partitions.
-The judge rubric is \textit{reference-informed}: construction-set
-reference answers inform the domain-conditioned evaluation criteria
-generated by \texttt{GuidelineGenerator} (Section~\ref{subsec:judge}),
-so that the judge's notion of quality is shaped by what correct
-responses look like in the domain.
-Ground-truth accuracy itself, and the reference answers for
-$\mathcal{Q}_{\text{eval}}$ specifically, are never inspected during
-arena evaluation; $A_{i,D_k}$ is computed strictly after all verdicts
-are recorded and is used only for external, post-hoc validation.
+The judge rubric is reference-informed at construction time but
+answer-key-blind at evaluation time
+(Sections~\ref{subsec:judge} and~\ref{sec:exp-info-separation});
+$A_{i,D_k}$ is computed strictly after all verdicts are recorded and
+is used only for external, post-hoc validation.
 Four rank-agreement metrics are reported per domain: Spearman $\rho$;
 Kendall $\tau$ (preferred when $M$ is small); pairwise-winner
 accuracy; and top-$k$ Jaccard agreement for $k \in \{3,5\}$.
@@ -271,24 +269,13 @@ within-query dependence across comparisons, which the Fisher
 information standard errors treat as independent and therefore
 slightly underestimate.
 
-\section{Chapter Summary}
-
-This chapter summarised the taxonomy construction formalism that
-feeds the arena---the vMF/NiW node model, the fixed-dimension
-embedding slice, emergent migration, the chance-corrected separation
-score, and the membership-floor trickle routing---with full
-derivations in
-Appendix~\ref{app:dag-formalism}, and formalised the arena's own
-statistical machinery: the half-win BT estimator with its MM solver
-and Fisher-information standard errors, the composite-utility active
-scheduler, the three-level arena stopping policy alongside the
-budgeted, quiescence-gated construction loop, sufficient-statistic pooling for
-upward aggregation under the primary-path and fractional-weight
-conventions, and the four rank-agreement validation metrics against
-MMLU-Pro.
-Numerical-stability procedures supporting these models---log-Bessel
-evaluation, the NiW posterior update algebra, the KDE bandwidth
-derivation, and the full Fisher information matrix---are given in
-Appendix~\ref{app:numerics}.
-Hyperparameter values are specified and justified in
-Chapter~\ref{ch:experimental-design}.
+\bigskip
+\noindent
+The machinery derived here is abstract over the concrete corpus,
+models, and budgets on which it runs.
+Chapter~\ref{ch:experimental-design} instantiates it: the split
+protocol, the ex-ante domain-node selection rule, the model roster and
+judge configuration, and the pre-specified metrics under which the
+results of Chapter~\ref{ch:results} are reported.
+Numerical-stability procedures supporting these computations are given
+in Appendix~\ref{app:numerics}.

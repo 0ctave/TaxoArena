@@ -38,8 +38,7 @@ models that are equal on average but opposite at the margin.
 
 The rapid deployment of LLMs has outpaced the development of evaluation
 frameworks capable of distinguishing their capabilities at the
-resolution required for informed routing---the diagnosis this section
-develops and the literature review substantiates.
+resolution required for informed routing.
 Two structural limitations characterise current practice.
 
 \subsubsection*{The Static Benchmark Problem}
@@ -99,6 +98,22 @@ the resolution of individual semantic sub-domains and distinguish
 profiles that coincide in mean but differ in composition---the
 resolution requirement the framework developed in this thesis is
 designed to meet.
+Figure~\ref{fig:routing-slopegraph} draws this crossing directly.
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
+Figure 1.1 --- Routing micro-example slopegraph (placeholder)\\
+\footnotesize Two-column slopegraph of the illustrative per-domain accuracies of Models A and B over four domains; data: the synthetic values stated in this section, declared illustrative.\vspace{0.6cm}}}
+\caption{Illustrative slopegraph of the routing micro-example.
+Four lines connect Model~$A$'s per-domain accuracy (left axis) to
+Model~$B$'s (right axis) for Mathematics, Physics, History, and
+Philosophy, crossing at the centre; a horizontal dashed line marks the
+shared aggregate accuracy of $0.72$ that both models collapse to on a
+scalar leaderboard. The values are the synthetic ones stated in the
+text and are declared illustrative, not empirical.}
+\label{fig:routing-slopegraph}
+\end{figure}
 
 \subsection{The Limits of Conventional Judging}\label{subsec:judging-limits}
 
@@ -238,10 +253,10 @@ data rather than a fixed editorial taxonomy.
     gated topology operations rather than by query multi-assignment
     during fitting.
     During construction each query holds weighted membership in every
-    sibling whose posterior responsibility clears a fixed membership
-    floor; the distribution fits use these normalised soft weights, while
-    a \textit{primary} (argmax) assignment is retained as a bookkeeping
-    convention for aggregation.
+    destination it reaches through the routing beam and retains a
+    sufficient share of its own normalised membership; the distribution
+    fits use these soft weights, while a \textit{primary} (argmax)
+    assignment is retained as a bookkeeping convention for aggregation.
     This construction is the instrument that produces granular, internally
     homogeneous judge domains; its statistical choices---a fixed
     256-dimensional Matryoshka Representation Learning (MRL)
@@ -261,14 +276,9 @@ data rather than a fixed editorial taxonomy.
     pairwise using this rubric: each comparison is run in both answer
     orders with analysis-before-verdict prompting, and disagreements
     between the orderings are treated as ties.
-    Arena routing, like construction routing, permits a query to enter
-    multiple sufficiently compatible leaves (capped by a per-query
-    assignment limit); when a held-out query enters $k$ leaves, its
-    verdicts contribute with weight $1/k$ to each leaf's win-count
-    matrix, preventing the same comparison from being double-counted.
-    This leaf-level fractional weighting is distinct from leaf-to-ancestor
-    aggregation, which pools sufficient statistics under a primary-path
-    convention (Chapter~\ref{ch:system-architecture}).
+    A held-out query may enter multiple sufficiently compatible leaves,
+    and its verdicts are then fractionally weighted so that no comparison
+    is double-counted (Chapter~\ref{ch:system-architecture}).
     Results are aggregated via Bradley--Terry, producing coherent
     per-leaf, per-domain, and corpus-wide capability profiles.
 
@@ -323,52 +333,33 @@ proof-of-concept, not a global validation across all MMLU-Pro domains;
 generalisation at matched power is identified as future work
 (Chapter~\ref{ch:conclusion}).
 
-Two properties secure the evaluation's validity.
-Construction and rubric induction use construction-set queries and their
-correct answers; the arena evaluates held-out responses without access
-to those queries' correct answers; and the MMLU-Pro accuracy oracle is
-revealed only after all matches are complete, so no arena-test signal
-can feed back into any system parameter.
-The three-way construction/tuning-validation/arena-test partition, the
-information-separation table, and the leakage analysis that enforces
-this boundary are specified in Chapter~\ref{ch:experimental-design}.
+The evaluation's validity rests on the reference-informed,
+answer-key-blind separation defined in Section~\ref{sec:approach}: the
+three-way construction/tuning-validation/arena-test partition and the
+information-separation protocol that enforce it are specified in
+Chapter~\ref{ch:experimental-design}.
 
 \section{Thesis Structure}\label{sec:thesis-structure}
 
 The remainder of this thesis is organised as follows.
-
-Chapter~\ref{ch:literature-review} surveys five bodies of prior work:
-LLM evaluation benchmarks, hierarchical taxonomy construction,
-LLM-as-a-judge reliability, pairwise ranking models, and query routing,
-with each section concluding with the design choice it motivates.
-Chapter~\ref{ch:system-architecture} describes the system design as
-two coupled subsystems: a taxonomy construction pipeline (seed
-initialisation, iterative splitting and topology optimisation, and
-construction completion) and an arena evaluation subsystem (routing,
-per-leaf MapReduce judge-rubric induction, match scheduling,
-Bradley--Terry aggregation, and upward propagation).
+Chapter~\ref{ch:literature-review} surveys the five bodies of prior
+work---evaluation benchmarks, taxonomy construction, LLM-as-a-judge
+reliability, pairwise ranking, and query routing---that motivate the
+design.
+Chapter~\ref{ch:system-architecture} describes the system as two
+coupled subsystems: a taxonomy construction pipeline and an arena
+evaluation subsystem.
 Chapter~\ref{ch:methodology} formalises the arena's statistical
-machinery---the Bradley--Terry likelihood and MM algorithm, the active
-scheduling utility, and the sufficient-statistic upward aggregation
-procedure---and summarises the taxonomy-construction formalism (the
-vMF node model with small-sample-corrected MLE, the fixed-dimension
-MRL slice, the chance-corrected separation score, and the
-membership-floor trickle routing), whose full treatment is deferred to
-Appendix~\ref{app:dag-formalism}; numerical-stability derivations are
-deferred to Appendix~\ref{app:numerics}.
+machinery and summarises the taxonomy-construction formalism, whose
+full treatment is deferred to Appendix~\ref{app:dag-formalism}.
 Chapter~\ref{ch:experimental-design} specifies the experimental
-configuration: corpus and domain selection, the three-way split protocol
-with pre-committed random seed, the L9 hyperparameter tuning protocol,
-the ex-ante domain-node selection rule, DAG and arena hyperparameters, the
-evaluated model set, judge configuration, baselines, and pre-specified
-metrics and thresholds.
-Chapter~\ref{ch:results} presents empirical results, covering DAG
-construction quality, the trickle-test routing diagnostic, arena ranking
-validity~(RQ1), and adapted-vs-canonical fidelity~(RQ2).
-Chapter~\ref{ch:discussion} interprets the findings, addresses the two
-research questions directly, and discusses construct validity and
-limitations---including the selected-domain, proof-of-concept scope of
-the arena evaluation.
+configuration: corpus, split protocol, tuning protocol, domain-node
+selection, model roster, judge configuration, baselines, and
+pre-specified metrics.
+Chapter~\ref{ch:results} presents the empirical results for
+construction quality, arena ranking validity~(RQ1), and
+adapted-vs-canonical fidelity~(RQ2).
+Chapter~\ref{ch:discussion} interprets the findings and discusses
+construct validity and limitations.
 Chapter~\ref{ch:conclusion} summarises the contributions and outlines
-future work, including production router deployment, multi-corpus
-transfer, and online domain discovery.
+future work.
