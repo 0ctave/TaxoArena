@@ -353,10 +353,12 @@ class TaxonomyEngine(
                 val cycleStartIndex = activeNodeHashes.lastIndexOf(topologyHash)
                 if (cycleStartIndex != -1 && (activeNodeHashes.size - cycleStartIndex) <= k) {
                     val period = activeNodeHashes.size - cycleStartIndex
-                    log.warn("[CYCLE DETECTED] Limit cycle of period $period detected at iteration $i! Same topology state recurred from iteration ${cycleStartIndex + 1}.")
-                    if (config.execution.enableEarlyStopping) {
-                        log.info("Early stopping triggered in iteration $i due to limit cycle detection.")
-                        break
+                    if (period >= 2) {
+                        log.warn("[CYCLE DETECTED] Limit cycle of period $period detected at iteration $i! Same topology state recurred from iteration ${cycleStartIndex + 1}.")
+                        if (config.execution.enableEarlyStopping) {
+                            log.info("Early stopping triggered in iteration $i due to limit cycle detection.")
+                            break
+                        }
                     }
                 }
                 activeNodeHashes.add(topologyHash)
