@@ -43,4 +43,10 @@ data class BatchTrickleTestResults(
     val ece: Double = 0.0,
     val avgMatchCountEval: Double = 1.0,
     val medianNodesPerQueryEval: Double = 1.0,
+    /**
+     * Fraction of evaluated held-out queries whose trickle walk reached ZERO leaves
+     * (the destination-count distribution's bucket 0). Numerically equal to
+     * [noMatchRate] today, but exported as an explicit coverage metric.
+     */
+    val heldOutResidualRate: Double = 0.0,
 )

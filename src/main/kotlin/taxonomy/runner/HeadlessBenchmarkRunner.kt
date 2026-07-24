@@ -699,6 +699,7 @@ class HeadlessBenchmarkRunner(
         log.info("  - Macro F1: ${"%,.2f%%".format(out.macroF1 * 100)}")
         log.info("  - Avg Match Count (Eval): ${"%,.2f".format(out.avgMatchCountEval)} leaves/query")
         log.info("  - Median Nodes/Query (Eval): ${"%,.2f".format(out.medianNodesPerQueryEval)}")
+        log.info("Held-out residual rate: ${"%.2f%%".format(java.util.Locale.US, out.heldOutResidualRate * 100)}")
 
         val tableStr = StringBuilder().apply {
             appendLine("Per-Domain Trickle Results ($condition):")
@@ -731,6 +732,7 @@ class HeadlessBenchmarkRunner(
             writer.write("ECE,${out.ece}\n")
             writer.write("AvgMatchCountEval,${out.avgMatchCountEval}\n")
             writer.write("MedianNodesPerQueryEval,${out.medianNodesPerQueryEval}\n")
+            writer.write("HeldOutResidualRate,${out.heldOutResidualRate}\n")
         }
         log.info("Trickle validation results written to ${file.absolutePath}")
 
@@ -789,6 +791,9 @@ class HeadlessBenchmarkRunner(
         val predictedMap = HashMap<String, Map<String, Double>>()
         val gtMap = HashMap<String, String>()
         val matchCounts = mutableListOf<Int>()
+        // Per-leaf held-out support: top-1 assignments and any-match appearances.
+        val heldOutTop1Counts = HashMap<String, Int>()
+        val heldOutAnyCounts = HashMap<String, Int>()
         var diagWriter: java.io.BufferedWriter? = null
 
         try {
@@ -815,6 +820,12 @@ class HeadlessBenchmarkRunner(
                     val domainConf = matched.groupBy { it.first.dominantDomain }
                         .mapValues { (_, list) -> list.maxOf { it.second } }
                     predictedMap[text] = domainConf
+
+                    val top1LeafId = matched.first().first.leafId
+                    heldOutTop1Counts[top1LeafId] = (heldOutTop1Counts[top1LeafId] ?: 0) + 1
+                    matched.map { it.first.leafId }.distinct().forEach { leafId ->
+                        heldOutAnyCounts[leafId] = (heldOutAnyCounts[leafId] ?: 0) + 1
+                    }
                 }
 
                 val isCorrect = if (matched.isEmpty()) {
@@ -849,6 +860,34 @@ class HeadlessBenchmarkRunner(
             log.error("Failed to write routing diagnostics: ${e.message}", e)
         } finally {
             diagWriter?.close()
+        }
+
+        // Per-leaf held-out support export: how many held-out queries each routable
+        // leaf actually receives (top-1 and any-match), including zero-support leaves.
+        try {
+            val supportFile = File(trickleDir, "${condition}_heldout_leaf_support.csv")
+            supportFile.bufferedWriter().use { writer ->
+                writer.write("leafId,label,heldOutTop1Count,heldOutAnyCount\n")
+                for ((leafId, profile) in profiles) {
+                    writer.write("${escapeCsv(leafId)},${escapeCsv(profile.label)},${heldOutTop1Counts[leafId] ?: 0},${heldOutAnyCounts[leafId] ?: 0}\n")
+                }
+            }
+            log.info("Held-out leaf support CSV written to ${supportFile.absolutePath}")
+
+            val top1Dist = profiles.keys.map { heldOutTop1Counts[it] ?: 0 }.sorted()
+            if (top1Dist.isNotEmpty()) {
+                val minTop1 = top1Dist.first()
+                val maxTop1 = top1Dist.last()
+                val medianTop1 = if (top1Dist.size % 2 == 0) {
+                    (top1Dist[top1Dist.size / 2].toDouble() + top1Dist[top1Dist.size / 2 - 1].toDouble()) / 2.0
+                } else {
+                    top1Dist[top1Dist.size / 2].toDouble()
+                }
+                val underSupported = top1Dist.count { it < cliConfig.questionsPerRound }
+                log.info("Held-out leaf support ($condition): leaves=${top1Dist.size}, top1 min=$minTop1 median=${"%.1f".format(java.util.Locale.US, medianTop1)} max=$maxTop1, leaves with <${cliConfig.questionsPerRound} held-out top-1 queries: $underSupported")
+            }
+        } catch (e: Exception) {
+            log.error("Failed to export held-out leaf support for $condition: ${e.message}", e)
         }
 
         try {

@@ -239,8 +239,13 @@ object BatchTrickleEvaluator {
             .entries.sortedBy { it.key }
             .joinToString(", ") { "${it.key}:${"%.2f".format(java.util.Locale.US, it.value)}" }
         val correlation = pearsonCorrelation(depthsList, weightsList)
+        // Coverage: held-out queries whose trickle walk reached zero leaves (dist bucket 0).
+        val heldOutResidualRate = if (matchCounts.isNotEmpty()) {
+            matchCounts.count { it == 0 }.toDouble() / matchCounts.size
+        } else 0.0
 
         log.info("[ROUTE]  posterior_sum≈${"%.4f".format(java.util.Locale.US, avgPostSum)}, membership_depth_corr=${"%.4f".format(java.util.Locale.US, correlation)}, multi_leaf_rate=${"%.4f".format(java.util.Locale.US, multiLeafRate)}, dist={$countDistribution}")
+        log.info("Held-out residual rate: ${"%.2f%%".format(java.util.Locale.US, heldOutResidualRate * 100)}")
 
         val p = top1Correct.toDouble() / n
         val num = processed
@@ -281,6 +286,7 @@ object BatchTrickleEvaluator {
             ece = eceVal,
             avgMatchCountEval = avgMatchCountEval,
             medianNodesPerQueryEval = medianNodesPerQueryEval,
+            heldOutResidualRate = heldOutResidualRate,
         )
     }
 
