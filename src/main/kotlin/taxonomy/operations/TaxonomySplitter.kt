@@ -412,8 +412,31 @@ class TaxonomySplitter(
 
         for (d in maxDepth downTo 2) {
             val levelNodes = nodesToLabel.filter { it.depth == d }
-            levelNodes.map { node ->
+            // Parallelize across PARENTS but label siblings SEQUENTIALLY: the prompt's
+            // sibling-differentiation context only works if earlier siblings' labels
+            // are already real. Fully parallel levels read placeholder labels
+            // ("Emergent Concept #x", filtered out), so the LLM never saw its
+            // neighborhood and produced near-duplicate sibling names.
+            levelNodes.groupBy { it.treeParentId ?: it.parents.firstOrNull()?.id ?: it.id }.values.map { siblingGroup ->
                 async(Dispatchers.Default) {
+                    for (node in siblingGroup) {
+                        labelSingleNode(node, completed, totalNodesToLabel, onProgress)
+                    }
+                }
+            }.awaitAll()
+        }
+        log.info("Post-Pass complete. {} nodes labeled across {} depth levels.", totalNodesToLabel, maxDepth - 1)
+    }
+
+    private suspend fun labelSingleNode(
+        node: GraphNode,
+        completed: java.util.concurrent.atomic.AtomicInteger,
+        totalNodesToLabel: Int,
+        onProgress: (Int, Int) -> Unit
+    ) {
+        run {
+            run {
+                run {
                     // 1) Determine query source: leaves vs internal
                     val isLeaf = node.children.isEmpty()
 
@@ -435,7 +458,7 @@ class TaxonomySplitter(
                         node.label = "Emergent Concept #${node.id.take(4)}"
                         val finished = completed.incrementAndGet()
                         onProgress(finished, totalNodesToLabel)
-                        return@async
+                        return
                     }
 
                     val parents = node.parents
@@ -484,8 +507,18 @@ class TaxonomySplitter(
                         .take(2)
                         .map { it.key }
 
-                    // Representative subset from queryTexts for the prompt
-                    val representativeSamples = queryTexts.shuffled(kotlin.random.Random(queryTexts.size)).take(40)
+                    // Centroid-ranked samples: the prompt should describe what the node
+                    // ACTUALLY contains — its most typical members by vMF alignment —
+                    // not a uniform shuffle; a spread of every-kth adds tail coverage.
+                    val representativeSamples = if (isLeaf && node.vmfMu.isNotEmpty()) {
+                        val ranked = node.queries
+                            .sortedByDescending { StatisticsUtils.dotProduct(it.projectTo(node.vmfMu.size), node.vmfMu) }
+                            .map { it.rawText }
+                        val step = (ranked.size / 10).coerceAtLeast(1)
+                        (ranked.take(30) + ranked.filterIndexed { i, _ -> i % step == 0 }).distinct().take(40)
+                    } else {
+                        queryTexts.shuffled(kotlin.random.Random(queryTexts.size)).take(40)
+                    }
 
                     val parentLabelsList = parents
                         .mapNotNull { it.label }
@@ -539,9 +572,8 @@ class TaxonomySplitter(
                     }
                     onProgress(finished, totalNodesToLabel)
                 }
-            }.awaitAll()
+            }
         }
-        log.info("Post-Pass complete. {} nodes labeled across {} depth levels.", totalNodesToLabel, maxDepth - 1)
     }
 
     private fun fitVmfParams(embeddings: List<Embedding>, d: Int): StatisticsUtils.VmfParameters {

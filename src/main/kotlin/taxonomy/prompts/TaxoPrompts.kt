@@ -106,6 +106,10 @@ $samples
 2. Lineage Integration:
    - Ground the label in the parent domain ($parentLabel) and domain anchors ($anchors).
    - The label must be a logical sub-partition (narrower refinement) of the parent domain, consistent with the anchors.
+
+3. Neighborhood Differentiation (STRICT):
+   - The label MUST be clearly distinguishable from every sibling label ($siblings): never reuse a sibling's head noun phrase with only a modifier change, and never restate the parent label.
+   - Name what makes THIS cluster's queries different from its siblings — the specific mechanism, method, or subject matter its samples share and the siblings' do not.
    - Prefer established subfield terminology (e.g., “Classical Mechanics”, “Bayesian Inference”, “Corporate Finance”) when it matches the samples.
 
 3. Distinctness & Contrast:
