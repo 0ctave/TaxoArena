@@ -1081,7 +1081,6 @@ class TaxonomyMerger(
         val children = node.children.toList()
         if (children.size < 2) return
 
-        val siblingMergeThreshold = config.formalism.separationEpsilon
         val statsDim = dimForDepth(node.depth + 1)
         val statsByChild = children.associateWith { child ->
             val branchQueries = child.getAllQueriesInBranch().distinctBy { it.rawText }
@@ -1104,7 +1103,7 @@ class TaxonomyMerger(
                 val statsA = statsByChild[nodeA] ?: continue
                 val statsB = statsByChild[nodeB] ?: continue
                 val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
-                if (sep < siblingMergeThreshold) pairsToMerge.add(Triple(nodeA, nodeB, sep))
+                if (sep < config.formalism.separationEpsilon) pairsToMerge.add(Triple(nodeA, nodeB, sep))
             }
         }
 

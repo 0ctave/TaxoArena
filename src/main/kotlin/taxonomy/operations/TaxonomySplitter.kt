@@ -213,22 +213,106 @@ class TaxonomySplitter(
         // birth). Assigning here with the same posterior the trickler applies makes
         // the birth state a routing fixed point at this level: a split only happens
         // if routing will sustain every child it creates.
-        val proposalVmfs = clusters.map { cluster -> fitVmfParams(cluster, childDim) }
+        fun routeToVmfs(vmfs: List<StatisticsUtils.VmfParameters>): List<MutableList<Embedding>> {
+            val out = List(vmfs.size) { mutableListOf<Embedding>() }
+            for (q in targetQueries) {
+                val x = q.projectTo(childDim)
+                var best = 0
+                var bestScore = Double.NEGATIVE_INFINITY
+                for (idx in vmfs.indices) {
+                    val vmf = vmfs[idx]
+                    val score = vmf.logNormalizer + vmf.kappa * StatisticsUtils.dotProduct(x, vmf.mu)
+                    if (score > bestScore) {
+                        bestScore = score
+                        best = idx
+                    }
+                }
+                out[best].add(q)
+            }
+            return out
+        }
 
-        val routedClusters = Array(k) { mutableListOf<Embedding>() }
-        for (q in targetQueries) {
-            val x = q.projectTo(childDim)
-            var best = 0
-            var bestScore = Double.NEGATIVE_INFINITY
-            for (idx in proposalVmfs.indices) {
-                val vmf = proposalVmfs[idx]
-                val score = vmf.logNormalizer + vmf.kappa * StatisticsUtils.dotProduct(x, vmf.mu)
-                if (score > bestScore) {
-                    bestScore = score
-                    best = idx
+        var activeVmfs = clusters.map { cluster -> fitVmfParams(cluster, childDim) }
+        var routedClusters = routeToVmfs(activeVmfs)
+
+        // ── Constrained k: project the proposal onto the routing-feasible set ─
+        // EM's k is an unconstrained separation argmax; under the routed re-
+        // assignment the partition of a large coherent node routinely lands as
+        // "m sustainable clusters + tiny fragments" (observed: History
+        // [147,164,1,28], Engineering [306,193,120,25]), and the all-or-nothing
+        // floor check vetoed the entire split forever. Instead of discarding the
+        // proposal, absorb under-floor fragments by DROPPING their components and
+        // re-routing every query among the survivors — the same winner-take-all
+        // vMF posterior, so no query is force-assigned anywhere. Each pass
+        // removes >= 1 component, terminating at k' >= 2 or rejection. Nothing
+        // is forced: the resulting coarser partition must still clear the SAME
+        // acceptance bar below (floor, chance-corrected separation on the routed
+        // partition, sibling distinctness); an incoherent merge fails separation
+        // and dies exactly as before.
+        // Flat, null-calibrated bar (see NullSeparationCalibrationTest): the value
+        // is chosen at the isotropic-selection noise ceiling, i.e. the p95 of the
+        // separation EM manufactures on structureless clouds — partitions below it
+        // are optimizer noise at any node size. Small populations keep the 2x
+        // margin (their proposals rest on fewer points; the EM floor already
+        // suppresses most chance splits there).
+        val requiredEps = if (targetQueries.size < 2 * minClusterSize)
+            2.0 * config.formalism.separationEpsilon
+        else
+            config.formalism.separationEpsilon
+
+        // ── Stabilize the proposal onto the feasible set ─────────────────────
+        // Two coarsening moves, both of which strictly reduce k and re-route with
+        // the same winner-take-all vMF posterior (no query is force-assigned):
+        //  1) FLOOR: an under-floor fragment's component is dropped and its mass
+        //     re-routes among the survivors (History [147,164,1,28] -> k=2).
+        //  2) GATE CONSISTENCY (weak pair): if any routed PAIR falls below the
+        //     same pairwise bar the sibling-merger fuses at, the pair is merged
+        //     and re-routed. The split gate previously accepted on the JOINT
+        //     k-way separation only; a k=4 partition with joint sep 0.06 can
+        //     contain a pair at 0.015, which the sibling-merger then immediately
+        //     fuses — the split/fuse limit cycle. Creation and destruction now
+        //     read the same statistic at the same granularity and bar, so their
+        //     acceptance regions are disjoint by construction.
+        while (true) {
+            if (routedClusters.any { it.size < minClusterSize }) {
+                if (routedClusters.size <= 2) break
+                val survivors = routedClusters.filter { it.size >= minClusterSize }
+                if (survivors.size < 2) break
+                log.debug("Split fallback: absorbing under-floor fragments (routed sizes: ${routedClusters.map { it.size }}, floor=$minClusterSize), k ${routedClusters.size} -> ${survivors.size}")
+                activeVmfs = survivors.map { cluster -> fitVmfParams(cluster, childDim) }
+                routedClusters = routeToVmfs(activeVmfs)
+                continue
+            }
+            val stats = routedClusters.map { clusterStats(it, childDim) }
+            var weakI = -1
+            var weakJ = -1
+            var weakSep = Double.MAX_VALUE
+            for (i in stats.indices) {
+                for (j in i + 1 until stats.size) {
+                    val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(stats[i], stats[j]))
+                    if (sep < weakSep) {
+                        weakSep = sep
+                        weakI = i
+                        weakJ = j
+                    }
                 }
             }
-            routedClusters[best].add(q)
+            if (weakI >= 0 && weakSep < requiredEps && routedClusters.size > 2) {
+                log.debug("Split fallback: pair sep ${"%.4f".format(java.util.Locale.US, weakSep)} < ${"%.4f".format(java.util.Locale.US, requiredEps)}, coarsening k ${routedClusters.size} -> ${routedClusters.size - 1}")
+                val mergedClusters = mutableListOf<MutableList<Embedding>>()
+                for (idx in routedClusters.indices) {
+                    if (idx == weakJ) continue
+                    if (idx == weakI) {
+                        mergedClusters.add((routedClusters[weakI] + routedClusters[weakJ]).toMutableList())
+                    } else {
+                        mergedClusters.add(routedClusters[idx])
+                    }
+                }
+                activeVmfs = mergedClusters.map { cluster -> fitVmfParams(cluster, childDim) }
+                routedClusters = routeToVmfs(activeVmfs)
+                continue
+            }
+            break
         }
 
         if (routedClusters.any { it.size < minClusterSize }) {
@@ -245,10 +329,21 @@ class TaxonomySplitter(
         )
         node.dasguptaDeltaNorm = sepScore
 
-        val requiredEps = if (targetQueries.size < 2 * minClusterSize)
-            2.0 * config.formalism.separationEpsilon
-        else
-            config.formalism.separationEpsilon
+        // Min-pairwise gate: every child pair must clear the same bar the
+        // sibling-merger tests, or the proposal is rejected outright (reachable
+        // only at k=2, where coarsening cannot go lower).
+        val finalStats = routedClusters.map { clusterStats(it, childDim) }
+        var minPairSep = Double.MAX_VALUE
+        for (i in finalStats.indices) {
+            for (j in i + 1 until finalStats.size) {
+                val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(finalStats[i], finalStats[j]))
+                if (sep < minPairSep) minPairSep = sep
+            }
+        }
+        if (minPairSep < requiredEps) {
+            log.debug("Split Rejected: min-pairwise separation ${"%.4f".format(java.util.Locale.US, minPairSep)} below bar ${"%.4f".format(java.util.Locale.US, requiredEps)}")
+            return
+        }
 
         log.debug("Eval '${node.label}': k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
 
@@ -258,7 +353,6 @@ class TaxonomySplitter(
         }
 
         // ── Sibling distinctness guard (same scale as the split/merge gates) ──
-        val siblingMergeThreshold = config.formalism.separationEpsilon
         val isUnique = routedClusters.all { cluster ->
             val newStats = clusterStats(cluster, childDim)
             node.children.all { sibling ->
@@ -268,7 +362,7 @@ class TaxonomySplitter(
                     val sep = StatisticsUtils.chanceCorrectedSeparation(
                         listOf(newStats, clusterStats(sibQueries, childDim))
                     )
-                    sep >= siblingMergeThreshold
+                    sep >= config.formalism.separationEpsilon
                 }
             }
         }
@@ -278,7 +372,7 @@ class TaxonomySplitter(
             return
         }
 
-        log.info("Split '${node.label}' (q=${targetQueries.size}, k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)}, routed=${routedClusters.map { it.size }}, converged=${mixture.converged}) -> Spawning $k children")
+        log.info("Split '${node.label}' (q=${targetQueries.size}, k=${routedClusters.size}${if (routedClusters.size != k) " (em k=$k)" else ""}, sep=${"%.3f".format(java.util.Locale.US, sepScore)}, routed=${routedClusters.map { it.size }}, converged=${mixture.converged}) -> Spawning ${routedClusters.size} children")
 
         // ── Create children and wire topology ────────────────────────────────
         // Oversized children are NOT re-split in this pass: immediate recursion peeled
