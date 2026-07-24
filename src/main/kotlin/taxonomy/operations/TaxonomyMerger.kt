@@ -170,10 +170,46 @@ class TaxonomyMerger(
         }
     }
 
+    /** True iff nodeId lies in the subtree rooted at start (tree + cross edges). */
+    private fun isInSubtree(start: GraphNode, nodeId: String): Boolean {
+        val seen = mutableSetOf<String>()
+        fun dfs(n: GraphNode): Boolean {
+            if (!seen.add(n.id)) return false
+            if (n.id == nodeId) return true
+            return n.children.any { dfs(it) } || n.crossLinkChildren.any { dfs(it) }
+        }
+        return dfs(start)
+    }
+
+    /** Diagnostic: total query-weight mass over reachable nodes. */
+    private fun reachableMass(root: GraphNode): Double {
+        var sum = 0.0
+        val seen = mutableSetOf<String>()
+        fun walk(n: GraphNode) {
+            if (!seen.add(n.id)) return
+            sum += n.queryWeights.values.sum()
+            n.children.forEach { walk(it) }
+            n.crossLinkChildren.forEach { walk(it) }
+        }
+        walk(root)
+        return sum
+    }
+
     private fun fuseNodes(target: GraphNode, source: GraphNode) {
         require(target.sliceDim == source.sliceDim) {
             "Cannot fuse nodes at different dims: ${target.label}(${target.sliceDim}) vs ${source.label}(${source.sliceDim})"
         }
+
+        // The target may itself be a parent of the source (earlier fusions redirect
+        // edges, so a "sibling" pair can also carry a parent-child edge). Detach that
+        // edge FIRST: otherwise the redistribution below routes the source's own mass
+        // back onto the source (its mu is trivially the best match for its own
+        // queries) and the source-cleanup step wipes it — measured on seed 2048:
+        // 229 of 275 weight units lost in a single fusion. The parent-redirect step
+        // also skips parent==target, which would leave a ghost target->source edge.
+        target.children.remove(source)
+        target.crossLinkChildren.remove(source)
+        source.parents.remove(target)
 
         val allQueries = (target.queries + source.queries).distinctBy { it.rawText }
         val allWeights = mutableMapOf<String, Double>()
@@ -208,9 +244,17 @@ class TaxonomyMerger(
             if (parent != target) {
                 val wasTree = parent.children.remove(source)
                 val wasCross = parent.crossLinkChildren.remove(source)
-                if (wasTree) parent.children.add(target)
-                if (wasCross && !parent.children.contains(target)) parent.crossLinkChildren.add(target)
-                target.parents.add(parent)
+                // Cycle safety: the edge parent->target is only legal if parent is
+                // NOT inside target's subtree. Un-vetoed redirect chains created
+                // real cycles (survived routing via its cycle guard, then blew the
+                // structure diff with a StackOverflowError at iteration 35).
+                if (isInSubtree(target, parent.id)) {
+                    log.info("[FUSE CYCLE-GUARD] dropping redirect '${parent.label}'->'${target.label}' (would create cycle)")
+                } else {
+                    if (wasTree) parent.children.add(target)
+                    if (wasCross && !parent.children.contains(target)) parent.crossLinkChildren.add(target)
+                    target.parents.add(parent)
+                }
             }
         }
 
@@ -226,12 +270,17 @@ class TaxonomyMerger(
             }
         }
 
-        // 4. Redirect tree children with defensive copy
+        // 4. Redirect tree children with defensive copy (cycle-guarded: the edge
+        // target->child is only legal if target is not inside child's subtree)
         source.children.toList().forEach { child ->
             if (child != target) {
                 child.parents.remove(source)
-                child.parents.add(target)
-                target.children.add(child)
+                if (isInSubtree(child, target.id)) {
+                    log.info("[FUSE CYCLE-GUARD] dropping redirect '${target.label}'->'${child.label}' (would create cycle)")
+                } else {
+                    child.parents.add(target)
+                    target.children.add(child)
+                }
             }
         }
 
@@ -239,30 +288,45 @@ class TaxonomyMerger(
         source.crossLinkChildren.toList().forEach { child ->
             if (child != target) {
                 child.parents.remove(source)
-                child.parents.add(target)
-                target.crossLinkChildren.add(child)
+                if (isInSubtree(child, target.id)) {
+                    log.info("[FUSE CYCLE-GUARD] dropping cross redirect '${target.label}'->'${child.label}' (would create cycle)")
+                } else {
+                    child.parents.add(target)
+                    target.crossLinkChildren.add(child)
+                }
             }
         }
 
-        // If target has children, distribute all queries to children to maintain internal composite separation
+        // If target has children, distribute all queries to children to maintain internal composite separation.
+        // Iterate the WEIGHT MAP, not the embedding list: queryWeights can hold keys whose
+        // embedding is absent from the queries lists (soft multi-assignment / residual
+        // bookkeeping). Iterating allQueries silently dropped those entries' mass — an
+        // internal sibling fusion at seed 2048 lost 229.0 units this way and tripped
+        // tryProposal's mass-conservation assert on the transient pre-reroute state.
         if (target.children.isNotEmpty()) {
-            val activeChildren = target.children.toList()
-            for (q in allQueries) {
-                val w = allWeights[q.rawText] ?: 1.0
+            val activeChildren = target.children.filter { it !== source }
+            val embByRaw = allQueries.associateBy { it.rawText }
+            for ((raw, w) in allWeights) {
+                val q = embByRaw[raw] ?: GraphNode.getEmbedding(raw)
+                if (q == null) {
+                    // No resolvable embedding: keep the mass at the survivor rather than drop it.
+                    target.queryWeights[raw] = (target.queryWeights[raw] ?: 0.0) + w
+                    continue
+                }
                 val bestChild = activeChildren.maxByOrNull { child ->
                     if (child.vmfMu.isEmpty()) -Double.MAX_VALUE
                     else StatisticsUtils.dotProduct(q.projectTo(child.sliceDim), child.vmfMu)
                 }
                  if (bestChild != null) {
-                    if (bestChild.queries.none { it.rawText == q.rawText }) {
+                    if (bestChild.queries.none { it.rawText == raw }) {
                         bestChild.queries.add(q)
                     }
-                    bestChild.queryWeights[q.rawText] = (bestChild.queryWeights[q.rawText] ?: 0.0) + w
+                    bestChild.queryWeights[raw] = (bestChild.queryWeights[raw] ?: 0.0) + w
                 } else {
-                    if (target.queries.none { it.rawText == q.rawText }) {
+                    if (target.queries.none { it.rawText == raw }) {
                         target.queries.add(q)
                     }
-                    target.queryWeights[q.rawText] = (target.queryWeights[q.rawText] ?: 0.0) + w
+                    target.queryWeights[raw] = (target.queryWeights[raw] ?: 0.0) + w
                 }
             }
         } else {

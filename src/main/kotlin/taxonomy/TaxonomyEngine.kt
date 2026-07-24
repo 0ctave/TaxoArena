@@ -520,6 +520,10 @@ class TaxonomyEngine(
         val memoHasChanges = mutableMapOf<String, Boolean>()
         fun hasChangesInSubtree(nodeId: String): Boolean {
             memoHasChanges[nodeId]?.let { return it }
+            // In-progress guard: a cycle in the captured state must not recurse
+            // forever (StackOverflowError at iteration 35, seed 2048) — treat a
+            // back-edge as "no additional changes" until the node's own result lands.
+            memoHasChanges[nodeId] = false
             val diff = diffs[nodeId]
             val selfChanged = diff != null && (diff.isAdded || diff.isMutated)
             val hasRemoved = removedChildren.containsKey(nodeId)

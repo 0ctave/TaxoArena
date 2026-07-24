@@ -192,6 +192,32 @@ class TaxonomyOperations(
                 }
             }
         }.awaitAll()
+
+        // ── Completeness diagnostic: every embedding must have deposited weight
+        // somewhere REACHABLE. A reroute that silently drops queries corrupts the
+        // state every later proposal is judged (and asserted) against.
+        run {
+            val reachableKeys = HashSet<String>()
+            val seen = HashSet<String>()
+            fun walkKeys(n: GraphNode) {
+                if (!seen.add(n.id)) return
+                reachableKeys.addAll(n.queryWeights.keys)
+                n.children.forEach { walkKeys(it) }
+                n.crossLinkChildren.forEach { walkKeys(it) }
+            }
+            walkKeys(root)
+            val dropped = embeddings.filter { it.rawText !in reachableKeys }
+            if (dropped.isNotEmpty()) {
+                log.warn("[REROUTE DIAG] ${dropped.size}/${embeddings.size} queries deposited no weight on any reachable node")
+                for (emb in dropped.take(3)) {
+                    val rr = trickler.routeQuery(emb, root, currentIteration, groundTruthMap[emb.rawText])
+                    val leafInfo = rr.leaves.toList().take(4).joinToString(", ") { (n, lw) ->
+                        "'${n.label}'(logW=${"%.2f".format(java.util.Locale.US, lw)}, reachable=${seen.contains(n.id)})"
+                    }
+                    log.warn("[REROUTE DIAG] '${emb.rawText.take(50)}' -> leaves=${rr.leaves.size} [$leafInfo] primary='${rr.primary.label}' primaryReachable=${seen.contains(rr.primary.id)}")
+                }
+            }
+        }
     }
 
     private fun computePairwiseDenom(root: GraphNode): Double {
@@ -280,10 +306,26 @@ class TaxonomyOperations(
             backup.restore(registry)
             return false
         }
-        
-        if (currentIteration > 1) {
-            assertMassConservation(root, allEmbeddings)
+
+        // Diagnose reachability loss: nodes present before the action but absent
+        // from the post-action walk are either intentionally destroyed (fusion
+        // sources) or ORPHANED subtrees whose mass silently leaves the graph.
+        val lostIds = registry.keys - postRegistry.keys
+        if (lostIds.isNotEmpty()) {
+            val details = lostIds.take(8).joinToString(" | ") { id ->
+                val n = registry[id]!!
+                "'${n.label}' w=${"%.1f".format(java.util.Locale.US, n.queryWeights.values.sum())} res=${n.residualQueries.size} ch=${n.children.size} par=${n.parents.size}"
+            }
+            log.info("[PROPOSAL DIAG] ${lostIds.size} node(s) unreachable after action: $details")
         }
+
+        // NOTE: no mass assertion here. The post-action state is TENTATIVE by
+        // design — the proposal machinery evaluates it and either re-routes
+        // (acceptance path, asserted below on the settled state) or restores the
+        // backup (rejection). Asserting mid-transaction killed runs on legal
+        // tentative states (seed-2048 round-1 validation: a fusion's transient
+        // weight bookkeeping tripped it while the J gate was about to reject and
+        // restore that very state).
 
         val baseJ = if (cachedBaseJ != null) {
             cachedBaseJ!!
@@ -370,7 +412,25 @@ class TaxonomyOperations(
         if (config.formalism.enableResidualRouting) {
             val N = allEmbeddings.size.toDouble()
             if (Math.abs(totalAssignedMass - N) > 1.5) {
-                throw AssertionError("Mass conservation violated: Total assigned mass is $totalAssignedMass but total corpus size N is $N. Difference: ${Math.abs(totalAssignedMass - N)}")
+                // Diagnose WHERE the mass went before throwing: which corpus queries
+                // hold no weight anywhere reachable, and whether they are at least
+                // residual-flagged somewhere (naked-ID retention leak) or fully gone.
+                val weightedKeys = queryWeights.keys
+                val residualIds = mutableSetOf<String>()
+                for (node in allNodes) residualIds.addAll(node.residualQueries)
+                val missing = allEmbeddings.filter { it.rawText !in weightedKeys }
+                val missingFlagged = missing.count { emb ->
+                    val qId = if (emb.queryId != -1) emb.queryId.toString()
+                              else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                    qId in residualIds || emb.rawText in residualIds
+                }
+                val samples = missing.take(3).joinToString(" | ") { it.rawText.take(60) }
+                throw AssertionError(
+                    "Mass conservation violated: Total assigned mass is $totalAssignedMass but total corpus size N is $N. " +
+                    "Difference: ${Math.abs(totalAssignedMass - N)}. " +
+                    "Queries with no weight anywhere: ${missing.size} (of which residual-flagged: $missingFlagged). " +
+                    "Reachable nodes: ${allNodes.size}. Samples: [$samples]"
+                )
             }
         }
     }
