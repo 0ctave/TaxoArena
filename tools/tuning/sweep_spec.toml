@@ -17,43 +17,45 @@ seeds = [137, 2048]
 stage = "validate"
 
 # ══════════════════════════════════════════════════════════════════════════
-#  CALIBRATION SWEEP — PROPOSAL-GATED POLYHIERARCHY REGIME (2026-07-23)
+#  REFINEMENT SWEEP — FINAL DAG CALIBRATION (2026-07-24, round 2)
 #
-#  Base: cross-linking restored as a J-gated growth edit; split gate is a
-#  pure Delta-J > 0 veto (local chance-corrected separation gates quality);
-#  fusion redirects preserve edge type; descentMargin wired into the
-#  Jensen-tight descent gate.
+#  Round 1 (L9: descentMargin x minClusterSize x secondaryMassFloor x
+#  routingBeamGamma) selected 6fcd2951 (delta=0.05, mCS=25, sMF=5.0,
+#  gamma=0.1; Top-1 73.9%, purity 0.728, ECE 0.213, ~0 residuals). That
+#  winner sits at the EDGE of the round-1 box on three factors (delta max,
+#  mCS min, gamma max) — the optimum may lie outside it. Round 2 therefore
+#  re-centers past the winner and swaps in the one structural knob round 1
+#  never varied:
 #
-#  FACTORS (all wired end-to-end in the current code):
+#   - separationEpsilon {0.005, 0.01, 0.02}   [NEW — the structure knob]
+#       Chance-corrected separation floor for splits/merges/distinctness
+#       and proposal-gate threshold magnitude. Round 1 fixed it at 0.01.
 #
-#   - descentMargin {0.0, 0.02, 0.05}
-#       Slack below the Jensen-tight descent bar
-#       max_c<mu_c,x> >= (r_bar_p - d) * <mu_p,x>.
-#       0.0 = exact bound (max residuals, max cross-link fuel);
-#       0.05 = measured single-run endpoint: residuals -38% but purity
-#       -1.9pts and bridges 11 -> 4. The sweep decides where the knee is.
+#   - descentMargin {0.05, 0.08, 0.12}        [pushed past round-1 max]
+#       Residuals were already ~0 at 0.05; the question is whether more
+#       slack keeps helping Top-1 or starts diluting purity.
 #
-#   - minClusterSize {25, 50, 75}
-#       Granularity dial: leaf count vs SmallLeafFraction/starvation.
+#   - minClusterSize {20, 25, 35}             [pushed below round-1 min]
+#       Round 1 chose 25 over 50/75. Watch arena support: held-out pool
+#       (~3.6k) per leaf must stay viable for judge evaluation.
 #
-#   - secondaryMassFloor {2.0, 5.0, 10.0}
-#       Cross-link host/candidate support floor: 2.0 admits tiny re-firing
-#       proposals; higher prunes proposal noise but may starve genuine links.
+#   - routingBeamGamma {0.10, 0.15, 0.20}     [pushed past round-1 max]
+#       Wider beams raise multi-assignment; AvgMatchCount band and the
+#       cap-rate gate bound the acceptable region.
 #
-#   - routingBeamGamma {0.015, 0.05, 0.10}
-#       Additive cosine beam margin below best sibling: sharing breadth,
-#       drives multi-assignment rate and ECE.
-#
-#  Interaction under test: descentMargin vs bridge formation — residual
-#  pools are the cross-link generator's fuel, so loosening the gate may
-#  trade measured ambiguity (residuals) for lost polyhierarchy (bridges).
+#  secondaryMassFloor is FIXED at 5.0 in the base config (round-1 result:
+#  2.0 admits re-firing noise, 10.0 starves genuine links).
+#  Base config = thesis_canonical.toml at the round-1 winner values.
+#  Prerequisite fix in this tree: fuseNodes redistributes mass over the
+#  weight map (seed-2048 round-1 validation crashed on the dropped-mass
+#  assert; repro re-run clean before this sweep was launched).
 # ══════════════════════════════════════════════════════════════════════════
 
 [factors]
-descentMargin      = [0.0, 0.02, 0.05]
-minClusterSize     = [25, 50, 75]
-secondaryMassFloor = [2.0, 5.0, 10.0]
-routingBeamGamma   = [0.015, 0.05, 0.10]
+separationEpsilon  = [0.005, 0.01, 0.02]
+descentMargin      = [0.05, 0.08, 0.12]
+minClusterSize     = [20, 25, 35]
+routingBeamGamma   = [0.10, 0.15, 0.20]
 
 [gates.hard]
 Acyclic = true
