@@ -1,0 +1,110 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  cal_seeds_bar025.toml — REPRODUCIBILITY + BASELINES on the bar025 canonical
+#
+#  This is the thesis-critical calibration run. It answers both reviewer
+#  blockers at once: variance on every reported metric across five seeds
+#  (plus cross-seed ARI for structural stability), and recursive k-means /
+#  agglomerative baselines at matched leaf count as comparators.
+#
+#  BASE CONFIGURATION: identical to experiment_configs/bar025.toml, which is
+#  the current canonical candidate. Differences from the superseded
+#  mcs30_eps02_tree.toml canonical, both established 2026-07-25:
+#
+#   1. proposalSeparationBar 0.02 -> 0.025.
+#      0.02 sits exactly at the ISOTROPIC null ceiling (p95 0.0209, p99
+#      0.0213 from NullSeparationCalibrationTest), so splits at 0.021 were
+#      being accepted from inside the noise band. That produced a period-2
+#      limit cycle: a marginal split at sep=0.021 was created locally on
+#      separation and destroyed globally on (J, -|V|), forever.
+#      The same harness measures a WITHIN-DOMAIN null at 0.068-0.130, but
+#      that null is a parametric bootstrap on a population which already
+#      contains the sub-topics, so it inherits their anisotropy and
+#      upper-bounds rather than estimates the noise. A probe at 0.07
+#      collapsed the taxonomy to 17 nodes and made held-out routing worse
+#      (Top-1 72.41%, ECE 0.253). 0.025 is chosen between the two bounds on
+#      held-out evidence, and lies inside the L9 swept range {0.01,0.02,0.03}.
+#
+#   2. Redundant fusion restricted to same-parent pairs (commit c0e74ca), so
+#      no operator can create a multi-parent node.
+#
+#  MEASURED at seed 42 (experiment_results/bar025): 167 nodes / 104 leaves,
+#  structural fixed point at iteration 4, converged iteration 15 on a 5/5
+#  quiescence streak, 0 multi-parent nodes at every iteration, 0 residuals,
+#  J = 0.247136, held-out Top-1 74.19% [72.73, 75.60], ECE 0.1996.
+#
+#  LABELING IS OFF DELIBERATELY. LLM post-pass labeling runs AFTER
+#  construction but BEFORE the validation exports, so a labeling failure
+#  destroys the metrics for that seed — which is exactly what happened on
+#  2026-07-25 18:14. Labels are cosmetic for this study: they affect no
+#  structural, routing, or baseline metric. Generate them separately on the
+#  frozen canonical snapshot once a seed is chosen.
+#
+#  Expect roughly 10 min per seed including baselines.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf",
+    "Meta-Llama-3-70B-Instruct"
+]
+
+category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filter)
+queryLimit    = 0       # 0 = no cap; use the full corpus
+outputDir     = "experiment_results/cal_iso/s7"
+testRatio     = 0.3     # frozen 70/30 stratified split, identical across seeds
+seed          = 7
+# seeds omitted deliberately: the in-process multi-seed loop corrupts held-out routing for every seed after the first (measured: seed 137 NoMatchRate 0.816 in-loop vs 0.0 isolated). Each seed runs in its own JVM.
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true          # produces the ECE/routing metrics
+runBaselines       = true          # recursive k-means + agglomerative at matched leaf count
+enableFinalMetrics = true          # REQUIRED — produces the reported metrics
+enableLabeling     = false         # see header: off to protect the run, not a behaviour change
+judgeInduction     = false         # judges are induced in the arena step
+
+# ── Construction mode ───────────────────────────────────────────────────────
+dagMode = "DAG_MAX"      # NOT TREE_BASELINE: that also disables residualRouting,
+                         # residualSplitGate and stableQuestionIds. Cross-linking no
+                         # longer exists, so this flag is purely those three.
+
+# ── Formalism parameters ─────────────────────────────────────────────────────
+maxDepth              = 8      # max taxonomy depth (caps runaway recursion)
+minClusterSize        = 30     # targets >=12 held-out top-1 per leaf for the arena
+proposalSeparationBar = 0.025  # between the isotropic (0.021) and within-domain (0.068) nulls
+tau                   = 1e-6   # lexicographic J acceptance tolerance
+
+# ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
+membershipFloor       = 0.25   # min share of a query's own normalized membership for a leaf to count
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0    # min effective (soft) support for a node to be retained
+defaultKappaPrior     = 10.0   # NiW prior concentration when a node has too few points
+
+numIterations         = 50     # max evolution passes
+maxLeafAssignments    = 5      # max leaves a query may be softly assigned to at arena time
+
+# ── Merging / convergence ────────────────────────────────────────────────────
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false  # iteration 1 keeps the bootstrap assignment intact
+
+# ── Diagnostics ──────────────────────────────────────────────────────────────
+enableProfiling           = true
+
