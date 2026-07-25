@@ -74,16 +74,17 @@ class TaxonomySplitter(
         log.info("Finished parallel split evaluation.")
     }
 
-    suspend fun splitSingleNode(node: GraphNode) {
+    suspend fun splitSingleNode(node: GraphNode): Boolean {
+        if (!node.isLeaf) return false
         val localWeights = node.queryWeights
         val mass = localWeights.values.sum()
         val ess = if (mass > 0.0) (mass * mass / localWeights.values.sumOf { it * it }) else 0.0
         val threshold = 2 * config.formalism.minClusterSize
-        if (mass < threshold || ess < threshold) return
+        if (mass < threshold || ess < threshold) return false
 
         if (node.depth >= config.formalism.maxDepth) {
             log.debug("Split Boundary: '${node.label}' reached max depth (${config.formalism.maxDepth}). Preventing split.")
-            return
+            return false
         }
 
         val isDiffuse = node.vmfKappa < 0.5 && mass < 10 * config.formalism.minClusterSize
@@ -93,7 +94,7 @@ class TaxonomySplitter(
                 val minClusterSize = config.formalism.minClusterSize
                 val allSubtreeQueries = node.getAllQueriesInRegion()
                 val residualEmbeddings = allSubtreeQueries.filter { emb ->
-                    val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                    val qId = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                     qId in node.residualQueries
                 }
                 
@@ -111,7 +112,7 @@ class TaxonomySplitter(
                             val sep = StatisticsUtils.chanceCorrectedSeparation(
                                 listOf(resStats, clusterStats(sibQueries, resDim))
                             )
-                            sep >= config.formalism.separationEpsilon
+                            sep >= config.formalism.proposalSeparationBar
                         }
                     }
                 }
@@ -119,7 +120,7 @@ class TaxonomySplitter(
             
             if (!viable) {
                 log.debug("Split Skipped: '${node.label}' kappa=${node.vmfKappa} too diffuse.")
-                return
+                return false
             } else {
                 log.debug("Split Allowed via Residual Viability Gate: '${node.label}' is diffuse but has coherent residual cluster.")
             }
@@ -132,7 +133,7 @@ class TaxonomySplitter(
         val targetQueries = (if (isDiffuse && config.formalism.enableResidualSplitGate) {
             val allSubtreeQueries = node.getAllQueriesInRegion()
             allSubtreeQueries.filter { emb ->
-                val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                val qId = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                 qId in node.residualQueries
             }.ifEmpty { localWeights.keys.mapNotNull { GraphNode.getEmbedding(it) } }
         } else {
@@ -162,25 +163,25 @@ class TaxonomySplitter(
             d = splitDim,
             maxK = 2,
             minClusterFrac = minClusterFrac,
-            marginalEps = config.formalism.separationEpsilon
+            marginalEps = config.formalism.proposalSeparationBar
         )
 
         if (probe == null) {
             log.debug("Split Failed: k-means collapsed for '${node.label}'.")
-            return
+            return false
         }
 
 
         val mixture = if (probe.components.size < 2) {
             log.debug("Split Failed: k=2 probe insufficient for '${node.label}'.")
-            return
+            return false
         } else {
             StatisticsUtils.performVmfKMeans(
                 embeddings = pcaProjected,
                 d = splitDim,
                 maxK = 4,
                 minClusterFrac = minClusterFrac,
-                marginalEps = config.formalism.separationEpsilon
+                marginalEps = config.formalism.proposalSeparationBar
             ) ?: probe  // fallback to probe if full run collapses
         }
 
@@ -199,7 +200,7 @@ class TaxonomySplitter(
         // ── EM floor pre-check (cheap early-out before any 256-dim work) ──────
         if (clusters.any { it.size < minClusterSize }) {
             log.debug("Split Floor Rejected: a cluster is below minClusterSize=$minClusterSize (sizes: ${clusters.map { it.size }}).")
-            return
+            return false
         }
 
         // ── Fit proposal vMFs, then re-assign in ROUTING geometry ────────────
@@ -256,9 +257,9 @@ class TaxonomySplitter(
         // margin (their proposals rest on fewer points; the EM floor already
         // suppresses most chance splits there).
         val requiredEps = if (targetQueries.size < 2 * minClusterSize)
-            2.0 * config.formalism.separationEpsilon
+            2.0 * config.formalism.proposalSeparationBar
         else
-            config.formalism.separationEpsilon
+            config.formalism.proposalSeparationBar
 
         // ── Stabilize the proposal onto the feasible set ─────────────────────
         // Two coarsening moves, both of which strictly reduce k and re-route with
@@ -317,7 +318,7 @@ class TaxonomySplitter(
 
         if (routedClusters.any { it.size < minClusterSize }) {
             log.debug("Split Rejected: not routing-sustainable (routed sizes: ${routedClusters.map { it.size }}, floor=$minClusterSize)")
-            return
+            return false
         }
 
         // Refit each child on the population routing actually gives it
@@ -342,14 +343,14 @@ class TaxonomySplitter(
         }
         if (minPairSep < requiredEps) {
             log.debug("Split Rejected: min-pairwise separation ${"%.4f".format(java.util.Locale.US, minPairSep)} below bar ${"%.4f".format(java.util.Locale.US, requiredEps)}")
-            return
+            return false
         }
 
         log.debug("Eval '${node.label}': k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
 
         if (sepScore < requiredEps) {
             log.debug("Split Rejected: separation ${"%.3f".format(java.util.Locale.US, sepScore)} insufficient")
-            return
+            return false
         }
 
         // ── Sibling distinctness guard (same scale as the split/merge gates) ──
@@ -362,14 +363,14 @@ class TaxonomySplitter(
                     val sep = StatisticsUtils.chanceCorrectedSeparation(
                         listOf(newStats, clusterStats(sibQueries, childDim))
                     )
-                    sep >= config.formalism.separationEpsilon
+                    sep >= config.formalism.proposalSeparationBar
                 }
             }
         }
 
         if (!isUnique) {
             log.debug("Split Rejected: child too similar to sibling")
-            return
+            return false
         }
 
         log.info("Split '${node.label}' (q=${targetQueries.size}, k=${routedClusters.size}${if (routedClusters.size != k) " (em k=$k)" else ""}, sep=${"%.3f".format(java.util.Locale.US, sepScore)}, routed=${routedClusters.map { it.size }}, converged=${mixture.converged}) -> Spawning ${routedClusters.size} children")
@@ -388,6 +389,7 @@ class TaxonomySplitter(
             child.parents.add(node)
             fitter.fitSingleNode(child)
         }
+        return true
     }
 
     private fun clusterStats(embeddings: List<Embedding>, dim: Int): StatisticsUtils.ClusterStats {

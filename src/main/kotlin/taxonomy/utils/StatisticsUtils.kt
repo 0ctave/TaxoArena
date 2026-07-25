@@ -166,7 +166,7 @@ object StatisticsUtils {
      * degenerate k=1 "partition" — so a non-separating (wrapper) candidate can never
      * clear a positive threshold. The chance correction removes the mechanical
      * dependence the raw within/total ratio has on k and on the cluster-size
-     * profile, so one separationEpsilon means the same thing for split acceptance,
+     * profile, so one proposalSeparationBar means the same thing for split acceptance,
      * sibling merging, and sibling distinctness everywhere in the tree.
      *
      * Replaces two structurally broken gates: the former "Dasgupta delta"
@@ -220,7 +220,7 @@ object StatisticsUtils {
 
     fun computeDagSeparationJ(root: GraphNode, allEmbeddings: List<Embedding>): Double {
         val embMap = allEmbeddings.associateBy {
-            if (it.queryId != -1) it.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(it.rawText)
+            if (it.queryId != -1) it.queryId.toString() else it.rawText
         }
         val rawEmbMap = allEmbeddings.associateBy { it.rawText }
 

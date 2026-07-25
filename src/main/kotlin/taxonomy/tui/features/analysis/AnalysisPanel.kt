@@ -229,7 +229,7 @@ fun ConfigSnapshotPanel(
     add("Formalism", Cyan, true)
     add("  Max depth    ${config.formalism.maxDepth}")
     add("  Min cluster  ${config.formalism.minClusterSize}")
-    add("  Sep. epsilon ${config.formalism.separationEpsilon}")
+    add("  Sep. epsilon ${config.formalism.proposalSeparationBar}")
     add("  Member floor ${config.formalism.membershipFloor}")
     add("  Beam gamma   ${config.formalism.routingBeamGamma}")
 

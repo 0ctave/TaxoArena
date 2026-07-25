@@ -181,8 +181,8 @@ class TuiConfigFacade(
             name = "Separation Epsilon",
             description = "Geometric distinctness threshold",
             category = "Clustering & Routing (VMF)",
-            getValue = { deps.config.formalism.separationEpsilon.toString() },
-            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.separationEpsilon = it; true } ?: false },
+            getValue = { deps.config.formalism.proposalSeparationBar.toString() },
+            setValue = { s -> s.toDoubleOrNull()?.let { deps.config.formalism.proposalSeparationBar = it; true } ?: false },
             kind = SettingKind.NUMBER
         ),
         SettingItem(

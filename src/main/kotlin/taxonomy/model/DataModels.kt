@@ -10,18 +10,19 @@ object TextNormalizer {
 
 object QuestionIdRegistry {
     private val textToId = java.util.concurrent.ConcurrentHashMap<String, Int>()
+    private val fallbackCounter = java.util.concurrent.atomic.AtomicInteger(1_000_000_000)
 
     fun register(text: String, id: Int) {
         textToId[text] = id
-        textToId[TextNormalizer.cleanText(text)] = id
     }
 
-    fun lookup(text: String): Int? {
-        return textToId[text] ?: textToId[TextNormalizer.cleanText(text)]
+    fun lookup(text: String): Int {
+        return textToId.computeIfAbsent(text) { fallbackCounter.getAndIncrement() }
     }
 
     fun clear() {
         textToId.clear()
+        fallbackCounter.set(1_000_000_000)
     }
 }
 

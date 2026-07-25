@@ -74,7 +74,7 @@ object BatchTrickleEvaluator {
         
         for (leaf in leaves) {
             for (emb in leaf.queries) {
-                val queryKey = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                val queryKey = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                 val score = computeSimilarity(emb, leaf)
                 queryToLeaves.getOrPut(queryKey) { mutableListOf() }.add(leaf to score)
             }
@@ -101,7 +101,7 @@ object BatchTrickleEvaluator {
         for (leaf in leaves) {
             val countsDouble = HashMap<String, Double>()
             for (emb in leaf.queries) {
-                val queryKey = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                val queryKey = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                 val domain = textToDomain[emb.rawText] ?: continue
                 val weight = queryAssignments[queryKey]?.get(leaf.id) ?: 0.0
                 if (weight > 0.0) {
