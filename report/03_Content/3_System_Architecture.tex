@@ -32,8 +32,8 @@ this chapter.
 \textbf{Goal 1: Seed-guided geometric refinement.}
 Below the 14 immutable anchor nodes, sub-structure is induced
 exclusively from the geometric arrangement of query embeddings: no
-editorial label, ontology, or human annotation governs the splitting,
-merging, or cross-linking of internal and leaf nodes.
+editorial label, ontology, or human annotation governs the splitting or
+merging of internal and leaf nodes.
 Query membership across anchors is mutable: a query initially assigned
 to its MMLU-Pro label may migrate to a geometrically more appropriate
 anchor during iterative refinement (Section~\ref{subsec:migration}).
@@ -65,7 +65,7 @@ identified in Section~\ref{sec:llm-as-a-judge}.
 TaxoArena is an \textit{offline profiling system}.
 Its output is a set of per-leaf and per-anchor Bradley--Terry score
 vectors, one per evaluated model, organised by the nodes of the induced
-DAG.
+taxonomy.
 It does not implement a query router, a model cascade, or an inference
 dispatcher.
 The use of these profiles as input to a downstream routing system is
@@ -91,7 +91,7 @@ TaxoArena is structured as three subsystems connected by four
 persistent SQLite stores.
 The subsystems execute sequentially: the Embedding subsystem
 pre-computes all vector representations; the Taxonomy subsystem
-constructs the domain DAG from those representations within the
+constructs the domain taxonomy from those representations within the
 fixed anchor structure; the Arena subsystem evaluates models within
 the induced leaf nodes and aggregates scores upward to anchor level.
 The databases serve as interface artefacts between subsystems,
@@ -106,7 +106,7 @@ Figure 3.1 --- End-to-end data flow diagram (placeholder)\vspace{0.6cm}}}
 \caption{End-to-end data flow in TaxoArena.
 Upper lane: corpus queries are embedded, assigned to the 14 immutable
 anchor nodes by MMLU-Pro label, refined iteratively into a sub-domain
-DAG, and frozen as a snapshot.
+tree, and frozen as a snapshot.
 Lower lane: held-out queries are routed through the frozen snapshot,
 model responses are judged pairwise at each leaf, and Bradley--Terry
 sufficient statistics are aggregated upward to per-anchor rankings,
@@ -138,9 +138,9 @@ cross-domain migration may reassign queries during subsequent phases.
 
 \item \textbf{Iterative refinement.}
 The six-phase taxonomy loop runs within each anchor, inducing a
-sub-domain DAG by recursive vMF-based splitting and topological
+sub-domain tree by recursive vMF-based splitting and topological
 optimisation.
-When the iteration budget completes, the final DAG state is
+When the iteration budget completes, the final taxonomy state is
 serialised as an immutable snapshot to \texttt{snapshots.db}.
 
 \item \textbf{Held-out routing.}
@@ -199,7 +199,7 @@ Taxonomy
 & \texttt{TaxonomySplitter}
 & Propose and accept/reject splits via chance-corrected separation \\
 & \texttt{TaxonomyMerger}
-& Merge, prune, cross-link, transitive reduction \\
+& Merge, prune, dissolve single-child nodes \\
 \midrule
 Arena
 & \texttt{BenchmarkService}
@@ -219,7 +219,7 @@ Storage
 & \texttt{embeddings\_cache.db}
 & MRL vectors keyed by query identifier \\
 & \texttt{snapshots.db}
-& Serialised DAG snapshots with version metadata \\
+& Serialised taxonomy snapshots with version metadata \\
 & \texttt{ratings.db}
 & BT state, verdict records, aggregated domain rankings \\
 & \texttt{mmlu\_pro\_dataset\_cache\_v2.db}
@@ -242,33 +242,33 @@ the \textit{canonical}, editorial one---the basis of the
 geometry-correction research question (RQ2, Chapter~\ref{ch:results}).
 
 \texttt{TaxonomyEngine} then executes a six-phase loop over the whole
-DAG for a fixed iteration budget: (1)~embedding-slice extraction and
+taxonomy for a fixed iteration budget: (1)~embedding-slice extraction and
 re-normalisation, (2)~vMF/NiW model fitting per node, (3)~soft
 trickle-routing of queries to children (skipped in iteration~1 as
 described above), (4)~adaptive splitting of nodes whose proposed
 partition clears the chance-corrected separation threshold and
 remains sustainable under routed re-assignment, (5)~topological
-optimisation (sibling fusion, starved-leaf handling, dissolution of
-structurally redundant single-child nodes, and residual-driven
-cross-link insertion), and
+optimisation (sibling fusion, starved-leaf handling, and dissolution of
+structurally redundant single-child nodes), and
 (6)~a convergence check that measures the graph edit distance to the
-preceding iteration's DAG and either triggers the next iteration,
+preceding iteration's structure and either triggers the next iteration,
 stops early once the structure has been quiescent for five consecutive
-iterations, or freezes the DAG when the budget is exhausted.
+iterations, or freezes the taxonomy when the budget is exhausted.
 Every structural edit in phases~4 and~5 is applied as a measured
 proposal: the edit is executed tentatively, all queries are re-routed
-through the modified DAG, and the edit is committed only if a single
-global separation objective does not degrade
-(Appendix~\ref{app:dag-formalism}); splits must not lower it, growth
-edits such as cross-links must strictly improve it, and shrink edits
-may not damage it beyond a small hysteresis.
-No editorial label, ontology, or human annotation governs splitting,
-merging, or cross-linking below the anchor level: all sub-anchor
+through the modified structure, and the edit is committed only if a
+single global separation objective does not degrade
+(Appendix~\ref{app:dag-formalism}); splits must not lower it, and
+shrink edits may not damage it beyond a small hysteresis.
+Each operator preserves the single-parent invariant, so every
+iteration maps a tree to a tree.
+No editorial label, ontology, or human annotation governs splitting or
+merging below the anchor level: all sub-anchor
 structure is induced purely from the geometric arrangement of query
 embeddings.
 When construction terminates---by early stopping or budget
 exhaustion---\texttt{TaxonomyEngine}
-serialises the resulting DAG to \texttt{snapshots.db} as an immutable
+serialises the resulting taxonomy to \texttt{snapshots.db} as an immutable
 snapshot (Section~\ref{sec:arch-dag}); the Arena subsystem
 (Section~\ref{sec:arch-arena}) reads exclusively from this frozen
 structure, so no arena run can alter the taxonomy it evaluates
@@ -281,20 +281,21 @@ score with its global proposal gate, the three-criterion trickle
 routing, and the topology operators---is given in
 Appendix~\ref{app:dag-formalism}.
 
-\section{Taxonomy DAG Data Model}\label{sec:arch-dag}
+\section{Taxonomy Data Model}\label{sec:arch-dag}
 
 Every node in the taxonomy is represented as a \texttt{GraphNode}
 object persisted to \texttt{snapshots.db}
 (principal fields: \texttt{id}, \texttt{label},
-\texttt{originalCategory}, \texttt{depth}, tree \texttt{children},
-\texttt{crossLinkChildren}, \texttt{parents}, soft
+\texttt{originalCategory}, \texttt{depth}, \texttt{children},
+\texttt{parents}, soft
 \texttt{queryWeights}, the vMF self-model
 $(\boldsymbol{\mu}, \kappa)$ with its log-normaliser, the diagonal NiW
 posterior $(m_N, \kappa_N, \nu_N, \Lambda_N)$, and residual-query
-bookkeeping); the fixed-embedding-dimension and
-polyhierarchy/cross-link mechanics
-that shape this data model are given in
-Appendix~\ref{app:dag-formalism}.
+bookkeeping).
+Every node other than the root holds exactly one parent, so the
+persisted structure is a rooted tree; the
+fixed-embedding-dimension and routing mechanics that shape this data
+model are given in Appendix~\ref{app:dag-formalism}.
 The two properties below---node typing and snapshot
 immutability---are kept here because the arena subsystem
 (Section~\ref{sec:arch-arena}) depends on both directly: leaves are
@@ -323,42 +324,41 @@ queries retained at that node, with full weight and a residual flag,
 because the descent gate found them unexplained by the node's
 sub-structure.
 Residual pools are measured (they are cells of the global separation
-objective), remain routable destinations, can be carved into new
-children by the splitter, and drive cross-link generation
-(Appendix~\ref{app:dag-formalism}); they are a measurement of central
-or cross-domain mass, not a failure mode.
+objective), remain routable destinations, and can be carved into new
+children by the splitter; they are a measurement of central mass, not
+a failure mode.
 
 \item \textbf{Leaf.}
-A node with no outgoing edges---tree or cross-link---after the final
-iteration; the number of \emph{parents} is irrelevant, so a
-cross-linked leaf with two parents remains a leaf.
+A node with no children after the final iteration.
 Carries a vMF self-model and NiW posterior; its member set forms
 the query pool for arena evaluation.
+A leaf may hold queries that are also counted at other leaves, since
+routing assigns weighted membership to every destination a query
+reaches (Section~\ref{sec:arch-arena}).
 \end{itemize}
 
 Figure~\ref{fig:dag-excerpt} illustrates these node types on a real
-excerpt of the induced DAG, centred on an accepted cross-link bridge.
+excerpt of the induced taxonomy.
 
 \begin{figure}[h]
 \centering
 \fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
-Figure 3.2 --- Induced-DAG excerpt with a cross-link bridge (placeholder)\\
-\footnotesize Subgraph of $\sim$12--18 nodes: root, the two anchor domains of an accepted bridge, and their descendants down to the bridged node with two parents; data: final iteration of \texttt{dag\_snapshots.jsonl} plus \texttt{bridge\_candidates.csv}.\vspace{0.6cm}}}
-\caption{Excerpt of the induced DAG around an accepted cross-link
-bridge. The subgraph shows the root, the two anchor domains joined by
-the bridge, and their descendants down to the bridged node with two
-parents; tree edges are drawn solid, the cross-link edge dashed and
-annotated with its captured-residual count, and each node reports its
-label, query count, and residual count from the final construction
-iteration. All identifiers and counts are taken from the canonical
-seed-42 snapshot; elided branches are marked with ellipses.}
+Figure 3.2 --- Induced-taxonomy excerpt (placeholder)\\
+\footnotesize Subgraph of $\sim$12--18 nodes: root, two anchor domains, and their descendants down to leaf level, including one internal node carrying a residual pool; data: final iteration of \texttt{dag\_snapshots.jsonl}.\vspace{0.6cm}}}
+\caption{Excerpt of the induced taxonomy showing the three node types.
+The subgraph gives the root, two anchor domains, and their descendants
+down to leaf level, including one internal node that retains a
+residual pool. Each node reports its label, query count, and residual
+count from the final construction iteration. All identifiers and
+counts are taken from the canonical seed-42 snapshot; elided branches
+are marked with ellipses.}
 \label{fig:dag-excerpt}
 \end{figure}
 
 \subsection*{Snapshot Immutability}
 
 When construction completes, \texttt{TaxonomyEngine}
-serialises the current DAG to \texttt{snapshots.db} and sets an
+serialises the current taxonomy to \texttt{snapshots.db} and sets an
 \texttt{isFrozen} flag on the snapshot record.
 A frozen snapshot is read-only: no subsequent taxonomy operation may
 modify its nodes or edges.
@@ -377,7 +377,7 @@ The arena subsystem is initialised from a frozen snapshot identified
 by a \texttt{snapshotId} and a specified set of evaluated models
 $\mathcal{M} = \{m_1, \ldots, m_M\}$.
 On startup, \texttt{BenchmarkService} routes the reserved held-out
-query set through the frozen DAG by the same trickle as construction,
+query set through the frozen taxonomy by the same trickle as construction,
 applied read-only and capped at \texttt{maxLeafAssignments} leaves per
 query (Appendix~\ref{app:dag-formalism}).
 The resulting per-leaf query pools $\{Q_L\}_{L \in \mathcal{L}}$ are
@@ -504,7 +504,7 @@ logical comparisons and marks the run \texttt{escaped = true}.
 \subsection{Upward Score Aggregation to Anchor Domains}\label{subsec:aggregation}
 
 After the arena run is complete, per-leaf verdict statistics are
-propagated upward through the DAG to produce coherent rankings at
+propagated upward through the tree to produce coherent rankings at
 every level of the taxonomy: leaf, sub-domain, anchor domain, and root.
 To produce a ranking at an ancestor node, the procedure pools the
 win- and comparison-count matrices of all descendant leaves and refits
@@ -550,7 +550,7 @@ procedure: the rubric is informed by what correct responses look like
 in the domain, but not by the specific queries on which models will be
 judged (Section~\ref{sec:exp-info-separation}).
 The generated rubrics are stored in \texttt{snapshots.db} alongside
-the frozen DAG, so that every arena run on a given snapshot uses
+the frozen taxonomy, so that every arena run on a given snapshot uses
 identical guidelines regardless of when it is executed.
 
 Each judge call receives a prompt structured as four sequential
@@ -587,13 +587,13 @@ truth for all downstream slice operations.
 \texttt{mmlu\_pro\_dataset\_cache\_v2.db} stores the MMLU-Pro corpus
 and the per-model ground-truth evaluations that serve as the
 post-hoc validation oracle.
-\texttt{snapshots.db} accumulates frozen DAG snapshots, each
+\texttt{snapshots.db} accumulates frozen taxonomy snapshots, each
 identified by a \texttt{snapshotId} UUID; only frozen snapshots are
 eligible as arena inputs.
 \texttt{ratings.db} is append-only during an arena run and records every
 verdict, the per-round BT estimates, and run-level metadata;
 the \texttt{snapshotId} foreign key in every record allows the exact
-DAG under which a verdict was produced to be recovered unambiguously.
+taxonomy under which a verdict was produced to be recovered unambiguously.
 
 Any result is fully specified by the reproducibility tuple
 \texttt{(corpusVersion, snapshotId, runId)}: given these stores

@@ -1,10 +1,10 @@
-\chapter{DAG Construction Formalism}\label{app:dag-formalism}
+\chapter{Taxonomy Construction Formalism}\label{app:dag-formalism}
 
 This appendix gives the full architectural and mathematical detail
 behind the taxonomy construction pipeline summarised in
 Section~\ref{sec:arch-taxonomy} (Chapter~\ref{ch:system-architecture})
 and Section~\ref{sec:meth-construction-summary}
-(Chapter~\ref{ch:methodology}). The DAG construction pipeline is a
+(Chapter~\ref{ch:methodology}). The construction pipeline is a
 necessary prerequisite that the arena evaluation runs on, not the
 thesis's own headline contribution; this appendix exists so the exact
 mechanics are preserved and traceable without requiring the reader to
@@ -48,10 +48,9 @@ membership rather than the editorial label.
 \subsection{Iterative Six-Phase Refinement Loop}
 
 After anchor initialisation, \texttt{TaxonomyEngine} executes a
-six-phase loop over the whole DAG (the loop is global: splitting
-proceeds per depth across all branches, and the cross-link operator
-of Section~\ref{subsec:polyhierarchy} spans anchors by
-construction).
+six-phase loop over the whole taxonomy (the loop is global: splitting
+proceeds per depth across all branches, and queries may migrate
+between anchors at every iteration, Section~\ref{subsec:migration}).
 The loop runs for a fixed iteration budget, with completion semantics
 defined in Section~\ref{subsec:quiescence}.
 Table~\ref{tab:pipeline} summarises the phases.
@@ -80,7 +79,7 @@ NiW hyperparameters $(m_N, \kappa_N, \nu_N, \Lambda_N)$ \\
 5 & Topological optimisation (proposal-gated)
 & \texttt{TaxonomyMerger}
 & Fused siblings; pruned starved leaves;
-cross-links; transitive reduction \\
+dissolved sole children \\
 6 & Convergence check
 & \texttt{TaxonomyEngine}
 & GED quiescence streak; early stop or next iteration \\
@@ -103,7 +102,7 @@ direction includes them.
 Statistical detail is given in Section~\ref{sec:meth-vmf}.
 
 \textbf{Phase 3 --- Trickle routing.}
-\texttt{TaxonomyTrickler} routes each query down the DAG under three
+\texttt{TaxonomyTrickler} routes each query down the tree under three
 separated criteria---a parameter-free descent-versus-residual gate,
 direction-only sibling competition with a cosine beam, and a final
 per-query membership-share floor
@@ -122,8 +121,8 @@ vMF-EM clustering in a PCA-projected subspace; a proposal must pass
 the local gates of Section~\ref{sec:meth-split}
 (chance-corrected separation, routed sustainability, sibling
 distinctness) and is then committed only if the measured global
-objective does not degrade ($\Delta J > 0$;
-Section~\ref{sec:meth-proposal-gate}).
+objective improves beyond the neutrality band
+($\Delta J > \tau$; Section~\ref{sec:meth-proposal-gate}).
 
 \textbf{Phase 5 --- Topological optimisation.}
 \texttt{TaxonomyMerger} executes a sequence of anchor-exempt
@@ -132,18 +131,18 @@ under the gate of Section~\ref{sec:meth-proposal-gate}:
 starved-leaf handling (a three-way choice between keeping the leaf,
 absorbing it into its parent, and fusing it into its nearest
 sibling, decided by measured $J$); fusion of insufficiently separated
-siblings; fusion of near-duplicate non-siblings; dissolution of
-structurally redundant sole children; and insertion of
-polyhierarchical cross-link edges generated from residual pools
-(Section~\ref{subsec:polyhierarchy}); followed by transitive
-reduction to maintain the minimal DAG.
+siblings; fusion of near-duplicate pairs that share a parent; and
+dissolution of structurally redundant sole children.
+Every one of these operators preserves the single-parent invariant
+(Section~\ref{subsec:polyhierarchy}), so each iteration maps a tree to
+a tree.
 
 \textbf{Phase 6 --- Convergence check.}
 At the end of each iteration, \texttt{TaxonomyEngine} computes the
-graph edit distance to the preceding iteration's DAG and either stops
-construction early once the structure has been quiescent for five
+graph edit distance to the preceding iteration's structure and either
+stops construction early once the structure has been quiescent for five
 consecutive iterations, triggers the next iteration, or, when the
-budget is exhausted, serialises the DAG as an immutable snapshot
+budget is exhausted, serialises the taxonomy as an immutable snapshot
 (Section~\ref{subsec:quiescence}).
 
 \subsection{Cross-Domain Migration}\label{subsec:migration}\label{sec:meth-migration}
@@ -200,11 +199,9 @@ specified in Chapter~\ref{ch:experimental-design}), and a structural
 early-stopping gate---enabled in the canonical configuration
 (\texttt{enableEarlyStopping})---can terminate it earlier.
 At the end of each iteration, the \texttt{TaxonomyStabilizer} counts
-the structural edits between the current DAG $\mathcal{G}^{(t)}$ and
-the preceding iteration's $\mathcal{G}^{(t-1)}$: node additions and
-deletions plus edge additions and deletions, where cross-link edges
-count exactly like tree edges---so an oscillating polyhierarchy edge
-breaks quiescence just as tree churn does.
+the structural edits between the current taxonomy $\mathcal{G}^{(t)}$
+and the preceding iteration's $\mathcal{G}^{(t-1)}$: node additions and
+deletions plus edge additions and deletions.
 After a minimum iteration count (proportional to the number of
 domains, floored at $5$), an iteration counts as quiescent when this
 edit count is zero; construction stops early once five consecutive
@@ -222,8 +219,8 @@ initialisation is seeded from the problem shape, node identifiers are
 monotonic counters (hash-set traversal and proposal-enumeration
 orders therefore repeat exactly), and order-sensitive floating-point
 aggregations iterate their inputs in sorted order.
-Two runs at the same seed produce structurally identical DAGs (same
-nodes, edges, and populations), which makes cross-configuration
+Two runs at the same seed produce structurally identical taxonomies
+(same nodes, edges, and populations), which makes cross-configuration
 comparisons exact.
 
 \subsection{Residual Retention}\label{subsec:residuals}
@@ -243,8 +240,7 @@ pool is a cell of the global objective $J$,
 Section~\ref{sec:meth-proposal-gate}), routable (a pool node is an
 admissible destination for later walks), recoverable (a coherent pool
 can be carved into new children by the splitter,
-Section~\ref{sec:meth-split}), and they are the generation signal for
-the cross-link operator (Section~\ref{subsec:polyhierarchy}).
+Section~\ref{sec:meth-split}).
 Residual mass is therefore an explicit measurement of
 central or cross-domain content that the current structure does not
 yet explain, rather than a failure mode.
@@ -358,7 +354,7 @@ predictive density are given in Appendix~\ref{app:numerics}; in the
 current implementation the stored posterior serves diagnostic roles
 (notably the leaf log-semantic-volume convergence diagnostic of
 Section~\ref{subsec:quiescence}), while all routing, migration, and
-cross-link decisions operate on the vMF geometry of
+topology decisions operate on the vMF geometry of
 Section~\ref{sec:meth-routing}.
 Node centroids are refit directly to the fresh weighted MLE each
 iteration, subject to a no-update band that freezes a node's centroid
@@ -389,12 +385,17 @@ discriminability of fine-grained sub-topic splits, but the vMF
 concentration estimate degrades as $d/N$ grows
 (Section~\ref{sec:meth-vmf}); at $d = 256$ the fully prior-dominated
 regime ($d/N > 10$) is crossed only below $N \approx
-26$, and the $n_{\min} = 50$ floor keeps every fitted leaf above
-that---though a minimum-size leaf still sits on the empirical-Bayes
-blend ramp ($\alpha \approx 0.39$), i.e.\ partially prior-anchored.
+26$, and the $n_{\min} = 30$ floor keeps every fitted leaf above
+that.
+A minimum-size leaf nevertheless sits high on the empirical-Bayes
+blend ramp: at $N = 30$, $\rho = d/N \approx 8.5$ gives
+$\alpha = (\rho - 2)/8 \approx 0.82$, so its concentration estimate is
+largely parent-anchored rather than fit from its own scatter.
+This is a direct cost of the small-leaf setting, and it is why leaf
+size is a calibrated parameter rather than a free one.
 Fixing a single dimension additionally means all nodes---across all
-depths---live on the same unit hypersphere, so sibling-fusion,
-dissolution, and cross-link comparisons require no cross-depth
+depths---live on the same unit hypersphere, so sibling-fusion and
+dissolution comparisons require no cross-depth
 down-projection.
 The coarse-to-fine property of MRL is exploited not by widening the
 slice with depth but by the recursive structure itself: shallow nodes
@@ -420,9 +421,8 @@ quality-stable operating point rather than a fragile one.
 Routing separates three decisions that a single absolute floor
 previously conflated: whether to descend at all, which siblings
 compete, and which reached destinations count as memberships.
-At an internal node $v$, the competition set is
-$K(v) = C(v) \cup X(v)$---tree children and cross-link children
-compete identically (Section~\ref{subsec:polyhierarchy}).
+At an internal node $v$, the competition set $K(v) = C(v)$ is the
+node's children.
 
 \textbf{(i) Descent-versus-residual gate.}
 The walk descends from $v$ for query $\mathbf{x}$ iff
@@ -589,10 +589,11 @@ guaranteed by stages 1--3, so the global check is a veto rather than
 an additional toll.
 \end{enumerate}
 The recursion depth is hard-capped at $D_{\max}$.
-The threshold $\epsilon_{\text{sep}}$ has no closed-form optimum and
+The threshold $\epsilon_{\text{sep}}$ (\texttt{proposalSeparationBar})
+has no closed-form optimum and
 trades over-splitting against under-splitting; its canonical value is
-$\epsilon_{\text{sep}} = 0.01$, subject to final calibration.
-% TODO(calibration): finalize once DAG construction is frozen
+$\epsilon_{\text{sep}} = 0.02$, subject to final calibration.
+% TODO(calibration): finalize once taxonomy construction is frozen
 The \emph{same} score at the \emph{same} $\epsilon_{\text{sep}}$
 also gates sibling fusion, sibling distinctness, and residual-split
 viability, unifying these decisions under a single dimensionless
@@ -600,8 +601,8 @@ separability scale.
 
 \section{The Proposal Gate}\label{sec:meth-proposal-gate}
 
-Every structural edit---split, fusion, prune, dissolution, and
-cross-link---is applied as a \emph{measured proposal} rather than by
+Every structural edit---split, fusion, prune, and dissolution---is
+applied as a \emph{measured proposal} rather than by
 its local rule alone.
 The gate operates on a global objective $J$: the chance-corrected
 separation score of Section~\ref{sec:meth-split} lifted to the whole
@@ -610,61 +611,46 @@ cell per internal node's residual pool, so that residual mass is
 measured rather than ignored.
 
 The proposal procedure is:
-snapshot the DAG state (topology including cross-links, node
+snapshot the current state (topology, node
 parameters, and assignments); apply the candidate edit tentatively;
 recompute descent-gate statistics; clear and fully re-route every
-query through the modified DAG; measure $J' = J(\mathcal{G}')$; and
-commit iff
+query through the modified taxonomy; measure $J' = J(\mathcal{G}')$; and
+commit under a lexicographic rule on $(J, -|V|)$, where $|V|$ is the
+node count:
 \[
-\Delta J = J' - J \;>\; \theta \cdot \pi_S,
+\text{accept}
+\iff
+\Delta J > \tau
+\quad\text{or}\quad
+\bigl( |\Delta J| \leq \tau \;\wedge\; \Delta |V| < 0 \bigr),
 \qquad
-\pi_S = \frac{n_S (n_S - 1)}{\sum_{\text{cells}} n_c (n_c - 1)}
-\;\; (\text{capped at } 1),
+\Delta J = J' - J .
 \]
-where $S$ is the proposal site and $\pi_S$ its share of all
-within-cell pairs, so that the bar scales with the mass the edit can
-actually move; otherwise the snapshot is restored.
-The sign of $\theta$ encodes the edit's direction:
+Otherwise the snapshot is restored.
+An edit is therefore taken when it strictly improves the global
+objective, or when it leaves the objective unchanged and strictly
+simplifies the structure.
+The tolerance $\tau$ (\texttt{tau}, canonical $10^{-6}$) is a
+neutrality band, not a quality bar: each edit's own quality gate---the
+separation score for splits, the similarity pre-filter for
+fusions---has already been applied upstream, so the gate does not
+charge a second, edit-type-specific toll for the same question.
+The rule is uniform across edit types, which is what makes accept and
+reject decisions comparable between splits and shrink edits.
 
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-Edit & $\theta$ & Semantics \\
-\midrule
-Split & $0$ &
-Veto only: local gates (Section~\ref{sec:meth-split}) already
-certify quality; \\
-& & the global check rejects degradation.
-A positive toll double-charges \\
-& & the same question through a diluted lens, because global $J$
-gains \\
-& & from refining an already-tight region are far smaller than the \\
-& & local separation indicates. \\
-Cross-link & $+\epsilon_{\text{sep}}$, site $=$ target &
-Growth must strictly improve $J$ beyond noise, scaled to \\
-& & the mass the new edge can move. \\
-Prune / fusion / dissolution & $-\epsilon_{\text{sep}}$ &
-Shrink edits simplify the graph; accepted unless they \emph{hurt}
-\\
-& & $J$ beyond a small hysteresis. \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-Figure~\ref{fig:proposal-gate-flow} summarises this procedure and the
-three threshold rows as a single flowchart.
+Figure~\ref{fig:proposal-gate-flow} summarises this procedure as a
+single flowchart.
 
 \begin{figure}[h]
 \centering
 \fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
 Figure E.1 --- Proposal-gate flow diagram (placeholder)\\
-\footnotesize Compact flowchart: snapshot $\rightarrow$ tentative apply $\rightarrow$ no-edge early exit $\rightarrow$ re-route $\rightarrow$ $\Delta J$ vs.\ $\theta \cdot \pi_S$ $\rightarrow$ commit/restore, with the three $\theta$ rows as an embedded mini-table; structural, no run data required.\vspace{0.6cm}}}
+\footnotesize Compact flowchart: snapshot $\rightarrow$ tentative apply $\rightarrow$ no-edge early exit $\rightarrow$ re-route $\rightarrow$ lexicographic $(\Delta J, \Delta|V|)$ test $\rightarrow$ commit/restore; structural, no run data required.\vspace{0.6cm}}}
 \caption{Proposal-gate flowchart. The candidate-edit path runs from
-DAG snapshot through tentative application, the no-edge early exit,
-full re-routing of every query, and the $\Delta J$ versus
-$\theta \cdot \pi_S$ comparison to commit or restore, with the three
-edit-type thresholds (split $0$, cross-link $+\epsilon_{\text{sep}}$,
-shrink $-\epsilon_{\text{sep}}$) shown as an embedded mini-table.}
+snapshot through tentative application, the no-edge early exit,
+full re-routing of every query, and the lexicographic
+$(\Delta J, \Delta |V|)$ test against the neutrality band $\tau$, to
+commit or restore.}
 \label{fig:proposal-gate-flow}
 \end{figure}
 
@@ -675,15 +661,15 @@ measured decision boundary on the canonical run's proposals.
 \centering
 \fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
 Figure E.2 --- Proposal-gate accept/reject scatter (placeholder)\\
-\footnotesize Scatter of the 187 logged proposals from the canonical seed-42 run: $\pi_S$ vs.\ $\Delta J$ (log-symmetric y-axis), marker shape by edit type, fill by acceptance, per-type effective threshold lines; data: \texttt{headless\_run.log} proposal lines.\vspace{0.6cm}}}
+\footnotesize Scatter of the logged proposals from the canonical seed-42 run: $\Delta |V|$ vs.\ $\Delta J$ (log-symmetric x-axis), marker shape by edit type, fill by acceptance, neutrality band $\tau$ shaded; data: \texttt{headless\_run.log} proposal lines.\vspace{0.6cm}}}
 \caption{Accepted and rejected structural proposals under the gate.
 Each proposal from the canonical seed-42 construction log is plotted
-at its site mass share $\pi_S$ and measured $\Delta J$ (symmetric log
-scale), with marker shape encoding the edit type (split, cross-link,
-shrink) and fill encoding acceptance; the effective threshold
-$\theta \cdot \pi_S$ is drawn per edit type. Rejected cross-links
-lying close to their threshold line illustrate the mass-scaled bar in
-operation.}
+at its measured $\Delta J$ (symmetric log scale) and node-count change
+$\Delta |V|$, with marker shape encoding the edit type (split, fusion,
+prune, dissolution) and fill encoding acceptance; the neutrality band
+$|\Delta J| \leq \tau$ is shaded, so the edits admitted purely for
+simplifying the structure are the ones inside the band with
+$\Delta |V| < 0$.}
 \label{fig:proposal-gate-scatter}
 \end{figure}
 
@@ -692,90 +678,99 @@ Sole-child dissolution needs no separate justification: a parent's
 only tree child separates nothing (the score of
 Section~\ref{sec:meth-split} is identically $0$ at $k = 1$), and the
 gate confirms empirically that removing it does not degrade $J$;
-children with multiple parents and top-level nodes are exempt.
+top-level nodes are exempt.
 Starved-leaf handling (a leaf whose branch falls below $n_{\min}$,
 the same floor that gates birth) is a three-way choice---keep,
 absorb into parent, or fuse into the nearest sibling---decided by
 whichever option measures best under the gate, not by a fixed rule.
 
-\section{Polyhierarchy: the Cross-Link Operator}\label{subsec:polyhierarchy}\label{sec:meth-topology}
+\section{Polyhierarchy: a Measured Negative Result}\label{subsec:polyhierarchy}\label{sec:meth-topology}\label{sec:poly-negative}
 
-The DAG structure---as distinct from a tree---arises from
-node-level topology edits, not from query multi-assignment:
-construction-time routing is weighted multi-membership
+The construction produces a strict tree: every node below the root has
+exactly one parent.
+An earlier version of the pipeline admitted polyhierarchy through a
+dedicated operator. This section records that operator, the evidence
+that retired it, and the invariant that replaced it.
+
+Two claims have to be kept apart.
+Construction-time routing is weighted multi-membership
 (Section~\ref{sec:meth-routing}), which lets a \emph{query} belong to
-several leaves, whereas polyhierarchy lets a \emph{concept} belong to
-several branches.
-The two claims are kept distinct throughout the thesis.
+several leaves.
+Polyhierarchy is a different claim: it lets a \emph{concept} belong to
+several branches, through node-level topology edits.
+The first is retained; the second is not.
 
-Two mechanisms produce multi-parent nodes.
-\textbf{Fusion} is a shrink edit: when two nodes are insufficiently
-separated (siblings below $\epsilon_{\text{sep}}$ on branch
-statistics) or near-duplicates across branches (mean-direction cosine
-above \texttt{fusionSimilarityThreshold}, a cheap pre-filter with the
-proposal gate as the judge), one identity is destroyed and its
-queries, parameters, and edges are folded into the survivor.
-Parent edges are redirected \emph{type-preservingly}---a cross-link
-parent of the dead node keeps a cross-link edge to the survivor---so
-fusion can leave multi-parent nodes behind as a side effect.
-\textbf{Cross-linking} is the intended polyhierarchy operator and a
-growth edit: an existing node $n$ gains a second parent $h$ because
-$h$'s residual pool demonstrably fits $n$.
-A genuinely cross-domain query (a biostatistics question between
-Mathematics and Biology) can, under a strict tree, only pick one
-branch, fail to specialise there, and residualise at the domain
-anchor; the cross-link gives it a legitimate second path.
-
-\textbf{Candidate generation.}
-For each host $h$ (an internal node whose residual pool holds at
-least \texttt{secondaryMassFloor} queries), each candidate $n$ is
-scored by how many of $h$'s residuals it \emph{captures}, where
-capture applies the runtime descent gate itself:
+\textbf{The operator that was tested.}
+A cross-link was a growth edit: an existing node $n$ gained a second
+parent $h$ when $h$'s residual pool demonstrably fitted $n$.
+The motivating case is a genuinely cross-domain query---a
+biostatistics question between Mathematics and Biology---which under a
+strict tree can only pick one branch, fail to specialise there, and
+residualise at the domain anchor.
+Candidates were scored by how many of $h$'s residuals they
+\emph{captured}, with capture applying the runtime descent gate itself:
 \[
 \hat{\boldsymbol{\mu}}_n^\top \mathbf{x}
 \;\geq\;
 (\bar{r}_h - \delta)\,
 \hat{\boldsymbol{\mu}}_h^\top \mathbf{x}.
 \]
-``Captured'' therefore means ``will actually descend at $h$ once the
+``Captured'' therefore meant ``will actually descend at $h$ once the
 edge exists,'' not proxy similarity.
-A candidate survives iff it captures at least
-\texttt{secondaryMassFloor} queries \emph{and} at least a fraction
-\texttt{bridgeSupportRelFraction} of the host's pool; the top three
-candidates per host proceed to the proposal gate.
+Guards required acyclicity, no grandparent or redundant edges, and
+disjoint top-level anchors for $h$ and $n$.
+Acceptance used the proposal gate with the growth-side threshold and
+the \emph{target} as the site, $\Delta J > \epsilon_{\text{sep}} \cdot
+\pi_n$, so that the threshold scaled with the mass the new edge could
+actually move.
 
-\textbf{Guards.}
-Before any proposal: acyclicity ($n$ must not be an ancestor of
-$h$); no redundant or grandparent edges ($h$ must not be an ancestor
-or descendant of $n$ or of any existing parent of $n$); and a
-cross-domain requirement ($h$ and $n$ must lie under disjoint
-top-level anchors---the operator means ``concept shared across
-domains,'' and the intra-branch case is what transitive reduction
-exists to remove).
-Guards are re-checked against a rebuilt ancestor map after every
-acceptance.
+\textbf{What the measurements showed.}
+Across 42 cross-link proposals on the canonical corpus, the capture
+fraction $f$ that the operator uses to rank candidates was
+uncorrelated with the objective it must satisfy: $r(f, \Delta J) =
++0.085$, with complete distributional overlap between accepted and
+rejected proposals (median $f$ of $0.802$ accepted against $0.818$
+rejected).
+The effect sizes were an order of magnitude apart: median $\Delta J$
+was $6.9 \times 10^{-5}$ for cross-links against $5.3 \times 10^{-4}$
+for splits.
+Admission was therefore decided by evaluation order rather than by
+evidence, which the proposal sequence makes explicit: one node was
+accepted at four hosts and rejected at two, and acquired five parents
+by iteration~1.
 
-\textbf{Acceptance and interaction.}
-Acceptance is the proposal gate with the growth-side threshold and
-the \emph{target} as the site ($\Delta J >
-\epsilon_{\text{sep}} \cdot \pi_n$): the threshold scales with the
-mass the new edge can actually move, which is the target's cell plus
-the captured pool, not the host domain's much larger mass.
-An accepted cross-link makes $n$ a member of both branches: it joins
-$h$'s competition set for all subsequent routing
-(Section~\ref{sec:meth-routing}), its membership accumulates over
-both parent paths, and---because a leaf is defined by having no
-outgoing edges, irrespective of parent count---a cross-linked leaf
-remains a leaf, an arena unit, and a cell of $J$.
-Multi-parent nodes are exempt from sole-child dissolution, cross-link
-edges are counted by the convergence check exactly like tree edges
-(Section~\ref{subsec:quiescence}), and a transitive reduction sweep
-(which protects designated tree edges and bridge edges) maintains the
-minimal DAG.
+\textbf{Why a partition objective cannot decide this.}
+$J$ scores a partition of query mass into cells.
+Giving a node a second parent changes which paths reach its cell, but
+it leaves the cell contents almost unchanged, so $\Delta J$ carries
+little signal about whether the edge is semantically right.
+A partition-based objective is structurally indifferent to
+polyhierarchy, and no threshold on such an objective can separate good
+cross-links from bad ones.
+
+\textbf{The decision, and what it costs.}
+The operator was removed rather than retuned.
+The multi-membership claim survives that removal: the multi-leaf rate
+of held-out queries was $0.1549$ with cross-links and $0.1518$ without,
+so queries that legitimately span domains still reach several leaves
+through the routing beam and the membership floor.
+What is given up is the \emph{concept}-level claim, which the evidence
+above could not support in the first place.
+
+\textbf{The single-parent invariant.}
+Removing the generator is not by itself sufficient, because fusion also
+redirects parent edges: fusing two nodes that sit under different
+parents leaves the survivor holding both, which reintroduces
+multi-parent nodes with no cross-link operator present.
+Fusion proposals are therefore restricted to pairs sharing a parent,
+which makes every topology operator a map from a tree to a tree.
+The structural-integrity gates of Appendix~\ref{app:tuning-protocol}
+check the invariant directly by counting multi-parent nodes, which must
+be zero.
 
 Evaluation-time multi-leaf assignment of held-out queries---the same
 routing, applied read-only to the frozen snapshot and capped at
-\texttt{maxLeafAssignments}---is distinct from this node-level
-polyhierarchy: it does not modify the frozen DAG topology but
+\texttt{maxLeafAssignments}---is a separate mechanism: it does not
+modify the frozen topology but
 determines which leaves a given query contributes comparisons to
 during the arena run (Section~\ref{sec:arch-arena}).

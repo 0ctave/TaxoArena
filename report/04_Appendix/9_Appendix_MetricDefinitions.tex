@@ -70,17 +70,17 @@ hierarchy in which some domains decompose much further than others.
 
 \section{Average Match Count}\label{sec:app-metrics-avgmatch}
 
-In the polyhierarchical DAG (Section~\ref{sec:arch-dag}), a query can
+The taxonomy is a strict tree, but routing is weighted
+multi-membership (Section~\ref{sec:arch-dag}), so a query can
 be assigned to more than one leaf. Writing $\mathcal{L}(q)$ for the
 set of leaves query $q$ is assigned to,
 \[
 \text{AvgMatch} = \frac{1}{N} \sum_{i=1}^{N} |\mathcal{L}(q_i)|.
 \]
-$\text{AvgMatch} = 1.0$ means the taxonomy behaves as a strict tree
-for routing purposes; $\text{AvgMatch} > 1.0$ confirms that
-soft-routing and bridge insertion (Appendix~\ref{app:dag-formalism},
-\S\ref{sec:meth-topology})
-are actively producing multi-membership.
+$\text{AvgMatch} = 1.0$ means routing resolves every query to a single
+leaf; $\text{AvgMatch} > 1.0$ measures how much multi-membership the
+routing beam and the membership floor actually produce
+(Appendix~\ref{app:dag-formalism}, \S\ref{sec:meth-routing}).
 
 \section{Weighted Leaf Purity}\label{sec:app-metrics-wlp}
 
@@ -95,25 +95,23 @@ function $\text{gt}(\cdot)$,
 \text{WLP} = \sum_{\ell \in \text{Leaves}} \frac{|Q_\ell|}{N} \, \text{purity}(\ell).
 \]
 Because WLP flat-tests each leaf directly rather than through a
-DAG lowest-common-ancestor traversal, it is a useful complement to
+lowest-common-ancestor traversal, it is a useful complement to
 the LCA-sensitive Dendrogram Purity of
 Section~\ref{sec:app-metrics-dendrogram-purity}.
 
-\section{DAG Dendrogram Purity}\label{sec:app-metrics-dendrogram-purity}
+\section{Dendrogram Purity}\label{sec:app-metrics-dendrogram-purity}
 
-Standard dendrogram purity is defined over a tree, where the lowest
-common ancestor (LCA) of two leaves is unique. In a DAG, a node can
-have more than one parent (Appendix~\ref{app:dag-formalism},
-\S\ref{sec:meth-topology}), so the
-LCA of two queries is not in general unique. The implementation
-resolves this with the \emph{shallowest} LCA taken over the full
-DAG (a conservative bound), but tests subtree purity only over the
-tree-skeleton (primary-edge) structure---cross-links are followed
-when locating the common ancestor but not when enumerating the
-purity-test subtree's members. This hybrid avoids the metric
-collapsing toward its floor value under heavy cross-linking. Because
-the shallowest-LCA convention means same-label queries split across
-distant subtrees still resolve to a high, impure ancestor, Dendrogram
+Dendrogram purity is defined over a tree, where the lowest
+common ancestor (LCA) of two leaves is unique.
+Because the induced taxonomy is a strict tree
+(Appendix~\ref{app:dag-formalism}, \S\ref{sec:poly-negative}), the
+metric takes its standard form here.
+The implementation retains the more general \emph{shallowest}-LCA
+convention, which coincides with the unique LCA whenever every node
+has one parent, so no reconciliation between the two is required in
+the reported runs.
+Because a same-label pair split across distant subtrees resolves to a
+high and therefore impure ancestor, Dendrogram
 Purity should be read alongside the flat Weighted Leaf Purity of
 Section~\ref{sec:app-metrics-wlp}, which is insensitive to LCA
 placement.

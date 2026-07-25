@@ -49,9 +49,10 @@ The anchor set $\mathcal{A} = \{D_1, \ldots, D_{14}\}$ is in
 one-to-one correspondence with the 14 MMLU-Pro domains; each anchor
 is a top-level node from which the pipeline induces a sub-structure of
 internal nodes and leaves $\mathcal{L}(D_k)$, with full leaf set
-$\mathcal{L} = \bigcup_k \mathcal{L}(D_k)$ (a cross-linked leaf with
-parents under two anchors belongs to $\mathcal{L}(D_k)$ of its
-designated tree parent).
+$\mathcal{L} = \bigcup_k \mathcal{L}(D_k)$.
+Because every node has exactly one parent, the sets
+$\mathcal{L}(D_k)$ partition $\mathcal{L}$: each leaf belongs to
+exactly one anchor.
 The membership map $\hat{D}(q_i)$ assigns each query to the anchor of
 its primary leaf after construction.
 
@@ -88,16 +89,17 @@ proposals must clear a chance-corrected separation threshold and
 remain sustainable under routed re-assignment, followed by a
 topological-optimisation pass that fuses insufficiently separated
 siblings (under the same score), resolves starved leaves by a
-measured three-way choice, dissolves structurally redundant
-single-child nodes, and inserts polyhierarchical cross-links
-generated from residual pools.
+measured three-way choice, and dissolves structurally redundant
+single-child nodes.
+Sibling fusion is restricted to nodes sharing a parent, which is what
+keeps each operator a tree-to-tree map.
 Every one of these structural edits is committed only after a
 global check: the edit is applied tentatively, all queries are
 re-routed, and a single corpus-wide separation objective must not
-degrade (splits), must strictly improve (cross-links), or must not
+degrade (splits) or must not
 be damaged beyond a small hysteresis (shrink edits).
 Both at construction time and for held-out queries, a query trickles
-down the DAG under three separated criteria: a parameter-free
+down the tree under three separated criteria: a parameter-free
 descent-versus-residual gate on directions, sibling competition
 within an additive cosine beam of the best-matching child, and a
 final per-query membership-share floor over the destinations
@@ -198,10 +200,9 @@ Section~\ref{sec:disc-limitations}).
 The taxonomy construction loop, by contrast, runs under an iteration
 budget (\texttt{numIterations}, canonical $50$) with a structural
 early-stopping gate: after a minimum number of iterations, the
-per-iteration graph edit distance to the preceding DAG is counted
-over node and edge additions and deletions---cross-link edges
-included, so polyhierarchy churn breaks quiescence like tree
-churn---and construction stops once five consecutive iterations show
+per-iteration graph edit distance to the preceding structure is counted
+over node and edge additions and deletions, and construction stops
+once five consecutive iterations show
 zero structural edits; otherwise the budget is exhausted and the
 snapshot is frozen as-is.
 Canonical runs converge at approximately iteration~15.

@@ -73,13 +73,7 @@ alongside the tuning protocol that produced them; their provenance is
 the historical L9/Pareto sweep, conducted on a predecessor
 parameterisation, plus subsequent unification of the routing
 parameters under \texttt{membershipFloor}, and final values follow
-the pending calibration study.\footnote{Two of the former
-    bridge-export diagnostics are now functional construction
-    parameters and appear in the table: \texttt{secondaryMassFloor}
-    (the residual-pool and capture floor of the cross-link generator)
-    and \texttt{bridgeSupportRelFraction} (the minimum fraction of a
-    host's residual pool a cross-link candidate must capture);
-    \texttt{bridgeSupportFloor} remains unused. Run identifiers,
+the pending calibration study.\footnote{Run identifiers,
     seeds, and realised call counts are recorded in the experiment
     manifest (\texttt{manifest.json}) emitted with each run.}
 
@@ -101,14 +95,13 @@ labelled corpus; it is not used for anchor seeding or arena
 evaluation.
 
 Taxonomy \textbf{construction} runs on the full 14-domain corpus
-simultaneously, a precondition for the cross-link operator of
-Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-topology})---whose
-guards require host and target to lie under different anchors---to be
-exercised meaningfully.
+simultaneously, which is what allows queries to migrate between anchors
+and so makes the adapted partition of RQ2 measurable at all
+(Appendix~\ref{app:dag-formalism}).
 The \textbf{arena} evaluates 12 models on one or two ex-ante-selected,
 high-support domain nodes, chosen before observing any $\rho$ or
 $\Delta\rho$ result under a fixed rule: (i) high held-out query
-support; (ii) high DAG coherence relative to siblings; (iii)
+support; (ii) high geometric coherence relative to siblings; (iii)
 non-trivial adapted-versus-canonical migration volume; (iv)
 non-degenerate model performance variance under existing MMLU-Pro
 accuracy. Math (1,079 queries after deduplication) is the primary
@@ -232,7 +225,7 @@ design asserted in Chapters~\ref{ch:system-architecture} and
         $\mathcal{Q}_{\text{eval}}$ text &
         $\mathcal{Q}_{\text{eval}}$ labels/answers \\
         \midrule
-        DAG construction & \checkmark & \checkmark & --- & --- \\
+        Taxonomy construction & \checkmark & \checkmark & --- & --- \\
         Rubric generation & \checkmark & \checkmark & --- & --- \\
         Held-out routing & --- & --- & \checkmark & --- \\
         Arena evaluation (judging) & --- & --- & \checkmark & --- \\
@@ -281,7 +274,7 @@ alternatives, not equal-pipeline comparisons.
     \end{tabular}
 \end{table}
 
-No gold DAG exists for MMLU-Pro, so reference-dependent metrics
+No gold taxonomy exists for MMLU-Pro, so reference-dependent metrics
 (hierarchical F1, Edge F1, Triplet Accuracy) are dropped from DQ1
 entirely rather than computed against an ad-hoc gold structure; DQ1
 is led instead by the reference-free metrics of

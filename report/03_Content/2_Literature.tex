@@ -303,22 +303,30 @@ This is a more conservative departure from strict tree structure than
 global soft clustering, since it introduces polyhierarchy only where
 the embedding geometry provides positive evidence of genuine overlap,
 rather than allowing every item a non-trivial membership everywhere.
-TaxoArena combines both ideas under a bounded form of soft membership:
-query assignment during distribution fitting is weighted
-multi-membership, but a fixed posterior-responsibility floor admits
+TaxoArena takes the soft-membership idea and leaves the structural one
+aside.
+Query assignment during distribution fitting is weighted
+multi-membership, and a fixed posterior-responsibility floor admits
 only children with non-negligible responsibility, so each node's
 concentration estimate is fit on normalised weights over a small
 admitted set rather than on diffuse membership everywhere; a
 \textit{primary} (argmax) assignment is retained as a bookkeeping
-convention, and node-level polyhierarchy is introduced at the
-topology-optimisation stage through gated cross-link insertion
-(Chapter~\ref{ch:methodology}).
+convention.
+The topology stays a strict tree: every node has exactly one parent,
+and overlap is carried by the membership weights rather than by the
+edge set.
+The thermodynamics query above therefore holds weighted membership in
+both a physics-oriented and a chemistry-oriented leaf, while neither
+leaf acquires a second parent.
 This floor-bounded design is closer to the fuzzy-clustering tradition
-than a hard partition, but it differs from the fully-soft
+than a hard partition, and it differs from the fully-soft
 polyhierarchy literature, where every item holds non-trivial
 membership everywhere, and from the strictly exclusive tree literature
-(TaxoGen, CoRel, HiAGM, HiTIN), where no cross-branch edge can be
-represented at all.
+(TaxoGen, CoRel, HiAGM, HiTIN), where an item is assigned to one node
+per level.
+A polyhierarchical variant of the construction was implemented and
+measured; Appendix~\ref{sec:poly-negative} reports why it was not
+adopted.
 
 \subsection*{Multi-Scale Embeddings}
 
@@ -345,8 +353,8 @@ itself---shallow nodes separate coarse directions, deeper splits resolve
 finer structure within the same 256-dimensional geometry---not by widening
 the slice with depth.
 Fixing a single dimension additionally places every node, at every depth,
-on the same unit hypersphere, so sibling-merge, passthrough-collapse, and
-bridge-coherence comparisons are directly valid without cross-depth
+on the same unit hypersphere, so sibling-merge and passthrough-collapse
+comparisons are directly valid without cross-depth
 down-projection; it is also held coherent with the minimum-cluster-size
 floor so that each fitted leaf remains outside the regime in which the
 vMF concentration estimate becomes statistically unreliable
@@ -403,7 +411,7 @@ predicted and true nodes~\parencite{kosmopoulos2015hmetrics}.
 These measures apply equally to tree and DAG taxonomies, but they are
 \textit{reference-dependent}: they require a gold hierarchy against
 which predictions are scored.
-No gold DAG is defined for a corpus-induced taxonomy over MMLU-Pro,
+No gold hierarchy is defined for a corpus-induced taxonomy over MMLU-Pro,
 so this thesis validates structural quality primarily through
 reference-free coherence metrics---purity, silhouette, Dasgupta cost,
 and balance measures---as specified in
@@ -801,9 +809,9 @@ literature require exactly that substrate.
 TaxoArena addresses this compound problem through two integrated
 contributions: a label-bootstrapped, corpus-induced geometric
 taxonomy---seeded from MMLU-Pro ground-truth labels as a warm start
-but refined entirely by embedding geometry, and admitting
-polyhierarchy only through gated cross-link insertion rather than
-through unconstrained soft membership---that produces the coherent
+but refined entirely by embedding geometry, with a strict single-parent
+topology and overlap confined to bounded membership weights---that
+produces the coherent
 sub-domains required by both the ranking model and the domain judge;
 and a reference-informed, answer-key-blind arena that produces the
 per-domain profiles required by routing.

@@ -168,8 +168,8 @@ this thesis address them in pairs (Section~\ref{sec:research-goal}).
     Induced evaluation structure is well-defined only if the resulting
     domains are semantically precise and internally homogeneous.
     A hierarchical decomposition of query space, derived from embedding
-    geometry and formalised as a directed acyclic graph (DAG) of semantic
-    sub-domains, provides principled boundaries whose extent is defined
+    geometry and formalised as a rooted tree of semantic sub-domains,
+    provides principled boundaries whose extent is defined
     by the data rather than by editorial judgement.
 
     \item \textbf{Judging at scale with controllable bias.}
@@ -188,7 +188,7 @@ this thesis address them in pairs (Section~\ref{sec:research-goal}).
 TaxoArena works in three stages.
 First, the 14 MMLU-Pro domain labels seed top-level anchor nodes, which
 are then refined by embedding geometry: queries migrate to geometrically
-closer anchors, and each anchor is recursively split into a DAG of
+closer anchors, and each anchor is recursively split into a tree of
 semantically coherent leaves.
 Second, each leaf induces a reference-informed judge rubric from
 construction-set queries and their correct answers.
@@ -200,22 +200,22 @@ This thesis designs, implements, and evaluates TaxoArena and tests a
 single, two-part claim.
 First, that answer-key-blind, domain-conditioned pairwise LLM
 judges---evaluating models on held-out queries routed through a
-geometrically induced semantic DAG---can recover the per-domain
+geometrically induced semantic taxonomy---can recover the per-domain
 capability rankings that MMLU-Pro produces using ground-truth accuracy on
 selected high-support domain nodes.
 Second, that geometry-adapted domain groupings improve the fidelity of
 those rankings relative to the original editorial labels.
 
-\textbf{Position of the DAG.}
-The induced DAG is \textit{not} the contribution of this thesis; it is
+\textbf{Position of the taxonomy.}
+The induced taxonomy is \textit{not} the contribution of this thesis; it is
 the instrument by which the per-domain ranking resolution required for
 routing is made available.
 The scientific content is the demonstration that this instrument---a
-geometrically induced, label-seeded semantic DAG coupled with
+geometrically induced, label-seeded semantic tree coupled with
 reference-informed, answer-key-blind judging---is sufficient to recover
 ground-truth per-domain rankings, and that geometric adaptation of the
 domain partition adds fidelity over editorial labels.
-The DAG construction is therefore presented at the level needed to
+The construction is therefore presented at the level needed to
 justify that the judge domains it produces are granular and internally
 coherent; its statistical derivations are deferred to
 Chapter~\ref{ch:methodology} and Appendix~\ref{app:numerics}.
@@ -240,7 +240,7 @@ data rather than a fixed editorial taxonomy.
 \begin{enumerate}
 
     \item \textbf{Seed-guided geometric taxonomy construction.}
-    TaxoArena induces a semantic DAG over the full 14-domain MMLU-Pro
+    TaxoArena induces a semantic tree over the full 14-domain MMLU-Pro
     corpus by seeding 14 anchor nodes from ground-truth labels and then
     letting embedding geometry refine them.
     Queries migrate to geometrically closer anchors, producing an
@@ -249,9 +249,11 @@ data rather than a fixed editorial taxonomy.
     under a chance-corrected separation score---accepting a proposed
     partition only when its within-cluster scatter is sufficiently below
     that expected under a uniformly random same-size partition---into
-    internally coherent leaves, with polyhierarchical DAG edges added by
-    gated topology operations rather than by query multi-assignment
-    during fitting.
+    internally coherent leaves.
+    Every node keeps exactly one parent, so the induced structure is a
+    strict concept hierarchy.
+    A query can still reach several leaves: that breadth is produced by
+    the routing rule below, while the topology stays a tree.
     During construction each query holds weighted membership in every
     destination it reaches through the routing beam and retains a
     sufficient share of its own normalised membership; the distribution
@@ -314,7 +316,7 @@ independent contribution
 
 Two further analyses are reported as non-headline diagnostics rather
 than claims the thesis depends on: a construction-validity check that
-the induced DAG is geometrically coherent relative to unsupervised
+the induced taxonomy is geometrically coherent relative to unsupervised
 baselines (Dendrogram Purity, Weighted Leaf Purity, Spherical
 Silhouette, Total Dasgupta Cost, Sackin index, Routing ECE), and an
 optional test of whether the adaptive
