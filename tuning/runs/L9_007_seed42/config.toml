@@ -1,0 +1,75 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  mcs30_eps02_test.toml — TWO-CHANGE EXPERIMENT: minClusterSize 30, proposalSeparationBar 0.02
+#
+#  Identical to thesis_canonical.toml except minClusterSize = 30, proposalSeparationBar = 0.02,
+#  and its own outputDir. Purpose: raise per-leaf held-out top-1 support above
+#  the arena round size (questionsPerRound = 12) while filtering noise splits.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+# Evaluated model roster (16 models spanning capability tiers, frontier -> small).
+# Held fixed across all conditions; the arena ranks these within each leaf.
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf",
+    "Meta-Llama-3-70B-Instruct"
+]
+
+category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filter)
+queryLimit    = 0       # 0 = no cap; use the full corpus
+outputDir = "tuning/runs/L9_007_seed42/output"
+testRatio     = 0.3     # frozen 70/30 stratified split; the 30% held-out pool is
+                        # reserved for arena evaluation and excluded from construction
+seed = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline = true
+runBenchmark = false
+runTrickle = true
+runBaselines = false
+enableFinalMetrics = false
+enableLabeling     = true          # LLM cluster labeling off for structural build
+judgeInduction     = false         # judges are induced in the arena step
+
+# ── Construction mode ───────────────────────────────────────────────────────
+dagMode = "DAG_MAX"      # keeps residualRouting / residualSplitGate / stableQuestionIds on.
+                         # Cross-linking no longer exists, so this is purely those three flags.
+
+# ── Formalism parameters ─────────────────────────────────────────────────────
+maxDepth              = 8      # max taxonomy depth (caps runaway recursion)
+minClusterSize = 35
+proposalSeparationBar = 0.02
+tau                   = 1e-6   # lexicographic J acceptance tolerance
+
+# ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
+membershipFloor = 0.15
+routingBeamGamma      = 0.2    # round-2 winner a21f2ac1
+descentMargin = 0.18
+                               # higher = fewer residual queries, softer leaf populations (sweep-calibrated)
+
+effectiveSupportFloor = 2.0    # min effective (soft) support for a node to be retained
+defaultKappaPrior     = 10.0   # NiW prior concentration when a node has too few points
+
+numIterations = 35
+maxLeafAssignments    = 5      # max leaves a single query may be softly assigned to during arena evaluation
+
+# ── Merging / convergence ────────────────────────────────────────────────────
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false  # skips trickle-based reassignment on iteration 1, keeping bootstrap intact
+
+# ── Diagnostics ──────────────────────────────────────────────────────────────
+enableProfiling           = true
