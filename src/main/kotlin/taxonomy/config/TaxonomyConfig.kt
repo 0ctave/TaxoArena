@@ -91,18 +91,6 @@ class TaxonomyConfig {
         // Lexicographic convergence tolerance. E.g. 1e-6.
         var tau: Double = 1e-6
 
-        // Minimum ambiguity fraction for a cross-link: the share of the candidate concept's own
-        // queries that the prospective second parent explains at least as well as the current
-        // best parent. This is the criterion that SELECTS bridges; Delta J only vetoes. Left at
-        // 0.0 for the calibration pass so [F-HIST] reports the undistorted distribution — set it
-        // from that histogram, never from the accepted set.
-        var bridgeAmbiguityFloor: Double = 0.0
-
-        // Hard cap on parents per node. A concept under five of fourteen domains is
-        // under-specified rather than cross-domain; this is the wrapper pathology in bridge
-        // form. Structural bound, deliberately not a tuned one.
-        var maxParentsPerNode: Int = 2
-
         // Dasgupta separation threshold: a split is accepted when its delta
         // exceeds this value, guaranteeing the two children are geometrically
         // separated in vMF space.

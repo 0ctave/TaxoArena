@@ -13,7 +13,7 @@ import taxonomy.model.TraversalPolicy
 import taxonomy.model.DagRoot
 import kotlin.math.exp
 
-enum class ProposalType { GROW, SHRINK, BRIDGE }
+enum class ProposalType { GROW, SHRINK }
 enum class ProposalOutcome { ACCEPTED, REJECTED, NO_PROPOSAL }
 
 class ProposalStats {
@@ -435,22 +435,15 @@ class TaxonomyOperations(
         assertMassConservation(root, allEmbeddings)
         val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
         val deltaJ = newJ - baseJ
-        // Lexicographic objective: (J, B, -|V|)
+        // Lexicographic objective: (J, -|V|)
         val deltaV = postRegistry.size - registry.size
-        val deltaB = postRegistry.values.sumOf { it.crossLinkChildren.size } - registry.values.sumOf { it.crossLinkChildren.size }
         val tau = config.formalism.tau
         
-        // Delta J SELECTS growth and shrink edits, but only VETOES bridges.
-        //
-        // The old rule accepted any J-neutral edit that added a cross-link (deltaB > 0). That
-        // terminates — bridges are monotone — but it gives no account of whether a bridge is
-        // worth having, and the evidence says J cannot supply one: accepted bridges spanned
-        // 1e-6 to 8e-4 with the sign flipping on evaluation order, the same node being accepted
-        // at four hosts and rejected at two. Selection now lives in the ambiguity fraction,
-        // which is a statement about joint membership; J keeps the one job it can do here,
-        // which is blocking an edge that actively degrades the partition.
+        // Lexicographic acceptance on (J, -|V|): an edit is taken if it strictly improves the
+        // global objective, or if it is J-neutral within tau and strictly reduces node count.
+        // tau is the neutrality band, not a quality bar — every edit's own quality gate
+        // (separation for splits, similarity for fusions) has already been applied upstream.
         val accepted = when {
-            proposalType == ProposalType.BRIDGE -> deltaJ >= -tau
             deltaJ > tau -> true
             kotlin.math.abs(deltaJ) <= tau -> deltaV < 0
             else -> false

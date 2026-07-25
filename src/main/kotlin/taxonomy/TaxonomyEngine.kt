@@ -16,7 +16,6 @@ import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.utils.reportToIterationMetrics
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.operations.TaxonomyTrickler
-import taxonomy.utils.BridgeDiagnosticsExporter
 import java.io.File
 import kotlin.system.measureTimeMillis
 
@@ -221,28 +220,6 @@ class TaxonomyEngine(
                         val jBeforeEdits = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
                         val drift = if (lastIterationJAfterRefit != null) jBeforeEdits - lastIterationJAfterRefit!! else 0.0
 
-                        // Phase 3c: Pre-split passthrough collapse
-                        log.debug("Phase 3c: Pre-split passthrough collapse...")
-                        val prunePercent = 10.0 + ((i - 1).toDouble() / totalIters) * 80.0 + (2.0 / 5.0) * (80.0 / totalIters)
-                        taxonomyService.updateGenerationProgress(
-                            GenerationProgress(
-                                currentIteration = i,
-                                totalIterations = totalIters,
-                                currentStep = "Phase 3c: Passthrough Collapse",
-                                stepIndex = 2,
-                                totalSteps = 5,
-                                percentComplete = prunePercent,
-                                statusText = "Bypassing intermediate single-child chains..."
-                            )
-                        )
-
-                        val pruneTime = measureTimeMillis {
-                            ops.prunePassthroughNodesPublic(root)
-                        }
-                        perfTracker.recordTime("construction.phase3c_collapse", pruneTime, 1L)
-                        perfTracker.recordTime("construction.phase3c_collapse@iter=$i", pruneTime, 1L)
-                        taxonomyService.notifyGraphUpdated(true)
-
                         // Phase 4: Discover (Adaptive Splitting)
                         log.debug("Phase 4: Discovering emergent concepts (Splitting)...")
                         val splitPercent = 10.0 + ((i - 1).toDouble() / totalIters) * 80.0 + (3.0 / 5.0) * (80.0 / totalIters)
@@ -312,9 +289,9 @@ class TaxonomyEngine(
                         perfTracker.recordTime("construction.phase2_refit@iter=$i", refitTime, 1L)
                         taxonomyService.notifyGraphUpdated()
 
-                        val jAfterRefit = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
+                        val jAfterRefit = jAfterEdits // Parameter update doesn't change queryWeights
                         lastIterationJAfterRefit = jAfterRefit
-                        log.info("[J-TRACK] Iteration $i | J_before_edits: ${"%.5f".format(jBeforeEdits)} (Drift from prev refit: ${"%.5f".format(drift)}) | J_after_edits: ${"%.5f".format(jAfterEdits)} (Edits Delta: ${"%.5f".format(jAfterEdits - jBeforeEdits)}) | J_after_refit: ${"%.5f".format(jAfterRefit)} (Refit Delta: ${"%.5f".format(jAfterRefit - jAfterEdits)})")
+                        log.info("[J-TRACK] Iteration $i | J_after_trickle: ${"%.5f".format(jBeforeEdits)} (Trickle Delta: ${"%.5f".format(drift)}) | J_after_edits: ${"%.5f".format(jAfterEdits)} (Edits Delta: ${"%.5f".format(jAfterEdits - jBeforeEdits)})")
                     }
                 }
 
@@ -363,6 +340,10 @@ class TaxonomyEngine(
                 }
                 activeNodeHashes.add(topologyHash)
 
+                log.info("=== PROPOSAL SUMMARY (ITERATION $i) ===")
+                log.info(ops.proposalStats.summary())
+                ops.proposalStats.clear()
+                
                 // Phase 6: Stabilize Convergence Check
                 val stabilizationResult = stabilizer.evaluateConvergence(root, i)
                 if (stabilizationResult.isConverged) {
@@ -406,16 +387,6 @@ class TaxonomyEngine(
             log.info("--- ${config.execution.numIterations}-Iteration Evolution Completed ---")
             ops.printHierarchy(root)
 
-            // Generate and export bridge and soft routing diagnostics (if enabled)
-            if (config.diagnostics.enableBridgeAnalysis) {
-                try {
-                    val exporter = BridgeDiagnosticsExporter(config, datasetFetcher, trickler)
-                    val outPath = (ExperimentOutputContext.activeBaseDir ?: File(".")).absolutePath
-                    exporter.exportDiagnostics(root, uniqueEmbs, outPath)
-                } catch (e: Exception) {
-                    log.warn("Failed to export bridge diagnostics: ${e.message}", e)
-                }
-            }
             
             // Final Exports
             if (config.execution.enableVisualization) {
