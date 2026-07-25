@@ -51,6 +51,11 @@ data class HeadlessCliConfig(
     val testRatio: Double = 0.3,           // 70/30 split
     val seed: Long = 42L,                  // deterministic seed
     val seeds: List<Long> = emptyList(),   // multi-seed support
+    // Seed for the train/test split ONLY. Defaults to the construction seed, which is the
+    // historical behaviour. Setting it pins the split while `seed`/`seeds` still vary
+    // construction, which is the only way to separate sample variation from algorithmic
+    // nondeterminism: with one knob driving both, a cross-seed spread confounds the two.
+    val splitSeed: Long? = null,
     val regenerateSplit: Boolean = false,
     val runPipeline: Boolean = false,
     val maxDepth: Int? = null,
@@ -210,11 +215,15 @@ class HeadlessBenchmarkRunner(
                     maxQueries = cliConfig.queryLimit.takeIf { it > 0 } ?: Int.MAX_VALUE,
                     selectedDomains = targetDomains
                 )
-                log.info("Splitting dataset into train/test (ratio=${cliConfig.testRatio}, seed=$currentSeed)...")
+                val effectiveSplitSeed = cliConfig.splitSeed ?: currentSeed
+                log.info(
+                    "Splitting dataset into train/test (ratio=${cliConfig.testRatio}," +
+                        " splitSeed=$effectiveSplitSeed, constructionSeed=$currentSeed)..."
+                )
                 val (trainSet, testSet) = datasetFetcher.splitTrainTest(
                     dataset,
                     testRatio = cliConfig.testRatio,
-                    seed = currentSeed
+                    seed = effectiveSplitSeed
                 )
                 log.info("Syncing database reserved pool...")
                 evalLoader.syncReservedPool()
@@ -1252,6 +1261,7 @@ class HeadlessBenchmarkRunner(
         var testRatio = 0.3
         var seed = 42L
         var seeds = listOf<Long>()
+        var splitSeed: Long? = null
         var regenerateSplit = false
         var runPipeline = false
         var maxDepth: Int? = null
@@ -1342,6 +1352,7 @@ class HeadlessBenchmarkRunner(
                 "runTrickle" -> runTrickle = rawVal.toBoolean()
                 "domains" -> domains = parseStringList(rawVal)
                 "seeds" -> seeds = parseStringList(rawVal).map { it.toLong() }
+                "splitSeed" -> splitSeed = rawVal.toLong()
                 "enableStableQuestionIds" -> enableStableQuestionIds = rawVal.toBoolean()
                 "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
@@ -1374,6 +1385,7 @@ class HeadlessBenchmarkRunner(
             testRatio = testRatio,
             seed = seed,
             seeds = seeds,
+            splitSeed = splitSeed,
             regenerateSplit = regenerateSplit,
             runPipeline = runPipeline,
             maxDepth = maxDepth,
