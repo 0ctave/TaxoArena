@@ -75,31 +75,33 @@ class TaxonomyMerger(
             pruneUnrelevantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
             mergeSimilarSiblingsWithProposals(dag, root, allEmbeddings, groundTruthMap, currentIteration, ops)
 
-            if (config.formalism.enableBridging) {
-                proposeCrossLinksWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
-            }
-
             mergeRedundantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
 
             do {} while (prunePassthroughNodes(dag, root, allEmbeddings, groundTruthMap, currentIteration, ops))
             pruneUnrelevantNodesWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
             removeStaleParentRefs(root)
 
+            if (config.formalism.enableBridging) {
+                proposeCrossLinksWithProposals(dag, allEmbeddings, groundTruthMap, currentIteration, ops)
+            }
+
             invalidateAncestorCache()
             val ancestorMapFinal = buildAncestorMap(root)
-            transitiveReduction(root, ancestorMapFinal)
+            if (!config.formalism.enableResidualRouting) {
+                transitiveReduction(root, ancestorMapFinal)
+            }
 
             for (node in getAllNodes(root)) {
-                if (node.parents.size > 1 || node.crossLinkChildren.isNotEmpty()) {
-                    node.isBridge = true
-                }
+                // isBridge means BRIDGED — this node has more than one parent. Hosting a
+                // cross-link is a different property (hasCrossLinks) and used to be folded in
+                // here, which flagged 12 of the 14 depth-1 domains as bridges purely for being
+                // hosts and made every "cross-domain node" count meaningless.
+                node.isBridge = node.parents.size > 1
             }
         }
     }
 
-    fun prunePassthroughNodesPublic(root: GraphNode) {
-        // Ignored or left as no-op/dummy, or we can use empty args
-    }
+
 
 
     private fun blendVmfAndNiw(target: GraphNode, source: GraphNode) {
@@ -168,6 +170,18 @@ class TaxonomyMerger(
                 }
             }
         }
+    }
+
+    /** Sufficient statistics of a node's whole branch population at the given dim. */
+    private fun branchStats(node: GraphNode, dim: Int): StatisticsUtils.ClusterStats? {
+        val branchQueries = node.getAllQueriesInBranch().distinctBy { it.rawText }
+        if (branchQueries.isEmpty()) return null
+        val sum = DoubleArray(dim)
+        for (emb in branchQueries) {
+            val v = emb.projectTo(dim)
+            for (i in 0 until dim) sum[i] += v[i]
+        }
+        return StatisticsUtils.ClusterStats(branchQueries.size.toDouble(), sum)
     }
 
     /** True iff nodeId lies in the subtree rooted at start (tree + cross edges). */
@@ -587,7 +601,7 @@ class TaxonomyMerger(
             val child = node.treeChildren.first()
             if (child.depth <= 1 || child.parents.size > 1) break
 
-            val collapsed = ops.tryProposal(dag = dag, site = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
+            val collapsed = ops.tryProposal(dag = dag, site = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, proposalType = ProposalType.SHRINK) {
                 log.info("[COLLAPSE] dissolving sole child '${child.label}' into '${node.label}' (${child.treeChildren.size} grandchildren hoisted)")
                 
                 node.queries = (node.queries + child.queries).distinctBy { it.rawText }.toMutableList()
@@ -629,8 +643,9 @@ class TaxonomyMerger(
                 child.queryWeights.clear()
                 child.residualQueries.clear()
                 child.residualConfidences.clear()
+                true
             }
-            if (collapsed) {
+            if (collapsed == ProposalOutcome.ACCEPTED) {
                 anyPruned = true
             } else {
                 break
@@ -641,7 +656,7 @@ class TaxonomyMerger(
         // C3 invariant stays satisfied until the next trickle re-routes them.
         if (node.treeChildren.isNotEmpty() && node.queries.isNotEmpty()) {
             for (emb in node.queries) {
-                val qId = if (emb.queryId != -1) emb.queryId.toString() else TextNormalizer.cleanText(emb.rawText)
+                val qId = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                 if (node.residualQueries.add(qId)) {
                     node.residualConfidences.putIfAbsent(qId, 0.0)
                 }
@@ -787,112 +802,177 @@ class TaxonomyMerger(
 
         val embById = HashMap<String, Embedding>(allEmbeddings.size * 2)
         for (emb in allEmbeddings) {
-            val key = if (emb.queryId != -1) emb.queryId.toString() else TextNormalizer.cleanText(emb.rawText)
+            val key = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
             embById[key] = emb
         }
 
-        val massFloor = config.diagnostics.secondaryMassFloor
-        val relFraction = config.diagnostics.bridgeSupportRelFraction
-
+        val minMisses = 5
         val hosts = allNodes.filter { p ->
             p.depth >= 1 && p.children.isNotEmpty() && p.vmfMu.isNotEmpty() &&
-                p.residualQueries.size >= massFloor
-        }.sortedByDescending { it.residualQueries.size }
+                p.nearMisses.size >= minMisses
+        }
+
+        // ── Phase A: score every (host, candidate) edge against ONE pre-pass state ─────────
+        //
+        // Scoring and evaluation are separated deliberately. The previous version walked hosts
+        // sequentially and evaluated each host's top-3 immediately, so every acceptance changed
+        // the state the next proposal was measured against — the same node was accepted at four
+        // hosts and rejected at two, with the sign decided by visit order, and it accumulated
+        // five parents that way. Ranking the whole field against a single snapshot makes the
+        // pass order-independent; the guards are still re-checked at evaluation time, because
+        // an acceptance can legitimately invalidate a later edge.
+        val prePassAncestors = buildAncestorMap(root)
+        val scoredEdges = ArrayList<Triple<GraphNode, GraphNode, Double>>()
+        val allF = ArrayList<Double>()
 
         for (host in hosts) {
-            val residuals = host.residualQueries.mapNotNull { qId ->
-                GraphNode.getEmbedding(qId) ?: embById[qId]
-            }
-            if (residuals.size < massFloor) continue
-
-            // Gate bar per residual: r_bar_P * <mu_P, x> — identical to the trickler's
-            // descent criterion, so "captured" here means "will actually descend at P
-            // once the edge exists", not a proxy similarity.
-            val bars = DoubleArray(residuals.size)
-            for (i in residuals.indices) {
-                val x = residuals[i].projectTo(host.vmfMu.size)
-                bars[i] = host.childCentroidShrinkage * StatisticsUtils.dotProduct(x, host.vmfMu)
-            }
-
             val hostDomains = getDepth1Ancestors(host)
-            var ancestorMap = buildAncestorMap(root)
+            val hostAnc = prePassAncestors[host.id] ?: emptySet()
             val attached = host.children + host.crossLinkChildren
 
-            val scored = allNodes.mapNotNull { cand ->
-                if (cand === host || cand.depth < 2 || cand.vmfMu.isEmpty()) return@mapNotNull null
-                if (cand.parents.isEmpty()) return@mapNotNull null
-                if (cand in attached || host in cand.parents) return@mapNotNull null
-                val candAnc = ancestorMap[cand.id] ?: emptySet()
-                val hostAnc = ancestorMap[host.id] ?: emptySet()
-                if (host.id in candAnc || cand.id in hostAnc) return@mapNotNull null
-                if (cand.parents.any { q -> q.id in hostAnc || host.id in (ancestorMap[q.id] ?: emptySet()) }) return@mapNotNull null
-                if (getDepth1Ancestors(cand).any { it in hostDomains }) return@mapNotNull null
+            for (cand in allNodes) {
+                if (cand === host || cand.depth < 2 || cand.vmfMu.isEmpty()) continue
+                if (cand.parents.isEmpty()) continue
+                if (cand in attached || host in cand.parents) continue
+                val candAnc = prePassAncestors[cand.id] ?: emptySet()
+                if (host.id in candAnc || cand.id in hostAnc) continue
+                if (cand.parents.any { q -> q.id in hostAnc || host.id in (prePassAncestors[q.id] ?: emptySet()) }) continue
+                if (getDepth1Ancestors(cand).any { it in hostDomains }) continue
+                // A concept under half the corpus's domains is under-specified, not
+                // cross-domain. Structural bound, not a tuned one.
+                if (cand.parents.size >= config.formalism.maxParentsPerNode) continue
 
-                var captured = 0
-                for (i in residuals.indices) {
-                    val x = residuals[i].projectTo(cand.vmfMu.size)
-                    if (StatisticsUtils.dotProduct(x, cand.vmfMu) >= bars[i]) captured++
-                }
-                if (captured < massFloor || captured < relFraction * residuals.size) null
-                else cand to captured
-            }.sortedByDescending { it.second }
-
-            // Each J evaluation is a full re-route — cap the expensive part per host.
-            for ((cand, captured) in scored.take(3)) {
-                // Re-check topological guards against the CURRENT graph: an earlier
-                // acceptance in this pass may have changed ancestor sets.
-                invalidateAncestorCache()
-                ancestorMap = buildAncestorMap(root)
-                val candAnc = ancestorMap[cand.id] ?: emptySet()
-                val hostAnc = ancestorMap[host.id] ?: emptySet()
-                if (host.id in candAnc || cand.id in hostAnc || host in cand.parents) continue
-
-                // Skip candidates already rejected under this exact topology and with
-                // identical capture counts — the J outcome is deterministic.
-                val memoKey = "${host.id}>${cand.id}#$captured/${residuals.size}"
-                if (memoKey in rejectedCrossLinks) {
-                    log.debug("[CROSS-LINK] memo-skip '${host.label}' -> '${cand.label}' ($captured/${residuals.size})")
-                    continue
-                }
-
-                val fracOfPool = captured.toDouble() / residuals.size
-                log.info("[CROSS-LINK] proposing '${host.label}' -> '${cand.label}' (captures $captured/${residuals.size} residuals)")
-                // site = the TARGET node N, not the host: the acceptance rule is
-                // Delta J > epsilon * pi_N. pi scales the threshold to the mass the edit
-                // can actually move (N's cell composition + the captured pool); scaling by
-                // the whole host domain's mass makes the bar unreachable for any
-                // small-concept link no matter how genuinely it improves J.
-                val accepted = ops.tryProposal(
-                    dag = dag,
-                    site = cand,
-                    allEmbeddings = allEmbeddings,
-                    groundTruthMap = groundTruthMap,
-                    currentIteration = currentIteration,
-                    deltaThreshold = config.formalism.separationEpsilon
-                ) {
-                    host.crossLinkChildren.add(cand)
-                    cand.parents.add(host)
-                }
-                logBridgeResidual(
-                    iteration = currentIteration,
-                    candidateId = "${host.id}->${cand.id}",
-                    sourceNodes = "${host.label} -> ${cand.label}",
-                    size = captured,
-                    entropy = fracOfPool,
-                    div = 0.0,
-                    accepted = accepted,
-                    reason = "residual-capture cross-link"
-                )
-                if (accepted) {
-                    // Topology changed: every cached rejection is stale.
-                    rejectedCrossLinks.clear()
-                    rejectedCrossLinksFingerprint = edgeTopologyFingerprint(root)
-                } else {
-                    rejectedCrossLinks.add(memoKey)
+                val f = ambiguityFraction(cand, host) ?: continue
+                allF.add(f)
+                if (f >= config.formalism.bridgeAmbiguityFloor) {
+                    scoredEdges.add(Triple(host, cand, f))
                 }
             }
         }
+
+        // Calibration dump over the FULL scored field — before any floor or top-k cut, so
+        // bridgeAmbiguityFloor is chosen against the whole distribution rather than the tail
+        // that already survived selection.
+        if (allF.isNotEmpty()) {
+            val hist = IntArray(10)
+            for (f in allF) hist[(f * 10).toInt().coerceIn(0, 9)]++
+            val sorted = allF.sorted()
+            log.info("[F-HIST] scored=${allF.size} deciles=[${hist.joinToString(",")}] " +
+                "median=${"%.3f".format(sorted[sorted.size / 2])} p90=${"%.3f".format(sorted[(sorted.size * 9) / 10])} " +
+                "passing(f>=${config.formalism.bridgeAmbiguityFloor})=${scoredEdges.size}")
+        }
+
+        // ── Phase B: evaluate best-first, one edge per host ────────────────────────────────
+        scoredEdges.sortByDescending { it.third }
+        val hostsUsed = HashSet<String>()
+
+        for ((host, cand, f) in scoredEdges) {
+            // One candidate per host per pass: with f doing the selecting, the second- and
+            // third-best are by construction weaker claims of joint membership, and taking
+            // three per host is what fixed the bridge count at 3 x |hosts| regardless of merit.
+            if (!hostsUsed.add(host.id)) continue
+
+            // Re-check against the LIVE graph: an earlier acceptance in this pass may have
+            // changed ancestor sets or filled the candidate's parent budget.
+            invalidateAncestorCache()
+            val live = buildAncestorMap(root)
+            val candAnc = live[cand.id] ?: emptySet()
+            val hostAnc = live[host.id] ?: emptySet()
+            if (host.id in candAnc || cand.id in hostAnc || host in cand.parents) continue
+            if (cand.parents.size >= config.formalism.maxParentsPerNode) continue
+
+            val memoKey = "${host.id}>${cand.id}#${"%.3f".format(f)}"
+            if (memoKey in rejectedCrossLinks) {
+                log.debug("[CROSS-LINK] memo-skip '${host.label}' -> '${cand.label}' (f=${"%.3f".format(f)})")
+                continue
+            }
+
+            log.info("[CROSS-LINK] proposing '${host.label}' -> '${cand.label}' " +
+                "(f=${"%.3f".format(f)} of ${cand.queries.size} own queries, parents=${cand.parents.size})")
+            val refitScope = { _: GraphNode ->
+                val toRefit = mutableSetOf(cand)
+                toRefit.addAll(cand.parents)
+                for (p in cand.parents) {
+                    toRefit.addAll(p.children)
+                    toRefit.addAll(p.crossLinkChildren)
+                }
+                for (n in toRefit) {
+                    ops.fitSingleNode(n, isFinalIteration = false)
+                }
+            }
+            val accepted = ops.tryProposal(
+                dag = dag,
+                site = cand,
+                allEmbeddings = allEmbeddings,
+                groundTruthMap = groundTruthMap,
+                currentIteration = currentIteration,
+                proposalType = ProposalType.BRIDGE,
+                refitScope = refitScope,
+                // A cross-link is the pair, not the target: without the host in the
+                // memo key every host after the first is skipped unevaluated.
+                proposalKey = "bridge:${host.id}"
+            ) {
+                host.crossLinkChildren.add(cand)
+                cand.parents.add(host)
+                true
+            }
+            logBridgeResidual(
+                iteration = currentIteration,
+                candidateId = "${host.id}->${cand.id}",
+                sourceNodes = "${host.label} -> ${cand.label}",
+                size = cand.queries.size,
+                entropy = f,
+                div = 0.0,
+                accepted = accepted == ProposalOutcome.ACCEPTED,
+                reason = "ambiguity-fraction cross-link"
+            )
+            if (accepted == ProposalOutcome.ACCEPTED) {
+                rejectedCrossLinks.clear()
+                rejectedCrossLinksFingerprint = edgeTopologyFingerprint(root)
+            } else {
+                rejectedCrossLinks.add(memoKey)
+            }
+        }
         invalidateAncestorCache()
+    }
+
+    /**
+     * The ambiguity fraction: of the candidate concept's OWN queries, what share does the
+     * prospective parent explain at least as well as the concept's current best parent?
+     *
+     *   f = |{ q in queries(N) : <mu_host, x_q> >= max_p <mu_p, x_q> - gamma }| / |queries(N)|
+     *
+     * Anchored on N, comparing two parents head to head. The previous formulation anchored on
+     * the HOST's near-miss ledger, which is the set of queries that barely belonged at the host
+     * — precisely the queries for which <mu_host, x> is low, hence the bar low, hence almost
+     * any plausible centroid cleared it. That test asked "does this candidate beat the host's
+     * weakest grip on its own leftovers?" and was true by construction: accepted and rejected
+     * proposals were distributionally indistinguishable (medians 0.802 vs 0.818, r with dJ =
+     * +0.085). This one asks whether the concept's content genuinely belongs to both, which is
+     * the claim a polyhierarchy edge actually makes.
+     *
+     * gamma reuses descentMargin — the same cosine slack the trickler already allows when
+     * deciding a query may descend — rather than introducing another knob.
+     */
+    private fun ambiguityFraction(cand: GraphNode, host: GraphNode): Double? {
+        val qs = cand.queries
+        if (qs.isEmpty()) return null
+        val parents = cand.parents.filter { it.vmfMu.isNotEmpty() }
+        if (parents.isEmpty()) return null
+        val gamma = config.formalism.descentMargin
+        var hits = 0
+        for (q in qs) {
+            val xHost = q.projectTo(host.vmfMu.size)
+            val hostDot = StatisticsUtils.dotProduct(xHost, host.vmfMu)
+            var bestParentDot = Double.NEGATIVE_INFINITY
+            for (p in parents) {
+                val xp = q.projectTo(p.vmfMu.size)
+                val d = StatisticsUtils.dotProduct(xp, p.vmfMu)
+                if (d > bestParentDot) bestParentDot = d
+            }
+            if (hostDot >= bestParentDot - gamma) hits++
+        }
+        return hits.toDouble() / qs.size
     }
 
     private fun isAncestor(ancestor: GraphNode, descendant: GraphNode): Boolean {
@@ -1007,7 +1087,7 @@ class TaxonomyMerger(
 
         for (child in leaves) {
             val parent = child.parents.firstOrNull() ?: continue
-            val deltaThreshold = -config.formalism.separationEpsilon
+
 
             // Keep L as is (Proposal 3 / Base)
             val baseJ = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
@@ -1043,13 +1123,13 @@ class TaxonomyMerger(
             val bestJ = maxOf(baseJ, J_prune, J_merge)
             if (bestJ == baseJ) {
                 log.debug("Starved Node: Keeping '${child.label}' (best option)")
-            } else if (bestJ == J_prune && J_prune > baseJ + deltaThreshold) {
+            } else if (bestJ == J_prune) {
                 pruneSingleNodeTentatively(parent, child)
                 log.info("[ACCEPTED STARVED PRUNE] '${child.label}' pruned into '${parent.label}' (Delta J: ${J_prune - baseJ})")
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
                 ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
-            } else if (bestJ == J_merge && J_merge > baseJ + deltaThreshold && nearestSibling != null) {
+            } else if (bestJ == J_merge && nearestSibling != null) {
                 fuseNodes(nearestSibling, child)
                 log.info("[ACCEPTED STARVED MERGE] '${child.label}' merged into '${nearestSibling.label}' (Delta J: ${J_merge - baseJ})")
                 root.updateAllShrinkages()
@@ -1103,7 +1183,7 @@ class TaxonomyMerger(
                 val statsA = statsByChild[nodeA] ?: continue
                 val statsB = statsByChild[nodeB] ?: continue
                 val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
-                if (sep < config.formalism.separationEpsilon) pairsToMerge.add(Triple(nodeA, nodeB, sep))
+                if (sep < config.formalism.proposalSeparationBar) pairsToMerge.add(Triple(nodeA, nodeB, sep))
             }
         }
 
@@ -1120,10 +1200,11 @@ class TaxonomyMerger(
         for (cluster in clusters) {
             val target = cluster[0]
             val sources = cluster.subList(1, cluster.size)
-            ops.tryProposal(dag = dag, site = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
+            ops.tryProposal(dag = dag, site = node, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, proposalType = ProposalType.SHRINK) {
                 for (source in sources) {
                     fuseNodes(target, source)
                 }
+                true
             }
         }
     }
@@ -1151,10 +1232,25 @@ class TaxonomyMerger(
                 val muA = StatisticsUtils.projectVector(nodeA.vmfMu, commonDim)
                 val muB = nodeB.vmfMu.copyOf(commonDim)
                 val similarity = StatisticsUtils.dotProduct(muA.map { it.toDouble() }.toDoubleArray(), muB)
+                if (similarity <= config.formalism.fusionSimilarityThreshold) continue
 
-                if (similarity > config.formalism.fusionSimilarityThreshold) {
-                    ops.tryProposal(dag = dag, site = root, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, deltaThreshold = -config.formalism.separationEpsilon) {
+                // Gate consistency: mu-cosine is only a cheap O(n^2) PREFILTER; the
+                // decision uses the same pairwise chance-corrected separation, on the
+                // same bar, that the splitter requires to create a pair and that
+                // sibling fusion uses to destroy one. Deciding on cosine alone let this
+                // pass destroy pairs the splitter had just certified separable (the
+                // shared-mean direction inflates cosine — the same geometry that makes
+                // uncentered EM collapse), so creation and destruction disagreed and
+                // the pair cycled. With one statistic at one bar the two acceptance
+                // regions are disjoint: nothing creatable is destroyable.
+                val statsA = branchStats(nodeA, commonDim)
+                val statsB = branchStats(nodeB, commonDim)
+                if (statsA == null || statsB == null) continue
+                val pairSep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
+                if (pairSep < config.formalism.proposalSeparationBar) {
+                    ops.tryProposal(dag = dag, site = root, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, proposalType = ProposalType.SHRINK) {
                         fuseNodes(nodeA, nodeB)
+                        true
                     }
                 }
             }

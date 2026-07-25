@@ -55,7 +55,7 @@ data class HeadlessCliConfig(
     val runPipeline: Boolean = false,
     val maxDepth: Int? = null,
     val minClusterSize: Int? = null,
-    val separationEpsilon: Double? = null,
+    val proposalSeparationBar: Double? = null,
     val membershipFloor: Double? = null,
     val routingBeamGamma: Double? = null,
     val descentMargin: Double? = null,
@@ -145,7 +145,7 @@ class HeadlessBenchmarkRunner(
         // Apply any pipeline configuration overrides from TOML config
         cliConfig.maxDepth?.let { config.formalism.maxDepth = it }
         cliConfig.minClusterSize?.let { config.formalism.minClusterSize = it }
-        cliConfig.separationEpsilon?.let { config.formalism.separationEpsilon = it }
+        cliConfig.proposalSeparationBar?.let { config.formalism.proposalSeparationBar = it }
         cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
         cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
@@ -1256,7 +1256,7 @@ class HeadlessBenchmarkRunner(
         var runPipeline = false
         var maxDepth: Int? = null
         var minClusterSize: Int? = null
-        var separationEpsilon: Double? = null
+        var proposalSeparationBar: Double? = null
         var membershipFloor: Double? = null
         var routingBeamGamma: Double? = null
         var descentMargin: Double? = null
@@ -1335,7 +1335,7 @@ class HeadlessBenchmarkRunner(
                 "runPipeline" -> runPipeline = rawVal.toBoolean()
                 "maxDepth" -> maxDepth = rawVal.toInt()
                 "minClusterSize" -> minClusterSize = rawVal.toInt()
-                "separationEpsilon" -> separationEpsilon = rawVal.toDouble()
+                "proposalSeparationBar" -> proposalSeparationBar = rawVal.toDouble()
                 "membershipFloor" -> membershipFloor = rawVal.toDouble()
                 "routingBeamGamma" -> routingBeamGamma = rawVal.toDouble()
                 "descentMargin" -> descentMargin = rawVal.toDouble()
@@ -1387,7 +1387,7 @@ class HeadlessBenchmarkRunner(
             runPipeline = runPipeline,
             maxDepth = maxDepth,
             minClusterSize = minClusterSize,
-            separationEpsilon = separationEpsilon,
+            proposalSeparationBar = proposalSeparationBar,
             membershipFloor = membershipFloor,
             routingBeamGamma = routingBeamGamma,
             descentMargin = descentMargin,
@@ -1445,7 +1445,7 @@ class HeadlessBenchmarkRunner(
         val raw = listOf(
             config.formalism.maxDepth,
             config.formalism.minClusterSize,
-            config.formalism.separationEpsilon,
+            config.formalism.proposalSeparationBar,
             config.formalism.membershipFloor,
             config.formalism.routingBeamGamma,
             config.formalism.descentMargin,
@@ -1473,7 +1473,7 @@ class HeadlessBenchmarkRunner(
         val acyclic = checkAcyclic(root)
         val rootReachable = true
         val leafCount = allNodes.count { it.isLeaf }
-        val bridgeCount = allNodes.count { it.isBridge }
+        val bridgeCount = allNodes.count { it.isBridged }
         val orphanCount = allNodes.count { it.id != root.id && it.parents.isEmpty() }
         
         val bridges = allNodes.filter { it.isBridge || it.parents.size > 1 || it.crossLinkChildren.isNotEmpty() }

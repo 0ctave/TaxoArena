@@ -88,10 +88,25 @@ class TaxonomyConfig {
         // Minimum queries a node must hold before it is eligible for splitting.
         var minClusterSize: Int = 25
 
+        // Lexicographic convergence tolerance. E.g. 1e-6.
+        var tau: Double = 1e-6
+
+        // Minimum ambiguity fraction for a cross-link: the share of the candidate concept's own
+        // queries that the prospective second parent explains at least as well as the current
+        // best parent. This is the criterion that SELECTS bridges; Delta J only vetoes. Left at
+        // 0.0 for the calibration pass so [F-HIST] reports the undistorted distribution — set it
+        // from that histogram, never from the accepted set.
+        var bridgeAmbiguityFloor: Double = 0.0
+
+        // Hard cap on parents per node. A concept under five of fourteen domains is
+        // under-specified rather than cross-domain; this is the wrapper pathology in bridge
+        // form. Structural bound, deliberately not a tuned one.
+        var maxParentsPerNode: Int = 2
+
         // Dasgupta separation threshold: a split is accepted when its delta
         // exceeds this value, guaranteeing the two children are geometrically
         // separated in vMF space.
-        var separationEpsilon: Double = 0.04
+        var proposalSeparationBar: Double = 0.04
 
         // ── Routing ───────────────────────────────────────────────────────────
         // Final membership share: after the trickle walk, a query's memberships are
@@ -181,7 +196,8 @@ class TaxonomyConfig {
         sb.append("│   - DAG Mode:             ${formalism.dagMode}\n")
         sb.append("│   - Max Depth:            ${formalism.maxDepth}\n")
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
-        sb.append("│   - Separation Epsilon:   ${formalism.separationEpsilon}\n")
+        sb.append("│   - Separation Bar:       ${formalism.proposalSeparationBar}\n")
+        sb.append("│   - Lexicographic Tau:    ${formalism.tau}\n")
         sb.append("│   - Membership Floor:     ${formalism.membershipFloor}\n")
         sb.append("│   - Routing Beam Gamma:   ${formalism.routingBeamGamma}\n")
         sb.append("│   - Descent Margin:       ${formalism.descentMargin}\n")
@@ -218,7 +234,8 @@ class TaxonomyConfig {
             dagMode = formalism.dagMode,
             maxDepth = formalism.maxDepth,
             minClusterSize = formalism.minClusterSize,
-            separationEpsilon = formalism.separationEpsilon,
+            proposalSeparationBar = formalism.proposalSeparationBar,
+            tau = formalism.tau,
             membershipFloor = formalism.membershipFloor,
             routingBeamGamma = formalism.routingBeamGamma,
             descentMargin = formalism.descentMargin,
@@ -263,7 +280,8 @@ class TaxonomyConfig {
         formalism.dagMode = c.formalism.dagMode
         formalism.maxDepth = c.formalism.maxDepth
         formalism.minClusterSize = c.formalism.minClusterSize
-        formalism.separationEpsilon = c.formalism.separationEpsilon
+        formalism.proposalSeparationBar = c.formalism.proposalSeparationBar
+        formalism.tau = c.formalism.tau
         formalism.membershipFloor = c.formalism.membershipFloor
         formalism.routingBeamGamma = c.formalism.routingBeamGamma
         formalism.descentMargin = c.formalism.descentMargin

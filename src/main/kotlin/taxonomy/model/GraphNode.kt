@@ -68,6 +68,7 @@ data class GraphNode(
     var bridgeJsDivergence: Double = 0.0,
     val residualQueries: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet(),
     val residualConfidences: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap(),
+    val nearMisses: MutableMap<String, Double> = java.util.concurrent.ConcurrentHashMap(),
     var dOverN: Double = 0.0,
     var description: String? = null
 ) {
@@ -103,6 +104,15 @@ data class GraphNode(
      */
     val isCrossLink: Boolean get() = isBridge
 
+    /** This node is BRIDGED: it has more than one parent, i.e. it is a polyhierarchy target. */
+    val isBridged: Boolean get() = parents.size > 1
+
+    /**
+     * This node HOSTS cross-links. Distinct from [isBridged] — a domain that hosts a bridge is
+     * not itself cross-domain, and conflating the two counted 12 of 14 domains as bridges.
+     */
+    val hasCrossLinks: Boolean get() = crossLinkChildren.isNotEmpty()
+
     // Proportional weight of this node as a component in its parent's vMF/NiW
     var proportionalWeight: Double = 1.0
 
@@ -117,7 +127,10 @@ data class GraphNode(
     var childCentroidShrinkage: Double = 1.0
 
     fun updateChildCentroidShrinkage() {
-        val childrenList = children.toList()
+        val childrenList = buildList {
+            addAll(children)
+            addAll(crossLinkChildren)
+        }
         if (childrenList.isEmpty()) {
             childCentroidShrinkage = 1.0
             return
@@ -316,11 +329,7 @@ fun assignQueryIds(root: GraphNode, enableStableQuestionIds: Boolean = false) {
         synchronized(node.queries) {
             node.queries.forEach { q ->
                 if (enableStableQuestionIds) {
-                    val clean = TextNormalizer.cleanText(q.rawText)
-                    val qId = QuestionIdRegistry.lookup(q.rawText) 
-                        ?: QuestionIdRegistry.lookup(clean)
-                        ?: (clean.hashCode() and 0x7FFFFFFF)
-                    q.queryId = qId
+                    q.queryId = QuestionIdRegistry.lookup(q.rawText)
                 } else {
                     if (seenTexts.add(q.rawText)) {
                         uniqueQueries.add(q)
@@ -358,9 +367,8 @@ fun assignQueryIds(root: GraphNode, enableStableQuestionIds: Boolean = false) {
             if (!visitedCollect.add(node.id)) return
             synchronized(node.queries) {
                 node.queries.forEach { q ->
-                    val clean = TextNormalizer.cleanText(q.rawText)
                     if (q.queryId != -1) {
-                        textToId[clean] = q.queryId
+                        textToId[q.rawText] = q.queryId
                     }
                 }
             }
@@ -374,8 +382,7 @@ fun assignQueryIds(root: GraphNode, enableStableQuestionIds: Boolean = false) {
             if (!visitedAssign.add(node.id)) return
             synchronized(node.queries) {
                 node.queries.forEach { q ->
-                    val clean = TextNormalizer.cleanText(q.rawText)
-                    q.queryId = textToId[clean] ?: q.queryId
+                    q.queryId = textToId[q.rawText] ?: q.queryId
                 }
             }
             node.children.forEach { walkAssign(it) }

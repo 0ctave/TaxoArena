@@ -13,6 +13,38 @@ import taxonomy.model.TraversalPolicy
 import taxonomy.model.DagRoot
 import kotlin.math.exp
 
+enum class ProposalType { GROW, SHRINK, BRIDGE }
+enum class ProposalOutcome { ACCEPTED, REJECTED, NO_PROPOSAL }
+
+class ProposalStats {
+    val attempted = mutableMapOf<ProposalType, Int>()
+    val accepted = mutableMapOf<ProposalType, Int>()
+    val rejected = mutableMapOf<ProposalType, Int>()
+    val noProposal = mutableMapOf<ProposalType, Int>()
+    
+    fun record(type: ProposalType, outcome: ProposalOutcome) {
+        attempted[type] = (attempted[type] ?: 0) + 1
+        when (outcome) {
+            ProposalOutcome.ACCEPTED -> accepted[type] = (accepted[type] ?: 0) + 1
+            ProposalOutcome.REJECTED -> rejected[type] = (rejected[type] ?: 0) + 1
+            ProposalOutcome.NO_PROPOSAL -> noProposal[type] = (noProposal[type] ?: 0) + 1
+        }
+    }
+    
+    fun clear() {
+        attempted.clear(); accepted.clear(); rejected.clear(); noProposal.clear()
+    }
+    
+    fun summary(): String {
+        val types = ProposalType.entries
+        return types.joinToString(" | ") { t ->
+            val att = attempted[t] ?: 0
+            if (att == 0) "$t: 0" else
+                "$t: $att attempted (${accepted[t] ?: 0} accepted, ${rejected[t] ?: 0} rejected, ${noProposal[t] ?: 0} no-proposal)"
+        }
+    }
+}
+
 /**
  * Orchestrator for DAG operations, delegating to specialized components.
  */
@@ -28,6 +60,7 @@ class TaxonomyOperations(
     
     private var cachedBaseJ: Double? = null
     private val rejectedProposalsCache = java.util.concurrent.ConcurrentHashMap.newKeySet<ProposalFingerprint>()
+    val proposalStats = ProposalStats()
     
     fun invalidateCachedJ() {
         cachedBaseJ = null
@@ -44,6 +77,7 @@ class TaxonomyOperations(
         trickler.routeQuery(query, root, currentIteration, originalCategories, isInference).leaves
 
     suspend fun fitNodeRecursive(node: GraphNode, currentIteration: Int = 0, isFinalIteration: Boolean = false) = fitter.fitNodeRecursive(node, currentIteration, isFinalIteration)
+    fun fitSingleNode(node: GraphNode, isFinalIteration: Boolean = false) = fitter.fitSingleNode(node, isFinalIteration)
 
     suspend fun splitNodesRecursive(
         dag: DagRoot,
@@ -77,7 +111,7 @@ class TaxonomyOperations(
                 // 620 q, local sep 0.058 = 5.8x epsilon, Delta J +0.00148, rejected
                 // every iteration at bar 0.00208 = epsilon*0.21 — domains stayed
                 // childless leaves and depth stalled at 3).
-                tryProposal(dag, node, allEmbeddings, groundTruthMap, currentIteration, 0.0) {
+                val outcome = tryProposal(dag, node, allEmbeddings, groundTruthMap, currentIteration, ProposalType.GROW) {
                     // splitSingleNode requires splitter to be called
                     splitter.splitSingleNode(node)
                 }
@@ -98,7 +132,7 @@ class TaxonomyOperations(
         learningPhase: Boolean = false
     ) = merger.optimizeHierarchy(dag, allEmbeddings, groundTruthMap, currentIteration, learningPhase, this)
 
-    suspend fun prunePassthroughNodesPublic(root: GraphNode) = merger.prunePassthroughNodesPublic(root)
+
 
     /**
      * Phase 3: Reassign all embeddings to their destination leaves using a
@@ -141,8 +175,16 @@ class TaxonomyOperations(
                         routeResult.leaves.forEach { (leaf, logWeight) ->
                             val weight = kotlin.math.exp(logWeight)
                             synchronized(leaf.queryWeights) {
+                                // `queries` and `queryWeights` move in lockstep: clearGraphQueries
+                                // empties both, GraphStateBackup restores both, and every caller of
+                                // reassignQueries clears immediately beforehand. So "emb is already
+                                // in queries" is exactly "rawText is already a queryWeights key
+                                // before this merge" — an O(1) lookup in place of an O(|queries|)
+                                // scan held under the per-leaf lock. That scan made a full reassign
+                                // quadratic in leaf population and serialised the parallel routing.
+                                val alreadyPresent = leaf.queryWeights.containsKey(emb.rawText)
                                 leaf.queryWeights.merge(emb.rawText, weight, Double::plus)
-                                if (leaf.queries.none { it.rawText == emb.rawText }) {
+                                if (!alreadyPresent) {
                                     leaf.queries.add(emb)
                                 }
                             }
@@ -160,14 +202,16 @@ class TaxonomyOperations(
                         // every iteration) and its embedding never entered the region, so the
                         // residual-split mechanism could never recover it.
                         log.debug("Query '${emb.rawText.take(40)}' reached no leaf — retained as residual at ${routeResult.primary.label ?: routeResult.primary.id}")
-                        val qId = if (emb.queryId != -1) emb.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                        val qId = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                         synchronized(routeResult.primary.residualQueries) {
                             routeResult.primary.residualQueries.add(qId)
                             routeResult.primary.residualConfidences[qId] = 0.0
                         }
                         synchronized(routeResult.primary.queryWeights) {
+                            // O(1) presence test — see the lockstep note in the leaf branch above.
+                            val alreadyPresent = routeResult.primary.queryWeights.containsKey(emb.rawText)
                             routeResult.primary.queryWeights.merge(emb.rawText, 1.0, Double::plus)
-                            if (routeResult.primary.queries.none { it.rawText == emb.rawText }) {
+                            if (!alreadyPresent) {
                                 routeResult.primary.queries.add(emb)
                             }
                         }
@@ -176,8 +220,10 @@ class TaxonomyOperations(
                         // fallback so mass still lands somewhere.
                         log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
                         synchronized(root.queryWeights) {
+                            // O(1) presence test — see the lockstep note in the leaf branch above.
+                            val alreadyPresent = root.queryWeights.containsKey(emb.rawText)
                             root.queryWeights.merge(emb.rawText, 1.0, Double::plus)
-                            if (root.queries.none { it.rawText == emb.rawText }) {
+                            if (!alreadyPresent) {
                                 root.queries.add(emb)
                             }
                         }
@@ -257,20 +303,28 @@ class TaxonomyOperations(
         allEmbeddings: List<Embedding>,
         groundTruthMap: Map<String, List<String>>,
         currentIteration: Int,
-        deltaThreshold: Double,
-        action: suspend () -> Unit
-    ): Boolean {
-        // Memoization check: identify if this exact proposal has been rejected in this iteration
+        proposalType: ProposalType,
+        refitScope: ((GraphNode) -> Unit)? = null,
+        proposalKey: String? = null,
+        action: suspend () -> Boolean
+    ): ProposalOutcome {
+        // Memoization check: identify if this exact proposal has been rejected in this iteration.
+        // `site` alone does NOT identify a proposal when several distinct edits target the same
+        // node: a cross-link is the pair (host -> target) and `site` is only the target, so
+        // rejecting 'Law -> N' would memo-skip 'Philosophy -> N', a genuinely different edit with
+        // a different J outcome, and record it as REJECTED without ever evaluating it. Callers
+        // whose proposal is not identified by its site pass a discriminating `proposalKey`.
         val populationHash = site.queryWeights.entries.map { it.key.hashCode() xor it.value.hashCode() }.sum()
         val fingerprint = ProposalFingerprint(
-            nodeId = site.id,
+            nodeId = if (proposalKey != null) "${site.id}|$proposalKey" else site.id,
             populationHash = populationHash,
             muHash = site.vmfMu.contentHashCode(),
             kappaHash = site.vmfKappa
         )
         if (rejectedProposalsCache.contains(fingerprint)) {
             log.debug("[MEMOIZED REJECTION] Skip tryProposal for site '${site.label ?: site.id}'")
-            return false
+            proposalStats.record(proposalType, ProposalOutcome.REJECTED)
+            return ProposalOutcome.REJECTED
         }
 
         val root = dag.node
@@ -295,7 +349,11 @@ class TaxonomyOperations(
 
         val backup = taxonomy.model.GraphStateBackup(root)
 
-        action()
+        val didAnything = action()
+        if (!didAnything) {
+            proposalStats.record(proposalType, ProposalOutcome.NO_PROPOSAL)
+            return ProposalOutcome.NO_PROPOSAL
+        }
 
         // 2. Capture structural state after action
         val postRegistry = mutableMapOf<String, GraphNode>()
@@ -319,7 +377,8 @@ class TaxonomyOperations(
         if (beforeNodes == afterNodes) {
             // No structural change occurred at all (complete early exit, no log clutter)
             backup.restore(registry)
-            return false
+            proposalStats.record(proposalType, ProposalOutcome.NO_PROPOSAL)
+            return ProposalOutcome.NO_PROPOSAL
         }
 
         // Diagnose reachability loss: nodes present before the action but absent
@@ -334,51 +393,85 @@ class TaxonomyOperations(
             log.info("[PROPOSAL DIAG] ${lostIds.size} node(s) unreachable after action: $details")
         }
 
-        val baseJ = if (cachedBaseJ != null) {
+        val baseJ = if (cachedBaseJ != null && refitScope == null) {
             cachedBaseJ!!
         } else {
             // Restore backup to get back to base state, compute baseJ, then re-execute action
             backup.restore(registry)
+            if (refitScope != null) {
+                refitScope(root)
+            }
+            root.updateAllShrinkages()
             clearGraphQueries(root)
             reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
+            // Base side of the proposal: this is a settled post-reroute state, so the same
+            // invariant applies. Checking here too means a conservation failure is attributed
+            // to the state that carried it in, rather than surfacing on the next proposal's
+            // post-action check and looking like that edit's fault.
+            assertMassConservation(root, allEmbeddings)
             val jVal = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
-            
+
             // Re-execute action
             action()
             
-            cachedBaseJ = jVal
+            if (refitScope == null) {
+                cachedBaseJ = jVal
+            }
             jVal
         }
 
+        if (refitScope != null) {
+            refitScope(root)
+        }
         root.updateAllShrinkages()
         clearGraphQueries(root)
         reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
 
-        if (currentIteration > 1) {
-            assertMassConservation(root, allEmbeddings)
-        }
+        // Runs on EVERY proposal, deliberately. It is cheap next to the full re-route it
+        // follows, and it is the invariant that caught the corpus-swallowing fusion, the
+        // maxOf weight destruction and the mass > q_dir excesses — all of which lived in
+        // iterations 2..N, so restricting it to iteration 1 would blind exactly the window
+        // where structural edits actually go wrong.
+        assertMassConservation(root, allEmbeddings)
         val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
         val deltaJ = newJ - baseJ
-
-        // Lexicographic objective: accept iff deltaJ > tau OR (|deltaJ| <= tau AND deltaV < 0)
+        // Lexicographic objective: (J, B, -|V|)
         val deltaV = postRegistry.size - registry.size
-        val tau = 1e-6
-        val accepted = deltaJ > tau || (kotlin.math.abs(deltaJ) <= tau && deltaV < 0)
+        val deltaB = postRegistry.values.sumOf { it.crossLinkChildren.size } - registry.values.sumOf { it.crossLinkChildren.size }
+        val tau = config.formalism.tau
+        
+        // Delta J SELECTS growth and shrink edits, but only VETOES bridges.
+        //
+        // The old rule accepted any J-neutral edit that added a cross-link (deltaB > 0). That
+        // terminates — bridges are monotone — but it gives no account of whether a bridge is
+        // worth having, and the evidence says J cannot supply one: accepted bridges spanned
+        // 1e-6 to 8e-4 with the sign flipping on evaluation order, the same node being accepted
+        // at four hosts and rejected at two. Selection now lives in the ambiguity fraction,
+        // which is a statement about joint membership; J keeps the one job it can do here,
+        // which is blocking an edge that actively degrades the partition.
+        val accepted = when {
+            proposalType == ProposalType.BRIDGE -> deltaJ >= -tau
+            deltaJ > tau -> true
+            kotlin.math.abs(deltaJ) <= tau -> deltaV < 0
+            else -> false
+        }
 
         if (accepted) {
-            log.info("[ACCEPTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV")
+            log.info("[$proposalType ACCEPTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV")
             rejectedProposalsCache.clear()
             cachedBaseJ = newJ
-            return true
+            proposalStats.record(proposalType, ProposalOutcome.ACCEPTED)
+            return ProposalOutcome.ACCEPTED
         } else {
             if (kotlin.math.abs(deltaJ) > 1e-9) {
-                log.info("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
+                log.info("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
             } else {
-                log.debug("[REJECTED PROPOSAL] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
+                log.debug("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
             }
             rejectedProposalsCache.add(fingerprint)
             backup.restore(registry)
-            return false
+            proposalStats.record(proposalType, ProposalOutcome.REJECTED)
+            return ProposalOutcome.REJECTED
         }
     }
 
@@ -403,6 +496,11 @@ class TaxonomyOperations(
         val totalAssignedMass = queryWeights.values.sum()
         if (totalAssignedMass == 0.0) return
 
+        val recursiveSum = root.getRecursiveSoftMass()
+        if (Math.abs(totalAssignedMass - recursiveSum) > 1e-6) {
+            throw AssertionError("Mass definitions mismatched: deduped by query=$totalAssignedMass vs recursive sum=$recursiveSum")
+        }
+
         // 1. Check for weight excess (> 1.01) on any query
         val queryWithExcessWeight = queryWeights.filter { it.value > 1.01 }
         if (queryWithExcessWeight.isNotEmpty()) {
@@ -423,7 +521,7 @@ class TaxonomyOperations(
                 val missing = allEmbeddings.filter { it.rawText !in weightedKeys }
                 val missingFlagged = missing.count { emb ->
                     val qId = if (emb.queryId != -1) emb.queryId.toString()
-                              else taxonomy.model.TextNormalizer.cleanText(emb.rawText)
+                              else emb.rawText
                     qId in residualIds || emb.rawText in residualIds
                 }
                 val samples = missing.take(3).joinToString(" | ") { it.rawText.take(60) }
@@ -444,6 +542,7 @@ class TaxonomyOperations(
         node.queryWeights.clear()
         node.residualQueries.clear()
         node.residualConfidences.clear()
+        node.nearMisses.clear()
         node.children.forEach { clearGraphQueries(it, visited) }
         node.crossLinkChildren.forEach { clearGraphQueries(it, visited) }
     }
@@ -561,7 +660,7 @@ class TaxonomyOperations(
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
-        val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent"
+        val type = if (node.isBridged) "Bridge" else if (node.isLeaf) "Leaf" else "Parent"
         val qCount = node.getRecursiveQueryCount()
         val directQ = node.queries.size
         val softMass = node.getRecursiveSoftMass()
@@ -607,7 +706,7 @@ class TaxonomyOperations(
     ) {
         val cross = if (visited.contains(node.id)) " [CROSS-LINK]" else ""
         val edgeType = if (isCrossEdge) " [BRIDGE-EDGE]" else ""
-        val type = if (node.isBridge) "Bridge" else if (node.isLeaf) "Leaf" else "Parent/Residual"
+        val type = if (node.isBridged) "Bridge" else if (node.isLeaf) "Leaf" else "Parent/Residual"
 
         val directQ = node.queries.size
         val qCount = node.getRecursiveQueryCount()

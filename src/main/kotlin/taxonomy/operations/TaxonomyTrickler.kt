@@ -123,27 +123,64 @@ class TaxonomyTrickler(
             return maxVal + ln(exp(a - maxVal) + exp(b - maxVal))
         }
 
-        val pathVisited = mutableSetOf<String>()
-        fun walk(node: GraphNode, currentLogProb: Double) {
-            if (!pathVisited.add(node.id)) return
-            nodeMap[node.id] = node
-            val existing = logProbMap[node.id]
-            logProbMap[node.id] = if (existing == null) currentLogProb else logSumExp(existing, currentLogProb)
-
-            if (node.isLeaf) {
-                pathVisited.remove(node.id)
-                return
+        // Topological (reverse-postorder) processing of the reachable subgraph.
+        //
+        // This was previously a DFS with backtracking — `pathVisited` was removed again on
+        // exit — so it enumerated every distinct root-to-node PATH and re-walked a node's
+        // entire subtree once per path reaching it. On a tree that is linear (paths = nodes),
+        // but every accepted cross-link multiplies the number of paths into the target's whole
+        // subtree, so routing cost grew combinatorially in the number of bridges. Measured:
+        // per-proposal cost rose 10x (0.30s -> 2.92s) as accepted cross-links went 22 -> 161,
+        // which dominated total runtime and got worse the better the polyhierarchy got.
+        //
+        // The quantity being computed is a logSumExp of path masses over an acyclic graph, so
+        // it is a dynamic program: visit each node only after all of its predecessors, and push
+        // mass along each EDGE exactly once. The value is unchanged because addition distributes
+        // over logSumExp — logSumExp(w1,w2) + t == logSumExp(w1+t, w2+t) — so aggregating at the
+        // parent and descending once is identical to descending once per path. O(V+E) instead of
+        // O(paths). The per-node scoring work below is untouched; it simply runs once per node.
+        val order = ArrayList<GraphNode>()
+        run {
+            // null = unseen, 0 = on the current stack, 1 = finished. Re-entering a node still on
+            // the stack is a back edge; the cross-link guards are supposed to keep the graph
+            // acyclic, but ignoring such an edge degrades gracefully instead of overflowing if
+            // one ever slips through.
+            val state = HashMap<String, Int>()
+            fun visit(n: GraphNode) {
+                if (state[n.id] != null) return
+                state[n.id] = 0
+                val kids = if (config.formalism.enableBridging) {
+                    n.children + n.crossLinkChildren
+                } else {
+                    n.children
+                }
+                for (c in kids) visit(c)
+                state[n.id] = 1
+                order.add(n)
             }
+            visit(root)
+        }
+        order.reverse()
+
+        // Log-mass accumulated at each node; final by the time topological order reaches it.
+        val acc = HashMap<String, Double>()
+        acc[root.id] = 0.0
+
+        for (node in order) {
+            // No entry means no admitted path reached this node — it is structurally
+            // reachable but the descent gate or the beam pruned every route to it.
+            val currentLogProb = acc[node.id] ?: continue
+            nodeMap[node.id] = node
+            logProbMap[node.id] = currentLogProb
+
+            if (node.isLeaf) continue
 
             val children = if (config.formalism.enableBridging) {
                 (node.children + node.crossLinkChildren).toList()
             } else {
                 node.children.toList()
             }
-            if (children.isEmpty()) {
-                pathVisited.remove(node.id)
-                return
-            }
+            if (children.isEmpty()) continue
 
             val K = children.size
             val vmfScores = DoubleArray(K)
@@ -192,17 +229,37 @@ class TaxonomyTrickler(
                     if (config.formalism.enableResidualRouting && node.depth >= 1 && !opts.readOnly) {
                         val sumExpAll = vmfScores.sumOf { exp(it - maxScore) }
                         val bestChildResp = 1.0 / sumExpAll.coerceAtLeast(1.0)
-                        val qId = if (embedding.queryId != -1) embedding.queryId.toString() else taxonomy.model.TextNormalizer.cleanText(embedding.rawText)
+                        val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
                         residualHits.add(ResidualHit(node, qId, bestChildResp))
                     }
-                    pathVisited.remove(node.id)
-                    return
+                    continue
                 }
             }
 
             // 3. Per-level relative beam: a child stays on the beam iff its cosine distance
             // is within routingBeamGamma of the BEST sibling's dot product.
             val bestIndices = children.indices.filter { dots[it] >= maxDot - config.formalism.routingBeamGamma }
+            
+            if (!opts.readOnly && config.formalism.enableResidualRouting) {
+                val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
+                for (i in children.indices) {
+                    if (dots[i] < maxDot) {
+                        val margin = maxDot - dots[i]
+                        val child = children[i]
+                        synchronized(child.nearMisses) {
+                            if (child.nearMisses.size < 200) {
+                                child.nearMisses[qId] = margin
+                            } else {
+                                val worst = child.nearMisses.maxByOrNull { it.value }
+                                if (worst != null && margin < worst.value) {
+                                    child.nearMisses.remove(worst.key)
+                                    child.nearMisses[qId] = margin
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             // Register the query embedding for MRL-projection lookup
             GraphNode.registerEmbedding(embedding)
@@ -222,13 +279,11 @@ class TaxonomyTrickler(
                 // test made balanced structure unreachable below depth 2 and forced the
                 // dominant-child wrapper churn.
                 if (accumulatedWeight >= LOG_NEGLIGIBLE_PATH) {
-                    walk(child, accumulatedWeight)
+                    val prev = acc[child.id]
+                    acc[child.id] = if (prev == null) accumulatedWeight else logSumExp(prev, accumulatedWeight)
                 }
             }
-            pathVisited.remove(node.id)
         }
-
-        walk(root, 0.0)
 
         // 1. Gather all candidates (both leaf candidates and fallback internal nodes)
         val candidates = mutableMapOf<GraphNode, Double>()

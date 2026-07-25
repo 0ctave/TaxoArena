@@ -44,7 +44,11 @@ class MrlRoutingTest {
 
     @Test
     fun testMrlConfigDefaults() {
-        assertEquals(0.02, config.formalism.separationEpsilon)
+        // 0.02 comes from config/application.yml. Before the key was renamed to match
+        // the property (separation-epsilon -> proposal-separation-bar) it bound to
+        // nothing and this asserted the Kotlin default 0.04 — i.e. the test passed
+        // precisely BECAUSE the configured value was being ignored.
+        assertEquals(0.02, config.formalism.proposalSeparationBar)
         assertEquals("qwen3.6:27b", config.llm.judgeModel)
         assertEquals("gemma4:e4b", config.llm.labelingModel)
     }
