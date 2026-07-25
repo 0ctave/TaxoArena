@@ -103,7 +103,7 @@ Statistical detail is given in Section~\ref{sec:meth-vmf}.
 
 \textbf{Phase 3 --- Trickle routing.}
 \texttt{TaxonomyTrickler} routes each query down the tree under three
-separated criteria---a parameter-free descent-versus-residual gate,
+separated criteria---a descent-versus-residual gate on a derived bound,
 direction-only sibling competition with a cosine beam, and a final
 per-query membership-share floor
 (Section~\ref{sec:meth-routing}).
@@ -313,14 +313,15 @@ node's parents' concentrations, or a default prior at the root):
 where $\rho = d/n$ is the dimension-to-effective-sample-size ratio,
 so a node's own data dominate when it is well supported and the
 parent prior takes over smoothly as support thins.
-The joint choice of fixed dimension and minimum leaf size should be
-read against this ramp honestly: at $d = 256$ and $n_{\min} = 50$
+The joint choice of fixed dimension and minimum leaf size has a direct
+cost on this ramp. At $d = 256$ and $n_{\min} = 30$
 (Section~\ref{sec:exp-env}), a minimum-size leaf sits at
-$\rho \approx 5.1$ and hence at a blend weight of
-$\alpha \approx 0.39$---partially prior-anchored, not comfortably
-outside any special regime; only nodes with $n \gtrsim 128$ are
+$\rho \approx 8.5$ and so at a blend weight of $\alpha \approx 0.82$:
+its concentration is largely inherited from its parent rather than
+estimated from its own scatter. Only nodes with $n \gtrsim 128$ are
 estimated from their own data alone, and the fully prior-dominated
 $\rho > 10$ regime is additionally logged with a warning.
+Leaf size is therefore a calibrated parameter, not a free one.
 Numerically stable evaluation of $\log I_\nu(\kappa)$ via the Debye
 asymptotic expansion is given in Appendix~\ref{app:numerics}.
 
@@ -386,13 +387,8 @@ concentration estimate degrades as $d/N$ grows
 (Section~\ref{sec:meth-vmf}); at $d = 256$ the fully prior-dominated
 regime ($d/N > 10$) is crossed only below $N \approx
 26$, and the $n_{\min} = 30$ floor keeps every fitted leaf above
-that.
-A minimum-size leaf nevertheless sits high on the empirical-Bayes
-blend ramp: at $N = 30$, $\rho = d/N \approx 8.5$ gives
-$\alpha = (\rho - 2)/8 \approx 0.82$, so its concentration estimate is
-largely parent-anchored rather than fit from its own scatter.
-This is a direct cost of the small-leaf setting, and it is why leaf
-size is a calibrated parameter rather than a free one.
+that, though only just: Section~\ref{sec:meth-vmf} gives the blend
+weight a minimum-size leaf carries as a result.
 Fixing a single dimension additionally means all nodes---across all
 depths---live on the same unit hypersphere, so sibling-fusion and
 dissolution comparisons require no cross-depth
@@ -438,17 +434,21 @@ The walk descends from $v$ for query $\mathbf{x}$ iff
 \in [0,1],
 \]
 where $\omega_c$ are the children's normalised query masses and
-$\delta = \texttt{descentMargin} \geq 0$ (canonical $0$).
+$\delta = \texttt{descentMargin} \geq 0$ (canonical $0.12$).
 The factor $\bar{r}_v$ makes the bound tight: the parent's direction
 is approximately the \emph{normalised} mean of its children's, so the
 raw parent dot product overstates what the children can collectively
 achieve by exactly the factor $1/\bar{r}_v$; after correction the
 test reads ``some child must match the query at least as well as the
 children's own mass-weighted average alignment.''
-At $\delta = 0$ the gate is parameter-free, and a query is residual
-only when it is genuinely unexplained by the sub-structure;
-$\delta > 0$ relaxes the bound, trading measured residual mass for
-softer leaf populations.
+The bound itself is derived rather than tuned: at $\delta = 0$ no free
+parameter enters the decision, and a query is residual only when it is
+genuinely unexplained by the sub-structure.
+The canonical configuration sets $\delta = 0.12$, which relaxes the
+bound and trades measured residual mass for softer leaf populations,
+so the gate as run carries one calibrated parameter rather than none.
+Its value is calibrated jointly with $n_{\min}$ and the separation bar
+(Appendix~\ref{app:tuning-protocol}).
 The comparison is between directions, never densities: the
 $N$-dependent shrinkage of Section~\ref{sec:meth-vmf} makes parents
 systematically sharper than children, so log-density comparisons

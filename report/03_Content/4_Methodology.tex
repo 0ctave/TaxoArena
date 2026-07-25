@@ -95,11 +95,11 @@ Sibling fusion is restricted to nodes sharing a parent, which is what
 keeps each operator a tree-to-tree map.
 Every one of these structural edits is committed only after a
 global check: the edit is applied tentatively, all queries are
-re-routed, and a single corpus-wide separation objective must not
-degrade (splits) or must not
-be damaged beyond a small hysteresis (shrink edits).
+re-routed, and the edit is kept only if it improves a single
+corpus-wide separation objective, or leaves that objective unchanged
+within a tolerance while strictly reducing the node count.
 Both at construction time and for held-out queries, a query trickles
-down the tree under three separated criteria: a parameter-free
+down the tree under three separated criteria: a derived-bound
 descent-versus-residual gate on directions, sibling competition
 within an additive cosine beam of the best-matching child, and a
 final per-query membership-share floor over the destinations
@@ -218,10 +218,14 @@ Leaf-level parameters are never averaged: BT identification is fixed
 only up to a per-component additive constant, so averaging
 differently-normalised leaf scales produces no interpretable result,
 whereas pooling counts and refitting yields a single shared scale.
-A fractional-weight sensitivity analysis, in which a leaf with $k$
-primary parents contributes $(1/k)$ of its counts to each, is
-recorded under a separate \texttt{aggregationConvention} field for
-comparison in Chapter~\ref{ch:results}.
+A fractional-weight sensitivity analysis, in which a held-out query
+assigned to $k$ leaves contributes $(1/k)$ of its verdicts to each
+rather than its full count, is recorded under a separate
+\texttt{aggregationConvention} field for comparison in
+Chapter~\ref{ch:results}.
+The discount applies to multi-leaf \emph{queries}
+(Section~\ref{sec:arch-arena}); leaves themselves have one parent, so
+no node's counts are ever split between branches.
 
 Two parallel tracks are maintained per anchor: \textit{Track A
 (canonical)} groups verdicts by MMLU-Pro label, producing

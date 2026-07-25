@@ -146,7 +146,7 @@ serialised as an immutable snapshot to \texttt{snapshots.db}.
 \item \textbf{Held-out routing.}
 A reserved subset of queries not used during taxonomy construction
 is routed through the frozen snapshot by the same trickle used at
-construction time: at each node, a parameter-free descent gate decides
+construction time: at each node, a descent gate on a derived bound decides
 whether the sub-structure explains the query at all, siblings within a
 cosine beam of the best-matching child are descended in parallel, and
 a final per-query membership-share floor selects the destinations that
@@ -258,8 +258,9 @@ Every structural edit in phases~4 and~5 is applied as a measured
 proposal: the edit is executed tentatively, all queries are re-routed
 through the modified structure, and the edit is committed only if a
 single global separation objective does not degrade
-(Appendix~\ref{app:dag-formalism}); splits must not lower it, and
-shrink edits may not damage it beyond a small hysteresis.
+(Appendix~\ref{app:dag-formalism}): the edit must either improve the
+objective, or leave it unchanged within a tolerance while strictly
+reducing the node count.
 Each operator preserves the single-parent invariant, so every
 iteration maps a tree to a tree.
 No editorial label, ontology, or human annotation governs splitting or
