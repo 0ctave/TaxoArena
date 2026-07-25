@@ -31,7 +31,7 @@ models        = [
 
 category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filter)
 queryLimit    = 0       # 0 = no cap; use the full corpus
-outputDir     = "experiment_results/mcs30_eps02_tree"
+outputDir     = "experiment_results/cal_mf025"
 testRatio     = 0.3     # frozen 70/30 stratified split; the 30% held-out pool is
                         # reserved for arena evaluation and excluded from construction
 seed          = 42      # construction seed
@@ -58,7 +58,7 @@ proposalSeparationBar     = 0.02   # null-calibrated: isotropic-selection noise 
 tau                   = 1e-6   # lexicographic J acceptance tolerance
 
 # ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
-membershipFloor       = 0.25   # min share of a query's own normalized membership for a leaf to count
+membershipFloor       = 0.25
 routingBeamGamma      = 0.2    # round-2 winner a21f2ac1
 descentMargin         = 0.12   # round-2 winner a21f2ac1
                                # higher = fewer residual queries, softer leaf populations (sweep-calibrated)

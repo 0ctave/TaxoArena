@@ -31,16 +31,17 @@ models        = [
 
 category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filter)
 queryLimit    = 0       # 0 = no cap; use the full corpus
-outputDir     = "experiment_results/mcs30_eps02_tree"
+outputDir     = "experiment_results/cal_seeds"
 testRatio     = 0.3     # frozen 70/30 stratified split; the 30% held-out pool is
                         # reserved for arena evaluation and excluded from construction
-seed          = 42      # construction seed
+seed          = 42
+seeds         = [42, 137, 2048, 7, 31337]   # cross-seed ARI + variance on every reported metric
 
 # ── Pipeline / evaluation switches ──────────────────────────────────────────
 runPipeline        = true
 runBenchmark       = false
 runTrickle         = true          # needed — produces the ECE/routing metrics
-runBaselines       = false         # skip for the pilot (save ~90s)
+runBaselines       = true    # recursive k-means + agglomerative at matched leaf count
 enableFinalMetrics = true          # REQUIRED — you need metrics to validate
 enableLabeling     = true          # LLM cluster labeling off for structural build
 judgeInduction     = false         # judges are induced in the arena step
