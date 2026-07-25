@@ -1,6 +1,6 @@
 [base]
-config = "experiment_configs/thesis_canonical.toml"
-gradle_cmd = "cmd /c Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\gradlew.bat bootRun --rerun-tasks"  # For Windows (cmd /c + absolute path: python subprocess cannot exec .bat directly and cwd is not guaranteed)
+config = "experiment_configs/mcs30_eps02_tree.toml"
+gradle_cmd = "cmd /c Z:\FAC\TUBerlin\THESIS\TaxoArena\gradlew.bat bootRun --rerun-tasks --no-configuration-cache"
 extra_args = ""
 
 [output]
@@ -17,55 +17,53 @@ seeds = [137, 2048]
 stage = "validate"
 
 # ══════════════════════════════════════════════════════════════════════════
-#  REFINEMENT SWEEP — FINAL DAG CALIBRATION (2026-07-24, round 2)
+#  TREE CALIBRATION (2026-07-25)
 #
-#  Round 1 (L9: descentMargin x minClusterSize x secondaryMassFloor x
-#  routingBeamGamma) selected 6fcd2951 (delta=0.05, mCS=25, sMF=5.0,
-#  gamma=0.1; Top-1 73.9%, purity 0.728, ECE 0.213, ~0 residuals). That
-#  winner sits at the EDGE of the round-1 box on three factors (delta max,
-#  mCS min, gamma max) — the optimum may lie outside it. Round 2 therefore
-#  re-centers past the winner and swaps in the one structural knob round 1
-#  never varied:
+#  Architecture changed since the round-2 DAG sweep: cross-linking is removed
+#  (commit 334b95d), so the base is the tree canonical — seed 42 gives
+#  J=0.26697, 177 nodes / 112 leaves, converged, multi_leaf_rate=0.1518,
+#  held-out Top-1 73.72% [72.25, 75.13].
 #
-#   - separationEpsilon {0.005, 0.01, 0.02}   [NEW — the structure knob]
-#       Chance-corrected separation floor for splits/merges/distinctness
-#       and proposal-gate threshold magnitude. Round 1 fixed it at 0.01.
+#  Every bridge factor and gate from the previous spec is gone: they are
+#  vacuously satisfied on a tree and would have silently passed everything.
+#  The four factors below are the knobs that still do something:
 #
-#   - descentMargin {0.05, 0.08, 0.12}        [pushed past round-1 max]
-#       Residuals were already ~0 at 0.05; the question is whether more
-#       slack keeps helping Top-1 or starts diluting purity.
+#   - proposalSeparationBar {0.01, 0.02, 0.03}
+#       The structure knob. Chance-corrected separation floor for splits.
+#       Null-calibrated ceiling was ~0.014-0.021 (measured p95 for n>=150),
+#       so this brackets the noise line rather than straddling it blindly.
 #
-#   - minClusterSize {20, 25, 35}             [pushed below round-1 min]
-#       Round 1 chose 25 over 50/75. Watch arena support: held-out pool
-#       (~3.6k) per leaf must stay viable for judge evaluation.
+#   - descentMargin {0.06, 0.12, 0.18}
+#       Slack below the Jensen-tight descent bar: trades residual rate
+#       against leaf purity. Canonical 0.12 came from the DAG sweep and has
+#       never been re-checked under a tree.
 #
-#   - routingBeamGamma {0.10, 0.15, 0.20}     [pushed past round-1 max]
-#       Wider beams raise multi-assignment; AvgMatchCount band and the
-#       cap-rate gate bound the acceptable region.
+#   - minClusterSize {25, 30, 35}
+#       Leaf granularity. Hard constraint downstream: the arena needs >=12
+#       held-out top-1 per leaf, so watch per-leaf support, not just count.
 #
-#  secondaryMassFloor is FIXED at 5.0 in the base config (round-1 result:
-#  2.0 admits re-firing noise, 10.0 starves genuine links).
-#  Base config = thesis_canonical.toml at the round-1 winner values.
-#  Prerequisite fix in this tree: fuseNodes redistributes mass over the
-#  weight map (seed-2048 round-1 validation crashed on the dropped-mass
-#  assert; repro re-run clean before this sweep was launched).
+#   - membershipFloor {0.15, 0.25, 0.35}
+#       Min share of a query's own membership for a leaf to count — the
+#       direct control on multi_leaf_rate, which is now a headline claim
+#       ("soft multi-membership over a strict hierarchy"), so it must be
+#       calibrated rather than inherited.
+#
+#  routingBeamGamma is held at the canonical 0.20: it and membershipFloor
+#  both act on multi-membership, and L9 cannot separate their interaction.
+#  Sweep it in a follow-up if membershipFloor turns out to be at an edge.
 # ══════════════════════════════════════════════════════════════════════════
 
 [factors]
-separationEpsilon  = [0.005, 0.01, 0.02]
-descentMargin      = [0.05, 0.08, 0.12]
-minClusterSize     = [20, 25, 35]
-routingBeamGamma   = [0.10, 0.15, 0.20]
+proposalSeparationBar = [0.01, 0.02, 0.03]
+descentMargin         = [0.06, 0.12, 0.18]
+minClusterSize        = [25, 30, 35]
+membershipFloor       = [0.15, 0.25, 0.35]
 
 [gates.hard]
 Acyclic = true
-DuplicateBridgeCount = 0
 OrphanCount = 0
-has_depth2_sourceB = false
 MaxAssignmentCapRate_le = 0.20
 SmallLeafFraction_le = 0.50
-SelectedNodeStarvedLeafFraction_le = 0.20
-SourceBPerAnchorMean_le = 3.0
 
 [gates.soft]
 AvgMatchCount_band = [1.0, 4.0]

@@ -142,11 +142,7 @@ class TaxonomyTrickler(
         opts: TrickleOptions,
         onResidual: (GraphNode, String, Double) -> Unit
     ): ChildTransitions? {
-        val children = if (config.formalism.enableBridging) {
-            (node.children + node.crossLinkChildren).toList()
-        } else {
-            node.children.toList()
-        }
+        val children = node.children.toList()
         if (children.isEmpty()) return null
 
         val K = children.size
@@ -331,12 +327,7 @@ class TaxonomyTrickler(
             fun visit(n: GraphNode) {
                 if (state[n.id] != null) return
                 state[n.id] = 0
-                val kids = if (config.formalism.enableBridging) {
-                    n.children + n.crossLinkChildren
-                } else {
-                    n.children
-                }
-                for (c in kids) visit(c)
+                for (c in n.children) visit(c)
                 state[n.id] = 1
                 order.add(n)
             }
@@ -400,12 +391,7 @@ class TaxonomyTrickler(
                 // (e.g. a domain node with a bridged child) whose residual pool must
                 // remain a valid destination, or its unrouted queries fall back to root.
                 if (!node.isLeaf) {
-                    val activeChildren = if (config.formalism.enableBridging) {
-                        node.children + node.crossLinkChildren
-                    } else {
-                        node.children
-                    }
-                    if (!activeChildren.any { logProbMap.containsKey(it.id) }) {
+                    if (!node.children.any { logProbMap.containsKey(it.id) }) {
                         candidates[node] = logProb
                     }
                 }

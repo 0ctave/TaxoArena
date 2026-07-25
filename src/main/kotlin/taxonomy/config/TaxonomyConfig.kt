@@ -23,7 +23,6 @@ class TaxonomyConfig {
     var formalism: FormalismConfig = FormalismConfig()
 
     class ExecutionConfig {
-        var calibrate: Boolean = false
         var startService: Boolean = false
         var numIterations: Int = 15
         var enableEarlyStopping: Boolean = true
@@ -62,14 +61,9 @@ class TaxonomyConfig {
         var embeddingModel: String = "qwen3-embedding"
         var maxJudgeGenerality: Int = 1 // 0 = only leaves, 1 = leaves + parents, etc.
         var judgeDomains: List<String> = emptyList()
-        var gemini: GeminiConfig = GeminiConfig()
         var azure: AzureConfig = AzureConfig()
     }
 
-    class GeminiConfig {
-        var apiKey: String? = null
-        var modelName: String = "gemini-1.5-flash"
-    }
 
     class AzureConfig {
         var endpoint: String = ""
@@ -137,14 +131,12 @@ class TaxonomyConfig {
                 enableStableQuestionIds = isDag
                 enableResidualRouting = isDag
                 enableResidualSplitGate = isDag
-                enableBridging = isDag
             }
 
         // ── Internal boolean flags (mapped by dagMode, overrideable for regression)
         var enableStableQuestionIds: Boolean = true
         var enableResidualRouting: Boolean = true
         var enableResidualSplitGate: Boolean = true
-        var enableBridging: Boolean = true
         var enableGtWarmStart: Boolean = false
 
         var fusionSimilarityThreshold: Double = 0.92
@@ -155,10 +147,6 @@ class TaxonomyConfig {
     var diagnostics: DiagnosticsConfig = DiagnosticsConfig()
 
     class DiagnosticsConfig {
-        var enableBridgeAnalysis: Boolean = false
-        var secondaryMassFloor: Double = 5.0
-        var bridgeSupportFloor: Double = 50.0
-        var bridgeSupportRelFraction: Double = 0.10
         var enableProfiling: Boolean = false
     }
 
@@ -231,17 +219,12 @@ class TaxonomyConfig {
             enableStableQuestionIds = formalism.enableStableQuestionIds,
             enableResidualRouting = formalism.enableResidualRouting,
             enableResidualSplitGate = formalism.enableResidualSplitGate,
-            enableBridging = formalism.enableBridging,
             enableGtWarmStart = formalism.enableGtWarmStart,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
             defaultKappaPrior = formalism.defaultKappaPrior
         ),
         diagnostics = EffectiveConfig.Diagnostics(
-            enableBridgeAnalysis = diagnostics.enableBridgeAnalysis,
-            secondaryMassFloor = diagnostics.secondaryMassFloor,
-            bridgeSupportFloor = diagnostics.bridgeSupportFloor,
-            bridgeSupportRelFraction = diagnostics.bridgeSupportRelFraction,
             enableProfiling = diagnostics.enableProfiling
         )
     )
@@ -277,16 +260,11 @@ class TaxonomyConfig {
         formalism.enableStableQuestionIds = c.formalism.enableStableQuestionIds
         formalism.enableResidualRouting = c.formalism.enableResidualRouting
         formalism.enableResidualSplitGate = c.formalism.enableResidualSplitGate
-        formalism.enableBridging = c.formalism.enableBridging
         formalism.enableGtWarmStart = c.formalism.enableGtWarmStart
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
 
-        diagnostics.enableBridgeAnalysis = c.diagnostics.enableBridgeAnalysis
-        diagnostics.secondaryMassFloor = c.diagnostics.secondaryMassFloor
-        diagnostics.bridgeSupportFloor = c.diagnostics.bridgeSupportFloor
-        diagnostics.bridgeSupportRelFraction = c.diagnostics.bridgeSupportRelFraction
         diagnostics.enableProfiling = c.diagnostics.enableProfiling
     }
 }

@@ -42,7 +42,7 @@ runBenchmark       = false
 runTrickle         = true          # needed — produces the ECE/routing metrics
 runBaselines       = false         # skip for the pilot (save ~90s)
 enableFinalMetrics = true          # REQUIRED — you need metrics to validate
-enableLabeling     = false         # LLM cluster labeling off for structural build
+enableLabeling     = true         # LLM cluster labeling off for structural build
 judgeInduction     = false         # judges are induced in the arena step
 
 # ── Construction mode ───────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ dagMode = "DAG_MAX"      # full polyhierarchy: enables bridging (multi-parent no
 # ── Formalism parameters ─────────────────────────────────────────────────────
 maxDepth              = 8      # max taxonomy depth (caps runaway recursion)
 minClusterSize        = 20     # round-2 winner a21f2ac1
-separationEpsilon     = 0.01   # chance-corrected separation floor for splits/merges
+proposalSeparationBar     = 0.01   # chance-corrected separation floor for splits/merges
 
 # ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
 membershipFloor       = 0.25   # min share of a query's own normalized membership for a leaf to count
@@ -71,6 +71,4 @@ fusionSimilarityThreshold = 0.90
 enableGtWarmStart         = false  # skips trickle-based reassignment on iteration 1, keeping bootstrap intact
 
 # ── Bridge Analysis & Diagnostics ─────────────────────────────────────────────
-secondaryMassFloor        = 5.0    # cross-link host/candidate floor (L9 winner 6fcd2951; 2.0 admitted re-firing noise)
-bridgeSupportRelFraction  = 0.10   # relative support a bridge must carry vs parent to be admitted
 enableProfiling           = true

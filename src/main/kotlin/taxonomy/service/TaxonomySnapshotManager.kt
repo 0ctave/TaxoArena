@@ -149,7 +149,7 @@ data class SnapshotSettings(
     val selectedDomains: List<String>,
     val maxDepth: Int,
     val enableLabeling: Boolean,
-    val separationEpsilon: Double,
+    val proposalSeparationBar: Double,
     val minClusterSize: Int,
     // Removed: routingSoftmaxTau/constructionMargin/arenaMargin/tauKappaScalingFactor/
     // kappaAdaptive. Those thresholded a raw nats gap whose practical width depended on local
@@ -158,9 +158,6 @@ data class SnapshotSettings(
     // (temperature=1, true Bayesian) responsibility, which means the same thing everywhere in
     // the tree. Kept here (defaulted) only so legacy snapshot rows still deserialize.
     val routingSoftmaxTau: Double = 1.0,
-    val secondaryMassFloor: Double = 5.0,
-    val bridgeSupportFloor: Double = 50.0,
-    val bridgeSupportRelFraction: Double = 0.10,
     val enableProfiling: Boolean = false,
     val deltaAssign: Double = 0.20,
     val constructionMargin: Double = 0.20,
@@ -198,7 +195,7 @@ data class SnapshotSettings(
         formalism = EffectiveConfig.Formalism(
             maxDepth = maxDepth,
             minClusterSize = minClusterSize,
-            separationEpsilon = separationEpsilon,
+            proposalSeparationBar = proposalSeparationBar,
             membershipFloor = membershipFloor,
             routingBeamGamma = routingBeamGamma,
             descentMargin = descentMargin,
@@ -207,9 +204,6 @@ data class SnapshotSettings(
             dagMode = dagMode
         ),
         diagnostics = EffectiveConfig.Diagnostics(
-            secondaryMassFloor = secondaryMassFloor,
-            bridgeSupportFloor = bridgeSupportFloor,
-            bridgeSupportRelFraction = bridgeSupportRelFraction,
             enableProfiling = enableProfiling
         )
     )
@@ -530,12 +524,9 @@ class TaxonomySnapshotManager(
             selectedDomains = config.dataset.selectedDomains,
             maxDepth = config.formalism.maxDepth,
             enableLabeling = config.execution.enableLabeling,
-            separationEpsilon = config.formalism.separationEpsilon,
+            proposalSeparationBar = config.formalism.proposalSeparationBar,
             minClusterSize = config.formalism.minClusterSize,
             routingSoftmaxTau = 1.0,
-            secondaryMassFloor = config.diagnostics.secondaryMassFloor,
-            bridgeSupportFloor = config.diagnostics.bridgeSupportFloor,
-            bridgeSupportRelFraction = config.diagnostics.bridgeSupportRelFraction,
             enableProfiling = config.diagnostics.enableProfiling,
             deltaAssign = 0.0,
             constructionMargin = 0.0,

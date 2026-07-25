@@ -53,7 +53,8 @@ data class EffectiveConfig(
         val dagMode: DagMode = DagMode.DAG_MAX,
         val maxDepth: Int = 12,
         val minClusterSize: Int = 25,
-        val separationEpsilon: Double = 0.04,
+        val proposalSeparationBar: Double = 0.04,
+        val tau: Double = 1e-6,
         val membershipFloor: Double = 0.10,
         val routingBeamGamma: Double = 0.15,
         val descentMargin: Double = 0.0,
@@ -61,7 +62,6 @@ data class EffectiveConfig(
         val enableStableQuestionIds: Boolean = true,
         val enableResidualRouting: Boolean = true,
         val enableResidualSplitGate: Boolean = true,
-        val enableBridging: Boolean = true,
         val enableGtWarmStart: Boolean = false,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
@@ -70,10 +70,6 @@ data class EffectiveConfig(
 
     @Serializable
     data class Diagnostics(
-        val enableBridgeAnalysis: Boolean = false,
-        val secondaryMassFloor: Double = 5.0,
-        val bridgeSupportFloor: Double = 50.0,
-        val bridgeSupportRelFraction: Double = 0.10,
         val enableProfiling: Boolean = false
     )
 }

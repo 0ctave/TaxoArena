@@ -46,10 +46,8 @@ enableLabeling     = true          # LLM cluster labeling off for structural bui
 judgeInduction     = false         # judges are induced in the arena step
 
 # ── Construction mode ───────────────────────────────────────────────────────
-dagMode = "DAG_MAX"      # NOT TREE_BASELINE: that also disables residualRouting,
-                         # residualSplitGate and stableQuestionIds. Tree-ness comes
-                         # from enableBridging=false alone.
-enableBridging = false   # tree with soft multi-membership routing (beam + membershipFloor)
+dagMode = "DAG_MAX"      # keeps residualRouting / residualSplitGate / stableQuestionIds on.
+                         # Cross-linking no longer exists, so this is purely those three flags.
 
 # ── Formalism parameters ─────────────────────────────────────────────────────
 maxDepth              = 8      # max taxonomy depth (caps runaway recursion)

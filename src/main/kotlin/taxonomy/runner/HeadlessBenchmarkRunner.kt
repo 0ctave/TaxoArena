@@ -69,14 +69,10 @@ data class HeadlessCliConfig(
     val enableStableQuestionIds: Boolean? = null,
     val enableResidualRouting: Boolean? = null,
     val enableResidualSplitGate: Boolean? = null,
-    val enableBridging: Boolean? = null,
     val fusionSimilarityThreshold: Double? = null,
     val effectiveSupportFloor: Double? = null,
     val numIterations: Int? = null,
     val runBaselines: Boolean = true,
-    val secondaryMassFloor: Double? = null,
-    val bridgeSupportFloor: Double? = null,
-    val bridgeSupportRelFraction: Double? = null,
     val enableGtWarmStart: Boolean? = null,
     val maxLeafAssignments: Int? = null,
     val dagMode: String? = null,
@@ -158,24 +154,18 @@ class HeadlessBenchmarkRunner(
         cliConfig.enableStableQuestionIds?.let { config.formalism.enableStableQuestionIds = it }
         cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
         cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
-        cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
         cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
         cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
-        cliConfig.secondaryMassFloor?.let { config.diagnostics.secondaryMassFloor = it }
-        cliConfig.bridgeSupportFloor?.let { config.diagnostics.bridgeSupportFloor = it }
-        cliConfig.bridgeSupportRelFraction?.let { config.diagnostics.bridgeSupportRelFraction = it }
         cliConfig.enableGtWarmStart?.let { config.formalism.enableGtWarmStart = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
         // dagMode's setter rewrites enableStableQuestionIds / enableResidualRouting /
-        // enableResidualSplitGate / enableBridging as a block, so it MUST be applied before the
-        // individual overrides — otherwise it silently clobbers them and the flags documented as
-        // "overrideable for regression" are not in fact overrideable. This matters for the
-        // tree-with-soft-membership build, which needs enableBridging=false while KEEPING
+        // enableResidualSplitGate as a block, so it MUST be applied before the individual
+        // overrides — otherwise it silently clobbers them and the flags documented as
+        // "overrideable for regression" are not in fact overrideable.
         // residual routing; TREE_BASELINE would switch all four off together.
         cliConfig.dagMode?.let {
             config.formalism.dagMode = taxonomy.config.DagMode.valueOf(it.uppercase())
         }
-        cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
         cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
         cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
         cliConfig.enableStableQuestionIds?.let { config.formalism.enableStableQuestionIds = it }
@@ -1282,12 +1272,8 @@ class HeadlessBenchmarkRunner(
         var enableStableQuestionIds: Boolean? = null
         var enableResidualRouting: Boolean? = null
         var enableResidualSplitGate: Boolean? = null
-        var enableBridging: Boolean? = null
         var fusionSimilarityThreshold: Double? = null
         var effectiveSupportFloor: Double? = null
-        var secondaryMassFloor: Double? = null
-        var bridgeSupportFloor: Double? = null
-        var bridgeSupportRelFraction: Double? = null
         var enableGtWarmStart: Boolean? = null
         var maxLeafAssignments: Int? = null
         var dagMode: String? = null
@@ -1359,17 +1345,12 @@ class HeadlessBenchmarkRunner(
                 "enableStableQuestionIds" -> enableStableQuestionIds = rawVal.toBoolean()
                 "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
-                "enableBridging" -> enableBridging = rawVal.toBoolean()
-                "enableBridgeAnalysis" -> config.diagnostics.enableBridgeAnalysis = rawVal.toBoolean()
                 "enableProfiling" -> {
                     config.diagnostics.enableProfiling = rawVal.toBoolean()
                     enableProfiling = rawVal.toBoolean()
                 }
                 "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
                 "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
-                "secondaryMassFloor" -> secondaryMassFloor = rawVal.toDouble()
-                "bridgeSupportFloor" -> bridgeSupportFloor = rawVal.toDouble()
-                "bridgeSupportRelFraction" -> bridgeSupportRelFraction = rawVal.toDouble()
                 "enableGtWarmStart" -> enableGtWarmStart = rawVal.toBoolean()
                 "maxLeafAssignments" -> maxLeafAssignments = rawVal.toInt()
                 "dagMode" -> dagMode = rawVal.trim().trim('"').trim('\'')
@@ -1411,12 +1392,8 @@ class HeadlessBenchmarkRunner(
             enableStableQuestionIds = enableStableQuestionIds,
             enableResidualRouting = enableResidualRouting,
             enableResidualSplitGate = enableResidualSplitGate,
-            enableBridging = enableBridging,
             fusionSimilarityThreshold = fusionSimilarityThreshold,
             effectiveSupportFloor = effectiveSupportFloor,
-            secondaryMassFloor = secondaryMassFloor,
-            bridgeSupportFloor = bridgeSupportFloor,
-            bridgeSupportRelFraction = bridgeSupportRelFraction,
             enableGtWarmStart = enableGtWarmStart,
             maxLeafAssignments = maxLeafAssignments,
             dagMode = dagMode,
@@ -1462,10 +1439,7 @@ class HeadlessBenchmarkRunner(
             config.formalism.maxLeafAssignments,
             config.formalism.dagMode,
             config.formalism.fusionSimilarityThreshold,
-            config.formalism.effectiveSupportFloor,
-            config.diagnostics.secondaryMassFloor,
-            config.diagnostics.bridgeSupportFloor,
-            config.diagnostics.bridgeSupportRelFraction
+            config.formalism.effectiveSupportFloor
         ).joinToString(",")
         return String.format(java.util.Locale.US, "%08x", raw.hashCode())
     }

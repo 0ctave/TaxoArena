@@ -1,0 +1,75 @@
+[base]
+config = "experiment_configs/thesis_canonical.toml"
+gradle_cmd = "cmd /c Z:\\FAC\\TUBerlin\\THESIS\\TaxoArena\\gradlew.bat bootRun --rerun-tasks"  # For Windows (cmd /c + absolute path: python subprocess cannot exec .bat directly and cwd is not guaranteed)
+extra_args = ""
+
+[output]
+runs_dir = "tuning/runs"
+combined_ledger = "tuning/combined_ledger.csv"
+
+[screening]
+design = "L9_3_4"
+seed = 42
+stage = "screen"
+
+[finalists]
+seeds = [137, 2048]
+stage = "validate"
+
+# ══════════════════════════════════════════════════════════════════════════
+#  REFINEMENT SWEEP — FINAL DAG CALIBRATION (2026-07-24, round 2)
+#
+#  Round 1 (L9: descentMargin x minClusterSize x secondaryMassFloor x
+#  routingBeamGamma) selected 6fcd2951 (delta=0.05, mCS=25, sMF=5.0,
+#  gamma=0.1; Top-1 73.9%, purity 0.728, ECE 0.213, ~0 residuals). That
+#  winner sits at the EDGE of the round-1 box on three factors (delta max,
+#  mCS min, gamma max) — the optimum may lie outside it. Round 2 therefore
+#  re-centers past the winner and swaps in the one structural knob round 1
+#  never varied:
+#
+#   - proposalSeparationBar {0.005, 0.01, 0.02}   [NEW — the structure knob]
+#       Chance-corrected separation floor for splits/merges/distinctness
+#       and proposal-gate threshold magnitude. Round 1 fixed it at 0.01.
+#
+#   - descentMargin {0.05, 0.08, 0.12}        [pushed past round-1 max]
+#       Residuals were already ~0 at 0.05; the question is whether more
+#       slack keeps helping Top-1 or starts diluting purity.
+#
+#   - minClusterSize {20, 25, 35}             [pushed below round-1 min]
+#       Round 1 chose 25 over 50/75. Watch arena support: held-out pool
+#       (~3.6k) per leaf must stay viable for judge evaluation.
+#
+#   - routingBeamGamma {0.10, 0.15, 0.20}     [pushed past round-1 max]
+#       Wider beams raise multi-assignment; AvgMatchCount band and the
+#       cap-rate gate bound the acceptable region.
+#
+#  secondaryMassFloor is FIXED at 5.0 in the base config (round-1 result:
+#  2.0 admits re-firing noise, 10.0 starves genuine links).
+#  Base config = thesis_canonical.toml at the round-1 winner values.
+#  Prerequisite fix in this tree: fuseNodes redistributes mass over the
+#  weight map (seed-2048 round-1 validation crashed on the dropped-mass
+#  assert; repro re-run clean before this sweep was launched).
+# ══════════════════════════════════════════════════════════════════════════
+
+[factors]
+proposalSeparationBar  = [0.005, 0.01, 0.02]
+descentMargin      = [0.05, 0.08, 0.12]
+minClusterSize     = [20, 25, 35]
+routingBeamGamma   = [0.10, 0.15, 0.20]
+
+[gates.hard]
+Acyclic = true
+DuplicateBridgeCount = 0
+OrphanCount = 0
+has_depth2_sourceB = false
+MaxAssignmentCapRate_le = 0.20
+SmallLeafFraction_le = 0.50
+SelectedNodeStarvedLeafFraction_le = 0.20
+SourceBPerAnchorMean_le = 3.0
+
+[gates.soft]
+AvgMatchCount_band = [1.0, 4.0]
+Top1Accuracy_ge = 0.72
+RoutingECE_le = 0.30
+CrossAnchorMigrationRate_band = [0.10, 0.30]
+CanonicalAdaptedJaccard_band = [0.0, 1.0]
