@@ -4,17 +4,14 @@
 
 \subsection{The Routing Problem and the Agentic Turn}\label{subsec:the-agentic-turn}
 
-The field of Artificial Intelligence is undergoing a structural shift
-from systems that respond to individual prompts towards systems that
-pursue goals autonomously across extended sequences of
-decisions~\parencite{wissuchek2025agentic}.
-This transition, the \textit{agentic turn}, marks the evolution of
-Large Language Models (LLMs) from passive text-generation interfaces
-into active participants within larger software
-pipelines, in which complex tasks are
-decomposed into sub-tasks and dispatched to specialised tools, APIs, or
-models~\parencite{yao2023react}.
-The quality of this dispatch depends critically on one question:
+Large Language Models (LLMs) increasingly act inside larger software
+pipelines rather than as interfaces that answer individual prompts.
+Complex tasks are decomposed into sub-tasks and dispatched to
+specialised tools, APIs, or models~\parencite{yao2023react}; systems
+built this way pursue goals across extended sequences of decisions,
+a transition termed the \textit{agentic
+turn}~\parencite{wissuchek2025agentic}.
+The quality of this dispatch depends on one question:
 \textit{which model should handle a given sub-task?}
 
 Answering it requires a fine-grained, up-to-date capability map of the
@@ -25,20 +22,20 @@ needed to build such a map remains largely absent: current benchmark
 leaderboards report a single aggregate score per model, which conflates
 performance across semantically heterogeneous tasks and gives no signal
 about domain-specific strengths or failure modes.
-A routing decision based on a global score is, at best, a coarse
-approximation to the question the orchestrating agent actually needs
+A routing decision based on a global score is a coarse
+approximation to the question the orchestrating agent needs
 answered.
 
-This thesis does not deploy a production router.
-It builds and validates the substrate such a router would consume:
-per-domain capability profiles at sufficient resolution to distinguish
-models that are equal on average but opposite at the margin.
+This thesis builds and validates the substrate such a router would
+consume: per-domain capability profiles at sufficient resolution to
+distinguish models that are equal on average but opposite at the
+margin.
+It does not deploy a production router.
 
 \subsection{The Evaluation Gap}\label{subsec:the-evaluation-gap}
 
-The rapid deployment of LLMs has outpaced the development of evaluation
-frameworks capable of distinguishing their capabilities at the
-resolution required for informed routing.
+Current evaluation frameworks do not distinguish model capabilities at
+the resolution informed routing requires.
 Two structural limitations characterise current practice.
 
 \subsubsection*{The Static Benchmark Problem}
@@ -64,10 +61,9 @@ Even when evaluation signals are available, current ranking systems
 reduce multidimensional capability profiles to a single scalar score,
 such as an Elo rating or a weighted
 accuracy~\parencite{boubdir2024elo}.
-This \textit{Scalar Fallacy} produces \textit{Aggregation Bias}:
-averaging performance across all domains masks catastrophic failures in
-specific subgroups and obscures profiles that differ only in
-composition, not in mean~\parencite{raju2024constructing}.
+Averaging performance across all domains masks catastrophic failures in
+specific subgroups and obscures profiles that differ in
+composition while agreeing in mean~\parencite{raju2024constructing}.
 Two models with identical global scores may differ sharply in their
 domain profiles---one strong in formal reasoning and weak in applied
 sciences, the other the reverse---yet a global leaderboard assigns them
@@ -91,13 +87,10 @@ Yet the correct routing decision for a question requiring formal logical
 inference is $A$, and for textual-source interpretation is $B$, each
 with high confidence.
 The aggregate score throws away exactly the information the routing
-decision needs: the two models are \textit{equal on average and opposite
-at the margin}.
+decision needs.
 A benchmark adequate for routing must therefore report capability at
 the resolution of individual semantic sub-domains and distinguish
-profiles that coincide in mean but differ in composition---the
-resolution requirement the framework developed in this thesis is
-designed to meet.
+profiles that coincide in mean but differ in composition.
 Figure~\ref{fig:routing-slopegraph} draws this crossing directly.
 
 \begin{figure}[h]
@@ -141,8 +134,8 @@ rubrics a general-purpose judge cannot provide.
 
 \section{Problem Statement}\label{sec:problem-statement}
 
-The preceding discussion identifies four concrete, interconnected
-problems that remain unresolved in current evaluation practice, each a
+The preceding discussion identifies four problems that remain
+unresolved in current evaluation practice, each a
 necessary precondition for the next; the two headline contributions of
 this thesis address them in pairs (Section~\ref{sec:research-goal}).
 

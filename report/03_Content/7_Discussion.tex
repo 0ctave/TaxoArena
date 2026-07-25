@@ -40,15 +40,13 @@ and the arena symmetrically), but that the \emph{judge} may recognise
 a held-out question and its correct answer from training.
 A memorising judge approximates the accuracy oracle directly, so
 judge contamination \emph{inflates} the RQ1 rank agreement for
-reasons unrelated to the evaluation mechanism---a validity threat
-that flatters the headline metric.
+reasons unrelated to the evaluation mechanism.
 The answer-key-blind protocol does not defend against it: the
 information is in the judge's weights, not in the prompt.
 
 The generic-judge condition C3---a shared structural template in the
 style of MT-Bench prompting~\parencite{zheng2023judging}, with no
-leaf-specific rubric---partially disciplines this threat, and the
-scope of that control must be stated precisely.
+leaf-specific rubric---partially disciplines this threat.
 Because C1 and C3 share the same judge model, any contamination
 contributes to both conditions alike, so the \emph{contrast}
 $\tau_{\text{C1}} - \tau_{\text{C3}}$ is contamination-robust

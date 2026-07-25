@@ -4,9 +4,9 @@ This appendix gives the full architectural and mathematical detail
 behind the taxonomy construction pipeline summarised in
 Section~\ref{sec:arch-taxonomy} (Chapter~\ref{ch:system-architecture})
 and Section~\ref{sec:meth-construction-summary}
-(Chapter~\ref{ch:methodology}). The construction pipeline is a
-necessary prerequisite that the arena evaluation runs on, not the
-thesis's own headline contribution; this appendix exists so the exact
+(Chapter~\ref{ch:methodology}).
+The pipeline is the instrument rather than the contribution
+(Section~\ref{sec:approach}); this appendix exists so the exact
 mechanics are preserved and traceable without requiring the reader to
 work through them before reaching the arena's methodology and
 results.
@@ -370,10 +370,9 @@ MRL~\parencite{kusupati2022mrl} trains a single embedding model such
 that every prefix slice $\mathbf{x}_{1:m}$ is itself a meaningful
 embedding, allowing the full vector to be stored once and sliced at
 query time.
-Its key property is \textit{coarse-to-fine information packing}: the
-most discriminative semantic directions are concentrated in the
-leading coordinates, so any prefix $\mathbf{x}_{1:m'}$ is a coherent
-lower-dimensional representation rather than a truncated artefact.
+Section~\ref{sec:taxonomy-construction} gives the coarse-to-fine
+packing property this rests on; what matters here is the consequence
+for construction.
 
 TaxoArena uses a single fixed slice
 \[
@@ -492,8 +491,8 @@ depth and fan-out---unlike an absolute product-versus-floor test,
 which mathematically forbids balanced structure beyond shallow depths
 and forces dominant-child chains.
 If no destination clears the share, the single best destination is
-kept: trimming negligible tails is this floor's job, declaring
-residuals is the gate's.
+kept. The floor trims negligible tails; the descent gate declares
+residuals.
 
 Membership weights over the reached destinations are normalised per
 query, and the \textit{primary} leaf is the argmax of these
@@ -673,7 +672,7 @@ $\Delta |V| < 0$.}
 \label{fig:proposal-gate-scatter}
 \end{figure}
 
-Two structural consequences are worth stating.
+The gate has two structural consequences.
 Sole-child dissolution needs no separate justification: a parent's
 only tree child separates nothing (the score of
 Section~\ref{sec:meth-split} is identically $0$ at $k = 1$), and the

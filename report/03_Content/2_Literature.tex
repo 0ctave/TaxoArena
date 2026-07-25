@@ -87,8 +87,8 @@ discriminability by extracting the 23 BIG-Bench tasks on which prior models
 had not outperformed average human raters, covering multi-step arithmetic,
 logical deduction, causal judgment, and temporal reasoning across 6,511
 examples.
-Crucially, BBH demonstrated that chain-of-thought (CoT) prompting enabled
-PaLM to surpass human-rater performance on 10 of those 23 tasks---a result
+BBH demonstrated that chain-of-thought (CoT) prompting enabled
+PaLM to surpass human-rater performance on 10 of those 23 tasks, a result
 that confirmed both the diagnostic value of the harder subset and the
 inadequacy of the four-choice format for measuring genuine
 reasoning~\parencite{suzgun2022bigbench}.
@@ -386,7 +386,7 @@ approximate sparsest cut and recursing---achieves an
 $O(\alpha_n \log n)$ approximation ratio, where $\alpha_n$ is the
 approximation factor of the sparsest-cut oracle~\parencite{dasgupta2016cost}.
 
-Critically for taxonomy induction, the Dasgupta cost provides a
+For taxonomy induction, the Dasgupta cost provides a
 formally grounded objective for evaluating competing hierarchies: a
 proposed split is geometrically motivated when it yields a measurable
 decrease in the cost function, in contrast to heuristic thresholds
@@ -419,23 +419,18 @@ Chapter~\ref{ch:experimental-design}.
 
 \bigskip
 \noindent
-The literature reviewed in this section identifies three requirements
-for the taxonomy construction component of an LLM evaluation framework:
-a node model that statistically characterises cluster geometry (vMF);
-a splitting criterion with an explicit, chance-corrected acceptance
-statistic rather than a heuristic threshold; and an embedding space in which
-both coarse and fine-grained distinctions are geometrically resolvable
-(MRL).
 The supervised classification literature (HiAGM, HiTIN) requires an
 editorial hierarchy as input and therefore cannot serve as a construction
 method.
 The unsupervised induction literature (TaxoGen, CoRel) operates at the
 term level, lacks a formal splitting criterion, and does not produce a
 statistical node model.
-These gaps jointly define the requirements for a query-level unsupervised
-taxonomy construction method: a statistical node model over directional
-embeddings, a formally grounded splitting criterion, and a multi-scale
-embedding space.
+These gaps define three requirements for a query-level unsupervised
+taxonomy construction method: a node model that statistically
+characterises cluster geometry (vMF); a splitting criterion with an
+explicit, chance-corrected acceptance statistic rather than a heuristic
+threshold; and an embedding space in which both coarse and fine-grained
+distinctions are geometrically resolvable (MRL).
 
 
 
@@ -444,7 +439,7 @@ embedding space.
 As human evaluation becomes a scalability bottleneck, the LLM-as-a-judge
 paradigm has emerged as the dominant approach to automated assessment of
 model outputs~\parencite{zheng2023judging}.
-This approach leverages the high-level reasoning capabilities of frontier
+This approach uses the reasoning capabilities of frontier
 models to evaluate the semantic quality of candidate responses; its
 reliability properties---and the conditions under which they hold---are
 therefore directly relevant to any evaluation framework that delegates
@@ -553,19 +548,15 @@ that has not been systematically studied in the literature.
 
 \bigskip
 \noindent
-The three biases and the domain-calibration requirement jointly define
-the constraints on the judge design in any pairwise arena framework.
-Positional bias motivates presentation-order randomisation and
-consistency filtering.
-Verbosity bias motivates explicit per-domain evaluation criteria that
-do not reward length, whose effectiveness is an empirical question.
-Self-preference bias is acknowledged as a residual structural limitation
-that cannot be eliminated without rotating judge models.
-Together they motivate a taxonomy-unsupervised, reference-conditioned
-guideline-generation mechanism, specified in
-Chapter~\ref{ch:system-architecture}, that occupies a position between
-keyword-based centroid descriptions (no semantic calibration) and
-MemAlign (requires gold labels).
+The three biases and the domain-calibration requirement constrain the
+judge design in any pairwise arena framework.
+Positional bias requires presentation-order randomisation and
+consistency filtering; verbosity bias requires explicit per-domain
+criteria that do not reward length, whose effectiveness is an empirical
+question; self-preference bias remains a residual structural limitation
+unless judge models are rotated.
+The guideline-generation mechanism that follows from these constraints
+is specified in Chapter~\ref{ch:system-architecture}.
 
 The pairwise preference observations produced by such a judge---one
 verdict per comparison, with ties represented as half-wins to each
@@ -595,15 +586,16 @@ distribution~\parencite{boubdir2024elo}:
     E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}
     \label{eq:elo-expected}
 \end{equation}
-While Elo is robust for tracking stable skill levels over time, it suffers from
+While Elo is reliable for tracking stable skill levels over time, it suffers from
 several weaknesses in LLM evaluation contexts.
 It assumes static skill between matches and does not explicitly model uncertainty,
 leading to ranking instability in populations with high variance or sparse
 interaction data~\parencite{boubdir2024elo}.
-Furthermore, Elo ratings are fundamentally transitive, meaning they assume that
-if $A \succ B$ and $B \succ C$, then $A \succ C$; research indicates that LLMs
-frequently exhibit non-transitive preferences, rendering linear Elo leaderboards
-statistically misleading~\parencite{boubdir2024elo}.
+Elo ratings are also transitive by construction, assuming that
+if $A \succ B$ and $B \succ C$, then $A \succ C$.
+\textcite{boubdir2024elo} show that LLMs frequently exhibit
+non-transitive preferences, which renders linear Elo leaderboards
+statistically misleading.
 
 \subsection*{Bradley--Terry and Bayesian Extensions}
 
@@ -713,8 +705,8 @@ dominance, the ``Rock-Paper-Scissors'' effect, which occurs when models have
 specialised capabilities that excel in certain domains but fail in others,
 violating the transitivity assumption of scalar
 models~\parencite{balduzzi2018melo}.
-To model these interactions, current research utilises vectorised approaches.
-\textit{mELO}~\parencite{balduzzi2018melo} utilises Hodge Decomposition to
+To model these interactions, current research uses vectorised approaches.
+\textit{mELO}~\parencite{balduzzi2018melo} applies Hodge Decomposition to
 separate model interactions into a transitive (scalar) component and a cyclic
 (skew-symmetric) component, allowing more accurate win-rate predictions where
 models exhibit diverse, niche strategies.
@@ -722,9 +714,10 @@ The \textit{Blade-Chest model}~\parencite{chen2016bladechest} infers a
 $d$-dimensional representation for each model, modelling ``offence'' and
 ``defence'' separately; by learning a dataset-specific metric space, it can
 represent any pairwise stochastic preference relation.
-Both approaches confirm that a single global ranking cannot faithfully
-represent the capability profile of models that excel in some domains
-and fail in others, and that direct interaction modelling can lead to more accurate predictions of pairwise outcomes.
+Both lines of work target the same failure of scalar ratings, that a
+single global ranking cannot represent models which excel in some
+domains and fail in others, and both report more accurate pairwise
+outcome predictions once interactions are modelled directly.
 
 \bigskip
 \noindent
@@ -777,7 +770,7 @@ to 98\% at matched accuracy.
 \textit{RouteLLM}~\parencite{ong2024routellm} instead trains binary
 routing functions---including a similarity-weighted Bradley--Terry
 router---on 80K pairwise preference judgements from Chatbot Arena.
-Critically, routers trained solely on the global preference
+Routers trained solely on the global preference
 distribution generalise poorly to domain-specific benchmarks such as
 MMLU and GSM8K unless the training data is augmented with in-domain
 preference labels~\parencite{ong2024routellm}: a globally trained BT

@@ -12,11 +12,12 @@ responsibilities, data flows, state representations, and interface
 contracts---deferring formal derivations and algorithmic proofs to
 Chapter~\ref{ch:methodology}.
 
-A central structural decision distinguishes this design from a purely
-unsupervised taxonomy induction approach: the 14 domain labels of
-MMLU-Pro initialise 14 immutable top-level anchor nodes---fixed
+The 14 domain labels of
+MMLU-Pro initialise 14 immutable top-level anchor nodes, fixed
 organisational boundaries within which all geometric refinement
 proceeds (Section~\ref{sec:arch-taxonomy}).
+This is what separates the design from purely unsupervised taxonomy
+induction.
 This design preserves a direct correspondence between the induced
 taxonomy and MMLU-Pro's domain taxonomy, enabling the per-anchor
 Bradley--Terry rankings produced by upward score aggregation to be
@@ -25,9 +26,7 @@ query subset.
 
 \section{Design Goals and Scope}\label{sec:arch-goals}
 
-TaxoArena is designed around three primary goals, each of which imposes
-constraints on the architectural choices described in the remainder of
-this chapter.
+TaxoArena is designed around three primary goals.
 
 \textbf{Goal 1: Seed-guided geometric refinement.}
 Below the 14 immutable anchor nodes, sub-structure is induced
@@ -326,8 +325,9 @@ because the descent gate found them unexplained by the node's
 sub-structure.
 Residual pools are measured (they are cells of the global separation
 objective), remain routable destinations, and can be carved into new
-children by the splitter; they are a measurement of central mass, not
-a failure mode.
+children by the splitter; they measure central mass that the current
+sub-structure does not yet explain
+(Appendix~\ref{app:dag-formalism}).
 
 \item \textbf{Leaf.}
 A node with no children after the final iteration.
@@ -522,9 +522,9 @@ form the primary validation interface: for each anchor $D$, the
 Spearman rank correlation between $\boldsymbol{\theta}^{(D)}$ and
 MMLU-Pro accuracy computed on the held-out query subset is reported
 as a structural validity check.
-The correlation is expected to be positive but not unity; divergence
-is informative, as it surfaces queries where geometric proximity
-diverges from editorial category membership.
+The correlation is expected to be positive but not unity, and the
+divergence is itself informative: it identifies queries whose
+geometric neighbours fall outside their editorial category.
 
 \subsection{Reference-Informed Judge Design}\label{subsec:judge}
 
@@ -654,8 +654,6 @@ budget before its comparison graph converges.
 
 \bigskip
 \noindent
-With the architecture fixed, the statistical machinery it executes
-remains to be derived.
 Chapter~\ref{ch:methodology} formalises the arena's Bradley--Terry
 estimation, active scheduling, stopping policy, and upward
 aggregation, and summarises the taxonomy-construction formalism whose
