@@ -1491,8 +1491,13 @@ class HeadlessBenchmarkRunner(
 
     private fun exportTaxonomyQuality(dir: File, root: GraphNode, condition: String) {
         val file = File(dir, "${condition}_taxonomy_quality.csv")
-        
+
         val groundTruthMap = mutableMapOf<String, List<String>>()
+        // The construction corpus, recovered from the frozen graph so that the global
+        // objective can be reported alongside the quality metrics. J was previously only
+        // ever emitted as a per-iteration [J-TRACK] log line, which made the headline
+        // number of the whole construction impossible to read off a run's artefacts.
+        val corpusByText = LinkedHashMap<String, Embedding>()
         fun walkGt(n: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
             if (!visited.add(n.id)) return
             n.queries.forEach { emb ->
@@ -1500,11 +1505,19 @@ class HeadlessBenchmarkRunner(
                 if (gt.isNotBlank()) {
                     groundTruthMap[emb.rawText] = listOf(gt)
                 }
+                corpusByText.putIfAbsent(emb.rawText, emb)
             }
             n.children.forEach { walkGt(it, visited) }
             n.crossLinkChildren.forEach { walkGt(it, visited) }
         }
         walkGt(root)
+
+        val separationJ = try {
+            taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, corpusByText.values.toList())
+        } catch (e: Exception) {
+            log.error("Failed to compute separation J for $condition: ${e.message}", e)
+            Double.NaN
+        }
 
         val startGen = System.currentTimeMillis()
         val reportObj = taxonomy.utils.TaxonomyMetrics(root, groundTruthMap).generateReport()
@@ -1515,6 +1528,7 @@ class HeadlessBenchmarkRunner(
 
         file.bufferedWriter().use { writer ->
             writer.write("Metric,Value\n")
+            writer.write("SeparationJ,$separationJ\n")
             writer.write("WeightedLeafPurity,${reportObj.weightedLeafPurity}\n")
             writer.write("DendrogramPurity,${reportObj.dendrogramPurity}\n")
             writer.write("SphericalSilhouette,${reportObj.sphericalSilhouette}\n")

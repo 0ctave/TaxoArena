@@ -450,16 +450,16 @@ class TaxonomyOperations(
         }
 
         if (accepted) {
-            log.info("[$proposalType ACCEPTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV")
+            log.info("[$proposalType ACCEPTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV")
             rejectedProposalsCache.clear()
             cachedBaseJ = newJ
             proposalStats.record(proposalType, ProposalOutcome.ACCEPTED)
             return ProposalOutcome.ACCEPTED
         } else {
             if (kotlin.math.abs(deltaJ) > 1e-9) {
-                log.info("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
+                log.info("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV. Reverting.")
             } else {
-                log.debug("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(deltaJ)}, Delta V = $deltaV. Reverting.")
+                log.debug("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV. Reverting.")
             }
             rejectedProposalsCache.add(fingerprint)
             backup.restore(registry)

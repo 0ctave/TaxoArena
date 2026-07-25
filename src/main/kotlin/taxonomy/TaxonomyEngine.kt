@@ -291,7 +291,16 @@ class TaxonomyEngine(
 
                         val jAfterRefit = jAfterEdits // Parameter update doesn't change queryWeights
                         lastIterationJAfterRefit = jAfterRefit
-                        log.info("[J-TRACK] Iteration $i | J_after_trickle: ${"%.5f".format(jBeforeEdits)} (Trickle Delta: ${"%.5f".format(drift)}) | J_after_edits: ${"%.5f".format(jAfterEdits)} (Edits Delta: ${"%.5f".format(jAfterEdits - jBeforeEdits)})")
+                        // Locale.US is required: the JVM runs under -Duser.language=fr, so a
+                        // bare format() emits "0,265920" and every downstream parse of the J
+                        // trajectory silently fails. Six decimals because the per-iteration
+                        // deltas that reveal a split/route limit cycle are O(1e-5).
+                        log.info(
+                            "[J-TRACK] Iteration $i | J_after_trickle: ${"%.6f".format(java.util.Locale.US, jBeforeEdits)}" +
+                                " (Trickle Delta: ${"%.6f".format(java.util.Locale.US, drift)})" +
+                                " | J_after_edits: ${"%.6f".format(java.util.Locale.US, jAfterEdits)}" +
+                                " (Edits Delta: ${"%.6f".format(java.util.Locale.US, jAfterEdits - jBeforeEdits)})"
+                        )
                     }
                 }
 
