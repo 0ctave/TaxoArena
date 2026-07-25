@@ -317,7 +317,14 @@ class TaxonomySplitter(
         }
 
         if (routedClusters.any { it.size < minClusterSize }) {
-            log.debug("Split Rejected: not routing-sustainable (routed sizes: ${routedClusters.map { it.size }}, floor=$minClusterSize)")
+            // [NO-SPLIT] is the instrumentation for the no-proposal path. Without the
+            // measured value the sweep only shows THAT a node did not split, not whether
+            // it was a near-miss at the bar or genuinely atomic — which is the difference
+            // between "lower the bar" and "this domain has one large concept".
+            log.info(
+                "[NO-SPLIT] '${node.label}' reason=not-routing-sustainable" +
+                    " k=${routedClusters.size} sizes=${routedClusters.map { it.size }} floor=$minClusterSize"
+            )
             return false
         }
 
@@ -342,14 +349,22 @@ class TaxonomySplitter(
             }
         }
         if (minPairSep < requiredEps) {
-            log.debug("Split Rejected: min-pairwise separation ${"%.4f".format(java.util.Locale.US, minPairSep)} below bar ${"%.4f".format(java.util.Locale.US, requiredEps)}")
+            log.info(
+                "[NO-SPLIT] '${node.label}' reason=min-pair n=${targetQueries.size} k=$k" +
+                    " sep=${"%.4f".format(java.util.Locale.US, minPairSep)}" +
+                    " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
+            )
             return false
         }
 
         log.debug("Eval '${node.label}': k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
 
         if (sepScore < requiredEps) {
-            log.debug("Split Rejected: separation ${"%.3f".format(java.util.Locale.US, sepScore)} insufficient")
+            log.info(
+                "[NO-SPLIT] '${node.label}' reason=k-way n=${targetQueries.size} k=$k" +
+                    " sep=${"%.4f".format(java.util.Locale.US, sepScore)}" +
+                    " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
+            )
             return false
         }
 
