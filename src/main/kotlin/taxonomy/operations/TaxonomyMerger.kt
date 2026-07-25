@@ -955,6 +955,7 @@ class TaxonomyMerger(
                 val nodeB = allNodes[j]
                 if (nodeA.depth <= 1 || nodeB.depth <= 1) continue
                 if (nodeA.parents.isEmpty() || nodeB.parents.isEmpty()) continue
+                if (!isTreeLegalFusionPair(nodeA, nodeB)) continue
                 if (isAncestor(nodeA, nodeB) || isAncestor(nodeB, nodeA)) continue
 
                 val commonDim = minOf(nodeA.sliceDim, nodeB.sliceDim)
@@ -1001,3 +1002,29 @@ class TaxonomyMerger(
         }
     }
 }
+
+/**
+ * Redundant fusion is only legal when it is expressible as a TREE edit: the two nodes must
+ * sit under the same parent set.
+ *
+ * `fuseNodes` redirects the source's parent edges onto the surviving target while the target
+ * keeps its own, so fusing across parents unions the two lineages and hands the survivor a
+ * second parent. That makes the redundant-fusion pass — not the deleted cross-link generator
+ * — the polyhierarchy admission path, exactly as the archived cross-anchor bridge diagnostic
+ * describes it: "no same-anchor constraint … a fused node inherits parents from both
+ * lineages". Removing cross-linking left this pass live, which is why a nominally strict
+ * tree still reported bridges: on the L9_007 screening cell, n00000038 (under Chemistry)
+ * fused into n00000119 (under Physics) at iteration 4 and the survivor ended up parented by
+ * both domains, giving BridgeCount=2 with JsDivergence=0 — no bridge selector ever scored
+ * it, because none was involved.
+ *
+ * Cross-parent fusion is also a silent subtree relocation across depth-1 anchors that no
+ * anchor-level metric accounts for, and it leaves [GraphNode.depth] stale: the survivor
+ * keeps its old depth under a shallower parent, so the parent and its own child can end up
+ * at equal depth.
+ *
+ * Same-parent pairs are unaffected: the source's parent set is then already the target's, so
+ * the redirect adds nothing and the result stays a tree.
+ */
+internal fun isTreeLegalFusionPair(nodeA: GraphNode, nodeB: GraphNode): Boolean =
+    nodeA.parents == nodeB.parents
