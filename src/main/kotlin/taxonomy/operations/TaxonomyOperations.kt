@@ -59,11 +59,15 @@ class TaxonomyOperations(
     private val log = LoggerFactory.getLogger("taxonomy.Operations")
     
     private var cachedBaseJ: Double? = null
+    // Cell assignment matching cachedBaseJ, kept so the paired dJ bootstrap can use the same
+    // pre-edit state the cached baseJ came from instead of forcing a restore.
+    private var cachedBaseCapture: taxonomy.utils.JBootstrap.Capture? = null
     private val rejectedProposalsCache = java.util.concurrent.ConcurrentHashMap.newKeySet<ProposalFingerprint>()
     val proposalStats = ProposalStats()
-    
+
     fun invalidateCachedJ() {
         cachedBaseJ = null
+        cachedBaseCapture = null
         rejectedProposalsCache.clear()
     }
 
@@ -393,6 +397,10 @@ class TaxonomyOperations(
             log.info("[PROPOSAL DIAG] ${lostIds.size} node(s) unreachable after action: $details")
         }
 
+        val bootstrapOn = config.diagnostics.enableProfiling
+        var baseCapture: taxonomy.utils.JBootstrap.Capture? =
+            if (bootstrapOn && refitScope == null) cachedBaseCapture else null
+
         val baseJ = if (cachedBaseJ != null && refitScope == null) {
             cachedBaseJ!!
         } else {
@@ -411,11 +419,18 @@ class TaxonomyOperations(
             assertMassConservation(root, allEmbeddings)
             val jVal = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
 
+            // Capture the pre-edit cell assignment while the graph is genuinely in the base
+            // state — this is the only point in the flow where it is.
+            if (bootstrapOn) {
+                baseCapture = taxonomy.utils.JBootstrap.capture(root, allEmbeddings)
+            }
+
             // Re-execute action
             action()
-            
+
             if (refitScope == null) {
                 cachedBaseJ = jVal
+                if (bootstrapOn) cachedBaseCapture = baseCapture
             }
             jVal
         }
@@ -435,8 +450,31 @@ class TaxonomyOperations(
         assertMassConservation(root, allEmbeddings)
         val newJ = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
         val deltaJ = newJ - baseJ
+
         // Lexicographic objective: (J, -|V|)
         val deltaV = postRegistry.size - registry.size
+
+        // Diagnostic only — nothing below reads this. Reports whether dJ is distinguishable
+        // from zero given that both sides share a corpus draw, which is the question the gate
+        // is really asking and the one tau (1e-6, a float tolerance) cannot answer.
+        var afterCapture: taxonomy.utils.JBootstrap.Capture? = null
+        if (bootstrapOn && baseCapture != null) {
+            try {
+                afterCapture = taxonomy.utils.JBootstrap.capture(root, allEmbeddings)
+                val seDelta = taxonomy.utils.JBootstrap.pairedDeltaSe(baseCapture!!, afterCapture!!)
+                val z = if (seDelta > 0.0) deltaJ / seDelta else Double.NaN
+                log.info(
+                    "[DJ-SE] $proposalType '${site.label ?: site.id}'" +
+                        " dJ=${"%.3e".format(java.util.Locale.US, deltaJ)}" +
+                        " SE_dJ=${"%.3e".format(java.util.Locale.US, seDelta)}" +
+                        " z=${"%.2f".format(java.util.Locale.US, z)}" +
+                        " dV=$deltaV"
+                )
+            } catch (e: Exception) {
+                afterCapture = null
+                log.debug("[DJ-SE] bootstrap failed for '${site.label ?: site.id}': ${e.message}")
+            }
+        }
         val tau = config.formalism.tau
         
         // Lexicographic acceptance on (J, -|V|): an edit is taken if it strictly improves the
@@ -453,6 +491,9 @@ class TaxonomyOperations(
             log.info("[$proposalType ACCEPTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV")
             rejectedProposalsCache.clear()
             cachedBaseJ = newJ
+            // The accepted post-edit state becomes the next proposal's base. If it was not
+            // captured, drop the stale one rather than pair the next dJ against the wrong base.
+            cachedBaseCapture = afterCapture
             proposalStats.record(proposalType, ProposalOutcome.ACCEPTED)
             return ProposalOutcome.ACCEPTED
         } else {

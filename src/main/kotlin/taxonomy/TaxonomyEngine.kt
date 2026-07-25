@@ -301,6 +301,23 @@ class TaxonomyEngine(
                                 " | J_after_edits: ${"%.6f".format(java.util.Locale.US, jAfterEdits)}" +
                                 " (Edits Delta: ${"%.6f".format(java.util.Locale.US, jAfterEdits - jBeforeEdits)})"
                         )
+
+                        // Diagnostic only — nothing reads this back into a decision. It reports the
+                        // sampling resolution of J against the tolerance the gate actually uses,
+                        // so that "accepted at dJ = 3.7e-5 under tau = 1e-6" can be judged as
+                        // evidence or as noise.
+                        if (config.diagnostics.enableProfiling) {
+                            val boot = taxonomy.utils.JBootstrap.estimate(root, uniqueEmbs)
+                            val ratio = if (config.formalism.tau > 0.0) boot.seBoot / config.formalism.tau else Double.NaN
+                            log.info(
+                                "[J-RESOLUTION] Iteration $i | J=${"%.6f".format(java.util.Locale.US, boot.j)}" +
+                                    " SE_boot=${"%.3e".format(java.util.Locale.US, boot.seBoot)}" +
+                                    " (B=${boot.replicates})" +
+                                    " | tau=${"%.3e".format(java.util.Locale.US, config.formalism.tau)}" +
+                                    " SE/tau=${"%.1f".format(java.util.Locale.US, ratio)}" +
+                                    " | 2*SE=${"%.3e".format(java.util.Locale.US, 2.0 * boot.seBoot)}"
+                            )
+                        }
                     }
                 }
 
