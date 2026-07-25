@@ -78,7 +78,16 @@ class TaxonomyTrickler(
         // Purely numerical fan-out guard: abandon walk paths whose absolute posterior has
         // become negligible (< 0.01%). Carries no membership semantics — those live in the
         // relative beam, the parent-gate, and the final per-query share floor.
-        private val LOG_NEGLIGIBLE_PATH = ln(1e-4)
+        // Genuinely negligible, not a selection threshold. At the old value of 1e-4 this was
+        // doing real work: TricklerRouterEquivalenceTest showed the topological router reaching
+        // nodes the enumerating router never did, because a node's SUMMED posterior cleared
+        // 1e-4 while no individual path to it did. Per-path and per-node cutoffs are structurally
+        // different rules, so no value makes them agree while the cutoff binds — the two coincide
+        // only once it prunes nothing, which is what a truly negligible constant buys. The old
+        // value was tuned against an exponential traversal that needed the pruning to terminate;
+        // the O(V+E) dynamic program does not, so the guard reverts to its stated purpose of
+        // dropping arithmetically irrelevant mass. Routing breadth increases as a result.
+        private val LOG_NEGLIGIBLE_PATH = ln(1e-30)
     }
 
     fun routeQuery(
@@ -107,6 +116,179 @@ class TaxonomyTrickler(
         val res = trickle(query, root, opts)
         val enableResidual = config.formalism.enableResidualRouting
         return RoutingResult(res.leaves(enableResidual).toMap(), res.residualHits, primary = res.primary)
+    }
+
+    /** Children of a node, the beam-admitted subset, and the renormalised log-transitions. */
+    internal class ChildTransitions(
+        val children: List<GraphNode>,
+        val bestIndices: List<Int>,
+        val logTransitions: DoubleArray
+    )
+
+    /**
+     * Per-node scoring, Jensen-tight descent gate and per-level beam — everything about a step
+     * except which node we arrived from and with how much mass.
+     *
+     * Extracted so the production topological router and [trickleByPathEnumeration] provably
+     * share it. The differential test between the two only means something if the traversals
+     * are the sole difference; a hand-copied reference could drift and silently pass.
+     *
+     * Returns null when the walk stops here (no children, or the descent gate fired), in which
+     * case [onResidual] has been invoked if residual routing is on and the walk is not readOnly.
+     */
+    internal fun childTransitions(
+        node: GraphNode,
+        embedding: Embedding,
+        opts: TrickleOptions,
+        onResidual: (GraphNode, String, Double) -> Unit
+    ): ChildTransitions? {
+        val children = if (config.formalism.enableBridging) {
+            (node.children + node.crossLinkChildren).toList()
+        } else {
+            node.children.toList()
+        }
+        if (children.isEmpty()) return null
+
+        val K = children.size
+        val vmfScores = DoubleArray(K)
+
+        // 1. Score each child with its own vMF log-density (its own kappa and normalizer —
+        // a component with tighter concentration or a better directional match scores higher
+        // on its own terms, not relative to a shared/averaged sibling kappa).
+        val meanKappa = children.map { it.vmfKappa }.average().coerceAtLeast(1e-9)
+        val dots = DoubleArray(K)
+        for (i in children.indices) {
+            val child = children[i]
+            val slicedX = embedding.projectTo(child.sliceDim)
+            dots[i] = StatisticsUtils.dotProduct(slicedX, child.vmfMu)
+            var f = meanKappa * dots[i]
+
+            // Ground Truth bias (iter == 1 only, governed by opts)
+            val isOriginal = opts.originalCategories?.any { it.equals(child.label, ignoreCase = true) } ?: false
+            if (opts.enableGtBias && isOriginal) {
+                f += ln(1.0 / 0.7)
+            }
+
+            vmfScores[i] = f
+        }
+
+        // 2. Descent-vs-residual gate: parent-vs-children Bayes factor at threshold 1,
+        // evaluated in the shared-concentration limit — i.e. on DIRECTIONS only.
+        // Descend iff some child's mean direction matches the query at least as well as
+        // this node's own: max_c <mu_c, x> >= \bar{r}_p <mu_p, x>.
+        val maxScore = vmfScores.maxOrNull() ?: 0.0
+        val maxDot = dots.maxOrNull() ?: 0.0
+        if (node.vmfMu.isNotEmpty()) {
+            val parentX = embedding.projectTo(node.vmfMu.size)
+            val parentDot = StatisticsUtils.dotProduct(parentX, node.vmfMu)
+            var bestChildDot = Double.NEGATIVE_INFINITY
+            for (child in children) {
+                if (child.vmfMu.isEmpty()) continue
+                val childX = embedding.projectTo(child.vmfMu.size)
+                val dot = StatisticsUtils.dotProduct(childX, child.vmfMu)
+                if (dot > bestChildDot) bestChildDot = dot
+            }
+            // descentMargin is slack below the Jensen-tight bar: 0.0 = exact bound,
+            // higher admits queries whose best child is slightly worse than the
+            // children's weighted-mean alignment (fewer residuals, softer leaves).
+            val descentBar = (node.childCentroidShrinkage - config.formalism.descentMargin).coerceAtLeast(0.0)
+            if (bestChildDot < descentBar * parentDot) {
+                if (config.formalism.enableResidualRouting && node.depth >= 1 && !opts.readOnly) {
+                    val sumExpAll = vmfScores.sumOf { exp(it - maxScore) }
+                    val bestChildResp = 1.0 / sumExpAll.coerceAtLeast(1.0)
+                    val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
+                    onResidual(node, qId, bestChildResp)
+                }
+                return null
+            }
+        }
+
+        // 3. Per-level relative beam: a child stays on the beam iff its cosine distance
+        // is within routingBeamGamma of the BEST sibling's dot product.
+        val bestIndices = children.indices.filter { dots[it] >= maxDot - config.formalism.routingBeamGamma }
+
+        if (!opts.readOnly && config.formalism.enableResidualRouting) {
+            val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
+            for (i in children.indices) {
+                if (dots[i] < maxDot) {
+                    val margin = maxDot - dots[i]
+                    val child = children[i]
+                    synchronized(child.nearMisses) {
+                        if (child.nearMisses.size < 200) {
+                            child.nearMisses[qId] = margin
+                        } else {
+                            val worst = child.nearMisses.maxByOrNull { it.value }
+                            if (worst != null && margin < worst.value) {
+                                child.nearMisses.remove(worst.key)
+                                child.nearMisses[qId] = margin
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Register the query embedding for MRL-projection lookup
+        GraphNode.registerEmbedding(embedding)
+
+        // 4. Renormalize over the admitted set so per-level probabilities sum to 1 (avoids
+        // path-depth bias from carrying the excluded tail's mass down the tree).
+        val beamSumExp = bestIndices.sumOf { exp(vmfScores[it] - maxScore) }
+        val logBeamSumExp = maxScore + ln(beamSumExp.coerceAtLeast(1e-300))
+
+        val logTransitions = DoubleArray(K)
+        for (i in bestIndices) logTransitions[i] = vmfScores[i] - logBeamSumExp
+
+        return ChildTransitions(children, bestIndices, logTransitions)
+    }
+
+    /**
+     * REFERENCE IMPLEMENTATION — the pre-rewrite path-enumerating walk, kept solely so the
+     * topological router can be proved equivalent on real graphs. Not used in production: it is
+     * exponential in the number of cross-links, which is exactly why [trickle] replaced it.
+     *
+     * The one deliberate difference is the cutoff. This applies LOG_NEGLIGIBLE_PATH per PATH,
+     * as the original did; [trickle] applies it to a node's summed posterior. The two coincide
+     * only when the cutoff binds on neither, which is the property the differential test pins
+     * down.
+     */
+    internal fun trickleByPathEnumeration(
+        embedding: Embedding,
+        root: GraphNode,
+        opts: TrickleOptions
+    ): Map<String, Double> {
+        val logProbMap = mutableMapOf<String, Double>()
+
+        fun logSumExp(a: Double, b: Double): Double {
+            val maxVal = maxOf(a, b)
+            return maxVal + ln(exp(a - maxVal) + exp(b - maxVal))
+        }
+
+        val pathVisited = mutableSetOf<String>()
+        fun walk(node: GraphNode, currentLogProb: Double) {
+            if (!pathVisited.add(node.id)) return
+            val existing = logProbMap[node.id]
+            logProbMap[node.id] = if (existing == null) currentLogProb else logSumExp(existing, currentLogProb)
+
+            if (node.isLeaf) {
+                pathVisited.remove(node.id)
+                return
+            }
+            val step = childTransitions(node, embedding, opts) { _, _, _ -> }
+            if (step == null) {
+                pathVisited.remove(node.id)
+                return
+            }
+            for (i in step.bestIndices) {
+                val accumulatedWeight = currentLogProb + step.logTransitions[i]
+                if (accumulatedWeight >= LOG_NEGLIGIBLE_PATH) {
+                    walk(step.children[i], accumulatedWeight)
+                }
+            }
+            pathVisited.remove(node.id)
+        }
+        walk(root, 0.0)
+        return logProbMap
     }
 
     fun trickle(
@@ -170,118 +352,32 @@ class TaxonomyTrickler(
             // No entry means no admitted path reached this node — it is structurally
             // reachable but the descent gate or the beam pruned every route to it.
             val currentLogProb = acc[node.id] ?: continue
+
+            // Negligible-mass cutoff, applied to the node's ACCUMULATED posterior once every
+            // incoming edge has been summed — deliberately not per-path. In a tree the two
+            // coincide, because a node has exactly one path. In a DAG they do not: several
+            // individually-negligible paths into one node can sum to material mass under
+            // logSumExp, and multi-parent nodes are precisely the polyhierarchy structure this
+            // router exists to measure. Pruning per-edge would therefore discard mass the
+            // enumerating router accumulated, with the error concentrated on bridges.
+            if (currentLogProb < LOG_NEGLIGIBLE_PATH) continue
+
             nodeMap[node.id] = node
             logProbMap[node.id] = currentLogProb
 
             if (node.isLeaf) continue
 
-            val children = if (config.formalism.enableBridging) {
-                (node.children + node.crossLinkChildren).toList()
-            } else {
-                node.children.toList()
-            }
-            if (children.isEmpty()) continue
+            val step = childTransitions(node, embedding, opts) { n, qId, resp ->
+                residualHits.add(ResidualHit(n, qId, resp))
+            } ?: continue
 
-            val K = children.size
-            val vmfScores = DoubleArray(K)
-
-            // 1. Score each child with its own vMF log-density (its own kappa and normalizer —
-            // a component with tighter concentration or a better directional match scores higher
-            // on its own terms, not relative to a shared/averaged sibling kappa).
-            val meanKappa = children.map { it.vmfKappa }.average().coerceAtLeast(1e-9)
-            val dots = DoubleArray(K)
-            for (i in children.indices) {
-                val child = children[i]
-                val slicedX = embedding.projectTo(child.sliceDim)
-                dots[i] = StatisticsUtils.dotProduct(slicedX, child.vmfMu)
-                var f = meanKappa * dots[i]
-
-                // Ground Truth bias (iter == 1 only, governed by opts)
-                val isOriginal = opts.originalCategories?.any { it.equals(child.label, ignoreCase = true) } ?: false
-                if (opts.enableGtBias && isOriginal) {
-                    f += ln(1.0 / 0.7)
-                }
-
-                vmfScores[i] = f
-            }
-
-            // 2. Descent-vs-residual gate: parent-vs-children Bayes factor at threshold 1,
-            // evaluated in the shared-concentration limit — i.e. on DIRECTIONS only.
-            // Descend iff some child's mean direction matches the query at least as well as
-            // this node's own: max_c <mu_c, x> >= \bar{r}_p <mu_p, x>.
-            val maxScore = vmfScores.maxOrNull() ?: 0.0
-            val maxDot = dots.maxOrNull() ?: 0.0
-            if (node.vmfMu.isNotEmpty()) {
-                val parentX = embedding.projectTo(node.vmfMu.size)
-                val parentDot = StatisticsUtils.dotProduct(parentX, node.vmfMu)
-                var bestChildDot = Double.NEGATIVE_INFINITY
-                for (child in children) {
-                    if (child.vmfMu.isEmpty()) continue
-                    val childX = embedding.projectTo(child.vmfMu.size)
-                    val dot = StatisticsUtils.dotProduct(childX, child.vmfMu)
-                    if (dot > bestChildDot) bestChildDot = dot
-                }
-                // descentMargin is slack below the Jensen-tight bar: 0.0 = exact bound,
-                // higher admits queries whose best child is slightly worse than the
-                // children's weighted-mean alignment (fewer residuals, softer leaves).
-                val descentBar = (node.childCentroidShrinkage - config.formalism.descentMargin).coerceAtLeast(0.0)
-                if (bestChildDot < descentBar * parentDot) {
-                    if (config.formalism.enableResidualRouting && node.depth >= 1 && !opts.readOnly) {
-                        val sumExpAll = vmfScores.sumOf { exp(it - maxScore) }
-                        val bestChildResp = 1.0 / sumExpAll.coerceAtLeast(1.0)
-                        val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
-                        residualHits.add(ResidualHit(node, qId, bestChildResp))
-                    }
-                    continue
-                }
-            }
-
-            // 3. Per-level relative beam: a child stays on the beam iff its cosine distance
-            // is within routingBeamGamma of the BEST sibling's dot product.
-            val bestIndices = children.indices.filter { dots[it] >= maxDot - config.formalism.routingBeamGamma }
-            
-            if (!opts.readOnly && config.formalism.enableResidualRouting) {
-                val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
-                for (i in children.indices) {
-                    if (dots[i] < maxDot) {
-                        val margin = maxDot - dots[i]
-                        val child = children[i]
-                        synchronized(child.nearMisses) {
-                            if (child.nearMisses.size < 200) {
-                                child.nearMisses[qId] = margin
-                            } else {
-                                val worst = child.nearMisses.maxByOrNull { it.value }
-                                if (worst != null && margin < worst.value) {
-                                    child.nearMisses.remove(worst.key)
-                                    child.nearMisses[qId] = margin
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Register the query embedding for MRL-projection lookup
-            GraphNode.registerEmbedding(embedding)
-
-            // 4. Renormalize over the admitted set so per-level probabilities sum to 1 (avoids
-            // path-depth bias from carrying the excluded tail's mass down the tree).
-            val beamSumExp = bestIndices.sumOf { exp(vmfScores[it] - maxScore) }
-            val logBeamSumExp = maxScore + ln(beamSumExp.coerceAtLeast(1e-300))
-
-            for (i in bestIndices) {
-                val child = children[i]
-                val logTransitionProb = vmfScores[i] - logBeamSumExp
-                val accumulatedWeight = currentLogProb + logTransitionProb
-                // Purely numerical guard against combinatorial fan-out: abandon paths whose
-                // absolute posterior is negligible. Membership semantics live in the final
-                // per-query share floor (below), NOT here — the old flat product-vs-floor
-                // test made balanced structure unreachable below depth 2 and forced the
-                // dominant-child wrapper churn.
-                if (accumulatedWeight >= LOG_NEGLIGIBLE_PATH) {
-                    val prev = acc[child.id]
-                    acc[child.id] = if (prev == null) accumulatedWeight else logSumExp(prev, accumulatedWeight)
-                }
+            for (i in step.bestIndices) {
+                val child = step.children[i]
+                val accumulatedWeight = currentLogProb + step.logTransitions[i]
+                // Push unconditionally; the cutoff is applied to the child's summed posterior
+                // when the child is processed, not to this single contribution.
+                val prev = acc[child.id]
+                acc[child.id] = if (prev == null) accumulatedWeight else logSumExp(prev, accumulatedWeight)
             }
         }
 

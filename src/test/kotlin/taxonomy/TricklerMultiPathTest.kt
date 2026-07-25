@@ -169,3 +169,126 @@ class TricklerMultiPathTest {
         assertEquals(0.50, byLabel["B"] ?: fail("B unreached"), 1e-12)
     }
 }
+
+/**
+ * Differential test: the production topological router vs the pre-rewrite path-enumerating
+ * walk, on graphs that actually contain bridges.
+ *
+ * Both traversals call the same [TaxonomyTrickler.childTransitions], so scoring, the descent
+ * gate and the beam are shared by construction and the ONLY difference under test is how
+ * arrival mass is accumulated — plus where LOG_NEGLIGIBLE_PATH is applied (per path in the
+ * reference, per summed node posterior in production).
+ */
+@SpringBootTest(
+    classes = [org.eclipse.lmos.arc.app.TaxoAdaptApplication::class],
+    properties = [
+        "taxoadapt.execution.enable-tui=false",
+        "taxoadapt.execution.run-batch=false",
+        "taxoadapt.execution.start-service=false"
+    ]
+)
+class TricklerRouterEquivalenceTest {
+
+    @Autowired
+    private lateinit var trickler: TaxonomyTrickler
+
+    private val dim = 256
+    private val rng = java.util.Random(42)
+
+    private fun randUnit(): FloatArray {
+        val v = FloatArray(dim)
+        var n = 0.0
+        for (i in 0 until dim) { val g = rng.nextGaussian().toFloat(); v[i] = g; n += g * g }
+        val inv = (1.0 / kotlin.math.sqrt(n)).toFloat()
+        for (i in 0 until dim) v[i] *= inv
+        return v
+    }
+
+    private fun node(label: String, depth: Int) = GraphNode(label = label, depth = depth).apply {
+        vmfMu = randUnit()
+        vmfKappa = 20.0 + rng.nextDouble() * 100.0
+        vmfLogNormalizer = StatisticsUtils.logVmfNormalizer(dim, vmfKappa)
+        childCentroidShrinkage = 0.0   // never let the descent gate stop the walk
+    }
+
+    /** A 4-level tree with [bridges] extra cross-links wired across branches. */
+    private fun buildDag(bridges: Int): GraphNode {
+        val root = node("Root", 0)
+        val level1 = (0 until 4).map { node("D$it", 1) }
+        val level2 = ArrayList<GraphNode>()
+        val level3 = ArrayList<GraphNode>()
+        for ((i, d) in level1.withIndex()) {
+            root.children.add(d); d.parents.add(root)
+            for (j in 0 until 3) {
+                val c = node("C$i$j", 2); level2.add(c)
+                d.children.add(c); c.parents.add(d)
+                for (k in 0 until 2) {
+                    val l = node("L$i$j$k", 3); level3.add(l)
+                    c.children.add(l); l.parents.add(c)
+                }
+            }
+        }
+        // Cross-link level-2 concepts under a different depth-1 domain, creating genuine
+        // multi-path arrivals into each bridged node's whole subtree.
+        var added = 0
+        var idx = 0
+        while (added < bridges && idx < level2.size) {
+            val cand = level2[idx]
+            val host = level1[(idx + 1) % level1.size]
+            if (cand.parents.none { it === host } && !host.children.contains(cand)) {
+                host.crossLinkChildren.add(cand); cand.parents.add(host); added++
+            }
+            idx++
+        }
+        return root
+    }
+
+    private fun probe() = Embedding(rawText = "q", distilledText = "q", values = randUnit())
+
+    private fun opts() = TrickleOptions(
+        membershipFloor = 0.05,
+        maxAssignments = Int.MAX_VALUE,
+        readOnly = true,
+        enableGtBias = false,
+        originalCategories = null
+    )
+
+    @Test
+    fun topologicalRouterMatchesPathEnumerationOnBridgedGraphs() {
+        for (bridgeCount in intArrayOf(0, 1, 4, 8)) {
+            val root = buildDag(bridgeCount)
+            root.updateAllShrinkages()
+            // updateAllShrinkages recomputes the descent bar; force it open again so this test
+            // isolates mass accumulation rather than gate behaviour.
+            fun openGates(n: GraphNode, seen: MutableSet<String> = mutableSetOf()) {
+                if (!seen.add(n.id)) return
+                n.childCentroidShrinkage = 0.0
+                n.children.forEach { openGates(it, seen) }
+                n.crossLinkChildren.forEach { openGates(it, seen) }
+            }
+            openGates(root)
+
+            var maxDiff = 0.0
+            var worst = ""
+            repeat(40) {
+                val q = probe()
+                val dp = trickler.trickle(q, root, opts()).allNodes
+                    .entries.associate { (n, lp) -> n.id to lp }
+                val ref = trickler.trickleByPathEnumeration(q, root, opts())
+                // Reference returns UNnormalised log-mass; normalise it the same way trickle does.
+                val maxL = ref.values.maxOrNull() ?: 0.0
+                val lse = maxL + kotlin.math.ln(ref.values.sumOf { kotlin.math.exp(it - maxL) })
+                val refNorm = ref.mapValues { (_, v) -> v - lse }
+
+                assertEquals(refNorm.keys, dp.keys,
+                    "bridges=$bridgeCount: the two routers reached different node sets")
+                for ((id, refVal) in refNorm) {
+                    val d = kotlin.math.abs(refVal - (dp[id] ?: Double.NaN))
+                    if (d > maxDiff) { maxDiff = d; worst = id }
+                }
+            }
+            assertTrue(maxDiff < 1e-12,
+                "bridges=$bridgeCount: max log-posterior divergence $maxDiff at '$worst' exceeds 1e-12")
+        }
+    }
+}

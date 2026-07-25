@@ -1,0 +1,76 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  mcs30_eps02_test.toml — TWO-CHANGE EXPERIMENT: minClusterSize 30, proposalSeparationBar 0.02
+#
+#  Identical to thesis_canonical.toml except minClusterSize = 30, proposalSeparationBar = 0.02,
+#  and its own outputDir. Purpose: raise per-leaf held-out top-1 support above
+#  the arena round size (questionsPerRound = 12) while filtering noise splits.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+# Evaluated model roster (16 models spanning capability tiers, frontier -> small).
+# Held fixed across all conditions; the arena ranks these within each leaf.
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf",
+    "Meta-Llama-3-70B-Instruct"
+]
+
+category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filter)
+queryLimit    = 0       # 0 = no cap; use the full corpus
+outputDir     = "experiment_results/mcs30_eps02_v2"
+testRatio     = 0.3     # frozen 70/30 stratified split; the 30% held-out pool is
+                        # reserved for arena evaluation and excluded from construction
+seed          = 42      # construction seed
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true          # needed — produces the ECE/routing metrics
+runBaselines       = false         # skip for the pilot (save ~90s)
+enableFinalMetrics = true          # REQUIRED — you need metrics to validate
+enableLabeling     = true          # LLM cluster labeling off for structural build
+judgeInduction     = false         # judges are induced in the arena step
+
+# ── Construction mode ───────────────────────────────────────────────────────
+dagMode = "DAG_MAX"      # full polyhierarchy: enables bridging (multi-parent nodes)
+
+# ── Formalism parameters ─────────────────────────────────────────────────────
+maxDepth              = 8      # max taxonomy depth (caps runaway recursion)
+minClusterSize        = 30     # targets >=12 held-out top-1 per leaf to support arena evaluation
+proposalSeparationBar     = 0.02   # null-calibrated: isotropic-selection noise ceiling p95
+tau                   = 1e-6   # lexicographic J acceptance tolerance
+
+# ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
+membershipFloor       = 0.25   # min share of a query's own normalized membership for a leaf to count
+routingBeamGamma      = 0.2    # round-2 winner a21f2ac1
+descentMargin         = 0.12   # round-2 winner a21f2ac1
+                               # higher = fewer residual queries, softer leaf populations (sweep-calibrated)
+
+effectiveSupportFloor = 2.0    # min effective (soft) support for a node to be retained
+defaultKappaPrior     = 10.0   # NiW prior concentration when a node has too few points
+
+numIterations         = 50     # max evolution passes
+maxLeafAssignments    = 5      # max leaves a single query may be softly assigned to during arena evaluation
+
+# ── Merging / convergence ────────────────────────────────────────────────────
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false  # skips trickle-based reassignment on iteration 1, keeping bootstrap intact
+
+# ── Bridge Analysis & Diagnostics ─────────────────────────────────────────────
+secondaryMassFloor       = 3.0    # calibration run: reproduce the old hardcoded absolute floor
+bridgeSupportRelFraction = 0.05   # calibration run: reproduce the old hardcoded f-bar, so this run isolates the router change
+enableProfiling           = true

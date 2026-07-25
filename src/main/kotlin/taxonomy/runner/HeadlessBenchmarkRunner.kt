@@ -166,9 +166,19 @@ class HeadlessBenchmarkRunner(
         cliConfig.bridgeSupportRelFraction?.let { config.diagnostics.bridgeSupportRelFraction = it }
         cliConfig.enableGtWarmStart?.let { config.formalism.enableGtWarmStart = it }
         cliConfig.maxLeafAssignments?.let { config.formalism.maxLeafAssignments = it }
+        // dagMode's setter rewrites enableStableQuestionIds / enableResidualRouting /
+        // enableResidualSplitGate / enableBridging as a block, so it MUST be applied before the
+        // individual overrides — otherwise it silently clobbers them and the flags documented as
+        // "overrideable for regression" are not in fact overrideable. This matters for the
+        // tree-with-soft-membership build, which needs enableBridging=false while KEEPING
+        // residual routing; TREE_BASELINE would switch all four off together.
         cliConfig.dagMode?.let {
             config.formalism.dagMode = taxonomy.config.DagMode.valueOf(it.uppercase())
         }
+        cliConfig.enableBridging?.let { config.formalism.enableBridging = it }
+        cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
+        cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
+        cliConfig.enableStableQuestionIds?.let { config.formalism.enableStableQuestionIds = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
         cliConfig.enableProfiling?.let { config.diagnostics.enableProfiling = it }
 
