@@ -716,6 +716,185 @@ class SeparationNullBySizeTest {
     }
 
     /**
+     * PHILOSOPHY: is the single leaf a property of the 256-dim MRL slice, or of the
+     * corpus?
+     *
+     * Every other depth-1 domain splits, so the embedding resolves sub-topics in
+     * general. Two candidate explanations for Philosophy, with different implications:
+     * either MMLU-Pro's philosophy questions are genuinely uniform, or the 256-slice
+     * discards the conceptual axes that would separate them.
+     *
+     * The naive version of this test — cluster at the full 4096 dims — is worse, not
+     * better: d/n = 10.1 at n=406, against 0.63 for the slice, and vMF concentration
+     * estimation degrades badly in that regime. PCA-from-full to 64 is the version
+     * that isolates "did slicing lose signal" from "is high dimension harder", because
+     * it keeps the top-variance directions of the WHOLE space rather than the first
+     * 256 coordinates.
+     *
+     * The yardstick is held fixed. PCA-from-full is used only to FIND the partition;
+     * both partitions are then scored with chanceCorrectedSeparation on the same
+     * 256-slice vectors. Scoring each in its own space would compare two different
+     * quantities and prove nothing — the mistake the superseded calibration harness
+     * made, which is how a 3x statistic mismatch reached a config header.
+     */
+    @Test
+    fun `Philosophy - does the 256 slice lose a seam that PCA from full would find`() {
+        (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
+        val embDb = java.io.File("embeddings_cache.db")
+        org.junit.jupiter.api.Assumptions.assumeTrue(embDb.exists(), "embeddings_cache.db not present")
+        val frozen = System.getProperty("snapshotId") ?: "20260726_200711_Headless_Run_Auto_ge"
+        val loaded = loadGraph(frozen) ?: loadGraph(null)
+        org.junit.jupiter.api.Assumptions.assumeTrue(loaded != null, "no snapshot available")
+        val (snapId, g) = loaded!!
+        val byId = g.nodes.associateBy { it.id }
+        val target = g.nodes.firstOrNull { it.label == "Philosophy" } ?: run {
+            println("no Philosophy node in $snapId"); return
+        }
+        val ids = regionQueryIds(target, byId)
+
+        // FULL vectors, not the 256 slice.
+        val full = mutableListOf<DoubleArray>()
+        val ro = org.sqlite.SQLiteConfig().apply { setReadOnly(true) }.toProperties()
+        java.sql.DriverManager.getConnection("jdbc:sqlite:${embDb.absolutePath}", ro).use { conn ->
+            ids.chunked(400).forEach { chunk ->
+                conn.prepareStatement(
+                    "SELECT e.vector FROM queries q JOIN embeddings e ON e.query = q.distilled_text " +
+                        "WHERE q.id IN (${chunk.joinToString(",") { "?" }})"
+                ).use { st ->
+                    chunk.forEachIndexed { i, id -> st.setString(i + 1, id) }
+                    val rs = st.executeQuery()
+                    while (rs.next()) {
+                        val bytes = rs.getBytes(1) ?: continue
+                        val buf = java.nio.ByteBuffer.wrap(bytes)
+                        val v = DoubleArray(bytes.size / 4) { buf.getFloat().toDouble() }
+                        var nrm = 0.0; for (x in v) nrm += x * x; nrm = sqrt(nrm)
+                        if (nrm > 0) { for (i in v.indices) v[i] /= nrm; full.add(v) }
+                    }
+                }
+            }
+        }
+        if (full.size < 60) { println("only ${full.size} vectors recovered; skipped"); return }
+        val d = full[0].size
+        val n = full.size
+
+        // The production geometry: first 256 coordinates, renormalised — what
+        // Embedding.projectTo(256) yields.
+        val slice = full.map { v ->
+            val s = DoubleArray(256) { v[it] }
+            var nrm = 0.0; for (x in s) nrm += x * x; nrm = sqrt(nrm)
+            if (nrm > 0) for (i in s.indices) s[i] /= nrm
+            s
+        }
+
+        val config = canonicalConfig(30)
+        val minClusterSize = config.formalism.minClusterSize
+        val frac = minClusterSize.toDouble() / n
+        val eps = config.formalism.proposalSeparationBar
+
+        fun partitionFrom(proposalSpace: List<DoubleArray>, pcaDim: Int): List<List<Int>>? {
+            val projected = StatisticsUtils.pcaProject(proposalSpace, pcaDim)
+            val mix = runBlocking {
+                StatisticsUtils.performVmfKMeans(
+                    embeddings = projected, d = pcaDim, maxK = 4,
+                    minClusterFrac = frac, marginalEps = eps
+                )
+            } ?: return null
+            val k = mix.components.size
+            val out = List(k) { mutableListOf<Int>() }
+            for (i in 0 until n) {
+                val r = mix.responsibilities[i]
+                out[r.indices.maxByOrNull { r[it] } ?: 0].add(i)
+            }
+            return out
+        }
+
+        fun scoreOnSlice(part: List<List<Int>>): Double =
+            StatisticsUtils.chanceCorrectedSeparation(part.map { idx -> idx.map { slice[it] } })
+
+        println("=".repeat(104))
+        println("PHILOSOPHY slice-vs-full test — snapshot=$snapId")
+        println("n=$n queries, stored dim=$d, production slice=256 (d/n=%.2f), full d/n=%.1f"
+            .format(java.util.Locale.US, 256.0 / n, d.toDouble() / n))
+        println("Both partitions scored identically: chanceCorrectedSeparation on the 256-slice vectors.")
+        println("Reference: Philosophy's own within-node null at n=406 — p50 0.0396, p95 0.0452;")
+        println("           the canonical run logged sep=0.0208 and refused the split at bar=$eps.")
+        println("=".repeat(104))
+        println("%-34s %4s %-22s %10s %10s".format("proposal space", "k", "cluster sizes", "sep(slice)", "verdict"))
+
+        for ((name, space) in listOf("A. 256 MRL slice (production)" to slice, "B. PCA-64 from full $d-dim" to full)) {
+            val part = partitionFrom(space, 64)
+            if (part == null) { println("%-34s   -  EM collapsed".format(name)); continue }
+            val sizes = part.map { it.size }
+            val sep = scoreOnSlice(part)
+            val viable = sizes.all { it >= minClusterSize }
+            println("%-34s %4d %-22s %10.5f %10s".format(
+                java.util.Locale.US, name, part.size, sizes.joinToString(","), sep,
+                if (!viable) "below floor" else if (sep >= eps) "clears bar" else "below bar"))
+        }
+        // ── Like-for-like null for arm B ────────────────────────────────────
+        // Arm B's score cannot be read against arm A's null. A search over a richer
+        // proposal space finds more separation on STRUCTURELESS data too, so the
+        // comparison needs B's own procedure run on unimodal clouds carrying
+        // Philosophy's full-space covariance. Without this the result would be
+        // exactly the error this file exists to document: a number compared against
+        // a null measured on a different statistic.
+        val reps = reps(60)
+        val mu = DoubleArray(d)
+        for (v in full) for (i in 0 until d) mu[i] += v[i] / n
+        val centered = full.map { v -> DoubleArray(d) { i -> v[i] - mu[i] } }
+        println()
+        println("Like-for-like null for arm B: within-node bootstrap on the FULL $d-dim covariance,")
+        println("clustered by arm B's own procedure, scored on the 256 slice. reps=$reps")
+        val nullSeps = runBlocking {
+            coroutineScope {
+                (0 until reps).map { rep ->
+                    async(Dispatchers.Default) {
+                        val rng = java.util.Random(4242L + rep * 104729L)
+                        val cloud = withinNodeCloud(mu, centered, n, rng)
+                        val cSlice = cloud.map { v ->
+                            val s = DoubleArray(256) { v[it] }
+                            var nrm = 0.0; for (x in s) nrm += x * x; nrm = sqrt(nrm)
+                            if (nrm > 0) for (i in s.indices) s[i] /= nrm
+                            s
+                        }
+                        val proj = StatisticsUtils.pcaProject(cloud, 64)
+                        val mix = StatisticsUtils.performVmfKMeans(
+                            embeddings = proj, d = 64, maxK = 4,
+                            minClusterFrac = frac, marginalEps = eps
+                        ) ?: return@async 0.0
+                        val k = mix.components.size
+                        val part = List(k) { mutableListOf<Int>() }
+                        for (i in 0 until n) {
+                            val r = mix.responsibilities[i]
+                            part[r.indices.maxByOrNull { r[it] } ?: 0].add(i)
+                        }
+                        StatisticsUtils.chanceCorrectedSeparation(part.map { idx -> idx.map { cSlice[it] } })
+                    }
+                }.awaitAll()
+            }
+        }
+        val reached = nullSeps.filter { it > 0.0 }.sorted()
+        if (reached.size < 10) {
+            println("null degenerate (${reached.size}/$reps reached the gate)")
+        } else {
+            val p50 = percentile(reached, 0.50); val p95 = percentile(reached, 0.95)
+            val p99 = percentile(reached, 0.99)
+            println("arm B null (n=%d, reach %d/%d): p50=%.5f  p95=%.5f  p99=%.5f".format(
+                java.util.Locale.US, n, reached.size, reps, p50, p95, p99))
+            val obsB = partitionFrom(full, 64)?.let { scoreOnSlice(it) } ?: Double.NaN
+            val q = reached.count { it < obsB }.toDouble() / reached.size
+            println("arm B observed = %.5f  ->  q = %.3f in its OWN null".format(java.util.Locale.US, obsB, q))
+            println(if (q >= 0.95)
+                "  => the PCA-from-full partition beats what its own search finds on structureless data."
+            else
+                "  => NOT distinguishable from what the richer search manufactures on noise.")
+        }
+        println("=".repeat(104))
+        println("Read: if B's separation is materially above A's AND above B's own null, the 256-slice")
+        println("      was discarding the seam. If B only beats A, the richer search is finding noise.")
+    }
+
+    /**
      * FIDELITY CHECK — not a null measurement. Replays the SAME driver on the real
      * Philosophy population from the frozen snapshot. If the driver is faithful, the
      * splitter must reject it on the min-pair gate at a separation close to the 0.0209

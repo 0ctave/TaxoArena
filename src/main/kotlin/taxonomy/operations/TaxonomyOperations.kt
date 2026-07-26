@@ -11,6 +11,7 @@ import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
 import taxonomy.model.TraversalPolicy
 import taxonomy.model.DagRoot
+import taxonomy.diagnostics.DiagnosticsBundle
 import kotlin.math.exp
 
 enum class ProposalType { GROW, SHRINK }
@@ -398,16 +399,46 @@ class TaxonomyOperations(
         // the `vmfKappa < 0.5` diffuse test, against observed values around 130-200.
         // The weights likewise enter only through the mass/ess feasibility thresholds.
         // Both are guarded below rather than trusted.
-        val populationHash = site.queryWeights.keys.sumOf { it.hashCode() }
+        // Mixed rather than a plain sum of hashCodes. A plain sum collides whenever a
+        // site loses query X and gains query Y with hash(X) == hash(Y) at unchanged n —
+        // and the failure mode is a STALE MEMO silently recorded as REJECTED, which is
+        // the silent-plausible class this codebase keeps having to dig out. The
+        // multiplier costs nothing and destroys that coincidence.
+        //
+        // It matters more than it looks: site.vmfMu is STALE during phase 4 (the refit
+        // runs at end-of-iteration, so mu reflects the previous iteration's population),
+        // so muHash discriminates ACROSS iterations but not WITHIN one. The real
+        // within-iteration discriminators are this hash, n and massQ.
+        //
+        // Walked over the SUBTREE, not just site.queryWeights. Internal nodes hold no
+        // direct queries, so a site-local hash degenerates to (nodeId, muHash) for
+        // every SHRINK proposal — and muHash is stale within an iteration, so the
+        // fingerprint would be effectively constant across iterations for exactly the
+        // proposals whose outcome depends on their children's drifting populations.
+        // Latent while the cache never hit; live the moment it did.
+        var populationHash = 0L
         var siteMass = 0.0
         var siteSumSq = 0.0
-        for (w in site.queryWeights.values) { siteMass += w; siteSumSq += w * w }
+        var siteN = 0
+        run {
+            val seen = HashSet<String>()
+            val stack = ArrayDeque<GraphNode>().apply { add(site) }
+            while (stack.isNotEmpty()) {
+                val cur = stack.removeLast()
+                if (!seen.add(cur.id)) continue
+                for ((k, w) in cur.queryWeights) {
+                    populationHash += k.hashCode() * -0x61c8864680b583ebL + cur.id.hashCode()
+                    siteMass += w; siteSumSq += w * w; siteN++
+                }
+                cur.children.forEach { stack.add(it) }
+            }
+        }
         val siteEss = if (siteMass > 0.0) (siteMass * siteMass / siteSumSq) else 0.0
         val fingerprint = ProposalFingerprint(
             nodeId = if (proposalKey != null) "${site.id}|$proposalKey" else site.id,
-            populationHash = populationHash,
+            populationHash = populationHash.toInt(),
             muHash = site.vmfMu.contentHashCode(),
-            n = site.queryWeights.size,
+            n = siteN,
             massQ = Math.round(siteMass * 1e3)
         )
 
@@ -428,6 +459,26 @@ class TaxonomyOperations(
         if (!onABoundary && rejectedProposalsCache.contains(fingerprint)) {
             proposalStats.memoHits++
             log.debug("[MEMOIZED REJECTION] Skip tryProposal for site '${site.label ?: site.id}'")
+            // Record the ROW, not just the counter. Without this the memo erases its own
+            // audit trail: the repeated (site, dJ) rows are exactly what made "44
+            // redundant REJECTED, 255 redundant NO_PROPOSAL" computable in the first
+            // place, and folding them into an aggregate would make the hit rate
+            // checkable per run but never per site.
+            //
+            // COMPATIBILITY: like the k= change, this is a break. proposals.csv written
+            // before this commit contains the repeats as full REJECTED rows; after it,
+            // the repeat appears once as decision=MEMOIZED with the fingerprint that
+            // matched. Anything counting redundancy across the boundary must treat
+            // MEMOIZED rows as the repeats.
+            DiagnosticsBundle.recordProposal(
+                iter = currentIteration, type = proposalType.name,
+                siteId = site.id, siteLabel = site.label,
+                dJ = null, seDJ = null, z = null, dV = null,
+                decision = "MEMOIZED",
+                reason = "identical_since_last_accept(pop=${fingerprint.populationHash}" +
+                    ",n=${fingerprint.n},massQ=${fingerprint.massQ})",
+                nSite = siteN
+            )
             proposalStats.record(proposalType, ProposalOutcome.REJECTED)
             return ProposalOutcome.REJECTED
         }
