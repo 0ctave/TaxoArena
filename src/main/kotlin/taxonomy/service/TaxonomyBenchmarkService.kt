@@ -738,6 +738,32 @@ class TaxonomyBenchmarkService(
                     }
                 }
             }
+            // Per-round ranking snapshot, aggregate and per leaf. node_bt_states is
+            // INSERT OR REPLACE keyed on (snapshot_id, node_id), so each round overwrites the
+            // last and a stopping rule that fires on rank stability could never be audited
+            // afterwards — only watched live, which this project has repeatedly shown is where
+            // misreadings happen. Append-only, so "why did it stop" stays answerable.
+            run {
+                currentAggregated?.let { board ->
+                    val ordered = board.ranks.sortedByDescending { it.btScore }.map { it.modelId }
+                    taxonomy.diagnostics.DiagnosticsBundle.recordRanking(
+                        round = round, scope = "AGGREGATE", scopeLabel = req.condition,
+                        comparisons = board.totalComparisons.toDouble(),
+                        ranking = ordered,
+                        scores = board.ranks.associate { it.modelId to it.btScore }
+                    )
+                }
+                for ((leafId, st) in btStates) {
+                    val ordered = st.btScores.entries.sortedByDescending { it.value }.map { it.key }
+                    taxonomy.diagnostics.DiagnosticsBundle.recordRanking(
+                        round = round, scope = leafId,
+                        scopeLabel = getAllNodes(root).firstOrNull { it.id == leafId }?.label,
+                        comparisons = st.totalComparisons.toDouble(),
+                        ranking = ordered, scores = st.btScores
+                    )
+                }
+            }
+
             // ── [ARENA-SCHED] global resolution is a cross-leaf suppression ──────────
             // The key here omits nodeId, unlike every per-leaf budget key, so a pair marked
             // resolved stops being sampled in EVERY leaf (checked at BtMatchScheduler:156, :189,

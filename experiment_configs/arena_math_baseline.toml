@@ -1,0 +1,126 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/arena_math_baseline
+#  arena_math_scoped.toml — FULL taxonomy, Math-scoped judging
+#
+#  The taxonomy is the frozen 88-leaf artifact over all 14 domains. Only the
+#  JUDGED POOL is restricted to Math. That is the distinction that makes this a
+#  scoped view of the production run rather than a different experiment: routing,
+#  leaf structure, rubrics and the reserved pool are all the real ones.
+#
+#  ── How the scoping actually works ────────────────────────────────────────
+#  runPipeline = false + snapshotId  loads the frozen tree instead of rebuilding.
+#  regenerateSplit = false           is the load-bearing one. Split regeneration
+#                                    is gated on `regenerateSplit && !runPipeline`
+#                                    (HeadlessBenchmarkRunner ~line 336), so with
+#                                    it false the canonical 3437-question reserved
+#                                    pool is used as-is. Setting it true would
+#                                    re-split on Math alone and silently produce a
+#                                    different held-out set from the frozen run's.
+#  category = "Math"                 scopes the arena: TaxonomyBenchmarkService
+#                                    keeps a query only if its primary leaf sits
+#                                    under the Math anchor. The other 13 anchors
+#                                    stay in the tree and stay routable; they just
+#                                    receive no judged queries.
+#
+#  ── Roster: 8 models, not 15 ──────────────────────────────────────────────
+#  Judge calls scale as 2 x cells x pairs x n, and pairs = M(M-1)/2 is QUADRATIC
+#  in the roster while only linear in cells. 15 models is 105 pairs; 8 is 28, a
+#  3.75x cut. Cutting the roster preserves granularity; cutting granularity would
+#  foreclose the fine end of the fidelity curve permanently, because leaf-level
+#  verdicts re-aggregate upward offline but coarse verdicts cannot be split.
+#
+#  Balanced 4/4 on chain-of-thought presence so the RQ1 trace stratification
+#  survives, and spanning 23-77% ground-truth accuracy so the rank correlation
+#  has range to work with:
+#    with trace : claude-3-5-sonnet 77.4, gpt-4o 74.3, deepseek 65.7, haiku 61.2
+#    no trace   : Meta-Llama-3_1-70B 61.9, Qwen1.5-72B 45.9, Llama-2-70b 35.9,
+#                 Llama-2-13b 23.0
+#  Spearman at n=8 needs rho ~ 0.74 for p<0.05, which the smoke runs clear.
+#
+#  ── Budget expectation ────────────────────────────────────────────────────
+#  Math holds ~13 of the 88 leaves and ~405 reserved questions (~398 judgeable).
+#  13 leaves x 28 pairs = 364 (leaf, pair) cells against 24 in the smoke run, so
+#  expect roughly an order of magnitude more evaluations. questionsPerRound = 2
+#  keeps the per-pair depth minimal; the point of this run is the shape of the
+#  cost and whether leaf-level BT fits are identifiable at production width, not
+#  a ranking.
+#
+#  BASELINE ARM. MAIN already ran on this exact snapshot and pool
+#  in arena_validation; re-running them here triples the judge cost for coverage
+#  already obtained.
+#
+#  ── What to read when it lands ────────────────────────────────────────────
+#   * [ARENA-INGEST]  8 models admitted, 0 FAIL
+#   * [ARENA-POOL]    composition should be math=~398 and nothing else
+#   * [ARENA-BT]      how many leaves are refused as unidentified at 28 pairs --
+#                     this is the number that decides whether the full run can
+#                     judge at leaves at all
+#   * [ARENA-SE]      whether the inverse-variance floor still trips at k=13
+#   * [ARENA-SCHED]   how often global resolution suppresses a pair across leaves
+#   * total evaluations and wall time -> extrapolate the 14-domain cost
+#
+#  DO NOT REPORT A RANKING FROM THIS RUN. Per-pair depth is minimal and one
+#  domain is not the corpus.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "claude-3-5-sonnet-20241022",
+    "gpt-4o-2024-08-06",
+    "deepseek-chat-v2_5",
+    "claude-3-5-haiku-20241022",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+# The frozen artifact: committed tree, certified fixed point, 88/88 rubrics.
+snapshotId    = "20260726_200711_Headless_Run_Auto_ge"
+
+category      = "Math"     # scopes the JUDGED pool, not the taxonomy
+queryLimit    = 0
+outputDir     = "experiment_results/arena_math_baseline"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false     # load the frozen tree, do not rebuild
+regenerateSplit    = false     # keep the canonical reserved pool
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false     # labels are already in the snapshot
+judgeInduction     = false     # rubrics are already in the snapshot
+
+conditions         = ["GENERIC_JUDGE", "ORACLE"]
+
+questionsPerRound  = 2
+confidenceGate     = 0.65
+parallelism        = 6
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 30
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 0.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

@@ -38,9 +38,12 @@ object DiagnosticsBundle {
     private var iterationWriter: java.io.Writer? = null
     private var proposalWriter: java.io.Writer? = null
 
+    private var rankWriter: java.io.Writer? = null
+
     /** Row counts, so close() can tell "nothing happened" from "nobody wired the hook". */
     @Volatile private var iterationRows: Int = 0
     @Volatile private var proposalRows: Int = 0
+    @Volatile private var rankRows: Int = 0
 
     /** Pinned to US so decimal separators are always '.', whatever the JVM locale is. */
     fun fmt(v: Double, decimals: Int = 6): String =
@@ -111,6 +114,15 @@ object DiagnosticsBundle {
                     it.write("iter,type,site_id,site_label,dJ,SE_dJ,z,dV,decision,reason,n_site\n")
                     it.flush()
                 }
+                // Per-round ranking history. node_bt_states is INSERT OR REPLACE on
+                // (snapshot_id, node_id), so every round overwrote the last and only the final
+                // fit survived — a stopping rule that fires on rank stability could then never
+                // be audited after the fact, only watched live. This is the append-only record
+                // that makes "why did it stop" answerable.
+                rankWriter = File(d, "rank_history.csv").bufferedWriter().also {
+                    it.write("round,scope,scope_label,comparisons,ranking,scores\n")
+                    it.flush()
+                }
                 log.info("[DIAG] diagnostics bundle open at ${d.absolutePath}")
             }
         }
@@ -145,8 +157,11 @@ object DiagnosticsBundle {
                 val d = dir ?: return@safely
                 iterationWriter?.runCatching { flush(); close() }
                 proposalWriter?.runCatching { flush(); close() }
+                rankWriter?.runCatching { flush(); close() }
                 iterationWriter = null
                 proposalWriter = null
+                rankWriter = null
+                manifest["rank_history_rows"] = rankRows
 
                 manifest["exit_reason"] = exitReason
                 manifest["finished_at_millis"] = System.currentTimeMillis()
@@ -238,6 +253,31 @@ object DiagnosticsBundle {
                         "$decision,${csv(reason ?: "")},${nSite ?: ""}\n"
                 )
                 proposalRows++
+                w.flush()
+            }
+        }
+    }
+
+    /**
+     * One row per (round, scope) with the ranking as it stood, models best-first.
+     *
+     * [scope] is a leaf id or "AGGREGATE". Scores are recorded alongside the order because a
+     * rank-stability rule needs to distinguish a swap between near-tied models from a real
+     * reordering, and the order alone cannot show that.
+     */
+    fun recordRanking(
+        round: Int, scope: String, scopeLabel: String?,
+        comparisons: Double, ranking: List<String>, scores: Map<String, Double>
+    ) {
+        safely("recordRanking") {
+            val w = rankWriter ?: return@safely
+            synchronized(lock) {
+                w.write(
+                    "$round,${csv(scope)},${csv(scopeLabel ?: "")}," +
+                        "${fmt(comparisons, 1)},${csv(ranking.joinToString(">"))}," +
+                        "${csv(ranking.joinToString(";") { fmt(scores[it] ?: 0.0, 4) })}\n"
+                )
+                rankRows++
                 w.flush()
             }
         }
