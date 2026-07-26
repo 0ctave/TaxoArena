@@ -65,16 +65,20 @@ object DiagnosticsBundle {
                 manifest["schema_version"] = 1
                 manifest["commit"] = git.commit
                 manifest["branch"] = git.branch
+                // "dirty" means TRACKED SOURCE differs from the commit, excluding the files that
+                // are modified permanently by design. It is not "git status is non-empty".
                 manifest["dirty"] = git.dirty
+                manifest["dirty_files"] = git.dirtyFiles
                 manifest["started_at_millis"] = startedAtMillis
 
                 if (git.dirty) {
-                    // Loud on purpose: a run from uncommitted code is not reproducible, and that
-                    // fact has to travel with the artifact rather than be inferred later.
+                    // Loud on purpose, and now meaningful: this fires only when source that could
+                    // have changed the result is uncommitted.
                     log.warn(
-                        "[DIAG] working tree is DIRTY at run start (commit ${git.commit}). This run" +
-                            " is NOT reproducible from the repository alone — record what was" +
-                            " uncommitted, or commit before a run whose numbers you intend to report."
+                        "[DIAG] source is UNCOMMITTED at run start (commit ${git.commit}," +
+                            " ${git.dirtyFiles.size} file(s): ${git.dirtyFiles.take(5).joinToString(", ")}" +
+                            (if (git.dirtyFiles.size > 5) ", …" else "") +
+                            "). This run is NOT reproducible from the repository alone."
                     )
                 }
 
@@ -213,7 +217,31 @@ object DiagnosticsBundle {
 
     // ── internals ───────────────────────────────────────────────────────────────
 
-    private data class Git(val commit: String, val branch: String, val dirty: Boolean)
+    private data class Git(
+        val commit: String, val branch: String,
+        val dirty: Boolean, val dirtyFiles: List<String>
+    )
+
+    /**
+     * Paths that are modified permanently and by design, so their presence says nothing about
+     * whether a run is reproducible from the commit.
+     *
+     * `config/application.yml` is a local override holding credentials; it must never be
+     * committed, and runs are driven by the TOML files under `experiment_configs` regardless.
+     * Compiled Python caches are build output.
+     *
+     * (Avoid writing a glob with a slash-star in this file: Kotlin nests block comments, so it
+     * opens a comment that never closes and the whole object stops resolving.)
+     *
+     * The first version of this check used bare `git status --porcelain`, which counts UNTRACKED
+     * files too — so it fired on database backups and git worktrees and reported `dirty: true` on
+     * a tree with no outstanding source work at all. A warning that always fires is worse than no
+     * warning, because it teaches you to ignore it.
+     */
+    private val EXPECTED_LOCAL_MODIFICATIONS = listOf(
+        "config/application.yml",
+        ".pyc",
+    )
 
     /** Resolved once per JVM; a git failure must never take a run down. */
     private val gitCached: Git by lazy {
@@ -222,10 +250,20 @@ object DiagnosticsBundle {
             val out = p.inputStream.bufferedReader().readText().trim()
             if (p.waitFor() == 0) out else null
         }.getOrNull()
+
+        // `-uno`: tracked modifications only. Untracked files cannot have contributed to the
+        // build, so they are irrelevant to whether this run is reproducible.
+        val porcelain = run("git", "status", "--porcelain", "--untracked-files=no").orEmpty()
+        val modified = porcelain.lines()
+            .filter { it.isNotBlank() }
+            .map { it.substring(minOf(3, it.length)).trim() }
+            .filter { path -> EXPECTED_LOCAL_MODIFICATIONS.none { path.contains(it) } }
+
         Git(
             commit = run("git", "rev-parse", "HEAD") ?: "unknown",
             branch = run("git", "rev-parse", "--abbrev-ref", "HEAD") ?: "unknown",
-            dirty = run("git", "status", "--porcelain")?.isNotBlank() ?: false
+            dirty = modified.isNotEmpty(),
+            dirtyFiles = modified
         )
     }
 
