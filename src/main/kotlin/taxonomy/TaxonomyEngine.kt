@@ -548,6 +548,40 @@ class TaxonomyEngine(
                         " editsDelta=${"%.3e".format(java.util.Locale.US, lastEditsDelta)}," +
                         " trickleDelta=${"%.3e".format(java.util.Locale.US, lastTrickleDelta)})"
                 )
+
+                // Second sink for the values just logged. This is the iteration hook that was
+                // missing: the bundle wrote a header at open() and never a row, which is the
+                // failure mode that looks like success — a valid file, a clean parse, no data.
+                run {
+                    val all = mutableListOf<GraphNode>()
+                    val seen = mutableSetOf<String>()
+                    fun walk(n: GraphNode) {
+                        if (!seen.add(n.id)) return
+                        all.add(n); n.children.forEach { walk(it) }
+                    }
+                    walk(root)
+                    val stats = ops.proposalStats
+                    taxonomy.diagnostics.DiagnosticsBundle.recordIteration(
+                        iter = i,
+                        nodes = all.size,
+                        leaves = all.count { it.isLeaf },
+                        maxDepth = all.maxOfOrNull { it.depth } ?: 0,
+                        jAfterRoute = lastIterationJAfterRefit ?: Double.NaN,
+                        jAfterEdits = lastIterationJAfterRefit ?: Double.NaN,
+                        trickleDelta = lastTrickleDelta,
+                        editsDelta = lastEditsDelta,
+                        // StabilizationResult reports GED as a single edit distance, not as
+                        // separate add/remove counts; volumeDelta carries the signed size change.
+                        gedAdd = stabilizationResult.ged,
+                        gedRem = stabilizationResult.volumeDelta.toInt(),
+                        attempted = stats.attempted.values.sum(),
+                        accepted = stats.accepted.values.sum(),
+                        rejected = stats.rejected.values.sum(),
+                        noProposal = stats.noProposal.values.sum(),
+                        mass = all.sumOf { it.queryWeights.values.sum() },
+                        wallMs = 0L
+                    )
+                }
                 if (stabilizationResult.isConverged) {
                     log.info("Early stopping triggered in iteration $i due to convergence (GED quiescence).")
                     break
