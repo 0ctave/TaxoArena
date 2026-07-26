@@ -1,5 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════
-#  outputDir: experiment_results/cal_iso/s137
+#  outputDir: experiment_results/ztau/s7
 #  cal_seeds_bar025.toml — REPRODUCIBILITY + BASELINES on the bar025 canonical
 #
 #  This is the thesis-critical calibration run. It answers both reviewer
@@ -66,16 +66,16 @@ models        = [
 
 category      = ""      # "" = all 14 MMLU-Pro domains (empty = no category filter)
 queryLimit    = 0       # 0 = no cap; use the full corpus
-outputDir     = "experiment_results/cal_iso/s137"
+outputDir     = "experiment_results/ztau/s7"
 testRatio     = 0.3     # frozen 70/30 stratified split, identical across seeds
-seed          = 137
+seed          = 7
 # seeds omitted deliberately: the in-process multi-seed loop corrupts held-out routing for every seed after the first (measured: seed 137 NoMatchRate 0.816 in-loop vs 0.0 isolated). Each seed runs in its own JVM.
 
 # ── Pipeline / evaluation switches ──────────────────────────────────────────
 runPipeline        = true
 runBenchmark       = false
 runTrickle         = true          # produces the ECE/routing metrics
-runBaselines       = true          # recursive k-means + agglomerative at matched leaf count
+runBaselines       = false        # gate comparison only; baselines already measured
 enableFinalMetrics = true          # REQUIRED — produces the reported metrics
 enableLabeling     = false         # see header: off to protect the run, not a behaviour change
 judgeInduction     = false         # judges are induced in the arena step
@@ -89,7 +89,8 @@ dagMode = "DAG_MAX"      # NOT TREE_BASELINE: that also disables residualRouting
 maxDepth              = 8      # max taxonomy depth (caps runaway recursion)
 minClusterSize        = 30     # targets >=12 held-out top-1 per leaf for the arena
 proposalSeparationBar = 0.025  # between the isotropic (0.021) and within-domain (0.068) nulls
-tau                   = 1e-6   # lexicographic J acceptance tolerance
+tau                   = 1e-6
+acceptanceZ           = 0.0    # varying split (splitSeed unset): tests whether the gate narrows the SAMPLE-driven spread
 
 # ── Unified Trickle Routing & Soft-Membership ──────────────────────────────
 membershipFloor       = 0.25   # min share of a query's own normalized membership for a leaf to count
@@ -108,4 +109,5 @@ enableGtWarmStart         = false  # iteration 1 keeps the bootstrap assignment 
 
 # ── Diagnostics ──────────────────────────────────────────────────────────────
 enableProfiling           = true
+
 
