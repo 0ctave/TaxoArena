@@ -134,7 +134,23 @@ dagMode = "DAG_MAX"
 
 # ── Formalism: canonical except the two cost knobs noted above ──────────────
 maxDepth              = 4      # cost knob (canonical 8)
-minClusterSize        = 60     # cost knob (canonical 30)
+
+# CANONICAL 30, and it must stay canonical. Raising this to 60 as a cost knob broke the run of
+# 2026-07-26: [NO-SPLIT] 'Computer science' reason=not-routing-sustainable k=2 sizes=[48, 243]
+# floor=60. The only viable k=2 split of Computer science puts 48 queries in one child, so a
+# floor of 60 rejected it and 291 queries — 53% of the corpus, more than all of History — stayed
+# in a single leaf while History split three ways.
+#
+# That does not merely make an ugly tree, it suppresses the effect MAIN exists to demonstrate:
+# with over half the corpus in one whole-domain leaf, MAIN's "leaf-specific" rubric there IS a
+# domain-level rubric, which is approximately the GENERIC_JUDGE condition. Any comparison between
+# the two on such a tree is biased toward finding no difference, by construction.
+#
+# The saving was illusory anyway. Judge cost scales with (leaf x pair) scheduling cells, so more
+# leaves do cost more — roughly 950 -> 2000 calls here — but induction and labeling are ~1 call
+# per leaf, and 2000 calls is still an order of magnitude under the production run. Buying a
+# degenerate tree to save 1000 calls is the wrong trade.
+minClusterSize        = 30
 proposalSeparationBar = 0.025
 tau                   = 1e-6
 acceptanceZ           = 0.0
