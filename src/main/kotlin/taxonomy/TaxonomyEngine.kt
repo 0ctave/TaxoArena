@@ -173,13 +173,38 @@ class TaxonomyEngine(
             stabilizer.reset()
             val activeNodeHashes = mutableListOf<Int>()
             var lastIterationJAfterRefit: Double? = null
+            // Retained for the fixed-point certificate emitted after the loop.
+            var lastTrickleDelta = Double.NaN
+            var lastEditsDelta = Double.NaN
+            var lastIterationRun = 0
+
+            // State captured immediately before each refit, so the refit can be treated as a
+            // proposal like every other J-changing operation. J does not read vmfMu or vmfKappa,
+            // so a refit's effect on J is realised only by the routing it drives at the start of
+            // the next iteration — refit and that re-route are therefore ONE move, and the point
+            // where its delta becomes measurable is where the gate has to sit.
+            var refitBackup: taxonomy.model.GraphStateBackup? = null
+            var refitRegistry: Map<String, GraphNode>? = null
+            // Parameter state captured immediately before each refit, so the certificate can
+            // assert that theta is stationary too. editsDelta and trickleDelta together show the
+            // structure and the objective have settled, but a refit can still move mu and kappa
+            // inside a J-equivalent set — and theta is what held-out queries route through, so a
+            // certificate that ignores it does not cover the object being frozen.
+            var preRefitTheta: Map<String, Pair<FloatArray, Double>> = emptyMap()
+            var lastMaxMuDelta = Double.NaN
+            var lastMaxKappaRel = Double.NaN
+            // Consecutive iterations with both J deltas inside tau. GED cannot see this: the
+            // structure can oscillate by one node while J sits still, which is convergence of the
+            // quantity being optimised.
+            var jStationaryStreak = 0
+            // Diagnostic count of refits the gate turned down over the whole run.
+            var refitRejectedCount = 0
 
             var previousDagState: Map<String, NodeState>? = null
             for (i in 1..totalIters) {
                 log.info("STARTING EVOLUTION ITERATION $i")
 
                 clearFitPhases(root)
-
                 val iterationTime = measureTimeMillis {
                     if (uniqueEmbs.isNotEmpty()) {
                         // Phase 3: Trickle (Top-Down Restrictive Funnel Routing)
@@ -217,8 +242,46 @@ class TaxonomyEngine(
                         perfTracker.recordTime("construction.phase3_trickle@iter=$i", trickleTime, uniqueEmbs.size.toLong())
                         taxonomyService.notifyGraphUpdated()
 
-                        val jBeforeEdits = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
-                        val drift = if (lastIterationJAfterRefit != null) jBeforeEdits - lastIterationJAfterRefit!! else 0.0
+                        var jBeforeEdits = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
+                        var drift = if (lastIterationJAfterRefit != null) jBeforeEdits - lastIterationJAfterRefit!! else 0.0
+
+                        // ── REFIT GATE ──────────────────────────────────────────────────
+                        // The composite (refit, re-route) has now been applied and its effect on
+                        // J is exactly `drift`. Judge it by the same rule every structural edit
+                        // faces: if it lowered J beyond the tolerance, restore the pre-refit
+                        // parameters AND assignment — and then CONTINUE. A rejected proposal has
+                        // never ended a run anywhere else in this system and must not here: a
+                        // refit failing to help says nothing about whether a split would, and
+                        // treating it as termination stops construction on a stunted tree (seen
+                        // directly: rejecting at iteration 3 froze a two-iteration taxonomy that
+                        // the fixed-point certificate then correctly refused to certify).
+                        //
+                        // Livelock is not possible while structural edits keep landing, because
+                        // each accepted edit changes the structure and so changes the next refit
+                        // proposal. When edits stop AND the refit is rejected, nothing in the
+                        // loop can change anything, and the J-stationarity criterion below sees
+                        // both deltas at zero and terminates.
+                        //
+                        // This closes the one exception to the framework's rule that every
+                        // J-changing operation is measured. Without it the edit gate can raise J
+                        // and the ungated re-route hand it straight back — observed at
+                        // -4.67e-04, the same order as a median accepted split (+5.19e-04).
+                        if (config.formalism.enableRefitGate &&
+                            drift < -config.formalism.tau && refitBackup != null && refitRegistry != null) {
+                            log.info(
+                                "[REFIT REJECTED] Iteration $i | the refit and its re-route lowered J by " +
+                                    "${"%.3e".format(java.util.Locale.US, -drift)} (tol " +
+                                    "${"%.3e".format(java.util.Locale.US, config.formalism.tau)}). Restoring the " +
+                                    "pre-refit parameters and assignment; continuing from there."
+                            )
+                            refitBackup!!.restore(refitRegistry!!)
+                            root.updateAllShrinkages()
+                            refitRejectedCount++
+                            // J is back to the previous iteration's post-refit value by
+                            // construction, so this iteration's edits are measured against that.
+                            jBeforeEdits = lastIterationJAfterRefit!!
+                            drift = 0.0
+                        }
 
                         // Phase 4: Discover (Adaptive Splitting)
                         log.debug("Phase 4: Discovering emergent concepts (Splitting)...")
@@ -281,16 +344,87 @@ class TaxonomyEngine(
                             )
                         )
 
+                        // Snapshot before the refit so the gate at the next iteration's drift
+                        // measurement can restore it. Captured here because this is the last
+                        // point at which the pre-refit parameters and assignment coexist.
+                        refitBackup = taxonomy.model.GraphStateBackup(root)
+                        refitRegistry = buildMap {
+                            val seen = mutableSetOf<String>()
+                            fun walkReg(n: GraphNode) {
+                                if (!seen.add(n.id)) return
+                                put(n.id, n)
+                                n.children.forEach { walkReg(it) }
+                                n.crossLinkChildren.forEach { walkReg(it) }
+                            }
+                            walkReg(root)
+                        }
+
+                        preRefitTheta = refitRegistry!!.mapValues { (_, n) -> n.vmfMu.copyOf() to n.vmfKappa }
+
                         val refitTime = measureTimeMillis {
                             ops.fitNodeRecursive(root, currentIteration = i, isFinalIteration = (i == totalIters))
                             ops.invalidateCachedJ()
+                        }
+
+                        // How far the refit actually moved theta. 1 - cos on the direction, and a
+                        // relative change on the concentration.
+                        run {
+                            var maxMu = 0.0
+                            var maxKap = 0.0
+                            for ((id, node) in refitRegistry!!) {
+                                val (oldMu, oldKappa) = preRefitTheta[id] ?: continue
+                                val d = minOf(oldMu.size, node.vmfMu.size)
+                                if (d > 0) {
+                                    var dot = 0.0; var na = 0.0; var nb = 0.0
+                                    for (j in 0 until d) {
+                                        dot += oldMu[j].toDouble() * node.vmfMu[j].toDouble()
+                                        na += oldMu[j].toDouble() * oldMu[j].toDouble()
+                                        nb += node.vmfMu[j].toDouble() * node.vmfMu[j].toDouble()
+                                    }
+                                    if (na > 1e-18 && nb > 1e-18) {
+                                        val cos = (dot / (Math.sqrt(na) * Math.sqrt(nb))).coerceIn(-1.0, 1.0)
+                                        maxMu = maxOf(maxMu, 1.0 - cos)
+                                    }
+                                }
+                                if (oldKappa > 1e-12) {
+                                    maxKap = maxOf(maxKap, kotlin.math.abs(node.vmfKappa - oldKappa) / oldKappa)
+                                }
+                            }
+                            lastMaxMuDelta = maxMu
+                            lastMaxKappaRel = maxKap
                         }
                         perfTracker.recordTime("construction.phase2_refit", refitTime, 1L)
                         perfTracker.recordTime("construction.phase2_refit@iter=$i", refitTime, 1L)
                         taxonomyService.notifyGraphUpdated()
 
-                        val jAfterRefit = jAfterEdits // Parameter update doesn't change queryWeights
+                        // The refit is asserted to leave J untouched because J reads only
+                        // queryWeights and the embeddings — never vmfMu or vmfKappa. That makes
+                        // the M-step inert with respect to J, and means the parameter update can
+                        // only move J indirectly, through the routing it drives next iteration.
+                        // The whole composite E o S o M therefore has exactly one ungated J
+                        // mover, E, which is where any damping has to act. Measure rather than
+                        // assume: if this ever prints non-zero, the claim above is false and the
+                        // termination discussion changes.
+                        val jAfterRefit = if (config.diagnostics.enableProfiling) {
+                            val measured = taxonomy.utils.StatisticsUtils.computeDagSeparationJ(root, uniqueEmbs)
+                            val refitDelta = measured - jAfterEdits
+                            if (kotlin.math.abs(refitDelta) > 1e-12) {
+                                log.warn(
+                                    "[REFIT-DELTA] Iteration $i | refit moved J by " +
+                                        "${"%.3e".format(java.util.Locale.US, refitDelta)} — the M-step is NOT " +
+                                        "inert with respect to J, contrary to the assumption in the descent analysis."
+                                )
+                            } else {
+                                log.info("[REFIT-DELTA] Iteration $i | 0.000e+00 (M-step inert, as expected)")
+                            }
+                            measured
+                        } else {
+                            jAfterEdits
+                        }
                         lastIterationJAfterRefit = jAfterRefit
+                        lastTrickleDelta = drift
+                        lastEditsDelta = jAfterEdits - jBeforeEdits
+                        lastIterationRun = i
                         // Locale.US is required: the JVM runs under -Duser.language=fr, so a
                         // bare format() emits "0,265920" and every downstream parse of the J
                         // trajectory silently fails. Six decimals because the per-iteration
@@ -307,6 +441,32 @@ class TaxonomyEngine(
                         // so that "accepted at dJ = 3.7e-5 under tau = 1e-6" can be judged as
                         // evidence or as noise.
                         if (config.diagnostics.enableProfiling) {
+                            // How far each node's own fitted direction sits from its children's
+                            // mass-weighted resultant. The descent-gate derivation assumes these
+                            // coincide; the shortfall is exactly what descentMargin absorbs.
+                            val cosines = mutableListOf<Double>()
+                            run {
+                                val seen = mutableSetOf<String>()
+                                fun walkCos(n: GraphNode) {
+                                    if (!seen.add(n.id)) return
+                                    if (n.children.isNotEmpty() && !n.muResultantCosine.isNaN()) {
+                                        cosines.add(n.muResultantCosine)
+                                    }
+                                    n.children.forEach { walkCos(it) }
+                                }
+                                walkCos(root)
+                            }
+                            if (cosines.isNotEmpty()) {
+                                val sorted = cosines.sorted()
+                                fun pct(p: Double) = sorted[(sorted.size * p).toInt().coerceAtMost(sorted.size - 1)]
+                                log.info(
+                                    "[MU-GAP] Iteration $i | internal nodes=${cosines.size}" +
+                                        " cos(mu_v, resultant) min=${"%.4f".format(java.util.Locale.US, sorted.first())}" +
+                                        " p10=${"%.4f".format(java.util.Locale.US, pct(0.10))}" +
+                                        " median=${"%.4f".format(java.util.Locale.US, pct(0.50))}" +
+                                        " max=${"%.4f".format(java.util.Locale.US, sorted.last())}"
+                                )
+                            }
                             val boot = taxonomy.utils.JBootstrap.estimate(root, uniqueEmbs)
                             val ratio = if (config.formalism.tau > 0.0) boot.seBoot / config.formalism.tau else Double.NaN
                             log.info(
@@ -371,10 +531,94 @@ class TaxonomyEngine(
                 ops.proposalStats.clear()
                 
                 // Phase 6: Stabilize Convergence Check
+                //
+                // Two criteria, reported jointly. GED asks whether the node and edge sets stopped
+                // changing; J-stationarity asks whether the objective stopped changing. They are
+                // not the same question, and GED is the weaker one: a structure can alternate
+                // between 174 and 175 nodes for 44 iterations while J sits at 0.2659 +/- 4e-5,
+                // which GED reads as perpetual churn and stationarity reads as converged.
                 val stabilizationResult = stabilizer.evaluateConvergence(root, i)
+                val jStationary = !lastEditsDelta.isNaN() && !lastTrickleDelta.isNaN() &&
+                    kotlin.math.abs(lastEditsDelta) <= config.formalism.tau &&
+                    kotlin.math.abs(lastTrickleDelta) <= config.formalism.tau
+                jStationaryStreak = if (jStationary) jStationaryStreak + 1 else 0
+                log.info(
+                    "[CONVERGENCE] Iteration $i | GED converged=${stabilizationResult.isConverged}" +
+                        " | J stationary=$jStationary (streak $jStationaryStreak/5," +
+                        " editsDelta=${"%.3e".format(java.util.Locale.US, lastEditsDelta)}," +
+                        " trickleDelta=${"%.3e".format(java.util.Locale.US, lastTrickleDelta)})"
+                )
                 if (stabilizationResult.isConverged) {
-                    log.info("Early stopping triggered in iteration $i due to convergence.")
+                    log.info("Early stopping triggered in iteration $i due to convergence (GED quiescence).")
                     break
+                }
+                if (jStationaryStreak >= 5) {
+                    log.info("Early stopping triggered in iteration $i due to convergence (J stationarity).")
+                    break
+                }
+            }
+
+            // ── FIXED-POINT CERTIFICATE ─────────────────────────────────────
+            // The claim a reader actually needs is not that construction converges from every
+            // starting point — it is that the artifact being frozen is a fixed point of the
+            // construction operator: one more iteration would change nothing. That is checkable
+            // at freeze time rather than provable in general, and it is currently satisfied but
+            // never asserted anywhere.
+            //
+            // Both components must vanish. Edits delta = 0 means the structural gate accepted
+            // nothing; trickle delta = 0 means re-routing under the final parameters reproduced
+            // the same assignment. Only the pair certifies the composite E o S o M is stationary
+            // — edits alone would miss the ungated routing step, which is the one operation in
+            // the loop that moves J without a gate.
+            run {
+                val tol = config.formalism.tau
+                // Theta tolerance is separate from tau: tau bounds a change in J, these bound a
+                // change in the parameters that produce it. 1e-6 on (1 - cos) is roughly a
+                // milliradian of direction change.
+                val epsMu = 1e-6
+                val epsKappa = 1e-6
+                val editsOk = !lastEditsDelta.isNaN() && kotlin.math.abs(lastEditsDelta) <= tol
+                val trickleOk = !lastTrickleDelta.isNaN() && kotlin.math.abs(lastTrickleDelta) <= tol
+                val muOk = !lastMaxMuDelta.isNaN() && lastMaxMuDelta <= epsMu
+                val kappaOk = !lastMaxKappaRel.isNaN() && lastMaxKappaRel <= epsKappa
+                val certified = editsOk && trickleOk && muOk && kappaOk
+                val line = "[FIXED-POINT] iteration=$lastIterationRun" +
+                    " editsDelta=${"%.3e".format(java.util.Locale.US, lastEditsDelta)}" +
+                    " trickleDelta=${"%.3e".format(java.util.Locale.US, lastTrickleDelta)}" +
+                    " maxMuDelta=${"%.3e".format(java.util.Locale.US, lastMaxMuDelta)}" +
+                    " maxKappaRel=${"%.3e".format(java.util.Locale.US, lastMaxKappaRel)}" +
+                    " tol=${"%.3e".format(java.util.Locale.US, tol)}" +
+                    " certified=$certified"
+                if (certified) log.info(line) else log.warn("$line — the frozen artifact is NOT a fixed point")
+
+                taxonomy.model.ExperimentOutputContext.activeBaseDir?.let { dir ->
+                    runCatching {
+                        java.io.File(dir, "fixed_point_certificate.txt").writeText(
+                            buildString {
+                                appendLine("Fixed-point certificate for the frozen construction artifact")
+                                appendLine("===========================================================")
+                                appendLine()
+                                appendLine("final iteration : $lastIterationRun")
+                                appendLine("edits delta     : ${"%.6e".format(java.util.Locale.US, lastEditsDelta)}")
+                                appendLine("trickle delta   : ${"%.6e".format(java.util.Locale.US, lastTrickleDelta)}")
+                                appendLine("max 1-cos(mu)   : ${"%.6e".format(java.util.Locale.US, lastMaxMuDelta)}")
+                                appendLine("max rel d kappa : ${"%.6e".format(java.util.Locale.US, lastMaxKappaRel)}")
+                                appendLine("tolerance (tau) : ${"%.6e".format(java.util.Locale.US, tol)}")
+                                appendLine("tolerance (theta): ${"%.6e".format(java.util.Locale.US, epsMu)}")
+                                appendLine("CERTIFIED       : $certified")
+                                appendLine()
+                                appendLine("Certified means one further iteration of the construction operator would")
+                                appendLine("change nothing that the frozen artifact consists of: the structural gate")
+                                appendLine("accepted no edit, re-routing reproduced the same partition, and the refit")
+                                appendLine("moved no node's direction or concentration. The last of those matters")
+                                appendLine("because held-out queries route through theta, so a certificate over")
+                                appendLine("structure and objective alone would not cover the object being frozen.")
+                                appendLine()
+                                appendLine("This certifies THIS artifact. It is not a claim that the construction")
+                                appendLine("loop terminates from an arbitrary starting point — it does not.")
+                            }
+                        )
+                    }
                 }
             }
 

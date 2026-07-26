@@ -126,6 +126,14 @@ data class GraphNode(
     // Jensen-tight shrinkage factor r_bar_p for descent gate
     var childCentroidShrinkage: Double = 1.0
 
+    /**
+     * cos(mu_v, sum_c w_c mu_c) — 1.0 iff this node's fitted direction coincides with its
+     * children's mass-weighted resultant, which is what the descent-gate derivation assumes.
+     * Anything below 1.0 is the gap descentMargin is paying for. NaN when undefined (no
+     * children, or an unfitted node).
+     */
+    var muResultantCosine: Double = Double.NaN
+
     fun updateChildCentroidShrinkage() {
         val childrenList = buildList {
             addAll(children)
@@ -173,6 +181,33 @@ data class GraphNode(
             sumSq += sumVector[j] * sumVector[j]
         }
         childCentroidShrinkage = Math.sqrt(sumSq).coerceIn(0.0, 1.0)
+
+        // Angle between this node's own fitted direction and the mass-weighted resultant of its
+        // children's directions.
+        //
+        // The descent gate's derivation assumes these are the same vector. If they were, the
+        // gate would be a tautology: r_v <mu_v, x> = sum_c w_c <mu_c, x> <= max_c <mu_c, x> by
+        // Jensen, so it would always descend and no query could ever residualise. It fires only
+        // because mu_v is fitted independently on the node's own queries while the resultant
+        // re-normalises each child (each child's contribution carries a 1/r_c inflation, so
+        // diffuse children are up-weighted relative to their share of the parent's own fit).
+        // descentMargin absorbs that gap, so measuring it directly turns delta from a
+        // calibrated constant into a quantified correction.
+        val ownDim = minOf(dim, vmfMu.size)
+        if (ownDim > 0 && childCentroidShrinkage > 1e-12) {
+            var dot = 0.0
+            var ownNorm = 0.0
+            for (j in 0 until ownDim) {
+                dot += vmfMu[j] * sumVector[j]
+                ownNorm += vmfMu[j].toDouble() * vmfMu[j].toDouble()
+            }
+            ownNorm = Math.sqrt(ownNorm)
+            muResultantCosine = if (ownNorm > 1e-12)
+                (dot / (ownNorm * childCentroidShrinkage)).coerceIn(-1.0, 1.0)
+            else Double.NaN
+        } else {
+            muResultantCosine = Double.NaN
+        }
     }
 
     fun updateAllShrinkages() {
