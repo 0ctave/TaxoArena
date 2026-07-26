@@ -738,6 +738,35 @@ class TaxonomyBenchmarkService(
                     }
                 }
             }
+            // ── [ARENA-SCHED] global resolution is a cross-leaf suppression ──────────
+            // The key here omits nodeId, unlike every per-leaf budget key, so a pair marked
+            // resolved stops being sampled in EVERY leaf (checked at BtMatchScheduler:156, :189,
+            // :360 and BtStoppingPolicy:107, :196). That is a confound for any comparison between
+            // groupings with different leaf counts: a 104-leaf adapted taxonomy loses sampling
+            // across far more cells than a 14-domain baseline, so the two receive systematically
+            // different evidence per cell for reasons that have nothing to do with the grouping.
+            //
+            // It is recomputed from scratch each round rather than accumulated, so a pair can
+            // leave the set — but sigma is the AGGREGATE leaderboard SE, which [ARENA-SE] showed
+            // collapsing to 0.139 against an inverse-variance floor of 0.793. An understated sigma
+            // makes 2.5*sigma understated and fires this gate on far too little evidence; the SE
+            // substitution now in place tightens it by the same 5.7x factor.
+            //
+            // None of that was observable: the set is in-memory and was never logged, so "how many
+            // pairs, at what round" could not be answered after a run. Now it can.
+            run {
+                val resolved = stoppingPolicy.globallyResolvedPairs.size
+                val totalPairs = modelNames.size * (modelNames.size - 1) / 2
+                if (resolved > 0) {
+                    val minSigma = currentAggregated?.ranks?.minOfOrNull { it.stdError }
+                    log.info(
+                        "[ARENA-SCHED] round $round: $resolved/$totalPairs pair(s) globally resolved" +
+                            " (gap > 2.5*sigma, sigma=max of the two aggregate SEs" +
+                            (if (minSigma != null) ", min aggregate SE=${"%.4f".format(java.util.Locale.US, minSigma)}" else "") +
+                            "); these are suppressed in EVERY leaf this round"
+                    )
+                }
+            }
 
             // Re-select each round: converged leaves are excluded, uncertain ones are promoted
             targetNodes = scheduler.selectTargetNodes(
