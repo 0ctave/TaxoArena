@@ -997,7 +997,18 @@ class TaxonomyEngine(
                 sb.append("\"residualQueries\":").append(n.residualQueries.size).append(",")
                 sb.append("\"subtreeQueries\":").append(n.getRecursiveQueryCount()).append(",")
                 sb.append("\"parentIds\":[").append(n.parents.joinToString(",") { "\"${esc(it.id)}\"" }).append("],")
-                sb.append("\"childIds\":[").append(n.children.joinToString(",") { "\"${esc(it.id)}\"" }).append("]")
+                sb.append("\"childIds\":[").append(n.children.joinToString(",") { "\"${esc(it.id)}\"" }).append("],")
+                // vmfMu, the node's direction on the sphere. Without it a snapshot cannot be
+                // compared to another run's snapshot at all: matching leaves ACROSS SEEDS needs a
+                // shared space, and every proxy fails. Query-set overlap is meaningless when each
+                // seed draws a different held-out split, and recomputing centroids from member
+                // embeddings requires the embedding cache, its exact byte order, and the router's
+                // assignments — three external dependencies for a quantity the node already holds.
+                // Emitted at 6 dp: mu is unit-norm, so that is well inside float32 precision.
+                sb.append("\"vmfMu\":[").append(
+                    n.vmfMu.joinToString(",") { String.format(java.util.Locale.US, "%.6f", it) }
+                ).append("],")
+                sb.append("\"sliceDim\":").append(n.sliceDim)
                 sb.append("}")
             }
             sb.append("]}")
