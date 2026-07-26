@@ -350,10 +350,25 @@ class TaxonomyJudgeService(
         if (sourceCorrectOptions.isEmpty()) return
         val (n, gram) = maxSharedNgram(rubric, sourceCorrectOptions)
         if (n >= 5) {
-            log.warn(
-                "[JUDGE-LEAK] node '${node.label}': rubric shares a $n-token span with a source" +
-                    " correct option — \"$gram\". The rule has memorised an answer rather than" +
-                    " abstracted a reasoning property; treat this leaf's verdicts as suspect."
+            // A GATE, not a warning, and deliberately at save time rather than at judgment.
+            //
+            // The alternative — asserting the answer text is absent from the assembled judge
+            // prompt — requires threading the correct-option string into the judging path purely
+            // so a check can confirm it is not there, which adds the exact surface it polices and
+            // leaves a refactor free to drop the assertion while keeping the string in scope.
+            // Rubrics are static per snapshot and the answer texts are already in scope here, so a
+            // rubric that is clean when saved is clean at every subsequent use. Gating here makes
+            // the runtime assertion unnecessary.
+            //
+            // Failing loudly is the right severity: a rubric that reproduces an answer invalidates
+            // every verdict in its leaf, and a run that stops is recoverable where a leaderboard
+            // built on a leaked rubric is not. If this proves too brittle, the graded response is
+            // to drop the offending rules and re-synthesise, not to downgrade it to a warning.
+            throw IllegalStateException(
+                "Rubric leakage gate failed for node '${node.label}' (id=${node.id}): the induced" +
+                    " rubric shares a $n-token span with a source correct option — \"$gram\"." +
+                    " The rule has memorised an answer rather than abstracted a reasoning property," +
+                    " so it would carry answer information into the held-out split. Refusing to save."
             )
         } else {
             log.info(
