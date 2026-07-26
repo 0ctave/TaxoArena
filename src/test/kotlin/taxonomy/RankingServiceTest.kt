@@ -18,8 +18,21 @@ class RankingServiceTest {
         tmpDir = java.nio.file.Files.createTempDirectory("ranking-service-test").toFile()
         System.setProperty("ranking.db.path", java.io.File(tmpDir, "ratings.db").absolutePath)
         rankingService = TaxonomyRankingService()
-        System.clearProperty("ranking.db.path")
+        // The property MUST stay set for the lifetime of the test. TaxonomyRankingService
+        // opens no connection in its constructor -- `connection` (TaxonomyRankingService.kt:96)
+        // re-reads System.getProperty("ranking.db.path", "ratings.db") on every access. Clearing
+        // it here meant the very next call, clearDatabaseForTest(), resolved to the repo-root
+        // ratings.db and ran its DELETEs against real research data, while the temp dir created
+        // above went unused. Every `gradlew test` emptied node_pair_stats, node_bt_states,
+        // agent_ratings_v2 and match_history of all 18 real snapshot arms; the tables NOT in the
+        // DELETE list (benchmark_query_offsets, benchmark_metadata) still hold their 2051 rows,
+        // which is how the wipe was identified.
         rankingService.clearDatabaseForTest()
+    }
+
+    @org.junit.jupiter.api.AfterEach
+    fun tearDown() {
+        System.clearProperty("ranking.db.path")
     }
 
     @Test

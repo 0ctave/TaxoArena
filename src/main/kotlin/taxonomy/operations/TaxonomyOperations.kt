@@ -16,6 +16,46 @@ import kotlin.math.exp
 enum class ProposalType { GROW, SHRINK }
 enum class ProposalOutcome { ACCEPTED, REJECTED, NO_PROPOSAL }
 
+/**
+ * The structural acceptance rule, extracted from `tryProposal` so it can be tested without
+ * standing up a DAG, a corpus and a full re-route. Pure and behaviour-identical to the
+ * expression it replaces.
+ *
+ * Canonical arm (`zGate == 0`): lexicographic on `(J, -|V|)` against the float tolerance
+ * [tau]. A strict J improvement accepts; a J-neutral edit accepts only if it also removes
+ * nodes, which is what lets passthrough wrappers dissolve; anything else rejects.
+ *
+ * z arm (`zGate > 0`): accepts on `deltaJ > max(tau, zGate * SE)`. The [tau] floor — not
+ * `zGate * SE` alone — is what makes a termination argument possible: every accepted edit
+ * then raises J by at least tau, and J is bounded above by 1, so at most `(1 - J_0)/tau`
+ * edits can ever commit. With `zGate * SE` alone a vanishing SE would admit a vanishing
+ * improvement and that bound collapses. In practice the floor almost never binds — median
+ * SE(dJ) is 5.85e-5, so z=2 gives 1.17e-4, two orders above tau.
+ *
+ * `SE == 0` identifies a pure structural edit (a passthrough dissolution that moves no
+ * query), for which deltaJ is exactly 0 and z is undefined; it falls back to the size test
+ * so those edits can still commit.
+ *
+ * Note the arms are alternatives, not layers: with `zGate > 0` the lexicographic tie-break
+ * applies only in the `SE == 0` case, so a J-neutral simplification with SE > 0 cannot
+ * commit. That is why `acceptanceZ = 0` is canonical.
+ */
+internal fun isProposalAccepted(
+    deltaJ: Double,
+    deltaV: Int,
+    tau: Double,
+    zGate: Double,
+    seDeltaJ: Double?
+): Boolean = if (zGate > 0.0 && seDeltaJ != null) {
+    if (seDeltaJ > 0.0) deltaJ > maxOf(tau, zGate * seDeltaJ) else deltaV < 0
+} else {
+    when {
+        deltaJ > tau -> true
+        kotlin.math.abs(deltaJ) <= tau -> deltaV < 0
+        else -> false
+    }
+}
+
 class ProposalStats {
     val attempted = mutableMapOf<ProposalType, Int>()
     val accepted = mutableMapOf<ProposalType, Int>()
@@ -509,25 +549,7 @@ class TaxonomyOperations(
         //
         // Legacy (acceptanceZ == 0): lexicographic on (J, -|V|) against the float tolerance
         // tau. Retained as the baseline arm so the gate change can be attributed.
-        val accepted = if (zGate > 0.0 && seDeltaJ != null) {
-            val se = seDeltaJ!!
-            when {
-                // max(tau, z*SE), not z*SE alone. The tau floor is what makes a termination
-                // argument possible: every accepted edit then raises J by at least tau, J is
-                // bounded above by 1, so at most (1 - J_0)/tau edits can ever be accepted. With
-                // z*SE alone a vanishing SE would admit a vanishing improvement and the bound
-                // collapses. In practice the floor almost never binds — median SE(dJ) is 5.85e-5,
-                // so z=2 gives 1.17e-4, two orders above tau.
-                se > 0.0 -> deltaJ > maxOf(tau, zGate * se)
-                else -> deltaV < 0
-            }
-        } else {
-            when {
-                deltaJ > tau -> true
-                kotlin.math.abs(deltaJ) <= tau -> deltaV < 0
-                else -> false
-            }
-        }
+        val accepted = isProposalAccepted(deltaJ, deltaV, tau, zGate, seDeltaJ)
 
         if (accepted) {
             log.info("[$proposalType ACCEPTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV")

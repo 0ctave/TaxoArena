@@ -3,7 +3,12 @@ package taxonomy
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
+import taxonomy.config.TaxonomyConfig
+import taxonomy.dataset.MMLUDatasetFetcher
+import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.model.GraphNode
+import taxonomy.operations.TaxonomyMerger
 import taxonomy.operations.isTreeLegalFusionPair
 
 /**
@@ -95,5 +100,115 @@ class TreeFusionInvariantTest {
 
         assertTrue(isTreeLegalFusionPair(a, b), "guard compares parent sets only")
         assertTrue(a.parents.isEmpty() && b.parents.isEmpty(), "the isEmpty check is what rejects orphans")
+    }
+
+    // ── End-to-end: run the REAL fuse and assert the resulting graph is a tree ──────────
+    //
+    // Every test above checks the admission guard in isolation. The polyhierarchy is not
+    // created by the guard, though — it is created by fuseNodes' parent-redirect step
+    // (TaxonomyMerger.kt, `target.parents.add(parent)`). So the guard could stay correct
+    // while a change to the fuse reintroduced BridgeCount > 0, and nothing would notice.
+
+    private fun merger(): TaxonomyMerger = TaxonomyMerger(
+        // fuseNodes is pure graph/parameter manipulation; none of these collaborators are
+        // reached, so mocks keep the test at unit cost with no Spring context.
+        mock(TaxonomyConfig::class.java),
+        mock(TaxonomyLlmClient::class.java),
+        mock(MMLUDatasetFetcher::class.java)
+    )
+
+    private fun fittedNode(label: String, depth: Int, d: Int = 8): GraphNode =
+        GraphNode(label = label, depth = depth).apply {
+            sliceDim = d
+            vmfMu = FloatArray(d) { if (it == 0) 1.0f else 0.0f }
+            vmfKappa = 10.0
+        }
+
+    /** Every node reachable from [root] via tree edges. */
+    private fun reachable(root: GraphNode): List<GraphNode> {
+        val seen = LinkedHashMap<String, GraphNode>()
+        fun walk(n: GraphNode) {
+            if (seen.put(n.id, n) != null) return
+            n.children.forEach { walk(it) }
+        }
+        walk(root)
+        return seen.values.toList()
+    }
+
+    private fun assertIsTree(root: GraphNode, context: String) {
+        reachable(root).forEach { n ->
+            if (n.id != root.id) {
+                assertTrue(
+                    n.parents.size <= 1,
+                    "$context: '${n.label ?: n.id}' has ${n.parents.size} parents — not a tree"
+                )
+            }
+        }
+        // A tree edge must be mirrored on both endpoints, or the structure diff walks a graph
+        // the router does not see.
+        reachable(root).forEach { p ->
+            p.children.forEach { c ->
+                assertTrue(c.parents.contains(p), "$context: '${c.label}' is missing its parent edge")
+            }
+        }
+    }
+
+    @Test
+    fun `fusing every guard-admitted pair leaves the graph a tree`() {
+        val m = merger()
+        val root = fittedNode("root", 0)
+        val chemistry = fittedNode("Chemistry", 1)
+        val physics = fittedNode("Physics", 1)
+        link(root, chemistry)
+        link(root, physics)
+
+        val c1 = fittedNode("Organic", 2)
+        val c2 = fittedNode("Inorganic", 2)
+        val p1 = fittedNode("Optics", 2)
+        val p2 = fittedNode("Mechanics", 2)
+        link(chemistry, c1); link(chemistry, c2)
+        link(physics, p1); link(physics, p2)
+
+        // Mirror the pass's own enumeration: all pairs at depth > 1, admitted by the guard.
+        val nodes = reachable(root).filter { it.depth > 1 }
+        var fused = 0
+        for (i in nodes.indices) {
+            for (j in i + 1 until nodes.size) {
+                val a = nodes[i]
+                val b = nodes[j]
+                if (a.parents.isEmpty() || b.parents.isEmpty()) continue
+                if (!isTreeLegalFusionPair(a, b)) continue
+                m.fuseNodes(a, b)
+                fused++
+            }
+        }
+
+        assertTrue(fused > 0, "the fixture must actually exercise the fuse")
+        assertIsTree(root, "after $fused guard-admitted fusions")
+    }
+
+    @Test
+    fun `bypassing the guard does create a two-parent node`() {
+        // Negative control. Without this, the test above could pass because the fixture never
+        // reaches a dangerous pair rather than because the guard works.
+        val m = merger()
+        val root = fittedNode("root", 0)
+        val chemistry = fittedNode("Chemistry", 1)
+        val physics = fittedNode("Physics", 1)
+        link(root, chemistry)
+        link(root, physics)
+
+        val survivor = fittedNode("survivor", 2)
+        val destroyed = fittedNode("destroyed", 2)
+        link(chemistry, survivor)
+        link(physics, destroyed)
+
+        assertFalse(isTreeLegalFusionPair(survivor, destroyed), "the guard would have refused this pair")
+        m.fuseNodes(survivor, destroyed)   // forced through anyway
+
+        assertTrue(
+            survivor.parents.size > 1,
+            "fuseNodes' parent-redirect is what creates the polyhierarchy, so assertIsTree can detect it"
+        )
     }
 }

@@ -153,6 +153,13 @@ class BtSchedulerRedesignTest {
 
     @Test
     fun testJudgeAgreementGateExclusion() {
+        // Without this property TaxonomyRankingService resolves to the repo-root ratings.db and
+        // writes real rows into it -- this test is where the stray snapshot_id='test-gate' rows
+        // in node_pair_stats and node_bt_states came from.
+        val tmpDb = java.nio.file.Files.createTempDirectory("bt-scheduler-test")
+            .resolve("ratings.db").toFile().absolutePath
+        System.setProperty("ranking.db.path", tmpDb)
+        try {
         val rankingService = TaxonomyRankingService()
         
         // Set up target leaves
@@ -186,26 +193,17 @@ class BtSchedulerRedesignTest {
         val rankA = aggregated.ranks.first { it.modelId == "model-A" }
         // The score of model-A should be very close to 1.5 (leaf-1), not pull up to 2.0 (leaf-2)
         assertTrue(abs(rankA.btScore - 1.5) < 0.2)
+        } finally {
+            System.clearProperty("ranking.db.path")
+        }
     }
 
-    @Test
-    fun testPositionBiasDebiasing() {
-        val originalStats = NodePairStats(
-            nodeId = "leaf-1", modelA = "model-A", modelB = "model-B",
-            winsA = 4.0, winsB = 2.0, ties = 0, totalComparisons = 6,
-            winAFirst = 4.0, winASecond = 0.0 // Strong position bias: delta = (4 - 0) / 6 = 0.66 > 0.3
-        )
-
-        // Invoke adjustForPositionBias using reflection or copy the logic to verify correctness
-        val delta = (originalStats.winAFirst - originalStats.winASecond) / originalStats.totalComparisons.toDouble()
-        assertTrue(abs(delta) > 0.3)
-
-        val correctedWinA = (originalStats.winAFirst + originalStats.winASecond) / 2.0
-        val correctedWinB = originalStats.totalComparisons.toDouble() - correctedWinA - originalStats.ties.toDouble()
-
-        assertEquals(2.0, correctedWinA)
-        assertEquals(4.0, correctedWinB)
-    }
+    // REMOVED: testPositionBiasDebiasing. It never called production code. The real
+    // adjustForPositionBias lives at TaxonomyBenchmarkService.kt:1625 and is referenced
+    // nowhere in src/test; this test re-derived the arithmetic inline and asserted against
+    // its own copy, so gutting the production function to `return stats` left it green.
+    // Position-bias debiasing is consequently UNCOVERED -- as it always was. Testing it for
+    // real means reaching the private method (visibility change or reflection).
 
     @Test
     fun testIrresolvableOnlyLeafConvergence() {

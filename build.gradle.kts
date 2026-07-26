@@ -33,6 +33,26 @@ tasks.withType<Test> {
     maxParallelForks = 1
 }
 
+// NullSeparationCalibrationTest is a research harness, not a test: 472 lines, zero
+// assertions, only println. It measured the isotropic and within-domain separation nulls
+// whose values now live in the canonical config header, so it has already delivered its
+// result. It also takes 5m42s -- against ~5.4s for every other test combined, i.e. 91% of
+// the suite -- and opens embeddings_cache.db and the 8.4 GB snapshots.db with read-write
+// handles. Excluded from `test` rather than deleted so it still compiles and cannot rot
+// silently; run it deliberately with `gradlew calibration`.
+tasks.named<Test>("test") {
+    exclude("**/NullSeparationCalibrationTest*")
+}
+
+tasks.register<Test>("calibration") {
+    description = "Runs the separation-null calibration harness (slow, no assertions)."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    filter { includeTestsMatching("*NullSeparationCalibrationTest*") }
+}
+
 // spring-dotenv resolves .env relative to the JVM working directory.
 // Without an explicit workingDir, Gradle uses whatever directory the
 // task was invoked from (often a module subdirectory in an IDE run config),

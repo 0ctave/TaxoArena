@@ -180,7 +180,10 @@ class TaxonomyMerger(
         return sum
     }
 
-    private fun fuseNodes(target: GraphNode, source: GraphNode) {
+    // `internal` rather than private so TreeFusionInvariantTest can drive the real fuse and
+    // assert the tree invariant on the result. Testing the admission guard alone is not enough:
+    // the polyhierarchy is created here, by the parent-redirect at `target.parents.add(parent)`.
+    internal fun fuseNodes(target: GraphNode, source: GraphNode) {
         require(target.sliceDim == source.sliceDim) {
             "Cannot fuse nodes at different dims: ${target.label}(${target.sliceDim}) vs ${source.label}(${source.sliceDim})"
         }

@@ -28,7 +28,13 @@ import kotlinx.serialization.json.Json
     properties = [
         "taxoadapt.execution.enable-tui=false",
         "taxoadapt.execution.run-batch=false",
-        "taxoadapt.execution.start-service=false"
+        "taxoadapt.execution.start-service=false",
+        // This test overwrites the real ./reserved_test_queries.json with fixture ids and then
+        // calls loadSnapshot, which re-syncs the reserved pool into the eval store. Its `finally`
+        // restores the FILE but not the DATABASE, so against the production cache every run left
+        // eval_results with exactly 3 reserved question_ids (101, 102, 201) out of 3599 — any
+        // arena run afterwards would have judged 3 questions. Point the store at a throwaway DB.
+        "taxoadapt.eval.db-path=build/tmp/test-eval-snapshot.db"
     ]
 )
 class TaxonomySnapshotTest {

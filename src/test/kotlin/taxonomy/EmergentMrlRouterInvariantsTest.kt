@@ -166,41 +166,13 @@ class EmergentMrlRouterInvariantsTest {
         assertEquals(1.0, weights[emb.rawText])
     }
 
-    @Test
-    fun `Test 5 - Split conserves mass exactly`() {
-        val parent = GraphNode(label = "Parent", depth = 1)
-        val d = 128
-        parent.sliceDim = d
-        parent.vmfMu = FloatArray(d) { if (it == 0) 1.0f else 0.0f }
-        parent.vmfKappa = 10.0
-
-        // Add 90 queries to clear split gate
-        val queries = (1..90).map {
-            Embedding("Q$it", "Q$it", FloatArray(d) { idx -> if (idx == 0) 1.0f else 0.0f }, "")
-        }
-        queries.forEach {
-            GraphNode.registerEmbedding(it)
-            parent.queries.add(it)
-            parent.queryWeights[it.rawText] = 1.0
-        }
-
-        // Run split
-        kotlinx.coroutines.runBlocking {
-            splitter.splitSingleNode(parent)
-        }
-
-        // If split occurred, assert that the sum of child weights + residual equals the original parent weight (90.0)
-        if (parent.children.isNotEmpty()) {
-            var sumChildWeights = 0.0
-            queries.forEach { q ->
-                val childSum = parent.children.sumOf { it.queryWeights[q.rawText] ?: 0.0 }
-                val residual = parent.queryWeights[q.rawText] ?: 0.0
-                assertEquals(1.0, childSum + residual, 1e-9)
-                sumChildWeights += childSum + residual
-            }
-            assertEquals(90.0, sumChildWeights, 1e-9)
-        }
-    }
+    // REMOVED: `Test 5 - Split conserves mass exactly`. All 90 fixture vectors shared one
+    // direction, so the split could not occur under any gate -- EM degenerates and
+    // performVmfKMeans returns null (TaxonomySplitter.kt:169), and even past that the
+    // separation is 0 < requiredEps. parent.children was therefore always empty and the
+    // entire `if (parent.children.isNotEmpty())` body, which held every assertion, never
+    // ran. Mass conservation across a split is still a real invariant and remains
+    // UNCOVERED; testing it needs a genuinely separable two-cluster fixture.
 
     @Test
     fun `Test 6 - Composite internal node is NOT split from region mass`() {
