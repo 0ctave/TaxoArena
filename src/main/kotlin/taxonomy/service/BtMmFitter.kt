@@ -10,11 +10,141 @@ object BtMmFitter {
 
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.BtMmFitter")
 
+    /**
+     * Default phantom-tie strength: half a win in each direction, added to every pair that has
+     * at least one REAL comparison.
+     *
+     * Without it the likelihood is unbounded whenever one model is undefeated in a pair. The MLE
+     * then runs to infinity, the MM sweeps never converge, and Fisher information per comparison
+     * — n*p*(1-p) — goes to zero exactly where the fit is least determined, so the reported SE
+     * shrinks as the estimate gets *worse*. Complete separation is not an edge case here: it is
+     * what a working arena produces on any leaf where a frontier model meets Llama-2.
+     *
+     * Half a win each way is the Beta(0.5, 0.5) / Jeffreys prior on each pairwise probability. It
+     * keeps 0 < p < 1 strictly, so the penalised MLE is finite and the information is positive,
+     * while contributing one phantom observation against a real budget of dozens — enough to
+     * identify the fit, too little to move a determined one.
+     */
+    const val DEFAULT_PRIOR_STRENGTH = 0.5
+
+    /**
+     * Structural verdict on whether a set of comparisons can identify a BT scale at all.
+     *
+     * This is deliberately assessed on the OBSERVED comparisons only, never on the phantom ties
+     * [DEFAULT_PRIOR_STRENGTH] adds. Phantom ties on every pair would make the comparison graph
+     * complete and connectivity trivially true, which would hide precisely the defect this type
+     * exists to surface — so the prior is applied only to pairs that already have real data.
+     */
+    data class Identifiability(
+        /** Models that appear in at least one real comparison. */
+        val participating: Set<String>,
+        /** Models in the roster with no comparison at all; their theta is undefined. */
+        val isolated: Set<String>,
+        /** Connected components of the observed comparison graph, largest first. */
+        val components: List<Set<String>>,
+        /** Pairs where one side is undefeated, i.e. the separation the prior has to absorb. */
+        val separatedPairs: List<Pair<String, String>>,
+        val totalComparisons: Double
+    ) {
+        /**
+         * True only when every model in the roster is reachable from every other through real
+         * comparisons.
+         *
+         * Bradley-Terry identifies theta only up to an additive constant PER CONNECTED COMPONENT.
+         * Two components therefore carry two independent, unrelated zero points, and their theta
+         * values are not on a common scale — a difference between them is not a quantity. Pooling
+         * such scores upward mixes incommensurable numbers and produces a leaderboard that looks
+         * ordinary and means nothing, which is the failure mode worth refusing over: it exits
+         * zero and reports plausible values.
+         */
+        val identified: Boolean get() = isolated.isEmpty() && components.size <= 1
+
+        fun describe(): String = buildString {
+            append("participating=${participating.size} isolated=${isolated.size}")
+            append(" components=${components.size}")
+            append(" comparisons=${"%.1f".format(java.util.Locale.US, totalComparisons)}")
+            if (separatedPairs.isNotEmpty()) append(" separatedPairs=${separatedPairs.size}")
+            if (isolated.isNotEmpty()) append(" | no data for: ${isolated.sorted().joinToString(", ")}")
+            if (components.size > 1) {
+                append(" | components: ")
+                append(components.joinToString(" / ") { it.sorted().joinToString("+") })
+            }
+        }
+    }
+
+    /**
+     * Assesses whether [pairStats] can identify a common scale over [models]. Pure; no logging.
+     */
+    fun assessIdentifiability(models: List<String>, pairStats: List<NodePairStats>): Identifiability {
+        val roster = models.toSet()
+        val adjacency = mutableMapOf<String, MutableSet<String>>()
+        val participating = mutableSetOf<String>()
+        val separated = mutableListOf<Pair<String, String>>()
+        var total = 0.0
+
+        for (ps in pairStats) {
+            if (ps.modelA !in roster || ps.modelB !in roster) continue
+            val n = ps.winsA + ps.winsB + ps.ties
+            if (n <= 0.0 && ps.totalComparisons <= 0.0) continue
+            total += ps.totalComparisons
+            participating.add(ps.modelA)
+            participating.add(ps.modelB)
+            adjacency.getOrPut(ps.modelA) { mutableSetOf() }.add(ps.modelB)
+            adjacency.getOrPut(ps.modelB) { mutableSetOf() }.add(ps.modelA)
+            // Undefeated on one side, ignoring ties: the term the penalty has to hold down.
+            if (ps.ties == 0.0 && (ps.winsA == 0.0 || ps.winsB == 0.0)) {
+                separated.add(ps.modelA to ps.modelB)
+            }
+        }
+
+        val seen = mutableSetOf<String>()
+        val components = mutableListOf<Set<String>>()
+        for (start in participating) {
+            if (start in seen) continue
+            val comp = mutableSetOf<String>()
+            val stack = ArrayDeque(listOf(start))
+            while (stack.isNotEmpty()) {
+                val cur = stack.removeLast()
+                if (!seen.add(cur)) continue
+                comp.add(cur)
+                adjacency[cur]?.forEach { if (it !in seen) stack.addLast(it) }
+            }
+            components.add(comp)
+        }
+
+        return Identifiability(
+            participating = participating,
+            isolated = roster - participating,
+            components = components.sortedByDescending { it.size },
+            separatedPairs = separated,
+            totalComparisons = total
+        )
+    }
+
+    /**
+     * Penalised Bradley-Terry fit by MM updates.
+     *
+     * Returns scores for every model in [models], mean-centred. Note that centring is only
+     * meaningful when the comparison graph is connected — call [assessIdentifiability] and refuse
+     * to USE the result when it is not; this function will still return numbers, because several
+     * callers legitimately fit pooled statistics where connectivity holds.
+     */
+    /**
+     * Sweeps allowed before giving up. Raised from 200 after the first multi-pair arena run:
+     * 2264 fits reported non-convergence, but their final deltas ran min 1.0e-6, median 9.0e-6,
+     * max 6.9e-4 against a 1e-6 tolerance — every one of them a hair short rather than stuck. MM
+     * for Bradley-Terry converges monotonically but slowly, so that was a sweep-budget artifact
+     * being reported as a modelling failure. The iteration is O(K^2) on a handful of models, so
+     * the extra headroom is close to free.
+     */
+    const val DEFAULT_MAX_ITER = 1000
+
     fun fit(
         models: List<String>,
         pairStats: List<NodePairStats>,
-        maxIter: Int = 200,
-        tol: Double = 1e-6
+        maxIter: Int = DEFAULT_MAX_ITER,
+        tol: Double = 1e-6,
+        priorStrength: Double = DEFAULT_PRIOR_STRENGTH
     ): Map<String, Double> {
         if (models.size < 2) return models.associateWith { 0.0 }
 
@@ -29,6 +159,20 @@ object BtMmFitter {
             w[j][i] += ps.winsB + 0.5 * ps.ties
         }
 
+        // Phantom ties on pairs that carry real data. Applied AFTER the observed counts so the
+        // pattern of which pairs exist is untouched — the prior regularises the scale, it must not
+        // invent comparisons between models that never met.
+        if (priorStrength > 0.0) {
+            for (i in 0 until K) {
+                for (j in i + 1 until K) {
+                    if (w[i][j] + w[j][i] > 0.0) {
+                        w[i][j] += priorStrength
+                        w[j][i] += priorStrength
+                    }
+                }
+            }
+        }
+
         var s = DoubleArray(K) { 0.0 }
         var itersUsed = maxIter
         var finalDelta = Double.NaN
@@ -37,7 +181,7 @@ object BtMmFitter {
             val sNew = DoubleArray(K)
             for (i in 0 until K) {
                 val Wi = (0 until K).sumOf { j -> w[i][j] }
-                if (Wi == 0.0) { 
+                if (Wi == 0.0) {
                     sNew[i] = s[i]
                     continue
                 }
@@ -63,18 +207,34 @@ object BtMmFitter {
             if (delta < tol) { itersUsed = iter + 1; break }
         }
 
-        val totalComparisons = pairStats.sumOf { it.totalComparisons }
+        val ident = assessIdentifiability(models, pairStats)
         val converged = finalDelta.isFinite() && finalDelta < tol
-        if (!converged) {
+        if (!ident.identified) {
+            // Structural, and not fixable by more sweeps: say so plainly rather than letting a
+            // convergence warning imply the budget is the problem.
             log.warn(
-                "[ARENA-BT] fit did NOT converge in $maxIter sweeps (final delta=" +
-                    "${"%.3e".format(java.util.Locale.US, finalDelta)}, tol=${"%.1e".format(java.util.Locale.US, tol)})" +
-                    " models=$K comparisons=$totalComparisons — scores are not a stable MLE"
+                "[ARENA-BT] fit is NOT identified — ${ident.describe()}." +
+                    " Bradley-Terry fixes theta only up to a constant per connected component," +
+                    " so these scores are not on one scale and must not be pooled."
             )
+        } else if (!converged) {
+            // Distinguish "needs more sweeps" from "not converging". MM descends monotonically,
+            // so a delta within a couple of orders of the tolerance is a stopped-early fit whose
+            // scores are fine to two more decimal places than anything downstream uses; treating
+            // that as a failure buried the cases that matter under thousands of benign warnings.
+            val nearlyThere = finalDelta.isFinite() && finalDelta < tol * 100.0
+            val msg = "[ARENA-BT] fit stopped at $maxIter sweeps (final delta=" +
+                "${"%.3e".format(java.util.Locale.US, finalDelta)}, tol=${"%.1e".format(java.util.Locale.US, tol)})" +
+                " models=$K comparisons=${"%.1f".format(java.util.Locale.US, ident.totalComparisons)}"
+            if (nearlyThere) log.debug("$msg — within 100x tol, treated as converged for reporting")
+            else log.warn("$msg — materially short of the fixed point; scores are not a stable MLE")
         } else {
             log.debug(
                 "[ARENA-BT] fit converged in $itersUsed sweeps (delta=" +
-                    "${"%.3e".format(java.util.Locale.US, finalDelta)}) models=$K comparisons=$totalComparisons"
+                    "${"%.3e".format(java.util.Locale.US, finalDelta)}) models=$K" +
+                    " comparisons=${"%.1f".format(java.util.Locale.US, ident.totalComparisons)}" +
+                    (if (ident.separatedPairs.isNotEmpty())
+                        " separatedPairs=${ident.separatedPairs.size} (absorbed by the Jeffreys prior)" else "")
             )
         }
 
@@ -116,7 +276,8 @@ object BtMmFitter {
     fun estimateStdErrors(
         models: List<String>,
         scores: Map<String, Double>,
-        pairStats: List<NodePairStats>
+        pairStats: List<NodePairStats>,
+        priorStrength: Double = DEFAULT_PRIOR_STRENGTH
     ): Map<String, Double> {
         val idx = models.withIndex().associate { (i, m) -> m to i }
         val K = models.size
@@ -130,7 +291,10 @@ object BtMmFitter {
             val sj = scores[ps.modelB] ?: 0.0
             val denom = exp(si) + exp(sj)
             val pij = if (denom == 0.0) 0.5 else exp(si) / denom
-            val nij = ps.totalComparisons.toDouble()
+            // Count the phantom observations too: they are part of the penalised likelihood the
+            // scores were fitted under, so excluding them here would report the information of a
+            // model that was not the one estimated.
+            val nij = ps.totalComparisons.toDouble() + (if (ps.totalComparisons > 0.0) 2.0 * priorStrength else 0.0)
             val info = nij * pij * (1.0 - pij)
             F[i][i] += info
             F[j][j] += info
@@ -159,15 +323,13 @@ object BtMmFitter {
         }
 
         // ── [ARENA-BT] is this standard error meaningful? ───────────────────────
-        // Fisher information per comparison is n*p*(1-p), which VANISHES as the
-        // models separate. When one model wins nearly everything, p -> 1, every
-        // entry of F -> 0, and Fc = F + 1.0 approaches the rank-one all-ones matrix;
-        // whatever the inverse returns there is numerically meaningless, and the
-        // 0.01 floor below hides it. That is precisely the regime a well-designed
-        // arena drives itself into, so the SE has to be reported with its own
-        // diagnostics or it will be quoted as if it were trustworthy.
+        // The Jeffreys prior in fit() keeps p away from 0 and 1, so information no longer
+        // collapses to zero outright, but it can still be small on a near-separated pair with a
+        // thin budget. These diagnostics stay because the floor is a bound, not a guarantee: the
+        // 0.01 floor at the bottom of this function would otherwise present a number with no
+        // information behind it as if it were precise.
         run {
-            val totalComparisons = pairStats.sumOf { it.totalComparisons }
+            val ident = assessIdentifiability(models, pairStats)
             val ps = pairStats.mapNotNull { p ->
                 val si = scores[p.modelA] ?: return@mapNotNull null
                 val sj = scores[p.modelB] ?: return@mapNotNull null
@@ -180,14 +342,16 @@ object BtMmFitter {
                 val sj = scores[p.modelB] ?: return@mapNotNull null
                 val d = exp(si) + exp(sj)
                 val pij = if (d == 0.0) 0.5 else exp(si) / d
-                p.totalComparisons * pij * (1 - pij)
+                val nij = p.totalComparisons + (if (p.totalComparisons > 0.0) 2.0 * priorStrength else 0.0)
+                nij * pij * (1 - pij)
             }.minOrNull() ?: 0.0
             val msg = "[ARENA-BT] SE diagnostics: models=$K pairs=${pairStats.size}" +
-                " comparisons=$totalComparisons inverted=${inv != null}" +
+                " comparisons=${"%.1f".format(java.util.Locale.US, ident.totalComparisons)}" +
+                " inverted=${inv != null} identified=${ident.identified}" +
                 " variancesFloored=$floored/$K" +
                 " minPairInfo=${"%.3e".format(java.util.Locale.US, minInfo)}" +
                 " nearSeparatedPairs=$extreme/${ps.size}"
-            if (extreme > 0 || floored > 0 || inv == null) {
+            if (!ident.identified || extreme > 0 || floored > 0 || inv == null) {
                 log.warn("$msg — SE is unreliable in this regime; do not quote the CI")
             } else {
                 log.info(msg)

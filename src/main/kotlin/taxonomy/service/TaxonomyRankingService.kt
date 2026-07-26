@@ -766,11 +766,16 @@ data class AggregatedLeaderboard(
         // comes out implausibly precise. Observed: leaf SEs 3.35–6.67 aggregating to
         // 0.126–0.263, a 25x shrinkage.
         //
-        // Combining k independent estimates cannot beat inverse-variance weighting,
-        // and that in turn cannot go below min_i(SE_i)/sqrt(k):
-        //     sum_i 1/SE_i^2 <= k / min_i(SE_i)^2  =>  1/sqrt(sum) >= min_i(SE_i)/sqrt(k)
-        // Leaves here share queries through multi-membership, so the true SE is larger
-        // still — the floor is generous and any violation is arithmetic, not modelling.
+        // The bound ENFORCED below is the inverse-variance one itself:
+        //     SE_ivw = 1 / sqrt(sum_i 1/SE_i^2)
+        // No weighting of independent estimates can do better than inverse-variance weighting,
+        // so SE_ivw is the tightest valid floor. (It implies the looser, more quotable
+        // min_i(SE_i)/sqrt(k), since sum_i 1/SE_i^2 <= k/min_i(SE_i)^2 — but that slacker bound
+        // is not what the check uses, so do not read it as the rule here.)
+        //
+        // Leaves share queries through multi-membership, so the leaf estimates are NOT
+        // independent and the true SE is larger than SE_ivw. That makes the floor conservative
+        // in the right direction and any violation of it arithmetic rather than modelling.
         val leafSEs = allModels.associateWith { model ->
             eligible.filter { it.nodeId !in inconsistentLeafIds }
                 .mapNotNull { it.stdErrors[model] }
@@ -802,6 +807,12 @@ data class AggregatedLeaderboard(
                     " ${"%.3f".format(java.util.Locale.US, ses.max())}]." +
                     " Substituting the inverse-variance SE and marking the leaderboard unreliable."
             )
+            // Both actions, and not belt-and-braces. The substituted SE_ivw is built from the
+            // per-leaf Fisher SEs, and under separation those are themselves untrustworthy — the
+            // [ARENA-BT] diagnostics say so at the point they are computed. So SE_ivw is only a
+            // defensible LOWER BOUND, not a usable estimate: it replaces a number that is
+            // arithmetically impossible with one that is merely unreliable. isReliable = false is
+            // what keeps that distinction from being lost the moment the value reaches a table.
             allModels.associateWith { model ->
                 val ivwM = ivwSEs[model]
                 if (model in violations && ivwM != null) ivwM else (rawBootstrapSEs[model] ?: 1.0)

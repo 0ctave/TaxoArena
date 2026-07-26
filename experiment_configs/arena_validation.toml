@@ -1,0 +1,156 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/arena_validation
+#  arena_validation.toml — CHEAP FULL-PATH VALIDATION. THROWAWAY OUTPUT.
+#
+#  DO NOT REPORT ANY NUMBER FROM THIS RUN. Every knob below is set for coverage
+#  per Azure call, not for statistical validity. The goal is that every code path
+#  the production run uses executes at least once, for a few hundred LLM calls
+#  rather than ~10k.
+#
+#  ── The cost model this config is built around ────────────────────────────
+#  Azure calls = judging + rubric induction + labeling, and judging dominates:
+#
+#      judge calls ~= 2 x pairs x depth-per-pair x judging-conditions
+#
+#  The 2x is the position-swap bias control (every comparison is judged twice).
+#  Crucially, judge cost scales with the number of model PAIRS and the per-pair
+#  depth — NOT with corpus size or reserved-pool size. Induction and labeling
+#  scale with the number of LEAVES.
+#
+#  So the cheap levers, in order of leverage:
+#    * models: 4 instead of 15 -> 6 pairs instead of 105. A 17x cut, and by far
+#      the biggest single saving.
+#    * questionsPerRound: 2 instead of 12.
+#    * fewer, larger leaves (minClusterSize 60, maxDepth 4) -> ~1 induction call
+#      and ~1 labeling call each, and more held-out queries per leaf, which is
+#      also what gives the BT fitter real per-pair depth.
+#  Domain breadth is nearly free for judging, so TWO domains are kept: a single
+#  domain would build one anchor and never exercise multi-anchor routing,
+#  cross-leaf aggregation or per-domain reporting.
+#
+#  Rough estimate: 6 pairs x ~9 evaluations x 3 judging conditions ~= 160
+#  evaluations ~= 320 judge calls, plus roughly 10 induction and 12 labeling
+#  calls. Order 350 Azure calls. ORACLE scores from ground truth and issues no
+#  judge call, which is why it is 3 judging conditions and not 4.
+#
+#  ── What still gets exercised ─────────────────────────────────────────────
+#   1. ORACLE, GENERIC_JUDGE and RANDOM_SCHEDULER. Only MAIN had ever run
+#      before 2026-07-26; these three are three quarters of the arena surface.
+#   2. Rubric induction and LLM labeling — the induction path is mandatory
+#      because ensureJudgePrompts throws on any leaf without a rubric, and
+#      judgeInduction only runs inside the construction branch (there is no way
+#      to retrofit rubrics onto an existing snapshot, which is why the canonical
+#      artifact cannot be arena'd at all).
+#   3. The BT fitter with a connected comparison graph. 4 models over 6 pairs is
+#      enough for connectivity to be achievable and for the identifiability
+#      refusal to be meaningfully exercised; the smoke run had 1 pair and 3
+#      comparisons, which is degenerate by construction.
+#   4. Separation. gpt-4o against Llama-2-13b should separate, which is what the
+#      Jeffreys prior in BtMmFitter exists to keep finite; Qwen1.5-14B against
+#      Llama-2-13b should be close, so both regimes appear.
+#   5. EvalIngestValidator on a mixed roster: 2 PASS and 2 WARN models.
+#   6. The trace-stub path: 2 models carry chain-of-thought, 2 carry none.
+#   7. runBenchmark together with runTrickle and enableFinalMetrics — never
+#      combined before.
+#   8. Upward aggregation over several leaves, and the [ARENA-SE] floor guard.
+#
+#  ── What this run deliberately does NOT establish ─────────────────────────
+#  Nothing statistical. Per-pair depth is tiny, so BT scores, SEs and any
+#  ranking are meaningless. It also does not test 105-pair scale or 14-domain
+#  breadth; run the full config for that once this is green.
+#
+#  ── Deviations from canonical_baseline.toml, all cost knobs ───────────────
+#  models            4, chosen for coverage rather than coverage of the roster:
+#                    gpt-4o (PASS, trace), claude-3-5-haiku (PASS, trace),
+#                    Qwen1.5-14B-Chat (WARN pred 83.2%, no trace),
+#                    Llama-2-13b-hf (WARN pred 83.2%, no trace).
+#                    Meta-Llama-3-70B-Instruct is deliberately absent: the
+#                    validator scores it 0.0000 on question identity and
+#                    excludes it, so including it would only look like a loss.
+#  domains           History + Computer science, the two smallest cached
+#                    domains (381 + 410 = 791 queries), so construction,
+#                    induction and labeling all stay small while still giving
+#                    two anchors.
+#  minClusterSize    60 rather than 30 — NOT a canonical value. It halves the
+#                    leaf count, which cuts induction and labeling calls and
+#                    raises held-out queries per leaf.
+#  maxDepth          4 rather than 8 — bounds the tree for the same reason.
+#  questionsPerRound 2 rather than 12.
+#  runBaselines      false. WARD_BASELINE is broken (8.47% Top-1, ~chance) from
+#                    a scoring-path bug, so it would emit a number that must not
+#                    be quoted; k-means is already measured canonically.
+#
+#  ── What to check when it lands ───────────────────────────────────────────
+#   * [ARENA-INGEST]  4 models admitted, 0 FAIL, the 2 WARNs explained
+#   * [ARENA-POOL]    composition matches the two constructed domains
+#   * [ARENA-BT]      identifiability: which leaves are refused for a
+#                     disconnected graph, and whether fits converge once a pair
+#                     has real depth. If they still fail after the Jeffreys
+#                     prior, the fitter is the problem rather than the budget.
+#   * [ARENA-SE]      whether the inverse-variance floor still trips
+#   * [ARENA-VERDICT] flip rate, and whether confidence is still two-valued
+#                     (0.5/0.95) — the log now states this explicitly
+#   * all four conditions present in the ledger
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+# Four models: 6 pairs. Spans trace/no-trace, PASS/WARN, and both a separated
+# and a close pairing.
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-haiku-20241022",
+    "Qwen1.5-14B-Chat",
+    "Llama-2-13b-hf"
+]
+
+# Two smallest cached domains -> two anchors, ~791 queries.
+domains       = ["History", "Computer science"]
+category      = ""
+queryLimit    = 0        # ignored when domains is set; the domain filter bounds the corpus
+outputDir     = "experiment_results/arena_validation"
+testRatio     = 0.3
+seed          = 42
+
+# ── Pipeline / evaluation switches ──────────────────────────────────────────
+runPipeline        = true
+runBenchmark       = true          # THE POINT OF THIS RUN
+runTrickle         = true
+runBaselines       = false         # WARD is broken; see header
+enableFinalMetrics = true
+enableLabeling     = true
+judgeInduction     = true          # REQUIRED — no retrofit path exists
+
+conditions         = ["MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"]
+
+# ── Arena budget: minimal ───────────────────────────────────────────────────
+questionsPerRound  = 2
+confidenceGate     = 0.65
+parallelism        = 6
+reservedOnly       = true
+
+# ── Construction mode ───────────────────────────────────────────────────────
+dagMode = "DAG_MAX"
+
+# ── Formalism: canonical except the two cost knobs noted above ──────────────
+maxDepth              = 4      # cost knob (canonical 8)
+minClusterSize        = 60     # cost knob (canonical 30)
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 0.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

@@ -517,23 +517,38 @@ class TaxonomyBenchmarkService(
                 pairStatsMap[leafId] = adjustedNodePairs.toMutableList()
                 
                 if (adjustedNodePairs.isNotEmpty()) {
-                    val fitStart = System.currentTimeMillis()
-                    val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
-                    val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
-                    val fitEnd = System.currentTimeMillis()
-                    if (config.diagnostics.enableProfiling) {
-                        perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
+                    // Refuse to persist a fit whose comparison graph cannot identify one scale.
+                    // Bradley-Terry pins theta only up to a constant per connected component, so a
+                    // leaf split into components (or with models that never played) yields scores
+                    // on several unrelated zero points. aggregateLeafScores pools per-leaf theta
+                    // upward, and pooling across components mixes incommensurable quantities —
+                    // which fails silently, with ordinary-looking numbers and exit code 0. Not
+                    // persisting is what keeps such a leaf out of the aggregate entirely.
+                    val ident = BtMmFitter.assessIdentifiability(modelNames, adjustedNodePairs)
+                    if (!ident.identified) {
+                        log.warn(
+                            "[ARENA-BT] leaf '$leafId': refusing the fit — ${ident.describe()}." +
+                                " Not persisted, so it is excluded from upward aggregation."
+                        )
+                    } else {
+                        val fitStart = System.currentTimeMillis()
+                        val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
+                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
+                        val fitEnd = System.currentTimeMillis()
+                        if (config.diagnostics.enableProfiling) {
+                            perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
+                        }
+                        val state = NodeBtState(
+                            nodeId = leafId,
+                            btScores = scores,
+                            stdErrors = stdErrors,
+                            fitVersion = (btStates[leafId]?.fitVersion ?: 0) + 1,
+                            totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
+                            lastFitAt = System.currentTimeMillis()
+                        )
+                        rankingService.saveBtState(state, snapshotId)
+                        btStates[leafId] = state
                     }
-                    val state = NodeBtState(
-                        nodeId = leafId,
-                        btScores = scores,
-                        stdErrors = stdErrors,
-                        fitVersion = (btStates[leafId]?.fitVersion ?: 0) + 1,
-                        totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
-                        lastFitAt = System.currentTimeMillis()
-                    )
-                    rankingService.saveBtState(state, snapshotId)
-                    btStates[leafId] = state
                 }
             }
         }
@@ -1076,23 +1091,36 @@ class TaxonomyBenchmarkService(
                     pairStatsMap[nodeId] = adjustedNodePairs.toMutableList()
 
                     if (adjustedNodePairs.isNotEmpty()) {
-                        val fitStart = System.currentTimeMillis()
-                        val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
-                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
-                        val fitEnd = System.currentTimeMillis()
-                        if (config.diagnostics.enableProfiling) {
-                            perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
+                        // Same connectivity refusal as the pre-round fit above: an unidentified
+                        // leaf must not reach aggregateLeafScores, because theta is only defined
+                        // up to a constant per component and pooling components is meaningless.
+                        // Early rounds legitimately hit this while the scheduler is still filling
+                        // pairs in, so it is logged at debug until the round is the last word.
+                        val ident = BtMmFitter.assessIdentifiability(modelNames, adjustedNodePairs)
+                        if (!ident.identified) {
+                            log.debug(
+                                "[ARENA-BT] round $round, node '$nodeId': fit not identified" +
+                                    " (${ident.describe()}) — not persisted this round."
+                            )
+                        } else {
+                            val fitStart = System.currentTimeMillis()
+                            val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
+                            val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
+                            val fitEnd = System.currentTimeMillis()
+                            if (config.diagnostics.enableProfiling) {
+                                perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
+                            }
+                            val state = NodeBtState(
+                                nodeId = nodeId,
+                                btScores = scores,
+                                stdErrors = stdErrors,
+                                fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
+                                totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
+                                lastFitAt = System.currentTimeMillis()
+                            )
+                            rankingService.saveBtState(state, snapshotId)
+                            btStates[nodeId] = state
                         }
-                        val state = NodeBtState(
-                            nodeId = nodeId,
-                            btScores = scores,
-                            stdErrors = stdErrors,
-                            fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
-                            totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
-                            lastFitAt = System.currentTimeMillis()
-                        )
-                        rankingService.saveBtState(state, snapshotId)
-                        btStates[nodeId] = state
                     }
                 }
                 if (req.updateRankings) {
@@ -1585,6 +1613,33 @@ class TaxonomyBenchmarkService(
                         " median=${"%.3f".format(java.util.Locale.US, pct(0.50))}" +
                         " p90=${"%.3f".format(java.util.Locale.US, pct(0.90))}"
                 )
+                // The judge's confidence is effectively TWO-VALUED, not graded: measured on the
+                // first end-to-end run, p10 = 0.500, median = 0.950, p90 = 0.950. So
+                // confidenceGate is a binary filter that partitions a bimodal distribution at the
+                // obvious point between the modes — it is not a tunable threshold on a continuum,
+                // and describing it as one would misrepresent what it does. Report the modes and
+                // the share the gate actually removes, so the claim can be checked rather than
+                // assumed.
+                run {
+                    val distinct = confs.distinct().sorted()
+                    val gate = req.confidenceGate
+                    val below = confs.count { it < gate }
+                    val modes = confs.groupingBy { it }.eachCount()
+                        .entries.sortedByDescending { it.value }.take(4)
+                    log.info(
+                        "[ARENA-VERDICT] confidence is ${if (distinct.size <= 3) "effectively discrete" else "continuous"}" +
+                            " with ${distinct.size} distinct value(s): " +
+                            modes.joinToString(", ") {
+                                "${"%.3f".format(java.util.Locale.US, it.key)}x${it.value}"
+                            } +
+                            " | gate=${"%.2f".format(java.util.Locale.US, gate)} removes $below/${confs.size}" +
+                            " (${"%.1f".format(java.util.Locale.US, 100.0 * below / confs.size)}%)" +
+                            (if (distinct.size <= 3)
+                                " — a binary partition of a bimodal distribution, not a graded threshold"
+                            else "")
+                    )
+                }
+
                 val perNode = evals.groupingBy { it.nodeId ?: it.domain }.eachCount()
                     .entries.sortedByDescending { it.value }
                 log.info(
