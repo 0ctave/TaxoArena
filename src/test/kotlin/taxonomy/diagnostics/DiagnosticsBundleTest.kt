@@ -143,6 +143,25 @@ class DiagnosticsBundleTest {
     }
 
     @Test
+    fun `an unwired producer leaves a header-only file and the manifest says so`() {
+        // The failure mode that looks like success: iteration_metrics.csv shipped in the first
+        // real bundle with a valid header, a clean parse and no rows, because its hook was never
+        // wired. Nothing surfaced until the data was wanted and the run was gone.
+        open()
+        DiagnosticsBundle.recordProposal(
+            iter = 1, type = "GROW", siteId = "n1", siteLabel = "x",
+            dJ = 0.1, seDJ = null, z = null, dV = 1, decision = "ACCEPTED", reason = null, nSite = 5
+        )
+        // ...but nothing is ever recorded to iteration_metrics.
+        DiagnosticsBundle.close("completed")
+        val m = File(bundle(), "run_manifest.json").readText()
+        assertTrue(m.contains("\"iteration_metrics_rows\": 0"),
+            "manifest must record that the file got no rows — was:\n$m")
+        assertTrue(m.contains("\"proposals_rows\": 1"),
+            "and must record the file that did — was:\n$m")
+    }
+
+    @Test
     fun `writes after close are ignored rather than throwing`() {
         open()
         DiagnosticsBundle.close("completed")

@@ -38,6 +38,10 @@ object DiagnosticsBundle {
     private var iterationWriter: java.io.Writer? = null
     private var proposalWriter: java.io.Writer? = null
 
+    /** Row counts, so close() can tell "nothing happened" from "nobody wired the hook". */
+    @Volatile private var iterationRows: Int = 0
+    @Volatile private var proposalRows: Int = 0
+
     /** Pinned to US so decimal separators are always '.', whatever the JVM locale is. */
     fun fmt(v: Double, decimals: Int = 6): String =
         if (v.isNaN()) "NaN" else if (v.isInfinite()) (if (v > 0) "Inf" else "-Inf")
@@ -147,6 +151,27 @@ object DiagnosticsBundle {
                 manifest["exit_reason"] = exitReason
                 manifest["finished_at_millis"] = System.currentTimeMillis()
                 manifest["duration_ms"] = System.currentTimeMillis() - startedAtMillis
+
+                // A well-formed EMPTY file is the failure mode that looks like success: the
+                // header is present, the parse succeeds, and the absence is only noticed when
+                // the data is needed and the run is gone. iteration_metrics.csv shipped exactly
+                // like that in the first bundle — header written at open(), hook never wired.
+                // Assert every promised file actually received rows.
+                for ((name, rows) in listOf(
+                    "iteration_metrics.csv" to iterationRows,
+                    "proposals.csv" to proposalRows
+                )) {
+                    val f = File(d, name)
+                    val lines = runCatching { f.readLines().count { it.isNotBlank() } }.getOrDefault(0)
+                    manifest["${name.substringBefore('.')}_rows"] = rows
+                    if (rows == 0 && lines <= 1) {
+                        log.error(
+                            "[DIAG] $name contains ONLY a header — nothing was ever recorded to it." +
+                                " The file parses and looks valid, so this will not surface later:" +
+                                " its producer is not wired up."
+                        )
+                    }
+                }
                 writeManifest()
 
                 // Copied last, and only now: the run log is held open by the appender for the
@@ -181,6 +206,8 @@ object DiagnosticsBundle {
                         "${fmt(trickleDelta, 12)},${fmt(editsDelta, 12)},$gedAdd,$gedRem," +
                         "$attempted,$accepted,$rejected,$noProposal,${fmt(mass, 3)},$wallMs\n"
                 )
+                iterationRows++
+
                 w.flush()   // per-iteration flush: a crash keeps everything before it
             }
         }
@@ -210,6 +237,7 @@ object DiagnosticsBundle {
                         "${z?.let { fmt(it, 4) } ?: ""},${dV ?: ""}," +
                         "$decision,${csv(reason ?: "")},${nSite ?: ""}\n"
                 )
+                proposalRows++
                 w.flush()
             }
         }
