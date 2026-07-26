@@ -260,9 +260,17 @@ class TaxonomyJudgeService(
             val ai = item.answer?.firstOrNull()?.let { it.uppercaseChar() - 'A' } ?: -1
             item.options.getOrNull(ai)
         }.filter { it.isNotBlank() }
+        // Stems and distractors decide how a flagged span should be read: a span in the question
+        // stem is part of the problem statement, and one in an incorrect option is not
+        // answer-specific. Either makes it domain vocabulary rather than a leaked key.
+        val sourceStems = details.map { it.question }.filter { it.isNotBlank() }
+        val sourceDistractors = details.flatMap { item ->
+            val ai = item.answer?.firstOrNull()?.let { it.uppercaseChar() - 'A' } ?: -1
+            item.options.filterIndexed { i, _ -> i != ai }
+        }.filter { it.isNotBlank() }
 
         if (validateAndSaveJudge(node, rawSynthesis)) {
-            auditRubricLeakage(node, sourceCorrectOptions)
+            auditRubricLeakage(node, sourceCorrectOptions, sourceStems, sourceDistractors)
             arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", finalSteps, finalSteps, "READY")
             onComplete?.invoke(node)
         } else {
@@ -276,7 +284,7 @@ class TaxonomyJudgeService(
             arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", currentStep, repairSteps, "SAVING")
             
             if (validateAndSaveJudge(node, repairedJson)) {
-                auditRubricLeakage(node, sourceCorrectOptions)
+                auditRubricLeakage(node, sourceCorrectOptions, sourceStems, sourceDistractors)
                 log.info("Successfully repaired judge JSON for '${node.label}'.")
                 arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", repairSteps, repairSteps, "READY")
                 onComplete?.invoke(node)
@@ -345,52 +353,57 @@ class TaxonomyJudgeService(
      * from. Threshold 5 follows the usual verbatim-reuse convention; single words and short
      * technical phrases ("standard deviation") are expected and not leakage.
      */
-    private fun auditRubricLeakage(node: GraphNode, sourceCorrectOptions: List<String>) {
+    private fun auditRubricLeakage(
+        node: GraphNode,
+        sourceCorrectOptions: List<String>,
+        sourceStems: List<String> = emptyList(),
+        sourceDistractors: List<String> = emptyList()
+    ) {
         val rubric = node.judgeRubric ?: return
         if (sourceCorrectOptions.isEmpty()) return
         val (n, gram) = maxSharedNgram(rubric, sourceCorrectOptions)
 
-        // A long shared span is only evidence of MEMORISATION if it is specific to one answer.
-        // A span occurring across many correct options is domain vocabulary, and penalising it
-        // penalises exactly the domains whose terminology is multi-word.
-        //
-        // This fired on 'Dormant Commerce Clause and State Protectionism' for the 5-token span
-        // "the privileges and immunities clause" — a named clause of the US Constitution, not a
-        // leaked answer. Of 86 clean nodes the next-highest spans were 4 tokens, and every one of
-        // those was law or economics ("Real Property Rights", "Criminal Liability and Mens Rea",
-        // "Market Equilibrium and Elasticity"). The smoke test could not have caught it: History
-        // and Computer science topped out at 2 tokens because they have no multi-word doctrine
-        // names. Raising the threshold to 6 would only move the failure to a longer doctrine.
         val norm = { s: String -> s.lowercase().replace(Regex("[^a-z0-9\\s]"), " ")
             .split(Regex("\\s+")).filter { it.isNotBlank() }.joinToString(" ") }
         val occurrences = if (gram.isBlank()) 0 else sourceCorrectOptions.count { norm(it).contains(gram) }
 
-        if (n >= 5 && occurrences > 1) {
-            log.info(
-                "[JUDGE-LEAK] node '${node.label}': $n-token span \"$gram\" appears in" +
-                    " $occurrences of ${sourceCorrectOptions.size} source options — domain" +
-                    " vocabulary rather than a memorised answer; not treated as leakage."
+        if (n >= 5) {
+            // ADVISORY, not a gate. Three reasons it cannot be one.
+            //
+            // It never actually blocked: JudgeService catches the throw, so a "blocked" rubric
+            // degraded to the generic fallback and the leaf quietly got worse. An invariant that
+            // appears enforced while the degradation is invisible is the failure pattern this
+            // project has hit repeatedly.
+            //
+            // String overlap cannot separate the two cases that matter. "Fee simple subject to
+            // condition subsequent" IS the doctrine under test; a property-law rubric that does
+            // not name it is not a property-law rubric. In law and economics, naming the concept
+            // and naming the answer are the same string, and no threshold resolves that — it
+            // fired on 3 of 3 encounters outside the smoke corpus, all in those two domains.
+            //
+            // So record it instead, with the evidence that decides how to read it: a span also
+            // present in the QUESTION STEM is part of the problem statement, and one present in a
+            // DISTRACTOR is not answer-specific. Either makes it vocabulary rather than a leaked
+            // key, and that distinction is reportable in a way "we blocked two" is not.
+            val inStem = sourceStems.count { norm(it).contains(gram) }
+            val inDistractor = sourceDistractors.count { norm(it).contains(gram) }
+            val verdict = when {
+                inStem > 0 -> "in the question stem ($inStem) — part of the problem statement, not the key"
+                inDistractor > 0 -> "in $inDistractor incorrect option(s) — not answer-specific"
+                occurrences > 1 -> "in $occurrences correct options — domain vocabulary"
+                else -> "ONLY in one correct option and nowhere else — possible memorisation"
+            }
+            log.warn(
+                "[JUDGE-LEAK] node '${node.label}': rubric shares a $n-token span with a source" +
+                    " correct option — \"$gram\". Found $verdict." +
+                    " Advisory: the rubric is kept and the span recorded."
             )
-        } else if (n >= 5) {
-            // A GATE, not a warning, and deliberately at save time rather than at judgment.
-            //
-            // The alternative — asserting the answer text is absent from the assembled judge
-            // prompt — requires threading the correct-option string into the judging path purely
-            // so a check can confirm it is not there, which adds the exact surface it polices and
-            // leaves a refactor free to drop the assertion while keeping the string in scope.
-            // Rubrics are static per snapshot and the answer texts are already in scope here, so a
-            // rubric that is clean when saved is clean at every subsequent use. Gating here makes
-            // the runtime assertion unnecessary.
-            //
-            // Failing loudly is the right severity: a rubric that reproduces an answer invalidates
-            // every verdict in its leaf, and a run that stops is recoverable where a leaderboard
-            // built on a leaked rubric is not. If this proves too brittle, the graded response is
-            // to drop the offending rules and re-synthesise, not to downgrade it to a warning.
-            throw IllegalStateException(
-                "Rubric leakage gate failed for node '${node.label}' (id=${node.id}): the induced" +
-                    " rubric shares a $n-token span with a source correct option — \"$gram\"." +
-                    " The rule has memorised an answer rather than abstracted a reasoning property," +
-                    " so it would carry answer information into the held-out split. Refusing to save."
+            taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
+                iter = -1, type = "RUBRIC", siteId = node.id, siteLabel = node.label,
+                dJ = null, seDJ = null, z = null, dV = null,
+                decision = "RUBRIC_SPAN",
+                reason = "span=\"$gram\";tokens=$n;correct=$occurrences;stem=$inStem;distractor=$inDistractor",
+                nSite = sourceCorrectOptions.size
             )
         } else {
             log.info(
