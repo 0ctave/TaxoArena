@@ -1100,7 +1100,17 @@ class HeadlessBenchmarkRunner(
     private fun exportVerdicts(dir: File, condition: String, report: taxonomy.model.BenchmarkReport) {
         val file = File(dir, "${condition}_verdicts.csv")
         file.bufferedWriter().use { writer ->
-        writer.write("Condition,QueryId,QueryText,Category,ModelA,ModelB,AnswerA,AnswerB,CorrectA,CorrectB,GroundTruth,Winner,Confidence,PositionFlip,Rationale\n")
+        // NodeId, the two per-order confidences, the two per-order win indicators and TieSource are
+        // all needed to reconstruct a verdict downstream. Confidence alone is
+        // `if (flip) 0.5 else avg(c1,c2) capped at 0.95`, which is irreversible — so without
+        // ConfidenceFirstOrder/ConfidenceSecondOrder the judge's real confidence distribution
+        // cannot be recovered from a completed run at any price. NodeId matters because a query
+        // reaching two leaves produces two verdicts that are otherwise indistinguishable here.
+        writer.write(
+            "Condition,QueryId,QueryText,Category,NodeId,ModelA,ModelB,AnswerA,AnswerB," +
+                "CorrectA,CorrectB,GroundTruth,Winner,Confidence,ConfidenceFirstOrder," +
+                "ConfidenceSecondOrder,WinAFirst,WinASecond,PositionFlip,TieSource,Rationale\n"
+        )
         report.queryResults.forEach { qr ->
             qr.pairEvaluations.forEach { (pairKey, evals) ->
                 val models = pairKey.split("_vs_")
@@ -1117,6 +1127,7 @@ class HeadlessBenchmarkRunner(
                         "${qr.queryId}," +
                         "${escapeCsv(qr.query)}," +
                         "${escapeCsv(qr.gtCategory)}," +
+                        "${escapeCsv(ev.nodeId ?: "")}," +
                         "${escapeCsv(mA)}," +
                         "${escapeCsv(mB)}," +
                         "${escapeCsv(ansA)}," +
@@ -1126,7 +1137,12 @@ class HeadlessBenchmarkRunner(
                         "${escapeCsv(qr.gtCorrectAnswer)}," +
                         "${escapeCsv(ev.winner)}," +
                         "${ev.confidence}," +
+                        "${ev.confidenceFirstOrder}," +
+                        "${ev.confidenceSecondOrder}," +
+                        "${ev.winAFirst}," +
+                        "${ev.winASecond}," +
                         "${ev.positionFlip}," +
+                        "${escapeCsv(ev.tieSource ?: "")}," +
                         "${escapeCsv(ev.rationale)}\n"
                     )
                 }

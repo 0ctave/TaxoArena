@@ -49,6 +49,14 @@ data class DomainEvaluation(
     val positionFlip: Boolean = false,
     val nodeId: String? = null,
     val tieSource: String? = null,
+    // Per-order confidences, kept alongside `confidence`. That field is
+    // `if (positionFlip) 0.5 else ((c1+c2)/2).coerceIn(0.0, 0.95)`, so both of its modes are
+    // artifacts of the combination rule rather than of the judge: 0.500 is forced on every flip
+    // and 0.950 is the cap. Averaging is irreversible, so without these the judge's actual
+    // confidence distribution — and any calibration claim resting on it — is unrecoverable once
+    // the run is paid for.
+    val confidenceFirstOrder: Double = -1.0,
+    val confidenceSecondOrder: Double = -1.0,
     val winAFirst: Double = 0.5,
     val winASecond: Double = 0.5
 ) {
@@ -572,6 +580,8 @@ class TaxonomyArenaService(
             positionFlip = positionFlip,
             nodeId       = node.id,
             tieSource    = tieSource,
+            confidenceFirstOrder  = c1,
+            confidenceSecondOrder = c2,
             winAFirst    = winAFirst,
             winASecond   = winASecond
         )
