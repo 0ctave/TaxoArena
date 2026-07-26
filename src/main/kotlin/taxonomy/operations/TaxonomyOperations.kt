@@ -17,6 +17,17 @@ enum class ProposalType { GROW, SHRINK }
 enum class ProposalOutcome { ACCEPTED, REJECTED, NO_PROPOSAL }
 
 /**
+ * Locale-pinned formatting for diagnostic strings embedded in CSV fields.
+ *
+ * The JVM runs with `-Duser.country=FR`, so a bare `"%.6f".format(x)` produces `0,024714`. Inside
+ * a CSV field that is not merely ugly, it shifts every following column.
+ */
+internal object DiagFmt {
+    fun f(v: Double, decimals: Int = 6): String =
+        String.format(java.util.Locale.US, "%.${decimals}f", v)
+}
+
+/**
  * The structural acceptance rule, extracted from `tryProposal` so it can be tested without
  * standing up a DAG, a corpus and a full re-route. Pure and behaviour-identical to the
  * expression it replaces.
@@ -550,6 +561,30 @@ class TaxonomyOperations(
         // Legacy (acceptanceZ == 0): lexicographic on (J, -|V|) against the float tolerance
         // tau. Retained as the baseline arm so the gate change can be attributed.
         val accepted = isProposalAccepted(deltaJ, deltaV, tau, zGate, seDeltaJ)
+
+        // Second sink for the same values the log lines below carry, in a form that can be
+        // grouped. The rejection tallies this project needs (unique nodes blocked, and by which
+        // gate) are a GROUP BY on this file rather than a re-read of 200k log lines.
+        taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
+            iter = currentIteration,
+            type = proposalType.name,
+            siteId = site.id,
+            siteLabel = site.label,
+            dJ = deltaJ,
+            seDJ = seDeltaJ,
+            z = seDeltaJ?.takeIf { it > 0.0 }?.let { deltaJ / it },
+            dV = deltaV,
+            decision = if (accepted) "ACCEPTED" else "REJECTED",
+            reason = if (accepted) null else {
+                // Which arm refused it, with the threshold that bound — the category alone is
+                // not enough to reconstruct why afterwards.
+                if (zGate > 0.0 && seDeltaJ != null && seDeltaJ > 0.0)
+                    "z_gate(need>${DiagFmt.f(maxOf(tau, zGate * seDeltaJ), 9)})"
+                else if (kotlin.math.abs(deltaJ) <= tau) "j_neutral_and_dV>=0(dV=$deltaV)"
+                else "j_regression"
+            },
+            nSite = site.queryWeights.size
+        )
 
         if (accepted) {
             log.info("[$proposalType ACCEPTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV")

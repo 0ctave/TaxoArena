@@ -1,0 +1,263 @@
+package taxonomy.diagnostics
+
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.security.MessageDigest
+import java.util.Locale
+
+/**
+ * A self-contained `diagnostics/` directory per run: one folder, one `tar czf` to send.
+ *
+ * Everything here is a SECOND SINK on values the pipeline already computes for logging. It adds
+ * no computation to the hot path and, critically, is never allowed to fail a run — a 40-minute
+ * construction must not die because a CSV append hit a full disk. Every public entry point
+ * swallows its exceptions to a warning.
+ *
+ * Writes are incremental and flushed at boundaries, for the same reason arena verdicts are: a
+ * crash at 90% should leave 90% of the diagnostics rather than nothing.
+ *
+ * ## Locale
+ *
+ * All floats go through [fmt], which pins [Locale.US]. The JVM here runs with
+ * `-Duser.country=FR`, so bare `"%.5f".format(x)` emits `0,24714` — a comma decimal separator
+ * that silently breaks every downstream parser, and has repeatedly cost analysis time on this
+ * project. The logs keep their existing behaviour; these files must not.
+ */
+object DiagnosticsBundle {
+
+    private val log = LoggerFactory.getLogger("taxonomy.Diagnostics")
+
+    @Volatile private var dir: File? = null
+    @Volatile private var startedAtMillis: Long = 0L
+    private val manifest = linkedMapOf<String, Any?>()
+    private val lock = Any()
+
+    /** Sources copied at [close]; symlinks would break the moment the folder is tarred or moved. */
+    private val pendingCopies = mutableListOf<Pair<File, String>>()
+
+    private var iterationWriter: java.io.Writer? = null
+    private var proposalWriter: java.io.Writer? = null
+
+    /** Pinned to US so decimal separators are always '.', whatever the JVM locale is. */
+    fun fmt(v: Double, decimals: Int = 6): String =
+        if (v.isNaN()) "NaN" else if (v.isInfinite()) (if (v > 0) "Inf" else "-Inf")
+        else String.format(Locale.US, "%.${decimals}f", v)
+
+    fun isOpen(): Boolean = dir != null
+
+    /** Directory for extra artifacts, or null when the bundle is closed. */
+    fun subdir(name: String): File? = safely("subdir") {
+        dir?.resolve(name)?.also { it.mkdirs() }
+    }
+
+    // ── lifecycle ───────────────────────────────────────────────────────────────
+
+    fun open(outputDir: File, configPath: File?, resolvedConfigSummary: String? = null) {
+        safely("open") {
+            synchronized(lock) {
+                val d = File(outputDir, "diagnostics").apply { mkdirs() }
+                dir = d
+                startedAtMillis = System.currentTimeMillis()
+                manifest.clear()
+                pendingCopies.clear()
+
+                val git = gitInfo()
+                manifest["schema_version"] = 1
+                manifest["commit"] = git.commit
+                manifest["branch"] = git.branch
+                manifest["dirty"] = git.dirty
+                manifest["started_at_millis"] = startedAtMillis
+
+                if (git.dirty) {
+                    // Loud on purpose: a run from uncommitted code is not reproducible, and that
+                    // fact has to travel with the artifact rather than be inferred later.
+                    log.warn(
+                        "[DIAG] working tree is DIRTY at run start (commit ${git.commit}). This run" +
+                            " is NOT reproducible from the repository alone — record what was" +
+                            " uncommitted, or commit before a run whose numbers you intend to report."
+                    )
+                }
+
+                if (configPath != null && configPath.isFile) {
+                    manifest["config_source"] = "file"
+                    manifest["config_path"] = configPath.absolutePath
+                    manifest["config_sha256"] = sha256(configPath.readBytes())
+                    pendingCopies += configPath to "config.toml"
+                } else {
+                    manifest["config_source"] = "resolved"
+                    val text = resolvedConfigSummary ?: "<unavailable>"
+                    manifest["config_sha256"] = sha256(text.toByteArray())
+                    File(d, "config.resolved.txt").writeText(text)
+                }
+                writeManifest()
+
+                iterationWriter = File(d, "iteration_metrics.csv").bufferedWriter().also {
+                    it.write(
+                        "iter,nodes,leaves,maxDepth,J_after_route,J_after_edits,trickleDelta," +
+                            "editsDelta,ged_add,ged_rem,proposals_attempted,accepted,rejected," +
+                            "no_proposal,mass,wall_ms\n"
+                    )
+                    it.flush()
+                }
+                proposalWriter = File(d, "proposals.csv").bufferedWriter().also {
+                    it.write("iter,type,site_id,site_label,dJ,SE_dJ,z,dV,decision,reason,n_site\n")
+                    it.flush()
+                }
+                log.info("[DIAG] diagnostics bundle open at ${d.absolutePath}")
+            }
+        }
+    }
+
+    /** Facts known only once the corpus is loaded and split. */
+    fun recordCorpus(
+        seed: Long, splitSeed: Long?, corpusSize: Int, trainSize: Int, testSize: Int,
+        domains: List<String>, reservedPoolId: String?, embeddingModel: String?, judgeModel: String?
+    ) {
+        safely("recordCorpus") {
+            manifest["seed"] = seed
+            manifest["split_seed"] = splitSeed
+            manifest["corpus_size"] = corpusSize
+            manifest["train_size"] = trainSize
+            manifest["test_size"] = testSize
+            manifest["domains"] = domains
+            manifest["reserved_pool_id"] = reservedPoolId
+            manifest["embedding_model"] = embeddingModel
+            manifest["judge_model"] = judgeModel
+            writeManifest()
+        }
+    }
+
+    fun registerCopy(source: File, asName: String) {
+        safely("registerCopy") { synchronized(lock) { pendingCopies += source to asName } }
+    }
+
+    fun close(exitReason: String) {
+        safely("close") {
+            synchronized(lock) {
+                val d = dir ?: return@safely
+                iterationWriter?.runCatching { flush(); close() }
+                proposalWriter?.runCatching { flush(); close() }
+                iterationWriter = null
+                proposalWriter = null
+
+                manifest["exit_reason"] = exitReason
+                manifest["finished_at_millis"] = System.currentTimeMillis()
+                manifest["duration_ms"] = System.currentTimeMillis() - startedAtMillis
+                writeManifest()
+
+                // Copied last, and only now: the run log is held open by the appender for the
+                // whole run, and the tail is exactly where convergence lives — copying it early
+                // would truncate the part that matters.
+                for ((src, name) in pendingCopies) {
+                    runCatching {
+                        if (src.isFile) src.copyTo(File(d, name), overwrite = true)
+                        else log.debug("[DIAG] skipped absent copy source: ${src.absolutePath}")
+                    }.onFailure { log.warn("[DIAG] copy of ${src.name} failed: ${it.message}") }
+                }
+                log.info("[DIAG] diagnostics bundle closed ($exitReason) at ${d.absolutePath}")
+                dir = null
+            }
+        }
+    }
+
+    // ── per-iteration ───────────────────────────────────────────────────────────
+
+    fun recordIteration(
+        iter: Int, nodes: Int, leaves: Int, maxDepth: Int,
+        jAfterRoute: Double, jAfterEdits: Double, trickleDelta: Double, editsDelta: Double,
+        gedAdd: Int, gedRem: Int,
+        attempted: Int, accepted: Int, rejected: Int, noProposal: Int,
+        mass: Double, wallMs: Long
+    ) {
+        safely("recordIteration") {
+            val w = iterationWriter ?: return@safely
+            synchronized(lock) {
+                w.write(
+                    "$iter,$nodes,$leaves,$maxDepth,${fmt(jAfterRoute)},${fmt(jAfterEdits)}," +
+                        "${fmt(trickleDelta, 12)},${fmt(editsDelta, 12)},$gedAdd,$gedRem," +
+                        "$attempted,$accepted,$rejected,$noProposal,${fmt(mass, 3)},$wallMs\n"
+                )
+                w.flush()   // per-iteration flush: a crash keeps everything before it
+            }
+        }
+    }
+
+    // ── per-proposal ────────────────────────────────────────────────────────────
+
+    /**
+     * One row per proposal evaluation.
+     *
+     * [reason] should carry the VALUE, not just the category — `sep_below_bar(0.021)` rather than
+     * `sep_below_bar` — because the whole point of this file is to make rejection tallies
+     * analysable without re-reading logs. Deduplication by unique node is then
+     * `GROUP BY site_id`, which the 379-vs-80 rejection count still needs.
+     */
+    fun recordProposal(
+        iter: Int, type: String, siteId: String, siteLabel: String?,
+        dJ: Double?, seDJ: Double?, z: Double?, dV: Int?,
+        decision: String, reason: String?, nSite: Int?
+    ) {
+        safely("recordProposal") {
+            val w = proposalWriter ?: return@safely
+            synchronized(lock) {
+                w.write(
+                    "$iter,$type,${csv(siteId)},${csv(siteLabel ?: "")}," +
+                        "${dJ?.let { fmt(it, 9) } ?: ""},${seDJ?.let { fmt(it, 9) } ?: ""}," +
+                        "${z?.let { fmt(it, 4) } ?: ""},${dV ?: ""}," +
+                        "$decision,${csv(reason ?: "")},${nSite ?: ""}\n"
+                )
+                w.flush()
+            }
+        }
+    }
+
+    // ── internals ───────────────────────────────────────────────────────────────
+
+    private data class Git(val commit: String, val branch: String, val dirty: Boolean)
+
+    /** Resolved once per JVM; a git failure must never take a run down. */
+    private val gitCached: Git by lazy {
+        fun run(vararg cmd: String): String? = runCatching {
+            val p = ProcessBuilder(*cmd).redirectErrorStream(true).start()
+            val out = p.inputStream.bufferedReader().readText().trim()
+            if (p.waitFor() == 0) out else null
+        }.getOrNull()
+        Git(
+            commit = run("git", "rev-parse", "HEAD") ?: "unknown",
+            branch = run("git", "rev-parse", "--abbrev-ref", "HEAD") ?: "unknown",
+            dirty = run("git", "status", "--porcelain")?.isNotBlank() ?: false
+        )
+    }
+
+    private fun gitInfo(): Git = gitCached
+
+    private fun sha256(bytes: ByteArray): String =
+        MessageDigest.getInstance("SHA-256").digest(bytes)
+            .joinToString("") { "%02x".format(it) }
+
+    private fun csv(s: String): String =
+        if (s.any { it == ',' || it == '"' || it == '\n' || it == '\r' })
+            "\"" + s.replace("\"", "\"\"").replace('\n', ' ').replace('\r', ' ') + "\""
+        else s
+
+    private fun jsonValue(v: Any?): String = when (v) {
+        null -> "null"
+        is Number, is Boolean -> v.toString()
+        is List<*> -> v.joinToString(",", "[", "]") { jsonValue(it) }
+        else -> "\"" + v.toString().replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+    }
+
+    private fun writeManifest() {
+        val d = dir ?: return
+        val body = manifest.entries.joinToString(",\n  ") { "\"${it.key}\": ${jsonValue(it.value)}" }
+        File(d, "run_manifest.json").writeText("{\n  $body\n}\n")
+    }
+
+    private inline fun <T> safely(what: String, block: () -> T): T? =
+        try {
+            block()
+        } catch (t: Throwable) {
+            log.warn("[DIAG] $what failed: ${t.message}")
+            null
+        }
+}

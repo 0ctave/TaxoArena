@@ -222,6 +222,20 @@ class HeadlessBenchmarkRunner(
                 null
             }
 
+            // Opened before anything else so a crash during construction still leaves a manifest
+            // saying which commit and config produced it. The run log and dag_snapshots are
+            // registered now but copied at close(), when the appender has flushed — copying the
+            // log early would truncate the tail, which is where convergence lives.
+            taxonomy.diagnostics.DiagnosticsBundle.open(
+                outputDir = baseDir,
+                configPath = File(configPath),
+                resolvedConfigSummary = cliConfig.toString()
+            )
+            taxonomy.diagnostics.DiagnosticsBundle.registerCopy(seedLogFile, "headless_run.log")
+            taxonomy.diagnostics.DiagnosticsBundle.registerCopy(
+                File(baseDir, "dag_snapshots.jsonl"), "dag_snapshots.jsonl"
+            )
+
             try {
                 log.info("==================================================")
                 log.info("STARTING PIPELINE AND EVALUATION WITH SEED: $currentSeed")
@@ -590,11 +604,15 @@ class HeadlessBenchmarkRunner(
                 log.info(printedReport)
             }
             } finally {
+                // Order matters: stop the appender FIRST so the log is flushed and closed, then
+                // close the bundle, which is what performs the copies. Copying a log still held
+                // open by the appender loses the tail, and the tail is the convergence record.
                 try {
                     stopFileLogging(seedAppender)
                 } catch (e: Exception) {
                     log.error("Failed to stop seed file logging: ${e.message}")
                 }
+                taxonomy.diagnostics.DiagnosticsBundle.close("completed")
             }
         }
     }

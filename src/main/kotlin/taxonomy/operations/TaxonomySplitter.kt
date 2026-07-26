@@ -325,6 +325,17 @@ class TaxonomySplitter(
                 "[NO-SPLIT] '${node.label}' reason=not-routing-sustainable" +
                     " k=${routedClusters.size} sizes=${routedClusters.map { it.size }} floor=$minClusterSize"
             )
+            taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
+                iter = -1, type = "GROW", siteId = node.id, siteLabel = node.label,
+                dJ = null, seDJ = null, z = null, dV = null,
+                decision = "NO_PROPOSAL",
+                // Carry the binding value: min_child against the floor is what distinguishes a
+                // near-miss from a genuinely atomic node, and it is exactly the number that
+                // showed minClusterSize=60 was blocking Computer science at min_child=48.
+                reason = "not_routing_sustainable(min_child=${routedClusters.minOf { it.size }}" +
+                    ",floor=$minClusterSize,k=${routedClusters.size})",
+                nSite = node.queryWeights.size
+            )
             return false
         }
 
@@ -354,6 +365,14 @@ class TaxonomySplitter(
                     " sep=${"%.4f".format(java.util.Locale.US, minPairSep)}" +
                     " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
             )
+            taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
+                iter = -1, type = "GROW", siteId = node.id, siteLabel = node.label,
+                dJ = null, seDJ = null, z = null, dV = null,
+                decision = "NO_PROPOSAL",
+                reason = "min_pair_sep_below_bar(sep=" +
+                    "${DiagFmt.f(minPairSep, 5)},bar=${DiagFmt.f(requiredEps, 5)},k=$k)",
+                nSite = targetQueries.size
+            )
             return false
         }
 
@@ -364,6 +383,14 @@ class TaxonomySplitter(
                 "[NO-SPLIT] '${node.label}' reason=k-way n=${targetQueries.size} k=$k" +
                     " sep=${"%.4f".format(java.util.Locale.US, sepScore)}" +
                     " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
+            )
+            taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
+                iter = -1, type = "GROW", siteId = node.id, siteLabel = node.label,
+                dJ = null, seDJ = null, z = null, dV = null,
+                decision = "NO_PROPOSAL",
+                reason = "sep_below_bar(sep=" +
+                    "${DiagFmt.f(sepScore, 5)},bar=${DiagFmt.f(requiredEps, 5)},k=$k)",
+                nSite = targetQueries.size
             )
             return false
         }
