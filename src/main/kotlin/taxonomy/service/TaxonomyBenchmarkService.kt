@@ -160,6 +160,38 @@ class TaxonomyBenchmarkService(
 
         log.info("Benchmark: ${matrix.size} questions, ${modelNames.size} models")
 
+        // ── [ARENA-POOL] what the arena is actually about to judge ──────────────
+        // The matrix above is fetched with category = null regardless of req.category,
+        // so a run configured for one domain still draws the whole reserved pool. That
+        // is invisible in every other output: the leaderboard reports models, not the
+        // provenance of the questions behind them. Measured on the Math-only smoke run,
+        // 17 of 27 judged verdicts were economics.
+        run {
+            val byCategory = matrix.values
+                .mapNotNull { it.values.firstOrNull()?.category }
+                .groupingBy { it }.eachCount()
+                .entries.sortedByDescending { it.value }
+            log.info(
+                "[ARENA-POOL] questions=${matrix.size} models=${modelNames.size}" +
+                    " reservedOnly=${req.reservedOnly} requestedCategory=${req.category ?: "<all>"}" +
+                    " | pool composition: " +
+                    byCategory.joinToString(", ") { "${it.key}=${it.value}" }
+            )
+            val requested = req.category
+            if (!requested.isNullOrBlank()) {
+                val offCategory = byCategory.filter { !it.key.equals(requested, ignoreCase = true) }.sumOf { it.value }
+                if (offCategory > 0) {
+                    log.warn(
+                        "[ARENA-POOL] category='$requested' was requested but the pool contains" +
+                            " $offCategory question(s) from other categories" +
+                            " (${"%.0f".format(java.util.Locale.US, 100.0 * offCategory / matrix.size)}%)." +
+                            " The question matrix is fetched with category = null, so the filter" +
+                            " applies to construction only and NOT to what the arena judges."
+                    )
+                }
+            }
+        }
+
         // Validate answer matrix completeness and export a missingness table
         val missingnessReport = mutableListOf<String>()
         var missingCount = 0
@@ -1444,6 +1476,43 @@ class TaxonomyBenchmarkService(
             ValidationService.computeMetrics(dummyReport, req.models.map { it.modelName }, "OVERALL")
         } catch (e: Exception) {
             null
+        }
+
+        // ── [ARENA-VERDICT] judge behaviour, not just judge output ──────────────
+        // Every comparison is judged twice with the positions swapped; positionFlip
+        // records that the two orders DISAGREED, which is then forced to a TIE. The
+        // flip rate is therefore the direct measure of positional inconsistency, and
+        // it is the number that justifies the bias-control design in Chapter 3. None
+        // of it appears anywhere in the exported CSVs.
+        run {
+            val evals = results.flatMap { it.domainEvaluations }
+            if (evals.isNotEmpty()) {
+                val flips = evals.count { it.positionFlip }
+                val winners = evals.groupingBy { it.winner }.eachCount()
+                val tieSources = evals.filter { it.winner == "TIE" }
+                    .groupingBy { it.tieSource ?: "<none>" }.eachCount()
+                val confs = evals.map { it.confidence }.sorted()
+                fun pct(p: Double) = confs[(confs.size * p).toInt().coerceAtMost(confs.size - 1)]
+                log.info(
+                    "[ARENA-VERDICT] evaluations=${evals.size} overQueries=${results.count { it.hadJudge }}" +
+                        " positionFlips=$flips (${"%.1f".format(java.util.Locale.US, 100.0 * flips / evals.size)}%" +
+                        " order-inconsistent, forced to TIE)" +
+                        " | winners: " + winners.entries.joinToString(", ") { "${it.key}=${it.value}" } +
+                        " | tie sources: " + (if (tieSources.isEmpty()) "none" else tieSources.entries.joinToString(", ") { "${it.key}=${it.value}" }) +
+                        " | confidence p10=${"%.3f".format(java.util.Locale.US, pct(0.10))}" +
+                        " median=${"%.3f".format(java.util.Locale.US, pct(0.50))}" +
+                        " p90=${"%.3f".format(java.util.Locale.US, pct(0.90))}"
+                )
+                val perNode = evals.groupingBy { it.nodeId ?: it.domain }.eachCount()
+                    .entries.sortedByDescending { it.value }
+                log.info(
+                    "[ARENA-VERDICT] evaluations per node (top 10): " +
+                        perNode.take(10).joinToString(", ") { "${it.key}=${it.value}" } +
+                        (if (perNode.size > 10) " ... ${perNode.size} nodes total" else "")
+                )
+            } else {
+                log.warn("[ARENA-VERDICT] no judged comparisons — every result came from cache or was skipped")
+            }
         }
 
         if (globalReport != null) {

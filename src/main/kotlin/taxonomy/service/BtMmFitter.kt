@@ -8,6 +8,8 @@ import kotlin.math.sqrt
 
 object BtMmFitter {
 
+    private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.BtMmFitter")
+
     fun fit(
         models: List<String>,
         pairStats: List<NodePairStats>,
@@ -28,8 +30,10 @@ object BtMmFitter {
         }
 
         var s = DoubleArray(K) { 0.0 }
+        var itersUsed = maxIter
+        var finalDelta = Double.NaN
 
-        repeat(maxIter) {
+        for (iter in 0 until maxIter) {
             val sNew = DoubleArray(K)
             for (i in 0 until K) {
                 val Wi = (0 until K).sumOf { j -> w[i][j] }
@@ -51,7 +55,27 @@ object BtMmFitter {
 
             val delta = sNew.zip(s.toList()).maxOf { (a, b) -> abs(a - b) }
             s = sNew
-            if (delta < tol) return@repeat
+            finalDelta = delta
+            // Was `return@repeat`, which returns from the lambda for THIS iteration rather
+            // than leaving the loop — so the fitter always ran the full 200 sweeps and the
+            // convergence check did nothing. Numerically harmless once converged, but it hid
+            // whether the fit converged at all, which is what the diagnostic below reports.
+            if (delta < tol) { itersUsed = iter + 1; break }
+        }
+
+        val totalComparisons = pairStats.sumOf { it.totalComparisons }
+        val converged = finalDelta.isFinite() && finalDelta < tol
+        if (!converged) {
+            log.warn(
+                "[ARENA-BT] fit did NOT converge in $maxIter sweeps (final delta=" +
+                    "${"%.3e".format(java.util.Locale.US, finalDelta)}, tol=${"%.1e".format(java.util.Locale.US, tol)})" +
+                    " models=$K comparisons=$totalComparisons — scores are not a stable MLE"
+            )
+        } else {
+            log.debug(
+                "[ARENA-BT] fit converged in $itersUsed sweeps (delta=" +
+                    "${"%.3e".format(java.util.Locale.US, finalDelta)}) models=$K comparisons=$totalComparisons"
+            )
         }
 
         return models.zip(s.toList()).toMap()
@@ -119,16 +143,54 @@ object BtMmFitter {
         val inv = invertMatrix(Fc)
 
         val variances = DoubleArray(K)
+        var floored = 0
         if (inv != null) {
             for (i in 0 until K) {
                 // Covariance under sum-to-zero constraint is diag(inv) - 1/K
                 val v = inv[i][i] - 1.0 / K
+                if (v < 1e-6) floored++
                 variances[i] = v.coerceAtLeast(1e-6)
             }
         } else {
             for (i in 0 until K) {
                 val diag = F[i][i].coerceAtLeast(1e-6)
                 variances[i] = 1.0 / diag
+            }
+        }
+
+        // ── [ARENA-BT] is this standard error meaningful? ───────────────────────
+        // Fisher information per comparison is n*p*(1-p), which VANISHES as the
+        // models separate. When one model wins nearly everything, p -> 1, every
+        // entry of F -> 0, and Fc = F + 1.0 approaches the rank-one all-ones matrix;
+        // whatever the inverse returns there is numerically meaningless, and the
+        // 0.01 floor below hides it. That is precisely the regime a well-designed
+        // arena drives itself into, so the SE has to be reported with its own
+        // diagnostics or it will be quoted as if it were trustworthy.
+        run {
+            val totalComparisons = pairStats.sumOf { it.totalComparisons }
+            val ps = pairStats.mapNotNull { p ->
+                val si = scores[p.modelA] ?: return@mapNotNull null
+                val sj = scores[p.modelB] ?: return@mapNotNull null
+                val d = exp(si) + exp(sj)
+                if (d == 0.0) 0.5 else exp(si) / d
+            }
+            val extreme = ps.count { it > 0.99 || it < 0.01 }
+            val minInfo = pairStats.mapNotNull { p ->
+                val si = scores[p.modelA] ?: return@mapNotNull null
+                val sj = scores[p.modelB] ?: return@mapNotNull null
+                val d = exp(si) + exp(sj)
+                val pij = if (d == 0.0) 0.5 else exp(si) / d
+                p.totalComparisons * pij * (1 - pij)
+            }.minOrNull() ?: 0.0
+            val msg = "[ARENA-BT] SE diagnostics: models=$K pairs=${pairStats.size}" +
+                " comparisons=$totalComparisons inverted=${inv != null}" +
+                " variancesFloored=$floored/$K" +
+                " minPairInfo=${"%.3e".format(java.util.Locale.US, minInfo)}" +
+                " nearSeparatedPairs=$extreme/${ps.size}"
+            if (extreme > 0 || floored > 0 || inv == null) {
+                log.warn("$msg — SE is unreliable in this regime; do not quote the CI")
+            } else {
+                log.info(msg)
             }
         }
 
