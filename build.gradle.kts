@@ -33,15 +33,23 @@ tasks.withType<Test> {
     maxParallelForks = 1
 }
 
-// NullSeparationCalibrationTest is a research harness, not a test: 472 lines, zero
-// assertions, only println. It measured the isotropic and within-domain separation nulls
-// whose values now live in the canonical config header, so it has already delivered its
-// result. It also takes 5m42s -- against ~5.4s for every other test combined, i.e. 91% of
-// the suite -- and opens embeddings_cache.db and the 8.4 GB snapshots.db with read-write
-// handles. Excluded from `test` rather than deleted so it still compiles and cannot rot
-// silently; run it deliberately with `gradlew calibration`.
+// Two research harnesses, not tests: measurement only, zero assertions, minutes rather than
+// the ~5.4s every real test takes combined, and they open embeddings_cache.db and the 8.4 GB
+// snapshots.db with read-write handles. Both are excluded from `test` rather than deleted so
+// they still compile and cannot rot silently.
+//
+// SeparationNullBySizeTest (`gradlew nullBySize`) is the CURRENT calibration path. It drives
+// the production TaxonomySplitter.splitSingleNode and is validated by replaying the frozen
+// Philosophy node (reproduces sep=0.02077 against the canonical run's logged 0.0208).
+// Measured curve: docs/separation_null_by_size.md.
+//
+// NullSeparationCalibrationTest (`gradlew calibration`) is SUPERSEDED. It scores EM's hard
+// assignment in the PCA subspace with the k-gate disabled, which is ~3x off the routed 256-d
+// statistic the bar actually gates, so its 0.0209 is not the isotropic null of the production
+// path. Kept for provenance only -- see the class KDoc.
 tasks.named<Test>("test") {
     exclude("**/NullSeparationCalibrationTest*")
+    exclude("**/SeparationNullBySizeTest*")
 }
 
 tasks.register<Test>("calibration") {
@@ -51,6 +59,18 @@ tasks.register<Test>("calibration") {
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     filter { includeTestsMatching("*NullSeparationCalibrationTest*") }
+}
+
+tasks.register<Test>("nullBySize") {
+    description = "Measures the split-acceptance separation null as a function of node population n."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    maxHeapSize = "6g"
+    testLogging { showStandardStreams = true }
+    systemProperty("nullReps", providers.gradleProperty("nullReps").getOrElse("400"))
+    filter { includeTestsMatching("*SeparationNullBySizeTest*") }
 }
 
 // spring-dotenv resolves .env relative to the JVM working directory.
