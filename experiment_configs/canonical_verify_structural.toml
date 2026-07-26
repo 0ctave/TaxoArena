@@ -1,0 +1,128 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/canonical_verify_structural
+#  canonical_verify_structural.toml — Tier 0 behaviour-preservation check
+#
+#  PURPOSE. Three provably-dead code paths were removed from TaxonomySplitter:
+#  the joint k-way separation gate (commit 58f4aed), the maxK=2 probe, and the
+#  sibling-distinctness guard. Each was argued dead — two by construction, one
+#  empirically (0 rejections in 5682 opportunities). This run is the empirical
+#  check on all three at once: rebuild the canonical tree with the current code
+#  and require the SAME PARTITION as the frozen artifact.
+#
+#  ── Why this is not simply canonical_freeze.toml ──────────────────────────
+#  enableLabeling and judgeInduction are OFF. Both are Azure calls and neither
+#  can affect topology: labels are assigned to nodes after the structure is
+#  decided, and judge rubrics are generated from a finished tree. Turning them
+#  off removes the only nondeterministic inputs to the comparison — an LLM that
+#  names the same cluster differently on a second call would otherwise look
+#  like a difference when nothing structural moved.
+#
+#  Everything that CAN affect topology is byte-identical to canonical_freeze:
+#  seed, testRatio, model roster, dagMode, and every formalism parameter.
+#
+#  ── The comparison ────────────────────────────────────────────────────────
+#  Labels are absent here, so equality is checked on the PARTITION, which is
+#  what the taxonomy actually is:
+#    * node count and leaf count
+#    * the multiset of leaf query-sets (the partition itself)
+#    * per-node dasguptaDeltaNorm — the separation each accepted split scored
+#    * depth distribution
+#    * J and the fixed-point certificate
+#  A bit-identical partition with identical separations means the three deleted
+#  paths never influenced a decision, which is exactly the Tier 0 claim.
+#
+#  ── Safety ────────────────────────────────────────────────────────────────
+#  outputDir is separate, so experiment_results/canonical_freeze/seed_42 is not
+#  touched. The run appends a new row to snapshots.db rather than replacing the
+#  frozen one; the arena continues to load 20260726_200711_Headless_Run_Auto_ge
+#  by id and is unaffected either way.
+#
+#  DO NOT CITE THIS RUN as a result. It has no labels and no rubrics; it exists
+#  only to answer whether the tree still reproduces.
+#
+#  ── WHAT THIS ACTUALLY TESTS ──────────────────────────────────────────────
+#  Not general reassurance. Two of the three removals cannot change output at
+#  all: the sibling guard iterated node.children, which the function's own
+#  isLeaf precondition guarantees is empty, and the probe's null check and
+#  fallback are unreachable because runVmfEm has no randomness. Those are
+#  algebra, and a run cannot add to them.
+#
+#  The exposure is ONE empirical claim: the k > 2 branch of the k-way argument.
+#  At routed k=2 min-pair and k-way are provably the same number, but above it
+#  the joint score is not proven to be bounded below by its pairs — that rests
+#  on 5682-to-0 in the logs plus five-decimal agreement on synthetic clouds. If
+#  the k-way gate would ever have fired on a k >= 3 split that min-pair passed,
+#  the tree moves. This run is the direct test of that, and nothing more.
+#
+#  ── RESULT (run 20260726_232441_Headless_Run_Auto_ge) ─────────────────────
+#  CONFIRMED. Against the frozen 20260726_200711_Headless_Run_Auto_ge:
+#
+#    fixed_point_certificate.txt   byte-identical (CERTIFIED true, iteration 10)
+#    J_after_route / J_after_edits 0.229418 / 0.229418  — both equal
+#    nodes / leaves / maxDepth     139 / 88 / 5         — all equal
+#    mass                          8299.000             — equal
+#    leaf partition                identical multiset of leaf query-sets
+#    accepted-split separations    all 50 identical to 9 decimals
+#
+#  The separations matching to 9 dp alongside the partition is the part that
+#  matters: it means the same tree was reached by the same decisions, not that
+#  two different decision paths happened to converge on one shape.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/canonical_verify_structural"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = true
+enableLabeling     = false     # OFF vs canonical_freeze — post-structural, Azure
+judgeInduction     = false     # OFF vs canonical_freeze — post-structural, Azure
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 30
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 0.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true

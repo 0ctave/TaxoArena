@@ -156,35 +156,56 @@ class TaxonomySplitter(
         val pcaProjected = StatisticsUtils.pcaProject(rawVectors, splitDim)
 
         // ── k-ary mixture selection ───────────────────────────────────────────
+        //
+        // KNOWN REMAINING COUPLING. proposalSeparationBar is passed below as
+        // `marginalEps` while also serving as the min-pair bar further down, and the
+        // two are different quantities:
+        //   marginalEps  — "how much must cluster k+1 ADD?"  a DIFFERENCE of separations
+        //   min-pair bar — "is every pair distinct?"          a LEVEL
+        // One constant, two meanings. Removing the k-way gate took this overload from
+        // three jobs to two; this is the half that remains.
+        //
+        // The consequence is that k is chosen by a threshold rather than by the
+        // objective, and the coarsening loop below can then change k again — so the k
+        // that EM selects is not the k that reaches the gates. (Which is exactly why
+        // the diagnostics now report both, as k= and emK=.)
+        //
+        // The clean fix is to emit every k candidate and let dJ select, but that costs
+        // 3x the re-routes and bootstraps per proposing node, so it is deliberately
+        // not done. The cheaper variant if it is ever worth revisiting: rank the
+        // candidates by local separation and evaluate dJ on the top two only.
         val minClusterFrac = minClusterSize.toDouble() / targetQueries.size
 
-        val probe = StatisticsUtils.performVmfKMeans(
+        // A maxK=2 probe used to run here before the maxK=4 selection, guarding a
+        // null check, a components.size<2 check and a `?: probe` fallback. All three
+        // were provably dead, because runVmfEm has NO randomness — mu_1 is the
+        // normalized centroid and mu_2..k are chosen by deterministic farthest-point
+        // maximin (the "k-means++" comment on it is a misnomer; nothing is sampled).
+        // Given that:
+        //   * performVmfKMeans evaluates k=2 identically under maxK=2 and maxK=4, so
+        //     the maxK=4 call returns null exactly when the probe would have, and the
+        //     `?: probe` fallback could never be taken.
+        //   * bestMixture is only ever assigned from k >= 2, so components.size < 2
+        //     was impossible. Confirmed: "probe insufficient" appears 0 times in every
+        //     log in the repo.
+        // What the probe did buy was a cheaper reject path (one EM instead of three)
+        // at the cost of a duplicate k=2 EM on the accept path — but the candidate EMs
+        // already run concurrently under async(Dispatchers.Default), so it added a
+        // sequential barrier for a CPU saving that never showed up in wall-clock. And
+        // for n < 3*minClusterSize it was pure duplication anyway, since
+        // actualMaxK = min(maxK, n/minSize) collapses maxK=4 to 2 there.
+        val mixture = StatisticsUtils.performVmfKMeans(
             embeddings = pcaProjected,
             d = splitDim,
-            maxK = 2,
+            maxK = 4,
             minClusterFrac = minClusterFrac,
             marginalEps = config.formalism.proposalSeparationBar
         )
 
-        if (probe == null) {
+        if (mixture == null) {
             log.debug("Split Failed: k-means collapsed for '${node.label}'.")
             return false
         }
-
-
-        val mixture = if (probe.components.size < 2) {
-            log.debug("Split Failed: k=2 probe insufficient for '${node.label}'.")
-            return false
-        } else {
-            StatisticsUtils.performVmfKMeans(
-                embeddings = pcaProjected,
-                d = splitDim,
-                maxK = 4,
-                minClusterFrac = minClusterFrac,
-                marginalEps = config.formalism.proposalSeparationBar
-            ) ?: probe  // fallback to probe if full run collapses
-        }
-
 
         val k = mixture.components.size
 
@@ -277,8 +298,12 @@ class TaxonomySplitter(
         // already requires mass >= 2*minClusterSize, and mass <= |targetQueries|. Only
         // the diffuse-residual branch above can enter it, where targetQueries becomes
         // the residual subset (floor minClusterSize, so 30..59 is possible) and
-        // enableResidualSplitGate defaults to isDag. It has never fired: bar=0.0500
-        // appears zero times in the repo's logs against 5628 of bar=0.0250. Kept
+        // enableResidualSplitGate defaults to isDag. That branch is itself unreachable
+        // in the canonical configuration: it additionally needs residualQueries >=
+        // minClusterSize, and at descentMargin = 0.12 every node carries zero
+        // residuals (verified on the frozen snapshot: 0 of 139 nodes have any). So the
+        // margin is dead twice over. It has never fired: bar=0.0500 appears zero times
+        // in the repo's logs against 5628 of bar=0.0250. Kept
         // because it is directionally right for the small-n CONDITIONAL null — the
         // proposals that do survive EM collapse at n < 160 rest on fewer points — not
         // because it is load-bearing today.
@@ -433,25 +458,16 @@ class TaxonomySplitter(
         // "is this partition more than a cut through the node's own elongation?",
         // which dJ structurally cannot ask, because dJ rewards elongation.
 
-        // ── Sibling distinctness guard (same scale as the split/merge gates) ──
-        val isUnique = routedClusters.all { cluster ->
-            val newStats = clusterStats(cluster, childDim)
-            node.children.all { sibling ->
-                val sibQueries = sibling.getAllQueriesInBranch().distinctBy { it.rawText }
-                if (sibQueries.isEmpty()) true
-                else {
-                    val sep = StatisticsUtils.chanceCorrectedSeparation(
-                        listOf(newStats, clusterStats(sibQueries, childDim))
-                    )
-                    sep >= config.formalism.proposalSeparationBar
-                }
-            }
-        }
-
-        if (!isUnique) {
-            log.debug("Split Rejected: child too similar to sibling")
-            return false
-        }
+        // The sibling-distinctness guard that used to sit here has been removed. It
+        // tested each proposed child against `node.children` — but this function
+        // returns at its first line unless `node.isLeaf`, and isLeaf is defined as
+        // `children.isEmpty() && crossLinkChildren.isEmpty()`. So the collection it
+        // iterated was ALWAYS empty and `all {}` on it was vacuously true: the guard
+        // could not reject anything, ever. Not a redundant re-test of the min-pair
+        // bar — a comparison against nothing. Confirmed by its log line "Split
+        // Rejected: child too similar to sibling" appearing 0 times in every run in
+        // the repo. Children are created below, after this point, which is why the
+        // list is empty when the guard ran.
 
         log.info("Split '${node.label}' (q=${targetQueries.size}, k=${routedClusters.size}${if (routedClusters.size != k) " (em k=$k)" else ""}, sep=${"%.3f".format(java.util.Locale.US, sepScore)}, routed=${routedClusters.map { it.size }}, converged=${mixture.converged}) -> Spawning ${routedClusters.size} children")
 

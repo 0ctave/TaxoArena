@@ -340,6 +340,24 @@ data class GraphNode(
     }
 }
 
+/**
+ * MRL slice width for a given depth. Flat 256 at every depth — the argument is
+ * deliberately unused.
+ *
+ * This was a real design axis: a per-depth Matryoshka ladder (128 at the root,
+ * widening with depth) so coarse levels compared on a cheap prefix and fine levels
+ * used the full vector. It was flattened to a constant after the ladder proved to
+ * cost accuracy at the coarse end without buying speed at the fine end, since every
+ * gate that matters — routing, the separation statistic, the vMF posterior — runs at
+ * the child dimension anyway.
+ *
+ * Kept as a function rather than inlined because it is the SINGLE SOURCE OF TRUTH for
+ * that width across 11 call sites (TaxonomyFitter, TaxonomyMerger, TaxonomySplitter,
+ * EmbeddingCache, TaxonomyPersistence, the engine's dimension fast-fail). Inlining
+ * would scatter the literal 256 across all of them and make reintroducing a ladder —
+ * or changing the width for a different embedding model — an edit in 11 places
+ * instead of one. The unused parameter is the price of keeping the seam.
+ */
 fun dimForDepth(depth: Int): Int = 256
 
 // Phase completion flags

@@ -237,6 +237,21 @@ object DiagnosticsBundle {
      * `sep_below_bar` — because the whole point of this file is to make rejection tallies
      * analysable without re-reading logs. Deduplication by unique node is then
      * `GROUP BY site_id`, which the 379-vs-80 rejection count still needs.
+     *
+     * ── COMPATIBILITY BREAK in the `k=` field of splitter reasons ──────────────
+     * Before commit 58f4aed, `min_pair_sep_below_bar(...,k=N)` and the matching
+     * [NO-SPLIT] log line reported N = the EM mixture's k. They now report N =
+     * `routedClusters.size`, the k that actually reached the gate, with EM's k
+     * carried separately as `emK=`. The two differ whenever floor-absorption or
+     * weak-pair coarsening reduced k — which is most rejections: min-pair is
+     * reachable only at routed k=2, so old files showing "k=3" and "k=4" were
+     * reporting a proposal that had already been coarsened to 2.
+     *
+     * Consequence: proposals.csv files written before and after 58f4aed are NOT
+     * comparable on that column. Anything aggregating rejections by k across the
+     * boundary must read `emK=` for old-style semantics, and treat a row with no
+     * `emK=` as pre-break. `sep_below_bar(...)` no longer appears at all — the
+     * joint k-way gate that emitted it was removed in the same commit.
      */
     fun recordProposal(
         iter: Int, type: String, siteId: String, siteLabel: String?,

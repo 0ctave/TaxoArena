@@ -83,10 +83,11 @@ class TaxonomyEngine(
             // ── Dimension fast-fail ──────────────────────────────────────────
             // Validate that the embedding model produces vectors with enough
             // dimensions to cover the deepest MRL level (dimForDepth(maxDepth)).
-            // The model stores full-size vectors; root-level slicing to
-            // dimForDepth(0)=128 is done later by projectTo(). Comparing against
-            // dimForDepth(0) was wrong — it always threw because the model
-            // produces e.g. 1024-dim vectors, not 128-dim ones.
+            // The model stores full-size vectors; slicing to dimForDepth(depth) is
+            // done later by projectTo(). Comparing against dimForDepth(0) was wrong —
+            // it always threw because the model produces e.g. 1024-dim vectors.
+            // (dimForDepth is flat 256 at every depth now, so this check and the old
+            // per-depth one coincide; see its KDoc for why the seam is kept.)
             val maxDepth    = config.formalism.maxDepth
             val minRequired = dimForDepth(maxDepth)
             val actualDim   = embeddingCache.dimensionality
