@@ -159,8 +159,39 @@ class TaxonomyJudgeService(
         }
         val detailsMap = datasetFetcher.getDetailsForQueries(corpusEmbeddings.map { it.rawText })
         val reservedTexts = evalStore.getReservedQuestionTexts()
-        val details = corpusEmbeddings.mapNotNull { detailsMap[it.rawText] }
-            .filter { it.question !in reservedTexts }
+        val resolved = corpusEmbeddings.mapNotNull { detailsMap[it.rawText] }
+        val details = resolved.filter { it.question !in reservedTexts }
+
+        // Supervised separation is the whole basis of the answer-key-blind-at-judgment claim:
+        // rubrics are induced on the construction split and applied to the held-out split. But
+        // `detailsMap` is keyed on Embedding.rawText while the filter tests HFProRowData.question,
+        // so if those ever diverge the `!in` test compares different string spaces and silently
+        // removes nothing — the same failure mode as joining on a raw id instead of question text.
+        // Verified as matching (100% of active-pool reserved texts join mmlu_pro.question
+        // verbatim), but an instruction is not a guarantee, so measure it rather than trust it.
+        run {
+            val heldOutInRegion = resolved.count { it.question in reservedTexts }
+            val removed = resolved.size - details.size
+            check(removed == heldOutInRegion) {
+                "Judge induction held-out filter is inconsistent for node '${node.label}': " +
+                    "counted $heldOutInRegion held-out questions but removed $removed. The filter " +
+                    "and the membership test disagree, which means rubrics may be induced on " +
+                    "questions this judge will later be asked to grade."
+            }
+            if (heldOutInRegion > 0) {
+                log.info(
+                    "[JUDGE-LEAK] node '${node.label}': withheld $heldOutInRegion of ${resolved.size}" +
+                        " region question(s) from induction (held-out split)"
+                )
+            } else if (resolved.isNotEmpty()) {
+                // Not an error — a node can legitimately contain no held-out queries — but worth
+                // surfacing, because it is indistinguishable from a filter that stopped working.
+                log.debug(
+                    "[JUDGE-LEAK] node '${node.label}': no held-out questions among" +
+                        " ${resolved.size} region question(s); nothing to withhold"
+                )
+            }
+        }
 
         if (details.isEmpty()) {
             log.warn("generateJudgeForNode: empty corpus for node '${node.label}' (id=${node.id}). " +
@@ -223,7 +254,15 @@ class TaxonomyJudgeService(
         currentStep = finalSteps - 1
         arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", currentStep, finalSteps, "SAVING")
         
+        // Correct-option text of every item the rubric was induced from — the strings a rubric
+        // must not have memorised. Computed once for the leakage audit below.
+        val sourceCorrectOptions = details.mapNotNull { item ->
+            val ai = item.answer?.firstOrNull()?.let { it.uppercaseChar() - 'A' } ?: -1
+            item.options.getOrNull(ai)
+        }.filter { it.isNotBlank() }
+
         if (validateAndSaveJudge(node, rawSynthesis)) {
+            auditRubricLeakage(node, sourceCorrectOptions)
             arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", finalSteps, finalSteps, "READY")
             onComplete?.invoke(node)
         } else {
@@ -237,6 +276,7 @@ class TaxonomyJudgeService(
             arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", currentStep, repairSteps, "SAVING")
             
             if (validateAndSaveJudge(node, repairedJson)) {
+                auditRubricLeakage(node, sourceCorrectOptions)
                 log.info("Successfully repaired judge JSON for '${node.label}'.")
                 arenaService.updateJudgeProgress(node.label ?: "Emergent Concept", repairSteps, repairSteps, "READY")
                 onComplete?.invoke(node)
@@ -255,6 +295,73 @@ class TaxonomyJudgeService(
         node.judgePrompt = parsed.first
         node.judgeRubric = parsed.second
         return true
+    }
+
+    /**
+     * Longest word n-gram shared between [text] and any string in [sources], as a token count.
+     *
+     * The induction prompt instructs the model not to restate question text or correct options,
+     * but an instruction is not a check — nothing verified it, so nothing could be reported about
+     * it. This turns the constraint into a measured property: a rubric that shares a long n-gram
+     * with a correct option has memorised that option rather than abstracted a rule, which is a
+     * leakage channel into the held-out split even though the questions themselves were withheld.
+     *
+     * Word-level rather than character-level, and case- and punctuation-insensitive, so
+     * paraphrase-level reuse is not mistaken for verbatim copying and vice versa.
+     */
+    internal fun maxSharedNgram(text: String, sources: List<String>, cap: Int = 12): Pair<Int, String> {
+        fun tokens(s: String) = s.lowercase()
+            .replace(Regex("[^a-z0-9\\s]"), " ")
+            .split(Regex("\\s+")).filter { it.isNotBlank() }
+
+        val t = tokens(text)
+        if (t.isEmpty()) return 0 to ""
+        val srcGrams = HashMap<Int, MutableSet<String>>()
+        for (s in sources) {
+            val st = tokens(s)
+            for (k in 1..minOf(cap, st.size)) {
+                val set = srcGrams.getOrPut(k) { HashSet() }
+                for (i in 0..st.size - k) set.add(st.subList(i, i + k).joinToString(" "))
+            }
+        }
+        var best = 0
+        var bestGram = ""
+        for (k in minOf(cap, t.size) downTo 1) {
+            val src = srcGrams[k] ?: continue
+            for (i in 0..t.size - k) {
+                val g = t.subList(i, i + k).joinToString(" ")
+                if (g in src) {
+                    best = k; bestGram = g
+                    break
+                }
+            }
+            if (best > 0) break
+        }
+        return best to bestGram
+    }
+
+    /**
+     * Reports whether an induced rubric reuses wording from the correct options it was induced
+     * from. Threshold 5 follows the usual verbatim-reuse convention; single words and short
+     * technical phrases ("standard deviation") are expected and not leakage.
+     */
+    private fun auditRubricLeakage(node: GraphNode, sourceCorrectOptions: List<String>) {
+        val rubric = node.judgeRubric ?: return
+        if (sourceCorrectOptions.isEmpty()) return
+        val (n, gram) = maxSharedNgram(rubric, sourceCorrectOptions)
+        if (n >= 5) {
+            log.warn(
+                "[JUDGE-LEAK] node '${node.label}': rubric shares a $n-token span with a source" +
+                    " correct option — \"$gram\". The rule has memorised an answer rather than" +
+                    " abstracted a reasoning property; treat this leaf's verdicts as suspect."
+            )
+        } else {
+            log.info(
+                "[JUDGE-LEAK] node '${node.label}': rubric leakage audit clean" +
+                    " (max shared span $n token(s) vs ${sourceCorrectOptions.size} source options," +
+                    " threshold 5)"
+            )
+        }
     }
 
     fun listJudges(root: GraphNode): List<JudgeMetadata> {

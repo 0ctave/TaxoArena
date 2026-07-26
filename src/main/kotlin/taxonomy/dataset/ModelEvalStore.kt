@@ -576,11 +576,47 @@ class ModelEvalStore(
     fun getReservedQuestionTexts(): Set<String> {
         val result = mutableSetOf<String>()
         conn().use { conn ->
-            conn.createStatement().use { stmt ->
-                stmt.executeQuery("SELECT DISTINCT question_text FROM eval_results WHERE is_reserved = 1").use { rs ->
-                    while (rs.next()) {
-                        rs.getString("question_text")?.let { result.add(it) }
+            // Resolve each reserved question to its ONE authoritative text via the link table,
+            // rather than collecting every question_text any model filed under that id.
+            //
+            // `SELECT DISTINCT question_text ... WHERE is_reserved = 1` returned 4994 distinct
+            // texts for a 3437-question pool: a 45% over-count, because Meta-Llama-3-70B-Instruct
+            // is mis-keyed (7424 rows whose question_id disagrees with the other 46 models) and
+            // files unrelated questions under reserved ids. This set is used to EXCLUDE held-out
+            // questions from rubric induction, so over-counting is the safe direction — it never
+            // leaks — but it silently withheld ~1500 legitimate training questions from
+            // induction. eval_question_link is authoritative and text-verified, so joining
+            // through it yields exactly one text per reserved id and drops the mis-keyed model's
+            // influence entirely.
+            conn.prepareStatement(
+                """
+                SELECT DISTINCT m.question
+                FROM ${ReservedPool.TABLE_POOL} p
+                JOIN ${ReservedPool.TABLE_ACTIVE} a ON a.pool_id = p.pool_id AND a.only_row = 1
+                JOIN eval_question_link l ON l.question_id = p.question_id
+                JOIN mmlu_pro m ON m.id = l.mmlu_pro_row_id
+                """.trimIndent()
+            ).use { ps ->
+                ps.executeQuery().use { rs ->
+                    while (rs.next()) rs.getString(1)?.let { result.add(it) }
+                }
+            }
+            // Fall back to the flag for a database predating the pool tables, or a pool whose
+            // questions have no link rows: withholding too much is preferable to leaking.
+            if (result.isEmpty()) {
+                conn.createStatement().use { stmt ->
+                    stmt.executeQuery(
+                        "SELECT DISTINCT question_text FROM eval_results WHERE is_reserved = 1"
+                    ).use { rs ->
+                        while (rs.next()) rs.getString("question_text")?.let { result.add(it) }
                     }
+                }
+                if (result.isNotEmpty()) {
+                    log.warn(
+                        "[JUDGE-LEAK] no active reserved pool resolved through eval_question_link;" +
+                            " fell back to the is_reserved flag (${result.size} texts). This set may" +
+                            " over-count if any model is mis-keyed."
+                    )
                 }
             }
         }

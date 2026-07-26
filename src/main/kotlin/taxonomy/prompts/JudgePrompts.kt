@@ -65,6 +65,8 @@ Focus on what distinguishes this subdomain from neighbouring topics (specific me
 Constraints:
 - Focus on PROCEDURAL LOGIC and VALIDITY of reasoning, not memorized facts or specific numbers.
 - Abstract away from individual questions: do NOT restate any question text or correct option — describe general patterns only.
+- Rules must describe properties of a REASONING PROCESS, never properties of an answer's content, form, or position. Never state what a correct answer looks like; state what a correct derivation does.
+- Do NOT reference option letters, option ordering, or the content of any option. A rule that would help pick an option without performing the reasoning is invalid.
 - Each rule must describe a TESTABLE behaviour of a candidate answer (e.g. "checks dimensional consistency in physics equations").
 - Limit to 8–15 high-level rules covering the subdomain.
 - Correctness of the final conclusion is primary; procedural elegance is secondary.
