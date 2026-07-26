@@ -72,6 +72,11 @@ class ProposalStats {
     val accepted = mutableMapOf<ProposalType, Int>()
     val rejected = mutableMapOf<ProposalType, Int>()
     val noProposal = mutableMapOf<ProposalType, Int>()
+    /** Proposals skipped because an identical (site, population, geometry) was already
+     *  decided since the last accepted edit. Reported next to the outcome counts so a
+     *  hit rate is always interpretable against how often the path was reached. */
+    var memoHits = 0
+    var boundarySkips = 0
     
     fun record(type: ProposalType, outcome: ProposalOutcome) {
         attempted[type] = (attempted[type] ?: 0) + 1
@@ -84,6 +89,7 @@ class ProposalStats {
     
     fun clear() {
         attempted.clear(); accepted.clear(); rejected.clear(); noProposal.clear()
+        memoHits = 0; boundarySkips = 0
     }
     
     fun summary(): String {
@@ -92,7 +98,7 @@ class ProposalStats {
             val att = attempted[t] ?: 0
             if (att == 0) "$t: 0" else
                 "$t: $att attempted (${accepted[t] ?: 0} accepted, ${rejected[t] ?: 0} rejected, ${noProposal[t] ?: 0} no-proposal)"
-        }
+        } + " | [MEMO] hits=$memoHits boundary-exempt=$boundarySkips"
     }
 }
 
@@ -369,14 +375,58 @@ class TaxonomyOperations(
         // rejecting 'Law -> N' would memo-skip 'Philosophy -> N', a genuinely different edit with
         // a different J outcome, and record it as REJECTED without ever evaluating it. Callers
         // whose proposal is not identified by its site pass a discriminating `proposalKey`.
-        val populationHash = site.queryWeights.entries.map { it.key.hashCode() xor it.value.hashCode() }.sum()
+        // Fingerprint components are chosen from MEASURED stability, not from what
+        // looks like it identifies the state. Instrumenting a full canonical run over
+        // iterations 5..10 — after growth stops, when nothing should move — gave:
+        //
+        //   key-set hash   139/139 sites constant      mu.contentHashCode  139/139
+        //   node size n    139/139 constant            mu quantized        139/139
+        //   weight bits     51/139 constant            kappa bits            1/139
+        //   weights @1e-6   52/139 constant            kappa @1e-6           1/139
+        //
+        // The previous version folded in `it.value.hashCode()` (raw Double bits of
+        // every membership weight) and `kappaHash = site.vmfKappa` (a raw Double).
+        // Both are re-derived by routing every iteration and neither ever reaches
+        // bit-identity — kappa converges asymptotically, drifting at ~1e-13 forever
+        // (...541 -> ...206 -> ...205 -> ...204). So the fingerprint changed on almost
+        // every site on every iteration and the cache could never hit: zero
+        // [MEMOIZED REJECTION] lines in any run in the repo.
+        //
+        // Excluding them is sound rather than a tolerance fudge. kappa is FITTED from
+        // this node's population and direction, so conditioning on (keys, mu, n)
+        // already pins it up to fit noise; and its only consumer in the split path is
+        // the `vmfKappa < 0.5` diffuse test, against observed values around 130-200.
+        // The weights likewise enter only through the mass/ess feasibility thresholds.
+        // Both are guarded below rather than trusted.
+        val populationHash = site.queryWeights.keys.sumOf { it.hashCode() }
+        var siteMass = 0.0
+        var siteSumSq = 0.0
+        for (w in site.queryWeights.values) { siteMass += w; siteSumSq += w * w }
+        val siteEss = if (siteMass > 0.0) (siteMass * siteMass / siteSumSq) else 0.0
         val fingerprint = ProposalFingerprint(
             nodeId = if (proposalKey != null) "${site.id}|$proposalKey" else site.id,
             populationHash = populationHash,
             muHash = site.vmfMu.contentHashCode(),
-            kappaHash = site.vmfKappa
+            n = site.queryWeights.size,
+            massQ = Math.round(siteMass * 1e3)
         )
-        if (rejectedProposalsCache.contains(fingerprint)) {
+
+        // Boundary guard. The quantities deliberately left out of the fingerprint
+        // reach the split decision only through threshold comparisons, so a node
+        // sitting on one of those thresholds is never memoized — there, the low-bit
+        // drift the fingerprint ignores could genuinely flip the outcome. Away from
+        // them, identical (keys, mu, n, mass) provably gives an identical decision.
+        val feasibility = 2.0 * config.formalism.minClusterSize
+        val diffuseMass = 10.0 * config.formalism.minClusterSize
+        val onABoundary =
+            kotlin.math.abs(siteMass - feasibility) < 0.05 ||
+                kotlin.math.abs(siteEss - feasibility) < 0.05 ||
+                kotlin.math.abs(siteMass - diffuseMass) < 0.05 ||
+                site.vmfKappa < 1.0 ||
+                site.depth >= config.formalism.maxDepth - 1
+        if (onABoundary) proposalStats.boundarySkips++
+        if (!onABoundary && rejectedProposalsCache.contains(fingerprint)) {
+            proposalStats.memoHits++
             log.debug("[MEMOIZED REJECTION] Skip tryProposal for site '${site.label ?: site.id}'")
             proposalStats.record(proposalType, ProposalOutcome.REJECTED)
             return ProposalOutcome.REJECTED
@@ -406,6 +456,10 @@ class TaxonomyOperations(
 
         val didAnything = action()
         if (!didAnything) {
+            // Memoized like a rejection: the site proposed nothing, and with the same
+            // population and geometry it will propose nothing again. Cleared on every
+            // accepted edit, exactly as rejections are.
+            if (!onABoundary) rejectedProposalsCache.add(fingerprint)
             proposalStats.record(proposalType, ProposalOutcome.NO_PROPOSAL)
             return ProposalOutcome.NO_PROPOSAL
         }
@@ -432,6 +486,7 @@ class TaxonomyOperations(
         if (beforeNodes == afterNodes) {
             // No structural change occurred at all (complete early exit, no log clutter)
             backup.restore(registry)
+            if (!onABoundary) rejectedProposalsCache.add(fingerprint)
             proposalStats.record(proposalType, ProposalOutcome.NO_PROPOSAL)
             return ProposalOutcome.NO_PROPOSAL
         }
@@ -601,7 +656,7 @@ class TaxonomyOperations(
             } else {
                 log.debug("[$proposalType REJECTED] '${site.label ?: site.id}' Delta J = ${"%.6f".format(java.util.Locale.US, deltaJ)}, Delta V = $deltaV. Reverting.")
             }
-            rejectedProposalsCache.add(fingerprint)
+            if (!onABoundary) rejectedProposalsCache.add(fingerprint)
             backup.restore(registry)
             proposalStats.record(proposalType, ProposalOutcome.REJECTED)
             return ProposalOutcome.REJECTED
@@ -886,5 +941,6 @@ private data class ProposalFingerprint(
     val nodeId: String,
     val populationHash: Int,
     val muHash: Int,
-    val kappaHash: Double
+    val n: Int,
+    val massQ: Long
 )
