@@ -746,12 +746,65 @@ data class AggregatedLeaderboard(
             }
         }
 
-        val bootstrapSEs = allModels.associateWith { model ->
+        val rawBootstrapSEs = allModels.associateWith { model ->
             if (queryIds.isEmpty()) 1.0 else {
                 val scores = bootstrapRanks[model]!!
                 val avg = scores.average()
                 val variance = scores.sumOf { (it - avg) * (it - avg) } / (numIterations - 1)
                 kotlin.math.sqrt(variance).coerceIn(1e-3, 10.0)
+            }
+        }
+
+        // ── Arithmetic floor on the aggregate SE ────────────────────────────────
+        // The bootstrap above never touches the per-leaf SEs: it resamples query ids
+        // and refits BT, so it reports the spread of the POINT ESTIMATE across
+        // resamples. Under complete separation — one model winning every comparison
+        // in a leaf, which is the regime the arena drives itself into — every resample
+        // reproduces the same win pattern, the refits coincide, and that spread
+        // collapses toward zero. The per-leaf Fisher SEs blow up in exactly the same
+        // regime, so the two estimators fail in opposite directions and the aggregate
+        // comes out implausibly precise. Observed: leaf SEs 3.35–6.67 aggregating to
+        // 0.126–0.263, a 25x shrinkage.
+        //
+        // Combining k independent estimates cannot beat inverse-variance weighting,
+        // and that in turn cannot go below min_i(SE_i)/sqrt(k):
+        //     sum_i 1/SE_i^2 <= k / min_i(SE_i)^2  =>  1/sqrt(sum) >= min_i(SE_i)/sqrt(k)
+        // Leaves here share queries through multi-membership, so the true SE is larger
+        // still — the floor is generous and any violation is arithmetic, not modelling.
+        val leafSEs = allModels.associateWith { model ->
+            eligible.filter { it.nodeId !in inconsistentLeafIds }
+                .mapNotNull { it.stdErrors[model] }
+                .filter { it.isFinite() && it > 0.0 && it < Double.MAX_VALUE }
+        }
+        val ivwSEs = allModels.associateWith { model ->
+            val ses = leafSEs[model].orEmpty()
+            if (ses.isEmpty()) null
+            else 1.0 / kotlin.math.sqrt(ses.sumOf { 1.0 / (it * it) })
+        }
+        val violations = allModels.filter { model ->
+            val ses = leafSEs[model].orEmpty()
+            val ivw = ivwSEs[model]
+            ses.isNotEmpty() && ivw != null && (rawBootstrapSEs[model] ?: 0.0) < ivw * 0.99
+        }
+
+        val bootstrapSEs = if (violations.isEmpty()) rawBootstrapSEs else {
+            val worst = violations.maxByOrNull { (ivwSEs[it] ?: 0.0) / (rawBootstrapSEs[it] ?: 1.0) }
+            val ivw = ivwSEs[worst] ?: 0.0
+            val boot = rawBootstrapSEs[worst] ?: 0.0
+            val ses = leafSEs[worst].orEmpty()
+            log.error(
+                "[ARENA-SE] aggregate SE is below the inverse-variance floor for" +
+                    " ${violations.size}/${allModels.size} model(s) — the query bootstrap has" +
+                    " collapsed and its SEs are NOT usable. Worst: '$worst' bootstrap=" +
+                    "${"%.4f".format(java.util.Locale.US, boot)} vs inverse-variance=" +
+                    "${"%.4f".format(java.util.Locale.US, ivw)} (${"%.1f".format(java.util.Locale.US, ivw / boot.coerceAtLeast(1e-9))}x)" +
+                    " from k=${ses.size} leaf SEs in [${"%.3f".format(java.util.Locale.US, ses.min())}," +
+                    " ${"%.3f".format(java.util.Locale.US, ses.max())}]." +
+                    " Substituting the inverse-variance SE and marking the leaderboard unreliable."
+            )
+            allModels.associateWith { model ->
+                val ivwM = ivwSEs[model]
+                if (model in violations && ivwM != null) ivwM else (rawBootstrapSEs[model] ?: 1.0)
             }
         }
 
@@ -780,7 +833,9 @@ data class AggregatedLeaderboard(
             leafsEligible = eligible.size,
             leafsTotal = leafNodeIds.size,
             totalComparisons = eligible.sumOf { it.totalComparisons },
-            isReliable = coverage >= 0.30
+            // A collapsed bootstrap makes the intervals meaningless even at full leaf
+            // coverage, so an SE-floor violation is disqualifying on its own.
+            isReliable = coverage >= 0.30 && violations.isEmpty()
         )
     }
 
