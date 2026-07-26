@@ -64,6 +64,8 @@ data class HeadlessCliConfig(
     val membershipFloor: Double? = null,
     val routingBeamGamma: Double? = null,
     val descentMargin: Double? = null,
+    val acceptanceZ: Double? = null,
+    val enableRefitGate: Boolean? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
     val judgeInduction: Boolean = false,
@@ -150,6 +152,13 @@ class HeadlessBenchmarkRunner(
         cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
         cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
+        cliConfig.acceptanceZ?.let { config.formalism.acceptanceZ = it }
+        cliConfig.enableRefitGate?.let { config.formalism.enableRefitGate = it }
+        // Headless splits on cliConfig.testRatio and never reads dataset.testSplitRatio, so the
+        // two drifted: the banner and — more seriously — the EffectiveConfig provenance record
+        // reported the Spring default (0.2) while every run actually split at the TOML value
+        // (0.3). Sync them so the recorded configuration is the one that ran.
+        config.dataset.testSplitRatio = cliConfig.testRatio
         cliConfig.defaultKappaPrior?.let { config.formalism.defaultKappaPrior = it }
         cliConfig.enableLabeling?.let { config.execution.enableLabeling = it }
         cliConfig.datasetType?.let {
@@ -183,6 +192,23 @@ class HeadlessBenchmarkRunner(
         }
 
         val seeds = if (cliConfig.seeds.isNotEmpty()) cliConfig.seeds else listOf(cliConfig.seed)
+
+        // Only the FIRST seed in an in-process loop routes held-out queries correctly. Every
+        // later seed strands roughly 80% of the test set as residuals (measured on seed 137:
+        // NoMatchRate 0.816 in-loop against 0.0 isolated, Top-1 5.31% against 74.90%), while
+        // the taxonomy itself looks healthy — purity ~0.76, plausible leaf counts, exit 0 — so
+        // the corruption reads as enormous seed variance rather than as an error. Baselines are
+        // unaffected because they use flat centroid assignment instead of routing through the
+        // graph, which makes a corrupted run look internally consistent.
+        //
+        // The routing path is not yet repaired; this refuses the configuration instead of
+        // producing plausible garbage. Run one seed per process.
+        require(seeds.size <= 1) {
+            "Multi-seed arrays route held-out queries for the first seed only. " +
+                "Requested seeds=$seeds. Use one seed per process (see " +
+                "experiment_configs/calibration/cal_iso_s*.toml)."
+        }
+
         for (currentSeed in seeds) {
             perfTracker.clear()
             val baseDir = File(cliConfig.outputDir + "/seed_$currentSeed")
@@ -1270,6 +1296,8 @@ class HeadlessBenchmarkRunner(
         var membershipFloor: Double? = null
         var routingBeamGamma: Double? = null
         var descentMargin: Double? = null
+        var acceptanceZ: Double? = null
+        var enableRefitGate: Boolean? = null
         var cosineTau: Double? = null
         var leafAcceptanceScale: Double? = null
         var assignmentGap: Double? = null
@@ -1345,6 +1373,8 @@ class HeadlessBenchmarkRunner(
                 "membershipFloor" -> membershipFloor = rawVal.toDouble()
                 "routingBeamGamma" -> routingBeamGamma = rawVal.toDouble()
                 "descentMargin" -> descentMargin = rawVal.toDouble()
+                "acceptanceZ" -> acceptanceZ = rawVal.toDouble()
+                "enableRefitGate" -> enableRefitGate = rawVal.toBoolean()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
                 "datasetType" -> datasetType = rawVal.trim('"', '\'')
@@ -1394,6 +1424,8 @@ class HeadlessBenchmarkRunner(
             membershipFloor = membershipFloor,
             routingBeamGamma = routingBeamGamma,
             descentMargin = descentMargin,
+            acceptanceZ = acceptanceZ,
+            enableRefitGate = enableRefitGate,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,
             judgeInduction = judgeInduction,

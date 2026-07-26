@@ -85,6 +85,43 @@ class TaxonomyConfig {
         // Lexicographic convergence tolerance. E.g. 1e-6.
         var tau: Double = 1e-6
 
+        /**
+         * Acceptance threshold in units of the paired bootstrap standard error of dJ.
+         *
+         * 0.0 keeps the historical rule: accept iff dJ > [tau], with a node-count tie-break
+         * inside the band. tau is a float tolerance, so that rule accepts edits whose measured
+         * improvement is far below the resolution of the measurement — the most marginal
+         * accepted edit observed carried dJ = 5.5e-6 against SE(dJ) = 9.5e-5, i.e. z = 0.06.
+         *
+         * Set > 0 to gate on z = dJ / SE(dJ) instead. SE(dJ) spans an order of magnitude
+         * between proposals because it scales with the affected node's population, so no
+         * fixed tolerance can track it.
+         *
+         * The termination argument survives, and tightens. SE >= 0, so any edit accepted with
+         * SE > 0 has dJ > z*SE >= 0 and J strictly increases; the SE == 0 clause admits only
+         * edits that leave J exactly unchanged while strictly reducing |V|. The lexicographic
+         * (J, -|V|) argument goes through with a strictly smaller acceptance region.
+         */
+        var acceptanceZ: Double = 0.0
+
+        /**
+         * Gate the parameter refit on J, like every structural edit. OFF by default: it is an
+         * ablation, not the canonical path.
+         *
+         * Measured on seed 42: the gated variant terminates provably and certifies a fixed
+         * point, but reaches J 0.24303 against 0.24714, 92 leaves against 104, and held-out
+         * Top-1 73.33% against 74.19%.
+         *
+         * The cost is attributable to the gate's GRANULARITY, not to monotonicity as such. The
+         * refit is gated whole-tree, so one node whose update transiently lowers J freezes the
+         * parameters of every node. In that run it fired from iteration 3 onward while
+         * structural edits were still landing, so later splits were proposed against stale
+         * parent geometry, and the identical recurring rejection (-6.106e-04 every iteration)
+         * is the signature of frozen theta with a settled structure. Whether a per-node or
+         * per-subtree refit gate preserves monotonicity without this cost is untested.
+         */
+        var enableRefitGate: Boolean = false
+
         // Dasgupta separation threshold: a split is accepted when its delta
         // exceeds this value, guaranteeing the two children are geometrically
         // separated in vMF space.

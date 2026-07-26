@@ -397,7 +397,10 @@ class TaxonomyOperations(
             log.info("[PROPOSAL DIAG] ${lostIds.size} node(s) unreachable after action: $details")
         }
 
-        val bootstrapOn = config.diagnostics.enableProfiling
+        // The z-gate needs SE(dJ) to decide, so it forces the bootstrap on regardless of the
+        // diagnostics flag.
+        val zGate = config.formalism.acceptanceZ
+        val bootstrapOn = config.diagnostics.enableProfiling || zGate > 0.0
         var baseCapture: taxonomy.utils.JBootstrap.Capture? =
             if (bootstrapOn && refitScope == null) cachedBaseCapture else null
 
@@ -458,16 +461,34 @@ class TaxonomyOperations(
         // from zero given that both sides share a corpus draw, which is the question the gate
         // is really asking and the one tau (1e-6, a float tolerance) cannot answer.
         var afterCapture: taxonomy.utils.JBootstrap.Capture? = null
+        var seDeltaJ: Double? = null
         if (bootstrapOn && baseCapture != null) {
             try {
                 afterCapture = taxonomy.utils.JBootstrap.capture(root, allEmbeddings)
                 val seDelta = taxonomy.utils.JBootstrap.pairedDeltaSe(baseCapture!!, afterCapture!!)
-                val z = if (seDelta > 0.0) deltaJ / seDelta else Double.NaN
+                seDeltaJ = seDelta
+                // Rendered as text, not NaN: a NaN in this field breaks comparison ordering in
+                // any downstream sort or percentile over the log.
+                val zText = if (seDelta > 0.0) "%.2f".format(java.util.Locale.US, deltaJ / seDelta) else "n/a"
+
+                // SE(dJ) == 0 means no query changed cells between the two structures. Then dJ
+                // must be exactly 0 as well: identical cell contents cannot produce a different
+                // J. If it does, the capture points are not the states they claim to be, and
+                // every z below is being computed against the wrong baseline. Exact zero is the
+                // right test — with continuous Dirichlet weights a genuine partition change
+                // cannot land on 0.
+                if (seDelta == 0.0 && deltaJ != 0.0) {
+                    log.error(
+                        "[DJ-SE INVARIANT] SE(dJ)=0 but dJ=${"%.3e".format(java.util.Locale.US, deltaJ)}" +
+                            " for $proposalType '${site.label ?: site.id}' — identical cells cannot" +
+                            " change J. The before/after capture points are inconsistent."
+                    )
+                }
                 log.info(
                     "[DJ-SE] $proposalType '${site.label ?: site.id}'" +
                         " dJ=${"%.3e".format(java.util.Locale.US, deltaJ)}" +
                         " SE_dJ=${"%.3e".format(java.util.Locale.US, seDelta)}" +
-                        " z=${"%.2f".format(java.util.Locale.US, z)}" +
+                        " z=$zText" +
                         " dV=$deltaV"
                 )
             } catch (e: Exception) {
@@ -477,14 +498,35 @@ class TaxonomyOperations(
         }
         val tau = config.formalism.tau
         
-        // Lexicographic acceptance on (J, -|V|): an edit is taken if it strictly improves the
-        // global objective, or if it is J-neutral within tau and strictly reduces node count.
-        // tau is the neutrality band, not a quality bar — every edit's own quality gate
-        // (separation for splits, similarity for fusions) has already been applied upstream.
-        val accepted = when {
-            deltaJ > tau -> true
-            kotlin.math.abs(deltaJ) <= tau -> deltaV < 0
-            else -> false
+        // Two acceptance rules, selected by acceptanceZ.
+        //
+        // z-gate (acceptanceZ > 0): an edit is taken if its measured improvement is large
+        // relative to the paired bootstrap error of that same measurement, or if it changes no
+        // query's cell at all and strictly simplifies the structure. The second clause is not a
+        // loophole — SE(dJ) == 0 identifies a pure structural edit (a passthrough dissolution
+        // that moves no query), for which dJ is exactly 0 and z is undefined. Without it those
+        // edits could never commit and wrapper nodes would accumulate through construction.
+        //
+        // Legacy (acceptanceZ == 0): lexicographic on (J, -|V|) against the float tolerance
+        // tau. Retained as the baseline arm so the gate change can be attributed.
+        val accepted = if (zGate > 0.0 && seDeltaJ != null) {
+            val se = seDeltaJ!!
+            when {
+                // max(tau, z*SE), not z*SE alone. The tau floor is what makes a termination
+                // argument possible: every accepted edit then raises J by at least tau, J is
+                // bounded above by 1, so at most (1 - J_0)/tau edits can ever be accepted. With
+                // z*SE alone a vanishing SE would admit a vanishing improvement and the bound
+                // collapses. In practice the floor almost never binds — median SE(dJ) is 5.85e-5,
+                // so z=2 gives 1.17e-4, two orders above tau.
+                se > 0.0 -> deltaJ > maxOf(tau, zGate * se)
+                else -> deltaV < 0
+            }
+        } else {
+            when {
+                deltaJ > tau -> true
+                kotlin.math.abs(deltaJ) <= tau -> deltaV < 0
+                else -> false
+            }
         }
 
         if (accepted) {
