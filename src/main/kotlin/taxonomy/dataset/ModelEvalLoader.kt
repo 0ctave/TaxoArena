@@ -130,14 +130,30 @@ class ModelEvalLoader(
             log.warn("reserved_test_queries.json not found — skipping reserved sync"); return
         }
         val raw = reservedQueriesJson.readText()
-        // Support both new (List<Int>) and old (List<String>) formats during migration:
-        val reservedIds: Set<Int> = try {
-            json.decodeFromString<Map<String, List<Int>>>(raw).values.flatten().toSet()  // new
+        // Support both new (List<Int>) and old (List<String>) formats during migration. The
+        // per-domain structure is carried through rather than flattened: the split is
+        // domain-stratified, and the stratum is part of what identifies a pool.
+        val parsed: Map<String, List<Int>> = try {
+            json.decodeFromString<Map<String, List<Int>>>(raw)                            // new
         } catch (_: Exception) {
-            resolveTextsToIds(json.decodeFromString<Map<String, List<String>>>(raw))     // old fallback
+            val textMap = json.decodeFromString<Map<String, List<String>>>(raw)           // old fallback
+            textMap.mapValues { (_, texts) -> resolveTextsToIds(mapOf("d" to texts)).toList() }
         }
-        store.markReserved(reservedIds)
-        log.info("Reserved sync: ${reservedIds.size} question_ids marked")
+        // Drop sentinel ids (UNLINKED_QUERY_ID_BASE and below) before hashing. They match no
+        // eval_results row so they cannot be part of a judgeable pool, and — critically — the
+        // fetcher already excludes them when it records the pool at split time. Hashing a
+        // different id set here would mint a second pool id for the very same split.
+        val idsByDomain = parsed.mapValues { (_, ids) -> ids.filter { it > 0 } }
+            .filterValues { it.isNotEmpty() }
+        val dropped = parsed.values.sumOf { it.size } - idsByDomain.values.sumOf { it.size }
+        if (dropped > 0) {
+            log.info("Reserved sync: ignoring $dropped unlinked (sentinel) id(s) — routing-only, not judgeable")
+        }
+        val poolId = store.saveAndActivateReservedPool(idsByDomain)
+        log.info(
+            "Reserved sync: pool '$poolId', ${idsByDomain.values.sumOf { it.size }} question_id(s)" +
+                " across ${idsByDomain.size} domain(s)"
+        )
     }
 
     internal fun resolveTextsToIds(textMap: Map<String, List<String>>): Set<Int> {

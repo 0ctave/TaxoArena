@@ -685,6 +685,37 @@ class MMLUDatasetFetcher(
                     " reserved_test_queries.json ($judgeable arena-judgeable," +
                     " ${total - judgeable} unlinked and routing-only)."
             )
+
+            // Record the pool durably, here, where the provenance actually exists — the seed,
+            // ratio and corpus size are known at split time and nowhere downstream. The JSON
+            // above is now an export for inspection; this table is the source of truth, and
+            // because the id is a hash of the contents, the loader's later sync resolves to
+            // exactly this pool rather than creating a second copy of it.
+            try {
+                val idsByDomain = testIds.mapValues { (_, ids) -> ids.filter { it > 0 } }
+                    .filterValues { it.isNotEmpty() }
+                if (idsByDomain.isNotEmpty()) {
+                    connection.use { c ->
+                        val poolId = ReservedPool.save(
+                            c, idsByDomain,
+                            dataset = getTableName(),
+                            corpusSize = dataset.values.sumOf { it.size },
+                            seed = seed.toLong(),
+                            testRatio = testRatio,
+                            nowMillis = System.currentTimeMillis()
+                        )
+                        log.info(
+                            "Reserved pool '$poolId' recorded (seed=$seed, ratio=$testRatio," +
+                                " ${idsByDomain.values.sumOf { it.size }} judgeable ids). Sentinel ids" +
+                                " are excluded: they match no eval row, so they cannot belong to a pool."
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                // The JSON is written and the split is returned either way; a pool-recording
+                // failure must not take the run down with it.
+                log.warn("Failed to record the reserved pool in the database: ${e.message}")
+            }
         } catch (e: Exception) {
             log.error("Failed to save reserved test queries to file", e)
         }

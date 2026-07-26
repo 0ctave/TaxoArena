@@ -166,6 +166,9 @@ class ModelEvalStore(
 
                 s.execute("CREATE INDEX IF NOT EXISTS idx_link_mmlu ON eval_question_link(mmlu_pro_row_id)")
             }
+            // Durable, content-addressed reserved pools. eval_results.is_reserved is now a
+            // mirror of whichever of these is active; see ReservedPool for why.
+            ReservedPool.ensureSchema(c)
         }
         log.info("ModelEvalStore schema ready.")
     }
@@ -244,30 +247,63 @@ class ModelEvalStore(
     }
 
     /**
-     * Mark all rows for a given set of question_ids as reserved.
-     * Called after the reserved pool is determined.
+     * Records a reserved pool durably and makes it active.
+     *
+     * Kept for callers that only have a flat id set and no stratification; prefer
+     * [saveAndActivateReservedPool] so the domain of each question survives. Pools are
+     * content-addressed, so recording the same set twice is idempotent and re-activating a
+     * previous pool is exact — there is no longer any need to keep a copy of
+     * reserved_test_queries.json aside before a run that uses a different split.
      */
     fun markReserved(questionIds: Set<Int>) {
         if (questionIds.isEmpty()) return
-        conn().use { c ->
-            c.autoCommit = false
-            try {
-                // Reset ALL existing reserved flags — ensures pool is an exact mirror of the snapshot
-                c.createStatement().executeUpdate("UPDATE eval_results SET is_reserved = 0")
-                questionIds.chunked(900).forEach { chunk ->
-                    val placeholders = chunk.joinToString(",") { "?" }
-                    c.prepareStatement(
-                        "UPDATE eval_results SET is_reserved = 1 WHERE question_id IN ($placeholders)"
-                    ).use { ps ->
-                        chunk.forEachIndexed { i, id -> ps.setInt(i + 1, id) }
-                        ps.executeUpdate()
-                    }
-                }
-                c.commit()
-            } catch (e: Exception) { c.rollback(); throw e }
-        }
-        log.info("Reserved pool reset: ${questionIds.size} questions marked as reserved.")
+        saveAndActivateReservedPool(mapOf(ReservedPool.UNKNOWN_DOMAIN to questionIds.toList()))
     }
+
+    /**
+     * Records [idsByDomain] as a pool, activates it, and returns its content-addressed id.
+     *
+     * Activation rebuilds the `is_reserved` mirror; every existing `reservedOnly` query keeps
+     * working unchanged against that column.
+     */
+    fun saveAndActivateReservedPool(
+        idsByDomain: Map<String, List<Int>>,
+        dataset: String? = null,
+        corpusSize: Int? = null,
+        seed: Long? = null,
+        testRatio: Double? = null
+    ): String {
+        val now = System.currentTimeMillis()
+        var poolId: String
+        var flagged: Int
+        conn().use { c ->
+            poolId = ReservedPool.save(c, idsByDomain, dataset, corpusSize, seed, testRatio, now)
+            flagged = ReservedPool.activate(c, poolId, now)
+        }
+        val questions = idsByDomain.values.sumOf { it.size }
+        log.info(
+            "Reserved pool '$poolId' active: $questions question(s) across ${idsByDomain.size} domain(s)," +
+                " $flagged eval_results row(s) flagged."
+        )
+        return poolId
+    }
+
+    /** Activates an already-recorded pool. Throws if [poolId] is unknown. */
+    fun activateReservedPool(poolId: String): Int = conn().use { c ->
+        ReservedPool.activate(c, poolId, System.currentTimeMillis()).also {
+            log.info("Reserved pool '$poolId' activated: $it eval_results row(s) flagged.")
+        }
+    }
+
+    /** The active pool's content id, or null if none was ever activated. */
+    fun activeReservedPoolId(): String? = conn().use { c -> ReservedPool.activeId(c) }
+
+    /** Every recorded pool, newest first. */
+    fun listReservedPools(): List<ReservedPool.Info> = conn().use { c -> ReservedPool.list(c) }
+
+    /** Question ids in a recorded pool. */
+    fun reservedPoolQuestionIds(poolId: String): Set<Int> =
+        conn().use { c -> ReservedPool.questionIds(c, poolId) }
 
     // ─── Read ─────────────────────────────────────────────────────────────────
 
