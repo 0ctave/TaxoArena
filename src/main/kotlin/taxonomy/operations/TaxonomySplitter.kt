@@ -45,34 +45,14 @@ class TaxonomySplitter(
         conceptCounter.set(1)
     }
 
-    /**
-     * Parallel BFS level-by-level recursive splitting.
-     */
-    suspend fun splitNodesRecursive(root: GraphNode) = withContext(Dispatchers.Default) {
-        checkAndSyncSemaphore()
-        log.info("Starting parallel split evaluation across the DAG...")
-        val byDepth = mutableMapOf<Int, MutableList<GraphNode>>()
-        val visited = mutableSetOf<String>()
-        val queue = ArrayDeque<GraphNode>().apply { add(root) }
-
-        while (queue.isNotEmpty()) {
-            val n = queue.removeFirst()
-            if (!visited.add(n.id)) continue
-            byDepth.getOrPut(n.depth) { mutableListOf() }.add(n)
-            queue.addAll(n.children)
-        }
-
-        // Process bottom-up (deepest first)
-        byDepth.keys.sortedDescending().forEach { depth ->
-            val nodesAtDepth = byDepth[depth]!!
-            nodesAtDepth.map { node ->
-                async {
-                    splitSingleNode(node)
-                }
-            }.awaitAll()
-        }
-        log.info("Finished parallel split evaluation.")
-    }
+    // TaxonomySplitter.splitNodesRecursive has been removed. It was a parallel BFS
+    // that split every node bottom-up via async/awaitAll, and it had NO CALLER:
+    // production splits through TaxonomyOperations.splitNodesRecursive, which walks
+    // the same bottom-up order but wraps each node in tryProposal so the edit is
+    // gated on dJ. This copy bypassed that gate entirely, which is why keeping it
+    // was worse than dead — anything wiring itself to the splitter's own version
+    // would have committed splits without a global acceptance test. Its log lines
+    // ("Starting/Finished parallel split evaluation") never appear in any run.
 
     suspend fun splitSingleNode(node: GraphNode): Boolean {
         if (!node.isLeaf) return false
@@ -307,10 +287,16 @@ class TaxonomySplitter(
         // because it is directionally right for the small-n CONDITIONAL null — the
         // proposals that do survive EM collapse at n < 160 rest on fewer points — not
         // because it is load-bearing today.
-        val requiredEps = if (targetQueries.size < 2 * minClusterSize)
-            2.0 * config.formalism.proposalSeparationBar
-        else
-            config.formalism.proposalSeparationBar
+        // The 2x small-node margin that used to sit here is gone. It doubled the bar
+        // when targetQueries.size < 2*minClusterSize, and was unreachable twice over:
+        // the feasibility check at the top of this function already requires
+        // mass >= 2*minClusterSize and mass <= |targetQueries|, and the only branch
+        // that could reassign targetQueries to something smaller — the diffuse-residual
+        // path — additionally needs residualQueries >= minClusterSize, while at
+        // descentMargin = 0.12 all 139 nodes of the frozen tree carry zero residuals.
+        // Never observed firing: bar=0.0500 appears 0 times in the repo's logs against
+        // 5628 of bar=0.0250.
+        val requiredEps = config.formalism.proposalSeparationBar
 
         // ── Stabilize the proposal onto the feasible set ─────────────────────
         // Two coarsening moves, both of which strictly reduce k and re-route with

@@ -505,6 +505,15 @@ class TaxonomyMerger(
      * FIX: transitiveReduction must consider BOTH children and crossLinkChildren.
      * Tree parent protection (treeParentId) still applies.
      * Redundant parents are removed from BOTH sets.
+     *
+     * NOT DEAD CODE — checked before it was proposed for deletion. The reasoning that
+     * flagged it ("nothing is transitively redundant with one parent per node") holds
+     * only for the canonical tree configuration, where it is additionally never
+     * reached: the call site is gated on `!enableResidualRouting`, and DAG_MAX sets
+     * that flag true. But TREE_BASELINE configs, under experiment_configs/calibration,
+     * switch residual routing off, do reach it, and it severs real edges there — the
+     * logs carry 54 `[TR] Severed N shortcuts` lines with N up to 23. Deleting it
+     * would silently change every calibration baseline.
      */
     internal fun transitiveReduction(root: GraphNode, ancestorMap: Map<String, Set<String>>) {
         val allNodes = getAllNodes(root)

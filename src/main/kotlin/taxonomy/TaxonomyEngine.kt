@@ -529,6 +529,16 @@ class TaxonomyEngine(
 
                 log.info("=== PROPOSAL SUMMARY (ITERATION $i) ===")
                 log.info(ops.proposalStats.summary())
+                // Snapshot BEFORE clearing. recordIteration below reads these counts ~30
+                // lines further down, by which point proposalStats has been reset — which
+                // is why every attempted/accepted/rejected/no_proposal column in
+                // iteration_metrics.csv was 0 while the file itself looked healthy. The
+                // header-and-rows guard at bundle close cannot catch this: the rows exist,
+                // they are just all zero.
+                val iterAttempted = ops.proposalStats.attempted.values.sum()
+                val iterAccepted = ops.proposalStats.accepted.values.sum()
+                val iterRejected = ops.proposalStats.rejected.values.sum()
+                val iterNoProposal = ops.proposalStats.noProposal.values.sum()
                 ops.proposalStats.clear()
                 
                 // Phase 6: Stabilize Convergence Check
@@ -561,7 +571,6 @@ class TaxonomyEngine(
                         all.add(n); n.children.forEach { walk(it) }
                     }
                     walk(root)
-                    val stats = ops.proposalStats
                     taxonomy.diagnostics.DiagnosticsBundle.recordIteration(
                         iter = i,
                         nodes = all.size,
@@ -575,10 +584,10 @@ class TaxonomyEngine(
                         // separate add/remove counts; volumeDelta carries the signed size change.
                         gedAdd = stabilizationResult.ged,
                         gedRem = stabilizationResult.volumeDelta.toInt(),
-                        attempted = stats.attempted.values.sum(),
-                        accepted = stats.accepted.values.sum(),
-                        rejected = stats.rejected.values.sum(),
-                        noProposal = stats.noProposal.values.sum(),
+                        attempted = iterAttempted,
+                        accepted = iterAccepted,
+                        rejected = iterRejected,
+                        noProposal = iterNoProposal,
                         mass = all.sumOf { it.queryWeights.values.sum() },
                         wallMs = 0L
                     )

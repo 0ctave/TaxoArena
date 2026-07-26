@@ -675,7 +675,6 @@ class TaxonomyOperations(
         node.queryWeights.clear()
         node.residualQueries.clear()
         node.residualConfidences.clear()
-        node.nearMisses.clear()
         node.children.forEach { clearGraphQueries(it, visited) }
         node.crossLinkChildren.forEach { clearGraphQueries(it, visited) }
     }

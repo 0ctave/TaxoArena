@@ -165,9 +165,11 @@ class HeadlessBenchmarkRunner(
             config.dataset.datasetType = taxonomy.config.DatasetType.valueOf(it.uppercase())
         }
 
-        cliConfig.enableStableQuestionIds?.let { config.formalism.enableStableQuestionIds = it }
-        cliConfig.enableResidualRouting?.let { config.formalism.enableResidualRouting = it }
-        cliConfig.enableResidualSplitGate?.let { config.formalism.enableResidualSplitGate = it }
+        // NOTE: the three enable* flags are NOT applied here. They used to be, and the
+        // assignments were dead — dagMode's setter rewrites all three as a block and is
+        // applied below, so anything set here was overwritten a few lines later before
+        // being re-applied after dagMode. Two copies, only the second of which had any
+        // effect. The live ones are below, deliberately ordered after dagMode.
         cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
         cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
         cliConfig.enableGtWarmStart?.let { config.formalism.enableGtWarmStart = it }

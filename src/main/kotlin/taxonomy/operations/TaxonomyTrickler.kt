@@ -203,26 +203,13 @@ class TaxonomyTrickler(
         // is within routingBeamGamma of the BEST sibling's dot product.
         val bestIndices = children.indices.filter { dots[it] >= maxDot - config.formalism.routingBeamGamma }
 
-        if (!opts.readOnly && config.formalism.enableResidualRouting) {
-            val qId = if (embedding.queryId != -1) embedding.queryId.toString() else embedding.rawText
-            for (i in children.indices) {
-                if (dots[i] < maxDot) {
-                    val margin = maxDot - dots[i]
-                    val child = children[i]
-                    synchronized(child.nearMisses) {
-                        if (child.nearMisses.size < 200) {
-                            child.nearMisses[qId] = margin
-                        } else {
-                            val worst = child.nearMisses.maxByOrNull { it.value }
-                            if (worst != null && margin < worst.value) {
-                                child.nearMisses.remove(worst.key)
-                                child.nearMisses[qId] = margin
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // The nearMisses ledger that used to be maintained here is gone. It recorded,
+        // per child, the routing margin of every query that ALMOST landed there,
+        // capped at 200 entries with an eviction scan — under `synchronized`, on the
+        // hot path, for every query on every route. Its only consumer was
+        // proposeCrossLinks, deleted when cross-linking was removed (334b95d), so it
+        // had become a write-only structure whose entire cost was contention on a
+        // lock nothing read.
 
         // Register the query embedding for MRL-projection lookup
         GraphNode.registerEmbedding(embedding)
