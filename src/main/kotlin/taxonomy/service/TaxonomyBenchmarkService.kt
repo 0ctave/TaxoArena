@@ -161,11 +161,20 @@ class TaxonomyBenchmarkService(
         log.info("Benchmark: ${matrix.size} questions, ${modelNames.size} models")
 
         // ── [ARENA-POOL] what the arena is actually about to judge ──────────────
-        // The matrix above is fetched with category = null regardless of req.category,
-        // so a run configured for one domain still draws the whole reserved pool. That
-        // is invisible in every other output: the leaderboard reports models, not the
-        // provenance of the questions behind them. Measured on the Math-only smoke run,
-        // 17 of 27 judged verdicts were economics.
+        // The leaderboard reports models, never the provenance of the questions behind
+        // them, so a pool drawn from the wrong population is invisible in every export.
+        //
+        // The pool is scoped by reservedOnly, which restricts it to THIS run's held-out
+        // split, so the category argument below is intentionally null: adding a second
+        // filter on eval_results.category would drop legitimate held-out questions
+        // whenever the two stores disagree about a question's category — and they do.
+        //
+        // Measured on a Math-only run: the dataset fetcher reserved 405 questions under
+        // "Math", and eval_results labels 48 of those same ids "economics". Inspection
+        // confirms the eval_results label is the accurate one (e.g. question 7506 is a
+        // marginal-product problem), so MMLU-Pro's math category genuinely contains
+        // economics-flavoured items. That is a cross-store labelling disagreement, NOT
+        // pool contamination: every judged question belongs to this run's own split.
         run {
             val byCategory = matrix.values
                 .mapNotNull { it.values.firstOrNull()?.category }
@@ -173,20 +182,26 @@ class TaxonomyBenchmarkService(
                 .entries.sortedByDescending { it.value }
             log.info(
                 "[ARENA-POOL] questions=${matrix.size} models=${modelNames.size}" +
-                    " reservedOnly=${req.reservedOnly} requestedCategory=${req.category ?: "<all>"}" +
-                    " | pool composition: " +
+                    " reservedOnly=${req.reservedOnly} constructionDomain=${req.category ?: "<all>"}" +
+                    " | eval_results category composition: " +
                     byCategory.joinToString(", ") { "${it.key}=${it.value}" }
             )
+            if (!req.reservedOnly) {
+                log.warn(
+                    "[ARENA-POOL] reservedOnly=false — the pool is NOT restricted to this run's" +
+                        " held-out split, so the arena may judge questions the taxonomy was built on."
+                )
+            }
             val requested = req.category
             if (!requested.isNullOrBlank()) {
-                val offCategory = byCategory.filter { !it.key.equals(requested, ignoreCase = true) }.sumOf { it.value }
-                if (offCategory > 0) {
-                    log.warn(
-                        "[ARENA-POOL] category='$requested' was requested but the pool contains" +
-                            " $offCategory question(s) from other categories" +
-                            " (${"%.0f".format(java.util.Locale.US, 100.0 * offCategory / matrix.size)}%)." +
-                            " The question matrix is fetched with category = null, so the filter" +
-                            " applies to construction only and NOT to what the arena judges."
+                val disagreeing = byCategory.filter { !it.key.equals(requested, ignoreCase = true) }.sumOf { it.value }
+                if (disagreeing > 0) {
+                    log.info(
+                        "[ARENA-POOL] $disagreeing of ${matrix.size} reserved question(s)" +
+                            " (${"%.0f".format(java.util.Locale.US, 100.0 * disagreeing / matrix.size)}%)" +
+                            " carry an eval_results category other than '$requested'." +
+                            " These are still this run's own held-out questions — the dataset" +
+                            " fetcher's domain and eval_results.category disagree for them."
                     )
                 }
             }
