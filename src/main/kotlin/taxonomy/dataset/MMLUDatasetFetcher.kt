@@ -461,9 +461,24 @@ class MMLUDatasetFetcher(
                         pstmt.setInt(rawDomains.size + 1, limit)
                     }
                     val rs = pstmt.executeQuery()
+                    var unlinked = 0
                     while (rs.next()) {
                         val upstreamId = rs.getInt("question_id")
-                        val finalId = if (rs.wasNull() || upstreamId <= 0) rs.getInt("id") else upstreamId
+                        val localRowId = rs.getInt("id")
+                        // `mmlu_pro.id` is a local AUTOINCREMENT rowid (1..12000);
+                        // `eval_results.question_id` is the upstream MMLU-Pro id (70..12256).
+                        // The two spaces overlap numerically and mean nothing to each other, so
+                        // falling back to the local rowid here handed downstream code an id it
+                        // reads as an upstream one: an unlinked question then joined to whatever
+                        // unrelated eval row happened to share the number. Every one of a
+                        // Math-only run's 405 reserved ids resolved to a different question that
+                        // way. Unlinked rows now get a negative sentinel instead — unique, so
+                        // clustering identity is preserved, and unable to match any eval
+                        // question_id, so the join fails loudly rather than silently lying.
+                        val finalId = if (rs.wasNull() || upstreamId <= 0) {
+                            unlinked++
+                            UNLINKED_QUERY_ID_BASE - localRowId
+                        } else upstreamId
                         rows.add(HFProRowData(
                             id = finalId,
                             question = rs.getString("question"),
@@ -472,6 +487,13 @@ class MMLUDatasetFetcher(
                             options = json.decodeFromString(rs.getString("options")),
                             answer = rs.getString("answer")
                         ))
+                    }
+                    if (unlinked > 0) {
+                        log.warn(
+                            "[EVAL-LINK] $unlinked of ${rows.size} $table rows have no eval_question_link" +
+                                " entry and carry a sentinel id. They can take part in construction but" +
+                                " NOT in the arena, which needs a real eval question_id."
+                        )
                     }
                 }
             }
@@ -590,7 +612,12 @@ class MMLUDatasetFetcher(
             }
         }.mapValues { entry ->
             entry.value.mapIndexed { idx, it ->
-                val finalId = if (it.id >= 0) it.id else idx
+                // `id = -1` is the HFProRowData default, used by the datasets that carry no id
+                // of their own (ARC, 20 Newsgroups, AG News) — those still fall back to the
+                // positional index. Sentinels from loadFromDb are far more negative and must
+                // survive intact, or unlinked questions would be renumbered onto small indices
+                // and collide with each other.
+                val finalId = if (it.id >= 0 || it.id <= UNLINKED_QUERY_ID_BASE) it.id else idx
                 MMLUQuery(id = finalId, text = it.question, category = entry.key)
             }
         }
@@ -647,7 +674,17 @@ class MMLUDatasetFetcher(
             val prettyJson = Json { prettyPrint = true }
             val testIds: Map<String, List<Int>> = test.mapValues { (_, qs) -> qs.map { it.id } }
             file.writeText(prettyJson.encodeToString(testIds))
-            log.info("Successfully reserved ${test.values.flatten().size} test queries across ${test.size} domains to reserved_test_queries.json.")
+            // Sentinel ids (see UNLINKED_QUERY_ID_BASE) belong in the split — held-out routing
+            // metrics are computed over them — but they match no eval_results row, so they can
+            // never be marked reserved and the arena can never judge them. Reporting only the
+            // total overstated the judgeable pool: 3599 written, 3437 actually reservable.
+            val total = test.values.sumOf { it.size }
+            val judgeable = test.values.flatten().count { it.id > 0 }
+            log.info(
+                "Successfully reserved $total test queries across ${test.size} domains to" +
+                    " reserved_test_queries.json ($judgeable arena-judgeable," +
+                    " ${total - judgeable} unlinked and routing-only)."
+            )
         } catch (e: Exception) {
             log.error("Failed to save reserved test queries to file", e)
         }
@@ -853,6 +890,17 @@ private data class HFProDatasetResponse(val rows: List<HFProRowItem>)
 
 @Serializable
 private data class HFProRowItem(val row: HFProRowData)
+
+/**
+ * Base for the ids given to dataset rows with no `eval_question_link` entry.
+ *
+ * A query's id is consumed downstream as an `eval_results.question_id`. Rows without a
+ * link have no such id, so they get `UNLINKED_QUERY_ID_BASE - <local rowid>`: unique, so
+ * clustering identity survives, and comfortably below any real question_id (observed
+ * range 70..12256) so it can never produce a spurious join. It is also distinct from the
+ * `-1` [HFProRowData] default, which still means "no id, use the positional index".
+ */
+const val UNLINKED_QUERY_ID_BASE: Int = -1_000_000
 
 @Serializable
 data class HFProRowData(

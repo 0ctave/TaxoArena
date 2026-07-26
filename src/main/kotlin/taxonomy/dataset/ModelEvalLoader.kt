@@ -211,7 +211,7 @@ class ModelEvalLoader(
 
         // Build lookup maps for cross-referencing
         val questionTexts = raw.map { it.question }
-        val (mmlProRowIds, dbIdSet) = fetchMmlProRowIdsAndSet(questionTexts)   // question_text → mmlu_pro.id
+        val (mmlProRowIds, _) = fetchMmlProRowIdsAndSet(questionTexts)   // question_text → mmlu_pro.id
         val embeddingHits = fetchEmbeddingHits(questionTexts)  // question_text → exists?
 
         // Load existing reserved pool for immediate marking
@@ -242,11 +242,16 @@ class ModelEvalLoader(
                     isReserved   = isReserved
                 )
 
-                val resolvedMmlProId = if (item.question_id >= 0 && dbIdSet.contains(item.question_id)) {
-                    item.question_id
-                } else {
-                    mmlProRowIds[item.question]
-                }
+                // Resolve the link by question TEXT only. `item.question_id` is the upstream
+                // MMLU-Pro id (observed range 70..12256) while `mmlu_pro.id` is a local
+                // AUTOINCREMENT rowid (1..12000): the two spaces overlap numerically but are
+                // unrelated, so the old `dbIdSet.contains(item.question_id)` shortcut tested
+                // nothing and linked a row to whichever local row happened to share the number.
+                // It stayed harmless only while mmlu_pro was sparsely populated; the cache now
+                // holds ids 1..12000, so the shortcut would fire for nearly every row and
+                // fabricate wrong links wholesale. Text resolution is exact-or-normalised and
+                // covers 11999 of the 12000 cached questions.
+                val resolvedMmlProId = mmlProRowIds[item.question]
 
                 links += EvalQuestionLink(
                     questionId    = item.question_id,

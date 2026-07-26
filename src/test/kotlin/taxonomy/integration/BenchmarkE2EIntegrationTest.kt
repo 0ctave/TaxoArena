@@ -15,6 +15,7 @@ import org.mockito.Mockito.mock
 import taxonomy.config.TaxonomyConfig
 import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.dataset.EmbeddingCache
+import taxonomy.dataset.EvalIngestValidator
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.dataset.ModelEvalLoader
 import taxonomy.dataset.ModelEvalStore
@@ -55,7 +56,9 @@ class BenchmarkE2EIntegrationTest {
         val text: String,
         val category: String,
         val answer: String,
-        val answerIndex: Int
+        val answerIndex: Int,
+        /** False for a question the eval ZIP knows but the local mmlu_pro cache does not. */
+        val inMmluPro: Boolean = true
     )
 
     private val options = listOf("first", "second", "third", "fourth")
@@ -69,6 +72,9 @@ class BenchmarkE2EIntegrationTest {
         Q(6, "physics q6: speed of light?", "physics", "B", 1),
         Q(7, "physics q7: Newton's 2nd law?", "physics", "A", 0),
         Q(8, "physics q8: charge of electron?", "physics", "D", 3),
+        // Known to the eval data but absent from the local cache, so its link must stay
+        // unresolved. Not reserved, so it does not disturb the benchmark assertions.
+        Q(9, "physics q9: not in the local cache", "physics", "A", 0, inMmluPro = false),
     )
 
     private val reservedIds = setOf(1, 2, 5, 6)
@@ -82,6 +88,7 @@ class BenchmarkE2EIntegrationTest {
     private lateinit var mockTaxonomyService: TaxonomyService
     private lateinit var mockEmbeddingCache: EmbeddingCache
     private lateinit var datasetFetcher: MMLUDatasetFetcher
+    private lateinit var datasetDbPath: String
 
     /**
      * Subclass of the real arena service that bypasses embedding/routing/LLM calls and
@@ -132,16 +139,29 @@ class BenchmarkE2EIntegrationTest {
     fun setup() {
         tmp = Files.createTempDirectory("benchmark-e2e").toFile()
         val datasetDb = File(tmp, "dataset.db").absolutePath      // holds mmlu_pro + eval_results
+        datasetDbPath = datasetDb
         val embeddingDb = File(tmp, "embeddings.db").absolutePath // holds embeddings cache
         val reservedFile = File(tmp, "reserved_test_queries.json")
 
         // Seed mmlu_pro (so links resolve mmlu_pro_row_id) in the dataset DB.
+        //
+        // Inserted in REVERSE order deliberately. mmlu_pro.id is a local AUTOINCREMENT rowid
+        // and eval question_id is an upstream id; they are unrelated spaces that merely happen
+        // to overlap numerically. Seeding in list order made them an identity mapping, under
+        // which a correct text-join and a wrong id-equality join produce byte-identical rows —
+        // so this fixture could not distinguish them, and in production the id-equality path
+        // mislinked every one of a Math run's 405 reserved questions before anyone noticed.
+        // Reversed, eval question_id 1 ("math q1") must resolve to mmlu_pro.id 8; an
+        // id-equality join still links 8 rows, so cardinality assertions still pass, but every
+        // row points at the wrong question and `links resolve to the correct question text`
+        // fails.
         DriverManager.getConnection("jdbc:sqlite:$datasetDb").use { c ->
             c.createStatement().use { s ->
                 s.execute("CREATE TABLE IF NOT EXISTS mmlu_pro (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT)")
             }
             c.prepareStatement("INSERT INTO mmlu_pro (question) VALUES (?)").use { ps ->
-                questions.forEach { ps.setString(1, it.text); ps.executeUpdate() }
+                questions.filter { it.inMmluPro }.reversed()
+                    .forEach { ps.setString(1, it.text); ps.executeUpdate() }
             }
         }
 
@@ -216,7 +236,10 @@ class BenchmarkE2EIntegrationTest {
             taxonomyService = mockTaxonomyService,
             evalStore = store,
             config = TaxonomyConfig(),
-            perfTracker = TaxonomyPerformanceTracker()
+            perfTracker = TaxonomyPerformanceTracker(),
+            // Points at the same temp dataset DB the store writes, so the pre-flight
+            // validator votes over this fixture's two models rather than the production cache.
+            ingestValidator = EvalIngestValidator(datasetDbPath)
         )
     }
 
@@ -234,12 +257,58 @@ class BenchmarkE2EIntegrationTest {
     @Test
     fun `pipeline loads both models and links the reserved pool`() {
         assertEquals(setOf(modelA, modelB), store.getLoadedModels().toSet())
-        assertEquals(16, store.getStats()["totalRows"], "2 models × 8 questions = 16 rows")
+        assertEquals(
+            2 * questions.size, store.getStats()["totalRows"],
+            "2 models × ${questions.size} questions"
+        )
         assertEquals(
             reservedIds.size,
             store.getLinkedReservedQuestionIds(listOf(modelA, modelB)).size,
             "4 reserved questions, all cross-linked to mmlu_pro + embeddings"
         )
+    }
+
+    @Test
+    fun `links resolve to the correct question text, not merely to some row`() {
+        // The assertion that actually discriminates. Cardinality checks pass under a wrong
+        // join; only comparing the linked mmlu_pro row's text against the eval row's text
+        // catches an id-space conflation. With mmlu_pro seeded in reverse, an id-equality
+        // join links the right NUMBER of rows and the wrong ones.
+        DriverManager.getConnection("jdbc:sqlite:$datasetDbPath").use { c ->
+            c.prepareStatement(
+                """
+                SELECT l.question_id, l.question_text, m.question
+                FROM eval_question_link l
+                JOIN mmlu_pro m ON m.id = l.mmlu_pro_row_id
+                """.trimIndent()
+            ).use { ps ->
+                val rs = ps.executeQuery()
+                var checked = 0
+                while (rs.next()) {
+                    val qid = rs.getInt("question_id")
+                    assertEquals(
+                        rs.getString("question"), rs.getString(2),
+                        "question_id $qid is linked to an mmlu_pro row holding a different question"
+                    )
+                    checked++
+                }
+                assertEquals(
+                    questions.count { it.inMmluPro }, checked,
+                    "every cached question must be linked exactly once"
+                )
+            }
+
+            // The uncached question must resolve to nothing rather than to a coincidental row.
+            c.prepareStatement(
+                "SELECT mmlu_pro_row_id FROM eval_question_link WHERE question_id = ?"
+            ).use { ps ->
+                ps.setInt(1, questions.first { !it.inMmluPro }.id)
+                val rs = ps.executeQuery()
+                assertTrue(rs.next(), "the unmatched question still gets a link row")
+                rs.getInt(1)
+                assertTrue(rs.wasNull(), "a question absent from mmlu_pro must have a NULL row id")
+            }
+        }
     }
 
     @Test

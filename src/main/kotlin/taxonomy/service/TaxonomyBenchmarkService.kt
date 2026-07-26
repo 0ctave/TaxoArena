@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import taxonomy.utils.TaxonomyPerformanceTracker
 import taxonomy.config.TaxonomyConfig
+import taxonomy.dataset.EvalIngestValidator
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.dataset.ModelEvalResult
@@ -28,7 +29,8 @@ class TaxonomyBenchmarkService(
     private val taxonomyService: TaxonomyService,
     private val evalStore: ModelEvalStore,
     private val config: TaxonomyConfig,
-    private val perfTracker: TaxonomyPerformanceTracker
+    private val perfTracker: TaxonomyPerformanceTracker,
+    private val ingestValidator: EvalIngestValidator
 ) {
     private val log = LoggerFactory.getLogger("taxonomy.BenchmarkService")
     private val dbWriteDispatcher = Dispatchers.IO.limitedParallelism(1)
@@ -136,7 +138,42 @@ class TaxonomyBenchmarkService(
         onProgress: ((BenchmarkLiveStats) -> Unit)? = null
     ): BenchmarkReport = coroutineScope {
         require(req.models.size >= 2) { "Need at least 2 models" }
-        val modelNames = req.models.map { it.modelName }
+        val requestedModels = req.models.map { it.modelName }
+
+        // ── [ARENA-INGEST] pre-flight ingest validation ─────────────────────────
+        // Runs BEFORE getResultsMatrix, because the matrix joins on question_id alone and
+        // therefore cannot tell a model that answered question 70 from a model whose zip
+        // numbered a different question 70. Once a mis-keyed model is in the matrix its rows
+        // are indistinguishable from good ones, and the resulting leaderboard is silently
+        // wrong — no downstream export records question provenance.
+        //
+        // FAIL models are excluded rather than tolerated; if that leaves fewer than two
+        // participants the run is aborted, because a "benchmark" of one model is not one.
+        val modelNames = run {
+            val ingest = ingestValidator.validate(requestedModels)
+            ingest.renderLines().forEach { log.info("[ARENA-INGEST] $it") }
+            val rejected = ingest.failed
+            if (rejected.isEmpty()) {
+                requestedModels
+            } else {
+                rejected.forEach { v ->
+                    log.error(
+                        "[ARENA-INGEST] EXCLUDED ${v.modelName} — ingest validation FAILED: " +
+                            v.reasons.joinToString(" | ")
+                    )
+                }
+                val kept = requestedModels.filterNot { m -> rejected.any { it.modelName == m } }
+                check(kept.size >= 2) {
+                    "[ARENA-INGEST] Cannot run benchmark: ${rejected.size} of ${requestedModels.size} " +
+                        "requested model(s) failed ingest validation (${rejected.joinToString(", ") { it.modelName }}), " +
+                        "leaving only ${kept.size} usable. Re-ingest the failing model(s) before benchmarking."
+                }
+                log.warn(
+                    "[ARENA-INGEST] proceeding with ${kept.size} of ${requestedModels.size} requested models"
+                )
+                kept
+            }
+        }
 
         val health = evalStore.verifyIngestion(modelNames)
         health.forEach { h ->
@@ -1141,7 +1178,7 @@ class TaxonomyBenchmarkService(
         }
 
         val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
-        val report = aggregate(completedResults, pairs, req, trajectory)
+        val report = aggregate(completedResults, pairs, req, trajectory, admittedModels = modelNames)
 
         // Export evaluated triples if this is the C1/MAIN condition
         val isExportCondition = req.condition.equals("MAIN", ignoreCase = true)
@@ -1339,7 +1376,11 @@ class TaxonomyBenchmarkService(
         results: List<QueryBenchmarkResult>,
         pairs: List<Pair<String, String>>,
         req: BenchmarkRequest,
-        trajectory: List<TrajectoryPoint> = emptyList()
+        trajectory: List<TrajectoryPoint> = emptyList(),
+        // Models that actually competed. Not req.models: a model rejected by [ARENA-INGEST]
+        // has no comparisons, so ranking it against ground truth would inject a meaningless
+        // rank into the correlation metrics.
+        admittedModels: List<String> = req.models.map { it.modelName }
     ): BenchmarkReport {
 
         // ─── Compute judge-GT agreement per leaf ───
@@ -1488,7 +1529,7 @@ class TaxonomyBenchmarkService(
             queryResults = results
         )
         val globalReport = try {
-            ValidationService.computeMetrics(dummyReport, req.models.map { it.modelName }, "OVERALL")
+            ValidationService.computeMetrics(dummyReport, admittedModels, "OVERALL")
         } catch (e: Exception) {
             null
         }
@@ -1508,11 +1549,37 @@ class TaxonomyBenchmarkService(
                     .groupingBy { it.tieSource ?: "<none>" }.eachCount()
                 val confs = evals.map { it.confidence }.sorted()
                 fun pct(p: Double) = confs[(confs.size * p).toInt().coerceAtMost(confs.size - 1)]
+
+                // DomainEvaluation.winner is a POSITION label ("Model A"/"Model B"), not a
+                // model name, so the raw tally reads "Model B=38" and says nothing about which
+                // model won until you join it against the pairing table by hand. Resolve it
+                // through pairEvaluations, whose key is "<modelA>_vs_<modelB>". Both tallies
+                // are kept: the positional one is the position-bias signal (a judge that
+                // always answers "B" shows up there and nowhere else), the resolved one is
+                // what a reader actually wants.
+                val winsByModel = mutableMapOf<String, Int>()
+                results.forEach { r ->
+                    r.pairEvaluations.forEach { (pairKey, evs) ->
+                        // Model names contain '_' (Meta-Llama-3_1-70B-Instruct) but not '_vs_'.
+                        val sides = pairKey.split("_vs_", limit = 2)
+                        if (sides.size == 2) {
+                            evs.forEach { e ->
+                                when (e.winner) {
+                                    "Model A" -> winsByModel.merge(sides[0], 1, Int::plus)
+                                    "Model B" -> winsByModel.merge(sides[1], 1, Int::plus)
+                                }
+                            }
+                        }
+                    }
+                }
                 log.info(
                     "[ARENA-VERDICT] evaluations=${evals.size} overQueries=${results.count { it.hadJudge }}" +
                         " positionFlips=$flips (${"%.1f".format(java.util.Locale.US, 100.0 * flips / evals.size)}%" +
                         " order-inconsistent, forced to TIE)" +
-                        " | winners: " + winners.entries.joinToString(", ") { "${it.key}=${it.value}" } +
+                        " | wins by model: " + (if (winsByModel.isEmpty()) "<unresolved>"
+                            else winsByModel.entries.sortedByDescending { it.value }
+                                .joinToString(", ") { "${it.key}=${it.value}" }) +
+                        " | by position slot: " + winners.entries.joinToString(", ") { "${it.key}=${it.value}" } +
                         " | tie sources: " + (if (tieSources.isEmpty()) "none" else tieSources.entries.joinToString(", ") { "${it.key}=${it.value}" }) +
                         " | confidence p10=${"%.3f".format(java.util.Locale.US, pct(0.10))}" +
                         " median=${"%.3f".format(java.util.Locale.US, pct(0.50))}" +
@@ -1531,9 +1598,9 @@ class TaxonomyBenchmarkService(
         }
 
         if (globalReport != null) {
-            log.info("GT Rank Correlation — Spearman ρ = ${"%.2f".format(java.util.Locale.US, globalReport.spearmanRho)}, Kendall τ = ${"%.2f".format(java.util.Locale.US, globalReport.kendallTau)} (n=${req.models.size} models, ${req.category ?: "All Domains"})")
+            log.info("GT Rank Correlation — Spearman ρ = ${"%.2f".format(java.util.Locale.US, globalReport.spearmanRho)}, Kendall τ = ${"%.2f".format(java.util.Locale.US, globalReport.kendallTau)} (n=${admittedModels.size} models, ${req.category ?: "All Domains"})")
         } else {
-            log.info("GT Rank Correlation — Spearman ρ = 1.00, Kendall τ = 1.00 (n=${req.models.size} models)")
+            log.info("GT Rank Correlation — Spearman ρ = 1.00, Kendall τ = 1.00 (n=${admittedModels.size} models)")
         }
 
         return BenchmarkReport(
