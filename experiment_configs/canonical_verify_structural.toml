@@ -67,6 +67,33 @@
 #  The separations matching to 9 dp alongside the partition is the part that
 #  matters: it means the same tree was reached by the same decisions, not that
 #  two different decision paths happened to converge on one shape.
+#
+#  ── TWO CERTIFICATE FIELDS ARE NOT REPRODUCIBLE ───────────────────────────
+#  Established by running the SAME code twice after the Tier 0 batch (7a5ca86):
+#
+#                     frozen         run A          run B
+#    trickle delta    1.110223e-16   3.330669e-16   2.220446e-16
+#    max rel d kappa  3.500885e-13   3.847323e-13   5.545846e-13
+#
+#  Run A and run B are the same commit, same config, same seed. So these two
+#  fields vary run to run and are NOT a consequence of any code change — an
+#  earlier commit message attributed the movement to the nearMisses removal
+#  changing thread interleaving, which is at most part of it. Routing is
+#  parallel and float accumulation over concurrently-routed queries is not
+#  associative, so the convergence RESIDUALS carry scheduling noise even when
+#  every decision is identical.
+#
+#  Consequence for how the certificate may be cited: `CERTIFIED`, `final
+#  iteration`, `edits delta` and `max 1-cos(mu)` are exact and reproducible.
+#  `trickle delta` and `max rel d kappa` are bounded, not reproducible — both
+#  land 7 to 10 orders below the 1e-6 tolerance in every run, and that bound is
+#  the claim the certificate supports. An earlier verification that reported the
+#  file as byte-identical was luck, and should not be restated as a
+#  reproducibility guarantee.
+#
+#  This is consistent with the separately measured finding that a node's kappa
+#  never reaches bit-identity between iterations, drifting at ~1e-13 while every
+#  gate outcome stays fixed.
 # ══════════════════════════════════════════════════════════════════════════
 
 datasetType   = "MMLU_PRO"
