@@ -349,7 +349,29 @@ class TaxonomyJudgeService(
         val rubric = node.judgeRubric ?: return
         if (sourceCorrectOptions.isEmpty()) return
         val (n, gram) = maxSharedNgram(rubric, sourceCorrectOptions)
-        if (n >= 5) {
+
+        // A long shared span is only evidence of MEMORISATION if it is specific to one answer.
+        // A span occurring across many correct options is domain vocabulary, and penalising it
+        // penalises exactly the domains whose terminology is multi-word.
+        //
+        // This fired on 'Dormant Commerce Clause and State Protectionism' for the 5-token span
+        // "the privileges and immunities clause" — a named clause of the US Constitution, not a
+        // leaked answer. Of 86 clean nodes the next-highest spans were 4 tokens, and every one of
+        // those was law or economics ("Real Property Rights", "Criminal Liability and Mens Rea",
+        // "Market Equilibrium and Elasticity"). The smoke test could not have caught it: History
+        // and Computer science topped out at 2 tokens because they have no multi-word doctrine
+        // names. Raising the threshold to 6 would only move the failure to a longer doctrine.
+        val norm = { s: String -> s.lowercase().replace(Regex("[^a-z0-9\\s]"), " ")
+            .split(Regex("\\s+")).filter { it.isNotBlank() }.joinToString(" ") }
+        val occurrences = if (gram.isBlank()) 0 else sourceCorrectOptions.count { norm(it).contains(gram) }
+
+        if (n >= 5 && occurrences > 1) {
+            log.info(
+                "[JUDGE-LEAK] node '${node.label}': $n-token span \"$gram\" appears in" +
+                    " $occurrences of ${sourceCorrectOptions.size} source options — domain" +
+                    " vocabulary rather than a memorised answer; not treated as leakage."
+            )
+        } else if (n >= 5) {
             // A GATE, not a warning, and deliberately at save time rather than at judgment.
             //
             // The alternative — asserting the answer text is absent from the assembled judge

@@ -282,9 +282,15 @@ object DiagnosticsBundle {
         // `-uno`: tracked modifications only. Untracked files cannot have contributed to the
         // build, so they are irrelevant to whether this run is reproducible.
         val porcelain = run("git", "status", "--porcelain", "--untracked-files=no").orEmpty()
+        // Porcelain v1 is "XY PATH". Slicing at a fixed offset went wrong by one and produced
+        // "onfig/application.yml" — which then failed to match the exclusion list, so the flag
+        // read dirty on a tree whose only modification was the by-design-local credentials file.
+        // Trimming first and taking everything after the first space handles one- and two-letter
+        // status codes alike.
         val modified = porcelain.lines()
             .filter { it.isNotBlank() }
-            .map { it.substring(minOf(3, it.length)).trim() }
+            .map { it.trim().substringAfter(' ').trim() }
+            .filter { it.isNotEmpty() }
             .filter { path -> EXPECTED_LOCAL_MODIFICATIONS.none { path.contains(it) } }
 
         Git(
