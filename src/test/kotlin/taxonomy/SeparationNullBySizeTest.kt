@@ -560,7 +560,7 @@ class SeparationNullBySizeTest {
         capture.start(); splitLog.level = Level.DEBUG; splitLog.isAdditive = false; splitLog.addAppender(capture)
 
         data class Row(
-            val label: String, val depth: Int, val n: Int, val k: Int,
+            val id: String, val label: String, val depth: Int, val n: Int, val k: Int,
             val observed: Double, val p50: Double, val p95: Double,
             val q: Double, val reach: Double
         )
@@ -608,7 +608,7 @@ class SeparationNullBySizeTest {
                 val p50 = percentile(reached, 0.50)
                 val p95 = percentile(reached, 0.95)
                 val q = reached.count { it < site.dasguptaDeltaNorm }.toDouble() / reached.size
-                rows.add(Row(label, site.depth, m, site.childIds.size, site.dasguptaDeltaNorm, p50, p95, q, reachPct))
+                rows.add(Row(site.id, label, site.depth, m, site.childIds.size, site.dasguptaDeltaNorm, p50, p95, q, reachPct))
                 println(
                     "%-46s %5d %5d %3d | %8.5f | %8.5f %8.5f | %6.3f | %5.1f%%".format(
                         java.util.Locale.US, label, site.depth, m, site.childIds.size,
@@ -620,6 +620,79 @@ class SeparationNullBySizeTest {
         splitLog.detachAppender(capture); capture.stop(); splitLog.isAdditive = true
 
         if (rows.isEmpty()) { println("\nno usable rows"); return }
+
+        // ── Export: per-split, and per-leaf provenance ───────────────────────────
+        // The point of writing these out is that every leaf then carries the null
+        // quantile of the split that FOUNDED it, so downstream analysis can report a
+        // distribution instead of a caveat — and can join low-q cells against the
+        // fringe/redundancy/non-recurrence findings per node rather than inferring a
+        // shared cause from three separate aggregates.
+        //
+        // Computed offline from the frozen snapshot on purpose. Doing it inline would
+        // cost reps x splitSingleNode per proposing node and would change the freeze;
+        // this changes nothing and needs no re-run.
+        fun esc(s: String) = "\"" + s.replace("\"", "\"\"") + "\""
+        val outDir = java.io.File("docs/data").apply { mkdirs() }
+        val byRowId = rows.associateBy { it.id }
+
+        java.io.File(outDir, "within_node_null_splits.csv").printWriter().use { w ->
+            w.println("snapshot_id,node_id,label,depth,n,k,observed_sep,null_p50,null_p95,q,reach_pct,reps")
+            rows.sortedBy { it.q }.forEach { row ->
+                w.println("${esc(snapId)},${esc(row.id)},${esc(row.label)},${row.depth},${row.n},${row.k}," +
+                    "%.6f,%.6f,%.6f,%.4f,%.1f,%d".format(
+                        java.util.Locale.US, row.observed, row.p50, row.p95, row.q, row.reach, r))
+            }
+        }
+
+        // A leaf's founding split is the split at its tree parent. But the founding
+        // split alone UNDERSTATES exposure: a low-q split high in the tree taints its
+        // whole subtree without being any leaf's founding split. Computer science is
+        // the case in point — 550 queries under a q=0.007 split, and not one of its
+        // leaves is founded by it. So also walk the lineage and record the WORST
+        // ancestor quantile, restricted to ancestors whose null was not censored
+        // (reach >= 90%), since a censored q is not evidence of anything.
+        fun lineage(leaf: taxonomy.service.SerialNode): List<Row> {
+            val out = mutableListOf<Row>()
+            var cur: taxonomy.service.SerialNode? = leaf
+            val guard = HashSet<String>()
+            while (cur != null && guard.add(cur.id)) {
+                val pid = cur.treeParentId ?: cur.parentIds.firstOrNull() ?: break
+                byRowId[pid]?.let { out.add(it) }
+                cur = byId[pid]
+            }
+            return out
+        }
+        val leaves = g.nodes.filter { it.childIds.isEmpty() }
+        var withProvenance = 0
+        java.io.File(outDir, "within_node_null_leaves.csv").printWriter().use { w ->
+            w.println("snapshot_id,leaf_id,leaf_label,leaf_n,founding_split_id,founding_split_label," +
+                "founding_observed_sep,founding_null_p50,founding_q,founding_reach_pct," +
+                "min_ancestor_q_clean,min_ancestor_q_clean_node,ancestor_splits_measured")
+            leaves.sortedBy { it.label ?: it.id }.forEach { leaf ->
+                val parentId = leaf.treeParentId ?: leaf.parentIds.firstOrNull()
+                val p = parentId?.let { byRowId[it] }
+                if (p != null) withProvenance++
+                val anc = lineage(leaf)
+                val worstClean = anc.filter { it.reach >= 90.0 }.minByOrNull { it.q }
+                w.println(
+                    "${esc(snapId)},${esc(leaf.id)},${esc(leaf.label ?: "")}," +
+                        "${regionQueryIds(leaf, byId).size},${esc(parentId ?: "")}," +
+                        "${esc(p?.label ?: "")}," +
+                        (if (p != null) "%.6f,%.6f,%.4f,%.1f,".format(
+                            java.util.Locale.US, p.observed, p.p50, p.q, p.reach)
+                        else ",,,,") +
+                        (if (worstClean != null) "%.4f,${esc(worstClean.label)},".format(
+                            java.util.Locale.US, worstClean.q)
+                        else ",,") +
+                        "${anc.size}"
+                )
+            }
+        }
+        println()
+        println("wrote docs/data/within_node_null_splits.csv  (${rows.size} splits)")
+        println("wrote docs/data/within_node_null_leaves.csv  (${leaves.size} leaves, " +
+            "$withProvenance with a founding-split null)")
+
         println()
         println("=".repeat(120))
         val belowP50 = rows.count { it.observed < it.p50 }

@@ -250,12 +250,38 @@ class TaxonomySplitter(
         // acceptance bar below (floor, chance-corrected separation on the routed
         // partition, sibling distinctness); an incoherent merge fails separation
         // and dies exactly as before.
-        // Flat, null-calibrated bar (see NullSeparationCalibrationTest): the value
-        // is chosen at the isotropic-selection noise ceiling, i.e. the p95 of the
-        // separation EM manufactures on structureless clouds — partitions below it
-        // are optimizer noise at any node size. Small populations keep the 2x
-        // margin (their proposals rest on fewer points; the EM floor already
-        // suppresses most chance splits there).
+        // Flat bar, positioned BETWEEN two nulls. Both are measured by driving this
+        // very function on synthetic clouds (SeparationNullBySizeTest); the curve is
+        // tabulated in docs/separation_null_by_size.md.
+        //
+        //   isotropic null  p95 = 0.0055 .. 0.0093 over n = 75..900   ("more than nothing?")
+        //   this bar             0.025
+        //   within-node null p50 = 0.0396 at n = 406 (Philosophy)       ("more than elongation?")
+        //
+        // The gap matters. J is a scatter-reduction criterion with a random-partition
+        // correction, so cutting an elongated UNIMODAL cloud along its principal axis
+        // scores well above the isotropic null without any discrete structure being
+        // present. Dropping the bar to the isotropic floor would therefore admit
+        // anisotropy-carving, and no amount of resampling confidence on dJ would catch
+        // it — dJ rewards exactly the thing being mistaken for structure. The bar is
+        // the only gate that asks the second question.
+        //
+        // Flat rather than a function of n because the size effect is small and
+        // two-regime: for n >= 160 the null is a clean quantile decaying 0.0090 ->
+        // 0.0055 (1.64x over a 5.6x span of n); below n ~ 160 minClusterFrac does the
+        // rejecting (at n = 75, EM collapses on 94% of structureless clouds before the
+        // statistic is computed) and the measured p95 there is censored, not small.
+        // One constant at the curve's maximum is conservative across the whole range.
+        //
+        // The 2x small-node margin below is unreachable on the direct path: line ~83
+        // already requires mass >= 2*minClusterSize, and mass <= |targetQueries|. Only
+        // the diffuse-residual branch above can enter it, where targetQueries becomes
+        // the residual subset (floor minClusterSize, so 30..59 is possible) and
+        // enableResidualSplitGate defaults to isDag. It has never fired: bar=0.0500
+        // appears zero times in the repo's logs against 5628 of bar=0.0250. Kept
+        // because it is directionally right for the small-n CONDITIONAL null — the
+        // proposals that do survive EM collapse at n < 160 rest on fewer points — not
+        // because it is load-bearing today.
         val requiredEps = if (targetQueries.size < 2 * minClusterSize)
             2.0 * config.formalism.proposalSeparationBar
         else
@@ -349,8 +375,17 @@ class TaxonomySplitter(
         node.dasguptaDeltaNorm = sepScore
 
         // Min-pairwise gate: every child pair must clear the same bar the
-        // sibling-merger tests, or the proposal is rejected outright (reachable
-        // only at k=2, where coarsening cannot go lower).
+        // sibling-merger tests, or the proposal is rejected outright.
+        //
+        // This is the load-bearing separation gate — in the repo's logs it accounts
+        // for 5682 rejections against 0 for the k-way gate below. Two facts explain
+        // the asymmetry. At routed k=2 there is exactly one pair, and clusterStats()
+        // builds the same ClusterStats(n, sum) the k-way overload builds internally,
+        // so minPairSep and sepScore are the SAME NUMBER and this gate always fires
+        // first. Above k=2 the coarsening loop has already merged every pair below
+        // the bar, so this gate cannot fire and the joint score is bounded below by
+        // its pairs. Confirmed independently on synthetic clouds: bindP95 matches the
+        // k-way p95 to five decimals at every n (docs/separation_null_by_size.md).
         val finalStats = routedClusters.map { clusterStats(it, childDim) }
         var minPairSep = Double.MAX_VALUE
         for (i in finalStats.indices) {
@@ -361,7 +396,8 @@ class TaxonomySplitter(
         }
         if (minPairSep < requiredEps) {
             log.info(
-                "[NO-SPLIT] '${node.label}' reason=min-pair n=${targetQueries.size} k=$k" +
+                "[NO-SPLIT] '${node.label}' reason=min-pair n=${targetQueries.size}" +
+                    " k=${routedClusters.size} emK=$k" +
                     " sep=${"%.4f".format(java.util.Locale.US, minPairSep)}" +
                     " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
             )
@@ -370,7 +406,8 @@ class TaxonomySplitter(
                 dJ = null, seDJ = null, z = null, dV = null,
                 decision = "NO_PROPOSAL",
                 reason = "min_pair_sep_below_bar(sep=" +
-                    "${DiagFmt.f(minPairSep, 5)},bar=${DiagFmt.f(requiredEps, 5)},k=$k)",
+                    "${DiagFmt.f(minPairSep, 5)},bar=${DiagFmt.f(requiredEps, 5)}" +
+                    ",k=${routedClusters.size},emK=$k)",
                 nSite = targetQueries.size
             )
             return false
@@ -378,22 +415,23 @@ class TaxonomySplitter(
 
         log.debug("Eval '${node.label}': k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
 
-        if (sepScore < requiredEps) {
-            log.info(
-                "[NO-SPLIT] '${node.label}' reason=k-way n=${targetQueries.size} k=$k" +
-                    " sep=${"%.4f".format(java.util.Locale.US, sepScore)}" +
-                    " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
-            )
-            taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
-                iter = -1, type = "GROW", siteId = node.id, siteLabel = node.label,
-                dJ = null, seDJ = null, z = null, dV = null,
-                decision = "NO_PROPOSAL",
-                reason = "sep_below_bar(sep=" +
-                    "${DiagFmt.f(sepScore, 5)},bar=${DiagFmt.f(requiredEps, 5)},k=$k)",
-                nSite = targetQueries.size
-            )
-            return false
-        }
+        // The joint k-way gate that used to sit here has been removed. It was dead
+        // code by construction, not merely unused. At routed k=2 there is exactly one
+        // pair, and clusterStats() builds the same ClusterStats(n, sum) the k-way
+        // overload builds internally, so sepScore and minPairSep are the SAME NUMBER
+        // and the min-pair gate above always fires first. Above k=2 the coarsening
+        // loop has already merged every pair below the bar; the joint score is not
+        // PROVEN to be bounded below by its pairs there, but it was never observed
+        // below the bar in any run. Measured both ways before removal: 5682
+        // min-pair rejections against 0 k-way across every log in the repo, and on
+        // synthetic clouds the two statistics agree to five decimals at every n
+        // (docs/separation_null_by_size.md). sepScore is still computed — it is the
+        // value persisted as dasguptaDeltaNorm and the one the within-node null
+        // diagnostic reads.
+        //
+        // Min-pair is therefore the splitter's only separation gate. What it asks is
+        // "is this partition more than a cut through the node's own elongation?",
+        // which dJ structurally cannot ask, because dJ rewards elongation.
 
         // ── Sibling distinctness guard (same scale as the split/merge gates) ──
         val isUnique = routedClusters.all { cluster ->

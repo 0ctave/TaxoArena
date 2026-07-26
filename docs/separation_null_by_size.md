@@ -56,9 +56,11 @@ grid, against a null whose worst point is 0.00933. That is a margin of 2.7x at t
 proposes k = 2 on structureless clouds in 100% of reached replicates (`emK: k2=...`). At
 routed k = 2 the min-pair and k-way statistics are computed from identical sufficient
 statistics, so they are the same number — visible here as `bindP95` agreeing with `p95` to
-five decimals at every row. The k-way gate (`sepScore < requiredEps`) is consequently
-unreachable at k = 2, and the coarsening loop makes it near-unreachable above it: it has
-rejected nothing in 5682 opportunities across the repo's logs.
+five decimals at every row. The joint k-way gate (`sepScore < requiredEps`) was consequently
+unreachable at k = 2, and the coarsening loop made it near-unreachable above it: it rejected
+nothing in 5682 opportunities across the repo's logs. **It has since been removed**, leaving
+min-pair as the splitter's only separation gate. `sepScore` is still computed — it is the
+value persisted as `dasguptaDeltaNorm` and the one the within-node diagnostic below reads.
 
 ## Consequence for the small-node margin
 
@@ -101,8 +103,19 @@ reach >= 90% is what separates them:
 
 The depth gradient looks strong on the full set (depth 1: 8% below p50; depth 3: 71%) and
 **disappears once censoring is controlled**: rho(q, depth) = -0.230 over all 50, but -0.071
-within the clean subset. rho(q, n) = +0.491 survives. Depth is not the variable; node size
-is, and most of that is the censoring.
+within the clean subset. Depth is not the variable.
+
+`rho(q, n) = +0.491` does survive into the clean subset, and it is a POWER effect, not a
+quality one. The isotropic table above shows the null tightening with n (p95 0.0090 -> 0.0055
+from n=160 to n=900), and the within-node null behaves the same way. For a fixed true effect,
+a larger node therefore lands further into its own null's tail purely because that null is
+narrower. Rising q with n is what constant structure quality predicts, not evidence that
+large nodes split better.
+
+The consequence matters for how the failures below are read. Small-node failures are at least
+partly **under-powered rather than spurious**. "These splits cannot be distinguished from
+elongation" is supported; "these splits are elongation" is not, and the size correlation is
+itself evidence for the weaker reading.
 
 ### The six splits that fail a clean within-node null
 
@@ -118,6 +131,43 @@ is, and most of that is the censoring.
 All are k=2. Psychology (depth 1, n=629, observed 0.02734 against null p50 0.02639, q=0.767)
 is the marginal case: it clears its own null median by less than the width of the bar.
 
+### Computer science: the case that shows what the null cannot see
+
+Computer science is the standout failure — depth 1, n=550, 100% reach, q=0.007 — and it is
+also the site with the MOST statistical power, so the under-powered reading above does not
+rescue it. Its actual partition (verified against the frozen snapshot):
+
+```
+Computer science (550)                                            sep=0.02797  q=0.007
+├── Foundational Computing Systems and Data Principles (144)       sep=0.06481  q=0.889
+│   ├── Foundational Computer Security and Cryptographic Systems (54)
+│   ├── Legacy Systems Programming and Debugging Fundamentals (47)
+│   └── Data Representation and Information Theory Fundamentals (46)
+└── Formal Statement Validation and Logical Discrimination (419)   sep=0.06730  q=1.000
+    ├── Formal Statement Discrimination and Validation (116)       sep=0.05777  q=0.285
+    │   ├── Advanced Algebraic Group and Ring Theory (47)
+    │   └── Formal Logical Statement Discrimination (71)
+    ├── Computational Probability and Information Theory (93)      sep=0.03388  q=0.000
+    └── Statistical Model Validation and Inference Discrimination (225)  sep=0.09256  q=1.000
+        ├── Statistical Inference and Hypothesis Testing (84)
+        ├── Time Series Model Diagnostics and Validation (41)
+        ├── Logical Statement Veracity Discrimination (49)
+        └── Machine Learning Model Theory and Evaluation (55)
+```
+
+The split separates systems CS (144: security, legacy programming, data representation) from
+statistics, formal logic and mathematics labelled as CS (419) — a branch that contains
+"Advanced Algebraic Group and Ring Theory", i.e. pure mathematics, inside the Computer
+science domain. That is the corpus contamination finding (the 25.8% reassignment rate, the
+label-geometry disagreement) surfacing at the domain level, and it is semantically real.
+
+It is also precisely the configuration the caveat below describes. A genuinely heterogeneous
+node has covariance elongated along the very axis that separates its parts, so the bootstrap
+reproduces that elongation and the true split scores unremarkably against it. **The split
+whose meaning is most obvious is the one this null penalises hardest.** Note also that both
+children then split at q = 0.889 and q = 1.000: once the contamination is separated, the
+substructure within each part clears its own null comfortably.
+
 ### Limit on the interpretation
 
 A node that genuinely contains two clusters has an empirical covariance already **elongated
@@ -128,12 +178,62 @@ p50" over-flags: it is necessary evidence of anisotropy-carving, not sufficient.
 the two would need a null built on the covariance with the candidate split direction removed,
 or a direct unimodality test (dip, or mixture BIC). Not done here.
 
+This is not an abstract concession — Computer science above is a worked instance of it, with
+the semantics checkable by reading the child labels.
+
 So the defensible claim is bounded: **a named minority of splits (6 of 27 with clean nulls,
 22%) cannot be distinguished from a cut through their own node's elongation, and about half
 (13 of 27) fall inside the range their own null routinely produces.** That is a real
 limitation with a list attached. It is not a single mechanism explaining the taxonomy's
 redundancy, non-recurrence and small fringe, because 78% of clean-null splits do clear their
-own null median.
+own null median, and one of the six is demonstrably a real distinction the null cannot see.
+
+### Where the bar actually sits
+
+Against the within-node p50 values measured here (0.033-0.063 across the clean sites), the
+bar at 0.025 is **permissive relative to that null** — it admits partitions that node-level
+resampling produces routinely. Against the isotropic null (0.0055-0.0093) it is conservative
+by 2.7x to 4.5x. Both statements are true at once and neither is the whole picture: 78% of
+clean-reach splits clear their own null median regardless of where the bar sits, so the
+permissiveness only decides the marginal cases — which are precisely the six named above.
+
+### Per-node provenance export
+
+The harness writes two CSVs so downstream analysis can report the distribution rather than
+repeat the caveat:
+
+* `docs/data/within_node_null_splits.csv` — one row per accepted split: node id, label,
+  depth, n, k, observed separation, null p50/p95, q, reach%.
+* `docs/data/within_node_null_leaves.csv` — one row per leaf, carrying both the null quantile
+  of the split that FOUNDED it (its tree parent's) and `min_ancestor_q_clean`, the worst
+  quantile anywhere in its lineage among ancestors whose null was not censored.
+
+The leaf file is the useful one: it gives every cell a provenance flag ("founded by a split
+at q = 0.97" against "q = 0.007"), which lets the low-q cells be joined per node against the
+fringe-size, leaderboard-redundancy and cross-seed-recurrence findings, instead of a shared
+cause being inferred from three separate aggregates.
+
+**The lineage column is the one to report, because the founding split alone understates
+exposure by about 3x.** Of 88 leaves holding 9186 queries:
+
+| flagged by | leaves | queries | share of leaf-held corpus |
+|---|---:|---:|---:|
+| founding split below its own null median (clean reach) | 7 | 845 | 9.2% |
+| **any clean ancestor below its null median** | **25** | **1807** | **19.7%** |
+| any clean ancestor below its null 5th percentile | 13 | 944 | 10.3% |
+
+Computer science is the whole reason for the gap: its q = 0.007 split produced two internal
+nodes, so **not one of the nine leaves beneath it is flagged by founding split**, yet all
+nine sit under it. Same pattern for Discrete Quantitative Problem Solving (q = 0.060, seven
+leaves) and Organismal Biology (q = 0.138, two leaves).
+
+Read with the caveat above, this is an upper bound on the concern rather than a count of
+defective cells — Computer science alone contributes nine of the twenty-five leaves, and its
+split is the one this null most clearly gets wrong.
+
+Both are computed offline from the frozen snapshot. Doing it inline would cost
+`reps x splitSingleNode` per proposing node and would change the freeze; this changes nothing
+and needs no re-run.
 
 ## Reproducing
 

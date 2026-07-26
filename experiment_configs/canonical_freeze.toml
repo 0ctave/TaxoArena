@@ -38,13 +38,36 @@
 #  to 20 recovers 11. That substructure is real but small-grained, and cells
 #  that small are individually unmeasurable (r ~ 0.45 at ~18 held-out queries).
 #
-#  proposalSeparationBar stays 0.025, calibrated between two measured nulls
-#  (isotropic p95 0.0209, within-domain 0.068-0.130). It binds only 6 nodes.
-#  Philosophy's best split scores 0.0212 -- between the 95th and 99th percentile
-#  of the isotropic null, i.e. at the boundary of detectability -- and the bar
-#  declines it. Philosophy is therefore a single 406-query leaf, which is a
-#  reported property with a measured cost: it is among the least evaluatively
-#  informative cells in the taxonomy.
+#  proposalSeparationBar stays 0.025. It binds only 6 nodes. The value sits
+#  BETWEEN two nulls, both measured by driving the production splitSingleNode
+#  itself (SeparationNullBySizeTest; curve in docs/separation_null_by_size.md;
+#  the driver is validated by replaying the frozen Philosophy node, which
+#  reproduces sep=0.02077 against this run's logged 0.0208):
+#
+#    isotropic null   p95 0.0055-0.0093 over n=75..900   "more than nothing?"
+#    this bar             0.025
+#    within-node null p50 0.0396, p95 0.0452 at n=406    "more than elongation?"
+#
+#  The gap is the point, and it is 6.6x -- far larger than any dependence on n,
+#  which is 1.64x over a 5.6x span of node size. J is a scatter-reduction
+#  criterion with a random-partition correction, so cutting an elongated
+#  UNIMODAL cloud along its principal axis beats the isotropic null without any
+#  discrete structure being present. A bar at the isotropic floor would admit
+#  that, and no confidence gate on dJ could catch it, because dJ rewards the
+#  very thing being mistaken for structure.
+#
+#  Philosophy's best split scores 0.0208: about 3x the isotropic p99 (0.0070),
+#  but BELOW the median of its own within-node null. Against noise it is real;
+#  against its own anisotropy it is not, and the bar declines it. Philosophy is
+#  therefore a single 406-query leaf -- a reported property with a measured
+#  cost, being among the least evaluatively informative cells in the taxonomy.
+#
+#  Superseded: an earlier header cited isotropic p95 0.0209 / within-domain
+#  0.068-0.130 from NullSeparationCalibrationTest. That harness scores EM's hard
+#  assignment in the PCA subspace with the k-gate disabled, whereas production
+#  scores the ROUTED 256-d partition after coarsening -- the same clouds differ
+#  by ~3x between the two. Those numbers never measured the quantity this bar
+#  gates. Use the production-path driver.
 #
 #  ── Verify before citing this run ─────────────────────────────────────────
 #   * run_manifest.json: "dirty": false, commit recorded, config_sha256 present
