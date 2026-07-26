@@ -129,15 +129,57 @@ object BtMmFitter {
      * to USE the result when it is not; this function will still return numbers, because several
      * callers legitimately fit pooled statistics where connectivity holds.
      */
+    const val DEFAULT_MAX_ITER = 200
+
     /**
-     * Sweeps allowed before giving up. Raised from 200 after the first multi-pair arena run:
-     * 2264 fits reported non-convergence, but their final deltas ran min 1.0e-6, median 9.0e-6,
-     * max 6.9e-4 against a 1e-6 tolerance — every one of them a hair short rather than stuck. MM
-     * for Bradley-Terry converges monotonically but slowly, so that was a sweep-budget artifact
-     * being reported as a modelling failure. The iteration is O(K^2) on a handful of models, so
-     * the extra headroom is close to free.
+     * Convergence is declared when the MM step falls below this fraction of theta's own standard
+     * error, rather than below a fixed absolute number.
+     *
+     * A fixed tolerance is the wrong shape for this. On the first multi-pair arena run 2264 fits
+     * reported non-convergence at a 1e-6 tolerance, with deltas of median 9.0e-6 and max 6.9e-4 —
+     * while the per-leaf SEs on the same parameter were 1.1 and, on an earlier run, 3.35 to 6.67.
+     * The numerical residual was three to four orders of magnitude BELOW the statistical
+     * uncertainty, so those warnings reported precision the data cannot express. (The construction
+     * side had the identical defect: tau = 1e-6 against SE(dJ) = 5.85e-5.)
+     *
+     * Worse, an absolute threshold penalises the best-determined fits. The 15 largest residuals in
+     * that run all sat on the RICHEST comparison graphs — 106 to 163 comparisons — because more
+     * evidence means stronger separation, larger |theta|, and therefore larger absolute steps at
+     * equal relative precision. Ranking by comparisons against delta gave Spearman -0.29 overall
+     * but with the entire tail on the dense end.
+     *
+     * Scaling by SE/100 makes "converged" mean "resolved far beyond what the data can
+     * distinguish", so a warning is again evidence of a real problem.
      */
-    const val DEFAULT_MAX_ITER = 1000
+    const val SE_FRACTION_FOR_CONVERGENCE = 0.01
+
+    /**
+     * Lower bound on min_i SE(theta_i) at the current estimate, from the Fisher diagonal alone.
+     *
+     * F_ii = sum_j n_ij p_ij (1 - p_ij), and the constrained covariance satisfies
+     * diag(F^-1)_ii >= 1 / F_ii, so 1/sqrt(F_ii) under-estimates the true SE. Using a lower bound
+     * makes the derived threshold conservative — stricter than the honest SE would require — and
+     * costs one O(K^2) pass with no matrix inversion.
+     */
+    private fun minSeLowerBound(s: DoubleArray, w: Array<DoubleArray>): Double {
+        val K = s.size
+        var best = Double.MAX_VALUE
+        for (i in 0 until K) {
+            var fii = 0.0
+            for (j in 0 until K) {
+                if (j == i) continue
+                val nij = w[i][j] + w[j][i]
+                if (nij <= 0.0) continue
+                val pij = 1.0 / (1.0 + exp(s[j] - s[i]))
+                fii += nij * pij * (1.0 - pij)
+            }
+            if (fii > 0.0) {
+                val se = 1.0 / sqrt(fii)
+                if (se < best) best = se
+            }
+        }
+        return if (best == Double.MAX_VALUE) 0.0 else best
+    }
 
     fun fit(
         models: List<String>,
@@ -176,6 +218,7 @@ object BtMmFitter {
         var s = DoubleArray(K) { 0.0 }
         var itersUsed = maxIter
         var finalDelta = Double.NaN
+        var effectiveTol = tol
 
         for (iter in 0 until maxIter) {
             val sNew = DoubleArray(K)
@@ -200,15 +243,22 @@ object BtMmFitter {
             val delta = sNew.zip(s.toList()).maxOf { (a, b) -> abs(a - b) }
             s = sNew
             finalDelta = delta
-            // Was `return@repeat`, which returns from the lambda for THIS iteration rather
-            // than leaving the loop — so the fitter always ran the full 200 sweeps and the
-            // convergence check did nothing. Numerically harmless once converged, but it hid
-            // whether the fit converged at all, which is what the diagnostic below reports.
-            if (delta < tol) { itersUsed = iter + 1; break }
+            // Stop against theta's own standard error, not a fixed number: `tol` is only an
+            // absolute floor for the degenerate case where the information is ~0. See
+            // SE_FRACTION_FOR_CONVERGENCE for why an absolute threshold is the wrong shape and
+            // why it penalised the best-determined fits.
+            //
+            // Was `return@repeat`, which returned from the lambda for THIS iteration rather than
+            // leaving the loop — so the fitter always ran every sweep and the convergence check
+            // did nothing. Numerically harmless once converged, but it hid whether the fit
+            // converged at all.
+            val seScale = minSeLowerBound(s, w)
+            effectiveTol = maxOf(tol, seScale * SE_FRACTION_FOR_CONVERGENCE)
+            if (delta < effectiveTol) { itersUsed = iter + 1; break }
         }
 
         val ident = assessIdentifiability(models, pairStats)
-        val converged = finalDelta.isFinite() && finalDelta < tol
+        val converged = finalDelta.isFinite() && finalDelta < effectiveTol
         if (!ident.identified) {
             // Structural, and not fixable by more sweeps: say so plainly rather than letting a
             // convergence warning imply the budget is the problem.
@@ -222,12 +272,14 @@ object BtMmFitter {
             // so a delta within a couple of orders of the tolerance is a stopped-early fit whose
             // scores are fine to two more decimal places than anything downstream uses; treating
             // that as a failure buried the cases that matter under thousands of benign warnings.
-            val nearlyThere = finalDelta.isFinite() && finalDelta < tol * 100.0
-            val msg = "[ARENA-BT] fit stopped at $maxIter sweeps (final delta=" +
-                "${"%.3e".format(java.util.Locale.US, finalDelta)}, tol=${"%.1e".format(java.util.Locale.US, tol)})" +
-                " models=$K comparisons=${"%.1f".format(java.util.Locale.US, ident.totalComparisons)}"
-            if (nearlyThere) log.debug("$msg — within 100x tol, treated as converged for reporting")
-            else log.warn("$msg — materially short of the fixed point; scores are not a stable MLE")
+            log.warn(
+                "[ARENA-BT] fit stopped at $maxIter sweeps still short of SE/100 (final delta=" +
+                    "${"%.3e".format(java.util.Locale.US, finalDelta)}, threshold=" +
+                    "${"%.3e".format(java.util.Locale.US, effectiveTol)})" +
+                    " models=$K comparisons=${"%.1f".format(java.util.Locale.US, ident.totalComparisons)}" +
+                    " — the residual is now large relative to theta's own uncertainty, so this is a" +
+                    " real failure rather than a tolerance artifact"
+            )
         } else {
             log.debug(
                 "[ARENA-BT] fit converged in $itersUsed sweeps (delta=" +

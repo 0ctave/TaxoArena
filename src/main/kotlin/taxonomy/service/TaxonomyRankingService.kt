@@ -681,6 +681,57 @@ data class AggregatedLeaderboard(
             tol = 1e-6
         )
 
+        // ── Gauge / coverage diagnostic ──────────────────────────────────────────
+        // Bradley-Terry identifies only DIFFERENCES, so each per-leaf fit fixes its own gauge by
+        // centring over the models present in that leaf. Averaging those theta across leaves is
+        // therefore unbiased only under complete coverage, and an adaptive scheduler allocates by
+        // information gain, which correlates presence with strength.
+        //
+        // This aggregate does NOT average theta: step 1 above pools sufficient statistics — wins,
+        // ties and comparisons — and fits ONCE. Pooling counts carries no gauge, so the point
+        // estimate is immune to that failure. The check below exists to keep that true: it fits
+        // the leaf-average path as well and reports whether the two paths still rank alike. If
+        // they diverge, aggregation has started doing something and it needs explaining.
+        //
+        // It also reports coverage explicitly. Every persisted leaf should already contain every
+        // model, because TaxonomyBenchmarkService refuses to persist an unidentified fit and
+        // `identified` requires an empty isolated set — so incomplete leaves never reach here.
+        // A non-zero hole count means that guard has been bypassed.
+        run {
+            val leafThetas = eligible.filter { it.nodeId !in inconsistentLeafIds }
+            if (leafThetas.size >= 2 && allModels.size >= 2) {
+                val holes = leafThetas.sumOf { st -> allModels.count { it !in st.btScores.keys } }
+                val leafAvg = allModels.associateWith { m ->
+                    val vs = leafThetas.mapNotNull { it.btScores[m] }
+                    if (vs.isEmpty()) 0.0 else vs.average()
+                }
+                fun rankOf(scores: Map<String, Double>) =
+                    allModels.sortedByDescending { scores[it] ?: 0.0 }
+                val pooledOrder = rankOf(globalScores)
+                val avgOrder = rankOf(leafAvg)
+                val maxRankShift = allModels.maxOf {
+                    kotlin.math.abs(pooledOrder.indexOf(it) - avgOrder.indexOf(it))
+                }
+                val dispersions = leafThetas.map { st ->
+                    val vs = st.btScores.values
+                    if (vs.isEmpty()) 0.0 else (vs.max() - vs.min())
+                }
+                val dispRatio = dispersions.filter { it > 0.0 }.let {
+                    if (it.isEmpty()) 1.0 else it.max() / it.min()
+                }
+                val msg = "[ARENA-GAUGE] leaves=${leafThetas.size} models=${allModels.size}" +
+                    " coverageHoles=$holes" +
+                    " pooledVsLeafAvg: identicalRanking=${pooledOrder == avgOrder}" +
+                    " maxRankShift=$maxRankShift" +
+                    " leafDispersionRatio=${"%.2f".format(java.util.Locale.US, dispRatio)}x"
+                if (holes > 0 || pooledOrder != avgOrder) {
+                    log.warn("$msg — investigate before quoting the aggregate")
+                } else {
+                    log.info(msg)
+                }
+            }
+        }
+
         // 2. Query-Level Bootstrap for Confidence Intervals (exclude matches from inconsistent domains)
         val matches = getMatchRecords(snapshotId).filter { it.domain !in inconsistentLeafIds }
         val matchesByQuery = matches.groupBy { it.queryId }
