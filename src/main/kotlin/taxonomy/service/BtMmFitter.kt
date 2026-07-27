@@ -379,8 +379,21 @@ object BtMmFitter {
         var floored = 0
         if (inv != null) {
             for (i in 0 until K) {
-                // Covariance under sum-to-zero constraint is diag(inv) - 1/K
-                val v = inv[i][i] - 1.0 / K
+                // Constrained covariance is diag(Fc^-1) - 1/K^2, NOT - 1/K.
+                //
+                // F is singular with 1 in its null space (F*1 = 0), so it is regularised here as
+                // Fc = F + J, J the all-ones matrix. Since J = K*P with P = 1*1^T/K, we get
+                // Fc*1 = K*1: the 1-direction is an eigenvector of Fc with eigenvalue K, and on
+                // its orthogonal complement Fc acts as F. Hence
+                //
+                //     Fc^-1 = F^+ + (1/K)*(1*1^T/K) = F^+ + J/K^2
+                //     =>  F^+ = Fc^-1 - J/K^2,  so the diagonal correction is 1/K^2.
+                //
+                // The previous 1/K over-subtracted by (1/K - 1/K^2) = (K-1)/K^2 from EVERY
+                // variance — 0.109 at K=8, 0.083 at K=12 — which drove most values straight into
+                // the 1e-6 floor and made every reported standard error the floor rather than a
+                // measurement. 12_Appendix_Numerics.tex:137-139 documents the same wrong constant.
+                val v = inv[i][i] - 1.0 / (K.toDouble() * K.toDouble())
                 if (v < 1e-6) floored++
                 variances[i] = v.coerceAtLeast(1e-6)
             }
