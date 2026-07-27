@@ -289,8 +289,34 @@ has a MECHANISM for its null rather than an absence of effect.
    (6 pairs — the built-in null, which SHOULD return to chance; see the
    stratified baseline above for why it currently does not).
 
-   Tie rate alongside, plus refusal and malformed-verdict rate. Rho reported but
-   not leaned on.
+   Tie rate alongside. **Refusal and malformed-verdict rate separately** — with
+   two bare letters and no options, a judge that DECLINES is a distinct outcome
+   from one that guesses, and collapsing them would hide the difference.
+
+   #### Predictions, fixed before the run
+
+   | stratum | with options | predicted without |
+   |---|---:|---|
+   | no-trace x no-trace | 92.9% | **~50% (chance), tie rate very high** |
+   | trace x trace | 84.2% | the measurement — reasoning-only signal |
+   | trace x no-trace | 89.4% | confounded; expect trace-presence to dominate |
+
+   **`no-trace x no-trace` is now the sharpest cell, not a formality.** Without
+   options AND without traces the judge has a question and two bare letters —
+   genuinely no information. It must return to chance or tie. If it comes back at
+   70%+, something is leaking, and the candidates are enumerable: the judge
+   recognising the question from pretraining, position bias surviving the
+   dual-call control, or letter-frequency priors in MMLU-Pro. None of those is
+   currently measurable, and any would be worth knowing. That makes this a
+   falsification test with a hard prediction rather than a floor.
+
+   **For `trace x trace`, write down the second possibility now.** At SE 2.5% a
+   drop to ~75% is 3.6 SE and readable. But landing NEAR 84% — unchanged — is
+   plausible given the inversion above, and it would mean that on traced pairs
+   the judge was never using the key at all, so the 88.8% aggregate is carried
+   entirely by the untraced and mixed strata. That is a cleaner decomposition
+   than anything currently in this document, and it should not be discovered
+   after the fact.
 3. **Other or Health**, only if verdict agreement there shows the arms differ.
 
 ## Data and defects
