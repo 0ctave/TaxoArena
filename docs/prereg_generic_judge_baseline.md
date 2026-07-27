@@ -88,7 +88,7 @@ result attributable to the partition.
 ## Primary outcome, fixed before the run
 
 **Primary: Spearman rho against GT accuracy, per domain.** This is the partition claim.
-Bounded honestly: n = 11 models gives a grid of 0.0035, and math's GT ordering is
+Bounded honestly: the 12-model roster gives a grid of 0.0035 (n=11 would be 0.0046), and math's GT ordering is
 already rho = 1.000 against global, so math has little room to differ in EITHER
 direction — which is exactly why it is the null arm rather than a second test.
 
