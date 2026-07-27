@@ -114,6 +114,57 @@ withholding the options is the only regime in which the rubric has been shown ab
 matter. With options present, the judge can verify the answer and the rubric is
 decorative.
 
+## Scope condition: substantive-response models only
+
+**The roster is restricted to models producing substantive responses. Answer-only
+systems are out of scope for this evaluation design.**
+
+Stated explicitly rather than left implicit, because it resolves an ambiguity that
+would otherwise make the options-blind arm uninterpretable. A rubric — reasoning-based
+or content-based — has nothing to grade in a response that carries no content.
+
+Note what this is NOT. The four models in the original 8-model run were not terse by
+style: `getRobustTrace` synthesised "The model selected option F: ..." because the
+ingest had stored an empty `model_output`. That was a pipeline stub, not model output,
+and the re-ingest fixed it — those models have real traces under `generated_text`. So
+the bare-answer problem was a data defect that is now repaired, not a standing design
+tension.
+
+The 12-model length-matched band satisfies this condition by construction (median 486-
+1413 chars), so for this run the tension does not arise.
+
+## A mechanism for the prediction, worth registering separately
+
+The predictions above are empirical: law should show a rubric advantage, math should
+not. They currently have no stated mechanism.
+
+**Candidate mechanism:** induced rubrics can encode CONTENT criteria, not only
+REASONING criteria. A rubric induced on a history leaf may encode "cites the correct
+period" or "names the right actor" — properties of the answer checkable without a
+derivation. A rubric induced on a math leaf encodes derivation properties, because
+that is what math content offers. Which kind a cell yields depends on what its content
+supports.
+
+**If that holds, it predicts which domains admit content-based criteria** — and it
+would use the same predictor as the arena prediction, giving the empirical hope a
+stated cause.
+
+**Proposed offline test, no arena calls:** classify the rules in the 87 leaf rubrics
+(already on disk in the frozen snapshot's `judgeRubric` field) as derivation-property
+versus content-property, via an LLM pass. Then correlate the content-property fraction
+against each cell's hapax / reusable-term measure. Prediction: enumerative cells
+produce content-heavy rubrics, conceptual cells produce reasoning-heavy ones.
+
+**UNVERIFIED — source needed before this is registered as a prediction.** The hapax
+figures motivating it (enumerative cells at >= 0.836 — Other, Health; Law at 0.580)
+were supplied in discussion and I could not locate them in `docs/`. The only hapax
+reference found is in `docs/measurement-discipline.md:79-81`, and it is a RETIRED
+measurement: a rubric-to-cell vocabulary ratio that was withdrawn because it "was not
+even commensurable — rubric vocabulary overlaps the cell's hapax terms, which the
+denominator excludes by construction." If the 0.836/0.580 figures come from that
+retired instrument, the mechanism needs a different predictor. Locate the source and
+confirm it is not the withdrawn ratio before this becomes a registered prediction.
+
 ## Domains: four, chosen for a built-in control
 
 `math` (393 reserved), `physics` (378), `chemistry` (338), `law` (287).
