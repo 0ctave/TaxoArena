@@ -554,3 +554,78 @@ uninterpretable rather than a chance-level null.
 The fix is re-running generation for the four models **with output capture**,
 which is generation calls rather than judge calls. Until then the arena claim
 can only be made on the four-model traced subset.
+
+---
+
+## Roster: exclusion is viable — 10 clean models, not 4
+
+Ran before choosing between exclusion and regeneration, because the answer
+determines which fix is available. The corpus holds 47 evaluated models, of which
+**13 have `model_output` populated**. Three of those are mixed-format and carry
+the same artifact:
+
+| model | p10 | median | p90 | <40 ch | verdict |
+|---|---:|---:|---:|---:|---|
+| jamba-1.5-large | 18 | 18 | 334 | **68.4%** | exclude |
+| gemini-1.5-pro-002 | 19 | 119 | 717 | **35.4%** | exclude |
+| gemini-1.5-flash-002 | 18 | 305 | 809 | **27.6%** | exclude |
+
+A model that emits a bare answer a third of the time reintroduces the format
+preference within its own comparisons. The threshold is format *consistency*,
+not text presence.
+
+### The clean roster (<=1.4% bare, full Math coverage)
+
+| model | Math acc (241 Q) | coverage |
+|---|---:|---|
+| gemini-3.1-pro_5-shots | 95.4% | 241/241 |
+| arx_0314 | 90.0% | 241/241 |
+| iask_pro | 87.5% | 240/241 |
+| arx_3 | 81.3% | 241/241 |
+| gpt-4o-2024-08-06 | 78.4% | 241/241 |
+| claude-3-5-sonnet-20241022 | 75.9% | 241/241 |
+| claude-3.5-sonnet | 73.0% | 241/241 |
+| deepseek-chat-v2_5 | 71.0% | 241/241 |
+| gpt-4o-mini | 69.3% | 241/241 |
+| claude-3-5-haiku-20241022 | 57.7% | 241/241 |
+
+**n=10 beats the roster this run used.** Spearman grid is 6/(n^3-n) = 0.00606,
+against 0.0119 at n=8 and 0.10 at n=4. Capability spans 37.7 points with five
+models packed into the 71-81% band — a harder ranking problem measured with a
+finer instrument, which is the right direction on both counts.
+
+Four of the current eight survive (gpt-4o, sonnet-20241022, deepseek, haiku);
+six are new, so this is a re-run rather than a re-analysis. At 45 pairs instead
+of 28, cost scales to roughly 2,800 comparisons per condition.
+
+### Three things to settle before adopting it
+
+1. **Provenance of `arx_3`, `arx_0314`, `iask_pro`.** Accuracies of 81-90% and
+   names unlike any base model — plausibly search-augmented or ensemble systems.
+   They are legitimate arena entrants but must not be described as LLMs without
+   knowing what they are.
+2. **`gemini-3.1-pro_5-shots` is a 5-shot condition** at 95.4%, not comparable
+   like-for-like with the 0-shot remainder. Either label the prompting condition
+   in the roster table or drop it.
+3. **`claude-3-5-sonnet-20241022` vs `claude-3.5-sonnet` agree on only 83.4% of
+   predictions** (10,034/12,030) — two harnesses of nominally the same model,
+   3 points apart on Math. Not a duplicate to be collapsed. Kept as a pair they
+   are a **free resolution check**: two near-clones should rank adjacently and
+   tie often, and a judge that separates them confidently is over-resolving.
+
+**Judge model is `Mistral-Large-3`, which appears nowhere in the roster** — no
+self-preference confound.
+
+### Framing for the write-up
+
+Not an outlier exclusion. The honest sentence:
+
+> Four models' response text was not persisted by the generation pipeline, and
+> three further models emit a bare answer on more than a quarter of items. All
+> seven are excluded from arena comparisons; the reported roster is the ten
+> models with complete and consistent response text.
+
+The format artifact is still reported, as the measurement that justifies the
+exclusion, and it is transferable beyond this project: **an LLM judge shown a
+reasoned response against a bare answer selects the response 99.4% of the time,
+regardless of which is correct.**
