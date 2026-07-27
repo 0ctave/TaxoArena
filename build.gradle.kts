@@ -116,6 +116,15 @@ tasks.register<Test>("randomCellRubrics") {
 // configurations behave identically.
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     workingDir = rootDir
+    // bootRun forks a JVM, so a -D on the Gradle command line reaches Gradle's JVM and NOT the
+    // application. Forward the ones that matter explicitly. `ranking.db.path` isolates a run
+    // onto a throwaway ratings DB: match_history is keyed by (snapshot_id, condition), so a
+    // re-run against a frozen snapshot CLEARS that snapshot's rows before writing -- which is
+    // how a smoke test destroyed the frozen Math MAIN results (1736/11/241 -> 66/1/1).
+    providers.systemProperty("ranking.db.path").orNull?.let { systemProperty("ranking.db.path", it) }
+    // Never up-to-date: an experiment run has no meaningful input/output fingerprint, and a
+    // silently skipped run reads exactly like a completed one.
+    outputs.upToDateWhen { false }
 }
 
 dependencies {

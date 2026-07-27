@@ -475,6 +475,24 @@ class TaxonomyArenaService(
         traceB: String,
         condition: String = "MAIN"
     ): DomainEvaluation = coroutineScope {
+        // Answer-key blindness. buildJudgeUserPrompt takes exactly (query, traceA, traceB) — there
+        // is no answer-key parameter on this path, for MAIN or for GENERIC_JUDGE; the rubric is the
+        // only difference between them.
+        //
+        // This guard is NARROWER than it looks: it matches one exact literal, so a key embedded in
+        // any other form passes. It is a tripwire against reintroducing the old template, not a
+        // proof of blindness. The proof is the absence of a parameter.
+        //
+        // A line reading "If the ground truth answer is provided, use it to assess factual
+        // correctness" was removed from buildJudgeUserPrompt on 2026-07-27. It was dead — nothing
+        // supplies a key to this path — but it was sent on every MAIN call, so the prompt template
+        // instructed the judge to use something that was never there. Dead or not, a reviewer
+        // reading the template saw the judge being told to use ground truth, and "the branch never
+        // fires" is a weaker position than not having the line.
+        //
+        // NOTE what blindness here does and does not mean: 94.8% of model traces state their own
+        // answer ("The answer is (C)"), and the options block is shown, so the judge can re-derive
+        // the key from the question. Blind at the prompt is not blind at the mechanism.
         require(!query.contains("Ground Truth Answer")) {
             "Information leakage: prompt contains the ground truth answer!"
         }
@@ -900,6 +918,16 @@ class TaxonomyArenaService(
 ────────────────────────────────────────
 EVALUATION MECHANICS (non-negotiable)
 ────────────────────────────────────────
+        // MEASURED: this instruction does not work. On mixed pairs where one side was a
+        // one-line stub, the judge preferred the longer response 863/868 = 99.4% of the
+        // time (GENERIC 874/880), against a ground-truth rate of 87.6% — an excess
+        // preference of +11.8pp, on 50% of all comparisons. So "ignore length" is present,
+        // explicit, and demonstrably not followed. The format artifact is therefore NOT a
+        // prompt-design oversight that can be fixed by asking harder, which is the argument
+        // for controlling it with a length-matched roster instead. See
+        // docs/arena-math-findings.md and the transferable form: an LLM judge shown a
+        // reasoned response against a bare answer selects the response 99.4% of the time,
+        // regardless of which is correct.
 Bias suppression — ignore completely:
 • Response length, verbosity, or token count
 • Formatting: markdown, LaTeX, bullet points, plain prose — all equal
@@ -942,8 +970,8 @@ $traceA
 $traceB
 
 ────────────────────────────────────────
-If the ground truth answer is provided, use it to assess factual correctness. Your task is to determine
-superior reasoning quality based solely on the logical rigour and domain soundness of its response.
+Your task is to determine superior reasoning quality based solely on the logical rigour and domain
+soundness of its response.
 
 If both models are genuinely equivalent, output winner: "TIE" with confidence ≤ 0.5.
 
