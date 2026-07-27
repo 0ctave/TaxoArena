@@ -6,11 +6,60 @@ reserved questions, 1736 verdicts per condition, MAIN vs GENERIC_JUDGE
 (MT-Bench-style domain-agnostic judge). Completed, 0 errors beyond the known
 `[ARENA-SE]` inverse-variance floor guard.
 
-## Headline
+## Headline — read this first, it reframes everything below
+
+**The judge decides on answer correctness, not on reasoning quality.**
+
+On items where exactly one response is correct and the judge did not tie, it
+picks the correct one 88.8% of the time (MAIN) and 88.4% (GENERIC_JUDGE). The
+rubric moves that by 0.4 points.
+
+| condition | decidable, non-tie | GT-agreement |
+|---|---:|---:|
+| GENERIC_JUDGE | 1033 | 913 = **88.4%** |
+| MAIN | 1029 | 914 = **88.8%** |
+
+Independent corroboration from the tie rates, which was not part of the
+hypothesis. When correctness CANNOT discriminate, the judge falls back to "these
+are equivalent":
+
+| subset | n | tie rate MAIN | tie rate GENERIC |
+|---|---:|---:|---:|
+| exactly one correct | 1160 | ~11% | ~11% |
+| both correct | 129 | **38.0%** | **32.6%** |
+| neither correct | 447 | **33.1%** | **34.9%** |
+
+A three-fold jump in ties precisely where the answer key stops helping. That is
+the signature of a correctness-driven decision.
+
+### The composite claim, four measurements with controls
+
+The judge **decides on answer correctness** (88.8% agreement with the key on
+discriminable items), **reads** the leaf-specific rubric (rationale-rubric
+overlap 0.200 against a 0.138 baseline that never sees it), **reproduces its
+vocabulary** in the justification, and **reaches the same verdict as a
+rubric-free judge** (99.4% identical winners). When correctness cannot
+discriminate, the tie rate triples.
+
+Each has a control that shares every confound except the treatment. Together
+they identify one mechanism: the arena is largely re-deriving the answer key and
+reporting it with domain-flavoured justification.
+
+**This is a negative result about the LLM-as-judge paradigm, not about the
+taxonomy.** MMLU-Pro is multiple-choice with a verifiable key, so a capable
+judge can shortcut to correctness and bypass the partition entirely. The
+architecture would only bind where correctness is not checkable — open-ended
+generation, agent traces, tasks with no key. That is the setting the incremental
+framing was always aimed at, and this result is now the MEASURED argument for
+it rather than a motivation. MMLU-Pro grounds the comparison and is also the
+corpus where the judging mechanism can bypass what the comparison is about.
+
+## Ranking fidelity
 
 Both judges recover the ground-truth ordering to within one adjacent
 transposition. Aggregate rho ~0.95-0.98 (win-rate); the run's own BT-based
-aggregate reports rho = 0.90, tau = 0.79.
+aggregate reports rho = 0.90, tau = 0.79. Given the above, that fidelity is
+substantially inherited from the answer key rather than earned by judgment.
 
 **The arena cannot separate the two conditions at n = 8, and that is structural
 rather than a power problem.** Spearman at n = 8 is quantised in steps of
@@ -105,6 +154,26 @@ Link 2 is established causally (`docs/prereg_rubric_specificity.md`). Link 3 now
 has a MECHANISM for its null rather than an absence of effect.
 
 ## Next, in order
+
+0. **Rho on the correctness-blind subset** (free, no new run). The 576 rows where
+   BOTH or NEITHER response is correct are the cases where the judge must
+   evaluate rather than verify. Computing rho there is an options-blind
+   measurement on data already held.
+
+   TWO THINGS FIXED IN ADVANCE, because the subset is not a random sample:
+
+   * **Selection control.** Those 576 items are exactly where the models agree —
+     both easy or both hard — so they carry the LEAST capability
+     discrimination. A collapsed rho would be partly range restriction, not only
+     judgment quality. So compute the GROUND-TRUTH ranking on the same 576
+     questions: if GT rho is also compressed there, the restriction explains part
+     of the collapse and the two can be separated. Same "measure the null on the
+     same population" move that made the within-arm and GENERIC-baseline results
+     work.
+   * **Tie handling.** A third of the subset is ties, and the conversion changes
+     rho materially. Fixed in advance: ties count 0.5 to each side (standard
+     BT/Elo convention), and the tie fraction is reported alongside so a reader
+     can see how much of the ranking rests on them.
 
 1. **Rule-ID citation** in the verdict schema. Distinguishes reproduction from
    application, and counts prior-decided verdicts. Must precede the full-corpus
