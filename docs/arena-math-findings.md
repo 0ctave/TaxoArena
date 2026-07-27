@@ -730,3 +730,60 @@ Per the granularity screen above, **Math should not be re-run with the new
 roster except as a judge-validation baseline.** Law is where the taxonomy has
 something to be right about, and law + the corrected roster + options-blind is
 the run that tests the actual claim.
+
+---
+
+## UPDATE: the flatness result does not survive the roster expansion
+
+Re-ran the permutation screen after the trace backfill, on the 37 models with a
+substantive trace instead of 8. Same method: per-domain GT accuracy ranking
+against global, 2,000-draw null over same-size random subsets, seed 42.
+
+| domain | nQ | rho | null p5 | null med | p_emp | at n=8 |
+|---|---:|---:|---:|---:|---:|---:|
+| law | 20 | 0.690 | 0.816 | 0.897 | **0.001** | 0.000 |
+| **math** | 391 | 0.979 | 0.987 | 0.992 | **0.001** | *0.217* |
+| economics | 248 | 0.947 | 0.981 | 0.989 | **0.000** | 0.394 |
+| engineering | 254 | 0.955 | 0.981 | 0.989 | **0.000** | 0.962 |
+| health | 206 | 0.953 | 0.977 | 0.987 | **0.000** | 0.069 |
+| other | 270 | 0.951 | 0.982 | 0.989 | **0.000** | 0.064 |
+| philosophy | 144 | 0.934 | 0.969 | 0.982 | **0.000** | 0.000 |
+| physics | 377 | 0.989 | 0.987 | 0.992 | 0.131 | 0.220 |
+
+**Math now reorders significantly (p=0.001) where at 8 models it was
+indistinguishable from a random subset (p=0.217).** Seven domains clear the null
+instead of three.
+
+The mechanism is the one predicted: with 8 models spanning 70 accuracy points the
+global ordering dominates by construction and a cell has almost no room to
+reorder anything. With 37 models, many clustered in capability, adjacent pairs
+can swap on domain-specific competence without disturbing the global order.
+
+**This reopens the granularity argument.** The earlier conclusion — that Math
+could not test the taxonomy claim and budget should go to law/philosophy/history
+— was an artifact of roster size, not a property of the domain. It should not be
+cited.
+
+### Two caveats that bound the new reading
+
+1. **The question set changed.** Requiring all 37 models to have answered drops
+   the intersection from 3,445 to 2,127 questions, and it does so unevenly:
+   law falls 287 -> 20, biology 196 -> 15, psychology 238 -> 8. The permutation
+   null is size-matched so each p-value is internally valid, but the small-n
+   domains now have little power, and **law's p=0.001 now rests on 20 questions**
+   rather than 287. Cross-domain comparison of these rho values is not safe.
+2. **Neither screen is the taxonomy test.** Both use MMLU-Pro's native category
+   labels, not induced cells. They bound what a partition could show; they do
+   not show that induced cells separate.
+
+### What this changes downstream
+
+The A3 curve and the cell-level rho values reported above were computed on the
+8-model arena verdicts, so they inherit the same limitation and are now
+**provisional**. Re-deriving them needs arena verdicts on the expanded roster,
+which is a run rather than a regrouping.
+
+Math is back as a viable arena domain. Choosing between Math and law should now
+turn on question coverage — Math retains 391 questions at full roster
+intersection, law retains 20 — which currently favours **Math**, reversing the
+recommendation above.
