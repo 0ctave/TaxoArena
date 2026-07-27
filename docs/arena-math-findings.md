@@ -462,3 +462,95 @@ Caveat on the screen: it uses MMLU-Pro's native category labels, not induced
 cells. It bounds what any partition of a domain could show — a domain whose own
 label carries no reordering is unlikely to contain cells that do — but it does
 not prove induced cells inside law will separate. That remains the test.
+
+---
+
+## DEFECT: half the Math comparisons were decided by a capture gap, not by content
+
+Found while sizing the roster fix for OPTIONS-BLIND. This qualifies several
+numbers reported above and must be read before any of them are cited.
+
+### The roster splits perfectly on response format, and format tracks capability
+
+| model | response | GT acc (241 Q) |
+|---|---|---:|
+| gpt-4o-2024-08-06 | reasoning, median 1211 ch | 78.4% |
+| claude-3-5-sonnet-20241022 | reasoning, median 630 ch | 75.9% |
+| deepseek-chat-v2_5 | reasoning, median 1038 ch | 71.0% |
+| claude-3-5-haiku-20241022 | reasoning, median 664 ch | 57.7% |
+| Meta-Llama-3_1-70B-Instruct | **bare letter** | 53.1% |
+| Qwen1.5-72B-Chat | **bare letter** | 36.5% |
+| Llama-2-70b-hf | **bare letter** | 13.3% |
+| Llama-2-13b-hf | **bare letter** | 7.5% |
+
+The two groups do not overlap in accuracy (57.7% vs 53.1% at the boundary), so
+**trace presence and capability are collinear.**
+
+`model_output` is the empty string for those four models across all 12,032 rows,
+while `pred` is populated. This is a **capture gap in the eval pipeline, not
+model behaviour** — the responses were generated, the text was never stored.
+The judge was shown a 600-1200 character worked solution on one side and the
+single character `F` on the other.
+
+### The judge picks the response that has text, essentially always
+
+Mixed pairs (traced vs bare), both conditions:
+
+```
+                       MAIN            GENERIC
+judge picks traced   863/868 = 99.4%   874/880 = 99.3%   SE 0.3%
+GT says traced right 593/677 = 87.6%   593/677 = 87.6%
+excess preference        +11.8 pp          +11.7 pp
+```
+
+**Mixed pairs are 868/1736 = 50% of all comparisons.** Half the arena was
+decided by which side had text. That is not a judge failure — it is the only
+sane response to an empty string — but it means those verdicts carry no
+information about model quality.
+
+### What this qualifies
+
+- **The 88.8% aggregate GT-agreement.** Half its support is format-decided. The
+  format preference agrees with the key 87.6% of the time *by roster
+  construction*, because text presence tracks capability.
+- **rho = 0.95-0.98 against GT accuracy.** Ranking all four traced models above
+  all four bare ones reproduces the top-4/bottom-4 split of the GT ordering for
+  free. The rho is substantially purchased by the artifact.
+- **rho_blind = 0.74-0.76.** Same mechanism: on correctness-blind pairs the
+  judge still separates the groups by format.
+
+### What survives
+
+Within-stratum comparisons are unaffected, because both sides share a format.
+Re-running the trace stratification with the capability gap controlled:
+
+```
+stratum               gap<20pp        20-40pp       >=40pp
+trace x trace          83.2% (173)   88.1% (42)        --
+trace x no-trace       74.6%  (67)   83.3% (186)   94.6% (407)
+no-trace x no-trace    97.0%  (33)   94.4% (89)    84.4% (32)
+```
+
+At matched capability gap (<20pp) the inversion **strengthens**: bare-letter
+pairs 97.0% vs reasoning pairs 83.2%, a 13.8 pp gap with capability controlled.
+So *"reasoning text degrades the judge's agreement with the key"* survives, and
+is now a within-format result rather than a cross-format one.
+
+The mixed stratum at gap<20pp is the worst cell in the table (74.6%). Those are
+haiku (57.7%, traced) against Llama-3.1-70B (53.1%, bare) — near-equal models
+where the judge takes the traced side ~always and is therefore wrong whenever
+the bare model happened to be right.
+
+Unaffected entirely: the granularity and domain-screen results above, which use
+ground-truth accuracy only and never touch a verdict.
+
+### Consequence for OPTIONS-BLIND
+
+Blocking. Without options AND without stored reasoning, four of eight models
+present the judge with a bare letter and nothing else — those comparisons are
+not hard, they are empty. The `no-trace x no-trace` cell would be 100%
+uninterpretable rather than a chance-level null.
+
+The fix is re-running generation for the four models **with output capture**,
+which is generation calls rather than judge calls. Until then the arena claim
+can only be made on the four-model traced subset.
