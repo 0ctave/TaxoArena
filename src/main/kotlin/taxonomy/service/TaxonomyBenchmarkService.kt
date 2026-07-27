@@ -11,9 +11,12 @@ import taxonomy.dataset.EvalIngestValidator
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.dataset.ModelEvalStore
 import taxonomy.dataset.ModelEvalResult
+import taxonomy.dataset.unwrapTraceEnvelope
 import taxonomy.model.*
 import java.io.File
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.encodeToString
 import kotlin.collections.filter
 import kotlin.math.abs
@@ -1732,8 +1735,10 @@ class TaxonomyBenchmarkService(
         )
     }
 
+    // Strips the arx JSON envelope (and its correctness-predicting `reason_code`) down to
+    // the prose response. See taxonomy.dataset.unwrapTraceEnvelope.
     private fun getRobustTrace(r: ModelEvalResult): String {
-        val output = r.modelOutput
+        val output = r.modelOutput?.let { unwrapTraceEnvelope(it) }
         if (!output.isNullOrBlank()) return output
         val pred = r.pred?.trim()?.uppercase() ?: return "The model did not provide a prediction."
         val predChar = pred.firstOrNull() ?: return "The model did not provide a prediction."

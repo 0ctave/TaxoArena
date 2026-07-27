@@ -25,7 +25,14 @@ private data class RawEvalItem(
     val pred: String? = null,             // model's extracted answer
     val model_outputs: String = "",       // full CoT trace
     // Some older eval files use cot_content instead of model_outputs
-    val cot_content: String? = null
+    val cot_content: String? = null,
+    // ...and 28 of the 47 upstream archives (the Llama / Qwen / Mistral / Mixtral / Yi /
+    // Phi-3 / gemma / mathstral families) use `generated_text` instead, with `cot_content`
+    // present but blank. Omitting this key meant `trace` resolved to "" for every one of
+    // those models: the ingest silently stored an empty `model_output` for 34 of 47 models,
+    // and `getRobustTrace` then synthesised a one-line stub in place of the real trace.
+    // That drove the 99.4% format preference measured in docs/arena-math-findings.md.
+    val generated_text: String? = null
 )
 
 @Service
@@ -241,7 +248,14 @@ class ModelEvalLoader(
             runCatching {
                 if (item.question_id < 0 || item.question.isBlank()) return@runCatching
 
-                val trace = item.model_outputs.ifBlank { item.cot_content ?: "" }
+                // Unwrapped at ingest so the stored column is clean, AND again at read time in
+                // TaxonomyBenchmarkService.getRobustTrace, which covers rows ingested before
+                // this fix existed. Belt and braces: the leak is asymmetric and silent.
+                val trace = unwrapTraceEnvelope(
+                    item.model_outputs
+                        .ifBlank { item.cot_content ?: "" }
+                        .ifBlank { item.generated_text ?: "" }
+                )
                 val isCorrect = item.pred != null && item.pred == item.answer
                 val isReserved = item.question in existingReservedTexts
 
