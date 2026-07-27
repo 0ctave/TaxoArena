@@ -74,18 +74,39 @@ object DiagnosticsBundle {
                 manifest["branch"] = git.branch
                 // "dirty" means TRACKED SOURCE differs from the commit, excluding the files that
                 // are modified permanently by design. It is not "git status is non-empty".
-                manifest["dirty"] = git.dirty
+                //
+                // SPLIT, because one boolean could not distinguish "the splitter was edited
+                // mid-run" from "a .tex file was edited", and fired identically for both. The
+                // frozen artifact 20260727_042523 read dirty=true from 14 report/*.tex files and
+                // one test file with NO production source dirty — technically correct and
+                // practically useless, which is how a real warning gets discounted.
+                //   dirty_src   -> anything under src/main. BLOCKS a freeze.
+                //   dirty_other -> thesis text, tests, everything else. Noise.
+                val srcDirty = git.dirtyFiles.filter { it.startsWith("src/main") }
+                val otherDirty = git.dirtyFiles.filterNot { it.startsWith("src/main") }
+                manifest["dirty"] = git.dirty            // retained for older readers
+                manifest["dirty_src"] = srcDirty.isNotEmpty()
+                manifest["dirty_src_files"] = srcDirty
+                manifest["dirty_other"] = otherDirty.isNotEmpty()
+                manifest["dirty_other_files"] = otherDirty
                 manifest["dirty_files"] = git.dirtyFiles
                 manifest["started_at_millis"] = startedAtMillis
 
-                if (git.dirty) {
-                    // Loud on purpose, and now meaningful: this fires only when source that could
-                    // have changed the result is uncommitted.
+                if (srcDirty.isNotEmpty()) {
+                    // Loud on purpose: production source that could have changed the result is
+                    // uncommitted. This is the case that invalidates an artifact.
                     log.warn(
-                        "[DIAG] source is UNCOMMITTED at run start (commit ${git.commit}," +
-                            " ${git.dirtyFiles.size} file(s): ${git.dirtyFiles.take(5).joinToString(", ")}" +
-                            (if (git.dirtyFiles.size > 5) ", …" else "") +
+                        "[DIAG] PRODUCTION SOURCE is UNCOMMITTED at run start (commit ${git.commit}," +
+                            " ${srcDirty.size} file(s) under src/main: ${srcDirty.take(5).joinToString(", ")}" +
+                            (if (srcDirty.size > 5) ", …" else "") +
                             "). This run is NOT reproducible from the repository alone."
+                    )
+                } else if (otherDirty.isNotEmpty()) {
+                    // Deliberately info, not warn. Thesis text and test edits do not affect the
+                    // artifact, and warning about them is what trained a reader to ignore the flag.
+                    log.info(
+                        "[DIAG] ${otherDirty.size} non-source file(s) uncommitted (tests/report/docs);" +
+                            " src/main is clean, so this run IS reproducible from the repository."
                     )
                 }
 
