@@ -72,6 +72,14 @@ law    rho = 0.955  p = 0.008   models DO reorder — about 6 adjacent swaps vs 
 2. **On `law`: per-leaf beats per-domain**, if the partition helps at all.
 3. `physics` and `chemistry` are intermediate and not predicted.
 
+**What counts as "not flat" on math, fixed in advance.** At the 12-model roster the
+Spearman grid is 0.0035, so the smallest representable difference is one grid step.
+**A difference of two grid steps or more — |d rho| >= 0.007 — counts as a real
+difference on math and therefore as a FAILED null.** Anything below that is one
+quantisation step and is read as flat. Without this threshold a small math difference
+could be argued either way after the fact, which would destroy the value of having the
+null arm at all.
+
 **Why the pair is stronger than "per-leaf wins overall":** a uniform advantage across
 both math and law would suggest something other than the partition is driving it —
 rubric verbosity, prompt length, schema effects. The math null is what makes a law
@@ -88,11 +96,41 @@ direction — which is exactly why it is the null arm rather than a second test.
 but it measures the JUDGE rather than the grouping, so it cannot carry the partition
 claim. Reported alongside as the judge-side check.
 
-Disattenuation, where used, is two-sided — `rho_obs / sqrt(r_A * r_B)`, i.e.
+### Disattenuation is mandatory, and its limits are stated in advance
+
+Two-sided — `rho_obs / sqrt(r_A * r_B)`, i.e.
 `rho_obs / r` when both arms share a cell size — at the corrected constant
 **c = 2.52**, not the published 7.66. Domain cells (~250-390 questions) and leaf cells
 (~27-53) differ by an order of magnitude in size, so a raw rho-against-rho comparison
 between the two arms is invalid without it.
+
+**Magnitudes at c = 2.52, so the corrected number is not over-interpreted either way:**
+
+| cell n | r | correction (two-sided, 1/r) |
+|---:|---:|---:|
+| 27 (small leaf) | 0.9146 | +9.3% |
+| 40 (median leaf) | 0.9407 | +6.3% |
+| 300 (domain) | 0.9917 | +0.8% |
+
+The domain arm's correction is nearly a no-op; the leaf arm's is ~6%. The differential
+is about **5.5 points of relative adjustment**, which is good news for saturation risk
+— under the old c = 7.66 the leaf correction was large enough to push values past 1.0,
+which is exactly what forced the earlier discriminative analysis to reason around a
+clipping column. But it also means **disattenuation will not rescue a large raw
+difference**. If per-domain beats per-leaf by more than a few points raw, the
+correction does not reverse it.
+
+Note the two-sided form is `1/r`, not `1/sqrt(r)`: both sides of
+`rho(arena ranking, GT ranking)` are estimated on the same n questions, so the GT
+ranking is itself a finite-sample estimate rather than a fixed truth. The one-sided
+figures (+3.1% at n=40) apply only when one measure is perfectly reliable, which is
+not the case here.
+
+**c = 2.52 is the 11-model-band value.** It is a property of the roster, not of the
+corpus. If this run uses a different roster — including the 12-model set — the
+constant must be REFITTED FIRST with `tools/analysis/reliability_constant.py`, which
+takes a roster list. Skipping that step reintroduces precisely the dependency that
+already invalidated three results in this project.
 
 ## Run conditions
 
