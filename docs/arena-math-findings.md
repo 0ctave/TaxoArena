@@ -923,18 +923,48 @@ published 7.66 / 2 = 3.83                    (independent SB fit gave 3.84)
 | length mismatch fixed | 3.83 | x0.50 — SB applied after the fit, not before |
 | roster corrected too | **2.52** | x0.66 — c is not a property of the corpus |
 
-Net **3.04x**. Disattenuation at a 40-question cell, observed rho = 0.823:
+Net **3.04x**.
 
-```
-c=7.66 -> 0.898    c=3.84 -> 0.862
-c=5.05 -> 0.873    c=2.52 -> 0.849
-```
+**Correction to an earlier version of this section:** disattenuation is
+`rho_true = rho_obs / sqrt(r_A * r_B)`. Both sides here are per-cell rankings and
+both are attenuated, so with `r_A = r_B = r` this is `rho_obs / r`, NOT
+`rho_obs / sqrt(r)`. The one-sided form is correct only when one measure is
+perfectly reliable. The figures below are the two-sided ones.
 
-**The redundancy claim is affected most.** At the 87-leaf median n=38, clearing
-rho > 0.90 after disattenuation requires an observed rho of **0.821 under c=7.66
-but 0.872 under c=2.52**. Every leaf pair between those two values leaves the
-redundant bucket, so *"72% of leaf pairs redundant at rho > 0.90"* is stated at
-its strongest possible reading and must be recomputed.
+At a 40.8-query cell, observed median rho = 0.823:
+
+| c | r(40.8) | corrects to |
+|---:|---:|---:|
+| 7.66 | 0.842 | **0.978** |
+| 3.83 | 0.914 | 0.900 |
+| 2.52 | 0.942 | **0.874** |
+
+**The redundancy claim inverts.** At the 87-leaf median n=38, clearing
+rho > 0.90 after disattenuation needs an observed rho of **0.749 under c=7.66 but
+0.844 under c=2.52**. The reported median corrects to 0.978 under the published
+constant — comfortably redundant — and to 0.874 under the corrected one, which is
+*below the threshold*. So *"72.2% of leaf pairs redundant at rho > 0.90, 42.2%
+saturated at 1.0"* likely becomes a MINORITY claim, and the saturation largely
+disappears since only observed rho above ~0.94 would clip.
+
+The corrected analysis is cleaner as well: the caveat that 42% of pairs clip at
+1.0 and must be reported qualitatively mostly goes away, leaving a distribution
+that can be quoted precisely.
+
+**The reliability ladder compresses, which touches the granularity argument.**
+
+| cells | held-out/cell | r at 7.66 | r at 2.52 |
+|---:|---:|---:|---:|
+| 152 | 23 | 0.750 | 0.901 |
+| 87 (frozen) | 38 | 0.832 | 0.938 |
+| 37 | 90 | 0.922 | 0.973 |
+| 14 | 238 | 0.969 | 0.990 |
+
+Spread across granularities falls from **0.219 to 0.088**, and leaf-level cells
+stop being individually low-reliability — 0.94 is good. That weakens the
+reliability leg of the argument for judging at a coarser cut. The
+identification-cost leg (33-45 calls/cell) is untouched and probably carries it
+alone, but the two-leg version needs restating.
 
 Everything quoting `r = n/(n+7.66)` needs revisiting: `docs/frozen-artifact.md`
 (median 0.833 at 87 cells), `docs/router-shared-kappa-correction.md`
