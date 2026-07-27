@@ -259,6 +259,23 @@ object BtMmFitter {
 
         val ident = assessIdentifiability(models, pairStats)
         val converged = finalDelta.isFinite() && finalDelta < effectiveTol
+        // Identification cost. The budget question for the fidelity-vs-granularity curve is
+        // how many calls a cell needs to reach a CONNECTED comparison graph, and that has
+        // never been measured: the Math run spent exactly 56 comparisons on every cell
+        // regardless of size (33..111 queries), which is a scheduler allocation, not a cost.
+        // The bracket for 87 cells is 1,200 (spanning tree, 7 pairs) to 9,744 (full 28-pair
+        // floor at minMatches=2) — wide enough to decide whether leaf-level judging is
+        // affordable at all. Emitted on every identified fit; take the MINIMUM per node
+        // across rounds to get the cost, and pair it with the cell's query count to see
+        // whether cost climbs as cells shrink.
+        if (ident.identified) {
+            val livePairs = pairStats.count { it.totalComparisons > 0 }
+            val calls = pairStats.sumOf { it.totalComparisons }
+            log.info(
+                "[ARENA-IDENT] identified: models=${models.size} pairs_with_data=$livePairs" +
+                    " of ${models.size * (models.size - 1) / 2} comparisons=$calls"
+            )
+        }
         if (!ident.identified) {
             // Structural, and not fixable by more sweeps: say so plainly rather than letting a
             // convergence warning imply the budget is the problem.

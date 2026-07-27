@@ -226,9 +226,38 @@ class TaxonomyRankingService {
                             winner TEXT,
                             loser TEXT,
                             is_tie INTEGER,
-                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            -- Real columns, not values parsed out of other values.
+                            --   node_id            was only recoverable from `domain`, which holds
+                            --                      the LLM-generated leaf label: not unique across a
+                            --                      tree and different between runs. Without it,
+                            --                      verdicts cannot be re-aggregated to a coarser cut,
+                            --                      so the fidelity-vs-granularity curve has no data.
+                            --   eval_question_id   NAMED FOR THE SPACE IT HOLDS. This is
+                            --                      eval_question_link.question_id — the id the arena
+                            --                      routes on — and NOT mmlu_pro.id, which shares the
+                            --                      same integer range and resolves cleanly to a
+                            --                      DIFFERENT question. Joining it to mmlu_pro is the
+                            --                      failure that returns a well-formed wrong answer.
+                            --                      The collision-free key is the taxonomy content hash
+                            --                      (queries.id, `q_dc3beb...`); it is NOT available at
+                            --                      the record site and would need a lookup, so it is
+                            --                      deliberately not stored under a name implying it.
+                            --   condition          was a suffix on snapshot_id recovered by chained
+                            --                      substringBefore calls; breaks the first time a name
+                            --                      contains an underscore.
+                            node_id TEXT,
+                            eval_question_id TEXT,
+                            condition TEXT
                         )
                     """.trimIndent())
+
+                    // Forward-migrate existing databases. Pre-existing rows keep NULLs; they
+                    // predate c381211 and are not citable anyway.
+                    for (col in listOf("node_id TEXT", "eval_question_id TEXT", "condition TEXT")) {
+                        try { stmt.execute("ALTER TABLE match_history ADD COLUMN $col") }
+                        catch (_: Exception) { /* already present */ }
+                    }
 
                     stmt.execute("""
                         CREATE INDEX IF NOT EXISTS idx_match_snapshot_domain_query
@@ -1012,6 +1041,53 @@ data class AggregatedLeaderboard(
         }
     }
 
+    /**
+     * Every verdict's node_id must name a node in the snapshot it was judged against.
+     *
+     * Verdicts outlive the tree they were produced from — a snapshot can be superseded while
+     * its match_history rows remain — and a verdict whose node_id is absent cannot be
+     * re-aggregated to any cut, so the fidelity-vs-granularity curve would silently lose
+     * those rows rather than fail. Reported as a count, not a sample, because "some rows are
+     * orphaned" and "most rows are orphaned" are different problems.
+     *
+     * Rows written before the node_id column existed carry NULL and are counted separately:
+     * they are pre-migration, not orphaned.
+     */
+    fun validateVerdictNodeIds(snapshotId: String, treeNodeIds: Set<String>): Boolean {
+        var total = 0; var nullId = 0; val orphans = linkedSetOf<String>()
+        try {
+            withConn { conn ->
+                conn.prepareStatement(
+                    "SELECT node_id, COUNT(*) FROM match_history WHERE snapshot_id = ? GROUP BY node_id"
+                ).use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    val rs = pstmt.executeQuery()
+                    while (rs.next()) {
+                        val nid = rs.getString(1); val c = rs.getInt(2); total += c
+                        if (nid == null) nullId += c
+                        else if (nid !in treeNodeIds) { orphans.add(nid) }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            log.warn("[VERDICT-CHECK] could not validate node_ids: ${e.message}"); return true
+        }
+        if (total == 0) { log.info("[VERDICT-CHECK] no verdicts for $snapshotId"); return true }
+        if (orphans.isNotEmpty()) {
+            log.error(
+                "[VERDICT-CHECK] $snapshotId: ${orphans.size} node_id(s) absent from the snapshot tree" +
+                    " (${orphans.take(5).joinToString(", ")}${if (orphans.size > 5) ", …" else ""})." +
+                    " Those verdicts cannot be re-aggregated to any cut."
+            )
+            return false
+        }
+        log.info(
+            "[VERDICT-CHECK] $snapshotId: $total verdict rows, all node_ids resolve" +
+                (if (nullId > 0) " ($nullId pre-migration rows with NULL node_id)" else "")
+        )
+        return true
+    }
+
     fun recordMatch(
         query: String,
         domain: String,
@@ -1021,7 +1097,10 @@ data class AggregatedLeaderboard(
         confidence: Double = 1.0,
         snapshotId: String = "global",
         modelA: String = winner,
-        modelB: String = loser
+        modelB: String = loser,
+        nodeId: String? = null,
+        evalQuestionId: String? = null,
+        condition: String? = null
     ) {
         try {
             withConn { conn ->
@@ -1057,8 +1136,9 @@ data class AggregatedLeaderboard(
                     } else {
                         // Insert new record
                         val sql = """
-                            INSERT INTO match_history (snapshot_id, query, model_a, model_b, domain, winner, loser, is_tie) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            INSERT INTO match_history (snapshot_id, query, model_a, model_b, domain, winner, loser, is_tie,
+                                                       node_id, eval_question_id, condition)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """.trimIndent()
                         conn.prepareStatement(sql).use { pstmt ->
                             pstmt.setString(1, snapshotId)
@@ -1069,6 +1149,9 @@ data class AggregatedLeaderboard(
                             pstmt.setString(6, winner)
                             pstmt.setString(7, loser)
                             pstmt.setInt(8, if (isTie) 1 else 0)
+                            pstmt.setString(9, nodeId)
+                            pstmt.setString(10, evalQuestionId)
+                            pstmt.setString(11, condition)
                             pstmt.executeUpdate()
                         }
                         // Update ratings

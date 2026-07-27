@@ -951,7 +951,10 @@ class TaxonomyBenchmarkService(
                                         confidence = primaryEval.confidence,
                                         snapshotId = snapshotId,
                                         modelA = task.modelA,
-                                        modelB = task.modelB
+                                        modelB = task.modelB,
+                                        nodeId = task.nodeId,
+                                        evalQuestionId = qId.toString(),
+                                        condition = req.condition
                                     )
                                 }
                             }
@@ -1004,7 +1007,10 @@ class TaxonomyBenchmarkService(
                                             confidence = primaryEval.confidence,
                                             snapshotId = snapshotId,
                                             modelA = task.modelA,
-                                            modelB = task.modelB
+                                            modelB = task.modelB,
+                                            nodeId = task.nodeId,
+                                            evalQuestionId = qId.toString(),
+                                            condition = req.condition
                                         )
                                     }
                                 }
