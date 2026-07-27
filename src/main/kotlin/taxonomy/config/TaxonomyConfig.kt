@@ -208,6 +208,24 @@ class TaxonomyConfig {
          */
         var excludeFromAnchoring: Set<String> = emptySet()
 
+        /**
+         * Expected number of queries the hold-out must withhold, or -1 to skip.
+         *
+         * The presence guards cannot fail in the case they were written for: a
+         * category name whose CASE is wrong (dataset keys are lowercase, tree labels
+         * are capitalised) yields a non-empty set that matches nothing, so the config
+         * assertion passes, "no excluded category is among the anchors" passes
+         * trivially, and a normal 14-anchor run looks correct. Asserting the COUNT is
+         * the check that can actually fail.
+         *
+         * Values in dataset space (train split, testRatio 0.3): chemistry 792,
+         * law 771, other 647, philosophy 349. These are NOT the leaf-region counts
+         * (934 / 738 / 511 / 402) — regions over-count by 294 in total through
+         * multi-membership, and the difference is not a constant offset: law moves
+         * DOWN and chemistry UP.
+         */
+        var expectedWithheldQueries: Int = -1
+
         var dagMode: DagMode = DagMode.DAG_MAX
             set(value) {
                 field = value

@@ -68,6 +68,7 @@ data class HeadlessCliConfig(
     val marginalEps: Double? = null,
     val maxK: Int? = null,
     val excludeFromAnchoring: List<String> = emptyList(),
+    val expectedWithheldQueries: Int? = null,
     val enableRefitGate: Boolean? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
@@ -160,6 +161,7 @@ class HeadlessBenchmarkRunner(
         cliConfig.maxK?.let { config.formalism.maxK = it }
         if (cliConfig.excludeFromAnchoring.isNotEmpty())
             config.formalism.excludeFromAnchoring = cliConfig.excludeFromAnchoring.toSet()
+        cliConfig.expectedWithheldQueries?.let { config.formalism.expectedWithheldQueries = it }
         cliConfig.enableRefitGate?.let { config.formalism.enableRefitGate = it }
         // Headless splits on cliConfig.testRatio and never reads dataset.testSplitRatio, so the
         // two drifted: the banner and — more seriously — the EffectiveConfig provenance record
@@ -1343,6 +1345,7 @@ class HeadlessBenchmarkRunner(
         var marginalEps: Double? = null
         var maxK: Int? = null
         var excludeFromAnchoring: List<String> = emptyList()
+        var expectedWithheldQueries: Int? = null
         var enableRefitGate: Boolean? = null
         var cosineTau: Double? = null
         var leafAcceptanceScale: Double? = null
@@ -1422,6 +1425,7 @@ class HeadlessBenchmarkRunner(
                 "acceptanceZ" -> acceptanceZ = rawVal.toDouble()
                 "marginalEps" -> marginalEps = rawVal.toDouble()
                 "maxK" -> maxK = rawVal.toInt()
+                "expectedWithheldQueries" -> expectedWithheldQueries = rawVal.toInt()
                 "excludeFromAnchoring" -> excludeFromAnchoring =
                     rawVal.trim().removePrefix("[").removeSuffix("]")
                         .split(",")
@@ -1481,6 +1485,7 @@ class HeadlessBenchmarkRunner(
             marginalEps = marginalEps,
             maxK = maxK,
             excludeFromAnchoring = excludeFromAnchoring,
+            expectedWithheldQueries = expectedWithheldQueries,
             enableRefitGate = enableRefitGate,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,

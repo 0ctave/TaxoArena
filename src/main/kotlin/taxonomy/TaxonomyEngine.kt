@@ -116,13 +116,29 @@ class TaxonomyEngine(
                 )
             )
 
+            var withheldCount = 0
             val bootstrapTime = measureTimeMillis {
                 // Anchor grouping only. distilledData itself is untouched, so the
                 // groundTruthMap below and the routable corpus both still contain these
                 // queries — they lose their anchor, not their existence.
                 val excluded = config.formalism.excludeFromAnchoring
+                // Membership check against the ACTUAL dataset keys. Dataset keys are
+                // lowercase ("chemistry"); depth-1 tree labels are capitalised
+                // ("Chemistry"), and `it.first in excluded` is exact string equality —
+                // so the wrong case silently excludes nothing. Deliberately not
+                // case-insensitive: normalising would paper over the two-space problem
+                // rather than surfacing it.
+                if (excluded.isNotEmpty()) {
+                    val available = dataset.keys
+                    val unknown = excluded.filterNot { it in available }
+                    require(unknown.isEmpty()) {
+                        "excludeFromAnchoring names categor(ies) absent from the dataset: $unknown. " +
+                            "Matching is case-sensitive and exact. Available keys: ${available.sorted()}"
+                    }
+                }
                 val anchorable = if (excluded.isEmpty()) distilledData
                                  else distilledData.filterNot { it.first in excluded }
+                withheldCount = distilledData.size - anchorable.size
                 if (excluded.isNotEmpty()) {
                     log.warn(
                         "[HOLD-OUT] excluding ${excluded.size} categor(ies) from anchoring: $excluded" +
@@ -192,6 +208,17 @@ class TaxonomyEngine(
                         " the queries, not just their anchor; recovery could not be scored"
                 }
                 log.warn("[HOLD-OUT] ${root.children.size} anchors seeded; $retained withheld queries retained unanchored")
+                // The one guard that can fail. Presence checks pass on a vacuous run;
+                // a count check does not.
+                val expected = config.formalism.expectedWithheldQueries
+                if (expected >= 0) {
+                    check(withheldCount == expected) {
+                        "[HOLD-OUT] withheld $withheldCount queries but expectedWithheldQueries=$expected." +
+                            " Either the category names are wrong (case-sensitive) or the expected value" +
+                            " was derived in the wrong space — it must be the TRAIN-split count, not the" +
+                            " leaf-region count."
+                    }
+                }
             }
 
             // --- NEW: Print Initial State ---
