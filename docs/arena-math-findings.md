@@ -892,3 +892,55 @@ the three mixed-format models.
 Written because `Meta-Llama-3-70B-Instruct` was documented as excluded *before*
 it entered the 8-model Math roster and produced the spurious "law has only 20
 questions" result. A documented exclusion is not an enforcement point.
+
+### RESOLVED: the published constant is exactly 2x too large
+
+`docs/measurement-discipline.md:191` reads *"Refit on the three measured
+**split-half** values"*, with the table column headed "measured r". So 0.842 is
+`r_half`, uncorrected — fitted against a formula the same document calls
+"Spearman-Brown rearranged". That is a length mismatch with an exact signature.
+
+Split-half on a cell of n queries correlates two halves of n/2, so it measures
+reliability at HALF length:
+
+```
+r_half(n) = (n/2)/((n/2)+c0) = n/(n + 2*c0)
+```
+
+Fitting that against `n/(n+c)` returns `c = 2*c0`. Verified both ways:
+
+```
+8-model roster    raw 7.71 / SB-corrected 3.84 = 2.008
+11-model band     raw 5.05 / SB-corrected 2.52 = 2.004
+published 7.66 / 2 = 3.83                    (independent SB fit gave 3.84)
+```
+
+**Two independent errors compound in the same direction:**
+
+| | c | cause |
+|---|---:|---|
+| published | 7.66 | — |
+| length mismatch fixed | 3.83 | x0.50 — SB applied after the fit, not before |
+| roster corrected too | **2.52** | x0.66 — c is not a property of the corpus |
+
+Net **3.04x**. Disattenuation at a 40-question cell, observed rho = 0.823:
+
+```
+c=7.66 -> 0.898    c=3.84 -> 0.862
+c=5.05 -> 0.873    c=2.52 -> 0.849
+```
+
+**The redundancy claim is affected most.** At the 87-leaf median n=38, clearing
+rho > 0.90 after disattenuation requires an observed rho of **0.821 under c=7.66
+but 0.872 under c=2.52**. Every leaf pair between those two values leaves the
+redundant bucket, so *"72% of leaf pairs redundant at rho > 0.90"* is stated at
+its strongest possible reading and must be recomputed.
+
+Everything quoting `r = n/(n+7.66)` needs revisiting: `docs/frozen-artifact.md`
+(median 0.833 at 87 cells), `docs/router-shared-kappa-correction.md`
+(0.842 -> 0.745), `docs/dag-logic-and-math.md`, `docs/prereg_discriminative_power.md`,
+and `tools/analysis/cell_fidelity_and_a3.py`.
+
+Note this does NOT invalidate the second caveat already recorded with the
+constant — that it was fitted on ground-truth rankings and is a ceiling rather
+than a prediction. Both caveats now travel with it, plus roster dependence.
