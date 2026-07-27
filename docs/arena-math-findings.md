@@ -489,8 +489,10 @@ The two groups do not overlap in accuracy (57.7% vs 53.1% at the boundary), so
 `model_output` is the empty string for those four models across all 12,032 rows,
 while `pred` is populated. This is a **capture gap in the eval pipeline, not
 model behaviour** — the responses were generated, the text was never stored.
-The judge was shown a 600-1200 character worked solution on one side and the
-single character `F` on the other.
+The judge was shown a 600-1200 character worked solution on one side and, via
+`getRobustTrace` (TaxonomyBenchmarkService.kt:1735), a synthesised one-line
+stub on the other: `The model selected option F: "Safe practices, Distress,
+Jealousy, Serious".` Not a bare character, but zero reasoning either way.
 
 ### The judge picks the response that has text, essentially always
 
@@ -629,3 +631,102 @@ The format artifact is still reported, as the measurement that justifies the
 exclusion, and it is transferable beyond this project: **an LLM judge shown a
 reasoned response against a bare answer selects the response 99.4% of the time,
 regardless of which is correct.**
+
+---
+
+## Roster identification: two systems leak, and the render path passes it through
+
+Ran the pre-launch format check on `arx_3`, `arx_0314`, `iask_pro`. Length,
+citation rate and URL rate are all unremarkable against the known models (no URLs
+anywhere, so no retrieved content). The tell was newlines: `arx_3` and
+`arx_0314` show a median of **0** where every other model shows 8-24.
+
+They are not prose. The stored `model_output` is a **raw JSON envelope**:
+
+```json
+{"response": "Let's think step-by-step:\n\n1. ...", "reason_code": "A", "difficulty": 0}
+```
+
+The newlines are escaped, not absent — and the envelope carries metadata fields
+alongside the reasoning.
+
+### `reason_code` predicts correctness
+
+```
+arx_3     A -> 83.2% (n=10289)   B -> 55.6% (n=1118)   C -> 36.5% (n=624)
+arx_0314  A -> 90.0% (n=9417)    B -> 57.5% (n=2588)
+```
+
+A self-reported confidence signal that tracks the very outcome being judged,
+present on 2 of 10 models and absent from the rest. That is an asymmetric
+side-channel, strictly worse than a format artifact.
+
+### The render path does not strip it
+
+`TaxonomyBenchmarkService.getRobustTrace` (line 1735) returns `modelOutput`
+**verbatim** whenever it is non-blank. No JSON parse, no field selection. The
+judge would receive `reason_code` inline.
+
+**Verdict: `arx_3` and `arx_0314` must not enter the arena as stored.**
+
+The fix is contained and strictly better than exclusion: unwrap the envelope in
+`getRobustTrace` — attempt a JSON parse, and if the result is an object carrying
+a `response` string, render that field alone. Falls back to current behaviour on
+any parse failure. That recovers both models and removes the leak in one place.
+
+`iask_pro` is clean on this axis — plain text, no envelope, no metadata. It does
+carry a fixed `Answer: Let's think step by step.` prefix and LaTeX `\[ \]`
+blocks, so it is stylistically distinct but not leaking. Keep with a note.
+
+### Roster size under each option
+
+| option | n | Spearman grid | \|rho\| crit p<.05 |
+|---|---:|---:|---:|
+| unwrap the envelope, keep all 10 | **10** | 0.00606 | 0.653 |
+| exclude both arx systems | 8 | 0.01190 | 0.741 |
+| exclude arx **and** gemini-3.1 | 7 | 0.01786 | 0.775 |
+
+Excluding drops straight back to the granularity of the run being replaced.
+**Unwrapping is the only option that improves on the current instrument.**
+
+On `gemini-3.1-pro_5-shots`: it is the top model at 95.4% and a 5-shot condition
+against a 0-shot remainder. Dropping it costs 7.9 points off the top of the
+range, which is expensive given five models already sit inside 71-81%. Preferred
+resolution is to keep it and label the prompting condition explicitly in the
+roster table, since the confound is documentable rather than hidden.
+
+### The near-clone resolution check, pre-registered
+
+`claude-3-5-sonnet-20241022` and `claude-3.5-sonnet` agree on 83.4% of
+predictions and sit 3 points apart on Math. **Predictions, fixed before the run:**
+
+1. They finish **adjacent** in the fitted ranking, or separated by at most one
+   intervening model.
+2. Their pairwise tie rate is **above the roster average** tie rate.
+3. Their BT score difference is **within 2 SE** of zero.
+
+A judge that separates them confidently at high stated confidence is
+over-resolving — a validity failure that rho cannot see, because a confidently
+wrong ordering of two adjacent models costs almost no rank correlation.
+
+### Budget arithmetic, done in advance
+
+10 models is 45 pairs, ~2,800 comparisons per condition — 1.6x the Math run.
+
+```
+MAIN                    ~2,800
+options-blind           ~2,800
+cross-cell rubric       ~2,800
+                        -------
+                         8,400   against a ~10,000 budget
+GENERIC baseline        ~2,800 -> 11,200  OVER
+```
+
+Three conditions fit; four do not. **GENERIC should be dropped from the law
+run** — it answered its question on Math (rubric specificity, ~0 effect on
+verdicts) and re-running it buys a second copy of a settled negative.
+
+Per the granularity screen above, **Math should not be re-run with the new
+roster except as a judge-validation baseline.** Law is where the taxonomy has
+something to be right about, and law + the corrected roster + options-blind is
+the run that tests the actual claim.
