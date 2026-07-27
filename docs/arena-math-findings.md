@@ -787,3 +787,61 @@ Math is back as a viable arena domain. Choosing between Math and law should now
 turn on question coverage — Math retains 391 questions at full roster
 intersection, law retains 20 — which currently favours **Math**, reversing the
 recommendation above.
+
+---
+
+## Resolved: law, under both roster policies
+
+The n=20 law figure was a join artifact with a specific cause.
+**`Meta-Llama-3-70B-Instruct` sits in a different question-id space** — 213 law
+rows overlapping the other models' 287 on exactly **1**. Any roster containing it
+collapses to near-empty intersections. (This confirms the standing exclusion in
+the eval id-space repair; it should never have been in the 8-model arena roster
+either.) Dropping it restores law to its full 287 and gives an 11-model band.
+
+Screen re-run under both policies, 1,500-draw size-matched null, seed 42:
+
+| domain | (A) per-domain roster | (B) 11-model band |
+|---|---|---|
+| **law** | n=285 rho=0.942 **p=0.000** | n=287 rho=0.955 **p=0.008** |
+| **math** | n=391 rho=0.979 **p=0.000** | n=393 rho=**1.000** *p=1.000* |
+| psychology | n=238 p=0.001 | n=238 p=0.000 |
+| history | n=112 p=0.052 | n=114 p=0.003 |
+| philosophy | n=144 p=0.000 | n=143 p=0.046 |
+| health | n=206 p=0.000 | n=206 p=0.001 |
+| other | n=270 p=0.000 | n=277 p=0.041 |
+| physics | n=377 p=0.141 | n=378 p=0.017 |
+| economics | n=248 p=0.000 | n=250 p=0.003 |
+| engineering | n=254 p=0.000 | n=261 p=0.706 |
+| chemistry | n=333 p=0.005 | n=338 p=0.213 |
+| biology | n=193 p=0.046 | n=196 p=0.342 |
+
+**Law is significant under both policies at full question count.** The earlier
+"law is only 20 questions" worry was the id-space bug, not a real limitation.
+
+**Math is significant only at 36-37 models. At the 11-model band it scores
+rho = 1.000 — the band's models order identically in Math as they do globally.**
+An arena run on ~11 models would have nothing to detect there.
+
+So the reversal in the previous section was itself wrong, and for an instructive
+reason: it compared domains at a roster (37 models) that the arena will never
+run, using an intersection poisoned by one id-space-mismatched model. **The
+screen must be computed at the roster the arena will actually use.** Both of
+this session's roster-size inversions came from evaluating a ranking statistic at
+a model count that did not match the decision it was informing.
+
+**Recommendation: law, on the 11-model length-matched band.** Stable across both
+roster policies, full 287-question coverage, and the domain where the taxonomy
+has something to be right about.
+
+### Still outstanding
+
+The **discriminative analysis** (rho ~ 0.92 across granularities, two routers,
+3,160 pairs) was computed at the 8-model roster and is the offline result
+currently licensing the granularity choice behind `minClusterSize = 55`. It has
+NOT been re-derived at the corrected roster and should not be cited until it is.
+
+Same dependency check is owed by anything else derived from model rankings — in
+particular the reliability constant fitted at **7.66**, which sets
+`r = n/(n+7.66)` and therefore every disattenuation and every reliability ceiling
+quoted in the thesis.
