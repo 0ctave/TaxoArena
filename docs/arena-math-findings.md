@@ -346,3 +346,119 @@ VARIES across cells, which clears the void condition in
 `docs/prereg_arena_launch.md` (the earlier Math run's uniform 56 was a scheduler
 allocation, not a cost). Minimum 32.9 sits in the `<= 40` band: leaf-level
 judging is affordable, ~2,900-3,900 calls for 87 cells against a ~10,000 budget.
+
+---
+
+## Math cannot test the granularity claim, and the ground truth says so
+
+Analyses #2 and #3 were free regroupings of verdicts already on disk (1,736 per
+condition, 11 Math cells, 241 questions, 8 models). Join verified before
+computing: 241/241 questions and 8/8 models resolve against `eval_results`.
+
+### #2 Cell size vs judge fidelity — underpowered, curve not validated
+
+| cell | nQ | GT-agree | SE | tie% | rho | rho_blind | r=n/(n+7.66) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| n00000155 | 37 | 88.2% | 3.3% | 27.5% | 0.946 | 0.707 | 0.828 |
+| n00000239 | 27 | 82.8% | 3.8% | 23.9% | 0.892 | 0.723 | 0.779 |
+| n00000158 | 25 | 91.7% | 3.0% | 18.9% | 0.952 | 0.916 | 0.765 |
+| n00000154 | 23 | 82.8% | 3.8% | 22.7% | 0.916 | 0.855 | 0.750 |
+| n00000161 | 23 | 94.8% | 2.2% | 19.2% | 0.988 | 0.855 | 0.750 |
+| n00000238 | 22 | 84.9% | 3.9% | 18.8% | 1.000 | 0.929 | 0.742 |
+| n00000157 | 20 | 91.6% | 2.8% | 11.0% | 0.898 | 0.898 | 0.723 |
+| n00000242 | 17 | 87.5% | 3.1% | 11.7% | 0.916 | 0.699 | 0.689 |
+| n00000159 | 16 | 100.0% | 0.0% | 15.6% | 0.976 | 0.905 | 0.676 |
+| n00000241 | 16 | 86.7% | 3.3% | 15.1% | 0.905 | 0.643 | 0.676 |
+| n00000240 | 15 | 88.9% | 3.5% | 20.3% | 0.859 | 0.724 | 0.662 |
+
+Fidelity regressed on cell size, k=11 cells (critical |rho| ~ 0.618 at p=.05):
+
+```
+                    MAIN     GENERIC
+GT-agreement vs n  -0.231     -0.320
+rho vs n           +0.236     +0.386
+rho_blind vs n     +0.078     +0.438
+```
+
+**Nothing is significant, and the test could not have succeeded.** Cell sizes
+span only n=15..37, over which `r = n/(n+7.66)` moves 0.662 -> 0.828 and the
+disattenuation factor `sqrt(r)` moves 0.81 -> 0.91. Predicted rho for the largest
+cell is 1.12x the smallest — but observed rho is already 0.86-1.00, so the
+prediction lands above the ceiling. **The reliability curve remains an untested
+caveat.** Validating it needs cells spanning a far wider n, or a domain where rho
+is low enough to have somewhere to move.
+
+### #3 Aggregation-level fidelity — flat, then rising at the coarsest cut
+
+```
+cut                groups  mean nQ    MAIN   GENERIC
+leaf cut               11     21.9   0.932     0.926
+depth-3 cut             4     60.2   0.929     0.917
+depth-2 cut             2    120.5   0.929     0.929
+Math as one cell        1    241.0   0.976     0.976
+```
+
+Finer aggregation does not improve fidelity. The single Math cell scores
+highest, identically under both judges.
+
+### Why: the ground truth has no cell-level structure in Math
+
+```
+mean rho(cell BT,     GLOBAL BT)  = 0.942 MAIN / 0.948 GENERIC
+mean rho(cell GT acc, GLOBAL GT)  = 0.945          <-- ground truth itself
+rho(GLOBAL BT, GLOBAL GT)         = 0.976
+```
+
+The arena's per-cell rankings depart from the global ranking by **the same
+amount the ground truth does**. This is not the arena failing to resolve cells.
+There is nearly nothing at the cell level to resolve: in Math these 8 models are
+ordered almost identically in every sub-cell, and the arena tracks that
+faithfully at every level.
+
+**So the flat A3 curve is a property of the domain, not of the taxonomy.**
+
+### Screening: which domains can show a granularity effect at all
+
+Free, offline, no arena calls — per-domain GT accuracy ranking against global,
+with a 2,000-draw permutation null over same-size random subsets of the same
+reserved pool (3,445 questions with all 8 models, seed 42):
+
+| domain | nQ | rho | null p5 | null median | p_emp |
+|---|---:|---:|---:|---:|---:|
+| **law** | 287 | **0.855** | 0.934 | 0.994 | **0.000** |
+| **philosophy** | 144 | **0.850** | 0.922 | 0.988 | **0.000** |
+| **history** | 114 | **0.850** | 0.922 | 0.982 | **0.001** |
+| psychology | 238 | 0.922 | 0.922 | 0.994 | 0.056 |
+| other | 277 | 0.922 | 0.922 | 0.994 | 0.064 |
+| health | 206 | 0.922 | 0.922 | 0.994 | 0.069 |
+| physics | 379 | 0.970 | 0.958 | 0.994 | 0.220 |
+| **math** | 393 | **0.970** | 0.958 | 0.994 | **0.217** |
+| chemistry | 339 | 0.970 | 0.946 | 0.994 | 0.249 |
+| biology | 196 | 0.970 | 0.922 | 0.994 | 0.385 |
+| economics | 250 | 0.982 | 0.922 | 0.994 | 0.394 |
+| business | 232 | 0.988 | 0.922 | 0.994 | 0.413 |
+| computer science | 123 | 0.994 | 0.922 | 0.982 | 0.958 |
+| engineering | 267 | 0.994 | 0.922 | 0.994 | 0.962 |
+
+Sampling noise alone almost never reorders these models (null median 0.994).
+Against that floor, **only law, philosophy, and history reorder for real.**
+
+**Math is statistically indistinguishable from a same-size random subset
+(p=0.217).** The pilot domain was close to the worst available choice for
+testing granularity: model ranking in Math simply is not domain-specific, so no
+partition of it — however good — can demonstrate that partitioning helps.
+
+Two consequences:
+
+1. **The Math arena validated the judge, not the taxonomy.** Everything it
+   established (88.8% GT-agreement, the key-dependence split, the trace
+   inversion) is a judge result and stands. The granularity claim was never
+   testable here.
+2. **Budget goes to law, philosophy, history.** Law was already queued and is
+   confirmed as the strongest choice. `other` is marginal (p=0.064) and should
+   not be run on the expectation of a positive result.
+
+Caveat on the screen: it uses MMLU-Pro's native category labels, not induced
+cells. It bounds what any partition of a domain could show — a domain whose own
+label carries no reordering is unlikely to contain cells that do — but it does
+not prove induced cells inside law will separate. That remains the test.
