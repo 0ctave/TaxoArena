@@ -161,6 +161,26 @@ class TaxonomyConfig {
 
 
         // ── Mode Switch ──────────────────────────────────────────────────────
+        /**
+         * k-selection increment for performVmfKMeans: "how much must cluster k+1 ADD?".
+         * A DIFFERENCE of separations, whereas proposalSeparationBar is a LEVEL ("is
+         * every pair distinct?"). One constant served both for the whole history of the
+         * project; this decouples them.
+         *
+         * NEGATIVE means "fall back to proposalSeparationBar", so every existing config
+         * keeps its exact behaviour and this is inert until set.
+         */
+        var marginalEps: Double = -1.0
+
+        /**
+         * Upper bound on k for the EM mixture search. Historically hardcoded to 4.
+         * With marginalEps > 0 the increment test bound k below this and the cap was
+         * slack; with marginalEps = 0 nothing stops k except the coarsening loop, the
+         * min-pair gate and this constant — so it can become the binding selector,
+         * which would replace a documented threshold with an undocumented one.
+         */
+        var maxK: Int = 4
+
         var dagMode: DagMode = DagMode.DAG_MAX
             set(value) {
                 field = value

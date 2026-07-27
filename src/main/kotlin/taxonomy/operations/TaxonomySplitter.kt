@@ -45,6 +45,15 @@ class TaxonomySplitter(
         conceptCounter.set(1)
     }
 
+    /**
+     * Why the most recent splitSingleNode call declined, or null if it split. Read by
+     * the k-fallback loop to decide whether trying a higher k is worth a full
+     * tryProposal cycle. Safe as a plain field because the split loop is sequential
+     * per node — the lambda runs inside the same iteration that reads this.
+     */
+    @Volatile
+    var lastDeclineReason: String? = null
+
     // TaxonomySplitter.splitNodesRecursive has been removed. It was a parallel BFS
     // that split every node bottom-up via async/awaitAll, and it had NO CALLER:
     // production splits through TaxonomyOperations.splitNodesRecursive, which walks
@@ -54,7 +63,15 @@ class TaxonomySplitter(
     // would have committed splits without a global acceptance test. Its log lines
     // ("Starting/Finished parallel split evaluation") never appear in any run.
 
-    suspend fun splitSingleNode(node: GraphNode): Boolean {
+    /**
+     * [forcedK] non-null runs the mixture search at EXACTLY that k instead of letting
+     * performVmfKMeans pick one. Every downstream gate is unchanged: floor absorption,
+     * weak-pair coarsening, the routed min-pair bar. A forced candidate is therefore
+     * not privileged — it still has to survive everything a self-selected one does,
+     * and coarsening may reduce it below k before it gets there.
+     */
+    suspend fun splitSingleNode(node: GraphNode, forcedK: Int? = null, currentIteration: Int = -1): Boolean {
+        lastDeclineReason = null
         if (!node.isLeaf) return false
         val localWeights = node.queryWeights
         val mass = localWeights.values.sum()
@@ -155,6 +172,10 @@ class TaxonomySplitter(
         // not done. The cheaper variant if it is ever worth revisiting: rank the
         // candidates by local separation and evaluate dJ on the top two only.
         val minClusterFrac = minClusterSize.toDouble() / targetQueries.size
+        // Negative marginalEps means "not set" -> keep the historical coupling.
+        val marginal = config.formalism.marginalEps.let {
+            if (it >= 0.0) it else config.formalism.proposalSeparationBar
+        }
 
         // A maxK=2 probe used to run here before the maxK=4 selection, guarding a
         // null check, a components.size<2 check and a `?: probe` fallback. All three
@@ -174,12 +195,16 @@ class TaxonomySplitter(
         // sequential barrier for a CPU saving that never showed up in wall-clock. And
         // for n < 3*minClusterSize it was pure duplication anyway, since
         // actualMaxK = min(maxK, n/minSize) collapses maxK=4 to 2 there.
+        // Forcing k: cap maxK at k and drive marginalEps negative so every increment
+        // up to k is taken, which makes performVmfKMeans return exactly k rather than
+        // its own choice. Without the negative eps it would still stop early at the
+        // increment test and the "forced" candidate would silently be a smaller one.
         val mixture = StatisticsUtils.performVmfKMeans(
             embeddings = pcaProjected,
             d = splitDim,
-            maxK = 4,
+            maxK = forcedK ?: config.formalism.maxK,
             minClusterFrac = minClusterFrac,
-            marginalEps = config.formalism.proposalSeparationBar
+            marginalEps = if (forcedK != null) -1.0e9 else marginal
         )
 
         if (mixture == null) {
@@ -363,7 +388,7 @@ class TaxonomySplitter(
                     " k=${routedClusters.size} sizes=${routedClusters.map { it.size }} floor=$minClusterSize"
             )
             taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
-                iter = -1, type = "GROW", siteId = node.id, siteLabel = node.label,
+                iter = currentIteration, type = "GROW", siteId = node.id, siteLabel = node.label,
                 dJ = null, seDJ = null, z = null, dV = null,
                 decision = "NO_PROPOSAL",
                 // Carry the binding value: min_child against the floor is what distinguishes a
@@ -373,6 +398,7 @@ class TaxonomySplitter(
                     ",floor=$minClusterSize,k=${routedClusters.size})",
                 nSite = node.queryWeights.size
             )
+            lastDeclineReason = "not_routing_sustainable"
             return false
         }
 
@@ -413,7 +439,7 @@ class TaxonomySplitter(
                     " bar=${"%.4f".format(java.util.Locale.US, requiredEps)}"
             )
             taxonomy.diagnostics.DiagnosticsBundle.recordProposal(
-                iter = -1, type = "GROW", siteId = node.id, siteLabel = node.label,
+                iter = currentIteration, type = "GROW", siteId = node.id, siteLabel = node.label,
                 dJ = null, seDJ = null, z = null, dV = null,
                 decision = "NO_PROPOSAL",
                 reason = "min_pair_sep_below_bar(sep=" +

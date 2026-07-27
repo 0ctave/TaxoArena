@@ -65,6 +65,8 @@ data class HeadlessCliConfig(
     val routingBeamGamma: Double? = null,
     val descentMargin: Double? = null,
     val acceptanceZ: Double? = null,
+    val marginalEps: Double? = null,
+    val maxK: Int? = null,
     val enableRefitGate: Boolean? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
@@ -153,6 +155,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
         cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
         cliConfig.acceptanceZ?.let { config.formalism.acceptanceZ = it }
+        cliConfig.marginalEps?.let { config.formalism.marginalEps = it }
+        cliConfig.maxK?.let { config.formalism.maxK = it }
         cliConfig.enableRefitGate?.let { config.formalism.enableRefitGate = it }
         // Headless splits on cliConfig.testRatio and never reads dataset.testSplitRatio, so the
         // two drifted: the banner and — more seriously — the EffectiveConfig provenance record
@@ -1333,6 +1337,8 @@ class HeadlessBenchmarkRunner(
         var routingBeamGamma: Double? = null
         var descentMargin: Double? = null
         var acceptanceZ: Double? = null
+        var marginalEps: Double? = null
+        var maxK: Int? = null
         var enableRefitGate: Boolean? = null
         var cosineTau: Double? = null
         var leafAcceptanceScale: Double? = null
@@ -1410,6 +1416,8 @@ class HeadlessBenchmarkRunner(
                 "routingBeamGamma" -> routingBeamGamma = rawVal.toDouble()
                 "descentMargin" -> descentMargin = rawVal.toDouble()
                 "acceptanceZ" -> acceptanceZ = rawVal.toDouble()
+                "marginalEps" -> marginalEps = rawVal.toDouble()
+                "maxK" -> maxK = rawVal.toInt()
                 "enableRefitGate" -> enableRefitGate = rawVal.toBoolean()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
@@ -1461,6 +1469,8 @@ class HeadlessBenchmarkRunner(
             routingBeamGamma = routingBeamGamma,
             descentMargin = descentMargin,
             acceptanceZ = acceptanceZ,
+            marginalEps = marginalEps,
+            maxK = maxK,
             enableRefitGate = enableRefitGate,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,

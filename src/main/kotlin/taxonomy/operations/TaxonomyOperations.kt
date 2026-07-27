@@ -173,9 +173,50 @@ class TaxonomyOperations(
                 // 620 q, local sep 0.058 = 5.8x epsilon, Delta J +0.00148, rejected
                 // every iteration at bar 0.00208 = epsilon*0.21 — domains stayed
                 // childless leaves and depth stalled at 3).
-                val outcome = tryProposal(dag, node, allEmbeddings, groundTruthMap, currentIteration, ProposalType.GROW) {
-                    // splitSingleNode requires splitter to be called
-                    splitter.splitSingleNode(node)
+                // ── k-fallback ────────────────────────────────────────────────
+                // Previously: EM picked one k, and if that single candidate failed any
+                // downstream gate the node stayed an unsplit leaf with no recourse.
+                // That made maxK a structural determinant rather than a cost cap —
+                // measured: raising it 4 -> 6 collapsed the tree to 36 leaves and J
+                // 0.181, because wider proposals died outright instead of falling back.
+                //
+                // Now every k in 2..maxK is offered in ASCENDING order and the first
+                // one the objective accepts is taken.
+                //
+                // Selection is lowest-k-first, NOT argmax dJ. Taking a maximum over
+                // several noisy dJ estimates is the same optimisation bias that makes
+                // argmax-separation invalid for choosing k: with 3 candidates the max
+                // is biased upward even when all three are equivalent, and the winner
+                // is disproportionately the one whose bootstrap SE happened to land
+                // low. Every candidate here has already cleared the SAME statistical
+                // gate independently, so the ordering only has to break ties among
+                // edits that are each individually supported. Parsimony is the
+                // conservative tie-break and is deterministic, which argmax is not.
+                //
+                // GUARD (memo): proposalKey carries k. The memo fingerprint is keyed on
+                // the site, so without a discriminator a rejected k=2 would memo-skip
+                // k=3 and record it REJECTED unevaluated — the false-hit class the
+                // MEMOIZED row caught on internal nodes.
+                //
+                // GUARD (determinism): ascending k, first acceptance wins. No tie-break
+                // on a float comparison, so the bit-identical-at-fixed-split property
+                // is preserved.
+                //
+                // Coarsening can map different k onto the same routed partition (k=4
+                // and k=3 both collapsing to 3). Those are not deduplicated here: a
+                // duplicate simply fails the memo on a different proposalKey and costs
+                // one extra evaluation. Dedup would need the routed assignment, which
+                // is only known inside splitSingleNode after it has already mutated
+                // the node.
+                var outcome = ProposalOutcome.NO_PROPOSAL
+                for (k in 2..config.formalism.maxK) {
+                    outcome = tryProposal(
+                        dag, node, allEmbeddings, groundTruthMap, currentIteration,
+                        ProposalType.GROW, proposalKey = "k$k"
+                    ) {
+                        splitter.splitSingleNode(node, forcedK = k, currentIteration = currentIteration)
+                    }
+                    if (outcome == ProposalOutcome.ACCEPTED) break
                 }
             }
         }
