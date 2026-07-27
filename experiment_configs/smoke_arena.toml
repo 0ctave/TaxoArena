@@ -1,0 +1,58 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/smoke_arena
+#  smoke_arena.toml — PRE-LAUNCH VERIFICATION ONLY. NOT A RESULT.
+#
+#  Verifies the four things listed in docs/prereg_arena_launch.md before the
+#  real Math run spends its budget:
+#    1. rank_history.csv POPULATES (wired, never exercised with runBenchmark=true)
+#    2. match_history carries node_id / eval_question_id / condition non-NULL
+#    3. [ARENA-IDENT] emits a calls-to-identification figure
+#    4. a non-MAIN verdict CSV appears (A5 needs GENERIC_JUDGE separable from MAIN)
+#
+#  Deliberately tiny: 3 models = 3 pairs against 28, questionsPerRound = 1.
+#  Cost scales as pairs x cells x depth, so this is ~1/10th of the real run.
+#  DO NOT CITE ANY RANKING FROM THIS RUN.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+models        = ["claude-3-5-sonnet-20241022", "gpt-4o-2024-08-06", "Llama-2-13b-hf"]
+
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Math"
+queryLimit    = 0
+outputDir     = "experiment_results/smoke_arena"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+conditions         = ["MAIN", "GENERIC_JUDGE"]
+
+questionsPerRound  = 1
+confidenceGate     = 0.65
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+numIterations         = 50
+maxLeafAssignments    = 5
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+enableProfiling           = true
