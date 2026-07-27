@@ -232,13 +232,31 @@ class TaxonomySplitter(
         // if routing will sustain every child it creates.
         fun routeToVmfs(vmfs: List<StatisticsUtils.VmfParameters>): List<MutableList<Embedding>> {
             val out = List(vmfs.size) { mutableListOf<Embedding>() }
+            // SHARED kappa, no per-child normalizer — matching TaxonomyTrickler's
+            // `meanKappa * dots[i]` exactly. This used to score
+            // `vmf.logNormalizer + vmf.kappa * dot`, the per-child density form that
+            // production routing was moved away from because it lets a concentrated
+            // sibling absorb a diffuse one's queries on concentration bookkeeping
+            // rather than on direction.
+            //
+            // The check this feeds is routing sustainability, justified as "every
+            // target query is re-assigned by the same level-local posterior the
+            // trickler uses". It was not the same posterior, so the check was asking
+            // whether the children survive under a router the tree does not use.
+            // Since the bias systematically depresses the smallest child, and the
+            // check rejects on min(routed child) < minClusterSize, it produced
+            // failures concentrated on splits with one tight and one diffuse child.
+            //
+            // meanKappa is a positive constant across children, so it cannot change
+            // the argmax; it is kept only so this line reads identically to the
+            // trickler's and cannot drift from it silently.
+            val meanKappa = vmfs.map { it.kappa }.average().coerceAtLeast(1e-9)
             for (q in targetQueries) {
                 val x = q.projectTo(childDim)
                 var best = 0
                 var bestScore = Double.NEGATIVE_INFINITY
                 for (idx in vmfs.indices) {
-                    val vmf = vmfs[idx]
-                    val score = vmf.logNormalizer + vmf.kappa * StatisticsUtils.dotProduct(x, vmf.mu)
+                    val score = meanKappa * StatisticsUtils.dotProduct(x, vmfs[idx].mu)
                     if (score > bestScore) {
                         bestScore = score
                         best = idx
