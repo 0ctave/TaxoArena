@@ -45,15 +45,6 @@ class TaxonomySplitter(
         conceptCounter.set(1)
     }
 
-    /**
-     * Why the most recent splitSingleNode call declined, or null if it split. Read by
-     * the k-fallback loop to decide whether trying a higher k is worth a full
-     * tryProposal cycle. Safe as a plain field because the split loop is sequential
-     * per node — the lambda runs inside the same iteration that reads this.
-     */
-    @Volatile
-    var lastDeclineReason: String? = null
-
     // TaxonomySplitter.splitNodesRecursive has been removed. It was a parallel BFS
     // that split every node bottom-up via async/awaitAll, and it had NO CALLER:
     // production splits through TaxonomyOperations.splitNodesRecursive, which walks
@@ -71,7 +62,6 @@ class TaxonomySplitter(
      * and coarsening may reduce it below k before it gets there.
      */
     suspend fun splitSingleNode(node: GraphNode, forcedK: Int? = null, currentIteration: Int = -1): Boolean {
-        lastDeclineReason = null
         if (!node.isLeaf) return false
         val localWeights = node.queryWeights
         val mass = localWeights.values.sum()
@@ -398,7 +388,6 @@ class TaxonomySplitter(
                     ",floor=$minClusterSize,k=${routedClusters.size})",
                 nSite = node.queryWeights.size
             )
-            lastDeclineReason = "not_routing_sustainable"
             return false
         }
 
