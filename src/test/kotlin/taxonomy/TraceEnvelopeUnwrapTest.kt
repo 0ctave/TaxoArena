@@ -144,4 +144,17 @@ class TraceEnvelopeUnwrapTest {
         // ...and an envelope with no usable `response` also falls back, so nothing is lost.
         assertEquals("""{"reason_code": "A"}""", unwrapTraceEnvelope("""{"reason_code": "A"}"""))
     }
+
+    /** The exclusion list must be an enforcement point, not a note. */
+    @Test
+    fun `banned models are rejected at roster load`() {
+        val v = taxonomy.dataset.EvalIngestValidator(dbPath)
+        val ex = org.junit.jupiter.api.assertThrows<IllegalStateException> {
+            v.enforceNamedExclusions(listOf("gpt-4o-2024-08-06", "Meta-Llama-3-70B-Instruct"))
+        }
+        assertTrue(ex.message!!.contains("Meta-Llama-3-70B-Instruct"))
+        assertTrue(ex.message!!.contains("question-id space"))
+        // A clean roster passes.
+        v.enforceNamedExclusions(listOf("gpt-4o-2024-08-06", "claude-3-5-haiku-20241022"))
+    }
 }

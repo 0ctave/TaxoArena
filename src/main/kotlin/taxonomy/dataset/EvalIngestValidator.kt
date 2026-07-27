@@ -302,6 +302,42 @@ class EvalIngestValidator(
     // ─── Entry point ─────────────────────────────────────────────────────────────────────
 
     /**
+     * Models that must never appear in a roster, with the reason. Checked by
+     * [enforceNamedExclusions] and thrown on, because the failure mode these guard against
+     * is silent: a bad model produces plausible numbers rather than an error.
+     *
+     * This exists because a documented exclusion is not an enforcement point. Every entry
+     * below was already written down somewhere before it went on to corrupt a measurement.
+     */
+    private val BANNED_MODELS: Map<String, String> = mapOf(
+        "Meta-Llama-3-70B-Instruct" to
+            "different question-id space: 213 law rows overlap the other models' 287 on " +
+            "exactly 1, so ANY roster containing it collapses to a near-empty intersection. " +
+            "Was in the 8-model Math arena roster and produced the spurious 'law has only 20 " +
+            "questions' result (docs/arena-math-findings.md).",
+        "deepseek" to "no trace field in the upstream archive; getRobustTrace substitutes a " +
+            "one-line stub, reproducing the 99.4% format preference",
+        "flash_0shots_00_35_03" to "no trace field in the upstream archive",
+        "gpt4o(2024-05-13)" to "no trace field in the upstream archive",
+        "opus_2shots_00_37_14" to "no trace field in the upstream archive",
+        "sonnet-3.5_0shots_09_34_29" to "no trace field in the upstream archive",
+        "sonnet_0shots_12_01_18" to "no trace field in the upstream archive",
+        "jamba-1.5-large" to "mixed format: emits a bare answer on 68.4% of items, which " +
+            "reintroduces the format preference inside its own comparisons",
+        "gemini-1.5-pro-002" to "mixed format: bare answer on 35.4% of items",
+        "gemini-1.5-flash-002" to "mixed format: bare answer on 27.6% of items",
+    )
+
+    /** Fails loudly at roster load rather than silently at analysis time. */
+    fun enforceNamedExclusions(models: List<String>) {
+        val hits = models.filter { it in BANNED_MODELS }
+        check(hits.isEmpty()) {
+            "roster contains ${hits.size} banned model(s):\n" +
+                hits.joinToString("\n") { "  - $it: ${BANNED_MODELS[it]}" }
+        }
+    }
+
+    /**
      * Validate [models] against the ingested corpus.
      *
      * Majorities are established over every model in `eval_results`, not just [models], so a
@@ -311,6 +347,7 @@ class EvalIngestValidator(
         if (models.isEmpty()) {
             return EvalIngestReport(emptyList(), 0, 0, 0, 0, listOf("no models requested"))
         }
+        enforceNamedExclusions(models)
         openReadOnly().use { c ->
             if (!hasEvalResults(c)) {
                 return EvalIngestReport(

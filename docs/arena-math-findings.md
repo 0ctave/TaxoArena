@@ -845,3 +845,50 @@ Same dependency check is owed by anything else derived from model rankings — i
 particular the reliability constant fitted at **7.66**, which sets
 `r = n/(n+7.66)` and therefore every disattenuation and every reliability ceiling
 quoted in the thesis.
+
+---
+
+## The reliability constant re-fitted: c = 5.05, and the direction was backwards
+
+Method validated first: re-running the original procedure on the original 8-model
+roster returns **c = 7.71 against the published 7.66** (0.7%), and reproduces the
+fit points (n=40 -> 0.838 vs 0.842; n=52 -> 0.869 vs 0.872; n=90 -> 0.918 vs
+0.922). Note the fit is on the RAW split-half correlation, not the
+Spearman-Brown-corrected value — applying the correction first gives c = 3.84 and
+does not reproduce the published number.
+
+| roster | c | r1 = 1/(1+c) |
+|---|---:|---:|
+| original 8 models | 7.71 | 0.115 |
+| 11-model band | **5.05** | 0.165 |
+
+**c FALLS with roster size. The predicted direction was wrong.** The reasoning
+"at more models a ranking is harder to reproduce from half the data" does not
+hold: Spearman runs over more pairs, so noise in any one model's accuracy
+displaces it less in rank terms relative to the whole. A ranking over 11 models
+is *easier* to reproduce from half the data than one over 8.
+
+That reverses the consequence as well. Lower c means higher reliability at fixed
+n, so LESS disattenuation, so observed correlations are corrected less:
+
+```
+40-question cell   c=7.66: r=0.839 sqrt(r)=0.916 -> observed rho 0.60 becomes 0.655
+                   c=5.05: r=0.888 sqrt(r)=0.942 -> observed rho 0.60 becomes 0.637
+```
+
+**Redundancy findings come back weaker under the corrected constant, not
+stronger.** Every disattenuation and every reliability ceiling in the thesis
+needs recomputing at c = 5.05 if the arena runs on the 11-model band — and the
+constant must be re-fitted again if the roster changes, since it is not a
+property of the corpus.
+
+## Named exclusions are now enforced
+
+`EvalIngestValidator.enforceNamedExclusions` throws at roster load for 10 models,
+each with its reason, and is called from `validate()` so every roster passes
+through it. The list covers the id-space mismatch, the six traceless archives and
+the three mixed-format models.
+
+Written because `Meta-Llama-3-70B-Instruct` was documented as excluded *before*
+it entered the 8-model Math roster and produced the spurious "law has only 20
+questions" result. A documented exclusion is not an enforcement point.
