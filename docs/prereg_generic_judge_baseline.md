@@ -51,6 +51,69 @@ arms**. At a flat 0.85 it admits every C5 verdict while filtering MAIN's, so lea
 on would silently change which verdicts enter each fit and the arms would no longer be
 paired in the only place that matters.
 
+## Matched sampling: the domain IS the union of its leaves
+
+Sampling must be matched, not independent. If this system judges the questions its
+leaves contain while the MT-Bench arm judges "random queries of each domain", the two
+arms see different question sets and the comparison inherits sampling variance
+orthogonal to the treatment.
+
+Every leaf sits under exactly one depth-1 domain, so **the union of a domain's leaves'
+questions IS that domain's question set**. Sample once per domain, judge that same set
+both ways:
+
+| | questions | rubric | BT fitted |
+|---|---|---|---|
+| this system | domain set | each question under ITS OWN leaf's rubric | per leaf, rolled up |
+| MT-Bench arm | **same set** | generic, no rubric | directly at the domain |
+
+Identical questions, identical models, identical judge model. The only difference is
+whether the partition is used.
+
+## Roll-up: pool sufficient statistics, fit once
+
+The per-leaf arm must become one domain-level ranking. Three options, not equivalent:
+
+- **pool sufficient statistics, fit once** (`aggregateLeafScores`) — CHOSEN
+- average per-leaf theta — reintroduces the gauge problem, since each leaf centres its
+  own scale
+- inverse-variance weighting — better than averaging, still gauge-dependent
+
+Pooling is chosen because it makes the two arms **identical in estimation**, so any
+difference between them is attributable to the rubric rather than to the aggregation.
+State this explicitly in the write-up: a reader will otherwise wonder whether the
+roll-up is doing the work.
+
+The consequence is worth naming — under pooling, the partition affects only WHICH
+RUBRIC judged each verdict, not how scores combine.
+
+*(To verify before launch: that `aggregateLeafScores` pools sufficient statistics
+rather than combining fitted per-leaf scores. The choice above depends on it.)*
+
+## What this arm tests — and what it does not
+
+Narrower than "our system versus MT-Bench":
+
+> Does judging a question under a rubric induced from its own leaf produce a better
+> domain-level model ranking than judging it under a generic rubric?
+
+It does **not** test whether the partition helps aggregation — pooling makes that
+identical by construction. It does **not** test cell-level ranking structure — that is
+the granularity screen, which is offline and already run. It tests **rubric
+conditioning at matched everything-else**.
+
+**Honest prior, recorded before the run:** this likely comes back NULL with options
+present. On Math, MAIN and GENERIC_JUDGE agreed on 99.4% of winners, and the 88.8%
+GT-agreement was driven by correctness verification rather than by rubric application.
+C5 uses a different generic template from GENERIC_JUDGE, so it is not literally the
+same test — but it is close enough that a large difference would be surprising and
+would need explaining rather than celebrating.
+
+That is an argument for running this **options-blind** if budget allows, since
+withholding the options is the only regime in which the rubric has been shown able to
+matter. With options present, the judge can verify the answer and the rubric is
+decorative.
+
 ## Domains: four, chosen for a built-in control
 
 `math` (393 reserved), `physics` (378), `chemistry` (338), `law` (287).
