@@ -89,6 +89,48 @@ agreement. The selection control addresses the ranking-compression form of that
 concern; it does not address whether these items are harder in ways that affect
 judging beyond correctness.
 
+### Reasoning text makes the judge WORSE at picking the correct answer
+
+GT-agreement stratified by whether each response carries a chain-of-thought
+trace. The roster is balanced 4/4 by design. Rows where exactly one response is
+correct and the judge did not tie.
+
+| condition | stratum | hits / n | GT-agree | SE | ties |
+|---|---|---:|---:|---:|---:|
+| MAIN | trace x trace | 181 / 215 | **84.2%** | 2.5% | 40 |
+| MAIN | trace x no-trace | 590 / 660 | 89.4% | 1.2% | 17 |
+| MAIN | no-trace x no-trace | 143 / 154 | **92.9%** | 2.1% | 74 |
+| GENERIC | trace x trace | 174 / 211 | **82.5%** | 2.6% | 44 |
+| GENERIC | trace x no-trace | 595 / 670 | 88.8% | 1.2% | 7 |
+| GENERIC | no-trace x no-trace | 144 / 152 | **94.7%** | 1.8% | 76 |
+
+Agreement is HIGHEST where neither response has a trace and LOWEST where both
+do — an 8.7-point gap (MAIN), ~2.7 SE, and the same shape in GENERIC.
+
+This inverts the design assumption. An untraced response is a bare answer
+letter, so the judge has nothing BUT the letter — and it matches the key almost
+perfectly. Traced responses give it reasoning to read, and agreement falls. That
+is only paradoxical if the judge is evaluating; it is exactly what verification
+predicts, with the prose as a distraction that occasionally argues it out of the
+correct answer.
+
+The tie counts corroborate independently: 74 ties in the no-trace stratum
+against 17 in the mixed one. Given two bare letters and no reasoning to compare,
+the judge either matches the key or declares equivalence.
+
+This was not part of the hypothesis, so it is confirmation of the
+correctness-driven reading from a direction that was not being looked at.
+
+**Consequence for the planned OPTIONS-BLIND arm.** The `no-trace x no-trace`
+stratum was designed as a floor expected near 50%. WITH options it sits at
+92.9%, so it is not measuring what the design assumed — it is
+letter-verification at maximum clarity. WITHOUT options that stratum becomes
+genuinely uninformative (two bare letters, no key), and it should return to
+chance. **If it does not, that is the leak the design was built to detect** — a
+sharp test rather than a formality. And `trace x trace` at 84.2%, n = 215,
+SE 2.5%, is the real measurement: a fall to ~75% would be ~3.6 SE and clearly
+readable.
+
 **This is a negative result about the LLM-as-judge paradigm, not about the
 taxonomy.** MMLU-Pro is multiple-choice with a verifiable key, so a capable
 judge can shortcut to correctness and bypass the partition entirely. The
@@ -208,16 +250,47 @@ has a MECHANISM for its null rather than an absence of effect.
 1. **Rule-ID citation** in the verdict schema. Distinguishes reproduction from
    application, and counts prior-decided verdicts. Must precede the full-corpus
    run because it changes the schema.
-2. **OPTIONS-BLIND arm**, with the reading fixed in advance:
+2. **OPTIONS-BLIND arm.** Same 241 questions, MAIN rubric, options withheld from
+   the judge. Implementation: suppress the options block built in
+   `TaxonomyArenaService.evaluateWithPrecomputedTraces` (~lines 655-657); the
+   answering models' block at 319-322 is separate and must stay.
 
-   | rho without options | tie rate | reading |
+   It completes a 2x2 that the correctness-blind subset does NOT cover — the two
+   manipulations are orthogonal, not substitutes:
+
+   |  | options present | options withheld |
    |---|---|---|
-   | collapses | SPIKES | judge can no longer decide — the task became impossible |
-   | collapses | stable | judge was verifying the letter — it was solving |
-   | holds ~0.9 | — | judge evaluates reasoning; the rubric null needs another explanation |
+   | key discriminates (n=1160) | 88.8% GT-agree, rho 0.95 | **the missing cell** |
+   | key ties (n=576) | rho 0.75, tie 0.34 | — |
 
-   Without the tie-rate control a collapse is uninterpretable. Log refusal and
-   malformed-verdict rate too.
+   The blind subset holds information constant and varies the population;
+   OPTIONS-BLIND holds population constant and varies information. There is also
+   a mechanism difference: in the blind subset the judge can verify both answers
+   are right and then knowingly falls back to other grounds, whereas without
+   options it never knows, so reasoning is its primary signal from the start.
+
+   **PRIMARY OUTCOME IS GT-AGREEMENT, NOT RHO.** Rho at n = 8 is quantised at
+   0.0119 and burns 1736 comparisons for one number. GT-agreement is a
+   per-verdict proportion: n = 1160 on the discriminable subset, SE ~1.5%,
+   resolving ~4-point differences.
+
+   | 88.8% falls to | reading |
+   |---|---|
+   | ~55% (chance) | the key was doing nearly all the work |
+   | ~75% | reasoning carries substantial independent signal |
+   | ~85% | options barely mattered; the judge infers correctness from reasoning |
+
+   **STRATIFY BY TRACE PRESENCE — mandatory, not optional.** 4 of the 8 models
+   carry no trace. Without options, a bare "C" against a bare "E" gives the
+   judge nothing, and a traced response against an untraced one is decided by
+   trace presence alone. So report separately: `trace x trace` (6 pairs, ~250
+   comparisons, SE ~3% — the real measurement), `trace x no-trace` (16 pairs,
+   contaminated, expect trace-presence to dominate), and `no-trace x no-trace`
+   (6 pairs — the built-in null, which SHOULD return to chance; see the
+   stratified baseline above for why it currently does not).
+
+   Tie rate alongside, plus refusal and malformed-verdict rate. Rho reported but
+   not leaned on.
 3. **Other or Health**, only if verdict agreement there shows the arms differ.
 
 ## Data and defects
