@@ -67,6 +67,7 @@ data class HeadlessCliConfig(
     val acceptanceZ: Double? = null,
     val marginalEps: Double? = null,
     val maxK: Int? = null,
+    val excludeFromAnchoring: List<String> = emptyList(),
     val enableRefitGate: Boolean? = null,
     val defaultKappaPrior: Double? = null,
     val enableLabeling: Boolean? = null,
@@ -157,6 +158,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.acceptanceZ?.let { config.formalism.acceptanceZ = it }
         cliConfig.marginalEps?.let { config.formalism.marginalEps = it }
         cliConfig.maxK?.let { config.formalism.maxK = it }
+        if (cliConfig.excludeFromAnchoring.isNotEmpty())
+            config.formalism.excludeFromAnchoring = cliConfig.excludeFromAnchoring.toSet()
         cliConfig.enableRefitGate?.let { config.formalism.enableRefitGate = it }
         // Headless splits on cliConfig.testRatio and never reads dataset.testSplitRatio, so the
         // two drifted: the banner and — more seriously — the EffectiveConfig provenance record
@@ -1339,6 +1342,7 @@ class HeadlessBenchmarkRunner(
         var acceptanceZ: Double? = null
         var marginalEps: Double? = null
         var maxK: Int? = null
+        var excludeFromAnchoring: List<String> = emptyList()
         var enableRefitGate: Boolean? = null
         var cosineTau: Double? = null
         var leafAcceptanceScale: Double? = null
@@ -1418,6 +1422,11 @@ class HeadlessBenchmarkRunner(
                 "acceptanceZ" -> acceptanceZ = rawVal.toDouble()
                 "marginalEps" -> marginalEps = rawVal.toDouble()
                 "maxK" -> maxK = rawVal.toInt()
+                "excludeFromAnchoring" -> excludeFromAnchoring =
+                    rawVal.trim().removePrefix("[").removeSuffix("]")
+                        .split(",")
+                        .map { it.trim().trim('\"', '\'') }
+                        .filter { it.isNotEmpty() }
                 "enableRefitGate" -> enableRefitGate = rawVal.toBoolean()
                 "enableLabeling" -> enableLabeling = rawVal.toBoolean()
                 "judgeInduction" -> judgeInduction = rawVal.toBoolean()
@@ -1471,6 +1480,7 @@ class HeadlessBenchmarkRunner(
             acceptanceZ = acceptanceZ,
             marginalEps = marginalEps,
             maxK = maxK,
+            excludeFromAnchoring = excludeFromAnchoring,
             enableRefitGate = enableRefitGate,
             defaultKappaPrior = defaultKappaPrior,
             enableLabeling = enableLabeling,
@@ -1490,7 +1500,27 @@ class HeadlessBenchmarkRunner(
             numIterations = numIterations,
             runBaselines = runBaselines,
             enableProfiling = enableProfiling
-        )
+        ).also { parsed ->
+            // Fail on a silent no-op rather than on a missing log line.
+            //
+            // If the key is present but misparsed (misspelling, wrong list syntax, a
+            // parse branch that never runs) the set ends up empty, the [HOLD-OUT]
+            // guards pass TRIVIALLY — no excluded category is among the anchors,
+            // because there are none — and the run looks like a normal 14-anchor
+            // build. The only signal would be the ABSENCE of a warning line, and an
+            // absence is exactly what nobody notices.
+            //
+            // Same reasoning as the config-header provenance guard: the check has to
+            // fire on the failure, not require someone to spot something missing.
+            if (Regex("""^\s*excludeFromAnchoring\s*=""", RegexOption.MULTILINE).containsMatchIn(text)) {
+                require(parsed.excludeFromAnchoring.isNotEmpty()) {
+                    "Config declares excludeFromAnchoring but it parsed to an EMPTY set. " +
+                        "The hold-out would silently run with every domain anchored and " +
+                        "produce a clean-looking negative. Expected a list literal, e.g. " +
+                        "excludeFromAnchoring = [Law]"
+                }
+            }
+        }
     }
 
     private fun checkAcyclic(root: GraphNode): Boolean {

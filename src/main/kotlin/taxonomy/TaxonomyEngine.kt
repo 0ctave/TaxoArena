@@ -117,7 +117,19 @@ class TaxonomyEngine(
             )
 
             val bootstrapTime = measureTimeMillis {
-                val categoryGroups = distilledData.groupBy { it.first }
+                // Anchor grouping only. distilledData itself is untouched, so the
+                // groundTruthMap below and the routable corpus both still contain these
+                // queries — they lose their anchor, not their existence.
+                val excluded = config.formalism.excludeFromAnchoring
+                val anchorable = if (excluded.isEmpty()) distilledData
+                                 else distilledData.filterNot { it.first in excluded }
+                if (excluded.isNotEmpty()) {
+                    log.warn(
+                        "[HOLD-OUT] excluding ${excluded.size} categor(ies) from anchoring: $excluded" +
+                            " — ${distilledData.size - anchorable.size} queries will enter unanchored"
+                    )
+                }
+                val categoryGroups = anchorable.groupBy { it.first }
                 categoryGroups.forEach { (name, items) ->
                     val node = GraphNode(label = name, depth = 1)
                     node.originalCategory = name
@@ -161,9 +173,26 @@ class TaxonomyEngine(
             }
             perfTracker.recordTime("construction.phase2_bootstrap", bootstrapTime, 1L)
 
-            // Ground truth map
+            // Ground truth map — deliberately over the FULL distilledData, so withheld
+            // categories keep their labels and recovery can be scored against them.
             val groundTruthMap = distilledData.groupBy({ it.second }, { it.first })
                 .mapValues { it.value.toList() }
+
+            // Guard the hold-out invariants. Without these the experiment can go
+            // silently vacuous: a filter that dropped the queries entirely, rather than
+            // just their anchor, would produce "no new domain discovered" for the wrong
+            // reason and look like a negative result.
+            config.formalism.excludeFromAnchoring.takeIf { it.isNotEmpty() }?.let { ex ->
+                val anchorLabels = root.children.mapNotNull { it.label }.toSet()
+                val leaked = anchorLabels intersect ex
+                check(leaked.isEmpty()) { "[HOLD-OUT] excluded categories were anchored anyway: $leaked" }
+                val retained = groundTruthMap.values.count { labels -> labels.any { it in ex } }
+                check(retained > 0) {
+                    "[HOLD-OUT] excluded categories vanished from groundTruthMap — the filter removed" +
+                        " the queries, not just their anchor; recovery could not be scored"
+                }
+                log.warn("[HOLD-OUT] ${root.children.size} anchors seeded; $retained withheld queries retained unanchored")
+            }
 
             // --- NEW: Print Initial State ---
             log.info("Initial DAG Structure (Before Statistical Fitting)")

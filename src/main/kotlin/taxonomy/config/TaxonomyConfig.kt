@@ -181,6 +181,33 @@ class TaxonomyConfig {
          */
         var maxK: Int = 4
 
+        /**
+         * Ground-truth categories excluded from BOOTSTRAP ANCHORING only.
+         *
+         * Their queries still enter the corpus and the ground-truth map — they are
+         * simply denied a depth-1 anchor, so they must route from the root like any
+         * unexplained query. This is the entry path the incremental claim needs: a
+         * domain that ARRIVES rather than one that is seeded.
+         *
+         * Without it the only expressible hold-out is relabel-to-an-existing-category,
+         * which seeds the withheld queries INSIDE a host anchor and therefore tests
+         * whether construction can evict a foreign body — the contamination story, not
+         * the discovery story. That question already has an answer (the Computer
+         * science split, q = 0.007 against its own within-node null); this one has
+         * none.
+         *
+         * Empty in every reported configuration. It changes the bootstrap for the
+         * REMAINING domains too — different corpus, different initial partition — so a
+         * hold-out run is its own construction with its own baseline and its leaf count
+         * is NOT comparable to the canonical artifact.
+         *
+         * The baseline for a hold-out run is THE SAME RUN'S 13 remaining domains, not
+         * the canonical artifact. Recovery is scored as precision/recall against the
+         * withheld label, and any structural comparison is within-run. Diffing leaf
+         * counts against the frozen 87 would compare two different constructions.
+         */
+        var excludeFromAnchoring: Set<String> = emptySet()
+
         var dagMode: DagMode = DagMode.DAG_MAX
             set(value) {
                 field = value
