@@ -381,20 +381,25 @@ class BtMatchScheduler(
             val available = resultsMatrix.keys.intersect(nodeQueryIds.toSet()).sorted()
             if (available.isEmpty()) return false
 
-            val node = nodesMap[nodeId]
-            val rankedAvailable = if (node != null && node.vmfMu.isNotEmpty()) {
-                available.sortedByDescending { queryId ->
-                    val emb = node.queries.find { it.queryId == queryId }
-                    if (emb != null) {
-                        val slicedX = emb.projectTo(node.sliceDim)
-                        StatisticsUtils.dotProduct(slicedX, node.vmfMu)
-                    } else {
-                        -1.0
-                    }
-                }
-            } else {
-                available
-            }
+            // Uniform sampling over the leaf's FULL query pool.
+            //
+            // This used to sort by descending dot product with the node's vMF mean — most
+            // prototypical question first — and every pair then walked that ranking from the
+            // front via `offset`. Because per-pair budgets are small relative to the pool, no
+            // pair ever reached the tail, so the arena judged each cell on its most central
+            // members only.
+            //
+            // Measured on the 12-model Math run (2,640 comparisons, 11 leaves): 250 of 379
+            // available questions were used — 66% — while each used question was judged ~10.6
+            // times, up to 17.1 in the smaller leaves. The unused third was not a random third:
+            // it was systematically the LEAST prototypical, so the ranking was biased toward the
+            // items the partition already fits best, inflating apparent within-cell coherence.
+            //
+            // Shuffling instead gives every question in the leaf an equal chance, which is what
+            // the held-out pool is for. Deterministic: seeded per (run seed, leaf), so a re-run
+            // at the same seed reproduces the same ordering. The offset-walk below is unchanged,
+            // so a pair still never repeats a question until it has exhausted the pool.
+            val rankedAvailable = available.shuffled(java.util.Random(seed.toLong() * 31 + nodeId.hashCode()))
 
             val offset = pairQueryOffsets.getOrDefault("$nodeId|$pk", ps?.totalComparisons?.toInt() ?: 0)
             val slice = rankedAvailable.drop(offset).take(BATCH_STEP_SIZE)
