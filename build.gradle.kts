@@ -50,6 +50,28 @@ tasks.withType<Test> {
 tasks.named<Test>("test") {
     exclude("**/NullSeparationCalibrationTest*")
     exclude("**/SeparationNullBySizeTest*")
+    // Third harness (`gradlew randomCellRubrics`): it makes REAL Azure judge-induction calls,
+    // so it must never run as part of the suite.
+    exclude("**/RandomCellRubricNullHarness*")
+    // Fourth harness (`gradlew routeReserved`): routes the reserved pool through the
+    // production trickler to dump per-cell assignments. Minutes of runtime, opens the
+    // 215 MB embeddings cache and the 275 MB snapshots DB, writes a CSV. No assertions.
+    exclude("**/ReserveRoutingHarness*")
+}
+
+tasks.register<Test>("routeReserved") {
+    description = "Routes the reserved pool through the production trickler; dumps query->leaf assignments."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    maxHeapSize = "6g"
+    workingDir = rootDir
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
+    systemProperty("snapshotId", providers.systemProperty("snapshotId").getOrElse("20260727_042523_Headless_Run_Auto_ge"))
+    systemProperty("routeOut", providers.systemProperty("routeOut").getOrElse("reserved_leaf_assignments.csv"))
+    filter { includeTestsMatching("*ReserveRoutingHarness*") }
 }
 
 tasks.register<Test>("calibration") {
@@ -71,6 +93,19 @@ tasks.register<Test>("nullBySize") {
     testLogging { showStandardStreams = true }
     systemProperty("nullReps", providers.gradleProperty("nullReps").getOrElse("400"))
     filter { includeTestsMatching("*SeparationNullBySizeTest*") }
+}
+
+tasks.register<Test>("randomCellRubrics") {
+    description = "Induces judge rubrics on synthetic random cells (null arm of the rubric-specificity prereg). MAKES REAL AZURE CALLS."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    workingDir = rootDir
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
+    systemProperty("rubricNullDryRun", providers.systemProperty("rubricNullDryRun").getOrElse("false"))
+    filter { includeTestsMatching("*RandomCellRubricNullHarness*") }
 }
 
 // spring-dotenv resolves .env relative to the JVM working directory.
