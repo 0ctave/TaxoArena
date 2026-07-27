@@ -45,6 +45,50 @@ Each has a control that shares every confound except the treatment. Together
 they identify one mechanism: the arena is largely re-deriving the answer key and
 reporting it with domain-flavoured justification.
 
+### How much fidelity depends on the key being available
+
+Analysis 0, run. Rho recomputed on the subset where correctness CANNOT
+discriminate — both responses correct, or neither — so the judge must evaluate
+rather than verify. Ties count 0.5 per side, fixed in advance.
+
+| condition | subset | n rows | n questions | tie fraction | rho |
+|---|---|---:|---:|---:|---:|
+| MAIN | full | 1736 | 241 | 0.19 | +0.9762 |
+| MAIN | discriminable | 1160 | 201 | 0.11 | +0.9524 |
+| MAIN | **correctness-blind** | 576 | 170 | **0.34** | **+0.7619** |
+| GENERIC | full | 1736 | 241 | 0.19 | +0.9524 |
+| GENERIC | discriminable | 1160 | 201 | 0.11 | +0.9762 |
+| GENERIC | **correctness-blind** | 576 | 170 | **0.34** | **+0.7381** |
+
+**SELECTION CONTROL — range restriction is NOT the explanation.** The blind
+subset is where the models agree, so it might carry less capability spread by
+construction. Measured on the same 576 rows: GT accuracy spread 0.249 against
+0.258 on the full set (a 3.5% reduction), and the ground-truth ranking there is
+**identical** to the full-set ranking, rho(GT_blind, GT_full) = **+1.000**. The
+subset preserves the true ordering perfectly, so the fidelity drop is judgment,
+not selection.
+
+Fidelity falls ~0.22 (0.95-0.98 -> 0.74-0.76) while the tie fraction triples
+(0.11 -> 0.34). Both conditions behave identically — MAIN 0.762, GENERIC 0.738,
+one grid step apart, which is nothing at n = 8.
+
+This is the options-blind measurement without a new run, and it lands on the
+combination the pre-registered reading table called "the judge can no longer
+decide". But the task did NOT change here: the judge still has the question, the
+options and both responses. What it lost is a DISCRIMINATING key. So the claim
+sharpens from "the judge prefers correctness" to a magnitude: **when correctness
+is unavailable, ranking fidelity degrades to rho ~0.75 and the judge abstains on
+a third of comparisons.** Residual reasoning-based signal is real — 0.75 is well
+above chance — but substantially weaker than the aggregate 0.95 implies.
+
+Unlike the MAIN/GENERIC comparisons, this gap is not quantisation noise: at
+n = 8 models the Spearman grid is 0.0119, so 0.9762 -> 0.7619 is ~18 grid steps.
+
+Caveat: 170 questions against 241, and the subset is self-selected by model
+agreement. The selection control addresses the ranking-compression form of that
+concern; it does not address whether these items are harder in ways that affect
+judging beyond correctness.
+
 **This is a negative result about the LLM-as-judge paradigm, not about the
 taxonomy.** MMLU-Pro is multiple-choice with a verifiable key, so a capable
 judge can shortcut to correctness and bypass the partition entirely. The
@@ -155,25 +199,11 @@ has a MECHANISM for its null rather than an absence of effect.
 
 ## Next, in order
 
-0. **Rho on the correctness-blind subset** (free, no new run). The 576 rows where
-   BOTH or NEITHER response is correct are the cases where the judge must
-   evaluate rather than verify. Computing rho there is an options-blind
-   measurement on data already held.
-
-   TWO THINGS FIXED IN ADVANCE, because the subset is not a random sample:
-
-   * **Selection control.** Those 576 items are exactly where the models agree —
-     both easy or both hard — so they carry the LEAST capability
-     discrimination. A collapsed rho would be partly range restriction, not only
-     judgment quality. So compute the GROUND-TRUTH ranking on the same 576
-     questions: if GT rho is also compressed there, the restriction explains part
-     of the collapse and the two can be separated. Same "measure the null on the
-     same population" move that made the within-arm and GENERIC-baseline results
-     work.
-   * **Tie handling.** A third of the subset is ties, and the conversion changes
-     rho materially. Fixed in advance: ties count 0.5 to each side (standard
-     BT/Elo convention), and the tie fraction is reported alongside so a reader
-     can see how much of the ranking rests on them.
+0. ~~Rho on the correctness-blind subset~~ — **DONE**, see "How much fidelity
+   depends on the key being available" above. Both pre-registered controls held:
+   the selection control cleared range restriction (GT rho on the subset =
+   +1.000 against the full set), and ties were handled at 0.5 per side with the
+   fraction reported. Result: rho falls to ~0.75 with the tie fraction tripling.
 
 1. **Rule-ID citation** in the verdict schema. Distinguishes reproduction from
    application, and counts prior-decided verdicts. Must precede the full-corpus
