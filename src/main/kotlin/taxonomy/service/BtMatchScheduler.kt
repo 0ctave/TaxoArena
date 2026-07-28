@@ -29,6 +29,7 @@ class BtMatchScheduler(
     val seed: Long = 42L
 ) {
     val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
+    private val BOOTSTRAP_MIN_MATCHES = 2
     private val random = java.util.Random(seed)
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
@@ -271,6 +272,68 @@ class BtMatchScheduler(
         val isNewRandom = condition.equals("RANDOM_SCHEDULER", ignoreCase = true)
 
         if (isNewMain) {
+            // ── Mandatory bootstrap phase before ANY utility-ranked scheduling ──────────
+            //
+            // The racing scheduler converges to a leader-centric star: on the paired Math
+            // run it scheduled 20 of 66 pairs, put the top model in 55% of all comparisons
+            // (1,452 of 2,640), and left 46 pairs — including the pre-registered near-clone
+            // check — with zero data. On law it had 5 of 12 models at zero comparisons 861
+            // calls in, and BtMmFitter logged 48 'fit is NOT identified' warnings. The
+            // "always play if unseen" guard inside isMatchInformative never fired because
+            // the racing path does not consult it.
+            //
+            // So: every pair gets BOOTSTRAP_MIN_MATCHES comparisons unconditionally, no
+            // ranking involved, before the adaptive phase starts. At 12 models that is
+            // 66 pairs x 2 ~ 132 calls against a ~5,000-call run — and it guarantees the
+            // BT graph is complete, not merely connected, before adaptivity can shape it.
+            val globalPairComps = HashMap<String, Double>()
+            for ((_, list) in pairStats) for (ps in list) {
+                val k = "${minOf(ps.modelA, ps.modelB)}|${maxOf(ps.modelA, ps.modelB)}"
+                globalPairComps[k] = (globalPairComps[k] ?: 0.0) + ps.totalComparisons
+            }
+            val allRosterPairs = models.flatMapIndexed { i, a ->
+                models.drop(i + 1).map { b -> minOf(a, b) to maxOf(a, b) }
+            }
+            val starved = allRosterPairs.filter { (a, b) ->
+                (globalPairComps["$a|$b"] ?: 0.0) < BOOTSTRAP_MIN_MATCHES
+            }
+            if (starved.isNotEmpty()) {
+                val bootTasks = mutableListOf<BtMatchTask>()
+                for ((a, b) in starved) {
+                    if (bootTasks.size >= batchSize) break
+                    val node = targetNodes.maxByOrNull { nodeToQueries[it.id]?.size ?: 0 } ?: continue
+                    val qs = (nodeToQueries[node.id] ?: emptyList()).sorted()
+                    if (qs.isEmpty()) continue
+                    val bk = "BOOT|${node.id}|$a|$b"
+                    val off = pairQueryOffsets.getOrDefault(bk, 0)
+                    val q = qs[off % qs.size]
+                    pairQueryOffsets[bk] = off + 1
+                    bootTasks += BtMatchTask(
+                        nodeId = node.id, modelA = a, modelB = b,
+                        queryIds = listOf(q.toString()),
+                        priority = 10.0, batchId = UUID.randomUUID().toString()
+                    )
+                }
+                if (bootTasks.isNotEmpty()) {
+                    log.info("[ARENA-BOOTSTRAP] ${starved.size} of ${allRosterPairs.size} pairs " +
+                        "below $BOOTSTRAP_MIN_MATCHES comparisons; scheduling ${bootTasks.size} " +
+                        "bootstrap matches before the adaptive phase")
+                    return bootTasks
+                }
+            } else {
+                // Coverage assertion: fires DURING the run, not after. The law hub was
+                // caught at 869 calls by reading the appearance distribution by hand;
+                // this catches the same failure at the end of bootstrap (~132 calls).
+                val seen = HashSet<String>()
+                for ((_, list) in pairStats) for (ps in list) if (ps.totalComparisons > 0) {
+                    seen += ps.modelA; seen += ps.modelB
+                }
+                val missing = models.filterNot { it in seen }
+                check(missing.isEmpty()) {
+                    "[ARENA-COVERAGE] bootstrap complete but ${missing.size} model(s) have ZERO " +
+                        "comparisons: $missing — aborting rather than fitting an unidentified ranking"
+                }
+            }
             val activeRacing = ActiveBtRacingScheduler(alpha = 0.05, nMin = 5)
             return activeRacing.selectNextBatch(
                 targetNodes = targetNodes,
