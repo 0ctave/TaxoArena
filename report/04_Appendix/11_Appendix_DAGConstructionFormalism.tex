@@ -2,7 +2,7 @@
 
 This appendix gives the full architectural and mathematical detail
 behind the taxonomy construction pipeline summarised in
-Section~\ref{sec:arch-taxonomy} (Chapter~\ref{ch:system-architecture}).
+Section~\ref{sec:arch-taxonomy} (Chapter~\ref{ch:methodology}).
 The pipeline is the instrument rather than the contribution
 (Section~\ref{sec:approach}); this appendix exists so the exact
 mechanics are preserved and traceable without requiring the reader to
@@ -53,7 +53,7 @@ The loop runs for a fixed iteration budget, with completion semantics
 defined in Section~\ref{subsec:quiescence}.
 Table~\ref{tab:pipeline} summarises the phases.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Taxonomy construction phases, implementing classes, and outputs.}
 \label{tab:pipeline}
@@ -132,7 +132,7 @@ sibling, decided by measured $J$); fusion of insufficiently separated
 siblings; fusion of near-duplicate pairs that share a parent; and
 dissolution of structurally redundant sole children.
 Every one of these operators preserves the single-parent invariant
-(Section~\ref{subsec:polyhierarchy}), so
+(Section~\ref{sec:poly-negative}), so
 each iteration maps a tree to a tree.
 
 \textbf{Phase 6 --- Convergence check.}
@@ -695,7 +695,7 @@ $z$, and the binding threshold to the proposal log.
 Figure~\ref{fig:proposal-gate-flow} summarises this procedure as a
 single flowchart.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
 Figure E.1 --- Proposal-gate flow diagram (placeholder)\\
@@ -711,7 +711,7 @@ commit or restore.}
 Figure~\ref{fig:proposal-gate-scatter} shows the gate operating as a
 measured decision boundary on the canonical run's proposals.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
 Figure E.2 --- Proposal-gate accept/reject scatter (placeholder)\\
@@ -744,7 +744,10 @@ gate rather than by a fixed rule.
 Section~\ref{sec:poly-negative} reports the polyhierarchy operator as
 built, measured, and retired; its mechanics are recorded here.
 A cross-link proposal was a growth edit giving an existing node $n$ a
-second parent $h$. Candidates were scored by how many of $h$'s
+second parent $h$. The motivating case is a genuinely cross-domain
+query --- a biostatistics question between Mathematics and Biology ---
+which under a strict tree can only pick one branch, fail to specialise
+there, and residualise at the domain anchor. Candidates were scored by how many of $h$'s
 residuals they \emph{captured}, with capture applying the runtime
 descent gate itself:
 \[
@@ -762,5 +765,23 @@ Section~\ref{sec:meth-proposal-gate} with the growth-side threshold
 and the \emph{target} as the site,
 $\Delta J > \epsilon_{\text{sep}} \cdot \pi_n$, so that the threshold
 scaled with the mass the new edge could actually move.
-The measurements that retired the operator, and the single-parent
-invariant that replaced it, are in Section~\ref{sec:poly-negative}.
+The measurements that retired the operator are in
+Section~\ref{sec:poly-negative}.
+
+\paragraph{The single-parent invariant.}
+Removing the generator is not by itself sufficient, because fusion also
+redirects parent edges: fusing two nodes that sit under different
+parents leaves the survivor holding both, which reintroduces
+multi-parent nodes with no cross-link operator present.
+Fusion proposals are therefore restricted to pairs sharing a parent,
+which makes every topology operator a map from a tree to a tree.
+The structural-integrity gates of Appendix~\ref{app:tuning-protocol}
+check the invariant directly by counting multi-parent nodes, which must
+be zero.
+
+\paragraph{Evaluation-time multi-leaf assignment} of held-out queries
+is a separate mechanism again. It applies the same routing read-only to
+the frozen snapshot, capped at \texttt{maxLeafAssignments}, and so does
+not modify the topology; what it determines is which leaves a given
+query contributes comparisons to during the arena run
+(Section~\ref{sec:arch-arena}).

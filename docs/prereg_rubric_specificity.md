@@ -120,3 +120,48 @@ Decision rule fixed in advance: if **evidence**, the specificity result stands
 without the 174 inductions and the three-arm test only establishes that
 coherence is WHY — a much smaller inferential step. If **no signal**, the
 three-arm test is unlikely to rescue it and the Azure spend is not warranted.
+
+---
+
+## ADDENDUM (2026-07-28) — results written back; artifact and band notes
+
+Recorded after the fact and dated, closing the "treatment arm only, no null,
+this is not yet evidence" status above.
+
+**The null arm ran.** A random-cell arm of 13 size-matched cells (not the 87
+originally specified above; see the arm-size note below) was induced by the
+identical procedure and scored against the 87 leaf cells. Outcome:
+
+- Treatment arm, within-arm specificity: median **0.138**, 81/87 (93%) of
+  cells positive — inside the **evidence** band of this document
+  (median >= 0.05 AND >= 75% of cells positive).
+- Random arm, absolute own-cell specificity: median **0.012** — inside the
+  <= 0.05 "coherence is the cause" band of `prereg_arena_launch.md`,
+  Decision 3.
+- Mann-Whitney U, one-sided, leaf vs. random: **p = 1.21e-6**, robust across
+  all three per-cell statistic definitions considered
+  (1.2e-6 / 2.1e-6 / 7.6e-6).
+- All four directional predictions above fired in their predicted directions
+  (thesis: `report/03_Content/6_Results.tex`, table `tab:rubric-null`).
+- Arm-size control (13 vs. 87 is unbalanced): 13 leaf rubrics subsampled give
+  0.134, a 200-draw bootstrap over subsamples gives 0.138 — the treatment
+  value is not a function of arm size. The domain-14 intermediate arm was
+  not run.
+
+**Band disambiguation.** Two documents state decision bands without naming
+the quantity each governs. Resolved: the band table in THIS document
+(>= 0.05 with >= 75% positive / (0.02, 0.05) / <= 0.02) governs the
+**treatment arm's within-arm specificity** (own-cell minus other-leaf-cell
+overlap). The band in `prereg_arena_launch.md` Decision 3
+(<= 0.05 causal / >= 0.10 refuted / between = partial) governs the **random
+arm's absolute own-cell specificity**; that document's attribution of its
+band to this one is an error in that document, recorded here rather than
+silently repaired. Both bands were met (0.138 with 93% positive; 0.012).
+
+**Untracked-artifact caveat.** The null-arm generation script
+(`tools/analysis/rubric_specificity_null.py`) and its outputs
+(`build/rubric_null/`) are untracked in version control as of this
+addendum. The headline separation (p = 1.21e-6) was reproduced from those
+stored artifacts on 2026-07-27. Until they are committed, this result is one
+clean checkout from being unsupported; the caveat travels with the result
+wherever it is cited.

@@ -32,7 +32,7 @@ three registered predictions unevaluable, and they finish at ranks 4
 and 8 of a mid-table whose five scores span $0.957$--$1.091$ --- a
 separation well inside the corrected standard errors.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{The Run~B roster, from the run manifest. At most two models
 per family; length-matched to control the format artifact.}
@@ -105,11 +105,14 @@ a new model that shares the defect would be admitted. The general guard
 is a one-line change and is named as future work
 (Section~\ref{sec:disc-future}).
 
-\textbf{The judge is in no roster.} The judge model appears in none of
+\textbf{The judge is in no roster.} The judge model is
+Mistral-Large-3 in every reported run. Two project documents named
+different judge models, so the identity was verified against two
+independent sources rather than read off either document: the Run~B
+run log records \texttt{Mistral-Large-3} on every judge call (four
+occurrences of the identifier, none of any smaller ``ministral''
+variant), and the runtime configuration pins
+\texttt{judge-model: "Mistral-Large-3"}. That model appears in none of
 the three rosters, so there is no self-preference confound in any
 reported run. No constraint enforces this; it is a property of these
 runs.
-
-\todo[inline]{Confirm the judge model identity against the run manifest
-and state it here. Two sources in this project name different models,
-and the self-preference claim above depends on the resolution.}

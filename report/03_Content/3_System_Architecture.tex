@@ -1,11 +1,12 @@
 
-\chapter{Method}\label{ch:system-architecture}\label{ch:methodology}
+\chapter{Method}\label{ch:methodology}
 
 This chapter specifies the method in three parts.
 Section~\ref{sec:arch-requirements} states what the partition must
-satisfy for the arena to mean anything, shows that the induced
-partition satisfies it, and names the three things it does not
-guarantee; the construction formalism itself is in
+satisfy for the arena to mean anything, points to the measured
+evidence that the induced partition satisfies it (reported with the
+results, Section~\ref{sec:res-construction}), and names the three
+things it does not guarantee; the construction formalism itself is in
 Appendix~\ref{app:dag-formalism}.
 Section~\ref{sec:arch-arena} specifies the arena --- what it judges,
 what the judge sees, and how verdicts become rankings --- and points
@@ -22,7 +23,7 @@ three pages here and eighteen in the appendix, in that proportion, for
 the measured reason of Section~\ref{sec:res-granularity}: its tuning
 has no measured evaluative consequence.
 
-\section{What a Good Partition Needs}\label{sec:arch-requirements}\label{sec:arch-goals}
+\section{What a Good Partition Needs}\label{sec:arch-requirements}
 
 The arena judges responses inside cells and reports a ranking per cell.
 For that to mean anything, four things must hold. They are stated here
@@ -69,123 +70,27 @@ certificate are given in full in Appendix~\ref{app:dag-formalism} and
 Appendix~\ref{app:numerics}.
 
 The resulting frozen artifact --- the single construction every result
-in this thesis is attributed to --- has 154 nodes, 87 leaves, maximum
-depth 6, and $J = 0.253129$ over a conserved query mass of $8299.00$.
-All 87 leaves carry a label and an induced judge rubric.
+in this thesis is attributed to --- is a tree of 154 nodes with 87
+labelled, rubric-carrying leaves; its full statistics, the fixed-point
+certificate, and the evidence per requirement are reported once, with
+the results (Section~\ref{sec:res-construction}).
 
-\subsection{Evidence That the Requirements Are Met}\label{sec:arch-dag}
+\subsection{Where the Evidence Is}\label{sec:arch-evidence-pointer}
 
-Table~\ref{tab:requirements-evidence} gives one line of evidence per
+Whether the construction meets R1--R4 is an empirical question, and
+the evidence is reported with the results rather than here:
+Table~\ref{tab:requirements-evidence}
+(Section~\ref{sec:res-construction}) collects one line of evidence per
 requirement, each marked \textsc{measured} or \textsc{argued} and each
-with the caveat that bounds it.
-One marker used in the table and twice more in this thesis is defined
-here once: \textsc{void as to values} means the underlying numbers
-were computed on a tree superseded by the frozen artifact and are
-withdrawn, while the design of the analysis and any comparison
-internal to it survive.
-
-\todo[inline]{Re-derive the within-node separation nulls (R1) and the
-anisotropy-exposure counts (limitation~1) on the frozen
-\texttt{mcs}$=55$ artifact; both currently rest on values computed on a
-superseded tree.}
-
-\begin{table}[h]
-\centering
-\caption{Evidence for the four partition requirements. Every row is
-\textsc{measured}; the caveat column states what the row does not
-establish. Full derivations are in Appendix~\ref{app:dag-formalism}.}
-\label{tab:requirements-evidence}
-\begin{tabular}{p{0.7cm}p{5.6cm}p{5.8cm}}
-\toprule
-Req & Evidence & Caveat \\
-\midrule
-R1
-& A split is accepted only when the minimum chance-corrected separation
-over all child pairs reaches $0.025$. That bar is positioned between two
-measured nulls: an isotropic null whose $p_{95}$ spans $0.0055$--$0.0093$
-over $n = 75\ldots900$, and a within-node null whose median lies well
-above it.
-& The bar is conservative against ``more than nothing'' and permissive
-against ``more than this node's own elongation''. The within-node null
-values are \textsc{void as to values}; the method survives. \\
-\addlinespace
-R1
-& Independent of the geometry: rubrics induced on these cells are
-specific to their cells against a size-matched randomised null,
-Mann--Whitney $U$, one-sided, $p = 1.21\times10^{-6}$
-(Section~\ref{sec:res-rubric-null}).
-& The measure is lexical. It shows reproduction of a cell's vocabulary,
-not application of its criteria. \\
-\addlinespace
-R2
-& 87 leaves; median 88 queries per leaf, IQR $[71, 118]$, minimum 54,
-maximum 396.
-& \texttt{minClusterSize} is a \emph{birth} constraint enforced at split
-time, not an invariant: populations drift under later re-routing and
-1 of 87 leaves ends below it. \\
-\addlinespace
-R2
-& Identification is reached at 7 model pairs of 28 --- a spanning tree,
-as the theory requires --- at 32.9 to 45 comparisons per cell, and the
-cost varies across cells (Section~\ref{sec:res-cost}).
-& Measured at 8 models. At 11 models there are 55 pairs and the
-arithmetic was not redone. \\
-\addlinespace
-R2
-& Discriminative power is flat across an eleven-fold change in cell
-count, so the number of cells can be chosen on budget grounds
-(Section~\ref{sec:res-granularity}).
-& This is what licenses \texttt{minClusterSize} $= 55$, and it is a
-statement about this corpus and this roster, not about partitioning in
-general. \\
-\addlinespace
-R3
-& Certified fixed point at iteration 10: structural edits $0$, maximum
-$1 - \cos(\hat{\boldsymbol{\mu}})$ over all nodes
-$1.11\times10^{-16}$, \texttt{CERTIFIED true}. Iterations 8, 9 and 10
-are identical on every recorded column.
-& It certifies \emph{this} artifact, not that the loop terminates from
-an arbitrary start --- it does not. Two of the six certificate fields
-are bounded rather than exactly reproducible, because routing is
-parallel and float accumulation is not associative. \\
-\addlinespace
-R4
-& The acceptance gate is expressed in units of its own objective's
-paired standard error. On this corpus $\mathrm{SE}(\Delta J)$ spans
-$13.1\times$ from $p_{10}$ to $p_{90}$, and the uncalibrated rule
-accepted 4 of 52 structural edits at $z < 1$, the worst at $z = 0.156$.
-& The gate is defended on coherence alone. Both of its empirical
-corroborations were tested and refuted
-(Section~\ref{sec:res-construction}). \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Two of these rows deserve a sentence rather than a table cell.
-
-\textbf{On R4.} An acceptance rule that thresholds an estimated
-improvement must express the threshold in units of that improvement's
-own standard error, estimated paired across the two states. A fixed
-absolute tolerance silently means different things at different sites,
-and against a $13.1\times$ spread it means a sixth of a standard error
-at the worst site. Committing an edit whose measured improvement is one
-sixth of its own measurement error is incoherent regardless of what it
-does to any downstream number. That is the entire argument for the
-gate, and it is enough: the two things one would naturally cite in its
-support --- that it tightens run-to-run stability, and that it raises
-$J$ --- were both measured and both refuted
-(Section~\ref{sec:res-construction}). The transferable statement is
-that \emph{a gate can be right because its units are right, without
-improving the number it gates}.
-
-\textbf{On R2.} The cell count is a budget choice, not a statistical
-one. \texttt{minClusterSize} $= 55$ was chosen so that the resulting
-87 cells match what the judge-call budget can identify; per-cell
-reliability is a consequence of that choice rather than its target.
-This ordering is only defensible for the measured reason of
-Section~\ref{sec:res-granularity}; without that result, 55 would be a
-compromise between coherence and support with no evidence behind the
-trade.
+with the caveat that bounds it. In outline: R1 rests on the
+positioning of the separation bar between two measured nulls and,
+independently of the geometry, on the rubric-specificity null of
+Section~\ref{sec:res-rubric-null}; R2 rests on the leaf-size
+distribution and the measured identification cost
+(Section~\ref{sec:res-cost}); R3 rests on the fixed-point certificate;
+and R4 rests on the acceptance gate being expressed in units of its
+own objective's paired standard error
+(Section~\ref{sec:res-construction}).
 
 \subsection{Three Things the Construction Does Not Guarantee}\label{sec:arch-limits}
 
@@ -203,6 +108,7 @@ distinguished from such a cut on the evidence
 $J$ provides. The counts that quantified this exposure --- how many
 accepted splits are affected, and what share of leaf-held queries sit
 under at least one such ancestor --- are \textsc{void as to values}
+(marker defined in Section~\ref{sec:res-construction})
 and are not restated here.
 
 \item \textbf{The size floor is a birth constraint.} It is enforced on

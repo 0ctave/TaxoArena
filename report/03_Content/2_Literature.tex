@@ -263,7 +263,7 @@ Section~\ref{sec:poly-negative}.
 \bigskip
 \noindent
 Three requirements for a query-level, unsupervised construction
-follow and are what Chapter~\ref{ch:system-architecture} builds
+follow and are what Chapter~\ref{ch:methodology} builds
 against: a node model that statistically characterises cluster
 geometry (vMF); a splitting criterion with an explicit,
 chance-corrected acceptance statistic rather than a heuristic
@@ -433,7 +433,7 @@ filtering against positional bias; explicit per-domain criteria that
 do not reward length against verbosity bias; judge rotation as the
 only remedy for self-preference. The guideline-generation mechanism
 built from these constraints is specified in
-Chapter~\ref{ch:system-architecture}. The judge produces one verdict
+Chapter~\ref{ch:methodology}. The judge produces one verdict
 per comparison, with ties counted as half-wins following
 Davidson~\parencite{davidson1970ties}; these verdicts are the
 observations consumed by the ranking models reviewed next.
@@ -485,10 +485,14 @@ identified only up to an additive constant per
 component~\parencite{bradley1952rank}.
 
 Connectivity is non-trivial in per-domain arenas, where the query
-pool at a leaf may be small, but it becomes a structural advantage of
-the decomposition: within a single leaf, $\binom{M}{2}$ bootstrap
-comparisons, one per pair, guarantee connectivity even for leaves
-with modest query populations. Connectivity is necessary but not
+pool at a leaf may be small, but the decomposition makes it cheap in
+principle: a full round-robin within a leaf --- $\binom{M}{2}$
+comparisons, one per pair --- would connect the graph by construction,
+even for leaves with modest query populations. That is a theoretical
+property of the design, not a guarantee of the implementation: the
+implemented bootstrap does not realise it per leaf, because it
+operates on global rather than per-leaf pair counts; see the
+identifiability discussion in Section~\ref{sec:meth-bt}. Connectivity is necessary but not
 sufficient for a finite unregularised MLE, since complete separation
 (one model winning every comparison against another) prevents
 convergence of the MM algorithm; the regularisation used for this
@@ -660,6 +664,6 @@ before any router consumes them. TaxoArena is built to test whether
 that conjunction can exist, and, because the corpus carries a
 verifiable answer key, every link in the chain is separately
 measurable. Chapter~\ref{ch:results} reports which links held; the
-system design is specified in Chapter~\ref{ch:system-architecture},
+system design is specified in Chapter~\ref{ch:methodology},
 and the formal foundations are derived in
 Chapter~\ref{ch:methodology}.

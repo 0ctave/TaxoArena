@@ -14,7 +14,7 @@ Table~\ref{tab:rq-map} fixes which condition answers which research
 question, with which metric, and which link of
 Section~\ref{sec:research-questions} it lands on.
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{Research question to condition, metric, and link.}
     \label{tab:rq-map}
@@ -39,19 +39,28 @@ Section~\ref{sec:research-questions} it lands on.
     \end{tabular}
 \end{table}
 
-The scope is a \textbf{selected-domain study}: the arena evaluates one
-or two ex-ante-selected, high-support domains at high power rather than
+The scope is a \textbf{selected-domain study}: the arena evaluates
+ex-ante-selected, high-support domains at high power rather than
 all 14 at matched power, and the selection rule is a compute-budget
-trade-off stated in Section~\ref{sec:exp-datasets}.
+trade-off stated in Section~\ref{sec:exp-datasets}. Two domains are
+reported in this thesis --- Math and law; replications on philosophy
+and history were launched under the same protocol and their results
+are pending.
 
 \section{Implementation Environment}\label{sec:exp-env}
 
 The pipeline is implemented in Kotlin on Spring Boot, backed by SQLite
 in WAL mode (Section~\ref{sec:arch-infra}). Embeddings are produced by
-Qwen3-Embedding served locally; the judge is a single large
-instruction-tuned model accessed through an Azure OpenAI-compatible
-client, and the same judge model is used for rubric induction and for
-every arena condition.
+Qwen3-Embedding served locally; the judge is Mistral-Large-3, a single
+large instruction-tuned model accessed through an Azure
+OpenAI-compatible client, and the same judge model is used for rubric
+induction and for every arena condition.\footnote{The judge identity
+was verified against two independent sources after two project
+documents were found to disagree: the Run~B run log records
+\texttt{Mistral-Large-3} on every judge call (four occurrences of the
+identifier, none of any smaller ``ministral'' variant), and the runtime
+configuration pins \texttt{judge-model: "Mistral-Large-3"}. The roster
+tables of Appendix~\ref{app:models} state it alongside the rosters.}
 
 \textbf{Every construction and arena result in this thesis is at seed
 42.} No result is reported as a mean over multiple seeds, and no
@@ -65,15 +74,9 @@ in Appendix~\ref{app:tuning-protocol}
 (Table~\ref{tab:hyperparams}). Per-run identifiers, seeds, and realised
 call counts are recorded in the manifest emitted with each run.
 
-\todo[inline]{Confirm the judge model identity against the run manifest
-for the reported runs, and make the roster table state it. Two sources
-in this project disagree, and Section~\ref{sec:exp-rosters}'s
-``the judge appears in no roster, so there is no self-preference
-confound'' depends on resolving it.}
-
 \section{Corpus, Split, and Information Separation}\label{sec:exp-datasets}
 
-The corpus is MMLU-Pro~\parencite{wang2024mmlupro}: 12{,}000 questions
+The corpus is MMLU-Pro~\parencite{wang2024mmlupro}: 12{,}032 questions
 across 14 domains with human-verified reference answers, used in two
 roles. It supplies the ground-truth domain labels that seed the 14
 anchor nodes, and it supplies the per-domain accuracy scores used as
@@ -82,14 +85,14 @@ All 14 categories seed anchors, including the semantically
 heterogeneous \textit{Other} category, which is retained as a geometric
 anchor --- its queries remain routable mass and may migrate toward
 coherent anchors --- but is not an arena selection candidate.
-AG News~\parencite{zhang2015agnews} serves only as a pipeline sanity
-check on an independently labelled corpus; it seeds no anchors and
-enters no arena.
+AG News~\parencite{zhang2015agnews} was used once, as a pipeline sanity
+check on an independently labelled corpus; the check passed and the
+corpus is not used further.
 
 Taxonomy construction runs on all 14 domains simultaneously, which is
 what allows queries to migrate between anchors and so makes the adapted
 partition differ from the canonical one at all.
-The arena evaluates a roster on one or two ex-ante-selected domains,
+The arena evaluates a roster on ex-ante-selected domains,
 chosen before observing any arena result under a fixed rule: high
 held-out query support; high geometric coherence relative to siblings;
 non-trivial adapted-versus-canonical migration volume; and
@@ -117,14 +120,14 @@ realisation, so the no-leakage property on which the answer-key-blind
 claim rests holds in both; but the split as run is $70/30$ and is
 described that way wherever a query count is quoted.
 
-One further detail belongs here because it affects what a
-``construction-set'' claim means: the rubric-induction pool is
-additionally thinned by roughly a fifth by a hash filter, so a leaf's
-rubric is induced from a sample of its construction queries rather than
-all of them.\footnote{And about $4.2\%$ of MMLU-Pro rows --- some 500
-of 12{,}000 --- carry no link into the evaluation tables; they are
-believed to be sentinel identifiers, but that has not been confirmed,
-and they are recorded here as unattributed rather than explained.}
+One further detail affects what a ``construction-set'' claim means:
+the rubric-induction pool is additionally thinned by a hash filter, so
+a leaf's rubric samples its construction queries
+(Section~\ref{sec:arch-judge}).\footnote{And about $4.2\%$ of MMLU-Pro
+rows --- some 500 of 12{,}032 --- carry no link into the evaluation
+tables; they are believed to be sentinel identifiers, but that has not
+been confirmed, and they are recorded here as unattributed rather than
+explained.}
 
 The arena-test fraction targets approximately 10 held-out queries at
 the smallest leaf under a selected domain. The binding constraint is
@@ -137,7 +140,7 @@ Table~\ref{tab:info-separation} makes the answer-key-blind design
 concrete: at every pipeline phase, only the data marked \checkmark{} is
 accessible to the corresponding component.
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{Data access by pipeline phase.}
     \label{tab:info-separation}
@@ -171,18 +174,18 @@ responses that usually state their own answer. ``Answer-key-blind'' is
 not ``answer-blind'', and Chapter~\ref{ch:results} turns on the
 difference.
 
-\section{Rosters and the Exclusion Policy}\label{sec:exp-arena}\label{sec:exp-rosters}
+\section{Rosters and the Exclusion Policy}\label{sec:exp-rosters}
 
-Three rosters appear in this thesis. They are not the same roster, and
-saying so is more useful than smoothing them into one.
+Three rosters appear in this thesis, and they are not the same roster.
 
-\textbf{The pilot roster (8 models)} is the one Run~A used. It is
-reported with its defect rather than repaired retroactively: four of
-its eight models had their response text stored as the empty string
-across all rows, and the resulting format artifact decided half of that
-run's comparisons (Section~\ref{sec:res-capture-gap}).
+\textbf{The pilot roster (8 models)} is the one Run~A used, and
+Table~\ref{tab:model-roster-pilot} lists it. It is reported with its
+defect, not repaired retroactively: four of its eight models had their
+response text stored as the empty string across all rows, and the
+resulting format artifact decided half of that run's comparisons
+(Section~\ref{sec:res-capture-gap}).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{The pilot roster (Run~A), with stored response format and
 ground-truth accuracy on the 241 judged Math questions. The two format
@@ -210,7 +213,7 @@ Llama-2-13b-hf & \textbf{empty; stub synthesised} & 7.5\% \\
 the repaired corpus. It is selected so that response length and
 accuracy are close to uncorrelated within the roster
 ($r = +0.286$, against $+0.597$ across all 36 valid models), which
-controls the format artifact by construction rather than qualifying it
+controls the format artifact by construction instead of qualifying it
 afterwards. All its members produce substantive responses; answer-only
 systems are out of scope for this evaluation design, because a rubric
 has nothing to grade in a response with no content.
@@ -218,10 +221,12 @@ has nothing to grade in a response with no content.
 \textbf{The corrected band (11 models)} is what the exclusion policy
 yields at full law coverage: the length-matched band less the one
 member that emits a bare answer on $35.4\%$ of items. It is the roster
-of the offline domain screen, of the reliability-constant fit, and of
-Run~C. Post-repair, its members are at least $99.8\%$ substantive.
+of the offline domain screen and of the reliability-constant fit;
+Run~C itself ran on the length-matched band
+(Section~\ref{sec:res-c5}). Post-repair, its members are at least
+$99.8\%$ substantive.
 
-\paragraph{Exclusion is enforced, and it is a measurement rather than a
+\paragraph{Exclusion is enforced, and it is a measurement, not a
 housekeeping decision.}
 Ten models are excluded at roster load by a hard-coded list that
 raises, each entry carrying its reason: one identifier-space mismatch,
@@ -252,7 +257,23 @@ The full roster tables are in Appendix~\ref{app:models}.
 
 \section{Conditions}\label{sec:exp-arena-conditions}
 
-\begin{table}[h]
+Three conditions carry every arena result in this thesis:
+C1 (\textsc{main}), C3 (\textsc{generic}), and C5
+(\textsc{no-partition}). Each chapter names them in full at first use
+and by the small-caps short form thereafter; run exports spell the
+generic condition \texttt{GENERIC\_JUDGE}, and the two names denote
+the same condition.\footnote{The identifiers are inherited from an
+earlier design document and are deliberately not renumbered: C2 ---
+re-aggregating C1's verdict set by editorial label --- and C4, an
+optional diagnostic, were cut before any run. C2 could not have
+isolated anything: it shares its entire verdict set with C1, and the
+question it was built to answer --- the per-cell
+adapted-versus-canonical rank difference --- was refuted at its
+premise under pre-registration before the arena ran
+(Section~\ref{sec:res-granularity}).}
+Table~\ref{tab:arena-conditions} states what each condition varies.
+
+\begin{table}[htbp]
     \centering
     \caption{Arena conditions. All conditions share the frozen
     snapshot and the model roster of their run; only the listed factor
@@ -281,16 +302,10 @@ The full roster tables are in Appendix~\ref{app:models}.
 \end{table}
 
 C3 and C5 control different things, and the difference is why both
-exist. C3 replays C1's leaf-scoped triples, so it \emph{shares the
-partition it would have to be a control for}; it can isolate the rubric
-and nothing else. C5 removes the partition. It is the no-taxonomy
-baseline.\footnote{A fourth condition, re-aggregating C1's verdict set
-by editorial label, was specified in an earlier design document and is
-cut: it shares its entire verdict set with C1 and therefore cannot
-isolate anything, and the question it was built to answer --- the
-per-cell adapted-versus-canonical rank difference --- was refuted at
-its premise under pre-registration before the arena ran
-(Section~\ref{sec:res-granularity}).}
+exist. \textsc{generic} replays \textsc{main}'s leaf-scoped triples,
+so it \emph{shares the partition it would have to be a control for};
+it can isolate the rubric and nothing else. \textsc{no-partition}
+removes the partition. It is the no-taxonomy baseline.
 
 \paragraph{Pairing, and what may be compared across formats.}
 Both arms of the C1-versus-C5 comparison judge an identical question
@@ -312,21 +327,20 @@ confidence gate must be disabled in both arms, since at a flat
 confidence it would admit every generic verdict while filtering the
 main arm's, and the arms would no longer be paired where it counts.
 
-\paragraph{And a precondition that came out of C3.}
-Before spending a judging budget on any A/B arm, \textbf{measure
-verdict agreement first}. It is one query against the verdict store. C1
-and C3 turned out to agree on $99.4\%$ of winners
-(Section~\ref{sec:res-generic-judge}), which means no ranking
-difference between them was detectable at any sample size --- a fact
-obtainable before the second arm was run rather than after.
-
-\section{Pre-Registration}\label{sec:exp-prereg}\label{sec:exp-baselines}
+\section{Pre-Registration}\label{sec:exp-prereg}
 
 Four decision rules were fixed in dated documents before the data they
-govern existed. They are reproduced in full in
-Appendix~\ref{app:tuning-protocol}; what each fixed is summarised here,
-because Chapter~\ref{ch:results} calls results ``pre-registered'' and a
-reader is entitled to check the claim.
+govern existed. The dates are part of the claim and are stated from
+the version-control history: the granularity analysis, the
+rubric-specificity test, and the arena launch-cost bands were
+registered on 2026-07-27; the no-partition baseline was registered on
+2026-07-27 --- the same day the domain screen settled on law
+(Section~\ref{sec:res-law}) --- and amended through 2026-07-28, with
+every amendment predating the Run~C law results it governs. The
+documents are reproduced in Appendix~\ref{app:tuning-protocol}; what
+each fixed is summarised here, because Chapter~\ref{ch:results} calls
+results ``pre-registered'' and a reader is entitled to check the
+claim.
 
 \textbf{Granularity and discriminative power.} Three outcomes were
 named in advance, and the primary statistic was fixed as the
@@ -368,11 +382,15 @@ reported instead is the fixed-point certificate, the leaf-size
 distribution, and the separation nulls of
 Section~\ref{sec:arch-requirements}.
 
-\todo[inline]{The rubric-specificity pre-registration is stale as
-written: it still records ``treatment arm only, no null, this is not
-yet evidence''. The null arm has since been run and its results were
-never written back. Amend the document, with the amendment dated, before
-reproducing it in the appendix.}
+One housekeeping note on the rubric-specificity document. As
+originally registered it recorded ``treatment arm only, no null, this
+is not yet evidence''; the null arm was subsequently run, and a dated
+results-written-back addendum (2026-07-28) now closes the document:
+the headline separation ($p = 1.21 \times 10^{-6}$) was reproduced
+from the stored artifacts on 2026-07-27, and the addendum records that
+those null-arm artifacts sit in an untracked build directory --- a
+reproducibility caveat the document carries explicitly
+(Section~\ref{sec:res-rubric-null}).
 
 \section{Metrics and Statistical Protocol}\label{sec:exp-metrics}
 
@@ -390,15 +408,13 @@ produce one number resolvable only to an adjacent transposition, which
 is why it is the secondary statistic everywhere except the partition
 claim, where it is the thing being claimed about.
 
-\textbf{Bradley--Terry $\theta$, never win-rate.} The scheduler
-over-samples uncertain pairs, so mid-ranked models face harder average
-opposition; win-rate ignores opponent strength and is biased by this,
-and $\theta$ is not. The measured cost of the difference --- the
-$5/0$-versus-$5/2/4$ sign-test contrast --- is shown in
-Section~\ref{sec:meth-scheduling}.
+\textbf{Bradley--Terry $\theta$, never win-rate}, for the
+scheduler-bias reason stated once in
+Section~\ref{sec:meth-scheduling}; the measured cost of the difference
+is reported beside the result it affects
+(Section~\ref{sec:res-c5}).
 
-\textbf{Every $\rho$ is reported under both tie conventions} ---
-ties half-weighted and tied comparisons dropped, in that order --- per
+\textbf{Every $\rho$ is reported under both tie conventions}, per
 rule~D5 of Section~\ref{sec:meth-discipline}; the measured instability
 that forces the rule is Section~\ref{sec:res-tie-policy}.
 

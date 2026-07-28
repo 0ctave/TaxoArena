@@ -1,25 +1,21 @@
-\chapter{Discussion and Conclusion}\label{ch:discussion}\label{ch:conclusion}
+\chapter{Discussion and Conclusion}\label{ch:discussion}
 
 \section{Where the Architecture Binds}\label{sec:disc-rq1}
 
 \textsc{argued}, from Section~\ref{sec:res-judge}.
 MMLU-Pro is multiple-choice with a verifiable answer key. The judge is
-shown the options and, in $94.8\%$ of cases, a response that states its
-own selected option. A judge capable of solving the item can therefore
-verify both responses against its own solution and decide the
-comparison without consulting the rubric at all --- while still being
-answer-key-blind in the sense the protocol guarantees, because nothing
-in the prompt tells it which option is right.
+shown the options and, in most cases, a response that states its own
+selected option (Section~\ref{sec:arch-judge}). A judge capable of
+solving the item can therefore verify both responses against its own
+solution and decide the comparison without consulting the rubric at
+all --- while still being answer-key-blind in the sense the protocol
+guarantees, because nothing in the prompt tells it which option is
+right.
 
-That is what the measurements say it does. Agreement with the key on
-discriminable items is $88.8\%$ and moves by $0.4$ points when the
-rubric changes; the tie rate triples exactly where the key stops
-discriminating; agreement is \emph{highest} where neither response
-carries any reasoning; and a rubric-scoped and a rubric-free judge
-reach the same winner on $99.4\%$ of comparisons, while a partition-free
-judge matches the key within half a percentage point of the per-leaf
-one. Five measurements, four of them with controls sharing every
-confound except the treatment, and all pointing the same way.
+The evidence that this is what it does is
+Section~\ref{sec:res-judge-summary}: five measurements, four with
+matched controls, all pointing the same way. None of the numbers is
+restated here; this section draws only the inference.
 
 The consequence for the architecture is precise and it is not a
 failure. \textbf{The partition can only bind where correctness is not
@@ -30,18 +26,18 @@ shortcut available and the rubric is the only thing standing between it
 and an undocumented heuristic. On a multiple-choice corpus it has a
 shortcut, and it takes it.
 
-The two halves of that statement belong together, and stating them
-together is this thesis's most defensible sentence: \emph{MMLU-Pro
+The two halves of that statement belong together and must be stated
+together: \emph{MMLU-Pro
 grounds the comparison against ground truth, and is simultaneously the
 corpus on which the judging mechanism can bypass what the comparison is
 about.} The first is why the arena could be validated at all. The
 second is why validating it there does not establish the thing the
 architecture was built for.
 
-This is an inference from Math pilots, not a demonstration. The
-demonstration is the options-blind arm --- the same questions, the same
-rubric, the options withheld --- whose predictions are already fixed in
-writing and which is blocked on a trace-complete roster
+This is an inference from the Math and law runs, not a demonstration.
+The demonstration is the options-blind arm --- the same questions, the
+same rubric, the options withheld --- whose predictions are already
+fixed in writing and which is blocked on a trace-complete roster
 (Section~\ref{sec:disc-future}).
 
 \section{What Each Negative Means, Link by Link}\label{sec:disc-rq2}
@@ -97,7 +93,7 @@ a claim about judge quality, and the measurement that would decide it
 has not been run in the only regime where the rubric has been shown able
 to matter.
 
-\section{The Apparatus Caught Its Own Errors}\label{sec:disc-dq1}\label{sec:disc-selfcheck}
+\section{The Apparatus Caught Its Own Errors}\label{sec:disc-selfcheck}
 
 \textsc{measured}, four instances. None of the following was found by
 looking for it, and that is the point: they are the best available
@@ -148,13 +144,14 @@ given the Bradley--Terry parameters, because a single held-out query is
 reused across many pairs; the Fisher standard errors treat them as
 independent and therefore understate uncertainty by an unmeasured
 margin. And the scheduler over-samples uncertain pairs, which biases
-win-rate; this is why Bradley--Terry $\theta$ is quoted throughout and
-win-rate is not.
+win-rate (Section~\ref{sec:meth-scheduling}); $\theta$ is quoted
+throughout.
 
 \subsection{External Validity}\label{subsec:disc-external-validity}
 
-Every arena result in this thesis is on one corpus, at seed 42, on one
-or two domains, with rosters of 8 to 12 models. The construction is
+Every arena result in this thesis is on one corpus, at seed 42, on two
+domains (Math and law; replications on philosophy and history are
+launched with results pending), with rosters of 8 to 12 models. The construction is
 contingent on one embedding model: if the embedding changes, the
 snapshot is invalid and results produced under different embeddings are
 not comparable. The anchor structure is seeded from MMLU-Pro's
@@ -165,15 +162,12 @@ Discovery is bounded by the corpus available at construction time,
 and there is no incremental insertion mechanism --- a new corpus
 requires a full reconstruction.
 
-The roster exclusion policy is a further external-validity limit and it
-is worth stating plainly rather than presenting as solved. Ten models
-are excluded by a hard-coded list of names, each with a recorded
-reason. Six of those ten are excluded for exactly the condition that
-the corpus validator's trace-presence check measures and declines to
-act on, because that check has no failure branch. The exclusion is a
-ratchet on known failures, not a threshold, and it does not generalise
-to any new model. A general guard is a one-line change and is named as
-future work.
+The roster exclusion policy is a further external-validity limit. Ten
+models are excluded by a hard-coded list of names, each with a
+recorded reason; the policy is a ratchet on known failures, not a
+threshold, and it does not generalise to any new model
+(Section~\ref{sec:exp-rosters}). A general guard is a one-line change
+and is named as future work.
 
 \subsection{Construct Validity}\label{subsec:disc-construct-validity}
 
@@ -213,10 +207,15 @@ its order asymmetry is large (Section~\ref{sec:arch-judge}). Verbosity
 bias~\parencite{chen2024verbosity} is not mitigated: the rubric
 contains no length-normalisation criterion, and the capture-gap result
 of Section~\ref{sec:res-capture-gap} is an extreme instance of a
-length-adjacent preference --- the judge takes the side with text
-$99.4\%$ of the time. Self-preference
+length-adjacent preference --- on mixed pairs the judge takes the side
+with text on $863/868$ of comparisons. Self-preference
 bias~\parencite{panickssery2024llm} does not arise here, because the
-judge model appears in no roster, but no constraint enforces that; it
+judge model appears in no roster,\footnote{Verified rather than
+assumed: the judge is Mistral-Large-3 in every reported run, confirmed
+against the Run~B run log (four occurrences of the judge identifier,
+none of any smaller ``ministral'' variant) and the runtime
+configuration; no roster contains it (Appendix~\ref{app:models}).}
+but no constraint enforces that; it
 is a property of these runs rather than of the system.
 
 \textbf{Tie approximation.}
@@ -234,7 +233,7 @@ $B_{\text{logical}}$, with $B_{\text{API}} = 2 B_{\text{logical}}$
 under the dual-call design, so that cost figures remain comparable
 with single-call systems.
 
-\subsection{The Standing Measurement Debt}\label{sec:disc-limitations}\label{sec:discussion-limitations}\label{sec:disc-debt}
+\subsection{The Standing Measurement Debt}\label{sec:disc-debt}
 
 Two of the following are errors this thesis found in its own
 previously reported numbers. They are presented under the frame of
@@ -253,6 +252,21 @@ subtracted $1/K$, so every pre-correction standard error was the floor
 constant, and correct values are 44 to 209 times larger
 (Section~\ref{sec:meth-bt}). No pre-correction interval or ``resolved
 pair'' determination is quoted.
+
+\item \textbf{The scheduler consequence of that bug, and which runs it
+touches.} The fix is dated (commit \texttt{a92a3ed}, 2026-07-27), and
+Run~A predates it. Run~A's scheduler therefore consumed floor-constant
+standard errors, with three mechanical consequences: the variance
+division inside $U_{\text{resolve}}$ degenerated to a constant, so the
+term collapsed to pure entropy; the maturity-driven mixing weight
+$\alpha$, keyed to falling per-leaf standard errors, never matured;
+and the $3\sigma$ resolve rule reduced to a fixed margin
+$|\hat{s}_i - \hat{s}_j| \geq 0.06$. Run~A's comparison allocation was
+consequently near-uniform-entropy scheduling, not the
+variance-weighted design described in
+Section~\ref{sec:meth-scheduling}, and no reading of Run~A may lean on
+adaptive allocation. Runs~B and~C postdate the fix and ran with
+measured standard errors.
 
 \item \textbf{The reliability constant and the disattenuation form.}
 The published $c = 7.66$ corrects to $c = 2.52$ --- a split-half
@@ -287,7 +301,12 @@ discrepancy named, and no claim rests on it
 
 \end{itemize}
 
+This register closes the discussion: the errors the apparatus caught
+(Section~\ref{sec:disc-selfcheck}) and the debt it still carries are
+two views of the same measurement discipline. What remains is to state
+what survives both --- what was demonstrated, on what scope, and what
+is handed to future work --- and that is the Conclusion.
 
-%%% Sections 6.5 (Conclusion) and 6.6 (Future work) continue in
-%%% 03_Content/8_Conclusion.tex, which is part of this chapter and
+%%% The Conclusion and Future Work sections of this chapter continue
+%%% in 03_Content/8_Conclusion.tex, which is part of this chapter and
 %%% carries no chapter command of its own.

@@ -1,11 +1,11 @@
 \chapter{Reference-Informed Judge Generation}\label{app:judge-generation}
 
 This appendix details the rubric-generation mechanics referenced in
-Chapter~\ref{ch:experimental-design}, \S\ref{sec:exp-arena}.
+Chapter~\ref{ch:experimental-design}, \S\ref{sec:exp-rosters}.
 
 \section{Generation Procedure}
 
-The judge rubric generation procedure (Section~\ref{subsec:judge}) is
+The judge rubric generation procedure (Section~\ref{sec:arch-judge}) is
 instantiated as follows. Representative-query packs are drawn from
 each leaf's construction pool at pack size $k = 25$; a leaf with fewer
 than 25 construction queries uses its full pool as a single pack.
@@ -18,7 +18,7 @@ of its construction queries rather than from all of them.
 The map-step LLM and the reduce-step LLM are the same underlying model
 as the arena judge, to avoid introducing a second
 model's stylistic biases into the rubric; this choice is revisited as
-a limitation in Section~\ref{sec:disc-limitations}. Guideline generation is
+a limitation in Section~\ref{sec:disc-debt}. Guideline generation is
 a one-time cost per frozen snapshot: rubrics are computed once at
 snapshot-freeze time and reused for every subsequent arena run against
 that snapshot, regardless of which models are being compared.
@@ -41,7 +41,7 @@ not modify its structure.
 
 Each logical comparison is realised as two judge calls with response
 position reversed between calls, per the dual-call protocol of
-Section~\ref{subsec:judge}. Disagreement between the two calls is
+Section~\ref{sec:arch-judge}. Disagreement between the two calls is
 resolved as a tie, with each candidate credited half a win
 (\parencite{davidson1970ties}), rather than resolved by a coin flip or
 discarded.

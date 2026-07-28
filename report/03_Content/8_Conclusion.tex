@@ -1,5 +1,5 @@
 
-\section{Conclusion}\label{sec:conclusion}\label{sec:disc-summary}
+\section{Conclusion}\label{sec:conclusion}
 
 This thesis set out to validate a taxonomy and ended by measuring a
 judge. Restating the contributions of
@@ -8,21 +8,27 @@ what was attempted:
 
 \textbf{What was demonstrated.}
 On a corpus with a verifiable answer key, an LLM judge's pairwise
-verdicts track answer correctness rather than reasoning quality. That
-is established by five measurements with mutually independent failure
-modes: an agreement rate with the key of $88.8\%$ on discriminable
-items; a tie rate that triples exactly where the key stops
-discriminating; an inversion by trace presence that \emph{strengthens}
-to $97.0\%$ against $83.2\%$ once capability is controlled; a
-rubric-scoped against rubric-free contrast that leaves $99.4\%$ of
-winners identical; and a paired partition against no-partition contrast
-that is indistinguishable on its high-power statistic
-($94.2\%$ against $94.7\%$).
+verdicts track answer correctness rather than reasoning quality. Five
+measurements establish it, four with matched controls, each by a
+distinct mechanism:
+\begin{itemize}
+\item an agreement rate with the key of $88.8\%$ on discriminable
+items;
+\item a tie rate that triples exactly where the key stops
+discriminating;
+\item an inversion by trace presence that \emph{strengthens} to
+$97.0\%$ against $83.2\%$ once capability is controlled;
+\item a rubric-scoped against rubric-free contrast that leaves
+$99.4\%$ of winners identical;
+\item and a paired partition against no-partition contrast that is
+indistinguishable on its high-power statistic ($94.2\%$ against
+$94.7\%$).
+\end{itemize}
 A construction method was built and characterised as an instrument: it
-reaches a certified structural fixed point at iteration 10, its
-acceptance rule is calibrated in units of its own objective's paired
-standard error against a $13.1\times$ spread in that error, and its
-separation threshold is positioned between two measured nulls.
+reaches a certified structural fixed point, its acceptance rule is
+calibrated in units of its own objective's paired standard error, and
+its separation threshold is positioned between two measured nulls
+(Section~\ref{sec:res-construction}).
 Rubrics induced on its cells were shown to be specific to those cells
 against a size-matched randomised null at
 $p = 1.21 \times 10^{-6}$, with all four pre-registered discriminators
@@ -44,15 +50,20 @@ designated in advance as the null arm, because the roster's models
 order identically there and globally --- the two arms are
 indistinguishable on answer-key agreement, and the rank-correlation gap
 that appears under one tie convention collapses to the registered
-boundary under the other. Under the registered rule that gap counts as
-a \emph{failed} null in favour of the partition-free arm; the
+boundary under the other. Under the registered rule, the
+pre-registration returned a verdict for the partition-free arm; the
 tie-scoring attribution is post hoc, and the confirmatory design fixes
-the convention in advance. The corresponding test on law, the domain the
-offline screen selects, is outstanding.
+the convention in advance. On law, the domain the offline screen
+selects, the registered prediction is met in direction under both tie
+conventions and in magnitude under one: the per-leaf arm leads by
+three times the decisive threshold with ties dropped and exactly ties
+half-weighted, never reversing (Section~\ref{sec:res-c5}).
 
 \textbf{What the scope licenses, and what it does not.}
 These are results about one multiple-choice corpus, one judge model,
-one or two domains, rosters of 8 to 12 models, and a single seed. They
+two domains (Math and law; replications on philosophy and history are
+launched with results pending), rosters of 8 to 12 models, and a
+single seed. They
 license the claim that on a corpus of this kind the judging mechanism
 can bypass the partition, and they license the negative result about
 geometry-adapted evaluation partitioning for a roster of this
@@ -74,10 +85,9 @@ corpus and at its mechanism on this judging paradigm. Stated the other
 way, as a single claim that adapted partitioning improves ranking
 fidelity, the same results read as a project that did not work. The
 decomposition is not a post-hoc rescue; it was written down and dated
-before the runs it now organises, and it is the difference between a
-result and a shrug.
+before the runs it now organises.
 
-\section{Outlook and Future Directions}\label{sec:outlook-and-future-directions}\label{sec:future-work}\label{sec:disc-future}
+\section{Outlook and Future Directions}\label{sec:disc-future}
 
 In priority order, with the reason each sits where it does.
 
@@ -107,12 +117,14 @@ Section~\ref{sec:res-capture-gap} removes that block for most of the
 corpus, and re-running generation with output capture removes it for
 the rest.
 
-\item \textbf{The law arena on the 11-model band} (Run~C). Law is the
+\item \textbf{The philosophy and history replications.} Law --- the
 one domain that reorders significantly under both roster policies at
-full question coverage, and it is therefore the domain where the
-partition has something to be right about. Without it,
-Section~\ref{sec:res-law} reports the screen as a \emph{bound} on what
-a partition could show rather than as a test of whether it shows it.
+full question coverage --- has now been tested by Run~C
+(Section~\ref{sec:res-c5}). Philosophy and history are the remaining
+domains that cleared the screen's permutation null at the pilot band;
+their replications under the same paired protocol are launched and
+their results are pending, and until they land, the law result is a
+single-domain finding.
 
 \item \textbf{A roster clustered within about ten accuracy points.} The
 granularity null of Section~\ref{sec:res-granularity} was measured on a
@@ -121,7 +133,7 @@ dominates by construction. A tightly clustered roster is the version of
 that question that could still come out positive, and it is untested.
 
 \item \textbf{Generalisation to all 14 domains at matched statistical
-power}, rather than one or two selected domains at high power.
+power}, rather than a few selected domains at high power.
 
 \item \textbf{A general trace-presence threshold in the corpus
 validator.} The current exclusion policy is a curated list of ten model
