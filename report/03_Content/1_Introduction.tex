@@ -7,17 +7,20 @@
 Large Language Models (LLMs) increasingly act inside larger software
 pipelines rather than as interfaces that answer individual prompts.
 Complex tasks are decomposed into sub-tasks and dispatched to
-specialised tools, APIs, or models~\parencite{yao2023react}; systems
+specialised tools and APIs~\parencite{yao2023react}, and the same
+dispatch pattern extends to models themselves: HuggingGPT uses an LLM
+controller to route each sub-task to a specialised
+model~\parencite{shen2023hugginggpt}. Systems
 built this way pursue goals across extended sequences of decisions,
 a transition termed the \textit{agentic
-turn}~\parencite{wissuchek2025agentic}.
+turn}~\parencite{wissuchek2025agentic, haidemariam2026agentic}.
 The quality of this dispatch depends on one question:
 \textit{which model should handle a given sub-task?}
 
 Answering it requires a fine-grained, up-to-date capability map of the
 available models.
-Deployed agentic systems are now widespread in
-enterprise~\parencite{pwc2025survey}, yet the evaluation infrastructure
+Agentic systems are increasingly deployed in
+enterprise settings~\parencite{pwc2025survey}, yet the evaluation infrastructure
 needed to build such a map remains coarse: mainstream benchmark
 leaderboards report a single aggregate score per model, which conflates
 performance across semantically heterogeneous tasks and gives no signal
@@ -40,7 +43,8 @@ dispatch tasks to different LLMs need to know which model is best
 splits an evaluation corpus into small, coherent topic cells, writes a
 judging rubric for each cell, and has an LLM judge compare model
 answers pairwise inside each cell --- a narrow cell makes a specific
-rubric writable, and a specific rubric was to make a better judge.
+rubric writable, and a specific rubric was supposed to make a better
+judge.
 Because the corpus has an answer key, every verdict can be checked,
 and the checks show the judge does not apply the rubric: it verifies
 which answer is correct, and a judge given no rubric at all reaches
@@ -50,9 +54,11 @@ carry different true model rankings on this corpus, so per-cell
 evaluation cannot beat global evaluation no matter how good the cells
 are. This thesis therefore set out to validate a taxonomy and ended by
 measuring a judge, and the result is a boundary: wherever correctness
-is checkable, a capable judge will shortcut the rubric, so cell-scoped
-judging can only matter on open-ended tasks --- exactly the setting
-the routing motivation is about, and the one this corpus cannot test.
+is checkable, a capable judge will shortcut the rubric, so on this
+corpus cell-scoped judging had nothing left to improve; the setting
+where it could matter --- open-ended tasks without a verifiable
+key --- is exactly the routing setting, and the one this corpus
+cannot test.
 
 \subsection{The Evaluation Gap}\label{subsec:the-evaluation-gap}
 
@@ -69,7 +75,7 @@ subject categories.
 As models improve, the hardest questions saturate: top-performing
 models converge toward indistinguishable scores, and the benchmark
 loses the ability to discriminate between closely performing
-systems~\parencite{boubdir2024elo}.
+systems~\parencite{hendrycks2021measuring, wang2024mmlupro}.
 The category structure is a second constraint, and it is the one this
 thesis works on; it is taken up in Section~\ref{sec:problem-statement}.
 
@@ -110,12 +116,15 @@ A benchmark adequate for routing must therefore report capability at
 the resolution of individual semantic sub-domains and distinguish
 profiles that coincide in mean but differ in composition.
 Figure~\ref{fig:routing-slopegraph} draws this crossing directly.
+Per-domain rankings of real models do differ in
+practice~\parencite{raju2024constructing}; whether a given roster
+exhibits such crossings on a given corpus is an empirical question,
+and Chapter~\ref{ch:results} reports that this corpus, for this
+roster, does not.
 
 \begin{figure}[h]
 \centering
-\fbox{\parbox{0.9\textwidth}{\centering\vspace{0.6cm}
-Figure 1.1 --- Routing micro-example slopegraph (placeholder)\\
-\footnotesize Two-column slopegraph of the illustrative per-domain accuracies of Models A and B over four domains; data: the synthetic values stated in this section, declared illustrative.\vspace{0.6cm}}}
+\includegraphics[width=0.85\textwidth]{routing_slopegraph}
 \caption{Illustrative slopegraph of the routing micro-example.
 Four lines connect Model~$A$'s per-domain accuracy (left axis) to
 Model~$B$'s (right axis) for Mathematics, Physics, History, and
@@ -141,8 +150,10 @@ contextualised question: is answer~A better than answer~B for this
 specific query~\parencite{zheng2023judging}?
 Yet LLM-as-a-judge systems exhibit biases even in pairwise mode:
 \textit{positional bias} systematically favours the answer presented
-first~\parencite{zheng2023judging}, and \textit{verbosity bias} favours
-longer answers regardless of quality~\parencite{chen2024verbosity}.
+first~\parencite{zheng2023judging}, \textit{verbosity bias} favours
+longer answers regardless of quality~\parencite{chen2024verbosity},
+and \textit{self-preference bias} favours answers that resemble the
+judge's own outputs~\parencite{wataoka2025selfpreference}.
 Beyond these, judges suffer from \emph{guideline incompleteness}: any
 finite rubric under-specifies the evaluation space, leaving cases where
 the judge falls back on undocumented heuristics.
@@ -281,6 +292,13 @@ The title term \textit{Dynamic Domains} refers to the dual property:
 domain boundaries are seeded from MMLU-Pro labels and then adapted by
 geometric evidence, so the evaluation dimensions reflect the structure
 of the data rather than a fixed editorial taxonomy.
+\textit{Query-Adaptive} names the corpus-level sense of that
+adaptivity: the domain \emph{structure} adapts to the query corpus as
+a whole --- corpus-adaptivity, distinct from the per-prompt sense in
+which Prompt-to-Leaderboard conditions a full ranking on each
+individual prompt~\parencite{frick2025p2l}.
+\textit{Multidimensional} means the output is one ranking per cell
+rather than one scalar per model.
 
 \section{Three Links and the Research Questions}\label{sec:research-questions}
 
@@ -325,9 +343,10 @@ mechanism. The question is replaced rather than repaired.
 
 \begin{enumerate}
 
-    \item[\textbf{RQ1.}] Do answer-key-blind, domain-conditioned
-    pairwise LLM judgments recover per-domain capability rankings on
-    held-out queries --- and \emph{what decides the verdicts}?
+    \item[\textbf{RQ1.}] \emph{What decides the verdicts} of
+    answer-key-blind, domain-conditioned pairwise LLM judgments ---
+    and do those judgments recover per-domain capability rankings on
+    held-out queries?
     \textit{Primary metric: agreement between the judge's winner and
     the MMLU-Pro answer key, per verdict. Spearman $\rho$ against
     ground-truth accuracy is reported alongside, under both tie
@@ -381,9 +400,9 @@ stated convention, it is reported as unresolved rather than quoted.
     no partition at all. The reading rule, the decisive difference and
     the void conditions were fixed in writing before the comparison
     existed. The arms are indistinguishable on the high-power
-    agreement metric; under the registered rule the low-power
-    rank-correlation contrast formally \emph{failed} the null in
-    favour of the partition-free arm, an outcome attributed --- after
+    agreement metric; the registered decision rule returned a verdict
+    for the partition-free arm on the low-power rank-correlation
+    contrast, an outcome attributed --- after
     the fact, and marked as such --- to tie scoring
     (Section~\ref{sec:res-c5}).
 
