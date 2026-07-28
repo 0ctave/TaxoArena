@@ -49,8 +49,8 @@ that split deep in the hierarchy incur a low penalty; pairs that
 split at the root are penalised by the full leaf count. A lower Total
 Dasgupta Cost indicates a more structurally coherent hierarchy; unlike
 the per-split chance-corrected separation acceptance test of
-Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-split})---which is
-not a Dasgupta quantity---it is a genuine
+Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-split}), which is
+not a Dasgupta quantity, it is a genuine
 whole-tree Dasgupta-cost measure, computed on a fixed dataset and
 comparable across configurations and
 baselines (Section~\ref{sec:exp-baselines}).
@@ -104,7 +104,7 @@ Section~\ref{sec:app-metrics-dendrogram-purity}.
 Dendrogram purity is defined over a tree, where the lowest
 common ancestor (LCA) of two leaves is unique.
 Because the induced taxonomy is a strict tree
-(Appendix~\ref{app:dag-formalism}, \S\ref{sec:poly-negative}), the
+(Section~\ref{sec:poly-negative}), the
 metric takes its standard form here.
 The implementation retains the more general \emph{shallowest}-LCA
 convention, which coincides with the unique LCA whenever every node
@@ -135,8 +135,22 @@ the bin's mean confidence. Then
 \[
 \text{ECE} = \sum_{b=1}^{B} \frac{|\mathcal{B}_b|}{N} \left| \text{acc}(\mathcal{B}_b) - \text{conf}(\mathcal{B}_b) \right|,
 \]
-the standard expected-calibration-error construction adapted from
-temperature-scaling calibration analysis to the domain-aggregated
-trickle-routing distribution. Lower Routing ECE
+the standard binned expected-calibration-error construction applied to
+the domain-aggregated trickle-routing distribution. Lower Routing ECE
 indicates a routing distribution whose confidence is a trustworthy
-proxy for correctness.
+proxy for correctness. No temperature-scaling recalibration is applied
+anywhere in this system; the metric is diagnostic only.
+
+\textbf{The exported number is not this metric.} The definition above
+\emph{sums} a query's leaf membership onto each leaf's depth-1 domain
+ancestor, which is what makes the result a distribution over domains.
+The export path instead takes the \emph{maximum} over a domain's
+leaves, and a maximum over leaves is not a distribution: it does not
+normalise, and it systematically understates confidence for queries
+spread across several leaves of the same domain. The frozen run's
+exported value of $0.2114$ is therefore reported as a routing
+diagnostic with the discrepancy named, and no claim in this thesis
+rests on it (Section~\ref{sec:disc-debt}). Fixing the aggregation will
+move the number in a predictable direction --- confidence rises, so
+apparent under-confidence falls --- by an amount that has not been
+measured.

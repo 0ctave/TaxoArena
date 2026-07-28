@@ -15,16 +15,17 @@ Parameter & Symbol/Name & Value \\
 \midrule
 Embedding dimension & $d$ & 256 (fixed) \\
 Maximum recursion depth & $D_{\max}$ & 8 \\
-Minimum cluster size & $n_{\min}$ (\texttt{minClusterSize}) & 30 \\
-Proposal separation bar & $\epsilon_{\text{sep}}$ (\texttt{proposalSeparationBar}) & 0.02 \\
+Minimum cluster size & $n_{\min}$ (\texttt{minClusterSize}) & 55 \\
+Proposal separation bar & $\epsilon_{\text{sep}}$ (\texttt{proposalSeparationBar}) & 0.025 \\
 Acceptance tolerance & $\tau$ (\texttt{tau}) & $10^{-6}$ \\
+Acceptance gate, in paired SE units & \texttt{acceptanceZ} & 2.0 \\
 Membership share floor\textsuperscript{a} & \texttt{membershipFloor} & 0.25 \\
 Routing beam margin & \texttt{routingBeamGamma} & 0.20 \\
 Descent-gate slack & \texttt{descentMargin} & 0.12 \\
 Effective support floor & \texttt{effectiveSupportFloor} & 2.0 \\
 Max leaf assignments (arena-time cap) & \texttt{maxLeafAssignments} & 5 \\
 Fusion pre-filter threshold & \texttt{fusionSimilarityThreshold} & 0.90 \\
-Iteration budget & \texttt{numIterations} & 50 \\
+Iteration budget & \texttt{numIterations} & 35\textsuperscript{c} \\
 Construction mode\textsuperscript{b} & \texttt{dagMode} & \texttt{DAG\_MAX} \\
 \bottomrule
 \end{tabular}
@@ -35,14 +36,28 @@ descent decision and sibling admission are governed separately by the
 descent gate and the beam margin
 (Appendix~\ref{app:dag-formalism}).
 \textsuperscript{b}The mode name is historical. It now selects three
-flags---residual routing, the residual split gate, and stable question
-identifiers---and carries no polyhierarchy setting, since cross-linking
-is no longer part of the pipeline (Appendix~\ref{sec:poly-negative}).
-Values are current canonical settings taken from the canonical run
-configuration; final values
-follow the calibration study conducted after the taxonomy-construction
-pipeline is frozen.
-% TODO(calibration): finalize once taxonomy construction is frozen
+flags (residual routing, the residual split gate, and stable question
+identifiers) and carries no polyhierarchy setting, since cross-linking
+is no longer part of the pipeline (Section~\ref{sec:poly-negative}).
+\textsuperscript{c}An upper budget, not a run length: the frozen
+construction reached its certified fixed point at \textbf{iteration
+10} and iterations 8--10 are identical on every recorded column
+(Section~\ref{sec:res-construction}).
+Values are those of the frozen construction run that every result in
+this thesis is attributed to, read from its run configuration.
+Two of them are commonly stated backwards and are stated here in the
+direction the evidence supports.
+\texttt{minClusterSize} is a \textbf{budget} choice --- it sets the
+cell count to what the judge budget can identify, and per-cell
+reliability follows from it rather than motivating it --- and it is
+free to choose only because granularity turned out to be evaluatively
+flat (Section~\ref{sec:res-granularity}).
+\texttt{descentMargin} is a \textbf{mode selector} with two justified
+operating points rather than a tuned optimum: $0.12$ is
+routing-optimal with sub-domain discovery off, which is what this
+artifact reports, while a value near $0$ turns discovery on at a cost
+of roughly five points of routing quality and a large residual
+reserve.
 \end{table}
 
 \section{Hyperparameter Selection Protocol}\label{sec:exp-tuning-protocol}
@@ -50,8 +65,8 @@ pipeline is frozen.
 The original L9($3^4$) orthogonal-array sweep documented here is
 \textbf{historical}: it was conducted on a predecessor
 parameterisation of the routing layer, and three of its four
-factors---\texttt{routingSoftmaxTau}, \texttt{assignmentCosineGap},
-and \texttt{deltaAssign}---were subsequently removed when routing was
+factors (\texttt{routingSoftmaxTau}, \texttt{assignmentCosineGap},
+and \texttt{deltaAssign}) were subsequently removed when routing was
 redesigned around the descent gate, beam margin, and
 membership-share floor (Appendix~\ref{app:dag-formalism}).
 The current calibration sweep uses the same L9/Pareto machinery over
@@ -66,17 +81,13 @@ Its protocol and gates are retained because they informed the
 surviving canonical values (notably \texttt{minClusterSize}) and
 because the selection machinery will be reused for the tuning study
 of the current parameter set.
-% TODO(calibration): finalize once taxonomy construction is frozen —
-% document the membershipFloor/proposalSeparationBar tuning study here.
-The design covered four factors---\texttt{minClusterSize},
-\texttt{routingSoftmaxTau}, \texttt{assignmentCosineGap}, and
-\texttt{deltaAssign}---each tested at three levels, run against a
-Pareto selection procedure (\texttt{tools/tuning/pareto.py}) driven by
-the harness \texttt{tools/tuning/tuning\_harness.py}.
-The L9 levels were \texttt{minClusterSize} $\in \{50, 75, 100\}$,
-\texttt{routingSoftmaxTau} $\in \{1.0, 1.5, 2.0\}$,
-\texttt{assignmentCosineGap} $\in \{0.10, 0.15, 0.20\}$, and
-\texttt{deltaAssign} $\in \{0.5, 1.0, 2.0\}$.
+The historical design covered four factors, each at three levels, run
+against a Pareto selection procedure. Only one of those factors
+(\texttt{minClusterSize} $\in \{50, 75, 100\}$) survives in the current
+parameterisation; the other three controlled a routing temperature and
+two nat-margin assignment gates that were removed with the mechanism
+they governed, and their levels are not reproduced here because no
+current parameter corresponds to them.
 
 Configuration selection proceeds in three steps. Every candidate is
 first checked against the eight hard gates in
@@ -85,7 +96,7 @@ candidate is then scored against the six soft gates in
 Table~\ref{tab:pareto-gates}, whose outcome is recorded per candidate
 but does not exclude it. All hard-gate survivors are then ranked by
 Pareto dominance count over twelve coherence and calibration
-objectives---five maximised (Weighted Leaf Purity, Dendrogram Purity,
+objectives: five maximised (Weighted Leaf Purity, Dendrogram Purity,
 Spherical Silhouette, total migration volume $m_{\text{total}}$ (the
 fraction of queries whose anchor assignment changed relative to the
 canonical partition; \emph{not} the RQ2 fidelity metric $\Delta\rho$,
@@ -93,7 +104,7 @@ which no tuning gate ever observes),
 canonical--adapted Jaccard) and seven minimised (Total Dasgupta Cost,
 Routing ECE, Brier score, no-match rate, small-leaf fraction,
 $\kappa$-shrinkage mean, selected-node starved-leaf
-fraction)---with raw Top-1 accuracy as the tiebreaker. Small-leaf
+fraction). Raw Top-1 accuracy is the tiebreaker. Small-leaf
 fraction, starved-leaf fraction, and canonical--adapted Jaccard
 appear in both layers: the gate sets a hard floor, and the dominance
 ranking additionally credits margin beyond it.
@@ -117,12 +128,21 @@ Starved-leaf fraction (selected node) & $\leq 0.20$ \\
 \midrule
 Average match count & $[1.05,\,1.30]$ \\
 Top-1 routing accuracy & $\geq 75.6\%$ \\
-Routing ECE & $\leq 0.25$ \\
+Routing ECE\textsuperscript{*} & $\leq 0.25$ \\
 Borderline rate & $[0.20,\,0.35]$ \\
 Cross-anchor migration rate & $[0.10,\,0.30]$ \\
 Canonical--adapted Jaccard & $[0.40,\,0.70]$ \\
 \bottomrule
 \end{tabular}
+\par\smallskip
+\footnotesize \textsuperscript{*}The frozen run exported a routing ECE
+of $0.2114$, inside this gate. The exported quantity is not the metric
+Appendix~\ref{app:metrics} defines: the export aggregates leaf
+membership onto domain ancestors by taking a maximum over leaves rather
+than summing, and a maximum over leaves is not a distribution. It is
+reported here as a routing diagnostic with the discrepancy named, and
+nothing in this thesis depends on it
+(Section~\ref{sec:disc-debt}).
 \end{table}
 
 \begin{table}[h]
@@ -194,20 +214,38 @@ A1 & Embedding dimension $d$ & $\{128, 256, 512\}$; canonical $= 256$ \\
 A2 & $\kappa$ estimator corrections (Newton--Raphson refinement, Hornik--Gr\"un shrinkage, parent-anchored EB blend) & On (canonical) vs. off \\
 A3$^\dagger$ & NMI variant & Overlapping vs. disjoint Shannon entropy \\
 A4$^\dagger$ & Purity formula & Multi-membership-aware vs. primary-assignment purity \\
-A5 & Separation threshold $\epsilon_{\text{sep}}$ & $\{0.01, 0.05, 0.10, 0.30\}$ \\
+A5 & Separation threshold $\epsilon_{\text{sep}}$ & $\{0.01, 0.025, 0.05, 0.10, 0.30\}$; canonical $= 0.025$ \\
+A5b & Marginal separation requirement & $\{0, \text{fall back to } \epsilon_{\text{sep}}\}$; $0$ measured and rejected \\
 A6$^\ddagger$ & \texttt{deltaAssign} $\times$ \texttt{assignmentCosineGap} (joint; historical) & $\{0.5,1.0,2.0\} \times \{0.10,0.15,0.20\}$ \\
 A7 & Iteration count & $\{10, 25, 50\}$ \\
 A8 & Query set scope & Reserved (arena-excluded) vs. full corpus \\
 A9 & Soft-membership refitting \texttt{refitMuPerIteration} & On (canonical) vs. off \\
-A10$^\ddagger$ & Cross-link insertion (historical) & Reported in Appendix~\ref{sec:poly-negative} \\
+A10$^\ddagger$ & Cross-link insertion (historical) & Reported in Section~\ref{sec:poly-negative} \\
 A11$^\ddagger$ & Dynamic-temperature exponent $\gamma$ (historical) & $\{0.0, 0.5, 1.0\}$; canonical $= 0.0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Each ablation is run across all three seeds and reported as mean
-$\pm$ std following the statistical protocol of
-Section~\ref{sec:exp-metrics}. A3 and A4 (marked $\dagger$) are not
+\textbf{Status of these rows.} Construction is deterministic at a fixed
+seed, so each ablation is a single run at seed 42 rather than a mean
+over seeds; no ablation figure in this thesis is a multi-seed mean.
+Three rows have current, citable outcomes and the rest do not.
+The separation-threshold row (A5) is what fixed the canonical
+$\epsilon_{\text{sep}} = 0.025$, positioned between the two nulls of
+Section~\ref{sec:arch-requirements}.
+The marginal-separation variant --- requiring cluster $k+1$ to add a
+fixed amount over $k$ rather than falling back to the level bar --- was
+measured at $0$ and \textbf{rejected}: 83 leaves at $J = 0.230247$
+against the canonical artifact's 87 leaves at $J = 0.253129$, and it
+relocates the binding threshold onto the maximum branching factor.
+The maximum-branching-factor plateau and the $k$-fallback figures were
+measured before a correction to the splitter's routing check and are
+void as to values; the qualitative finding they support --- that the
+branching cap was a structural determinant of the tree before the
+fallback existed, and is a cost bound afterwards --- stands, and the
+numbers are not restated.
+
+A3 and A4 (marked $\dagger$) are not
 system ablations in the same sense as the others: they vary the
 \textit{metric computation formula} used to score a fixed,
 already-constructed taxonomy, rather than a system parameter that
@@ -220,48 +258,219 @@ insertion operator, and the dynamic routing temperature, all of which
 have since been removed from the pipeline.
 Their rows are retained for provenance; an equivalent ablation of
 the current parameter set is pending, and the cross-link result is
-reported in Appendix~\ref{sec:poly-negative}.
+reported in Section~\ref{sec:poly-negative}.
 % TODO(calibration): finalize once taxonomy construction is frozen
 A9 isolates soft-membership refitting, whose marginal contribution to
 taxonomy quality needs to be demonstrated, not merely described.
 
-\section{Optional Secondary Diagnostics}\label{sec:appendix-optional-diagnostics}
 
-The following conditions are not part of the minimum defensible
-package (Table~\ref{tab:arena-conditions}) and are reported only
-where run, as secondary diagnostics.
+\section{Pre-Registrations}\label{app:preregs}
 
-\subsection{Random Scheduler Ablation (C4)}
+Four decision rules were fixed in dated documents before the data they
+govern existed. This section records what each fixed and when, so that
+every use of the word ``pre-registered'' in
+Chapter~\ref{ch:results} can be checked. The purpose of reproducing
+them is not ceremony: three results in this project inverted after the
+fact, and only the ones whose reading had been fixed in advance
+survived the inversion as findings rather than as revisions.
 
-Because the scheduler is not a headline contribution
-(\S\ref{sec:exp-rqmap}), the random scheduler ablation (C4) replaces
-the composite-utility pair and query selection of
-Section~\ref{sec:meth-scheduling} with uniformly random pair and
-query selection, retaining the same per-pair and per-leaf budgets and
-the same three-level stopping policy. It is compared against the
-adaptive scheduler at matched final judge-call counts on total match
-count, achieved Kendall $\tau$/pairwise-winner accuracy against
-MMLU-Pro, and rounds to convergence. The budget-fidelity curve
-($\rho$ or $\tau$ against cumulative judge calls) and a Wilcoxon
-signed-rank test on per-leaf Kendall $\tau$ (chosen over a paired
-$t$-test since per-leaf rank-agreement values are bounded and not
-assumed normally distributed) compare the adaptive scheduler against
-this ablation at matched judge-call budgets. An exhaustive
-round-robin condition is not included: it is computationally
-prohibitive at the 12-model arena scope and even less justified given
-the scheduler is not a headline contribution.
+\subsection*{P1 --- Granularity and discriminative power}
 
-\subsection{Verbosity Bias Probe}
+Fixed in advance: three named outcomes, so that any result the analysis
+could return already had an interpretation attached; and the rule that
+the \emph{observed} between-cell correlation is primary and the
+disattenuated one secondary. The outcome that occurred was named in
+advance as ``the same signal, thinner''. The primacy rule proved
+decisive: the disattenuated column moves in the opposite direction
+across granularities and clips past $1.0$, so leading with it would
+have produced a conclusion from the arithmetic of the correction rather
+than from the data (Section~\ref{sec:res-granularity}).
 
-Fifty judge matches are sampled uniformly from the canonical arena
-run and re-judged with response position swapped, independent of the
-standard dual-call protocol's own position randomisation, producing
-an out-of-protocol audit sample. The position-flip rate (fraction of
-re-judged matches whose verdict changes under the swap) and a
-per-model verbosity delta $\Delta_{\text{verbosity}}$ (win-rate
-difference attributable to response length after controlling for BT
-score) are reported. This probe targets an anomaly observed in
-preliminary runs (\texttt{arenabenchmark.log}) in which one evaluated
-model's verdicts appeared to correlate with response length
-independent of content quality; it is a targeted diagnostic, not a
-general-purpose bias correction.
+\subsection*{P2 --- Rubric specificity}
+
+Fixed in advance: four directional predictions, each with the direction
+of its own confound named separately --- including one measure whose
+vocabulary-size confound could plausibly have driven the \emph{null}
+arm higher, which is why it is reported alongside three others rather
+than alone. Also fixed: within-arm decision thresholds, and the rule
+that if the sharpest discriminator came back at zero in both arms the
+test is \emph{inconclusive} rather than negative
+(Section~\ref{sec:res-rubric-null}).
+
+\todo[inline]{This document is stale as written: it still records
+``treatment arm only, no null, this is not yet evidence''. The null arm
+has since been run and the result was never written back. Amend it,
+with the amendment dated, before reproducing its text here. Also
+resolve the band ambiguity: two pre-registrations state different
+decision bands and neither says whether they govern the same
+quantity.}
+
+\subsection*{P3 --- Arena launch cost}
+
+Fixed in advance: cost bands for per-cell identification, with the
+instruction that no band is to be renegotiated once the number is seen;
+and a void condition --- if the measured identification cost came back
+constant across cells, that would indicate the scheduler was still
+capping and the measurement would report nothing. The measured cost
+varies across cells and the minimum falls inside the pre-registered
+band (Section~\ref{sec:res-cost}).
+
+\subsection*{P4 --- The no-partition baseline}
+
+Fixed in advance: the paired design (both arms judge an identical
+question set, unlike the original MT-Bench protocol, because here the
+partition is the treatment); the primary outcome (Spearman $\rho$
+against ground-truth accuracy per domain) and the secondary
+(per-verdict answer-key agreement, which has more power but measures
+the judge rather than the grouping); the decisive difference of two
+Spearman grid steps on Math, i.e.\ $|\Delta\rho| \geq 0.007$ at twelve
+models; the designation of Math as the \emph{null} arm and law as the
+test, with the reason; and four void conditions --- identical question
+sets, the confidence gate disabled in both arms, identical query
+samplers, and identically defined ties across the two verdict formats.
+
+Recorded in the same document, before the run: the honest prior that
+with the multiple-choice options present the comparison would likely
+come back null, because the judge can verify the answer and the rubric
+is then decorative. Writing down the expected outcome, with its
+mechanism, in a dated document is what distinguishes the null of
+Section~\ref{sec:res-c5} from an absence of effort.
+
+\subsection*{P5 --- The options-blind arm, predicted but not run}
+
+The options-blind arm has not been run
+(Section~\ref{sec:disc-future}). Its predictions were nevertheless
+fixed in writing, per stratum, and are reproduced because a prediction
+written before a run that never happened is still evidence of
+discipline --- and because it names its own alternative outcome.
+
+Predicted: the untraced-against-untraced stratum, at $92.9\%$ with
+options present, should return to chance with a very high tie rate;
+if it comes back at $70\%$ or above, something is leaking, and the
+candidates are enumerable --- the judge recognising the question from
+pre-training, position bias surviving the dual-call control, or
+answer-letter frequency priors in the corpus.
+The traced-against-traced stratum, at $84.2\%$ with a standard error of
+$2.5\%$, is the real measurement; a fall to about $75\%$ would be
+$3.6$ standard errors and clearly readable.
+\textbf{And the second possibility, written down in advance:} landing
+near $84\%$ unchanged is plausible, and would mean that on traced pairs
+the judge was never using the key at all, so the $88.8\%$ aggregate is
+carried entirely by the untraced and mixed strata. That is a cleaner
+decomposition than any currently available, and it should not be
+discovered after the fact.
+
+\section{Register of Corrections to Previously Reported Figures}\label{app:corrections-register}
+
+Earlier versions of this pipeline and of its analysis record reported
+figures that this thesis corrects or withdraws. Each correction is
+told once, here; the main text states the corrected fact where the
+number is used and points to this register for the story. No value
+computed before a correction is quoted anywhere in the thesis.
+
+\subsection*{Bradley--Terry standard errors}
+
+The zero-sum rank completion requires subtracting $1/K^{2}$ after
+inversion; the implementation subtracted $1/K$
+(derivation: Appendix~\ref{app:numerics}). The over-subtraction of
+$(K-1)/K^{2}$ --- $0.109$ at $K = 8$ --- exceeds the variance itself
+at every realistic comparison count, so every Bradley--Terry standard
+error this system reported before the correction was clamped at the
+floor constant of $0.01$ rather than measured. Correct values are 44
+to 209 times larger. This invalidates every confidence interval and
+every ``resolved pair'' determination computed before the fix, since
+pair resolution thresholds on $3(\sigma_i + \sigma_j)$.
+
+\subsection*{The reliability constant, and the disattenuation form}
+
+The constant in $r = n/(n+c)$ was published at $c = 7.66$. Two
+independent errors compound. The curve was fitted against raw
+split-half correlations, which measure reliability at \emph{half}
+length, so fitting $n/(n + 2c_0)$ against $n/(n + c)$ returns
+$c = 2c_0$; correcting the length mismatch halves it. And $c$ is a
+property of the roster rather than of the corpus, and re-fitting at
+the corrected 11-model band multiplies it by a further $0.66$. The
+corrected value is $c = 2.52$. Separately, disattenuation must be
+two-sided: both sides of $\rho(\text{arena}, \text{ground truth})$ are
+finite-sample per-cell rankings, so the correction is $\rho / r$
+rather than $\rho / \sqrt{r}$.
+
+The consequences invert rather than shift. At a $40.8$-query cell an
+observed median $\rho$ of $0.823$ corrects to $0.978$ under the
+published constant and to $0.874$ under the corrected one. The
+reliability ladder across granularities compresses from a spread of
+$0.219$ to $0.088$, and leaf-scale cells stop being individually
+low-reliability. That weakens the reliability leg of the argument for
+judging at a coarser cut; the identification-cost leg of
+Section~\ref{sec:res-cost} is untouched and probably carries it alone.
+Two caveats travel with any value of $c$: the bootstrap interval
+originally quoted for it resamples three fitted points and does not
+propagate sampling uncertainty in the underlying split-half estimates,
+so it is not a confidence interval; and the curve was fitted on
+ground-truth rankings, which are noise-free per question, so arena
+reliability at a given $n$ lies \emph{below} it. It is a ceiling, not
+a prediction.
+
+\subsection*{Evaluative-redundancy percentages}
+
+Figures of the form ``$72.2\%$ of leaf pairs redundant, $42.2\%$
+saturated'' were reported by an earlier version of this analysis. They
+could not be reproduced under either an observed-primary or a
+disattenuated reading, and the convention that produced them is
+underspecified in the pre-registration. Under the corrected constant a
+redundancy claim would in any case require an observed $\rho$ of
+$0.844$ rather than $0.749$ to clear the same threshold, so the claim
+would likely become a minority one. No redundancy percentage is
+asserted in this thesis.
+
+\subsection*{The correctness-blind rank correlation}
+
+The value originally recorded for rank fidelity on the subset where
+the answer key cannot discriminate --- Spearman $\rho$ falling from
+the $0.95$--$0.98$ region to $0.74$--$0.76$ --- could not be
+reproduced; recomputation on the same verdict set returns
+$0.90$--$0.93$ under both tie conventions. The two computations differ
+by an analysis convention that was not written down at the time. The
+magnitude is withdrawn; the direction and the tie behaviour carry the
+claim (Section~\ref{sec:res-correctness}).
+
+\todo[inline]{Unresolved: the correctness-blind Spearman $\rho$.
+Recover the convention that produced the $0.74$--$0.76$ figure (tie
+weighting, row subsetting, and whether $\rho$ was fitted on
+Bradley--Terry $\theta$ or on win-rate), then report one value per tie
+convention or drop the magnitude claim entirely.}
+
+\subsection*{Routing expected calibration error}
+
+Routing ECE is implemented and was measured at $0.2114$ on the frozen
+run, inside the gate set for it. But the export aggregates leaf
+membership onto domain ancestors by taking a maximum over leaves
+rather than a sum, and a maximum over leaves is not a distribution;
+the exported number is therefore not the metric its definition
+specifies. It is reported as a routing diagnostic with the discrepancy
+named (Table~\ref{tab:pareto-gates}), and no claim rests on it.
+
+\subsection*{A side-channel found before it could enter a run}
+
+Recorded here because it belongs to the same audit trail, although no
+reported figure was affected. A pre-launch format check on two
+candidate roster entries had exactly one anomalous column: newline
+count, with a median of $0$ where every other model showed 8 to 24.
+The two systems' stored output was not prose but a raw JSON envelope
+carrying a self-reported \texttt{reason\_code} field alongside the
+reasoning, and that field predicts the very outcome being judged ---
+$83.2\%$ correct at code A against $36.5\%$ at code C for one system,
+$90.0\%$ against $57.5\%$ for the other. The rendering path returns
+stored output verbatim, so a judge would have received the code
+inline. An asymmetric side-channel present on two models and absent
+from the rest is strictly worse than a format artifact; neither system
+entered any arena run as stored.
+
+\todo[inline]{Resolve before submission: (i) recompute every
+Bradley--Terry interval quoted in Chapter~\ref{ch:results} against the
+corrected variance term, from the stored verdicts; (ii) fix the
+routing ECE aggregation (maximum $\rightarrow$ sum) and re-export, or
+keep the current number with the discrepancy stated as it is here;
+(iii) re-fit the reliability constant against the roster the reported
+arena runs actually used, since $c = 2.52$ is the 11-model-band value
+fitted on ground-truth rankings.}

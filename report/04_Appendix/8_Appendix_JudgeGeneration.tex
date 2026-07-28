@@ -7,10 +7,16 @@ Chapter~\ref{ch:experimental-design}, \S\ref{sec:exp-arena}.
 
 The judge rubric generation procedure (Section~\ref{subsec:judge}) is
 instantiated as follows. Representative-query packs are drawn from
-each leaf's construction pool at pack size $k = 5$; a leaf with fewer
-than 5 construction queries uses its full pool as a single pack. The
-map-step LLM and the reduce-step LLM are the same underlying model as
-the arena judge, Mistral-Large-3, to avoid introducing a second
+each leaf's construction pool at pack size $k = 25$; a leaf with fewer
+than 25 construction queries uses its full pool as a single pack.
+The pool a pack is drawn from is the leaf's construction queries
+\emph{after} two filters: the reserved-set filter, which is audited by
+a build-failing assertion and is what makes the answer-key-blind claim
+enforceable rather than asserted, and a hash filter that thins the pool
+by roughly a fifth. A leaf's rubric is therefore induced from a sample
+of its construction queries rather than from all of them.
+The map-step LLM and the reduce-step LLM are the same underlying model
+as the arena judge, to avoid introducing a second
 model's stylistic biases into the rubric; this choice is revisited as
 a limitation in Section~\ref{sec:disc-limitations}. Guideline generation is
 a one-time cost per frozen snapshot: rubrics are computed once at
@@ -19,8 +25,8 @@ that snapshot, regardless of which models are being compared.
 
 \section{Structural Template}\label{sec:judge-template-full}
 
-The global structural template---covering presentation order, tie
-handling, and output format---is fixed across all leaves. It governs
+The global structural template, covering presentation order, tie
+handling, and output format, is fixed across all leaves. It governs
 only the shared scaffolding of the judge prompt; the leaf-specific
 reference-informed content (representative queries, answer-key
 context) is injected into this template at generation time and does

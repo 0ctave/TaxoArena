@@ -1,106 +1,293 @@
-\chapter{Discussion}\label{ch:discussion}
+\chapter{Discussion and Conclusion}\label{ch:discussion}\label{ch:conclusion}
 
-This chapter interprets the results of Chapter~\ref{ch:results} in
-relation to the two headline research questions (RQ1, RQ2) and the
-construction-validity diagnostic (DQ1), then examines construct
-validity, threats to validity, and limitations.
+\section{Where the Architecture Binds}\label{sec:disc-rq1}
 
-\section{RQ1: Arena Ranking Validity}\label{sec:disc-rq1}
+\textsc{argued}, from Section~\ref{sec:res-judge}.
+MMLU-Pro is multiple-choice with a verifiable answer key. The judge is
+shown the options and, in $94.8\%$ of cases, a response that states its
+own selected option. A judge capable of solving the item can therefore
+verify both responses against its own solution and decide the
+comparison without consulting the rubric at all --- while still being
+answer-key-blind in the sense the protocol guarantees, because nothing
+in the prompt tells it which option is right.
 
-\section{RQ2: The Migration Effect}\label{sec:disc-rq2}
+That is what the measurements say it does. Agreement with the key on
+discriminable items is $88.8\%$ and moves by $0.4$ points when the
+rubric changes; the tie rate triples exactly where the key stops
+discriminating; agreement is \emph{highest} where neither response
+carries any reasoning; and a rubric-scoped and a rubric-free judge
+reach the same winner on $99.4\%$ of comparisons, while a partition-free
+judge matches the key within half a percentage point of the per-leaf
+one. Five measurements, four of them with controls sharing every
+confound except the treatment, and all pointing the same way.
 
-\section{Construction Validity (DQ1) in Context}\label{sec:disc-dq1}
+The consequence for the architecture is precise and it is not a
+failure. \textbf{The partition can only bind where correctness is not
+checkable.} On open-ended generation, on agent traces, on tasks with no
+key --- the settings the routing motivation of
+Section~\ref{sec:motivation} is actually about --- the judge has no
+shortcut available and the rubric is the only thing standing between it
+and an undocumented heuristic. On a multiple-choice corpus it has a
+shortcut, and it takes it.
 
-\section{Construct Validity and Threats to Validity}\label{sec:disc-validity}
+The two halves of that statement belong together, and stating them
+together is this thesis's most defensible sentence: \emph{MMLU-Pro
+grounds the comparison against ground truth, and is simultaneously the
+corpus on which the judging mechanism can bypass what the comparison is
+about.} The first is why the arena could be validated at all. The
+second is why validating it there does not establish the thing the
+architecture was built for.
+
+This is an inference from Math pilots, not a demonstration. The
+demonstration is the options-blind arm --- the same questions, the same
+rubric, the options withheld --- whose predictions are already fixed in
+writing and which is blocked on a trace-complete roster
+(Section~\ref{sec:disc-future}).
+
+\section{What Each Negative Means, Link by Link}\label{sec:disc-rq2}
+
+\textsc{argued}. This thesis reports several negative results, and they
+do not mean the same thing, because they land on different links of the
+chain in Section~\ref{sec:research-questions}.
+
+\textbf{``Cells do not carry different true rankings'' lands on link 3's
+premise.} It is a statement about MMLU-Pro and about a roster spanning
+$54$ accuracy points: cell identity adds essentially nothing to model
+ordering beyond global capability. It says nothing at all about whether
+cell-scoped judging produces better judgments, because it never touches
+a verdict --- it is computed on ground-truth accuracy alone.
+
+\textbf{``The rubric does not change the verdict'' lands on link 3's
+mechanism.} And it is not a parity finding. Two judges that agree on
+$99.4\%$ of winners cannot produce a detectable ranking difference at
+any sample size, granularity or domain count. The arms barely differ,
+and no amount of power repairs a comparison whose treatment is nearly
+the control. The transferable consequence is a precondition rather than
+a result: measure verdict agreement before spending a judging budget on
+an A/B arm.
+
+\textbf{Neither touches links 1 or 2, and both of those came out
+positive.} The construction reaches a certified fixed point and
+produces cells of the intended size distribution; rubrics induced on
+those cells are specific to them against a size-matched randomised null
+at $p = 1.21 \times 10^{-6}$, with all four pre-registered
+discriminators firing in the predicted directions. The chain does not
+break at the partition. It breaks at the step where a better rubric was
+supposed to produce a better verdict, on a corpus where the verdict was
+already decided by something else.
+
+\textbf{And the reading rule matters more than the reading.} A null
+under a decision rule fixed before the data is a finding. A null under a
+rule chosen afterwards is a shrug. Every negative above was read
+against a criterion recorded in a dated document: three outcomes named
+in advance for the granularity analysis, with ``observed $\rho$ is
+primary'' fixed in advance --- and that mattered, because the
+disattenuated column moves the opposite way and clips past $1.0$, so
+leading with it would have produced the opposite conclusion from the
+arithmetic of the correction rather than from the data. Four
+directional predictions with the confound direction named per measure
+for the rubric null. A decisive difference of two Spearman grid steps,
+and four void conditions, fixed for the no-partition baseline before its
+verdicts existed.
+
+A reader must not be allowed to collapse ``cells do not carry different
+true rankings'' into ``the taxonomy does not help the arena''. The first
+is a property of this corpus's saturation for this roster. The second is
+a claim about judge quality, and the measurement that would decide it
+has not been run in the only regime where the rubric has been shown able
+to matter.
+
+\section{The Apparatus Caught Its Own Errors}\label{sec:disc-dq1}\label{sec:disc-selfcheck}
+
+\textsc{measured}, four instances. None of the following was found by
+looking for it, and that is the point: they are the best available
+evidence that the results the apparatus did \emph{not} overturn are
+sound.
+
+\textbf{The response-capture gap} was found while sizing the roster for
+a different experiment. It showed that half of the pilot arena's
+comparisons had been decided by which side had text at all, and it
+qualified figures that were already written down
+(Section~\ref{sec:res-capture-gap}).
+
+\textbf{A side-channel in two candidate roster entries} was found by a
+pre-launch format check whose only anomalous column was newline count:
+the two systems' stored output was a raw JSON envelope carrying a
+self-reported code that predicts the very outcome being judged.
+Neither system entered any arena run as stored; the full account is in
+Appendix~\ref{app:corrections-register}.
+
+\textbf{The reliability constant} was caught twice, by two independent
+routes that compounded to the same factor: a re-fit at a different
+roster size, and a units check on a split-half length mismatch
+(Section~\ref{sec:disc-debt}).
+
+\textbf{The domain screen's two reversals} both traced to one cause,
+found only because the screen was re-run at the roster the arena would
+actually use (Section~\ref{sec:res-law}).
+
+Two design features did the work in three of these four cases, and both
+are cheap. A check whose only informative column is an unglamorous one
+--- newline count --- caught what length, citation rate and URL rate
+did not. And re-deriving a statistic at the configuration the decision
+will actually run at, rather than at whatever configuration was
+convenient, caught both screen reversals.
+
+\section{Threats to Validity and Limitations}\label{sec:disc-validity}
 
 \subsection{Internal Validity}\label{subsec:disc-internal-validity}
 
+The information separation that the answer-key-blind claim rests on is
+enforced in code and audited by a build-failing assertion
+(Section~\ref{sec:arch-judge}), which is the strongest guarantee in the
+system. It does not, however, make the judge answer-\emph{blind}, and
+Section~\ref{sec:disc-rq1} is the consequence.
+
+Two internal threats are unmitigated. Comparisons are not independent
+given the Bradley--Terry parameters, because a single held-out query is
+reused across many pairs; the Fisher standard errors treat them as
+independent and therefore understate uncertainty by an unmeasured
+margin. And the scheduler over-samples uncertain pairs, which biases
+win-rate; this is why Bradley--Terry $\theta$ is quoted throughout and
+win-rate is not.
+
 \subsection{External Validity}\label{subsec:disc-external-validity}
+
+Every arena result in this thesis is on one corpus, at seed 42, on one
+or two domains, with rosters of 8 to 12 models. The construction is
+contingent on one embedding model: if the embedding changes, the
+snapshot is invalid and results produced under different embeddings are
+not comparable. The anchor structure is seeded from MMLU-Pro's
+editorial domains and thereafter immutable, so anchor-level results are
+rankings conditioned on MMLU-Pro's partitioning; cross-domain migration
+mitigates this at the query level but cannot relocate or merge anchors.
+Discovery is bounded by the corpus available at construction time,
+and there is no incremental insertion mechanism --- a new corpus
+requires a full reconstruction.
+
+The roster exclusion policy is a further external-validity limit and it
+is worth stating plainly rather than presenting as solved. Ten models
+are excluded by a hard-coded list of names, each with a recorded
+reason. Six of those ten are excluded for exactly the condition that
+the corpus validator's trace-presence check measures and declines to
+act on, because that check has no failure branch. The exclusion is a
+ratchet on known failures, not a threshold, and it does not generalise
+to any new model. A general guard is a one-line change and is named as
+future work.
 
 \subsection{Construct Validity}\label{subsec:disc-construct-validity}
 
-\section{Limitations}\label{sec:disc-limitations}\label{sec:discussion-limitations}
-
-% TODO: integrate with results --- the three judge- and
-% statistics-facing limitations below were moved here from
-% Chapter 3 (Architectural Limitations) and must be discussed
-% against the observed arena outcomes; the four purely
-% architectural limitations remain in Section~\ref{sec:arch-limits}.
-
 \textbf{Judge-side benchmark contamination.}
 MMLU-Pro is a public benchmark, and its questions and answer keys
-plausibly appear in the pre-training corpora of contemporary LLMs;
-targeted probing has demonstrated recoverable benchmark content in
-modern models~\parencite{deng2024contamination}, and
-contamination-limited benchmark designs exist precisely because the
-problem is pervasive~\parencite{white2024livebench}.
-For this thesis the threat is specific: not that the \emph{evaluated}
-models saw the questions (that affects the MMLU-Pro accuracy oracle
-and the arena symmetrically), but that the \emph{judge} may recognise
-a held-out question and its correct answer from training.
-A memorising judge approximates the accuracy oracle directly, so
-judge contamination \emph{inflates} the RQ1 rank agreement for
-reasons unrelated to the evaluation mechanism.
-The answer-key-blind protocol does not defend against it: the
-information is in the judge's weights, not in the prompt.
+plausibly appear in the pre-training corpora of contemporary
+LLMs~\parencite{deng2024contamination}; contamination-limited benchmark
+designs exist precisely because the problem is
+pervasive~\parencite{white2024livebench}.
+The specific threat here is not that the \emph{evaluated} models saw
+the questions --- that affects the accuracy oracle and the arena
+symmetrically --- but that the \emph{judge} may recognise a held-out
+question and its answer from training. A memorising judge approximates
+the accuracy oracle directly, and would inflate rank agreement for
+reasons unrelated to the evaluation mechanism. The answer-key-blind
+protocol does not defend against it, because the information sits in
+the judge's weights rather than in the prompt.
 
-The generic-judge condition C3---a shared structural template in the
-style of MT-Bench prompting~\parencite{zheng2023judging}, with no
-leaf-specific rubric---partially disciplines this threat.
-Because C1 and C3 share the same judge model, any contamination
-contributes to both conditions alike, so the \emph{contrast}
-$\tau_{\text{C1}} - \tau_{\text{C3}}$ is contamination-robust
-evidence about the marginal value of reference-informed
-conditioning: a rubric gain that survives the control cannot be
-explained by memorised answer keys, which the generic judge also
-possesses.
-What C3 does \emph{not} do is bound the absolute level of either
-condition: if contamination is strong, both conditions report
-inflated agreement, and the absolute RQ1 claim inherits that
-inflation.
-The absolute agreement numbers are therefore interpreted as an upper
-bound on mechanism-attributable validity, while the C1--C3 contrast
-carries the contamination-robust part of the claim.
-A direct estimate of judge memorisation---for example, verdict
-consistency under paraphrased questions or a probe set published
-after the judge's training cutoff---is identified as future work.
+The generic-judge and no-partition arms discipline this threat only
+partially, and less than an earlier version of this argument claimed.
+Because all arms share the same judge model, contamination contributes
+to each alike and is differenced out of any contrast between them --- so
+a rubric gain that survived the control could not be explained by
+memorised answer keys. But the measured contrast is approximately zero
+(Sections~\ref{sec:res-generic-judge} and~\ref{sec:res-c5}), so there is
+no gain for the control to protect. What the control establishes is
+therefore the absence of an effect, not the contamination-robustness of
+a present one. The absolute agreement levels remain an upper bound on
+mechanism-attributable validity, and a direct estimate of judge
+memorisation --- verdict consistency under paraphrase, or a probe set
+published after the judge's training cutoff --- is future work.
 
 \textbf{Residual judge bias.}
-The dual-call protocol mitigates positional bias but leaves two
-biases architecturally unmitigated.
-\textit{Verbosity bias}: LLM judges tend to prefer longer responses
-independent of quality~\parencite{chen2024verbosity};
-the rubric includes no explicit length-normalisation criterion.
-\textit{Self-preference bias}: when the judge model coincides with an
-evaluated model, verdicts may favour the judge's own response
-style~\parencite{panickssery2024llm}; no judge-exclusion constraint
-is enforced.
-Their magnitude is bounded indirectly via the rank-stability analysis
-across different judge temperatures; a direct comparison against
-human preference annotations is identified as future work.
+The dual-call protocol converts positional disagreement into an
+explicit tie, and a post-hoc adjustment rewrites a pair's counts when
+its order asymmetry is large (Section~\ref{sec:arch-judge}). Verbosity
+bias~\parencite{chen2024verbosity} is not mitigated: the rubric
+contains no length-normalisation criterion, and the capture-gap result
+of Section~\ref{sec:res-capture-gap} is an extreme instance of a
+length-adjacent preference --- the judge takes the side with text
+$99.4\%$ of the time. Self-preference
+bias~\parencite{panickssery2024llm} does not arise here, because the
+judge model appears in no roster, but no constraint enforces that; it
+is a property of these runs rather than of the system.
 
-\textbf{Tie approximation and dual-call budget accounting.}
-Ties are encoded as half-wins within the standard BT likelihood,
-which does not include Davidson's tie-propensity
-parameter~\parencite{davidson1970ties}; the approximation slightly
-underestimates tie frequency.
-Additionally, each logical comparison produces two API calls under the
-dual-call design; budget reporting distinguishes
-$B_{\text{logical}}$ (comparisons) from $B_{\text{API}} = 2 \cdot
-B_{\text{logical}}$ (judge calls).
-Convergence curves and efficiency comparisons are expressed in
-$B_{\text{logical}}$ to remain comparable with single-call systems.
+\textbf{Tie approximation.}
+Ties are encoded as half-wins inside the standard Bradley--Terry
+likelihood, without Davidson's tie-propensity
+parameter~\parencite{davidson1970ties}. Section~\ref{sec:res-tie-policy}
+shows this is not a harmless approximation: on one paired contrast the
+choice of tie convention decides which arm appears ahead. A Davidson
+fit would make the tie propensity a parameter rather than a convention
+and is the principled repair.
 
-\textbf{Sparse-leaf risk at deep levels.}
-A leaf with a small held-out query pool may exhaust its comparison
-budget before the connectivity bootstrap achieves a fully connected
-comparison graph, since each query can serve multiple pairs but the
-number of pairs grows as $\binom{M}{2}$.
-Such leaves will terminate in state \texttt{BUDGET\_EXHAUSTED};
-their BT estimates enter the upward aggregation at full weight, which
-may inflate uncertainty at the ancestor level.
-The query-weighted convergence fraction $f_{\text{conv}}$ partially
-absorbs this: sparse leaves contribute little weight to the global
-condition.
+\textbf{Budget accounting.}
+Comparison counts follow the convention of Chapter~\ref{ch:results}:
+$B_{\text{logical}}$, with $B_{\text{API}} = 2 B_{\text{logical}}$
+under the dual-call design, so that cost figures remain comparable
+with single-call systems.
 
-\section{Chapter Summary}\label{sec:disc-summary}
+\subsection{The Standing Measurement Debt}\label{sec:disc-limitations}\label{sec:discussion-limitations}\label{sec:disc-debt}
+
+Two of the following are errors this thesis found in its own
+previously reported numbers. They are presented under the frame of
+Section~\ref{sec:disc-selfcheck} rather than apologetically. The full
+account of each --- the derivation, the pre-correction values, and
+what was withdrawn --- is told once, in the corrections register of
+Appendix~\ref{app:corrections-register}; no interval computed before
+the corrections is quoted anywhere in this document. What remains here
+is the corrected state and where each correction binds.
+
+\begin{itemize}
+
+\item \textbf{Bradley--Terry standard errors.} The rank completion
+requires subtracting $1/K^2$ after inversion; the implementation
+subtracted $1/K$, so every pre-correction standard error was the floor
+constant, and correct values are 44 to 209 times larger
+(Section~\ref{sec:meth-bt}). No pre-correction interval or ``resolved
+pair'' determination is quoted.
+
+\item \textbf{The reliability constant and the disattenuation form.}
+The published $c = 7.66$ corrects to $c = 2.52$ --- a split-half
+length mismatch compounded with a roster re-fit --- and disattenuation
+is two-sided, $\rho / r$ rather than $\rho / \sqrt{r}$
+(Section~\ref{sec:exp-metrics}). The correction compresses the
+reliability ladder across granularities from a spread of $0.219$ to
+$0.088$, so leaf-scale cells stop being individually low-reliability;
+that weakens the reliability leg of the argument for judging at a
+coarser cut, and the identification-cost result of
+Section~\ref{sec:res-cost} is untouched and probably carries that
+argument alone.
+
+\item \textbf{The evaluative-redundancy percentages} could not be
+reproduced under either an observed-primary or a disattenuated
+reading and are withdrawn; no redundancy percentage is asserted in
+this thesis.
+
+\item \textbf{Two convention-dependent figures} are reported as such
+rather than quoted flat: the correctness-blind rank correlation
+(Section~\ref{sec:res-correctness}) and the leaf-level between-cell
+agreement, $0.922$ against $0.884$ under two defensible assignment
+conventions (Section~\ref{sec:res-granularity}); the governing
+convention is named where each number appears.
+
+\item \textbf{Routing expected calibration error} is exported under a
+mis-specified aggregation --- a maximum over leaves where a sum is
+required, and a maximum over leaves is not a distribution. The
+exported $0.2114$ is reported as a routing diagnostic with the
+discrepancy named, and no claim rests on it
+(Appendix~\ref{app:tuning-protocol}).
+
+\end{itemize}
+
+
+%%% Sections 6.5 (Conclusion) and 6.6 (Future work) continue in
+%%% 03_Content/8_Conclusion.tex, which is part of this chapter and
+%%% carries no chapter command of its own.

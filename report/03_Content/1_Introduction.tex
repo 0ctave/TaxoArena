@@ -26,17 +26,37 @@ A routing decision based on a global score is a coarse
 approximation to the question the orchestrating agent needs
 answered.
 
-This thesis builds and validates the substrate such a router would
+This thesis builds and measures the substrate such a router would
 consume: per-domain capability profiles at sufficient resolution to
 distinguish models that are equal on average but opposite at the
 margin.
 It does not deploy a production router.
 
+Stated in advance, the argument of the thesis is this. Systems that
+dispatch tasks to different LLMs need to know which model is best
+\emph{per topic}; leaderboards report one number per model. TaxoArena
+splits an evaluation corpus into small, coherent topic cells, writes a
+judging rubric for each cell, and has an LLM judge compare model
+answers pairwise inside each cell --- a narrow cell makes a specific
+rubric writable, and a specific rubric was to make a better judge.
+Because the corpus has an answer key, every verdict can be checked,
+and the checks show the judge does not apply the rubric: it verifies
+which answer is correct, and a judge given no rubric at all reaches
+the same winner on $99.4\%$ of comparisons. The partition has nothing
+to reveal here either: under a pre-registered analysis, cells do not
+carry different true model rankings on this corpus, so per-cell
+evaluation cannot beat global evaluation no matter how good the cells
+are. This thesis therefore set out to validate a taxonomy and ended by
+measuring a judge, and the result is a boundary: wherever correctness
+is checkable, a capable judge will shortcut the rubric, so cell-scoped
+judging can only matter on open-ended tasks --- exactly the setting
+the routing motivation is about, and the one this corpus cannot test.
+
 \subsection{The Evaluation Gap}\label{subsec:the-evaluation-gap}
 
 Current evaluation frameworks do not distinguish model capabilities at
-the resolution informed routing requires.
-Two structural limitations characterise current practice.
+the resolution informed routing requires. The corpus is static, and
+the score is a scalar.
 
 \subsubsection*{The Static Benchmark Problem}
 
@@ -44,16 +64,12 @@ Traditional benchmarks such as MMLU~\parencite{hendrycks2021measuring}
 and its successor MMLU-Pro~\parencite{wang2024mmlupro} assess capability
 via fixed, editorially curated question sets organised into predefined
 subject categories.
-This design is brittle along two axes.
-First, as models improve, the hardest questions saturate:
-top-performing models converge toward indistinguishable scores, and the
-benchmark loses the ability to discriminate between closely performing
+As models improve, the hardest questions saturate: top-performing
+models converge toward indistinguishable scores, and the benchmark
+loses the ability to discriminate between closely performing
 systems~\parencite{boubdir2024elo}.
-Second, the category structure is fixed at construction time, so
-emerging capability dimensions---interdisciplinary topics, novel
-application domains, or sub-skills at the boundary between existing
-categories---have no representation unless the corpus is manually
-rebuilt, creating systematic blind spots.
+The category structure is a second constraint, and it is the one this
+thesis works on; it is taken up in Section~\ref{sec:problem-statement}.
 
 \subsubsection*{The Scalar Fallacy and Aggregation Bias}
 
@@ -65,15 +81,15 @@ Averaging performance across all domains masks catastrophic failures in
 specific subgroups and obscures profiles that differ in
 composition while agreeing in mean~\parencite{raju2024constructing}.
 Two models with identical global scores may differ sharply in their
-domain profiles---one strong in formal reasoning and weak in applied
-sciences, the other the reverse---yet a global leaderboard assigns them
-identical routing priority for every task, when a routing policy should
-assign them to entirely different sub-tasks.
+domain profiles, one strong in formal reasoning and weak in applied
+sciences and the other the reverse. A global leaderboard nonetheless
+assigns them identical routing priority for every task, where a routing
+policy should send them to entirely different sub-tasks.
 
 \subsubsection*{A Routing Micro-Example}\label{subsec:routing-example}
 
 To make the cost concrete, consider two models whose MMLU-Pro accuracy
-is identical at the aggregate level---$0.72$ overall---but whose
+is identical at the aggregate level, $0.72$ overall, but whose
 per-domain profiles are mirror images.
 Model~$A$ excels in formal domains: $0.91$ on Mathematics and $0.88$ on
 Physics, but only $0.55$ on History and $0.51$ on Philosophy.
@@ -114,9 +130,9 @@ Measuring performance on knowledge-intensive tasks requires a judge.
 Expert human annotation remains the gold standard but is economically
 prohibitive at the scale required for continuous, multi-model,
 multi-domain evaluation~\parencite{zheng2023judging}.
-Automated scalar scoring introduces systematic calibration errors: the
-judge has no stable internal reference for what a given score means
-across domains, question types, or model generations.
+Automated scalar scoring introduces systematic calibration errors,
+because the judge has no stable internal reference for what a given
+score means across domains, question types, or model generations.
 
 Pairwise comparison resolves this by reducing judgement to a local,
 contextualised question: is answer~A better than answer~B for this
@@ -128,16 +144,58 @@ longer answers regardless of quality~\parencite{chen2024verbosity}.
 Beyond these, judges suffer from \emph{guideline incompleteness}: any
 finite rubric under-specifies the evaluation space, leaving cases where
 the judge falls back on undocumented heuristics.
-Evaluating within semantically homogeneous groups of questions reduces
-the verbosity--quality confound and enables the tighter, domain-specific
-rubrics a general-purpose judge cannot provide.
 
-\section{Problem Statement}\label{sec:problem-statement}
+\section{What a Partition Is For}\label{sec:problem-statement}
 
-The preceding discussion identifies four problems that remain
-unresolved in current evaluation practice, each a
-necessary precondition for the next; the two headline contributions of
-this thesis address them in pairs (Section~\ref{sec:research-goal}).
+\textbf{A cell is a scope for a rubric.}
+Splitting a cell reduces the surface over which a judge must
+generalise. That is the entire mechanism.
+A semantic partition of an evaluation corpus is usually presented as a
+reporting device --- it decides which bucket each score is written
+into --- and that is not what it is for here; the difference decides
+what this thesis can claim.
+A judge asked to compare two answers about ``Computer science'' must
+hold one rubric that simultaneously covers operating systems,
+cryptography, group theory and time-series diagnostics; whatever the
+rubric says has to be true of all of them, so it can only say
+domain-general things --- be correct, be clear, show your work.
+A judge asked to compare two answers about ``Time Series Model
+Diagnostics and Validation'' can be told what a good answer looks like
+\emph{there}: which stationarity checks are load-bearing, which
+residual diagnostics are decisive, which shortcuts are defensible.
+The rubric becomes writable because the cell is narrow.
+This is an argument, not a measurement, and it is the argument the
+rest of the thesis tests.
+
+\textbf{Why better prompting does not substitute for it.}
+Guideline incompleteness is not a failure of prompt craft. A rubric
+that must hold over a heterogeneous cell is under-specified by
+construction: every criterion specific enough to discriminate is false
+of part of the cell, so the criteria that survive the intersection are
+the ones that discriminate least. Enlarging the prompt does not change
+this; it changes which of the heterogeneous cases the extra text is
+about. Narrowing the cell does change it, because it changes what the
+intersection contains.
+
+\textbf{What homogeneity is supposed to buy, stated as three
+properties.}
+First, a rubric becomes writable, in the sense above.
+Second, pairwise outcomes within the cell become closer to
+exchangeable, because the queries a comparison could have been drawn
+from are similar to one another; the Bradley--Terry model that
+aggregates the verdicts assumes a single latent strength per model
+within the cell, and that assumption is a statement about the cell's
+homogeneity rather than about the models.
+Third, the per-cell ranking is allowed to differ from the global one,
+which is the only way a capability \emph{profile} carries more
+information than a capability \emph{score}.
+The third property is the one that turns out to be empirical rather
+than architectural, and Chapter~\ref{ch:results} reports what happened
+when it was tested.
+
+\textbf{The four problems this leaves.}
+The discussion above and in Section~\ref{sec:motivation} identifies
+four unresolved problems, each a precondition for the next.
 
 \begin{enumerate}
 
@@ -146,37 +204,31 @@ this thesis address them in pairs (Section~\ref{sec:research-goal}).
     adapt to the evolving capability space of LLMs.
     A framework that uses editorial labels as a scaffold but refines
     domain structure geometrically can discover capability dimensions
-    that matter without being permanently constrained by what the labels
-    presuppose.
+    the labels do not presuppose.
 
     \item \textbf{Scalar ranking and loss of capability resolution.}
     Aggregating performance into a single score conceals the domain
     structure of model capabilities, but routing requires per-domain
     rankings, not global leaderboards.
-    A framework producing capability profiles---vectors of scores indexed
-    by semantic dimension---provides the resolution scalar rankings
-    discard.
 
     \item \textbf{Incoherent domain boundaries.}
     Induced evaluation structure is well-defined only if the resulting
-    domains are semantically precise and internally homogeneous.
-    A hierarchical decomposition of query space, derived from embedding
-    geometry and formalised as a rooted tree of semantic sub-domains,
-    provides principled boundaries whose extent is defined
-    by the data rather than by editorial judgement.
+    cells are semantically precise and internally homogeneous, because
+    coherence is what makes the rubric writable.
+    Section~\ref{sec:arch-requirements} states this as a requirement
+    with a threshold, rather than as an aspiration.
 
     \item \textbf{Judging at scale with controllable bias.}
-    Automated evaluation must trade off between calibration, bias, and
-    domain sensitivity.
-    A framework combining pairwise comparison with bidirectional order
+    Automated evaluation must trade off calibration, bias, and domain
+    sensitivity. Pairwise comparison with bidirectional order
     evaluation, domain-localised judging, and principled statistical
-    aggregation can control the known biases while remaining tractable---but
-    only if evaluation units are sufficiently homogeneous that outcomes
-    are exchangeable within each domain.
+    aggregation can control the known biases while remaining tractable
+    --- but only if the evaluation units are homogeneous enough that
+    outcomes are exchangeable within each unit.
 
 \end{enumerate}
 
-\section{Approach and Thesis Statement}\label{sec:approach}
+\section{The System in Outline}\label{sec:approach}
 
 TaxoArena works in three stages.
 First, the 14 MMLU-Pro domain labels seed top-level anchor nodes, which
@@ -185,176 +237,241 @@ closer anchors, and each anchor is recursively split into a tree of
 semantically coherent leaves.
 Second, each leaf induces a reference-informed judge rubric from
 construction-set queries and their correct answers.
-Third, held-out model responses are evaluated pairwise within leaves and
+Third, held-out model responses are compared pairwise within leaves and
 aggregated via a Bradley--Terry model~\parencite{bradley1952rank,
 hunter2004mm} into per-domain capability profiles.
-
-This thesis designs, implements, and evaluates TaxoArena and tests a
-single, two-part claim.
-First, that answer-key-blind, domain-conditioned pairwise LLM
-judges---evaluating models on held-out queries routed through a
-geometrically induced semantic taxonomy---can recover the per-domain
-capability rankings that MMLU-Pro produces using ground-truth accuracy on
-selected high-support domain nodes.
-Second, that geometry-adapted domain groupings improve the fidelity of
-those rankings relative to the original editorial labels.
 
 \textbf{Position of the taxonomy.}
 The induced taxonomy is \textit{not} the contribution of this thesis; it is
 the instrument by which the per-domain ranking resolution required for
 routing is made available.
-The scientific content is the demonstration that this instrument---a
-geometrically induced, label-seeded semantic tree coupled with
-reference-informed, answer-key-blind judging---is sufficient to recover
-ground-truth per-domain rankings, and that geometric adaptation of the
-domain partition adds fidelity over editorial labels.
-The construction is therefore presented at the level needed to
-justify that the judge domains it produces are granular and internally
-coherent; its statistical derivations are deferred to
-Chapter~\ref{ch:methodology} and Appendix~\ref{app:numerics}.
+The construction is therefore presented in the main text at the level
+needed to establish that the cells it produces are granular, coherent,
+and stable enough for the arena to mean anything
+(Section~\ref{sec:arch-requirements}); the formalism, the parameter
+derivations and the fixed-point certificate are given in
+Appendix~\ref{app:dag-formalism} and Appendix~\ref{app:numerics}.
+This ordering is not a late concession. It is forced by a measurement:
+an eleven-fold change in the number of cells, and a routing correction
+worth $+10.3\%$ on the construction objective, both change the
+system's measured discriminative power by zero
+(Section~\ref{sec:res-granularity}). A construction whose tuning has no
+measured evaluative consequence is an instrument, and it is documented
+like one.
 
+\textbf{Reference-informed at construction, answer-key-blind at test.}
 Two properties of the evaluation design are central to its validity.
 The \textit{judge-generation phase} uses correct MMLU-Pro answers from
 the construction query set to induce domain-specific rubrics; the system
 is \textit{reference-informed} at construction time.
-The \textit{arena evaluation phase} evaluates held-out responses without
+The \textit{arena evaluation phase} judges held-out responses without
 access to those queries' correct answers; the evaluation is
 \textit{answer-key-blind} at test time, and the MMLU-Pro accuracy oracle
 is revealed only after all matches are complete.
-The title term \textit{Dynamic Domains} refers to this dual property:
-domain boundaries are seeded from MMLU-Pro labels but subsequently
-adapted by geometric evidence---queries migrate to a geometrically more
-appropriate domain, and new sub-domain leaves emerge from recursive
-splitting---so the evaluation dimensions reflect the structure of the
-data rather than a fixed editorial taxonomy.
+The separation is enforced in code by a hold-out filter that a build-time
+assertion checks against the membership test itself
+(Section~\ref{sec:arch-judge}).
+Answer-key-blind is not the same as answer-blind, and the difference is
+load-bearing for Chapter~\ref{ch:results}: the judge is shown the
+multiple-choice options block, and $94.8\%$ of stored model traces state
+their own selected answer.
+The title term \textit{Dynamic Domains} refers to the dual property:
+domain boundaries are seeded from MMLU-Pro labels and then adapted by
+geometric evidence, so the evaluation dimensions reflect the structure
+of the data rather than a fixed editorial taxonomy.
+
+\section{Three Links and the Research Questions}\label{sec:research-questions}
+
+The claim that a partition improves evaluation is not one claim. It is a
+chain of three, each separately falsifiable:
+
+\begin{center}
+coherent cells
+$\;\xrightarrow{\;\text{(1)}\;}\;$ specific rubrics
+$\;\xrightarrow{\;\text{(2)}\;}\;$ better judgments
+$\;\xrightarrow{\;\text{(3)}\;}\;$ ranking closer to ground truth.
+\end{center}
+
+Link~1 asks whether the construction produces cells homogeneous enough
+to write a rubric about. Link~2 asks whether cell-scoped rubrics are in
+fact more specific than generic ones. Link~3 asks whether a judge
+holding a specific rubric produces verdicts that track the truth more
+closely than a judge holding a generic one.
+Naming them separately is what makes the results of this thesis
+readable, because its negative results land on different links and mean
+different things there.
+
+This decomposition was written after some of the results were in hand,
+and specifically after the pre-registered granularity analysis
+(Chapter~\ref{ch:results}) refuted the premise of the thesis's original
+second research question. That is stated here rather than left to be
+inferred: a reframing announced is a contribution, a reframing
+concealed is a rationalisation.
+
+The original second research question asked whether evaluation within
+geometry-adapted leaf groupings improves ranking fidelity over flat
+MMLU-Pro domain groupings, measured as
+$\Delta\tau = \tau_{\text{adapted}} - \tau_{\text{canonical}}$ per cell.
+Read literally that is a question about link~3's \emph{output}. The
+pre-registered analysis reported in Section~\ref{sec:res-granularity}
+found that the premise underneath it does not hold on this corpus:
+cells do not carry different true model rankings, at any granularity
+from 14 to 152 cells, under either router. A per-cell $\Delta\tau$
+between adapted and canonical groupings therefore measures a difference
+with no room to exist, and a null there says nothing about the
+mechanism. The question is replaced rather than repaired.
+
+\begin{enumerate}
+
+    \item[\textbf{RQ1.}] Do answer-key-blind, domain-conditioned
+    pairwise LLM judgments recover per-domain capability rankings on
+    held-out queries --- and \emph{what decides the verdicts}?
+    \textit{Primary metric: agreement between the judge's winner and
+    the MMLU-Pro answer key, per verdict. Spearman $\rho$ against
+    ground-truth accuracy is reported alongside, under both tie
+    policies, with its quantisation stated.}
+
+    \item[\textbf{RQ2.}] Does adapted, cell-scoped grouping enable
+    \emph{better judging} than judging the same questions under a
+    generic, partition-free rubric?
+    \textit{Primary metric: the paired contrast between the two arms on
+    an identical question set --- Spearman $\rho$ against ground-truth
+    accuracy for the partition claim, per-verdict answer-key agreement
+    for the judge-side check.}
+
+\end{enumerate}
+
+The second question is answerable with the same arena, and it is the
+question the system actually poses. The difference from the original
+wording matters for what gets reported: agreement between judge and
+ground truth \emph{within} a grouping, not rank divergence
+\emph{between} groupings.
+
+\textbf{A convention for evidence.}
+This thesis marks every substantive claim as either
+\textsc{measured} --- there is data behind it, and it could have come
+out otherwise --- or \textsc{argued} --- it is reasoning the thesis owes
+the reader, with no data behind it. Motivation is argued; results are
+measured; the two are not interchangeable and are not typeset as though
+they were. Where a number exists but could not be reproduced under a
+stated convention, it is reported as unresolved rather than quoted.
 
 \section{Contributions}\label{sec:research-goal}
 
 \begin{enumerate}
 
-    \item \textbf{Seed-guided geometric taxonomy construction.}
-    TaxoArena induces a semantic tree over the full 14-domain MMLU-Pro
-    corpus by seeding 14 anchor nodes from ground-truth labels and then
-    letting embedding geometry refine them.
-    Queries migrate to geometrically closer anchors, producing an
-    \textit{adapted partition} that may diverge from the original
-    \textit{canonical} label partition; each anchor is recursively split
-    under a chance-corrected separation score---accepting a proposed
-    partition only when its within-cluster scatter is sufficiently below
-    that expected under a uniformly random same-size partition---into
-    internally coherent leaves.
-    Every node keeps exactly one parent, so the induced structure is a
-    strict concept hierarchy.
-    A query can still reach several leaves: that breadth is produced by
-    the routing rule below, while the topology stays a tree.
-    During construction each query holds weighted membership in every
-    destination it reaches through the routing beam and retains a
-    sufficient share of its own normalised membership; the distribution
-    fits use these soft weights, while a \textit{primary} (argmax)
-    assignment is retained as a bookkeeping convention for aggregation.
-    This construction is the instrument that produces granular, internally
-    homogeneous judge domains; its statistical choices---a fixed
-    256-dimensional Matryoshka Representation Learning (MRL)
-    slice~\parencite{kusupati2022mrl}, a small-sample-corrected vMF
-    concentration estimator, and a unified separation threshold governing
-    splitting, merging, sibling distinctness, and residual-split
-    viability---are defended as a coherent set in
-    Chapter~\ref{ch:methodology}.
+    \item \textbf{A measured account of what an LLM judge decides, on a
+    corpus with a verifiable answer key.} \textsc{measured}.
+    On multiple-choice items the judge's verdict tracks answer
+    correctness, not reasoning quality: it selects the correct response
+    on the large majority of items where exactly one response is correct,
+    its tie rate roughly triples on precisely those items where the key
+    stops discriminating, and its agreement with the key is
+    \emph{highest} where neither response carries any reasoning at all.
+    Four controls support the decomposition, each sharing every confound
+    with its treatment except the one being varied
+    (Section~\ref{sec:res-judge}).
 
-    \item \textbf{Reference-informed, answer-key-blind arena evaluation.}
-    For each leaf, TaxoArena generates a domain-specific judge by
-    presenting construction queries---with their correct answers---to an
-    LLM in a MapReduce induction pipeline, producing a rubric that
-    encodes what correct reasoning looks like in that sub-domain without
-    referencing specific answers.
-    Within each selected node the arena evaluates held-out model responses
-    pairwise using this rubric: each comparison is run in both answer
-    orders with analysis-before-verdict prompting, and disagreements
-    between the orderings are treated as ties.
-    A held-out query may enter multiple sufficiently compatible leaves,
-    and its verdicts are then fractionally weighted so that no comparison
-    is double-counted (Chapter~\ref{ch:system-architecture}).
-    Results are aggregated via Bradley--Terry, producing coherent
-    per-leaf, per-domain, and corpus-wide capability profiles.
+    \item \textbf{A pre-registered no-partition baseline, and what
+    the registered rule returned.} \textsc{measured}.
+    A paired arm judged an identical Math question set under
+    cell-scoped rubrics and under a generic MT-Bench-style prompt with
+    no partition at all. The reading rule, the decisive difference and
+    the void conditions were fixed in writing before the comparison
+    existed. The arms are indistinguishable on the high-power
+    agreement metric; under the registered rule the low-power
+    rank-correlation contrast formally \emph{failed} the null in
+    favour of the partition-free arm, an outcome attributed --- after
+    the fact, and marked as such --- to tie scoring
+    (Section~\ref{sec:res-c5}).
 
-\end{enumerate}
+    \item \textbf{A construction method presented as an instrument,
+    with three guarantees and three named limitations.}
+    \textsc{measured}.
+    A certified structural fixed point, an acceptance gate calibrated in
+    units of its own objective's paired standard error, and a separation
+    threshold positioned between two measured nulls
+    (Section~\ref{sec:arch-requirements}, Appendix~\ref{app:dag-formalism}).
 
-An active matchmaking scheduler that prioritises model pairs with high
-rating uncertainty and declares per-leaf convergence from
-Bradley--Terry standard errors keeps judge-call cost tractable; it is an
-engineering component supporting Contribution~2 rather than an
-independent contribution
-(Section~\ref{sec:meth-scheduling} in Chapter~\ref{ch:methodology}).
+    \item \textbf{A pre-registered negative result about
+    geometry-adapted evaluation partitioning, scoped by power and by
+    roster.} \textsc{measured}.
+    Cells do not carry different true model rankings on this corpus for
+    this roster, at any granularity tested. The three possible outcomes
+    were named in advance, and the primary statistic was fixed in
+    advance --- which is the only reason the result is readable, since
+    the secondary statistic moves the other way
+    (Section~\ref{sec:res-granularity}).
 
-\section{Research Questions}\label{sec:research-questions}
-
-\begin{enumerate}
-
-    \item[\textbf{RQ1.}] Do answer-key-blind arena rankings agree with
-    ground-truth MMLU-Pro accuracy on held-out queries, on the selected
-    domain nodes?
-    \textit{Primary metrics: Kendall} $\tau$\textit{, pairwise-winner
-    accuracy, top-}$k$\textit{ Jaccard; Spearman} $\rho$
-    \textit{secondary, with bootstrap confidence intervals given the
-    small model count.}
-
-    \item[\textbf{RQ2.}] Does evaluation within geometry-adapted leaf
-    groupings improve ranking fidelity over flat MMLU-Pro domain
-    groupings?
-    \textit{Primary metric:} $\Delta\tau = \tau_{\text{adapted}} -
-    \tau_{\text{canonical}}$ (Kendall-based), reported per selected
-    node; $\Delta\rho$ (Spearman-based) secondary.
+    \item \textbf{The reframing itself.} \textsc{argued}.
+    The evaluative value of a taxonomy is a claim about a judge's
+    generalisation surface, and it decomposes into three separately
+    testable links. This thesis measures link~1 directly, link~2 against
+    a randomised null, and link~3 at the premise level.
 
 \end{enumerate}
 
-Two further analyses are reported as non-headline diagnostics rather
-than claims the thesis depends on: a construction-validity check that
-the induced taxonomy is geometrically coherent relative to unsupervised
-baselines (Dendrogram Purity, Weighted Leaf Purity, Spherical
-Silhouette, Total Dasgupta Cost, Sackin index, Routing ECE), and an
-optional test of whether the adaptive
-scheduler recovers the same ranking at lower judge-call cost than random
-scheduling.
+Contribution~1 is the one that changed. The thesis set out to validate a
+taxonomy and ended by measuring a judge. That is stated here rather than
+in the conclusion, because it is the reason
+Chapter~\ref{ch:results} leads with the judge and not with the partition.
+An active matchmaking scheduler keeps judge-call cost tractable, but it
+supports the arena rather than standing as a contribution
+(Section~\ref{sec:meth-scheduling}).
 
 \section{Scope and Validity}\label{sec:intro-scope}
 
-This thesis evaluates the mechanism at high statistical power on
-selected high-support domain nodes rather than spreading the same
-judge-call budget thinly across all 14 domains: the arena roster is 12
-models on one or two ex-ante-selected nodes (Math), with the selection
-rule specified in Chapter~\ref{ch:experimental-design}.
-The reported arena results are therefore a selected-domain
-proof-of-concept, not a global validation across all MMLU-Pro domains;
-generalisation at matched power is identified as future work
-(Chapter~\ref{ch:conclusion}).
+The arena results are a selected-domain study, not a global validation.
+The reported runs evaluate one domain (Math) at high statistical power
+rather than spreading the same judge-call budget across all 14 MMLU-Pro
+domains; the selection rule is specified in
+Chapter~\ref{ch:experimental-design}, and a second domain (law) was
+selected by an offline screen and is reported in
+Section~\ref{sec:res-law}.
+
+Three scope conditions are stated in advance because they bound
+everything downstream.
+First, MMLU-Pro is multiple-choice with a verifiable key. This is what
+makes the comparison against ground truth possible, and it is
+simultaneously the property that lets a capable judge bypass the rubric
+by verifying the answer. Both are true, and
+Chapter~\ref{ch:discussion} treats the second as a measurement of where
+the architecture binds rather than as a defect.
+Second, the pilot arena run carries a data defect: response text was not
+persisted for four of its eight models, so half of its comparisons were
+decided by which side had text at all. The defect is reported as a
+result, with what it qualifies and what survives it stated explicitly
+(Section~\ref{sec:res-capture-gap}).
+Third, the reported rank correlations are quantised and, at this model
+count, not stable to the third decimal across defensible analysis
+conventions. Paired contrasts within a run are safe; absolute values
+quoted to three decimals are not, and the thesis does not quote them
+that way (Section~\ref{sec:res-tie-policy}).
 
 The evaluation's validity rests on the reference-informed,
-answer-key-blind separation defined in Section~\ref{sec:approach}: the
-three-way construction/tuning-validation/arena-test partition and the
-information-separation protocol that enforce it are specified in
+answer-key-blind separation defined in Section~\ref{sec:approach}.
+The three-way construction / tuning-validation / arena-test partition
+and the information-separation protocol that enforce it are specified in
 Chapter~\ref{ch:experimental-design}.
 
 \section{Thesis Structure}\label{sec:thesis-structure}
 
-The remainder of this thesis is organised as follows.
-Chapter~\ref{ch:literature-review} surveys the five bodies of prior
-work---evaluation benchmarks, taxonomy construction, LLM-as-a-judge
-reliability, pairwise ranking, and query routing---that motivate the
-design.
-Chapter~\ref{ch:system-architecture} describes the system as two
-coupled subsystems: a taxonomy construction pipeline and an arena
-evaluation subsystem.
-Chapter~\ref{ch:methodology} formalises the arena's statistical
-machinery and summarises the taxonomy-construction formalism, whose
-full treatment is deferred to Appendix~\ref{app:dag-formalism}.
-Chapter~\ref{ch:experimental-design} specifies the experimental
-configuration: corpus, split protocol, tuning protocol, domain-node
-selection, model roster, judge configuration, baselines, and
-pre-specified metrics.
-Chapter~\ref{ch:results} presents the empirical results for
-construction quality, arena ranking validity~(RQ1), and
-adapted-vs-canonical fidelity~(RQ2).
-Chapter~\ref{ch:discussion} interprets the findings and discusses
-construct validity and limitations.
-Chapter~\ref{ch:conclusion} summarises the contributions and outlines
-future work.
+Chapter~\ref{ch:literature-review} gives the background the argument
+uses: benchmark saturation, what is known to go wrong with LLM judges,
+pairwise ranking and Bradley--Terry estimation, the family the
+construction belongs to, and query routing as the consumer of the
+output.
+Chapter~\ref{ch:system-architecture} is the method. It opens by stating
+what a partition must satisfy for the arena to mean anything, and shows
+that the induced partition satisfies it; it then specifies the arena ---
+the judge, the estimator, the scheduler, and an inventory of what is
+\emph{not} implemented --- and closes with the measurement rules the
+thesis holds itself to.
+Chapter~\ref{ch:experimental-design} fixes the corpus, the rosters, the
+conditions, the pre-registrations with their dates, and the statistical
+protocol.
+Chapter~\ref{ch:results} reports what was measured, in mechanism order:
+first what the judge does, then what the partition does.
+Chapter~\ref{ch:discussion} interprets those results, states where the
+architecture binds, records the errors the apparatus caught in its own
+published numbers, and concludes.
