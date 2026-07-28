@@ -75,17 +75,15 @@ directly at the domain). 5{,}278 comparisons. Shuffled query sampling.
 This is the no-taxonomy baseline, and it is the run that tests the
 partition itself rather than the rubric.
 
-\textbf{Run~C --- law, on the 11-model band.} Both arms, the domain the
-offline screen selects (Section~\ref{sec:res-law}). \emph{In progress
-at the time of writing.}
-
-\todo[inline]{Run~C (law arena, 11-model band, both arms) is running.
-Insert its results in Sections~\ref{sec:res-c5} and~\ref{sec:res-law}
-when it completes: per-verdict answer-key agreement per arm with
-standard errors, Spearman $\rho$ per arm under both tie conventions,
-and the paired contrast against the pre-registered two-grid-step
-threshold at $M = 11$ ($6/(11\cdot120) = 0.0046$ per step, so
-$|\Delta\rho| \geq 0.009$ is decisive).}
+\textbf{Run~C --- law, on the Run~B roster.} Both arms, the domain the
+offline screen selects (Section~\ref{sec:res-law}); same twelve models,
+same paired design. Two scheduler changes distinguish it from Run~B and
+are part of the record: a mandatory bootstrap phase gave every one of
+the 66 pairs at least two comparisons before any adaptive scheduling
+(Run~B left 46 of 66 pairs with no data), and per-(leaf, pair) query
+shuffling raised held-out pool coverage to 246 of 297 leaf-routed law
+questions (83\%, against 66\% in both Math runs). 4{,}978 comparisons.
+Results in Section~\ref{sec:res-c5}.
 
 \textbf{The offline analyses} required no judge calls: the fixed-point
 certificate and the acceptance-gate seed sweep
@@ -492,6 +490,42 @@ identical in estimation. It tests rubric conditioning at matched
 everything-else. And it does not test the partition where the partition
 has something to be right about; Math is the null arm by design, and
 the corresponding test is Run~C.
+
+
+\paragraph{Run~C: the law result.} The paired design held: both arms
+judged the same 246 questions (\textsc{main} 2{,}499 comparisons, ties
+19.8\%; \textsc{c5} 2{,}479, ties 17.8\%). \textsc{measured}, on
+answer-key agreement: \textsc{main} 982/1{,}116 = 88.0\% against
+\textsc{c5} 1{,}039/1{,}206 = 86.2\% (SE 1.0\% each). \textsc{measured},
+on the pooled rank correlation against ground truth, both tie
+conventions: half-weighted, \textsc{main} 0.9510 against \textsc{c5}
+0.9510 ($\Delta = 0.0000$); ties dropped, \textsc{main} 0.9650 against
+\textsc{c5} 0.9441 ($\Delta = +0.0210$).
+
+Run~C used the twelve-model roster, so the grid step is $0.0035$ and
+the two-step decisive threshold is $|\Delta\rho| \geq 0.007$. The
+registered prediction for law --- per-leaf judging beats partition-free
+judging, if the partition helps at all --- is met in direction under
+both conventions and in magnitude under one: ties dropped,
+\textsc{main} leads by three times the threshold; half-weighted, the
+arms are exactly tied. Unlike the Math contrast, the gap never changes
+sides: the law result is parity or a per-leaf advantage, not a
+reversal. And unlike Math, the both-conventions rule (D5) predates this
+run, so dual reporting here is pre-specified rather than post hoc. The
+answer-key-agreement gap ($+1.8$ points, about $1.3$ combined standard
+errors) leans the same way without being independently decisive. The
+prediction pair therefore closes as registered: flat on Math, where the
+roster's models do not reorder, and a convention-sensitive but
+never-reversed per-leaf advantage on law, where they do.
+
+\paragraph{The near-clone check, evaluable for the first time.} The
+bootstrap floor guaranteed the two Claude~3.5 Sonnet harnesses direct
+comparisons --- 24 per arm, where Run~B gave the pair zero. Of those,
+11 of 24 were ties in each arm, a 46\% pairwise tie rate against the
+roster average of roughly 19\%: the judge declines to separate two
+harnesses of nominally the same model far more often than it declines
+elsewhere --- the resolution behaviour the pre-registered check
+demanded (prediction P2, met).
 
 \subsection{Identification Cost}\label{sec:res-cost}
 
