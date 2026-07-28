@@ -272,3 +272,94 @@ already invalidated three results in this project.
 The comparison reports nothing if: the arms judge different question sets; the
 `confidenceGate` is left on for either arm; the two arms use different question
 samplers; or ties are defined differently between `[[C]]` and schema `TIE`.
+
+---
+
+# Addendum: the NO_KEY condition
+
+Written 2026-07-28, **before the law results exist**, so the design is not shaped by
+what law turns out to show.
+
+## Why options-blind alone is insufficient
+
+Withholding the options block does not remove the correctness channel, because
+**94.8% of traces state their own answer** ("The answer is (C)", `\boxed{C}`,
+"Answer: A"). A judge shown two stated answers and the question stem can still solve
+and match. The stated answers must be stripped as well, and that is a second,
+independent manipulation.
+
+## Stage 0 — measure the channel before removing it
+
+**(a) Per-model statement rate, 11-band. DONE.** Range 89.8% (Qwen1.5-72B-Chat) to
+100.0% (arx_3), spread 10.2 points; post-strip median length falls ~1%, so no model is
+gutted. The asymmetry is modest but non-zero.
+
+Note the direction of the risk: a LOW detection rate means either no answer stated OR
+an answer stated in a form the regex misses. Qwen1.5-72B at 89.8% is therefore the
+model most likely to LEAK through an uncovered phrasing, not the one least likely to
+state an answer.
+
+**(b) Stem-only probe. NOT YET RUN.** Send the judge model the question stems alone —
+no options, no responses — and measure accuracy. **This bounds the residual leak
+directly and is the honest ceiling on the whole condition.** If the judge answers well
+above chance from the stem, NO_KEY cannot fully remove the shortcut and the arm must
+be read accordingly. 241 single calls; must run BEFORE the condition is built.
+
+## Stage 1 — the strip
+
+Applied at **prompt assembly, not at ingest**: the frozen corpus stays untouched and
+the condition stays reversible. Identical regex to both traces.
+
+Patterns: `the answer is (A)` / `the answer is A` / `Answer: A` / `answer is (A).` /
+`**A**` / `so we get (C)` / `\boxed{A}` — case-insensitive, ALL occurrences, not only
+terminal.
+
+Replace with a neutral token `[ANSWER]` rather than deleting, so mid-derivation
+mentions ("so we get (C), which means the ratio is...") stay grammatical and both
+traces are altered identically.
+
+**Validation gate, before any judging.** Sample 30 stripped traces and count how many
+still name an answer. **Above a few percent, a null result means "the strip failed",
+not "the rubric does not matter."** Log the residual rate as a run diagnostic so it is
+visible rather than assumed.
+
+## Stage 2 — the condition
+
+`NO_KEY`: options block suppressed at the assembly site, both traces stripped, MAIN
+rubric otherwise unchanged, same questions, `confidenceGate` disabled.
+
+## Stage 3 — the reading, FIXED IN ADVANCE
+
+Removing the channel also makes the task harder, so a rho drop alone is consistent
+with two incompatible readings. The tie rate separates them:
+
+| rho | tie rate | reading |
+|---|---|---|
+| collapses | **spikes** | the judge cannot decide — the task became impossible |
+| collapses | **stable** | the judge decides differently — it WAS verifying |
+| holds | — | reasoning carries the signal; the rubric null needs another explanation |
+
+**The discriminator that matters: split-half reliability of the NO_KEY judge.** A judge
+ranking systematically on quality stays self-consistent while diverging from GT; a
+noisy judge diverges from itself too. No extra calls, and it separates "quality
+judgment that imperfectly tracks accuracy" from "noise" — which a pre-registered target
+range on rho cannot do.
+
+**Primary: GT-agreement** (proportion, ~1,200 comparisons, SE ~0.7%).
+**Secondary: rho, reported under BOTH tie policies** — half-weighted and ties-dropped
+differ by up to 0.029 with inconsistent direction, which is larger than most effects
+here.
+
+## Scope
+
+- **Roster: the 11-band only.** Answer-only systems are out of scope for this design.
+- **Domain: law.** Math would return a null for reasons unrelated to the manipulation.
+- **Arms: MAIN and NO_KEY on the same questions.** CROSS-CELL under NO_KEY is the
+  natural third arm and the only regime where cross-cell means anything — cost it
+  before committing.
+
+## Order
+
+Stage 0(b) first. The stem-only probe may show the ceiling is low enough that the whole
+condition is worth less than it looks, and it costs 241 calls against a condition that
+costs thousands.
