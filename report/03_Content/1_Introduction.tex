@@ -7,13 +7,10 @@
 Large Language Models (LLMs) increasingly act inside larger software
 pipelines rather than as interfaces that answer individual prompts.
 Complex tasks are decomposed into sub-tasks and dispatched to
-specialised tools and APIs~\parencite{yao2023react}, and the same
+specialised tools and APIs, and the same
 dispatch pattern extends to models themselves: HuggingGPT uses an LLM
 controller to route each sub-task to a specialised
-model~\parencite{shen2023hugginggpt}. Systems
-built this way pursue goals across extended sequences of decisions,
-a transition termed the \textit{agentic
-turn}~\parencite{wissuchek2025agentic, haidemariam2026agentic}.
+model. Systems built this way pursue goals across extended sequences of decisions, a transition termed the \textit{agentic turn}.
 The quality of this dispatch depends on one question:
 \textit{which model should handle a given sub-task?}
 
@@ -45,6 +42,8 @@ judging rubric for each cell, and has an LLM judge compare model
 answers pairwise inside each cell --- a narrow cell makes a specific
 rubric writable, and a specific rubric was supposed to make a better
 judge.
+
+% TODO check math results, and better fitting results to the different runs
 Because the corpus has an answer key, every verdict can be checked,
 and the checks show the judge does not apply the rubric: it verifies
 which answer is correct, and a judge given no rubric at all reaches
@@ -64,7 +63,7 @@ cannot test.
 
 Current evaluation frameworks do not distinguish model capabilities at
 the resolution informed routing requires. The corpus is static, and
-the score is a scalar.
+the score is a scalar per model, or per general domain (Math, Physics, Law, \ldots).
 
 \subsubsection*{The Static Benchmark Problem}
 
@@ -96,26 +95,50 @@ policy should send them to entirely different sub-tasks.
 
 \subsubsection*{A Routing Micro-Example}\label{subsec:routing-example}
 
-To make the cost concrete, consider two models whose MMLU-Pro accuracy
-is identical at the aggregate level, $0.72$ overall, but whose
-per-domain profiles are mirror images.
-Model~$A$ excels in formal domains: $0.91$ on Mathematics and $0.88$ on
-Physics, but only $0.55$ on History and $0.51$ on Philosophy.
-Model~$B$ is the reverse: $0.54$ on Mathematics and $0.50$ on Physics,
-but $0.92$ on History and $0.90$ on Philosophy.
-On any scalar leaderboard $A$ and $B$ are indistinguishable, and a router
-that trusts that single number dispatches both an integration problem
-and a historical-interpretation question to whichever model is
-nominally first.
-Yet the correct routing decision for a question requiring formal logical
-inference is $A$, and for textual-source interpretation is $B$, each
-with high confidence.
+To make the cost concrete, consider a router in front of two models,
+$A$ and $B$. Every incoming question must be dispatched to one of
+them. The only evidence the router holds is an evaluation of both
+models on held-out questions, and the question is what resolution
+that evaluation must have. The numbers that follow are synthetic,
+constructed so that the failure mode is legible; they are not
+measurements. Table~\ref{tab:routing-example} states them.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Synthetic accuracy profiles for the routing
+    micro-example. The aggregate is taken over all 14 MMLU-Pro
+    categories, of which two are shown. The values are illustrative,
+    not empirical.}
+    \label{tab:routing-example}
+    \begin{tabular}{lccc}
+        \toprule
+        & Mathematics & History & Aggregate \\
+        \midrule
+        Model~$A$ & $\mathbf{0.91}$ & $0.55$ & $0.72$ \\
+        Model~$B$ & $0.54$ & $\mathbf{0.92}$ & $0.72$ \\
+        \midrule
+        Per-domain routing picks & Model~$A$ & Model~$B$ & \\
+        Scalar routing picks & \multicolumn{2}{c}{one model for both} & \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The aggregate column is where the information disappears. Both models
+score $0.72$, so a scalar leaderboard ranks them as interchangeable,
+and a router that trusts it sends every question to whichever model
+sits nominally first. Suppose that is $A$. Mathematics questions are
+then served at $0.91$, which is correct, but History questions are
+served at $0.55$ when $0.92$ was available. The wrong dispatch costs
+$37$ points of accuracy on that domain; fixing on $B$ instead moves
+the same loss to Mathematics. A router that reads the per-domain
+columns pays this cost nowhere: it sends the integration problem
+to $A$ and the source-interpretation question to $B$.
 The aggregate score throws away exactly the information the routing
-decision needs.
-A benchmark adequate for routing must therefore report capability at
-the resolution of individual semantic sub-domains and distinguish
-profiles that coincide in mean but differ in composition.
-Figure~\ref{fig:routing-slopegraph} draws this crossing directly.
+decision needs, and a benchmark adequate for routing must report
+capability at the resolution of individual semantic sub-domains.
+Figure~\ref{fig:routing-slopegraph} draws the same numbers as a
+crossing: no single ordering of $A$ and $B$ is right in both columns,
+which is what a scalar ranking would require.
 Per-domain rankings of real models do differ in
 practice~\parencite{raju2024constructing}; whether a given roster
 exhibits such crossings on a given corpus is an empirical question,
@@ -125,13 +148,14 @@ roster, does not.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{routing_slopegraph}
-\caption{Illustrative slopegraph of the routing micro-example.
-Four lines connect Model~$A$'s per-domain accuracy (left axis) to
-Model~$B$'s (right axis) for Mathematics, Physics, History, and
-Philosophy, crossing at the centre; a horizontal dashed line marks the
-shared aggregate accuracy of $0.72$ that both models collapse to on a
-scalar leaderboard. The values are the synthetic ones stated in the
-text and are declared illustrative, not empirical.}
+\caption{The routing micro-example as a slopegraph. Each line is one
+model; its left end is the model's Mathematics accuracy and its right
+end its History accuracy, with the same values as
+Table~\ref{tab:routing-example}. The lines cross, so no single
+ordering of the two models holds in both domains, while the dashed
+line marks the shared aggregate of $0.72$ that a scalar leaderboard
+collapses both models to. The values are synthetic and declared
+illustrative, not empirical.}
 \label{fig:routing-slopegraph}
 \end{figure}
 
