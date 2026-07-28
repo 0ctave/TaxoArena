@@ -399,7 +399,16 @@ class BtMatchScheduler(
             // the held-out pool is for. Deterministic: seeded per (run seed, leaf), so a re-run
             // at the same seed reproduces the same ordering. The offset-walk below is unchanged,
             // so a pair still never repeats a question until it has exhausted the pool.
-            val rankedAvailable = available.shuffled(java.util.Random(seed.toLong() * 31 + nodeId.hashCode()))
+            // Seeded per (leaf, PAIR), not per leaf. Seeding per leaf gave every pair in a
+            // leaf the SAME shuffled order, and every pair still walks it from the front via
+            // `offset` — so it changed WHICH questions were used but not HOW MANY. Measured:
+            // pool utilisation stayed at exactly 66% (250/379) across both the centrality
+            // sampler and the per-leaf shuffle, identical to three significant figures. Adding
+            // the pair key decorrelates the orderings so different pairs enter the pool at
+            // different points and coverage widens.
+            val rankedAvailable = available.shuffled(
+                java.util.Random(seed * 31L + nodeId.hashCode() * 31L + pk.hashCode())
+            )
 
             val offset = pairQueryOffsets.getOrDefault("$nodeId|$pk", ps?.totalComparisons?.toInt() ?: 0)
             val slice = rankedAvailable.drop(offset).take(BATCH_STEP_SIZE)
