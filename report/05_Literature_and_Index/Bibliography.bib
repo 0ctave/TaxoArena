@@ -33,12 +33,11 @@ year = {2004},
 doi = {10.1214/aos/1079120141}
 }
 
-@article{dasgupta2016cost,
+@inproceedings{dasgupta2016cost,
 title = {A Cost Function for Similarity-Based Hierarchical Clustering},
 author = {Dasgupta, Sanjoy},
-journal = {arXiv preprint arXiv:1510.05043},
+booktitle = {Proceedings of the 48th Annual ACM Symposium on Theory of Computing (STOC)},
 year = {2016},
-doi = {10.48550/arXiv.1510.05043},
 url = {https://arxiv.org/abs/1510.05043}
 }
 
@@ -82,10 +81,10 @@ url = {https://arxiv.org/abs/2205.13147},
 doi = {10.48550/arXiv.2205.13147}
 }
 
-@article{wang2024mmlupro,
+@inproceedings{wang2024mmlupro,
 title = {{MMLU-Pro}: A More Robust and Challenging Multi-Task Language Understanding Benchmark},
 author = {Wang, Yubo and Ma, Xueguang and Zhang, Ge and Ni, Yuansheng and Chandra, Abhranil and Guo, Shiguang and Ren, Weiming and Arulraj, Aaran and He, Xuan and Jiang, Ziyan and others},
-journal = {arXiv preprint arXiv:2406.01574},
+booktitle = {Advances in Neural Information Processing Systems (NeurIPS), Datasets and Benchmarks Track},
 year = {2024},
 url = {https://arxiv.org/abs/2406.01574}
 }
@@ -148,9 +147,9 @@ doi = {10.48550/arXiv.2210.03629}
 % ── Entries added 2026-07-23 (gap-analysis §1.1 fix) ──────────────────────────
 
 @misc{arena2025categories,
-% TODO verify: thesis-specific details (80% coverage target, boundary-clarity
-% re-labelling test, "several weeks") could not be confirmed in this post and may
-% come from a different/earlier Arena write-up.
+% Resolved 2026-07-28: no longer used to source pipeline specifics; cited only as
+% a secondary pointer to Arena's public per-category leaderboards. The documented
+% pipeline critique is now sourced to li2024benchbuilder.
 title = {New Categories for Web Development in Code Arena},
 author = {{Arena Team}},
 howpublished = {LMArena blog post},
@@ -203,12 +202,14 @@ url = {https://arxiv.org/abs/2403.04132},
 doi = {10.48550/arXiv.2403.04132}
 }
 
-@misc{databricks2025memalign,
-% TODO verify: key year (2025) differs from the post's publication date (2026-02-03).
+@misc{databricks2026memalign,
+% Resolved 2026-07-28: key renamed 2025->2026 to match the post's publication date
+% (2026-02-03); cited in Ch. 2 only as an industrial (non-peer-reviewed) instance.
 title = {{MemAlign}: Building Better {LLM} Judges From Human Feedback With Scalable Memory},
 author = {Lyu, Veronica and Sreenivasan, Kartik and Moorjani, Samraj and Polyzotis, Alkis and Havens, Sam and Carbin, Michael and Bendersky, Michael and Zaharia, Matei and Chen, Xing},
 howpublished = {MLflow / Databricks blog post},
 year = {2026},
+note = {Industry blog post},
 url = {https://mlflow.org/blog/memalign/}
 }
 
@@ -301,18 +302,17 @@ doi = {10.1007/s10618-014-0382-x}
 @article{liang2022holistic,
 title = {Holistic Evaluation of Language Models},
 author = {Liang, Percy and Bommasani, Rishi and Lee, Tony and Tsipras, Dimitris and Soylu, Dilara and Yasunaga, Michihiro and Zhang, Yian and Narayanan, Deepak and Wu, Yuhuai and Kumar, Ananya and others},
-journal = {arXiv preprint arXiv:2211.09110},
-year = {2022},
-url = {https://arxiv.org/abs/2211.09110},
-doi = {10.48550/arXiv.2211.09110}
+journal = {Transactions on Machine Learning Research},
+year = {2023},
+url = {https://arxiv.org/abs/2211.09110}
 }
 
 
-@article{ong2024routellm,
+@inproceedings{ong2024routellm,
 title = {{RouteLLM}: Learning to Route {LLMs} with Preference Data},
 author = {Ong, Isaac and Almahairi, Amjad and Wu, Vincent and Chiang, Wei-Lin and Wu, Tianhao and Gonzalez, Joseph E. and Kadous, M. Waleed and Stoica, Ion},
-journal = {arXiv preprint arXiv:2406.18665},
-year = {2024},
+booktitle = {International Conference on Learning Representations (ICLR)},
+year = {2025},
 url = {https://arxiv.org/abs/2406.18665}
 }
 
@@ -344,9 +344,9 @@ url = {https://aclanthology.org/2024.customnlp4u-1.14/}
 }
 
 
-@misc{somerstep2025uniroute,
-% TODO verify: the UniRoute system cited in Ch. 2 is by Jitkrittum et al.; the key
-% suggests Somerstep (whose 2025 router paper is CARROT, arXiv:2502.03261).
+@misc{jitkrittum2025uniroute,
+% Resolved 2026-07-28: key renamed somerstep2025uniroute -> jitkrittum2025uniroute
+% to match the actual author list (Jitkrittum et al., arXiv:2502.08773).
 title = {Universal Model Routing for Efficient {LLM} Inference},
 author = {Jitkrittum, Wittawat and Narasimhan, Harikrishna and Rawat, Ankit Singh and Juneja, Jeevesh and Wang, Congchao and Wang, Zifeng and Go, Alec and Lee, Chen-Yu and Shenoy, Pradeep and Panigrahy, Rina and Menon, Aditya Krishna and Kumar, Sanjiv},
 howpublished = {arXiv preprint arXiv:2502.08773},
@@ -430,4 +430,158 @@ author = {Zhuang, Richard and Wu, Tianhao and Wen, Zhaojin and Li, Andrew and Ji
 booktitle = {International Conference on Learning Representations (ICLR)},
 year = {2025},
 url = {https://arxiv.org/abs/2410.02223}
+}
+
+% ── Entries added 2026-07-28 (Ch. 2 rework per supervisor review) ─────────────
+
+@article{stephan2024calculation,
+% TODO verify: author list against arXiv:2409.04168.
+title = {From Calculation to Adjudication: Examining {LLM} Judges on Mathematical Reasoning Tasks},
+author = {Stephan, Andreas and Zhu, Dawei and A{\ss}enmacher, Matthias and Shen, Xiaoyu and Roth, Benjamin},
+journal = {arXiv preprint arXiv:2409.04168},
+year = {2024},
+url = {https://arxiv.org/abs/2409.04168}
+}
+
+@inproceedings{tan2025judgebench,
+% TODO verify: author list against arXiv:2410.12784.
+title = {{JudgeBench}: A Benchmark for Evaluating {LLM}-Based Judges},
+author = {Tan, Sijun and Zhuang, Siyuan and Montgomery, Kyle and Tang, William Y. and Cuadron, Alejandro and Wang, Chenguang and Popa, Raluca Ada and Stoica, Ion},
+booktitle = {International Conference on Learning Representations (ICLR)},
+year = {2025},
+url = {https://arxiv.org/abs/2410.12784}
+}
+
+@article{li2024benchbuilder,
+title = {From Crowdsourced Data to High-Quality Benchmarks: {Arena-Hard} and {BenchBuilder} Pipeline},
+author = {Li, Tianle and Chiang, Wei-Lin and Frick, Evan and Dunlap, Lisa and Wu, Tianhao and Zhu, Banghua and Gonzalez, Joseph E. and Stoica, Ion},
+journal = {arXiv preprint arXiv:2406.11939},
+year = {2024},
+url = {https://arxiv.org/abs/2406.11939}
+}
+
+@inproceedings{singh2025leaderboard,
+% TODO verify: full author list against arXiv:2504.20879.
+title = {The Leaderboard Illusion},
+author = {Singh, Shivalika and Nan, Yiyang and Wang, Alex and others},
+booktitle = {Advances in Neural Information Processing Systems (NeurIPS), Datasets and Benchmarks Track},
+year = {2025},
+url = {https://arxiv.org/abs/2504.20879}
+}
+
+@inproceedings{frick2025p2l,
+% TODO verify: author list against arXiv:2502.14855.
+title = {{Prompt-to-Leaderboard}},
+author = {Frick, Evan and Chen, Connor and Tennyson, Joseph and Li, Tianle and Chiang, Wei-Lin and Angelopoulos, Anastasios N. and Stoica, Ion},
+booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
+year = {2025},
+url = {https://arxiv.org/abs/2502.14855}
+}
+
+@inproceedings{wan2024tntllm,
+% TODO verify: author list against arXiv:2403.12173.
+title = {{TnT-LLM}: Text Mining at Scale with Large Language Models},
+author = {Wan, Mengting and Safavi, Tara and Jauhar, Sujay Kumar and Kim, Yujin and Counts, Scott and Neville, Jennifer and Suri, Siddharth and Shah, Chirag and White, Ryen W. and others},
+booktitle = {Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
+year = {2024},
+url = {https://arxiv.org/abs/2403.12173}
+}
+
+@article{tamkin2024clio,
+% TODO verify: author list against arXiv:2412.13678.
+title = {Clio: Privacy-Preserving Insights into Real-World {AI} Use},
+author = {Tamkin, Alex and McCain, Miles and Handa, Kunal and Durmus, Esin and others},
+journal = {arXiv preprint arXiv:2412.13678},
+year = {2024},
+url = {https://arxiv.org/abs/2412.13678}
+}
+
+@inproceedings{pham2024topicgpt,
+% TODO verify: arXiv id (2311.01449) and author list.
+title = {{TopicGPT}: A Prompt-based Topic Modeling Framework},
+author = {Pham, Chau Minh and Hoyle, Alexander and Sun, Simeng and Resnik, Philip and Iyyer, Mohit},
+booktitle = {Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL)},
+year = {2024},
+url = {https://arxiv.org/abs/2311.01449}
+}
+
+@article{chen2025judgelrm,
+% TODO verify: author list against arXiv:2504.00050.
+title = {{JudgeLRM}: Large Reasoning Models as a Judge},
+author = {Chen, Nuo and Hu, Zhiyuan and Zou, Qingyun and Wu, Jiaying and Wang, Qian and Hooi, Bryan and He, Bingsheng},
+journal = {arXiv preprint arXiv:2504.00050},
+year = {2025},
+url = {https://arxiv.org/abs/2504.00050}
+}
+
+@inproceedings{ye2024flask,
+title = {{FLASK}: Fine-grained Language Model Evaluation based on Alignment Skill Sets},
+author = {Ye, Seonghyeon and Kim, Doyoung and Kim, Sungdong and Hwang, Hyeonbin and Kim, Seungone and Jo, Yongrae and Thorne, James and Kim, Juho and Seo, Minjoon},
+booktitle = {International Conference on Learning Representations (ICLR)},
+year = {2024},
+url = {https://arxiv.org/abs/2307.10928}
+}
+
+@article{lambert2024rewardbench,
+% TODO verify: full author list against arXiv:2403.13787.
+title = {{RewardBench}: Evaluating Reward Models for Language Modeling},
+author = {Lambert, Nathan and Pyatkin, Valentina and Morrison, Jacob and Miranda, LJ and Lin, Bill Yuchen and Chandu, Khyathi and others},
+journal = {arXiv preprint arXiv:2403.13787},
+year = {2024},
+url = {https://arxiv.org/abs/2403.13787}
+}
+
+@inproceedings{zeng2024llmbar,
+title = {Evaluating Large Language Models at Evaluating Instruction Following},
+author = {Zeng, Zhiyuan and Yu, Jiatong and Gao, Tianyu and Meng, Yu and Goyal, Tanya and Chen, Danqi},
+booktitle = {International Conference on Learning Representations (ICLR)},
+year = {2024},
+url = {https://arxiv.org/abs/2310.07641}
+}
+
+@article{cattelan2012paired,
+% TODO verify: volume/number/pages and DOI.
+title = {Models for Paired Comparison Data: A Review with Emphasis on Dependent Data},
+author = {Cattelan, Manuela},
+journal = {Statistical Science},
+volume = {27},
+number = {3},
+pages = {412--433},
+year = {2012},
+doi = {10.1214/12-STS396}
+}
+
+@article{zhang2025avengers,
+% TODO verify: author list against arXiv:2505.19797.
+title = {The Avengers: A Simple Recipe for Uniting Smaller Language Models to Challenge Proprietary Giants},
+author = {Zhang, Yiqun and others},
+journal = {arXiv preprint arXiv:2505.19797},
+year = {2025},
+url = {https://arxiv.org/abs/2505.19797}
+}
+
+@article{zhang2025avengerspro,
+% TODO verify: exact title and author list against arXiv:2508.12631.
+title = {{Avengers-Pro}: Test-Time Routing of Large Language Models for Performance and Efficiency},
+author = {Zhang, Yiqun and others},
+journal = {arXiv preprint arXiv:2508.12631},
+year = {2025},
+url = {https://arxiv.org/abs/2508.12631}
+}
+
+@inproceedings{chen2024routerdc,
+title = {{RouterDC}: Query-Based Router by Dual Contrastive Learning for Assembling Large Language Models},
+author = {Chen, Shuhao and Jiang, Weisen and Lin, Baijiong and Kwok, James T. and Zhang, Yu},
+booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+year = {2024},
+url = {https://arxiv.org/abs/2409.19886}
+}
+
+@article{hu2024routerbench,
+% TODO verify: full author list against arXiv:2403.12031.
+title = {{RouterBench}: A Benchmark for Multi-{LLM} Routing System},
+author = {Hu, Qitian Jason and Bieker, Jacob and Li, Xiuyu and Jiang, Nan and Keigwin, Benjamin and Ranganath, Gaurav and Keutzer, Kurt and Upadhyay, Shriyash Kaustubh},
+journal = {arXiv preprint arXiv:2403.12031},
+year = {2024},
+url = {https://arxiv.org/abs/2403.12031}
 }

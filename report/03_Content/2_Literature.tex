@@ -8,9 +8,9 @@ stated as positioning rather than surveyed
 with LLM judges (Section~\ref{sec:llm-as-a-judge}); and pairwise
 ranking models (Section~\ref{sec:ranking-models}).
 Section~\ref{sec:routing} closes with query routing, the downstream
-task for which per-domain capability profiles are needed and which
-existing routing systems cannot serve without a profiling layer
-beneath them.
+task for which per-domain capability profiles are needed, and states
+the narrowed gap this thesis defends against the routing systems that
+already induce structure of their own.
 
 The sections are not sized by the size of their literatures. They are
 sized by how much of each this thesis's argument consumes.
@@ -45,9 +45,10 @@ organisation are fixed at construction time.
 This creates three compounding failure modes.
 First, \textit{saturation}: as model capabilities advance, score
 distributions compress toward the ceiling and the benchmark loses
-discriminative power. Frontier models now cluster in the high 80s to
-low 90s (approximately 88--92\%) on MMLU, which leaves it unable to rank
-them against each other~\parencite{boubdir2024elo}.
+discriminative power. Frontier models now score at or near MMLU's
+estimated human-expert ceiling of 89.8\%, which leaves the benchmark
+unable to rank them against each
+other~\parencite{hendrycks2021measuring, wang2024mmlupro}.
 Second, \textit{contamination}: benchmark questions circulate online and
 enter training corpora; researchers found that ChatGPT and GPT-4 could guess
 missing answer options in MMLU at rates of 52\% and 57\% respectively,
@@ -121,38 +122,68 @@ sandwich robust standard error, providing statistically grounded rankings
 with explicit uncertainty estimates.
 To improve sample efficiency, Chatbot Arena employs an adaptive sampling
 rule that allocates comparison budget proportionally to the reduction in
-confidence interval size. The platform reports that this requires 54\%
-fewer comparisons than random sampling to achieve the same precision on
-the win matrix~\parencite{chiang2024chatbotarena}.
+confidence interval size, reaching a given precision on the win matrix
+with substantially fewer comparisons than uniform random
+sampling~\parencite{chiang2024chatbotarena}.
+
+The arena paradigm itself has since come under systematic critique.
+\textcite{singh2025leaderboard} document that Chatbot Arena's operating
+policies --- private testing of model variants before public listing,
+asymmetric access to vote data, and unequal sampling and deprecation
+rates across providers --- systematically advantage a small set of
+participants, so that observed Arena rank is partly a function of
+platform engagement rather than of capability alone.
+The consequence relevant here is methodological: a leaderboard is a
+measurement instrument, and its measurement properties must be audited
+independently of the quantity it reports --- the stance this thesis
+applies to its own evaluation chain.
 
 Recognising that a single global ranking conceals domain-specific
-capability variation, Arena has more recently constructed per-category
-leaderboards through an explicit taxonomy-building
-pipeline~\parencite{arena2025categories}.
-The methodology embeds prompts, clusters them at scale, uses an LLM to
-generate candidate category names and definitions, and iterates with
-human review toward two optimisation targets: coverage (at least 80\%
-of prompts assigned to a named category) and boundary clarity (category
-definitions remain mutually exclusive under re-labelling).
-This pipeline shares the high-level goal of inducing a domain structure
-from query data, but its design priorities (human interpretability and
-leaderboard presentation) differ from those of statistical evaluation
-rigour.
+capability variation, the Arena line of work has begun inducing
+structure from its own query stream. The documented pipeline is
+\textit{BenchBuilder}~\parencite{li2024benchbuilder}, which embeds
+roughly 200K Arena prompts, clusters them hierarchically into some
+4{,}000 topic clusters, scores prompts with an LLM against seven
+quality criteria, and distils a 500-prompt benchmark
+(Arena-Hard-Auto) whose model ranking reaches 98.6\% correlation with
+the full human-vote leaderboard at a judging cost of roughly \$20 per
+evaluated model; Arena's public
+per-category leaderboards follow the same
+embed--cluster--LLM-label recipe~\parencite{arena2025categories}.
+BenchBuilder demonstrates that corpus-induced structure over an
+evaluation query stream is practical at scale, which is precisely why
+the gap this thesis addresses must be stated narrowly
+(Sections~\ref{sec:taxonomy-construction} and~\ref{sec:routing}).
 
-Arena's splitting criterion is a coverage percentage and a qualitative
-boundary-clarity judgment, both requiring human-in-the-loop validation;
-there is no information-theoretic objective function that makes the
-resulting partition verifiably near-optimal.
-Category nodes carry no statistical characterisation. Without a
-probability model over the queries assigned to a category, membership
-decisions are hard and the coherence of a node cannot be measured.
-Cluster labelling is delegated to an LLM prompted to propose
-human-interpretable names, which optimises for presentation rather than
-for geometric separability.
-Finally, the process is shallow and manual. The Arena WebDev taxonomy
-contains seven categories constructed over several weeks of iterative
-refinement, whereas a principled recursive procedure would be required
-to scale to hundreds of semantic sub-domains.
+What the pipeline does not attempt is equally precise. Its clusters
+are a means to prompt \emph{filtering}: they carry no probability
+model, so cluster membership is hard, the coherence of a cluster is
+never measured, and the hierarchy is discarded once the 500 prompts
+are selected. There is no split-or-stop statistic that makes the
+partition itself an auditable object, and no per-cluster model
+statistics survive into the published benchmark.
+TaxoArena differs on exactly this axis: its cells are vMF-modelled
+regions of the embedding sphere whose coherence is statistically
+tested, and each cell carries a Bradley--Terry profile with
+Fisher-information confidence intervals --- the partition is the
+measured object, not a preprocessing step.
+
+\textit{Prompt-to-Leaderboard} (P2L)~\parencite{frick2025p2l} pushes
+per-domain resolution to its continuous limit: a language model is
+trained on Arena's human preference votes to map an individual prompt
+directly to a vector of prompt-conditional Bradley--Terry
+coefficients, yielding a leaderboard --- and hence a routing decision
+--- per prompt; a P2L-based router reached first place on Chatbot
+Arena in January 2025.
+P2L is the strongest existing occupant of the per-domain
+capability-profile territory, and Section~\ref{sec:routing} returns
+to it as a competing baseline.
+The differentiator is representational: P2L amortises the capability
+profile into the weights of a regression model, so its ``domains''
+are implicit, continuous, and inspectable only through the model's
+outputs, whereas TaxoArena produces a discrete, human-interpretable
+cell structure whose per-cell rankings are statistically
+characterised and can be hypothesis-tested cell by cell.
 
 
 
@@ -198,6 +229,37 @@ the \textit{term} level, where a node is a cluster of words; here a
 node must characterise the distributional geometry of full
 natural-language queries, which needs a different node model, a
 different splitting criterion, and a different coherence measure.
+
+\textbf{The occupying systems, and the narrowed claim.}
+The embed--cluster--LLM-label recipe that BenchBuilder applies to
+benchmark curation (Section~\ref{sec:benchmarks}) has become an
+industrial pattern for inducing taxonomies from live corpora, and any
+claim that corpus-induced taxonomy for evaluation is unoccupied
+territory would be false; this thesis does not make it.
+\textit{TnT-LLM}~\parencite{wan2024tntllm} has an LLM generate and
+iteratively refine a label taxonomy over conversation logs, then
+distils it into lightweight classifiers deployed at scale over Bing
+Copilot traffic. \textit{Clio}~\parencite{tamkin2024clio} embeds and
+clusters millions of Claude conversations, has an LLM name each
+cluster, and assembles the named clusters into a navigable hierarchy
+for privacy-preserving usage monitoring.
+\textit{TopicGPT}~\parencite{pham2024topicgpt} replaces the
+clustering step itself with prompted topic generation and assignment.
+All three, like BenchBuilder, induce human-readable structure from a
+corpus; all three consume that structure for classification,
+monitoring, or curation.
+The claim this thesis defends is a conjunction that none of them
+provides: TaxoArena combines (a) a generative node model --- vMF
+distributions on the embedding sphere --- with a geometric
+split-and-stop rule whose acceptance statistic is chance-corrected,
+so that the coherence of every cell is a tested quantity rather than
+an artefact of labelling, and (b) statistically characterised
+per-cell capability profiles (Bradley--Terry coefficients with
+Fisher-information confidence intervals) consumed by a router.
+BenchBuilder, TnT-LLM, Clio, and P2L each occupy one half of this
+conjunction --- taxonomy induction without statistical node
+characterisation, or capability profiles without a discrete,
+testable cell structure --- and none occupies both.
 
 \subsection*{Spherical Embeddings and vMF Clustering}
 
@@ -312,10 +374,15 @@ response quality.
     \item \textbf{Positional bias.}
     Judges tend to favour the response presented first in the prompt,
     independently of content~\parencite{zheng2023judging}.
-    Zheng et al.\ found that GPT-4 agreed with itself on only 85\% of
-    cases when the position of two responses was swapped, implying that
-    up to 15\% of pairwise outcomes are position-driven rather than
-    quality-driven.
+    Zheng et al.\ report a positional consistency of 65.0\% for
+    GPT-4: in only about two thirds of pairs did the judge reach the
+    same verdict when the positions of the two responses were swapped,
+    implying that up to roughly 35\% of single-order pairwise outcomes
+    can be position-driven rather than quality-driven.
+    The magnitude strengthens rather than weakens the case for the
+    bidirectional order evaluation adopted in this thesis: a bias that
+    can touch a third of verdicts is a first-order term to be measured
+    out, not a residual to be tolerated.
 
     \item \textbf{Verbosity bias.}
     Models consistently assign higher scores to longer responses, even
@@ -328,7 +395,10 @@ response quality.
 
     \item \textbf{Self-preference bias.}
     LLMs exhibit a tendency to favour outputs stylistically similar to
-    their own training distribution~\parencite{wataoka2025selfpreference}.
+    their own training distribution~\parencite{wataoka2025selfpreference,
+    panickssery2024llm}, and \textcite{panickssery2024llm} show the
+    effect is linked to self-recognition: evaluators that can identify
+    their own generations are the ones that favour them.
     Recent evidence characterises this as a familiarity bias: a model
     assigns lower perplexity to outputs close to its own distribution and
     translates that fluency signal into a preference judgment, effectively
@@ -350,12 +420,55 @@ rather than prompt-addressable, and its magnitude varies with the
 distance between the judging model's training distribution and
 those of the evaluated models.
 
+\subsection*{Judges on Verifiable Tasks: The Shortcut Result}
+
+The biases above concern open-ended comparison. On tasks with a
+verifiable answer, a further and more consequential behaviour is
+documented, and it is the closest prior work to
+Chapter~\ref{ch:results}'s central measurement.
+\textcite{stephan2024calculation}, examining LLM judges on
+mathematical reasoning tasks, find that judges tend to award the win
+to the generally stronger model even on instances where that model's
+answer is wrong; that a large fraction of judgments (70--75\%) can be
+predicted from shallow features without consulting the mathematics at
+all; and that judges are able to detect the stratum in which both
+candidate answers are correct --- the stratum where a preference
+verdict is least informative. On verifiable tasks, in short, verdicts
+track answer-level correctness and prior model strength rather than
+the quality of the reasoning being adjudicated.
+
+Meta-evaluation benchmarks corroborate the pattern from the other
+direction. \textit{JudgeBench}~\parencite{tan2025judgebench}
+constructs response pairs whose preference label is objective
+correctness and finds that even strong judge models perform near
+chance on them; \textit{LLMBar}~\parencite{zeng2024llmbar} shows
+judges systematically fail pairs in which superficial quality and
+instruction adherence are dissociated; and
+\textit{RewardBench}~\parencite{lambert2024rewardbench} standardises
+this style of adversarial audit for reward models.
+Judge competence, these benchmarks agree, is not a scalar that
+transfers from fluent domains to verifiable ones.
+
+Chapter~\ref{ch:results}'s central finding is therefore positioned as
+a pre-registered \emph{extension} of this line, not an independent
+discovery: relative to \textcite{stephan2024calculation} it moves the
+design from free-form mathematics to multiple choice, where the answer
+key is exact rather than extracted; it tests the rubric mechanism
+directly, through correctness strata the rubric cannot distinguish;
+and the strata analysis was registered before any verdict existed
+(Chapter~\ref{ch:experimental-design}).
+
 \subsection*{Domain Calibration}
 
 A judge prompted with a generic instruction to ``prefer the better
 answer'' applies implicit quality criteria drawn from its training
 distribution, which may not align with the domain-specific standards
-relevant to the query~\parencite{databricks2025memalign}.
+relevant to the query.
+\textit{FLASK}~\parencite{ye2024flask} makes this concrete:
+decomposing coarse quality judgments into fine-grained,
+instance-specific skill criteria changes both the scores and the
+resulting model orderings, so the choice of criteria is part of the
+measurement rather than a presentational detail.
 This misalignment is not merely a calibration error in the statistical
 sense; it changes the semantic content of the preference judgment.
 In mathematical reasoning, for instance, a judge without domain
@@ -363,37 +476,52 @@ conditioning will prefer a fluent but incorrect derivation over a
 terse but correct one, conflating presentation quality with
 mathematical validity.
 
-\textit{MemAlign}~\parencite{databricks2025memalign} aligns synthetic
-judges with domain-specific standards using a dual-memory system: a
-semantic memory that stores general evaluation principles and an episodic
-memory that stores specific edge-case examples, together calibrating the
-judge against as few as 30--50 human gold labels without weight updates.
-\textit{Judge-wise Reinforcement Learning}~\parencite{huang2025thinkj}
-rewards the judge for providing explicit chain-of-thought justifications
-that are consistent with the final preference, making the evaluation
-process auditable and reducing the proportion of preference reversals
-attributable to surface features.
-Both approaches confirm that domain-specific judge conditioning
-substantially improves alignment with human expert ratings, at the cost
-of requiring either labelled examples or a reasoning-capable judge model.
+The earliest mitigation in this family is Zheng et al.'s
+reference-guided mode, in which the judge is shown a reference
+solution at verdict time~\parencite{zheng2023judging}.
+In industrial practice, \textit{MemAlign} --- a non-peer-reviewed
+system description~\parencite{databricks2026memalign}, cited here as
+an industrial instance only --- aligns synthetic judges with
+domain-specific standards through a dual-memory design (general
+evaluation principles plus episodic edge cases) calibrated against as
+few as 30--50 human gold labels without weight updates.
+On the training side, the companion RL-trained reasoning judges
+\textit{Think-J}~\parencite{huang2025thinkj} and
+\textit{JudgeLRM}~\parencite{chen2025judgelrm} reward explicit
+chain-of-thought justifications that are consistent with the final
+preference, making the evaluation process auditable and reducing the
+proportion of preference reversals attributable to surface features.
+These approaches indicate that domain-specific judge conditioning
+improves alignment with human expert ratings, at the cost of requiring
+either labelled examples or a trained reasoning judge.
 
-A gap opens between the full MemAlign pipeline, which requires human
-preference labels, and the setting that arises in TaxoArena.
-Here the judge-generation phase has access to MMLU-Pro reference
-answers from the construction set but not to human preference
-annotations, while the arena evaluation phase has access to neither.
-This \textit{reference-informed, answer-key-blind} design has not been
-systematically studied in the literature.
+The setting that arises in TaxoArena sits between these mitigations
+and shares none of their supervision.
+Its judge-generation phase has access to MMLU-Pro reference answers
+from the construction set but not to human preference annotations,
+while the arena evaluation phase has access to neither.
+This differs from Zheng et al.'s reference-guided mode, which reveals
+the reference at verdict time, and from FLASK, whose criteria are
+instantiated per instance at evaluation time: here a rubric is
+distilled \emph{once} from the answer key at construction, and the key
+is withheld at test.
+The narrow claim this thesis makes is not that reference-informed
+judging is unstudied; it is that this distill-once,
+withhold-at-test protocol had not been tested against correctness
+strata, which is the design under which Chapter~\ref{ch:results}
+measures it.
 
-\subsection*{The Open Question This Thesis Measures}
+\subsection*{The Question This Thesis Measures}
 
 The biases above are all cited results, and this thesis claims novelty
 for none of them. That LLM judges prefer longer answers, favour the
 first-presented answer, and fall back on undocumented heuristics where
-a rubric is silent is established.
+a rubric is silent is established --- and so, on verifiable tasks, is
+the shortcut to answer correctness and prior model
+strength~\parencite{stephan2024calculation}.
 
-What is not established, and what
-Chapter~\ref{ch:results} measures, is a question one step earlier:
+What Chapter~\ref{ch:results} measures is the question this shortcut
+literature opened, moved to the setting where it is sharpest:
 \emph{on a corpus with a verifiable answer key, what does a pairwise
 judge condition its verdict on?} The domain-calibration literature
 assumes, reasonably, that a better-specified rubric changes the
@@ -403,9 +531,12 @@ criteria and one that is verifying an answer will behave differently
 under strata the criteria cannot distinguish --- items where both
 responses are correct, items where neither is, items where neither
 response contains any reasoning to evaluate. Those strata exist in
-MMLU-Pro and cost nothing to construct. The decomposition reported in
-Section~\ref{sec:res-judge} is the contribution here; the individual
-biases are background.
+MMLU-Pro, cost nothing to construct, and --- unlike the post-hoc
+predictability analyses of prior work --- were registered here before
+the verdicts existed. The pre-registered stratified decomposition
+reported in Section~\ref{sec:res-judge} is the contribution; the
+shortcut phenomenon itself is prior art, and the individual biases are
+background.
 
 
 \bigskip
@@ -509,6 +640,13 @@ Their online-update design targets streaming match data; for a
 fixed-budget batch arena, the BT MLE with Fisher standard errors
 provides the same uncertainty quantification within a simpler and more
 interpretable estimation framework.
+A further extension is hierarchical, partial-pooling Bayesian BT
+modelling, in which per-group strength parameters shrink toward a
+population-level mean~\parencite{cattelan2012paired}; it is the
+natural refinement for a per-domain arena whose smallest cells carry
+few comparisons, and this thesis instead estimates each cell's BT
+model independently, keeping per-cell profiles interpretable in
+isolation at the cost of borrowing no strength across cells.
 
 \subsection*{Active Ranking and Sample Complexity}
 
@@ -598,10 +736,14 @@ Section~\ref{sec:routing}.
 
 \section{Query Routing as the Target Use Case}\label{sec:routing}
 
-Query routing is the downstream task that per-domain capability profiles
-are designed to enable. Such profiles do not currently exist, and the
-routing systems that would consume them presuppose a fixed taxonomy;
-that is the gap motivating this thesis.
+Query routing is the downstream task that per-domain capability
+profiles are designed to enable. Routing systems that induce their own
+domain structure from a query corpus now exist, so the gap motivating
+this thesis is not the absence of induced structure; it is the absence
+of a routing substrate that is simultaneously interpretable,
+statistically characterised, and validated independently of routing
+accuracy. This section names the occupying systems and states that
+narrower gap.
 
 \subsection*{The Routing Problem in Agentic Systems}
 
@@ -638,28 +780,63 @@ preference labels~\parencite{ong2024routellm}, because a globally
 trained BT model does not encode the domain-conditional capability
 variation that accurate routing requires.
 \textit{EmbedLLM}~\parencite{zhuang2024embedllm} and
-\textit{UniRoute}~\parencite{somerstep2025uniroute} route
+\textit{UniRoute}~\parencite{jitkrittum2025uniroute} route
 geometrically, representing each model by an embedding derived from
 its performance on a representative query set; the quality of that
 per-model profile bounds achievable routing accuracy.
+In FrugalGPT, RouteLLM, and EmbedLLM, the domain structure over which
+models are profiled is either absent (a global ranking) or predefined
+by the benchmark used to construct the training set.
 
-A limitation shared by all four systems is that the domain structure
-over which models are profiled is either absent (global ranking) or
-predefined by the benchmark used to construct the training set.
-None of these systems provide a method for inductively deriving the
-domain taxonomy from the query corpus itself, nor do they produce
-statistically characterised per-domain profiles that can be validated
-for coherence independently of routing accuracy.
-These two absences define the gap between the learned routing literature
-and the problem addressed in this thesis.
+A more recent line induces its routing structure directly from the
+query corpus, and it forecloses any broad novelty claim here.
+\textit{The Avengers}~\parencite{zhang2025avengers} embeds and
+clusters training queries, scores each candidate model per cluster,
+and routes a test query to the models that dominate its nearest
+clusters; \textit{Avengers-Pro}~\parencite{zhang2025avengerspro}
+extends the recipe with a tunable performance--efficiency trade-off.
+UniRoute's cluster-based variant represents each model by its error
+profile over query clusters for exactly the same
+reason~\parencite{jitkrittum2025uniroute}, and
+\textit{RouterDC}~\parencite{chen2024routerdc} learns query and model
+embeddings jointly by dual contrastive learning, inducing a soft
+structure in the shared space. Corpus-induced structure for routing is
+therefore occupied territory; these systems are the competing
+baselines for TaxoArena's routing use case, and standardised router
+evaluations such as \textit{RouterBench}~\parencite{hu2024routerbench}
+make that comparison feasible.
+
+What none of these systems provides --- and what P2L
+(Section~\ref{sec:benchmarks}), the strongest occupant of the
+per-domain-profile territory, provides only in continuous, amortised
+form~\parencite{frick2025p2l} --- is the conjunction this thesis
+targets: routing structure that is (a) discrete and
+human-interpretable, seeded from editorial labels and then refined by
+geometric evidence; (b) statistically characterised per cell, with a
+tested coherence model on the query side and Bradley--Terry profiles
+carrying Fisher-information confidence intervals on the model side;
+and (c) built as an \emph{instrument}, its cells validated for
+coherence independently of --- and prior to --- any routing
+objective, an instrument/router separation that cluster-based
+routers, which tune their structure against routing accuracy itself,
+do not have.
+The Avengers, Avengers-Pro, UniRoute's cluster mode, and RouterDC
+occupy the structure-induction territory; the narrowed gap is the
+conjunction, not the induction.
 
 \section*{Synthesis}
 
 The five bodies of literature reviewed in this chapter converge on a
-single compound problem: no existing system produces statistically
-characterised per-domain capability profiles over a corpus-induced
-domain structure, yet both the ranking literature and the routing
-literature require exactly that substrate.
+single compound problem. Corpus-induced taxonomies for evaluation
+exist (BenchBuilder, TnT-LLM, Clio), corpus-induced routing structures
+exist (The Avengers, UniRoute's cluster mode, RouterDC), and
+per-prompt capability profiles with uncertainty exist (P2L); no
+existing system, however, combines a generative, coherence-tested node
+model over a discrete, human-interpretable partition with per-cell
+Bradley--Terry profiles carrying formal confidence intervals,
+validated as an instrument before any router consumes them.
+Both the ranking literature and the routing literature require exactly
+that conjunction as substrate.
 TaxoArena is built to test whether that substrate can exist: a
 label-bootstrapped, corpus-induced partition supplies the cells, a
 reference-informed, answer-key-blind arena judges inside them, and ---
