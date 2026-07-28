@@ -12,6 +12,11 @@
 %------------------------------
 % ENTER TEXT HERE
 %------------------------------
+% TODO(author): German abstract. The English text below is now written
+% against Chapter 5's numbers; translate that text rather than
+% composing a second, differently-scoped abstract. Re-check the
+% figures against Chapter 5 first, since the law run (Run C) may add a
+% sentence.
 %------------------------------
 \textbf{Schlüsselwörter:} \itshape \germankeywords
 \end{otherlanguage}
@@ -23,6 +28,38 @@
 %------------------------------
 % ENTER TEXT HERE
 %------------------------------
+Agentic systems dispatch sub-tasks to models and need a capability map
+at a finer resolution than a scalar leaderboard provides. TaxoArena
+induces a semantic partition over MMLU-Pro and runs an
+LLM-as-a-judge arena inside its cells, so that every pairwise
+comparison is judged under a rubric written for that cell. The
+partition is the instrument; the result is a measurement of the judge.
+
+On a corpus with a verifiable answer key, the judge's verdict tracks
+answer correctness rather than reasoning quality. It agrees with the
+key on $88.8\%$ of items where exactly one response is correct; its tie
+rate roughly triples on the items where the key stops discriminating;
+and its agreement is \emph{highest} where neither response contains any
+reasoning at all --- $97.0\%$ against $83.2\%$ once model capability is
+controlled. A judge given no cell rubric reaches the same winner on
+$99.4\%$ of comparisons, and a paired arm that removes the partition
+entirely matches the key to within half a percentage point
+($94.2\%$ against $94.7\%$) on an identical question set. Under the
+registered decision rule the rank-correlation contrast on Math formally
+failed the null in favour of the partition-free arm; the gap collapses
+to the registered boundary once ties are dropped, an attribution made
+after the fact and marked as such.
+
+The construction reaches a certified structural fixed point and yields
+87 cells whose induced rubrics are cell-specific against a size-matched
+randomised null ($p = 1.2 \times 10^{-6}$). What fails --- under
+pre-registration, and before the arena ran --- is the premise that
+cells carry different true model rankings: between-cell rank agreement
+is flat across an elevenfold change in granularity. On a
+multiple-choice corpus a capable judge can shortcut to correctness and
+bypass the partition entirely; the architecture binds only where
+correctness is not checkable. Results are a selected-domain study at
+one seed.
 %------------------------------
 \textbf{Keywords:} \itshape \englishkeywords
 \end{otherlanguage}

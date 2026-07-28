@@ -1,5 +1,150 @@
-\chapter{Conclusion and Outlook}\label{ch:conclusion-and-outlook}\label{ch:conclusion}
 
-\section{Conclusion}\label{sec:conclusion}
+\section{Conclusion}\label{sec:conclusion}\label{sec:disc-summary}
 
-\section{Outlook and Future Directions}\label{sec:outlook-and-future-directions}\label{sec:future-work}
+This thesis set out to validate a taxonomy and ended by measuring a
+judge. Restating the contributions of
+Section~\ref{sec:research-goal} as what was demonstrated rather than
+what was attempted:
+
+\textbf{What was demonstrated.}
+On a corpus with a verifiable answer key, an LLM judge's pairwise
+verdicts track answer correctness rather than reasoning quality. That
+is established by five measurements with mutually independent failure
+modes: an agreement rate with the key of $88.8\%$ on discriminable
+items; a tie rate that triples exactly where the key stops
+discriminating; an inversion by trace presence that \emph{strengthens}
+to $97.0\%$ against $83.2\%$ once capability is controlled; a
+rubric-scoped against rubric-free contrast that leaves $99.4\%$ of
+winners identical; and a paired partition against no-partition contrast
+that is indistinguishable on its high-power statistic
+($94.2\%$ against $94.7\%$).
+A construction method was built and characterised as an instrument: it
+reaches a certified structural fixed point at iteration 10, its
+acceptance rule is calibrated in units of its own objective's paired
+standard error against a $13.1\times$ spread in that error, and its
+separation threshold is positioned between two measured nulls.
+Rubrics induced on its cells were shown to be specific to those cells
+against a size-matched randomised null at
+$p = 1.21 \times 10^{-6}$, with all four pre-registered discriminators
+firing in their predicted directions.
+And the premise of this thesis's original second research question ---
+that cells carry different true model rankings --- was tested and
+refused under pre-registration, before the arena ran.
+
+\textbf{Answering the research questions.}
+RQ1 asked whether answer-key-blind, domain-conditioned pairwise
+judgments recover per-domain capability rankings, and what decides the
+verdicts. They recover the ground-truth ordering to within about one
+adjacent transposition, and what decides the verdicts is answer
+correctness; on the pilot roster, half of that recovery was purchased
+by a response-format artifact rather than earned by judgment.
+RQ2 asked whether adapted, cell-scoped grouping enables better judging
+than a generic partition-free rubric on the same questions. On Math ---
+designated in advance as the null arm, because the roster's models
+order identically there and globally --- the two arms are
+indistinguishable on answer-key agreement, and the rank-correlation gap
+that appears under one tie convention collapses to the registered
+boundary under the other. Under the registered rule that gap counts as
+a \emph{failed} null in favour of the partition-free arm; the
+tie-scoring attribution is post hoc, and the confirmatory design fixes
+the convention in advance. The corresponding test on law, the domain the
+offline screen selects, is outstanding.
+
+\textbf{What the scope licenses, and what it does not.}
+These are results about one multiple-choice corpus, one judge model,
+one or two domains, rosters of 8 to 12 models, and a single seed. They
+license the claim that on a corpus of this kind the judging mechanism
+can bypass the partition, and they license the negative result about
+geometry-adapted evaluation partitioning for a roster of this
+capability spread. They do \emph{not} license a claim that cell-scoped
+rubrics fail to improve judging in general: the regime in which a
+rubric has been shown able to matter --- where correctness is not
+checkable --- has not been tested here. Nor do they license any
+absolute rank-fidelity figure quoted to three decimals; the sampler and
+tie-convention sensitivity of Section~\ref{sec:res-tie-policy} rules
+that out, and only paired contrasts within a run are reported as such.
+
+\textbf{What the reframing contributes.}
+The evaluative value of a partition is a claim about a judge's
+generalisation surface, and it decomposes into three separately
+falsifiable links: coherent cells, specific rubrics, better judgments.
+Stated that way, this project's negative results become locatable ---
+link~1 holds, link~2 holds, and link~3 fails at its premise on this
+corpus and at its mechanism on this judging paradigm. Stated the other
+way, as a single claim that adapted partitioning improves ranking
+fidelity, the same results read as a project that did not work. The
+decomposition is not a post-hoc rescue; it was written down and dated
+before the runs it now organises, and it is the difference between a
+result and a shrug.
+
+\section{Outlook and Future Directions}\label{sec:outlook-and-future-directions}\label{sec:future-work}\label{sec:disc-future}
+
+In priority order, with the reason each sits where it does.
+
+\begin{enumerate}
+
+\item \textbf{A rule-identifier citation scheme in the verdict schema.}
+Section~\ref{sec:res-generic-judge} shows that the judge reproduces a
+cell rubric's vocabulary; it cannot show that the judge \emph{applies}
+the rubric's criteria, because lexical overlap cannot distinguish the
+two. Requiring the verdict to name the rule it relied on settles that
+directly --- a cited rule identifier cannot arise from topical
+coincidence --- and it counts, for free, how many verdicts cite no rule
+at all and are therefore decided on priors. It is first on this list
+because it changes the verdict schema and therefore must precede any
+further arena run.
+
+\item \textbf{The options-blind arm.} The same held-out questions, the
+same cell rubrics, with the multiple-choice options withheld from the
+judge. This is the demonstration that Section~\ref{sec:disc-rq1}
+currently has only as an inference, and its predictions are already
+fixed in writing per stratum. It is \emph{blocked} until the roster is
+trace-complete: without options and without stored reasoning, an
+untraced-against-untraced comparison presents the judge with a question
+and two bare letters, which is uninterpretable rather than a
+chance-level null. The corpus repair of
+Section~\ref{sec:res-capture-gap} removes that block for most of the
+corpus, and re-running generation with output capture removes it for
+the rest.
+
+\item \textbf{The law arena on the 11-model band} (Run~C). Law is the
+one domain that reorders significantly under both roster policies at
+full question coverage, and it is therefore the domain where the
+partition has something to be right about. Without it,
+Section~\ref{sec:res-law} reports the screen as a \emph{bound} on what
+a partition could show rather than as a test of whether it shows it.
+
+\item \textbf{A roster clustered within about ten accuracy points.} The
+granularity null of Section~\ref{sec:res-granularity} was measured on a
+roster spanning $54$ accuracy points, where global capability ordering
+dominates by construction. A tightly clustered roster is the version of
+that question that could still come out positive, and it is untested.
+
+\item \textbf{Generalisation to all 14 domains at matched statistical
+power}, rather than one or two selected domains at high power.
+
+\item \textbf{A general trace-presence threshold in the corpus
+validator.} The current exclusion policy is a curated list of ten model
+names. A failure branch on the trace-presence check at, say, $0.90$
+turns it into a threshold that generalises to models nobody has
+inspected. It is a one-line change and it makes the limitation of
+Section~\ref{subsec:disc-external-validity} actionable rather than
+merely honest.
+
+\item \textbf{A Davidson tie model.} Section~\ref{sec:res-tie-policy}
+shows that the choice between half-weighting and dropping ties is not
+neutral on this pipeline. Fitting tie propensity as a parameter
+replaces a convention that currently changes conclusions with an
+estimate that can be reported with an interval.
+
+\item \textbf{A direct estimate of judge memorisation}, by verdict
+consistency under paraphrased questions or by a probe set published
+after the judge model's training cutoff. The answer-key-blind protocol
+cannot defend against contamination that sits in the judge's weights.
+
+\item \textbf{Exposing the routing component as a deployable service.}
+This thesis builds the substrate a router would consume and does not
+deploy one; the routing rule exists and is exercised read-only during
+each arena run.
+
+\end{enumerate}
