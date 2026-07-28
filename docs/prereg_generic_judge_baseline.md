@@ -363,3 +363,39 @@ here.
 Stage 0(b) first. The stem-only probe may show the ceiling is low enough that the whole
 condition is worth less than it looks, and it costs 241 calls against a condition that
 costs thousands.
+
+## What must be preserved — and what must not be copied
+
+**The corpus is NOT backed up for this condition, deliberately.** The strip happens at
+prompt assembly, so `model_output` is never written. MAIN and NO_KEY read identical
+rows and the manipulation exists only as a string passed to the LLM call. That is the
+reason for stripping there rather than at ingest: one corpus, one frozen artifact,
+conditions differing only in prompt construction. A corpus copy would preserve the
+INPUT, not the manipulation, and would answer nothing.
+
+**What must be preserved is per-verdict, not per-corpus.** Each NO_KEY verdict row must
+carry:
+
+- `strip_residual` — did the stripped trace STILL name an answer, after stripping?
+- optionally a hash of the stripped text actually sent
+
+Without this, a surprising NO_KEY result cannot be attributed: there is no way to tell
+whether the strip worked *on those specific comparisons*. The corpus would not answer
+it either, since it holds the unstripped text.
+
+**Two things that DO warrant a backup, neither of them the traces:**
+
+1. `ratings.db` — `node_bt_states`, `node_pair_stats` and `match_history` accumulate
+   across runs, and NO_KEY adds rows under a new condition suffix. A wrong condition tag
+   would contaminate the law baseline. Snapshot before the run, same discipline as
+   `mmlu_pro_dataset_cache_v2.db.bak-before-trace-backfill`.
+2. **The law `MAIN_verdicts.csv` export.** It is the baseline NO_KEY is measured
+   against, and it is written once at end-of-condition rather than incrementally, so a
+   later crash or overwrite in the same output directory loses it. Copy it out of the
+   run directory as soon as law lands.
+
+**If the strip were ever moved to ingest** — it should not be — it must write a NEW
+column (`model_output_stripped`), never overwrite. The `generated_text` backfill is the
+precedent for in-place modification with a sha256 fingerprint over every other column,
+and that was justified because it was a REPAIR. A manipulation is different: both
+versions must stay queryable side by side.
