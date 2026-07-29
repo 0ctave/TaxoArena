@@ -18,10 +18,11 @@ that the results of Chapter~\ref{ch:results} are read against a
 standard the reader already holds.
 
 The ordering is deliberate. The partition is an instrument; the
-question is what the arena measures with it. The construction receives
-three pages here and eighteen in the appendix, in that proportion, for
-the measured reason of Section~\ref{sec:res-granularity}: its tuning
-has no measured evaluative consequence.
+question is what the arena measures with it. The main text therefore
+carries only what the arena depends on and the appendix carries the
+formalism, for the measured reason of
+Section~\ref{sec:res-granularity}: the construction's tuning has no
+measured evaluative consequence.
 
 \section{What a Good Partition Needs}\label{sec:arch-requirements}
 
@@ -41,15 +42,18 @@ reliability is not dominated by sampling noise.
 \item[R3 --- Stability.] The same corpus must yield the same cells, and
 the construction must reach a state that one further application of its
 own operator would not change.
-\item[R4 --- Verifiability.] What the construction guarantees, and what
-it does not, must be stated in advance of any result that depends on
-it.
+\item[R4 --- Verifiability.] The construction's guarantees and its
+non-guarantees must be enumerable, and fixed before any result depends
+on them.
 \end{description}
 
 \subsection{How the Requirements Are Met}\label{sec:arch-taxonomy}
 
 The construction is one paragraph in the main text.
 The 14 MMLU-Pro domain labels seed 14 immutable top-level anchor nodes.
+They are held immutable so that every induced cell stays nested under
+one MMLU-Pro top-level domain, which is what allows a per-domain result
+to be set against MMLU-Pro's own published category scores.
 Every corpus query is embedded, and a fixed 256-dimensional prefix
 slice of the embedding is $\ell_2$-normalised to the unit hypersphere
 and used at every depth. Queries then migrate by embedding geometry, so
@@ -57,8 +61,12 @@ a query labelled Mathematics may come to sit under a different anchor;
 this is what makes the induced (\textit{adapted}) partition differ from
 the editorial (\textit{canonical}) one.
 Each anchor is recursively split under a chance-corrected separation
-score $J$, computed against random relabelling into the same size
-profile. A split is accepted only when every child pair clears a
+score $J$. $J$ measures how much better the observed split separates
+the queries than chance separates them, where chance is the same
+queries randomly relabelled into clusters of the same sizes, so a high
+$J$ cannot be produced by the cell-size structure alone; the formal
+definition is in Appendix~\ref{app:dag-formalism}.
+A split is accepted only when every child pair clears a
 separation bar of $0.025$ \emph{and} the improvement in $J$ exceeds
 twice its own paired bootstrap standard error. Two coarsening moves
 --- absorption of below-floor children and merging of insufficiently
@@ -74,6 +82,10 @@ in this thesis is attributed to --- is a tree of 154 nodes with 87
 labelled, rubric-carrying leaves; its full statistics, the fixed-point
 certificate, and the evidence per requirement are reported once, with
 the results (Section~\ref{sec:res-construction}).
+The fixed-point certificate is the check that one further application
+of the construction operator to the frozen artifact would change
+nothing about it: no accepted edit, no query moved between cells, and
+no node parameter moved beyond tolerance.
 
 \subsection{Where the Evidence Is}\label{sec:arch-evidence-pointer}
 
@@ -99,15 +111,17 @@ collected as limitations afterwards.
 
 \begin{enumerate}
 \item \textbf{``Chance-corrected'' means corrected against relabelling,
-not against anisotropy.} $J$ compares an observed partition against
-random relabelling into the same size profile. A cut taken through a
-node's own elongation --- splitting one elongated cluster into two
-halves of itself --- is not excluded by that correction, because it
-also beats a random relabelling. A subset of accepted splits cannot be
-distinguished from such a cut on the evidence
-$J$ provides. The counts that quantified this exposure --- how many
-accepted splits are affected, and what share of leaf-held queries sit
-under at least one such ancestor --- are \textsc{void as to values}
+not against anisotropy.} What $J$ corrects for is how well a split of
+the same size profile would separate the queries if its labels had been
+assigned at random. One failure survives that correction. Consider a
+node whose queries form a single elongated cluster, cut in half across
+its own long axis. The two halves are one topic, but they sit far
+enough apart to beat a random relabelling, so $J$ scores the cut as a
+real split. A subset of accepted splits therefore cannot be
+distinguished from such a cut on the evidence $J$ provides. The counts
+that quantified this exposure --- how many accepted splits are
+affected, and what share of leaf-held queries sit under at least one
+such ancestor --- are \textsc{void as to values}
 (marker defined in Section~\ref{sec:res-construction})
 and are not restated here.
 
@@ -115,14 +129,25 @@ and are not restated here.
 the routed partition at split time. Populations drift as later
 iterations re-route queries, so about one leaf in a hundred ends
 marginally below it --- 1 of 87 in this artifact, with two further
-consistent instances at other settings. Any statement of the form
+consistent instances at other settings. The below-floor leaf is visible
+at the left edge of the leaf-size distribution
+(Figure~\ref{fig:leaf-size-hist}). Any statement of the form
 ``every leaf holds at least \texttt{minClusterSize} queries'' is false
 as written. This is a property of the mechanism, not a defect.
 
-\item \textbf{The certificate tests period 1 only.} It asks whether one
-further application of the operator changes anything. An oscillation at
-tolerance scale --- a two-cycle --- would report
-\texttt{CERTIFIED: false} indefinitely and would not be distinguished
+\item \textbf{Termination uses a five-iteration stability window; the
+certificate tests period 1 only.} The loop stops when the node and edge
+sets have been unchanged for five consecutive iterations, or when the
+objective has moved by less than the tolerance for five consecutive
+iterations; a single quiet iteration does not end a run. The structural
+window excludes oscillations of any period that add or remove a node or
+an edge, since one such iteration resets the count. The objective
+window does not, and it is the weaker of the two: a structure that
+alternates by one node while $J$ sits inside the tolerance satisfies
+it. The certificate is a separate check on the frozen artifact and asks
+only whether one further application of the operator changes anything,
+so an oscillation large enough to move $J$ reports
+\texttt{CERTIFIED: false} indefinitely and is not distinguished
 from divergence. A period-$p$ certificate is not implemented.
 \end{enumerate}
 
