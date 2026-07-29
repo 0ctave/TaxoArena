@@ -399,3 +399,23 @@ column (`model_output_stripped`), never overwrite. The `generated_text` backfill
 precedent for in-place modification with a sha256 fingerprint over every other column,
 and that was justified because it was a REPAIR. A manipulation is different: both
 versions must stay queryable side by side.
+
+---
+
+# Addendum 2 (2026-07-29, before either run): psychology and engineering
+
+Registered BEFORE launch, after Math/law/philosophy/history completed. The
+screen-predicts-arena pattern currently rests on one null point (Math). These
+two runs make it a paired test on fresh domains:
+
+- **Psychology** (238 reserved) — reorders under BOTH roster policies
+  (p = 0.001 per-domain / p = 0.000 band). **Prediction: MAIN > C5 in
+  direction under both tie conventions**, magnitude >= 0.007 under at least one.
+- **Engineering** (267 reserved) — does NOT reorder under either policy
+  (p = 0.962 / 0.706). **Prediction: no difference — |d rho| < 0.007 or
+  inconsistent sign across conventions.** A per-leaf advantage here would
+  indicate an artifact, exactly as the Math null clause stated.
+
+Same design as Runs C-E: 12-model roster, both arms on shared questions,
+bootstrap floor, per-(leaf,pair) shuffle, confidenceGate disabled, isolated DBs,
+threshold 0.007, both tie conventions reported.
