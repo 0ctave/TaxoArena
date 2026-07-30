@@ -419,3 +419,74 @@ two runs make it a paired test on fresh domains:
 Same design as Runs C-E: 12-model roster, both arms on shared questions,
 bootstrap floor, per-(leaf,pair) shuffle, confidenceGate disabled, isolated DBs,
 threshold 0.007, both tie conventions reported.
+
+---
+
+# Addendum 3 (2026-07-30, before either run): physics and computer science
+
+Registered BEFORE launch, after math, law, philosophy, history, psychology and
+engineering completed. These two close the two thinnest parts of the record: the
+last untested screen-flagged domain, and a third clean null.
+
+## The screen, recomputed at the roster the arena uses
+
+An earlier generation of the screen ran at an 8-model and then an 11-model band.
+Both are superseded. The classification below is computed at the 12-model Run-B
+roster, which is the roster every paired arena run uses, 2000-draw size-matched
+permutation null, seed 42:
+
+    flagged (p < 0.05)     psychology 0.000, physics 0.004, history 0.009, law 0.011
+    threshold region       business 0.052, philosophy 0.053, health 0.070
+    clear (p > 0.15)       biology 0.173, chemistry 0.173, other 0.242,
+                           economics 0.266, math 0.289, computer science 0.751,
+                           engineering 0.817
+
+Two facts about the existing record that this addendum must state rather than
+smooth over. Philosophy sits at p = 0.053, OUTSIDE the flagged set, and produced
+the largest per-leaf advantage of all six completed domains (+0.049 / +0.042).
+And math, at p = 0.289, was registered as a null arm and instead returned a
+verdict for the partition-free arm. The screen is therefore not a clean predictor
+and is not claimed as one here.
+
+## Physics
+
+546 reserved questions, 12 leaves, median leaf 34. The only untested domain in
+the flagged set, and the only domain besides math with double-digit leaf count.
+
+**Prediction: MAIN > C5 in direction under both tie conventions**, magnitude
+>= 0.007 under at least one. This is the same prediction that held in law,
+philosophy, history and psychology.
+
+Secondary, and registered because physics is the only test available of a
+confound already identified: math has the most leaves (13) and the only leaf
+pairs surviving Bonferroni correction for genuine ranking divergence. Whether
+that reflects finer resolution or simply more pairs tested is not separable in
+this corpus, because cell depth and cell size are confounded. **Physics at 12
+leaves is the nearest comparison. No prediction is registered on it** — the
+observation is recorded so that whatever physics shows cannot be presented
+afterwards as though it had been anticipated.
+
+## Computer science
+
+208 reserved questions, 3 leaves, median leaf 49. The clearest untested null on
+the screen and the cheapest run available.
+
+**Prediction: no difference — |d rho| < 0.007, or inconsistent sign across the
+two tie conventions.** A per-leaf advantage here would indicate an artifact
+rather than a finding, exactly as registered for engineering in Addendum 2.
+
+## Design
+
+Unchanged from Runs C-H: 12-model Run-B roster, both arms on an identical
+question set, mandatory 66-pair bootstrap floor, per-(leaf, pair) query
+shuffling, confidenceGate disabled for both arms, decisive threshold
+|d rho| >= 0.007 (grid 0.0035 at M = 12), both tie conventions reported,
+isolated ranking database per run.
+
+## What these runs cannot settle
+
+Neither is expected to change the central findings. The judge decides on answer
+correctness; the partition does not create evaluative diversity; the per-leaf
+advantage is a rubric-precision effect on a shared ranking rather than
+resolution of sub-domain specialisation. These two runs test the edges of the
+screen's predictive claim, nothing more, and are registered on that basis.
