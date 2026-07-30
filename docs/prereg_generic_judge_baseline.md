@@ -490,3 +490,85 @@ correctness; the partition does not create evaluative diversity; the per-leaf
 advantage is a rubric-precision effect on a shared ranking rather than
 resolution of sub-domain specialisation. These two runs test the edges of the
 screen's predictive claim, nothing more, and are registered on that basis.
+
+---
+
+# Addendum 4 (2026-07-30, before the run): mathematics re-run on a repaired scheduler
+
+Registered BEFORE launch. This addendum exists because the thesis's one failed
+pre-registered prediction is confounded with a scheduler defect that every other
+paired run had fixed, and that was not noticed until after all seven other
+domains had completed.
+
+## The confound
+
+Pair coverage across the paired runs, counting distinct model pairs with at
+least one comparison out of the 66 possible on a 12-model roster:
+
+    math          20 / 66      46 pairs never compared
+    law           66 / 66
+    philosophy    66 / 66
+    history       66 / 66
+    psychology    66 / 66
+    engineering   66 / 66
+    physics       66 / 66
+
+Mathematics ran before commit `5e1be09` (mandatory 66-pair bootstrap floor with
+an in-run coverage assertion) and before `a5c36fd` (per-(leaf, pair) question
+shuffling). Its Bradley-Terry fit therefore rests on a leader-centric star of 20
+pairs, with the top model appearing in 55 percent of all comparisons, while every
+comparison domain has a complete comparison graph.
+
+Both arms of the math run shared that structure, so the PAIRED contrast is not
+invalid. What is not supported is the further step the thesis currently takes:
+attributing math's negative result to a property of the domain, when the estimate
+comes from a graph three times sparser than every domain it is compared against,
+and sparse graphs are where Bradley-Terry estimates are least stable.
+
+## What is being re-run
+
+Mathematics, both arms, identical configuration to Runs C-J: 12-model Run-B
+roster, both arms on an identical question set, mandatory 66-pair bootstrap
+floor, per-(leaf, pair) query shuffling, confidenceGate disabled, decisive
+threshold |d rho| >= 0.007, both tie conventions reported, isolated ranking
+database. The original run is preserved at `ratings_math_paired.db.final` and is
+not overwritten.
+
+## Prediction, fixed before the run
+
+The original registration made math the null arm: NO DIFFERENCE between arms,
+because the screen places math at p = 0.289 at the 12-model roster and its models
+do not reorder. That registration stands unchanged and is what this re-run tests.
+
+**Predicted outcome: |d rho| < 0.007, or inconsistent sign across the two tie
+conventions** -- the same criterion engineering met.
+
+The original run returned -0.064 half-weighted and -0.007 with ties dropped, both
+favouring the partition-free arm, which FAILED that registration.
+
+## How each outcome will be read, fixed in advance
+
+1. **The re-run reproduces a negative beyond threshold.** The failed null is a
+   real property of mathematics and not a scheduler artifact. The confound is
+   eliminated and the finding strengthens, because it now rests on a complete
+   comparison graph.
+2. **The re-run returns a null.** The original failure was an artifact of the
+   sparse comparison graph. The thesis reports BOTH runs, states that the earlier
+   one is superseded on the grounds recorded here, and the six-domain picture
+   becomes four flagged domains positive and two cleared domains null.
+3. **The re-run returns a positive beyond threshold.** Math would join the
+   flagged domains despite the screen clearing it, which contradicts the screen
+   in the opposite direction from philosophy. This would be recorded as a
+   screen failure, not as support for the partition.
+
+Outcome 2 is the one that most simplifies the thesis, which is precisely why the
+reading is fixed here rather than after the numbers exist. Reporting only the
+re-run and discarding the original would be unacceptable under any outcome; both
+appear, with the reason for preferring one stated.
+
+## What this cannot settle
+
+A single re-run at one seed does not separate scheduler effect from run-to-run
+variance. If outcomes 1 and 2 differ only marginally, the honest conclusion is
+that math's result is not stable enough to carry the weight the thesis currently
+places on it, and the failed-null framing should be weakened accordingly.
