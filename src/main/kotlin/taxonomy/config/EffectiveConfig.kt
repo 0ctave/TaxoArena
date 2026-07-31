@@ -45,6 +45,7 @@ data class EffectiveConfig(
         val labelingModel: String = "ministral-3:14b",
         val embeddingModel: String = "qwen3-embedding",
         val maxJudgeGenerality: Int = 1,
+        val judgeOptionMode: String = "OPTIONS",
         val judgeDomains: List<String> = emptyList()
     )
 

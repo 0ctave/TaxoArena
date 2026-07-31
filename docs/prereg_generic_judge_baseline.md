@@ -572,3 +572,228 @@ A single re-run at one seed does not separate scheduler effect from run-to-run
 variance. If outcomes 1 and 2 differ only marginally, the honest conclusion is
 that math's result is not stable enough to carry the weight the thesis currently
 places on it, and the failed-null framing should be weakened accordingly.
+
+---
+
+# Addendum 5 (2026-07-30) — the outcome table, and three things this document had not recorded
+
+**Nothing above is edited.** This addendum is written after seven of the eight paired runs
+have results. It records the outcomes against the predictions already registered, retires one
+registered domain, fixes the status of two domains that were never registered prospectively,
+and bounds the screen.
+
+## The outcome table
+
+`Delta rho` = MAIN - C5. Positive favours the per-leaf arm. Decisive threshold
+`|Delta rho| >= 0.007`, two steps of the 0.0035 Spearman grid at M = 12. Both tie conventions
+reported, always.
+
+| domain | half | drop | screen p | registration | outcome |
+|---|---:|---:|---:|---|---|
+| psychology | +0.0210 | +0.0210 | 0.000 | registered (Add. 2) | met, both conventions |
+| physics | +0.0140 | +0.0140 | 0.004 | registered (Add. 3) | met, both |
+| history | +0.0105 | +0.0105 | 0.009 | replication | met, both |
+| law | +0.000 | +0.021 | 0.011 | registered (body) | met on **drop only** |
+| philosophy | +0.049 | +0.042 | 0.053 | replication | met, both — **and not flagged by the screen** |
+| engineering | +0.0035 | -0.0035 | 0.817 | registered null (Add. 2) | **met**: clean null, sign flips between conventions |
+| mathematics | -0.064 | -0.007 | 0.289 | registered null (body) | **failed**: verdict for C5 |
+| computer science | — | — | 0.751 | registered null (Add. 3) | RUNNING |
+| mathematics re-run | — | — | — | registered (Add. 4) | PENDING |
+
+Secondary outcome, GT-agreement MAIN / C5: psychology 85.2 / 84.3, physics 83.8 / 79.8,
+history 83.3 / 79.4, law 88.0 / 86.2, philosophy **92.9 / 94.2**, engineering 89.0 / 88.5,
+mathematics 94.2 / 94.7.
+
+Philosophy **dissociates** the two outcomes: the largest `Delta rho` in the corpus alongside a
+GT-agreement that favours C5. The registration treats GT-agreement as the high-power secondary
+and `Delta rho` as the low-power primary, so the primary stands — but the dissociation is a
+result in its own right and belongs in the text.
+
+## Retired: chemistry
+
+Chemistry is registered in the body and was never run. It is retired here rather than left
+open, so that the registered set and the run set can be reconciled. No prediction is claimed
+either way.
+
+## Philosophy and history were never registered prospectively
+
+The body and Addenda 2 and 3 register psychology, physics, chemistry, law, engineering,
+mathematics and computer science. **Philosophy and history are not in that set.** They ran
+under the identical protocol and are reported as **replications**, not as registered
+predictions. This document is the reason that distinction is checkable, so it is stated
+explicitly here rather than inferred from the absence of an entry.
+
+## The screen is not a clean predictor, and this document should not be read as claiming it is
+
+Addendum 3 already says the screen is not claimed as a clean predictor. Three measurements now
+bound it, and they are stronger than that sentence:
+
+1. It predicts the **domain aggregate** — whether a domain's own ground-truth ranking departs
+   from the corpus ranking. It does not predict **within-domain sub-structure**. The
+   correlation between screen p and within-domain between-leaf agreement is **+0.072**, which
+   is none.
+2. It has a **false negative that matters**: philosophy, at p = 0.053, was not flagged and
+   produced the largest advantage of any domain.
+3. It has a **failed null**: mathematics, at p = 0.289, returned a verdict for C5.
+
+So the screen is a coarse filter on the domain aggregate. It is not a test of whether cells
+inside a domain differ, and no claim in the thesis may rest on it as one.
+
+## What the body's superseded reasoning was, and why it does not transfer
+
+Two passages in the body reason from a screen value of `rho = 1.000, p = 1.000` for
+mathematics at the 11-model band: that there is "no cell structure for the partition to
+exploit", and that math therefore "has little room to differ in either direction". Addendum 3
+superseded that p-value (0.289 at 12 models) and math moved -0.064. The argument does not
+transfer, and the body's sentence "the math null is what makes a law result attributable to
+the partition" no longer holds as written — Addendum 4 supplies the reason.
+
+The body's honest prior, that the comparison would likely come back null with options present,
+is falsified in five of seven completed domains. It is left in place. Recording a prior that
+did not hold is the point of recording it.
+
+## One bound that must travel with every positive in this table
+
+Per-leaf rankings are near-identical to the domain ranking. On law, leaf-vs-domain Spearman
+runs 0.895 to 0.993, against 0.873 to 0.970 for ground truth against itself — the leaf
+rankings agree with the domain ranking about as well as ground truth agrees with itself. A
+positive `Delta rho` is therefore a **precision gain on one shared ranking**, not discovered
+specialisation. Every positive row above is bounded by this, and the bound is not optional.
+
+## Still open
+
+* The reliability constant is fitted at the 11-model band (`c = 2.52`). The arena roster is
+  12. The refit at 12 has not been run. The body's obligation to refit stands.
+* No confidence interval may be reported anywhere. The Bradley-Terry variance correction used
+  `1/K` instead of `1/K^2`; the intervals were never recomputed.
+
+---
+
+# Correction note (2026-07-30, after physics, during computer science)
+
+Descriptive only. Nothing below changes a prediction, a threshold, or a reading
+rule, and no text above this line has been altered.
+
+## Addendum 3 quoted the wrong leaf counts
+
+Addendum 3 describes physics as "546 reserved questions, 12 leaves, median leaf
+34" and computer science as "208 reserved questions, 3 leaves, median leaf 49".
+Those figures come from `reserved_leaf_assignments.csv` aggregated by assigning
+each leaf to whichever MMLU-Pro category most of its routed questions carry, then
+counting leaves per category. That is a statement about the label composition of
+the tree. It is not the quantity the runs use.
+
+The runs scope a domain by tree structure: a held-out question enters the run when
+the anchor of its primary leaf is the target domain, irrespective of its MMLU-Pro
+label (`TaxonomyBenchmarkService.kt:318-324`). A domain's cells are therefore the
+leaves beneath its depth-1 anchor. Under that definition:
+
+    domain            cells   pool     (Addendum 3 said)
+    math                 11    334     13 leaves
+    physics              10    338     12 leaves, 546 questions
+    psychology            8    258
+    computer science      6    191      3 leaves, 208 questions
+    law                   6    280
+    engineering           4    250
+    history               4    133
+    philosophy            3    167
+
+The structural counts sum to 87 leaves and 3,445 held-out questions, and each one
+was confirmed against the run that used it: every arena scheduled comparisons in
+exactly that many cells.
+
+## What survives and what does not
+
+Both registered predictions turn on the sign and magnitude of `Delta rho`. Neither
+references a leaf count, so both stand unchanged.
+
+The secondary observation registered for physics survives unchanged. It was
+registered as "math has the most leaves (13) ... physics at 12 leaves is the
+nearest comparison". Under the structural count math has 11 and physics 10. Math
+still has the most cells, physics still has the second most, and the gap is one
+cell under either count, so the observation is unaffected. It remains registered
+with no prediction attached.
+
+## A second, undiagnosed disagreement
+
+Reconciling the two counts surfaced a disagreement between two routing
+implementations. The harness that writes `reserved_leaf_assignments.csv` routes
+cached embeddings through `TaxonomyTrickler` and assigns all 3,445 held-out
+questions. Each arena run re-routes live through `routeToLeavesSoft` and discards
+561 as outliers matching no leaf — the same 561 in all eight runs. The remainder
+does not shrink proportionally: physics goes 338 -> 237 while psychology goes
+258 -> 265, so the paths disagree about composition and not only about coverage.
+
+This is recorded as **NOT DIAGNOSED**. It does not touch the paired contrasts,
+which compare two arms over one identical question set drawn by one path. It does
+mean that any offline analysis reading the CSV and any arena run are working over
+slightly different question sets, and analyses that compare the two directly
+should say so.
+
+## Where this is reported
+
+Thesis Section "The Adapted Partition, and How Far It Moves"
+(`6_Results.tex`), with the full fourteen-anchor table, the label-agreement
+measurement, and this correction stated in the text. The registration above is
+left as written.
+
+---
+
+# Addendum 6 (2026-07-31, after every registered run closed) — the batch is closed, and the reported results are not registered
+
+**Nothing above this line is altered.** This addendum closes the two outcomes that
+Addendum 5 left open, and records that the batch the thesis reports is a different
+batch from the one every prediction above was written against.
+
+## The two open outcomes, closed
+
+| domain | half | drop | steps | registration | outcome |
+|---|---:|---:|---:|---|---|
+| computer science | +0.006993 | +0.027972 | +2.00 / +8.00 | registered null (Add. 3) | **FAILED, positive** |
+| mathematics re-run | -0.080561 | -0.101576 | -23.04 / -29.05 | registered (Add. 4) | **FAILED, negative**, on complete domain-level coverage |
+
+`cs_secured/ratings_cs_paired.db.final`, `math_rerun_secured/ratings_math_rerun.db.final`.
+Answer-key agreement: computer science 87.1 / 87.6, mathematics re-run 93.1 / 94.3.
+
+**Two registered predictions failed, not one**, and they failed in opposite directions.
+Addendum 4's reading rule applies to the mathematics re-run: outcome 1, the negative
+reproduces beyond threshold on a complete graph, so the failed null is not a sparse-graph
+artifact and the finding strengthens. Both mathematics runs are reported together, as
+Addendum 4 requires.
+
+## The runs the thesis reports are not covered by anything above
+
+After this batch closed, two scheduler defects were found in it. The bootstrap counted its
+66-pair floor over the whole domain and put every bootstrap match on the largest leaf, so
+one cell per domain reached complete pair coverage and the rest sat at 4 to 33 pairs of 66;
+and three runs had unequal arms, down to 0.833. Both were fixed and five domains were
+re-run. Those five are what the thesis reports:
+
+    philosophy   +14.00 / +14.00      history      +4.00 / +4.00
+    engineering   +3.01 /  +3.01      psychology   +2.00 / +2.00
+    mathematics   -2.00 /   0.00
+
+**No prediction in this document covers any of them.** The registrations were written
+against the M = 12 configuration, and Addendum 4's registered mathematics re-run is
+explicitly at "identical configuration to Runs C-J" — the old scheduler with the
+domain-wide bootstrap floor. That run is `math_rerun_secured`, reported above. The
+revised-scheduler mathematics run is a further run under a configuration nobody
+registered, and it does **not** satisfy Addendum 4.
+
+Two consequences, both of which belong in the thesis text rather than here:
+
+1. Every result the thesis reports as primary is an unregistered replication of a
+   registered batch. It agrees with the registered batch on the sign of `Delta rho` in
+   every domain both cover, and disagrees on magnitude by 1 to 21 grid steps.
+2. **Engineering was the control and it moved.** Its registered null was met cleanly here
+   (+1.00 / -1.00, sign flipping). Under the revised scheduler it is +3.01 under both
+   conventions. Either the revised logic favours the per-leaf arm, or the run that met the
+   null was too broken to detect an effect — arm balance 0.833, one cell at 4 of 66 pairs.
+   The registration's own logic says a positive on the control is the signature of an
+   artifact. Nothing available distinguishes the two readings, and the text must say so.
+
+No pre-registration can be written for the revised configuration yet: the code that
+produced it is uncommitted, so there is no hash to name.
+
+Numbers, provenance and the full caveat list: `docs/newlogic-rerun-record.md`. The
+superseded batch: `docs/batch-M12-complete-record.md`.

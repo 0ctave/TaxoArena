@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import taxonomy.dataset.EvalCatalogEntry
 import taxonomy.tui.controller.TuiEvent
 import taxonomy.tui.controller.TuiReducer
-import taxonomy.tui.state.BenchmarkUiState
 import taxonomy.tui.state.TuiAppState
 
 class EvalCatalogPickerReducerTest {

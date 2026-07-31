@@ -882,8 +882,22 @@ class SeparationNullBySizeTest {
             println("arm B null (n=%d, reach %d/%d): p50=%.5f  p95=%.5f  p99=%.5f".format(
                 java.util.Locale.US, n, reached.size, reps, p50, p95, p99))
             val obsB = partitionFrom(full, 64)?.let { scoreOnSlice(it) } ?: Double.NaN
-            val q = reached.count { it < obsB }.toDouble() / reached.size
-            println("arm B observed = %.5f  ->  q = %.3f in its OWN null".format(java.util.Locale.US, obsB, q))
+            val below = reached.count { it < obsB }
+            val nr = reached.size
+            val q = below.toDouble() / nr
+            // Wilson score interval — correct near q=0/1 where the Wald interval is not.
+            val z = 1.96
+            val den = 1.0 + z * z / nr
+            val centre = (q + z * z / (2.0 * nr)) / den
+            val half = z * sqrt(q * (1 - q) / nr + z * z / (4.0 * nr * nr)) / den
+            println("arm B observed = %.5f  ->  q = %.3f  (%d/%d below)".format(
+                java.util.Locale.US, obsB, q, below, nr))
+            println("  Wilson 95%% CI on q: [%.3f, %.3f]".format(
+                java.util.Locale.US, (centre - half).coerceAtLeast(0.0), (centre + half).coerceAtMost(1.0)))
+            println("  CAVEAT: this null bootstraps the empirical covariance of $n points in $d dims, so its")
+            println("  rank is <= ${n - 1} and every draw lies exactly in the span of the observations. It inherits")
+            println("  the data's own subspace structure and is conservative (biased HIGH). The 256-slice null")
+            println("  is full-rank (256 < ${n - 1}) and the two nulls are NOT directly comparable.")
             println(if (q >= 0.95)
                 "  => the PCA-from-full partition beats what its own search finds on structureless data."
             else
@@ -892,6 +906,231 @@ class SeparationNullBySizeTest {
         println("=".repeat(104))
         println("Read: if B's separation is materially above A's AND above B's own null, the 256-slice")
         println("      was discarding the seam. If B only beats A, the richer search is finding noise.")
+    }
+
+    // ── TASK 1 + 2: disentangle marginalEps from the proposal subspace ───────────
+
+    /** Plain line-collector for the "taxonomy.Statistics" k-selection trace. */
+    private class LineCapture : AppenderBase<ILoggingEvent>() {
+        val lines = java.util.Collections.synchronizedList(mutableListOf<String>())
+        override fun append(e: ILoggingEvent) { e.formattedMessage?.let { lines.add(it) } }
+        fun drain(): List<String> { val c = lines.toList(); lines.clear(); return c }
+    }
+
+    /** Full 4096-d unit vectors for a node's subtree, from embeddings_cache.db. */
+    private fun loadFullVectors(conn: java.sql.Connection, ids: Collection<String>): List<DoubleArray> {
+        val out = mutableListOf<DoubleArray>()
+        ids.chunked(400).forEach { chunk ->
+            conn.prepareStatement(
+                "SELECT e.vector FROM queries q JOIN embeddings e ON e.query = q.distilled_text " +
+                    "WHERE q.id IN (${chunk.joinToString(",") { "?" }})"
+            ).use { st ->
+                chunk.forEachIndexed { i, id -> st.setString(i + 1, id) }
+                val rs = st.executeQuery()
+                while (rs.next()) {
+                    val bytes = rs.getBytes(1) ?: continue
+                    val buf = java.nio.ByteBuffer.wrap(bytes)
+                    val v = DoubleArray(bytes.size / 4) { buf.getFloat().toDouble() }
+                    var nrm = 0.0; for (x in v) nrm += x * x; nrm = sqrt(nrm)
+                    if (nrm > 0) { for (i in v.indices) v[i] /= nrm; out.add(v) }
+                }
+            }
+        }
+        return out
+    }
+
+    private fun sliceOf(full: List<DoubleArray>): List<DoubleArray> = full.map { v ->
+        val s = DoubleArray(256) { v[it] }
+        var nrm = 0.0; for (x in s) nrm += x * x; nrm = sqrt(nrm)
+        if (nrm > 0) for (i in s.indices) s[i] /= nrm
+        s
+    }
+
+    private data class Arm(val k: Int, val sizes: List<Int>, val sep: Double, val trace: List<String>)
+
+    /**
+     * Propose a partition in [proposalSpace] (PCA-reduced to [pcaDim]) and score it on
+     * the FIXED yardstick [yardstick] with chanceCorrectedSeparation.
+     * maxK / marginalEps are exposed so the k-selection rule can be neutralised.
+     */
+    private fun armOn(
+        proposalSpace: List<DoubleArray>,
+        yardstick: List<DoubleArray>,
+        pcaDim: Int,
+        maxK: Int,
+        marginalEps: Double,
+        minClusterFrac: Double,
+        cap: LineCapture
+    ): Arm? {
+        cap.drain()
+        val n = proposalSpace.size
+        val projected = StatisticsUtils.pcaProject(proposalSpace, pcaDim)
+        val mix = runBlocking {
+            StatisticsUtils.performVmfKMeans(
+                embeddings = projected, d = pcaDim, maxK = maxK,
+                minClusterFrac = minClusterFrac, marginalEps = marginalEps
+            )
+        } ?: return null
+        val k = mix.components.size
+        val part = List(k) { mutableListOf<Int>() }
+        for (i in 0 until n) {
+            val r = mix.responsibilities[i]
+            part[r.indices.maxByOrNull { r[it] } ?: 0].add(i)
+        }
+        val sep = StatisticsUtils.chanceCorrectedSeparation(part.map { idx -> idx.map { yardstick[it] } })
+        return Arm(k, part.map { it.size }, sep, cap.drain().filter { it.startsWith("k-Means") })
+    }
+
+    /**
+     * TASK 1 + TASK 2.
+     *
+     * Arm A (256-slice proposal) and arm B (PCA-64-from-full proposal) differ in TWO
+     * ways at once: the subspace they search, and the k that performVmfKMeans ends up
+     * selecting (2 vs 3), because the k increment is gated by marginalEps =
+     * proposalSeparationBar = 0.025. This separates the two: arm A is re-run with the
+     * k-gate neutralised (marginalEps = 0.0, and again forced to k=3), scored on the
+     * same fixed 256-slice yardstick.
+     *
+     * Run over Philosophy AND the five other largest leaves of the frozen tree, chosen
+     * programmatically by subtree query count, so the answer is not a Philosophy
+     * anecdote.
+     */
+    @Test
+    fun `slice vs full seam on the largest leaves - marginalEps disentangled`() {
+        (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
+        val embDb = java.io.File("embeddings_cache.db")
+        org.junit.jupiter.api.Assumptions.assumeTrue(embDb.exists(), "embeddings_cache.db not present")
+        val frozen = System.getProperty("snapshotId") ?: "20260726_200711_Headless_Run_Auto_ge"
+        val loaded = loadGraph(frozen) ?: loadGraph(null)
+        org.junit.jupiter.api.Assumptions.assumeTrue(loaded != null, "no snapshot available")
+        val (snapId, g) = loaded!!
+        val byId = g.nodes.associateBy { it.id }
+
+        // Largest LEAVES by subtree query count, selected programmatically.
+        val leaves = g.nodes.filter { it.childIds.isEmpty() }
+            .map { it to regionQueryIds(it, byId) }
+            .sortedByDescending { it.second.size }
+        val philosophy = leaves.firstOrNull { it.first.label == "Philosophy" }
+        val top = (listOfNotNull(philosophy) + leaves.filter { it.first.label != "Philosophy" }.take(5))
+
+        val config = canonicalConfig(30)
+        val minClusterSize = config.formalism.minClusterSize
+        val eps = config.formalism.proposalSeparationBar
+
+        val statsLog = LoggerFactory.getLogger("taxonomy.Statistics") as ch.qos.logback.classic.Logger
+        val cap = LineCapture()
+        cap.context = statsLog.loggerContext
+        cap.start(); statsLog.level = Level.DEBUG; statsLog.isAdditive = false; statsLog.addAppender(cap)
+
+        println("=".repeat(132))
+        println("SLICE-vs-FULL on the ${top.size} largest leaves — snapshot=$snapId")
+        println("Every sep below is chanceCorrectedSeparation on the SAME 256-slice vectors. Only the PROPOSAL differs.")
+        println("A     = propose from the 256 MRL slice, PCA-64, maxK=4, marginalEps=$eps  (production)")
+        println("A(e0) = same, marginalEps=0.0            — k-gate neutralised, subspace unchanged")
+        println("A(k3) = same, maxK=3, marginalEps=-1e9   — k=3 forced, subspace unchanged")
+        println("B     = propose from PCA-64 of the FULL 4096-dim vectors, maxK=4, marginalEps=$eps")
+        println("B(k3) = same, maxK=3, marginalEps=-1e9")
+        println("=".repeat(132))
+        println("%-40s %5s | %2s %9s | %2s %9s | %2s %9s | %2s %9s | %2s %9s".format(
+            "leaf", "n", "k", "A", "k", "A(e0)", "k", "A(k3)", "k", "B", "k", "B(k3)"))
+
+        val traces = mutableListOf<String>()
+        val ro = org.sqlite.SQLiteConfig().apply { setReadOnly(true) }.toProperties()
+        java.sql.DriverManager.getConnection("jdbc:sqlite:${embDb.absolutePath}", ro).use { conn ->
+            for ((node, ids) in top) {
+                val full = loadFullVectors(conn, ids)
+                if (full.size < 2 * minClusterSize) {
+                    println("%-40s %5d | too few vectors (${full.size})".format(
+                        java.util.Locale.US, (node.label ?: node.id).take(40), ids.size))
+                    continue
+                }
+                val slice = sliceOf(full)
+                val frac = minClusterSize.toDouble() / full.size
+
+                val a = armOn(slice, slice, 64, 4, eps, frac, cap)
+                val a0 = armOn(slice, slice, 64, 4, 0.0, frac, cap)
+                val a3 = armOn(slice, slice, 64, 3, -1e9, frac, cap)
+                val b = armOn(full, slice, 64, 4, eps, frac, cap)
+                val b3 = armOn(full, slice, 64, 3, -1e9, frac, cap)
+
+                fun f(x: Arm?) = if (x == null) " -        -" else "%2d %9.5f".format(java.util.Locale.US, x.k, x.sep)
+                println("%-40s %5d | %s | %s | %s | %s | %s".format(
+                    java.util.Locale.US, (node.label ?: node.id).take(40), full.size,
+                    f(a), f(a0), f(a3), f(b), f(b3)))
+
+                val lbl = (node.label ?: node.id).take(40)
+                traces.add("── $lbl (n=${full.size}) ──")
+                traces.add("  A     sizes=${a?.sizes}  " + (a?.trace ?: emptyList<String>()).joinToString(" | "))
+                traces.add("  A(e0) sizes=${a0?.sizes}  " + (a0?.trace ?: emptyList<String>()).joinToString(" | "))
+                traces.add("  A(k3) sizes=${a3?.sizes}  " + (a3?.trace ?: emptyList<String>()).joinToString(" | "))
+                traces.add("  B     sizes=${b?.sizes}  " + (b?.trace ?: emptyList<String>()).joinToString(" | "))
+                traces.add("  B(k3) sizes=${b3?.sizes}  " + (b3?.trace ?: emptyList<String>()).joinToString(" | "))
+            }
+        }
+        statsLog.detachAppender(cap); cap.stop(); statsLog.isAdditive = true
+
+        println()
+        println("k-SELECTION TRACES (separations inside the trace are in the PCA-64 PROPOSAL space,")
+        println("which is where the marginalEps test is applied — NOT the 256-slice yardstick above).")
+        traces.forEach { println(it) }
+        println("=".repeat(132))
+    }
+
+    /**
+     * VALIDITY CHECK for the table above. The armOn() numbers are the raw
+     * chanceCorrectedSeparation of EM's hard assignment in the PROPOSAL population.
+     * The quantity the production gate compares to the bar is the ROUTED partition's
+     * dasguptaDeltaNorm at childDim=256, after the EM floor, the floor-absorption and
+     * weak-pair coarsening loop, and the min-pairwise gate. If arm A reports 0.05 for a
+     * node that is nevertheless a LEAF in the frozen tree, then it is those later stages
+     * — not the proposal separation — that refused the split, and the arm A/arm B
+     * comparison is about proposal quality only. This drives the real splitSingleNode
+     * on the same six populations to establish which.
+     */
+    @Test
+    fun `why are the largest leaves leaves - real splitter on each`() {
+        (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
+        val embDb = java.io.File("embeddings_cache.db")
+        org.junit.jupiter.api.Assumptions.assumeTrue(embDb.exists(), "embeddings_cache.db not present")
+        val frozen = System.getProperty("snapshotId") ?: "20260726_200711_Headless_Run_Auto_ge"
+        val loaded = loadGraph(frozen) ?: loadGraph(null)
+        org.junit.jupiter.api.Assumptions.assumeTrue(loaded != null, "no snapshot available")
+        val (snapId, g) = loaded!!
+        val byId = g.nodes.associateBy { it.id }
+        val leaves = g.nodes.filter { it.childIds.isEmpty() }
+            .map { it to regionQueryIds(it, byId) }
+            .sortedByDescending { it.second.size }
+        val philosophy = leaves.firstOrNull { it.first.label == "Philosophy" }
+        val top = (listOfNotNull(philosophy) + leaves.filter { it.first.label != "Philosophy" }.take(5))
+
+        val config = canonicalConfig(30)
+        val splitter = TaxonomySplitter(config, NoLlm, MMLUDatasetFetcher(config, ""), TaxonomyFitter(config))
+        val capture = Capture()
+        val splitLog = LoggerFactory.getLogger("taxonomy.Splitter") as ch.qos.logback.classic.Logger
+        capture.context = splitLog.loggerContext
+        capture.start(); splitLog.level = Level.DEBUG; splitLog.isAdditive = false; splitLog.addAppender(capture)
+
+        println("=".repeat(120))
+        println("REAL splitSingleNode on the ${top.size} largest leaves — snapshot=$snapId")
+        println("sepKway = routed dasguptaDeltaNorm at childDim=256 (the gate's own statistic).")
+        println("=".repeat(120))
+        println("%-42s %5s %5s %4s %-18s %9s %9s".format(
+            "leaf", "depth", "n", "emK", "reason", "sepKway", "binding"))
+        val ro = org.sqlite.SQLiteConfig().apply { setReadOnly(true) }.toProperties()
+        java.sql.DriverManager.getConnection("jdbc:sqlite:${embDb.absolutePath}", ro).use { conn ->
+            for ((node, ids) in top) {
+                val vectors = loadVectors(conn, ids)
+                if (vectors.size < 2 * config.formalism.minClusterSize) continue
+                val rep = runBlocking {
+                    runReplicate(splitter, capture, "LEAFCHK_${node.id}", vectors)
+                }
+                println("%-42s %5d %5d %4d %-18s %9.5f %9.5f".format(
+                    java.util.Locale.US, (node.label ?: node.id).take(42), node.depth,
+                    vectors.size, rep.emK, rep.reason, rep.sepKway, rep.sepBinding))
+            }
+        }
+        splitLog.detachAppender(capture); capture.stop(); splitLog.isAdditive = true
+        println("=".repeat(120))
     }
 
     /**

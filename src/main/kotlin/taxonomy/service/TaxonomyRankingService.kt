@@ -652,13 +652,34 @@ data class AggregatedLeaderboard(
         val allStates = leafNodeIds.mapNotNull { getBtState(it, snapshotId) }
         val eligible = allStates.filter { it.totalComparisons >= minComparisons }
         
-        // Identify judge-inconsistent leaf node IDs
-        val inconsistentLeafIds = eligible.filter { state ->
+        // Identify judge-inconsistent leaf node IDs.
+        //
+        // A leaf-level verdict needs leaf-level evidence: the checks are pooled across the
+        // leaf's pairs and the leaf is discarded only if the POOLED agreement rate falls below
+        // chance. Testing individual pairs instead would discard nearly every leaf — with 66
+        // pairs per leaf, at least one pair landing under 50% is close to certain, so any
+        // single-pair criterion empties the eligible set. One weak pair is noise on 66; a leaf
+        // whose pooled agreement is below chance is a leaf whose judge is not tracking the key.
+        val leafAgreement = eligible.associate { state ->
             val pairStats = getNodePairStats(state.nodeId, snapshotId)
-            pairStats.any {
-                it.agreementChecks >= minComparisons && (it.agreementWins.toDouble() / it.agreementChecks) < 0.50
-            }
-        }.map { it.nodeId }.toSet()
+            val checks = pairStats.sumOf { it.agreementChecks }
+            val wins = pairStats.sumOf { it.agreementWins }
+            state.nodeId to (wins to checks)
+        }
+        val inconsistentLeafIds = leafAgreement.filter { (_, wc) ->
+            val (wins, checks) = wc
+            checks >= minComparisons && (wins.toDouble() / checks) < 0.50
+        }.keys
+        if (inconsistentLeafIds.isNotEmpty()) {
+            log.warn(
+                "[ARENA-AGG] dropping ${inconsistentLeafIds.size} of ${eligible.size} leaf/leaves for" +
+                    " pooled judge agreement below 0.50: " +
+                    inconsistentLeafIds.joinToString(", ") { id ->
+                        val (w, c) = leafAgreement[id] ?: (0 to 0)
+                        "$id (${w}/${c})"
+                    }
+            )
+        }
 
         if (eligible.isEmpty()) return AggregatedLeaderboard(
             emptyList(), 0, leafNodeIds.size, 0, false
@@ -670,6 +691,21 @@ data class AggregatedLeaderboard(
         val allEligiblePairs = eligible
             .filter { it.nodeId !in inconsistentLeafIds }
             .flatMap { getNodePairStats(it.nodeId, snapshotId) }
+
+        // Refuse rather than fit nothing. BtMmFitter on an empty pair set returns a zero for every
+        // model — a well-formed, ordinary-looking, completely uninformative board — and callers
+        // then print it, persist it, and feed its unit standard errors to the scheduler's
+        // resolution gate. Returning an explicitly unreliable, EMPTY leaderboard makes the caller
+        // deal with it.
+        if (allEligiblePairs.isEmpty()) {
+            log.error(
+                "[ARENA-AGG] no pooled pair statistics: ${eligible.size} eligible leaf/leaves, of which" +
+                    " ${inconsistentLeafIds.size} were dropped for judge inconsistency. Returning an" +
+                    " empty leaderboard rather than a fit over zero comparisons."
+            )
+            return AggregatedLeaderboard(emptyList(), eligible.size, leafNodeIds.size, 0, false)
+        }
+
         val pooledStatsMap = mutableMapOf<String, NodePairStats>()
         
         for (ps in allEligiblePairs) {
@@ -707,7 +743,8 @@ data class AggregatedLeaderboard(
             models = allModels,
             pairStats = pooledStatsMap.values.toList(),
             maxIter = 200,
-            tol = 1e-6
+            tol = 1e-6,
+            context = "pooled/${eligible.size - inconsistentLeafIds.size}leaves"
         )
 
         // ── Gauge / coverage diagnostic ──────────────────────────────────────────
@@ -761,141 +798,69 @@ data class AggregatedLeaderboard(
             }
         }
 
-        // 2. Query-Level Bootstrap for Confidence Intervals (exclude matches from inconsistent domains)
-        val matches = getMatchRecords(snapshotId).filter { it.domain !in inconsistentLeafIds }
-        val matchesByQuery = matches.groupBy { it.queryId }
-        val queryIds = matchesByQuery.keys.filter { it >= 0 } // exclude invalid parsed query IDs
-        
-        val numIterations = 50
-        val bootstrapRanks = allModels.associateWith { DoubleArray(numIterations) }
-        val rng = java.util.Random(42) // frozen seed for reproducibility
-
-        if (queryIds.isNotEmpty()) {
-            for (iter in 0 until numIterations) {
-                val sampledQueryIds = List(queryIds.size) { queryIds[rng.nextInt(queryIds.size)] }
-                val tempPairStats = mutableMapOf<String, NodePairStats>()
-                
-                for (qId in sampledQueryIds) {
-                    val qMatches = matchesByQuery[qId] ?: continue
-                    for (m in qMatches) {
-                        val mA = minOf(m.modelA, m.modelB)
-                        val mB = maxOf(m.modelA, m.modelB)
-                        val key = "${mA}|${mB}"
-                        val isFlipped = m.modelA != mA
-                        
-                        val isTie = m.isTie
-                        val isWinA = !isTie && m.winner == mA
-                        val isWinB = !isTie && m.winner == mB
-                        
-                        // Laplace prior: add a tiny epsilon to wins to ensure connected graph
-                        val addWinsA = (if (isTie) 0.5 else if (isWinA) 1.0 else 0.0) + 1e-4
-                        val addWinsB = (if (isTie) 0.5 else if (isWinB) 1.0 else 0.0) + 1e-4
-                        
-                        val existing = tempPairStats[key]
-                        if (existing == null) {
-                            tempPairStats[key] = NodePairStats(
-                                nodeId = "bootstrap",
-                                modelA = mA,
-                                modelB = mB,
-                                winsA = addWinsA,
-                                winsB = addWinsB,
-                                ties = if (isTie) 1.0 else 0.0,
-                                totalComparisons = 1.0
-                            )
-                        } else {
-                            tempPairStats[key] = existing.copy(
-                                winsA = existing.winsA + addWinsA,
-                                winsB = existing.winsB + addWinsB,
-                                ties = existing.ties + (if (isTie) 1.0 else 0.0),
-                                totalComparisons = existing.totalComparisons + 1.0
-                            )
-                        }
-                    }
-                }
-                
-                val fit = BtMmFitter.fit(
-                    models = allModels,
-                    pairStats = tempPairStats.values.toList(),
-                    maxIter = 100,
-                    tol = 1e-4
-                )
-                val mean = fit.values.average()
-                for (model in allModels) {
-                    bootstrapRanks[model]!![iter] = (fit[model] ?: 0.0) - mean
-                }
-            }
-        }
-
-        val rawBootstrapSEs = allModels.associateWith { model ->
-            if (queryIds.isEmpty()) 1.0 else {
-                val scores = bootstrapRanks[model]!!
-                val avg = scores.average()
-                val variance = scores.sumOf { (it - avg) * (it - avg) } / (numIterations - 1)
-                kotlin.math.sqrt(variance).coerceIn(1e-3, 10.0)
-            }
-        }
-
-        // ── Arithmetic floor on the aggregate SE ────────────────────────────────
-        // The bootstrap above never touches the per-leaf SEs: it resamples query ids
-        // and refits BT, so it reports the spread of the POINT ESTIMATE across
-        // resamples. Under complete separation — one model winning every comparison
-        // in a leaf, which is the regime the arena drives itself into — every resample
-        // reproduces the same win pattern, the refits coincide, and that spread
-        // collapses toward zero. The per-leaf Fisher SEs blow up in exactly the same
-        // regime, so the two estimators fail in opposite directions and the aggregate
-        // comes out implausibly precise. Observed: leaf SEs 3.35–6.67 aggregating to
-        // 0.126–0.263, a 25x shrinkage.
+        // 2. Aggregate standard errors: inverse-variance combination of the per-leaf
+        //    Fisher SEs,
         //
-        // The bound ENFORCED below is the inverse-variance one itself:
         //     SE_ivw = 1 / sqrt(sum_i 1/SE_i^2)
-        // No weighting of independent estimates can do better than inverse-variance weighting,
-        // so SE_ivw is the tightest valid floor. (It implies the looser, more quotable
-        // min_i(SE_i)/sqrt(k), since sum_i 1/SE_i^2 <= k/min_i(SE_i)^2 — but that slacker bound
-        // is not what the check uses, so do not read it as the rule here.)
         //
-        // Leaves share queries through multi-membership, so the leaf estimates are NOT
-        // independent and the true SE is larger than SE_ivw. That makes the floor conservative
-        // in the right direction and any violation of it arithmetic rather than modelling.
+        // A query-resampling bootstrap is NOT usable here: under complete separation (one
+        // model winning every comparison in a leaf — the regime the scheduler actively
+        // drives the arena into) every resample reproduces the same win pattern and the
+        // spread collapses to its clamp, going silent precisely when the variance matters.
+        //
+        // No weighting of independent estimates beats inverse-variance weighting, so this
+        // is the tightest defensible combination of the per-leaf SEs. Two caveats travel
+        // with it and must not be dropped:
+        //
+        //   1. Leaves share queries through multi-membership, so the per-leaf estimates are
+        //      NOT independent and the true aggregate SE is LARGER than this. SE_ivw is a
+        //      lower bound, not an unbiased estimate.
+        //   2. The per-leaf Fisher SEs it is built from come from a Jeffreys-penalised fit
+        //      (BtMmFitter, Beta(0.5,0.5) at strength 0.5 on pairs with real data), so they
+        //      are finite under separation — but the [ARENA-BT] diagnostics still flag when
+        //      the underlying fit is poorly identified.
+        //
+        // Both reasons are why no Bradley-Terry interval derived from this is reported in
+        // the thesis. The value exists because the scheduler's global stopping gate reads
+        // it (gap > 2.5*sigma), and an understated sigma retires pairs on too little
+        // evidence across EVERY leaf. Getting it right matters for what gets sampled, not
+        // for what gets quoted.
         val leafSEs = allModels.associateWith { model ->
             eligible.filter { it.nodeId !in inconsistentLeafIds }
                 .mapNotNull { it.stdErrors[model] }
                 .filter { it.isFinite() && it > 0.0 && it < Double.MAX_VALUE }
         }
-        val ivwSEs = allModels.associateWith { model ->
+        val modelsWithoutLeafSEs = allModels.filter { leafSEs[it].orEmpty().isEmpty() }
+        val aggregateSEs = allModels.associateWith { model ->
             val ses = leafSEs[model].orEmpty()
-            if (ses.isEmpty()) null
-            else 1.0 / kotlin.math.sqrt(ses.sumOf { 1.0 / (it * it) })
+            // No usable per-leaf SE means no evidence about this model's precision. Fall
+            // back to 1.0, which is wide on the log-strength scale and so fails safe: the
+            // scheduler's gate will not retire the model's pairs early.
+            if (ses.isEmpty()) 1.0
+            else (1.0 / kotlin.math.sqrt(ses.sumOf { 1.0 / (it * it) })).coerceIn(1e-3, 10.0)
         }
-        val violations = allModels.filter { model ->
-            val ses = leafSEs[model].orEmpty()
-            val ivw = ivwSEs[model]
-            ses.isNotEmpty() && ivw != null && (rawBootstrapSEs[model] ?: 0.0) < ivw * 0.99
-        }
-
-        val bootstrapSEs = if (violations.isEmpty()) rawBootstrapSEs else {
-            val worst = violations.maxByOrNull { (ivwSEs[it] ?: 0.0) / (rawBootstrapSEs[it] ?: 1.0) }
-            val ivw = ivwSEs[worst] ?: 0.0
-            val boot = rawBootstrapSEs[worst] ?: 0.0
-            val ses = leafSEs[worst].orEmpty()
-            log.error(
-                "[ARENA-SE] aggregate SE is below the inverse-variance floor for" +
-                    " ${violations.size}/${allModels.size} model(s) — the query bootstrap has" +
-                    " collapsed and its SEs are NOT usable. Worst: '$worst' bootstrap=" +
-                    "${"%.4f".format(java.util.Locale.US, boot)} vs inverse-variance=" +
-                    "${"%.4f".format(java.util.Locale.US, ivw)} (${"%.1f".format(java.util.Locale.US, ivw / boot.coerceAtLeast(1e-9))}x)" +
-                    " from k=${ses.size} leaf SEs in [${"%.3f".format(java.util.Locale.US, ses.min())}," +
-                    " ${"%.3f".format(java.util.Locale.US, ses.max())}]." +
-                    " Substituting the inverse-variance SE and marking the leaderboard unreliable."
+        if (modelsWithoutLeafSEs.isNotEmpty()) {
+            log.warn(
+                "[ARENA-SE] ${modelsWithoutLeafSEs.size}/${allModels.size} model(s) have no" +
+                    " usable per-leaf standard error and fall back to SE = 1.0:" +
+                    " ${modelsWithoutLeafSEs.joinToString(", ")}"
             )
-            // Both actions, and not belt-and-braces. The substituted SE_ivw is built from the
-            // per-leaf Fisher SEs, and under separation those are themselves untrustworthy — the
-            // [ARENA-BT] diagnostics say so at the point they are computed. So SE_ivw is only a
-            // defensible LOWER BOUND, not a usable estimate: it replaces a number that is
-            // arithmetically impossible with one that is merely unreliable. isReliable = false is
-            // what keeps that distinction from being lost the moment the value reaches a table.
-            allModels.associateWith { model ->
-                val ivwM = ivwSEs[model]
-                if (model in violations && ivwM != null) ivwM else (rawBootstrapSEs[model] ?: 1.0)
+        }
+        run {
+            val summary = allModels.mapNotNull { m ->
+                val ses = leafSEs[m].orEmpty()
+                if (ses.isEmpty()) null else Triple(m, ses.size, aggregateSEs[m] ?: 1.0)
+            }
+            if (summary.isNotEmpty()) {
+                val worst = summary.maxByOrNull { it.third }!!
+                log.info(
+                    "[ARENA-SE] inverse-variance aggregate SEs over k leaf fits:" +
+                        " median k=${summary.map { it.second }.sorted()[summary.size / 2]}," +
+                        " SE range [${"%.4f".format(java.util.Locale.US, summary.minOf { it.third })}," +
+                        " ${"%.4f".format(java.util.Locale.US, worst.third)}]," +
+                        " widest='${worst.first}'. Lower bound: leaves share queries, so the" +
+                        " true aggregate SE is larger."
+                )
             }
         }
 
@@ -903,7 +868,7 @@ data class AggregatedLeaderboard(
         val globalMean = globalScores.values.average()
         val ranks = allModels.map { model ->
             val score = (globalScores[model] ?: 0.0) - globalMean
-            val se = bootstrapSEs[model] ?: 1.0
+            val se = aggregateSEs[model] ?: 1.0
             ModelRank(
                 modelId = model,
                 btScore = score,
@@ -924,9 +889,14 @@ data class AggregatedLeaderboard(
             leafsEligible = eligible.size,
             leafsTotal = leafNodeIds.size,
             totalComparisons = eligible.sumOf { it.totalComparisons },
-            // A collapsed bootstrap makes the intervals meaningless even at full leaf
-            // coverage, so an SE-floor violation is disqualifying on its own.
-            isReliable = coverage >= 0.30 && violations.isEmpty()
+            // Leaf coverage is now the only disqualifier. The old second condition was
+            // "no SE-floor violation", which the query bootstrap violated on essentially
+            // every run — so this flag reported the bootstrap's failure rather than
+            // anything about the leaderboard. With that estimator gone the condition has
+            // no referent. What remains true, and is NOT encoded here, is that SE_ivw is a
+            // lower bound on the aggregate SE (leaves share queries); isReliable = true
+            // means the leaf coverage is adequate, never that the intervals are publishable.
+            isReliable = coverage >= 0.30 && modelsWithoutLeafSEs.isEmpty()
         )
     }
 

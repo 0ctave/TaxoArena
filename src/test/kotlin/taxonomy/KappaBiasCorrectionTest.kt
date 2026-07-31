@@ -16,7 +16,6 @@ import taxonomy.service.BtMmFitter
 import taxonomy.service.BtStoppingPolicy
 import taxonomy.utils.StatisticsUtils
 import taxonomy.dataset.ModelEvalResult
-import kotlin.math.abs
 
 /**
  * Formula verification test suite covering:

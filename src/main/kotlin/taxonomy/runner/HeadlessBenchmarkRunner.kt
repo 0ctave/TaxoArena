@@ -87,7 +87,9 @@ data class HeadlessCliConfig(
     val enableGtWarmStart: Boolean? = null,
     val maxLeafAssignments: Int? = null,
     val dagMode: String? = null,
-    val enableProfiling: Boolean? = null
+    val enableProfiling: Boolean? = null,
+    val judgeSeesOptions: Boolean? = null,
+    val judgeOptionMode: String? = null
 )
 
 @Component
@@ -174,11 +176,10 @@ class HeadlessBenchmarkRunner(
             config.dataset.datasetType = taxonomy.config.DatasetType.valueOf(it.uppercase())
         }
 
-        // NOTE: the three enable* flags are NOT applied here. They used to be, and the
-        // assignments were dead — dagMode's setter rewrites all three as a block and is
-        // applied below, so anything set here was overwritten a few lines later before
-        // being re-applied after dagMode. Two copies, only the second of which had any
-        // effect. The live ones are below, deliberately ordered after dagMode.
+        // NOTE: the three enable* flags (stable ids / residual routing / residual split
+        // gate) are deliberately NOT applied here: dagMode's setter rewrites all three
+        // as a block, so they must be applied only after dagMode, below. Assigning them
+        // here as well would be dead code that a later reordering could silently revive.
         cliConfig.fusionSimilarityThreshold?.let { config.formalism.fusionSimilarityThreshold = it }
         cliConfig.effectiveSupportFloor?.let { config.formalism.effectiveSupportFloor = it }
         cliConfig.enableGtWarmStart?.let { config.formalism.enableGtWarmStart = it }
@@ -196,6 +197,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.enableStableQuestionIds?.let { config.formalism.enableStableQuestionIds = it }
         cliConfig.numIterations?.let { config.execution.numIterations = it }
         cliConfig.enableProfiling?.let { config.diagnostics.enableProfiling = it }
+        cliConfig.judgeSeesOptions?.let { config.llm.judgeSeesOptions = it }
+        cliConfig.judgeOptionMode?.let { config.llm.judgeOptionMode = it.trim().uppercase() }
 
         val targetDomains = if (cliConfig.domains.isNotEmpty()) cliConfig.domains else (cliConfig.category?.let { listOf(it) } ?: emptyList())
         if (targetDomains.isNotEmpty()) {
@@ -1368,6 +1371,8 @@ class HeadlessBenchmarkRunner(
         var defaultKappaPrior: Double? = null
         var runBaselines = true
         var enableProfiling: Boolean? = null
+        var judgeSeesOptions: Boolean? = null
+        var judgeOptionMode: String? = null
 
         val lines = mutableListOf<String>()
         var inArray = false
@@ -1447,6 +1452,18 @@ class HeadlessBenchmarkRunner(
                     config.diagnostics.enableProfiling = rawVal.toBoolean()
                     enableProfiling = rawVal.toBoolean()
                 }
+                "judgeSeesOptions" -> {
+                    config.llm.judgeSeesOptions = rawVal.toBoolean()
+                    judgeSeesOptions = rawVal.toBoolean()
+                }
+                "judgeOptionMode" -> {
+                    val m = rawVal.trim().trim('"').uppercase()
+                    require(m in setOf("OPTIONS", "RESOLVED", "BLIND")) {
+                        "judgeOptionMode must be OPTIONS, RESOLVED or BLIND (got '$rawVal')"
+                    }
+                    config.llm.judgeOptionMode = m
+                    judgeOptionMode = m
+                }
                 "fusionSimilarityThreshold" -> fusionSimilarityThreshold = rawVal.toDouble()
                 "effectiveSupportFloor" -> effectiveSupportFloor = rawVal.toDouble()
                 "enableGtWarmStart" -> enableGtWarmStart = rawVal.toBoolean()
@@ -1504,7 +1521,9 @@ class HeadlessBenchmarkRunner(
             dagMode = dagMode,
             numIterations = numIterations,
             runBaselines = runBaselines,
-            enableProfiling = enableProfiling
+            enableProfiling = enableProfiling,
+            judgeSeesOptions = judgeSeesOptions,
+            judgeOptionMode = judgeOptionMode
         ).also { parsed ->
             // Fail on a silent no-op rather than on a missing log line.
             //
@@ -1619,9 +1638,8 @@ class HeadlessBenchmarkRunner(
 
         val groundTruthMap = mutableMapOf<String, List<String>>()
         // The construction corpus, recovered from the frozen graph so that the global
-        // objective can be reported alongside the quality metrics. J was previously only
-        // ever emitted as a per-iteration [J-TRACK] log line, which made the headline
-        // number of the whole construction impossible to read off a run's artefacts.
+        // objective J can be reported alongside the quality metrics in the run's
+        // artefacts, not only as per-iteration [J-TRACK] log lines.
         val corpusByText = LinkedHashMap<String, Embedding>()
         fun walkGt(n: GraphNode, visited: MutableSet<String> = mutableSetOf()) {
             if (!visited.add(n.id)) return

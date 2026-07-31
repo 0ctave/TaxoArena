@@ -3,7 +3,6 @@ package taxonomy.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import taxonomy.model.Embedding
-import taxonomy.model.GraphNode
 import java.io.Serializable
 import kotlinx.serialization.Serializable as KotlinxSerializable
 
@@ -61,6 +60,45 @@ class TaxonomyConfig {
         var embeddingModel: String = "qwen3-embedding"
         var maxJudgeGenerality: Int = 1 // 0 = only leaves, 1 = leaves + parents, etc.
         var judgeDomains: List<String> = emptyList()
+
+        /**
+         * What the judge is told about the multiple-choice options. One of:
+         *
+         *   OPTIONS   the full lettered candidate set is appended to the question stem.
+         *             The judge can work out which option is correct from the set itself
+         *             and then read off which letter each trace selected -- i.e. it can
+         *             reach a verdict by answer-checking without assessing any reasoning.
+         *
+         *   RESOLVED  no candidate set; instead each trace's OWN selected option is
+         *             resolved from its `pred` letter to the option text and appended to
+         *             that trace. The judge knows what each model concluded but has no
+         *             candidate set to check it against, so correctness has to be derived
+         *             rather than looked up.
+         *
+         *   BLIND     no candidate set and no resolution. Traces are passed verbatim.
+         *
+         * WHY RESOLVED EXISTS. BLIND looked like the clean removal of the answer-checking
+         * shortcut, and it is not. Measured over 2,000 reserved traces: 72% end in "the
+         * answer is (X)" and only 23% carry the option's text anywhere nearby, so under
+         * BLIND roughly half the traces' conclusions are unreadable -- "(C)" against "(F)"
+         * with no referent. A drop in agreement there could be a confused judge rather than
+         * one forced onto the reasoning, and the two are not separable after the fact.
+         *
+         * RESOLVED holds "can the judge tell what each model concluded" fixed and varies
+         * only "can the judge use the candidate set as a crutch", which is the RQ1 question.
+         * OPTIONS vs RESOLVED is therefore the experiment; BLIND is kept because it bounds
+         * the other end of the ladder.
+         *
+         * ANSWER-KEY BLINDNESS IS PRESERVED IN ALL THREE. RESOLVED injects the model's OWN
+         * selection, which is frequently wrong; `gt_answer` is never passed on any path.
+         */
+        var judgeOptionMode: String = "OPTIONS"
+
+        /** Back-compat for configs written before the three-way mode: true -> OPTIONS, false -> BLIND. */
+        var judgeSeesOptions: Boolean
+            get() = judgeOptionMode.equals("OPTIONS", ignoreCase = true)
+            set(v) { judgeOptionMode = if (v) "OPTIONS" else "BLIND" }
+
         var azure: AzureConfig = AzureConfig()
     }
 
@@ -131,9 +169,9 @@ class TaxonomyConfig {
         // Final membership share: after the trickle walk, a query's memberships are
         // normalized over the leaves it actually reached, and a leaf counts as a genuine
         // destination iff it holds at least this fraction of THAT query's own membership.
-        // Self-normalized, so its meaning is invariant to tree depth and fan-out — unlike
-        // the previous absolute product-vs-floor test, which made balanced structure
-        // unreachable below depth 2 and forced dominant-child (wrapper) chains.
+        // Self-normalized, so its meaning is invariant to tree depth and fan-out — an
+        // absolute product-vs-floor test would make balanced structure unreachable below
+        // depth 2 and force dominant-child (wrapper) chains.
         var membershipFloor: Double = 0.10
 
         // Per-level relative beam: a child stays on the beam iff its responsibility is at
@@ -303,6 +341,7 @@ class TaxonomyConfig {
             provider = llm.provider,
             embeddingProvider = llm.embeddingProvider,
             judgeModel = llm.judgeModel,
+            judgeOptionMode = llm.judgeOptionMode,
             labelingModel = llm.labelingModel,
             embeddingModel = llm.embeddingModel,
             maxJudgeGenerality = llm.maxJudgeGenerality,
@@ -345,6 +384,7 @@ class TaxonomyConfig {
         llm.provider = c.llm.provider
         llm.embeddingProvider = c.llm.embeddingProvider
         llm.judgeModel = c.llm.judgeModel
+        llm.judgeOptionMode = c.llm.judgeOptionMode
         llm.labelingModel = c.llm.labelingModel
         llm.embeddingModel = c.llm.embeddingModel
         llm.maxJudgeGenerality = c.llm.maxJudgeGenerality

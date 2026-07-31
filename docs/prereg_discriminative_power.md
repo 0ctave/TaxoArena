@@ -194,3 +194,75 @@ Do not let the flat result be read as "the taxonomy does not help the arena" —
 finding about MMLU-Pro's saturation for a 54-point-spread roster. The reframed question,
 the other two links, and the state of evidence on each are in
 [`reframed-argument.md`](reframed-argument.md).
+
+---
+
+# Addendum (2026-07-30) — two withdrawals, and the null that replaces the closing claim
+
+**Nothing above is edited.** The design and the observed-rho column stand. Three things do
+not.
+
+## 1. The disattenuated column is withdrawn
+
+Every value in it was computed with `r = n/(n+7.66)`. That constant is **3.04x too large**:
+Spearman-Brown was applied after the curve fit rather than to each point before it (x0.499),
+and its dependence on roster size went unnoticed (x0.656). The refit value is **`c = 2.52`**
+at the 11-model band. Derivation and both errors: `measurement-discipline.md`, appendix.
+
+Withdrawn as a consequence: the disattenuated values 0.942 / 1.015 / 1.002 / 1.039, the
+median per-leaf reliability figures 0.842 and 0.745, and the reading that "the disattenuated
+column moves in the opposite direction and clips past 1.0". **The clipping was an artifact of
+the oversized constant, not a property of the data.** At `c = 2.52` the correction is small
+and nothing clips.
+
+Note also that this document uses the one-sided form. **Disattenuation is two-sided** — both
+correlated quantities carry error, so it is `rho_obs / r`, not `rho_obs / sqrt(r)`.
+
+The methodological point survives intact, and is in fact stronger than it was written.
+Pre-registering *observed as primary* was not merely what made the conclusion readable; it is
+the only thing that stood between this analysis and a conclusion drawn from a 3x error.
+
+## 2. The centred-residual quartet is withdrawn as irreproducible
+
+The values -0.119 / -0.024 / -0.024 / -0.024 do not reproduce. This is not a pending
+re-measurement — the script no longer returns them and nobody can say why. The mechanical-null
+table built on them goes with them. See `void-results.md` §3.
+
+**A disambiguation that must travel with this document.** The leaf-level **0.922** reported
+here is measured on each cell's *own constituent queries*. There is a separate, unrelated
+0.922 elsewhere in the project, measured on *re-routed* assignments, and that one is
+irreproducible. They are different quantities that share three digits. Wherever either
+appears, say which it is, or a reader will merge them.
+
+## 3. The closing claim now has direct evidence, and it cuts both ways
+
+The document closes: *"if cell identity contributes nothing beyond global capability ordering,
+then no partition — adapted, canonical or otherwise — improves ranking fidelity on this
+corpus with this roster."*
+
+The premise has since been tested directly, and it holds. A **permutation null** — one that
+builds fake cells by reshuffling the real assignments and asks whether the real cells do
+anything the fake ones do not — finds **no domain with evaluative sub-structure** after
+multiple-testing correction. Several domains are stronger than that: economics p = 1.000,
+health p = 1.000, law p = 0.957, meaning their leaves agree with each other *more* than random
+splits of the same sizes do.
+
+**The first version of that null was wrong**, and in a way this document's own discipline
+would have caught: it sampled pseudo-leaves independently, giving them 11-26% pairwise
+question overlap where real leaves have 1.6-4.9%. Overlapping pseudo-leaves agree for free, so
+the null was inflated. The corrected version matches overlap to the real distribution.
+
+**But the conclusion drawn from the premise is refuted.** Eight paired arena runs compare a
+per-leaf-rubric arm against a partition-free arm on identical question sets. Five of seven
+completed domains meet the registered decisive threshold in favour of the per-leaf arm
+(psychology, physics, history, philosophy under both tie conventions; law under one).
+
+Both facts are true at once, and the reconciliation is the thesis's central bound: per-leaf
+rankings are **near-identical** to the domain ranking (law: leaf-vs-domain rho 0.895-0.993,
+against 0.873-0.970 for ground truth against itself). Partitioning does not find a different
+ranking per cell — this document was right about that. What it buys is a **less noisy estimate
+of the ranking the two arms already share**. A precision gain, not discovered specialisation.
+
+So the closing sentence should read: cell identity contributes nothing to the *ordering*, and
+a partition still improves *fidelity to* that ordering. The inference from the first to the
+second does not go through.

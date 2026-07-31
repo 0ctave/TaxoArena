@@ -186,7 +186,17 @@ object BtMmFitter {
         pairStats: List<NodePairStats>,
         maxIter: Int = DEFAULT_MAX_ITER,
         tol: Double = 1e-6,
-        priorStrength: Double = DEFAULT_PRIOR_STRENGTH
+        priorStrength: Double = DEFAULT_PRIOR_STRENGTH,
+        /**
+         * Who asked for this fit — a node id, "pooled", "validation", and so on.
+         *
+         * Every diagnostic below used to be emitted without it, so a log holding per-leaf fits,
+         * the pooled fit and the validation service's own fits showed interleaved lines that were
+         * indistinguishable from one another. Reading a per-leaf pair count off a validation line
+         * gives a coverage figure that contradicts the database, which is exactly the mistake this
+         * label exists to prevent.
+         */
+        context: String = "unlabelled"
     ): Map<String, Double> {
         if (models.size < 2) return models.associateWith { 0.0 }
 
@@ -272,18 +282,30 @@ object BtMmFitter {
             val livePairs = pairStats.count { it.totalComparisons > 0 }
             val calls = pairStats.sumOf { it.totalComparisons }
             log.info(
-                "[ARENA-IDENT] identified: models=${models.size} pairs_with_data=$livePairs" +
+                "[ARENA-IDENT] [$context] identified: models=${models.size} pairs_with_data=$livePairs" +
                     " of ${models.size * (models.size - 1) / 2} comparisons=$calls"
             )
         }
         if (!ident.identified) {
             // Structural, and not fixable by more sweeps: say so plainly rather than letting a
             // convergence warning imply the budget is the problem.
-            log.warn(
-                "[ARENA-BT] fit is NOT identified — ${ident.describe()}." +
-                    " Bradley-Terry fixes theta only up to a constant per connected component," +
-                    " so these scores are not on one scale and must not be pooled."
-            )
+            //
+            // No participating models at all is a different fault from a split graph: it means the
+            // caller handed over an empty pair set, which is a wiring bug upstream, not a coverage
+            // problem the scheduler can fix by sampling more.
+            if (ident.participating.isEmpty()) {
+                log.error(
+                    "[ARENA-BT] [$context] fit called with NO comparisons at all over" +
+                        " ${models.size} models. This is not a coverage gap — nothing was passed in." +
+                        " The returned scores are all zero and mean nothing."
+                )
+            } else {
+                log.warn(
+                    "[ARENA-BT] [$context] fit is NOT identified — ${ident.describe()}." +
+                        " Bradley-Terry fixes theta only up to a constant per connected component," +
+                        " so these scores are not on one scale and must not be pooled."
+                )
+            }
         } else if (!converged) {
             // Distinguish "needs more sweeps" from "not converging". MM descends monotonically,
             // so a delta within a couple of orders of the tolerance is a stopped-early fit whose
@@ -389,10 +411,10 @@ object BtMmFitter {
                 //     Fc^-1 = F^+ + (1/K)*(1*1^T/K) = F^+ + J/K^2
                 //     =>  F^+ = Fc^-1 - J/K^2,  so the diagonal correction is 1/K^2.
                 //
-                // The previous 1/K over-subtracted by (1/K - 1/K^2) = (K-1)/K^2 from EVERY
-                // variance — 0.109 at K=8, 0.083 at K=12 — which drove most values straight into
-                // the 1e-6 floor and made every reported standard error the floor rather than a
-                // measurement. 12_Appendix_Numerics.tex:137-139 documents the same wrong constant.
+                // Subtracting 1/K instead over-subtracts by (1/K - 1/K^2) = (K-1)/K^2 from
+                // EVERY variance — 0.109 at K=8 — which drives most values straight into the
+                // 1e-6 floor and turns every reported standard error into the floor rather
+                // than a measurement.
                 val v = inv[i][i] - 1.0 / (K.toDouble() * K.toDouble())
                 if (v < 1e-6) floored++
                 variances[i] = v.coerceAtLeast(1e-6)
@@ -405,8 +427,8 @@ object BtMmFitter {
         }
 
         // ── [ARENA-BT] is this standard error meaningful? ───────────────────────
-        // The Jeffreys prior in fit() keeps p away from 0 and 1, so information no longer
-        // collapses to zero outright, but it can still be small on a near-separated pair with a
+        // The Jeffreys prior in fit() keeps p away from 0 and 1, so information cannot
+        // collapse to zero outright, but it can still be small on a near-separated pair with a
         // thin budget. These diagnostics stay because the floor is a bound, not a guarantee: the
         // 0.01 floor at the bottom of this function would otherwise present a number with no
         // information behind it as if it were precise.

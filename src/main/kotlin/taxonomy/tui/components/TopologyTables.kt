@@ -2,7 +2,6 @@ package taxonomy.tui.components
 
 import androidx.compose.runtime.Composable
 import com.jakewharton.mosaic.layout.height
-import com.jakewharton.mosaic.layout.padding
 import com.jakewharton.mosaic.layout.width
 import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.text.SpanStyle

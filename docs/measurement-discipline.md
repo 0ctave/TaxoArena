@@ -183,32 +183,83 @@ warning" into a startup failure.
 
 ---
 
-## Appendix: the reliability constant
+## Appendix: the reliability constant — **corrected 2026-07-30**
 
-`r = n/(n+c)` is Spearman-Brown rearranged, so `c = (1-r1)/r1` and
-`r1 = 1/(1+c)` is the reliability of a **single query** for ranking 8 models.
+> **The published constant was 7.66 and it is wrong.** It is 3.04x too large.
+> Every reliability, and every disattenuation, derived from it is void. The old
+> value and the two errors that produced it are kept below, because the point of
+> this document is that the failure is what makes the rule credible.
 
-Refit on the three measured split-half values: **c = 7.602, r1 = 0.1163**.
+`r = n/(n+c)` is Spearman-Brown rearranged. **Spearman-Brown** is the formula
+that says how a test's reliability grows when you lengthen it, so `c` is the
+number of questions at which a cell's model ranking is half-reliable, and
+`r1 = 1/(1+c)` is the reliability of a **single query**.
 
-| n (held-out/cell) | measured r | predicted | diff |
-|---:|---:|---:|---:|
-| 40.8 | 0.842 | 0.843 | +0.0009 |
-| 51.2 | 0.872 | 0.871 | -0.0013 |
-| 90.2 | 0.922 | 0.922 | +0.0003 |
-| 38.0 | 0.833 | 0.833 | +0.0003 (**out-of-sample**: 87-leaf tree, postdates the fit) |
+### The correct value
 
-Max deviation 0.0013 across all four.
+Refit by `tools/analysis/reliability_constant.py` (400 resamples per point,
+9-point n-sweep, seed 42, reserved pool only):
 
-**Two caveats that must travel with it.**
+| roster | fitted on `r_half` | fitted on `r_full` (correct) |
+|---|---:|---:|
+| 8-model, the one 7.66 came from | 7.70 | 3.84 |
+| 11-model length-matched band | 5.05 | **2.52** |
 
-1. The bootstrap CI on `c` ([7.52, 7.66], 20k resamples of 3 points) measures how
-   tightly three points pin a one-parameter curve — NOT sampling uncertainty in
-   the underlying split-half estimates, which it does not propagate. Quote
-   `r1 ~ 0.116`; do not quote the interval as a confidence interval.
-2. It was fitted on **ground-truth** rankings, noise-free per question. Judge
-   noise adds on top, so arena reliability at n queries will be BELOW this
-   curve. It is a ceiling, not a prediction — the same status as the
-   discriminative-power result.
+**Use `c = 2.52`, `r1 = 0.284`, at the 11-model band.** SSE 0.00007 over the
+nine points.
+
+### The two errors, and why they compound
+
+The script's own comment marks the trap: `pts.append((n, rh))  # fit on r_half:
+matches the original 7.66 method`.
+
+1. **Spearman-Brown applied after the fit, not before it (x0.499).** Each draw
+   splits a cell in half and correlates the two halves, so `r_half` is the
+   reliability of a *half-length* cell. Spearman-Brown up-corrects it to the
+   full cell: `r_full = 2 r_half / (1 + r_half)`. The original fitted the curve
+   to `r_half` and then applied Spearman-Brown to the *result*. The correction
+   belongs on each point before the fit, because `n/(n+c)` is already a
+   full-length curve; applying it afterwards corrects a number that was never
+   half-length.
+2. **Roster dependence, unnoticed (x0.656).** The roster enters twice — the
+   ranking being correlated is over the roster, and the split-half correlation
+   is itself a rank statistic at that `n`. More models make a ranking *easier*
+   to reproduce from half the data, not harder, so `c` falls as the roster
+   grows: 7.70 at 8 models, 5.05 at 11. The predicted direction, stated in the
+   script header before running, was the opposite one. Recording that is the
+   point.
+
+`7.66 x 0.499 x 0.656 = 2.51`. The two errors are independent and multiply.
+
+### What this changed downstream
+
+At a 40-question cell, `r` moves 0.839 -> 0.941. Every disattenuated
+correlation shrinks toward its observed value, and the clipping past 1.0 that
+`prereg_discriminative_power.md` reported (0.942 -> 1.015 -> 1.039) was an
+artifact of the oversized constant, not a property of the data. Rule 2's third
+instance is therefore stronger than it was written: pre-registering *observed as
+primary* did not merely make the conclusion readable, it was the only thing
+standing between the project and a conclusion drawn from a 3x error.
+
+### Three caveats that must travel with it
+
+1. **Disattenuation is two-sided.** Both correlated quantities are measured with
+   error, so the correction is `rho_obs / r`, not `rho_obs / sqrt(r)`. Several
+   earlier documents use the square-root form; they are wrong.
+2. The bootstrap interval on `c` measures how tightly a handful of points pin a
+   one-parameter curve, NOT sampling uncertainty in the underlying split-half
+   estimates, which it does not propagate. Quote the point value. Do not quote
+   any interval as a confidence interval. (This is not only a caveat here: no
+   confidence interval may appear anywhere in the thesis until the
+   Bradley-Terry variance bug is re-run — see `void-results.md`.)
+3. It was fitted on **ground-truth** rankings, noise-free per question. Judge
+   noise adds on top, so arena reliability at `n` queries will be BELOW this
+   curve. It is a ceiling, not a prediction.
+
+**Open.** The arena roster is 12 models; `c = 2.52` is fitted at the 11-model
+band. The refit at 12 has not been run. Given the direction of the roster
+effect, 12 models should give `c` at or slightly below 2.52, so 2.52 is
+conservative for the arena — but that is an argument, not a measurement.
 
 ---
 

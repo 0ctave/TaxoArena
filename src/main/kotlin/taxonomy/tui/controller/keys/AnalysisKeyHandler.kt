@@ -4,7 +4,6 @@ import taxonomy.service.AnalysisMode
 import taxonomy.tui.controller.CommandController
 import taxonomy.tui.controller.TuiEffects
 import taxonomy.tui.controller.TuiEvent
-import taxonomy.tui.state.BenchmarkSection
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.tui.state.BenchmarkSubScreen

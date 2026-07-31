@@ -1,5 +1,26 @@
 # Separation null as a function of node population
 
+> **SCOPE NOTE (2026-07-27), added after commit `c381211`.** Split by section:
+>
+> * **The isotropic table and its reading are current.** They are generated on synthetic
+>   clouds driven through the real `splitSingleNode`, so they measure the splitter's
+>   behaviour on structureless data. The routing-sustainability correction changes which
+>   *real* splits pass, not the shape of the isotropic null.
+> * **The within-node section is VOID as to values.** "The within-node null on every accepted
+>   split", the 50 accepted splits, the q values, the six named marginal splits, the Computer
+>   science worked example and the leaf-lineage exposure table (7 / 25 / 13 leaves; 9.2% /
+>   19.7% / 10.3%) were all computed on the **pre-`c381211`** 88-leaf tree, which is
+>   superseded. **The method survives and is the right method** — including the censoring
+>   control, the reach-first reading, and the anisotropy caveat. Re-derive the numbers on the
+>   frozen mcs=55 artifact ([`frozen-artifact.md`](frozen-artifact.md)). The same applies to
+>   the `docs/data/within_node_null_*.csv` exports and to the lambda1/lambda-bar proxy fitted
+>   against these targets (R^2 0.865, LOO Q^2 0.851 — method survives, values do not).
+> * **The configuration described is not the frozen one.** This sweep was run at
+>   `minClusterSize = 30`; the frozen artifact uses 55, so the grid, the split-eligible
+>   population and the `2*minClusterSize` prefilter all shift. The **bar** it justifies
+>   (`proposalSeparationBar = 0.025`) is unchanged.
+> * See [`void-results.md`](void-results.md) for the full list.
+
 Measured by `gradlew nullBySize` (`SeparationNullBySizeTest`, arm A), which drives the real
 `TaxonomySplitter.splitSingleNode` on structureless clouds rather than reimplementing it.
 Fidelity check in the same suite: replaying the frozen Philosophy node through this driver

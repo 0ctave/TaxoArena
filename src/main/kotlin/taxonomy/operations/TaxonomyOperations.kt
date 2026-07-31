@@ -300,10 +300,10 @@ class TaxonomyOperations(
                         // visible to getAllQueriesInRegion so the residual-split gate can carve
                         // a new child out of coherent residual mass, and the residualQueries
                         // entry keeps the C3 invariant satisfied (internal hard queries are
-                        // legal exactly when they are residual-flagged). The previous version
-                        // recorded only the naked ID — the query lost its weight (mass leaked
-                        // every iteration) and its embedding never entered the region, so the
-                        // residual-split mechanism could never recover it.
+                        // legal exactly when they are residual-flagged). Recording only the
+                        // naked ID would lose the weight (mass leaks every iteration) and
+                        // keep the embedding out of the region, so the residual-split
+                        // mechanism could never recover it.
                         log.debug("Query '${emb.rawText.take(40)}' reached no leaf — retained as residual at ${routeResult.primary.label ?: routeResult.primary.id}")
                         val qId = if (emb.queryId != -1) emb.queryId.toString() else emb.rawText
                         synchronized(routeResult.primary.residualQueries) {
@@ -319,7 +319,7 @@ class TaxonomyOperations(
                             }
                         }
                     } else {
-                        // Residual routing disabled entirely: preserve the old hard-assignment-to-root
+                        // Residual routing disabled entirely: hard-assign to root as the
                         // fallback so mass still lands somewhere.
                         log.debug("Query '${emb.rawText.take(40)}' fell back to root — out-of-distribution?")
                         synchronized(root.queryWeights) {
@@ -426,13 +426,11 @@ class TaxonomyOperations(
         //   weight bits     51/139 constant            kappa bits            1/139
         //   weights @1e-6   52/139 constant            kappa @1e-6           1/139
         //
-        // The previous version folded in `it.value.hashCode()` (raw Double bits of
-        // every membership weight) and `kappaHash = site.vmfKappa` (a raw Double).
-        // Both are re-derived by routing every iteration and neither ever reaches
-        // bit-identity — kappa converges asymptotically, drifting at ~1e-13 forever
-        // (...541 -> ...206 -> ...205 -> ...204). So the fingerprint changed on almost
-        // every site on every iteration and the cache could never hit: zero
-        // [MEMOIZED REJECTION] lines in any run in the repo.
+        // Raw Double bits of the membership weights and of kappa must NOT be folded in:
+        // both are re-derived by routing every iteration and never reach bit-identity —
+        // kappa converges asymptotically, drifting at ~1e-13 forever — so a fingerprint
+        // that includes them changes on almost every site every iteration and the memo
+        // can never hit.
         //
         // Excluding them is sound rather than a tolerance fudge. kappa is FITTED from
         // this node's population and direction, so conditioning on (keys, mu, n)
@@ -442,8 +440,7 @@ class TaxonomyOperations(
         // Both are guarded below rather than trusted.
         // Mixed rather than a plain sum of hashCodes. A plain sum collides whenever a
         // site loses query X and gains query Y with hash(X) == hash(Y) at unchanged n —
-        // and the failure mode is a STALE MEMO silently recorded as REJECTED, which is
-        // the silent-plausible class this codebase keeps having to dig out. The
+        // and the failure mode is a STALE MEMO silently recorded as REJECTED. The
         // multiplier costs nothing and destroys that coincidence.
         //
         // It matters more than it looks: site.vmfMu is STALE during phase 4 (the refit

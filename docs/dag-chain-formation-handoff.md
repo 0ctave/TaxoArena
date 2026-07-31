@@ -1,5 +1,32 @@
 # DAG Chain-Formation Investigation — Handoff Notes
 
+> **STATUS: HISTORICAL (2026-07-23). Retained as archaeology, not as a description of the
+> system.**
+>
+> **The problem this document investigates no longer occurs.** Single-child chains were
+> resolved structurally, and by none of the six attempts below. Two causes were removed:
+> the in-pass macro-decomposition recursion in `splitSingleNode` (which re-split oversized
+> children immediately, before any trickle, collapse or refit could intervene — a direct
+> peeling loop terminated only by `maxDepth`), and the kappa-weighted collapse gate (whose
+> angular tolerance shrank below 0.7 degrees at the kappa these wrappers reach, so it
+> essentially never fired). Upward dissolution of sole children is now a J-gated shrink
+> proposal, and the `SE(dJ) = 0` clause in the acceptance rule exists specifically so that a
+> wrapper dissolution — which moves no query, so `dJ` is exactly 0 — can commit at all.
+> See `dag-construction-mechanisms.md` §8.
+>
+> **What is still valid here:** the six disproven directions (do not retry them), the
+> diagnosis of the kappa-weighted gate's angular tolerance (this is instance (a) of the
+> threshold-reuse defect class, `transferable-findings.md` §3), the reasoning about
+> `kappa0Parent` discontinuity under collapse, the Windows/Git-Bash gotchas, and the
+> `dag_snapshots.jsonl` tooling.
+>
+> **What is stale:** every parameter value (`minClusterSize = 50`, `separationEpsilon =
+> 0.01`, `membershipFloor = 0.10`), the description of the routing gate as a single
+> probability threshold, `separationEpsilon` as a unified constant (it no longer exists),
+> the acceptance criterion (now a paired-bootstrap z-gate), the split gate (now a level bar
+> at 0.025 with k-fallback), and every leaf/node count. Current specification:
+> `dag-logic-and-math.md`.
+
 ## Purpose of this document
 
 This is a handoff for whoever picks up the "deep single-child chain" investigation next.
@@ -396,6 +423,11 @@ govern any new attempt:
    - Metrics unaffected: Dendrogram Purity / Weighted Leaf Purity / Edge F1 / Ancestor
      Correct all still compute as expected (the only "off" metric, `ECE=1.0`, is the
      pre-existing, separately-documented Routing ECE bug, unrelated to this change).
+     *~~Corrected 2026-07-30: that diagnosis was wrong. Routing ECE is implemented, is
+     reached, and the frozen run exported 0.2114. The `ECE=1.0` seen here came from an
+     older implementation. The live defect is `maxOf` leaf-share aggregation at the export
+     sites — see `known-defects.md`. Do not carry the saturated-confidence diagnosis
+     forward.~~*
 
    This closes the *readability* complaint. It does **not** reduce actual node count in
    the persisted DAG or in metrics that operate on the raw tree — see option 2 below if

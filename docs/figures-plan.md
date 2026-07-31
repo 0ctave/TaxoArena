@@ -1,5 +1,8 @@
 # Figures and tables plan — six-chapter thesis
 
+> **STATUS: SUPERSEDED (2026-07-30) by `figures-plan-v2.md`, then by `figures-plan-v3.md`.**
+> The current set is 8 figures (6 main + 2 appendix). Go to v3.
+
 Status: written 2026-07-28 against branch `tree-only`, after the six-chapter restructure
 (`docs/thesis-plan-v2.md`). This plan **supersedes `docs/report-visualization-plan.md`
 (2026-07-23)** in full: that plan predates the restructure and is built around metrics and

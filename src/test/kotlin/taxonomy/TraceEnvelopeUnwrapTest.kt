@@ -9,7 +9,7 @@ import java.io.File
 import java.sql.DriverManager
 
 /**
- * Guards the two defects found on 2026-07-27 (see docs/arena-math-findings.md).
+ * Guards two ingestion defects (see docs/arena-math-findings.md).
  *
  * 1. `arx_3` / `arx_0314` store the trace as a JSON envelope carrying `reason_code`, a
  *    self-reported confidence field that predicts correctness. Handing it to the judge is

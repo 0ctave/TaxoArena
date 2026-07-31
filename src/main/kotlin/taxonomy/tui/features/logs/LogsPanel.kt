@@ -13,7 +13,6 @@ import com.jakewharton.mosaic.ui.Color.Companion.White
 import com.jakewharton.mosaic.ui.Color.Companion.Yellow
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Text
-import com.jakewharton.mosaic.ui.TextStyle.Companion.Bold
 import taxonomy.tui.components.ScrollablePanelContent
 import taxonomy.utils.TuiLogAppender
 

@@ -1,8 +1,6 @@
 package taxonomy.tui.features.startup
 
 import androidx.compose.runtime.Composable
-import com.jakewharton.mosaic.layout.padding
-import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.Green
 import com.jakewharton.mosaic.ui.Color.Companion.White

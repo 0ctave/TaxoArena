@@ -2,7 +2,6 @@ package taxonomy.service
 
 import taxonomy.model.*
 import taxonomy.dataset.ModelEvalResult
-import taxonomy.utils.StatisticsUtils
 import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import java.util.UUID
 import java.util.PriorityQueue
@@ -29,7 +28,18 @@ class BtMatchScheduler(
     val seed: Long = 42L
 ) {
     val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
-    private val BOOTSTRAP_MIN_MATCHES = 2
+    /**
+     * Minimum comparisons every (leaf, pair) receives before adaptive scheduling starts.
+     *
+     * 1, not 2, and the difference is the whole cost argument: one comparison per pair
+     * per leaf already makes each cell's comparison graph complete rather than merely
+     * connected, which is what per-cell estimation requires. Raising it to 2 doubles the
+     * bootstrap for no change in graph structure. Total cost is
+     * pairs x leaves x this — 66 x 11 = 726 at twelve models and eleven cells, or
+     * 105 x 11 = 1,155 at fifteen models. Budget for it when sizing a run: at fifteen
+     * models the bootstrap alone is larger than some completed twelve-model runs.
+     */
+    private val BOOTSTRAP_MIN_PER_LEAF = 1
     private val random = java.util.Random(seed)
     private val log = org.slf4j.LoggerFactory.getLogger("taxonomy.service.BtMatchScheduler")
     private val pairQueryOffsets = mutableMapOf<String, Int>()
@@ -44,7 +54,7 @@ class BtMatchScheduler(
         stablePairs.clear()
         irresolvablePairs.clear()
         stoppingPolicy.pairCustomBudgets.clear()
-        stoppingPolicy.globallyResolvedPairs.clear()
+        stoppingPolicy.resolvedPairs.clear()
     }
     fun loadOffsets(offsets: Map<String, Int>) { pairQueryOffsets.putAll(offsets) }
     fun getOffsets(): Map<String, Int> = pairQueryOffsets.toMap()
@@ -148,13 +158,13 @@ class BtMatchScheduler(
     }
 
     private fun isMatchInformative(
+        nodeId: String,
         mA: String, mB: String,
         state: NodeBtState?,
         ps: NodePairStats?,
         minMatches: Int = 2
     ): Boolean {
-        val pairKey = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
-        if (stoppingPolicy.globallyResolvedPairs.contains(pairKey)) return false
+        if (stoppingPolicy.isPairResolved(nodeId, mA, mB)) return false
 
         // Always play if either model is unseen (bootstrap guarantee)
         val nij = ps?.totalComparisons?.toInt() ?: 0
@@ -187,7 +197,7 @@ class BtMatchScheduler(
         val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
         return allPairs.count { (mA, mB) ->
             val pairKey = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
-            if (stoppingPolicy.globallyResolvedPairs.contains(pairKey)) return@count false
+            if (stoppingPolicy.isPairResolved(nodeId, mA, mB)) return@count false
             val ps = pairs.firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
             }
@@ -234,13 +244,13 @@ class BtMatchScheduler(
                     (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                 }
                 val isRR = condition.equals("ROUND_ROBIN", ignoreCase = true)
-                if (!isRR && !isMatchInformative(mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
+                if (!isRR && !isMatchInformative(node.id, mA, mB, state, ps, minMatches = 2)) continue // skip certain pairs
 
                 val budget = pairBudget(node.id, mA, mB)
                 val already = ps?.totalComparisons?.toInt() ?: 0
                 if (already >= budget) continue  // exhausted
 
-                val isBlockingPair = isMatchInformative(mA, mB, state, ps) && already < (budgetPerPair - 5) // not near budget
+                val isBlockingPair = isMatchInformative(node.id, mA, mB, state, ps) && already < (budgetPerPair - 5) // not near budget
                 val convergenceBonus = if (debt <= 5 && isBlockingPair) 1.5 else 1.0  // last-mile boost
 
                 val u = if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
@@ -274,37 +284,65 @@ class BtMatchScheduler(
         if (isNewMain) {
             // ── Mandatory bootstrap phase before ANY utility-ranked scheduling ──────────
             //
-            // The racing scheduler converges to a leader-centric star: on the paired Math
-            // run it scheduled 20 of 66 pairs, put the top model in 55% of all comparisons
-            // (1,452 of 2,640), and left 46 pairs — including the pre-registered near-clone
-            // check — with zero data. On law it had 5 of 12 models at zero comparisons 861
-            // calls in, and BtMmFitter logged 48 'fit is NOT identified' warnings. The
-            // "always play if unseen" guard inside isMatchInformative never fired because
-            // the racing path does not consult it.
+            // Left to itself, the racing scheduler converges to a leader-centric star:
+            // it concentrates comparisons on the current leader and leaves most pairs
+            // with zero data, so the Bradley-Terry fit is not identified. (The "always
+            // play if unseen" guard inside isMatchInformative cannot save it — the racing
+            // path does not consult it.) So every pair gets a guaranteed allocation
+            // unconditionally, no ranking involved, before the adaptive phase starts,
+            // making the comparison graph complete — not merely connected — before
+            // adaptivity can shape it.
             //
-            // So: every pair gets BOOTSTRAP_MIN_MATCHES comparisons unconditionally, no
-            // ranking involved, before the adaptive phase starts. At 12 models that is
-            // 66 pairs x 2 ~ 132 calls against a ~5,000-call run — and it guarantees the
-            // BT graph is complete, not merely connected, before adaptivity can shape it.
-            val globalPairComps = HashMap<String, Double>()
-            for ((_, list) in pairStats) for (ps in list) {
-                val k = "${minOf(ps.modelA, ps.modelB)}|${maxOf(ps.modelA, ps.modelB)}"
-                globalPairComps[k] = (globalPairComps[k] ?: 0.0) + ps.totalComparisons
+            // The floor is counted PER (leaf, pair), not domain-wide. A domain-level
+            // floor is satisfied by covering each pair in a single (in practice the
+            // largest) cell: the aggregate graph looks complete while individual cells
+            // stay sparse, and every PER-CELL quantity — per-cell rankings, per-cell
+            // standard errors, the between-cell heterogeneity estimate — rests on those
+            // sparse graphs. BOOTSTRAP_MIN_PER_LEAF = 1 is deliberate: one comparison per
+            // pair per leaf already makes every cell's comparison graph complete, which
+            // is what per-cell estimation needs, at a cost of pairs x leaves calls.
+            val leafPairComps = HashMap<String, Double>()
+            for ((nodeId, list) in pairStats) for (ps in list) {
+                val k = "$nodeId|${minOf(ps.modelA, ps.modelB)}|${maxOf(ps.modelA, ps.modelB)}"
+                leafPairComps[k] = (leafPairComps[k] ?: 0.0) + ps.totalComparisons
             }
             val allRosterPairs = models.flatMapIndexed { i, a ->
                 models.drop(i + 1).map { b -> minOf(a, b) to maxOf(a, b) }
             }
-            val starved = allRosterPairs.filter { (a, b) ->
-                (globalPairComps["$a|$b"] ?: 0.0) < BOOTSTRAP_MIN_MATCHES
+            // Only leaves that actually hold questions can be bootstrapped.
+            val bootNodes = targetNodes.filter { (nodeToQueries[it.id]?.size ?: 0) > 0 }
+            val starvedCells = bootNodes.flatMap { node ->
+                allRosterPairs.mapNotNull { (a, b) ->
+                    if ((leafPairComps["${node.id}|$a|$b"] ?: 0.0) < BOOTSTRAP_MIN_PER_LEAF)
+                        Triple(node, a, b) else null
+                }
             }
-            if (starved.isNotEmpty()) {
+            if (starvedCells.isNotEmpty()) {
                 val bootTasks = mutableListOf<BtMatchTask>()
-                for ((a, b) in starved) {
-                    if (bootTasks.size >= batchSize) break
-                    val node = targetNodes.maxByOrNull { nodeToQueries[it.id]?.size ?: 0 } ?: continue
+                // Round-robin over leaves rather than draining one leaf at a time, so a
+                // run stopped early still has balanced coverage instead of one finished
+                // cell and the rest empty.
+                val byNode = starvedCells.groupBy { it.first.id }
+                val queues = byNode.values.map { it.toMutableList() }
+                var idx = 0
+                while (bootTasks.size < batchSize && queues.any { it.isNotEmpty() }) {
+                    val q0 = queues[idx % queues.size]
+                    idx++
+                    if (q0.isEmpty()) continue
+                    val (node, a, b) = q0.removeAt(0)
                     val qs = (nodeToQueries[node.id] ?: emptyList()).sorted()
                     if (qs.isEmpty()) continue
-                    val bk = "BOOT|${node.id}|$a|$b"
+                    // Rotate the query across the leaf's pool, keyed per NODE rather than
+                    // per (node, pair): consecutive bootstrap tasks take consecutive
+                    // questions, so the pairs spread over min(pairs, poolSize) distinct
+                    // items. Keyed per (node, pair), the offset would start at 0 for every
+                    // pair and `qs[0]` would be handed to all of them — one question judged
+                    // once per pair while the rest of the pool goes untouched, which
+                    // matters because rho is computed against ground-truth accuracy ON THE
+                    // JUDGED QUESTIONS and a small distinct-question count makes that
+                    // reference noise. Deterministic: same seed, same order, same
+                    // assignment.
+                    val bk = "BOOT|${node.id}"
                     val off = pairQueryOffsets.getOrDefault(bk, 0)
                     val q = qs[off % qs.size]
                     pairQueryOffsets[bk] = off + 1
@@ -315,9 +353,10 @@ class BtMatchScheduler(
                     )
                 }
                 if (bootTasks.isNotEmpty()) {
-                    log.info("[ARENA-BOOTSTRAP] ${starved.size} of ${allRosterPairs.size} pairs " +
-                        "below $BOOTSTRAP_MIN_MATCHES comparisons; scheduling ${bootTasks.size} " +
-                        "bootstrap matches before the adaptive phase")
+                    val total = bootNodes.size * allRosterPairs.size * BOOTSTRAP_MIN_PER_LEAF
+                    log.info("[ARENA-BOOTSTRAP] ${starvedCells.size} of $total (leaf, pair) slots " +
+                        "below $BOOTSTRAP_MIN_PER_LEAF comparison(s) across ${bootNodes.size} leaf/leaves; " +
+                        "scheduling ${bootTasks.size} bootstrap matches before the adaptive phase")
                     return bootTasks
                 }
             } else {
@@ -334,7 +373,14 @@ class BtMatchScheduler(
                         "comparisons: $missing — aborting rather than fitting an unidentified ranking"
                 }
             }
-            val activeRacing = ActiveBtRacingScheduler(alpha = 0.05, nMin = 5)
+            // Hand the racing scheduler the same globally-resolved set the utility path
+            // consults, so both agree on which pairs are finished.
+            val activeRacing = ActiveBtRacingScheduler(
+                alpha = 0.05, nMin = 5,
+                externallyResolved = { leafId, key ->
+                    stoppingPolicy.isPairResolved(leafId, key.first, key.second)
+                }
+            )
             return activeRacing.selectNextBatch(
                 targetNodes = targetNodes,
                 pairStats = pairStats,
@@ -343,7 +389,8 @@ class BtMatchScheduler(
                 nodeToQueries = nodeToQueries,
                 batchSize = batchSize,
                 completedResults = completedResults,
-                budgetPerPair = budgetPerPair
+                budgetPerPair = budgetPerPair,
+                btStates = btStates
             )
         }
 
@@ -420,7 +467,7 @@ class BtMatchScheduler(
         ): Boolean {
             if (tasks.size >= batchSize) return false
             val pk = pairKey(mA, mB)
-            if (stoppingPolicy.globallyResolvedPairs.contains(pk)) return false
+            if (stoppingPolicy.isPairResolved(nodeId, mA, mB)) return false
             if (!ignoreFairShare && (pairBatchCount[pk] ?: 0) >= fairSharePerPair) return false
 
             val nodeLoad = nodeModelLoad.getOrPut(nodeId) { mutableMapOf() }
@@ -444,31 +491,19 @@ class BtMatchScheduler(
             val available = resultsMatrix.keys.intersect(nodeQueryIds.toSet()).sorted()
             if (available.isEmpty()) return false
 
-            // Uniform sampling over the leaf's FULL query pool.
+            // Uniform sampling over the leaf's FULL query pool: a seeded shuffle gives
+            // every question an equal chance, which is what the held-out pool is for.
+            // Any fixed ordering (e.g. most-prototypical-first by vMF dot product) biases
+            // the arena, because per-pair budgets are small relative to the pool and every
+            // pair walks the ordering from the front via `offset` — the tail is never
+            // reached, and the cell is judged on the items the partition already fits best.
             //
-            // This used to sort by descending dot product with the node's vMF mean — most
-            // prototypical question first — and every pair then walked that ranking from the
-            // front via `offset`. Because per-pair budgets are small relative to the pool, no
-            // pair ever reached the tail, so the arena judged each cell on its most central
-            // members only.
-            //
-            // Measured on the 12-model Math run (2,640 comparisons, 11 leaves): 250 of 379
-            // available questions were used — 66% — while each used question was judged ~10.6
-            // times, up to 17.1 in the smaller leaves. The unused third was not a random third:
-            // it was systematically the LEAST prototypical, so the ranking was biased toward the
-            // items the partition already fits best, inflating apparent within-cell coherence.
-            //
-            // Shuffling instead gives every question in the leaf an equal chance, which is what
-            // the held-out pool is for. Deterministic: seeded per (run seed, leaf), so a re-run
-            // at the same seed reproduces the same ordering. The offset-walk below is unchanged,
-            // so a pair still never repeats a question until it has exhausted the pool.
-            // Seeded per (leaf, PAIR), not per leaf. Seeding per leaf gave every pair in a
-            // leaf the SAME shuffled order, and every pair still walks it from the front via
-            // `offset` — so it changed WHICH questions were used but not HOW MANY. Measured:
-            // pool utilisation stayed at exactly 66% (250/379) across both the centrality
-            // sampler and the per-leaf shuffle, identical to three significant figures. Adding
-            // the pair key decorrelates the orderings so different pairs enter the pool at
-            // different points and coverage widens.
+            // Seeded per (run seed, leaf, PAIR), not per leaf: per-leaf seeding hands every
+            // pair the SAME shuffled order, which changes WHICH questions are used but not
+            // HOW MANY. The pair key decorrelates the orderings so different pairs enter
+            // the pool at different points and coverage widens. Deterministic: a re-run at
+            // the same seed reproduces the same assignment, and a pair never repeats a
+            // question until it has exhausted the pool.
             val rankedAvailable = available.shuffled(
                 java.util.Random(seed * 31L + nodeId.hashCode() * 31L + pk.hashCode())
             )

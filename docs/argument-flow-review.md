@@ -1,5 +1,23 @@
 # Argument-flow review — TaxoArena thesis (report/03_Content as of 2026-07-28)
 
+> **STATUS: STALE-BUT-FIXABLE (2026-07-30). Its diagnoses are good; its evidence base is
+> two runs out of date.**
+>
+> Nothing supersedes it — the evidence audit says nothing about flow, so this is still the
+> only reading-order review. But every `6_Results.tex` line number predates a ~176-line
+> move, and it models a **two-domain** thesis (math + law) where there are now eight paired
+> runs.
+>
+> Two of its premises are now false. It says cells carry no different true rankings *and
+> therefore* per-cell evaluation cannot beat global evaluation; the first half is right and
+> the second is not — five of seven completed domains show a positive `Delta rho`, as a
+> precision gain on a shared ranking. And it treats the 0.74-0.76 episode as a live
+> "eventual resolution"; it is permanently irreproducible (`void-results.md` §3).
+>
+> **Still correct and still cheap:** the Chapter 1 autopsy-before-live-RQs diagnosis, the
+> Chapter 2 synthesis handing over the pre-reframing thesis, and the conventions-box
+> placement.
+
 Reviewer stance: first-time examiner who knows ML but not this project, reading
 `report/03_Content/1_Introduction.tex` through `8_Conclusion.tex` in order, plus
 `report/02_Prematter/e_Abstract.tex`. This review is about ARGUMENT CLARITY AND FLOW

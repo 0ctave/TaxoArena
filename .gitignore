@@ -108,6 +108,29 @@ pdfa.xmpi
 # Generated PDF build output (preserves figure PDFs and prematter PDF assets)
 report/main.pdf
 
+# Local tooling and machine-local state (not part of the handover)
+.mcp.json
+.claude/
+lancedb/
+__pycache__/
+*.pyc
+
+# Archived and parked artefacts: kept on disk, documented by their manifests,
+# but not tracked. The two archive manifests are re-included below.
+archive/**
+!archive/ARCHIVE_MANIFEST.md
+!archive/README.md
+testing/
+
+# Ratings-store variants (backups, secured copies, trials) and secured export folders
+*.db.*
+*_secured/
+
+# Regenerable analysis exports and tuning run outputs
+model_domain_scores.csv
+reserved_leaf_assignments.csv
+tuning/runs/*/output/
+
 # Temporary and state output files
 *.tmp
 copied_snapshot_id.txt

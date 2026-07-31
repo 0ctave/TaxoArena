@@ -1,6 +1,30 @@
 # The reconciled argument — code, docs, report
 
-Status: **current as of 2026-07-27**, written against branch `tree-only` @ `4a0e915`.
+> **STATUS: SUPERSEDED AS AN ARGUMENT (2026-07-30). Parts 0 and 1 are HISTORICAL-KEEP and
+> still the only place several checks exist.**
+>
+> The ladder's conclusion — that link 3 fails because the two judges agree too closely to
+> produce a detectable ranking difference — is directly contradicted by the eight-run
+> result. The load-bearing false sentence is in Rung 8: *"Two judges agreeing on 99.4% of
+> winners cannot produce a detectable ranking difference at any n, any granularity, any
+> domain count."* Five domains meet the 0.007 threshold. Rung 8's companion claim, that the
+> null at n = 8 was "structural, not underpowered", is also wrong: it was underpowered, and
+> 12 models separated the arms.
+>
+> Rungs 7 and 12 rest on superseded inputs — the independent-sampling permutation null
+> (`void-results.md` §2) and the 11-band screen table, whose p-values were recomputed at the
+> 12-model roster in Addendum 3 of `prereg_generic_judge_baseline.md`.
+>
+> **What survives, and is not duplicated anywhere else:**
+> * **§0.1**, the refutation of the "routing ECE returns 0.0" claim, with the exported
+>   0.2114. It was right, and this document found it first.
+> * **§0.2**, the independent verification that the rubric-specificity result reproduces
+>   exactly.
+> * **Part 1**, the line-by-line code / doc / report reconciliation table.
+> * **Rung 13**, the reliability-constant correction (7.66 -> 2.52, two-sided
+>   disattenuation), now folded into `measurement-discipline.md`.
+
+Status (original): **current as of 2026-07-27**, written against branch `tree-only` @ `4a0e915`.
 
 This document does three things and nothing else.
 

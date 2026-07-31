@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test
 import taxonomy.model.GraphNode
 import taxonomy.model.NodeBtState
 import taxonomy.model.NodePairStats
-import taxonomy.model.ModelRank
-import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import kotlin.math.abs
 
 class BtSchedulerRedesignTest {
@@ -121,8 +119,10 @@ class BtSchedulerRedesignTest {
     fun testGlobalSeparationGuard() {
         val stoppingPolicy = BtStoppingPolicy(budgetPerPair = 20)
         
-        // Mark model-A vs model-B as globally resolved: gap = 4.0, max(se) = 0.5 -> gap (4.0) > 2.5 * 0.5 (1.25)
-        stoppingPolicy.globallyResolvedPairs.add("model-A|model-B")
+        // Mark model-A vs model-B resolved IN leaf-1: gap = 4.0, max(se) = 0.5 -> 4.0 > 2.5 * 0.5.
+        // The key carries the node id — the gate is per cell, so a pair
+        // settled here says nothing about any other cell.
+        stoppingPolicy.resolvedPairs.add("leaf-1|model-A|model-B")
 
         val state = NodeBtState(
             nodeId = "leaf-1",

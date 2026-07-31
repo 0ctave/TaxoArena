@@ -1,6 +1,5 @@
 package taxonomy.controller
 
-import kotlinx.coroutines.runBlocking
 import org.springframework.web.bind.annotation.*
 import taxonomy.config.TaxonomyConfig
 import taxonomy.model.GraphNode

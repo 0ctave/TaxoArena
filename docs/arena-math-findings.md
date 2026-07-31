@@ -1,5 +1,22 @@
 # Math arena on the frozen construction — findings
 
+> **STATUS: HISTORICAL-KEEP (banner added 2026-07-30).**
+>
+> An append-only lab log for the **8-model Mathematics pilot**, containing three sections
+> that retract earlier sections in place. Read it as archaeology.
+>
+> **Never cite it for** a screen p-value, a rank-correlation magnitude, or a domain
+> recommendation. Its screen table is the 11-band generation, superseded by Addendum 3 of
+> `prereg_generic_judge_baseline.md`; its "an arena on ~11 models would have nothing to
+> detect in math" recommendation was overtaken by a 12-model run; and its correctness-blind
+> rho (0.74-0.76) and redundancy figures (72.2% / 42.2%) are on the never-restate list in
+> `void-results.md` §3.
+>
+> **It is the sole provenance for** the reliability-constant derivation (7.66 -> 2.52, and
+> the two-sided disattenuation form) and for the near-clone pre-registrations. Note that the
+> `sqrt(r)` forms early in the file are corrected later in the same file and were never
+> cleaned up.
+
 Run: `experiment_configs/arena_math_frozen.toml`, snapshot `20260727_042523`
 (87 leaves, certified, 87/87 rubrics). 8 models, 11 Math cells, 241 judged
 reserved questions, 1736 verdicts per condition, MAIN vs GENERIC_JUDGE

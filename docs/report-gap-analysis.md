@@ -1,5 +1,36 @@
 # TaxoArena Thesis — Gap and Contradiction Report
 
+> **BASELINE MOVED (2026-07-27).** This report's "current implementation" is the state as of
+> **2026-07-23**, and the system has changed materially since. Before acting on any item
+> here, check it against:
+>
+> * [`../docs/dag-logic-and-math.md`](dag-logic-and-math.md) — current specification.
+>   `separationEpsilon` no longer exists (split into `proposalSeparationBar`, a LEVEL, and
+>   `marginalEps`, a DIFFERENCE); `minClusterSize` is 55, `membershipFloor` 0.25,
+>   `numIterations` 50 with convergence certified at 10; there is now an `acceptanceZ` gate.
+> * [`frozen-artifact.md`](frozen-artifact.md) — the artifact and its parameter derivations.
+> * [`void-results.md`](void-results.md) — what commit `c381211` invalidated.
+> * [`reframed-argument.md`](reframed-argument.md) — **supersedes every RQ2 item in this
+>   report** (§1.9, §1.11, the migration-definition item, and the `res-rq2` content owed).
+>   The `Delta tau` / `Delta rho` debate is moot: cells do not have different true rankings
+>   at any granularity on this corpus for this roster, so the metric choice is not what
+>   determines the answer. The reframed question is whether adapted grouping enables **better
+>   judging**.
+> * The taxonomy is a **tree** — cross-linking was removed at `334b95d` and polyhierarchy is
+>   a negative result, so every polyhierarchy-conditional metric caveat in the report is
+>   vacuous.
+> * ~~Routing ECE returns 0.0 in every run and must not be reported.~~ **STRUCK
+>   2026-07-30: this directive was false and must not be re-applied.** Routing ECE is
+>   implemented and the frozen run exported 0.2114. The defect is that both export sites
+>   aggregate a domain's leaf shares with `maxOf` instead of summing. See
+>   `known-defects.md`.
+> * The `Delta tau` framing throughout this file is dead. RQ2 is now `Delta rho` = MAIN - C5
+>   against a threshold of 0.007, measured across eight paired arena runs.
+>
+> The report's *structural* findings (undefined symbols, notation collisions, missing
+> definitions, table/text contradictions) are unaffected by the baseline move and remain
+> valid.
+
 Scope: `report/03_Content/1_Introduction.tex` … `8_Conclusion.tex`, plus appendices
 `7_Appendix_TuningProtocol.tex`, `8_Appendix_JudgeGeneration.tex`,
 `9_Appendix_MetricDefinitions.tex`, `10_Appendix_ModelRoster.tex`,

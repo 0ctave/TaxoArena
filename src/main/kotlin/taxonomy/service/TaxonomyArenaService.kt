@@ -20,11 +20,9 @@ import taxonomy.model.BenchmarkLiveStats
 import taxonomy.model.BenchmarkReport
 import taxonomy.model.Embedding
 import taxonomy.model.GraphNode
-import taxonomy.model.projectTo
 import taxonomy.service.TaxonomyRankingService.AggregatedLeaderboard
 import taxonomy.operations.TaxonomyLlmClient
 import taxonomy.operations.TaxonomyOperations
-import kotlin.math.abs
 import dev.langchain4j.model.chat.request.json.JsonSchema
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 
@@ -483,13 +481,6 @@ class TaxonomyArenaService(
         // any other form passes. It is a tripwire against reintroducing the old template, not a
         // proof of blindness. The proof is the absence of a parameter.
         //
-        // A line reading "If the ground truth answer is provided, use it to assess factual
-        // correctness" was removed from buildJudgeUserPrompt on 2026-07-27. It was dead — nothing
-        // supplies a key to this path — but it was sent on every MAIN call, so the prompt template
-        // instructed the judge to use something that was never there. Dead or not, a reviewer
-        // reading the template saw the judge being told to use ground truth, and "the branch never
-        // fires" is a weaker position than not having the line.
-        //
         // NOTE what blindness here does and does not mean: 94.8% of model traces state their own
         // answer ("The answer is (C)"), and the options block is shown, so the judge can re-derive
         // the key from the question. Blind at the prompt is not blind at the mechanism.
@@ -669,10 +660,14 @@ class TaxonomyArenaService(
             }
         }
 
-        // Build the MCQ context for judge prompts (question + options visible)
-        val optionsBlock = options.mapIndexed { i, opt -> "${('A' + i)}) $opt" }.joinToString("\n")
-        val questionWithOptions = buildString {
-            append("$query\n\nOptions:\n$optionsBlock")
+        // Build the MCQ context for judge prompts. `judgeSeesOptions` decides whether the
+        // candidate answers travel with the stem; the correct one never does either way.
+        // See TaxonomyConfig.LlmConfig.judgeSeesOptions for what the two settings measure.
+        val questionWithOptions = if (config.llm.judgeOptionMode.equals("OPTIONS", ignoreCase = true)) {
+            val optionsBlock = options.mapIndexed { i, opt -> "${('A' + i)}) $opt" }.joinToString("\n")
+            "$query\n\nOptions:\n$optionsBlock"
+        } else {
+            query
         }
 
         judges.map { node ->

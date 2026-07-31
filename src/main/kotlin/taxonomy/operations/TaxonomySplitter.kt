@@ -45,14 +45,10 @@ class TaxonomySplitter(
         conceptCounter.set(1)
     }
 
-    // TaxonomySplitter.splitNodesRecursive has been removed. It was a parallel BFS
-    // that split every node bottom-up via async/awaitAll, and it had NO CALLER:
-    // production splits through TaxonomyOperations.splitNodesRecursive, which walks
-    // the same bottom-up order but wraps each node in tryProposal so the edit is
-    // gated on dJ. This copy bypassed that gate entirely, which is why keeping it
-    // was worse than dead — anything wiring itself to the splitter's own version
-    // would have committed splits without a global acceptance test. Its log lines
-    // ("Starting/Finished parallel split evaluation") never appear in any run.
+    // Note: all production splitting goes through TaxonomyOperations.splitNodesRecursive,
+    // which wraps each node in tryProposal so every edit is gated on dJ. Do not add an
+    // ungated bulk-split entry point here — it would commit splits without the global
+    // acceptance test.
 
     /**
      * [forcedK] non-null runs the mixture search at EXACTLY that k instead of letting
@@ -167,24 +163,10 @@ class TaxonomySplitter(
             if (it >= 0.0) it else config.formalism.proposalSeparationBar
         }
 
-        // A maxK=2 probe used to run here before the maxK=4 selection, guarding a
-        // null check, a components.size<2 check and a `?: probe` fallback. All three
-        // were provably dead, because runVmfEm has NO randomness — mu_1 is the
-        // normalized centroid and mu_2..k are chosen by deterministic farthest-point
-        // maximin (the "k-means++" comment on it is a misnomer; nothing is sampled).
-        // Given that:
-        //   * performVmfKMeans evaluates k=2 identically under maxK=2 and maxK=4, so
-        //     the maxK=4 call returns null exactly when the probe would have, and the
-        //     `?: probe` fallback could never be taken.
-        //   * bestMixture is only ever assigned from k >= 2, so components.size < 2
-        //     was impossible. Confirmed: "probe insufficient" appears 0 times in every
-        //     log in the repo.
-        // What the probe did buy was a cheaper reject path (one EM instead of three)
-        // at the cost of a duplicate k=2 EM on the accept path — but the candidate EMs
-        // already run concurrently under async(Dispatchers.Default), so it added a
-        // sequential barrier for a CPU saving that never showed up in wall-clock. And
-        // for n < 3*minClusterSize it was pure duplication anyway, since
-        // actualMaxK = min(maxK, n/minSize) collapses maxK=4 to 2 there.
+        // No separate maxK=2 probe is needed before this call: runVmfEm has NO
+        // randomness (mu_1 is the normalized centroid, mu_2..k deterministic
+        // farthest-point maximin), so performVmfKMeans evaluates k=2 identically at
+        // any maxK and returns null exactly when a k=2 probe would.
         // Forcing k: cap maxK at k and drive marginalEps negative so every increment
         // up to k is taken, which makes performVmfKMeans return exactly k rather than
         // its own choice. Without the negative eps it would still stop early at the
@@ -233,19 +215,13 @@ class TaxonomySplitter(
         fun routeToVmfs(vmfs: List<StatisticsUtils.VmfParameters>): List<MutableList<Embedding>> {
             val out = List(vmfs.size) { mutableListOf<Embedding>() }
             // SHARED kappa, no per-child normalizer — matching TaxonomyTrickler's
-            // `meanKappa * dots[i]` exactly. This used to score
-            // `vmf.logNormalizer + vmf.kappa * dot`, the per-child density form that
-            // production routing was moved away from because it lets a concentrated
-            // sibling absorb a diffuse one's queries on concentration bookkeeping
-            // rather than on direction.
-            //
-            // The check this feeds is routing sustainability, justified as "every
-            // target query is re-assigned by the same level-local posterior the
-            // trickler uses". It was not the same posterior, so the check was asking
-            // whether the children survive under a router the tree does not use.
-            // Since the bias systematically depresses the smallest child, and the
-            // check rejects on min(routed child) < minClusterSize, it produced
-            // failures concentrated on splits with one tight and one diffuse child.
+            // `meanKappa * dots[i]` exactly. The per-child density form
+            // (`vmf.logNormalizer + vmf.kappa * dot`) must NOT be used here: it lets a
+            // concentrated sibling absorb a diffuse one's queries on concentration
+            // bookkeeping rather than on direction, and the check this feeds is routing
+            // sustainability — it must re-assign with the SAME level-local posterior
+            // the trickler uses, or it is asking whether the children survive under a
+            // router the tree does not use.
             //
             // meanKappa is a positive constant across children, so it cannot change
             // the argmax; it is kept only so this line reads identically to the
@@ -307,28 +283,10 @@ class TaxonomySplitter(
         // statistic is computed) and the measured p95 there is censored, not small.
         // One constant at the curve's maximum is conservative across the whole range.
         //
-        // The 2x small-node margin below is unreachable on the direct path: line ~83
-        // already requires mass >= 2*minClusterSize, and mass <= |targetQueries|. Only
-        // the diffuse-residual branch above can enter it, where targetQueries becomes
-        // the residual subset (floor minClusterSize, so 30..59 is possible) and
-        // enableResidualSplitGate defaults to isDag. That branch is itself unreachable
-        // in the canonical configuration: it additionally needs residualQueries >=
-        // minClusterSize, and at descentMargin = 0.12 every node carries zero
-        // residuals (verified on the frozen snapshot: 0 of 139 nodes have any). So the
-        // margin is dead twice over. It has never fired: bar=0.0500 appears zero times
-        // in the repo's logs against 5628 of bar=0.0250. Kept
-        // because it is directionally right for the small-n CONDITIONAL null — the
-        // proposals that do survive EM collapse at n < 160 rest on fewer points — not
-        // because it is load-bearing today.
-        // The 2x small-node margin that used to sit here is gone. It doubled the bar
-        // when targetQueries.size < 2*minClusterSize, and was unreachable twice over:
-        // the feasibility check at the top of this function already requires
-        // mass >= 2*minClusterSize and mass <= |targetQueries|, and the only branch
-        // that could reassign targetQueries to something smaller — the diffuse-residual
-        // path — additionally needs residualQueries >= minClusterSize, while at
-        // descentMargin = 0.12 all 139 nodes of the frozen tree carry zero residuals.
-        // Never observed firing: bar=0.0500 appears 0 times in the repo's logs against
-        // 5628 of bar=0.0250.
+        // One flat bar for every proposal, regardless of node size. (A small-node
+        // margin that doubled the bar below 2*minClusterSize is unreachable here: the
+        // feasibility check at the top of this function already requires
+        // mass >= 2*minClusterSize.)
         val requiredEps = config.formalism.proposalSeparationBar
 
         // ── Stabilize the proposal onto the feasible set ─────────────────────
@@ -338,12 +296,12 @@ class TaxonomySplitter(
         //     re-routes among the survivors (History [147,164,1,28] -> k=2).
         //  2) GATE CONSISTENCY (weak pair): if any routed PAIR falls below the
         //     same pairwise bar the sibling-merger fuses at, the pair is merged
-        //     and re-routed. The split gate previously accepted on the JOINT
-        //     k-way separation only; a k=4 partition with joint sep 0.06 can
-        //     contain a pair at 0.015, which the sibling-merger then immediately
-        //     fuses — the split/fuse limit cycle. Creation and destruction now
-        //     read the same statistic at the same granularity and bar, so their
-        //     acceptance regions are disjoint by construction.
+        //     and re-routed. Gating on the JOINT k-way separation alone would not
+        //     do: a k=4 partition with joint sep 0.06 can contain a pair at 0.015,
+        //     which the sibling-merger then immediately fuses — a split/fuse limit
+        //     cycle. Creation and destruction must read the same statistic at the
+        //     same granularity and bar, so their acceptance regions are disjoint
+        //     by construction.
         while (true) {
             if (routedClusters.any { it.size < minClusterSize }) {
                 if (routedClusters.size <= 2) break
@@ -399,9 +357,8 @@ class TaxonomySplitter(
                 iter = currentIteration, type = "GROW", siteId = node.id, siteLabel = node.label,
                 dJ = null, seDJ = null, z = null, dV = null,
                 decision = "NO_PROPOSAL",
-                // Carry the binding value: min_child against the floor is what distinguishes a
-                // near-miss from a genuinely atomic node, and it is exactly the number that
-                // showed minClusterSize=60 was blocking Computer science at min_child=48.
+                // Carry the binding value: min_child against the floor is what distinguishes
+                // a near-miss at the bar from a genuinely atomic node.
                 reason = "not_routing_sustainable(min_child=${routedClusters.minOf { it.size }}" +
                     ",floor=$minClusterSize,k=${routedClusters.size})",
                 nSite = node.queryWeights.size
@@ -459,34 +416,14 @@ class TaxonomySplitter(
 
         log.debug("Eval '${node.label}': k=$k, sep=${"%.3f".format(java.util.Locale.US, sepScore)} (req: ${"%.3f".format(java.util.Locale.US, requiredEps)})")
 
-        // The joint k-way gate that used to sit here has been removed. It was dead
-        // code by construction, not merely unused. At routed k=2 there is exactly one
-        // pair, and clusterStats() builds the same ClusterStats(n, sum) the k-way
-        // overload builds internally, so sepScore and minPairSep are the SAME NUMBER
-        // and the min-pair gate above always fires first. Above k=2 the coarsening
-        // loop has already merged every pair below the bar; the joint score is not
-        // PROVEN to be bounded below by its pairs there, but it was never observed
-        // below the bar in any run. Measured both ways before removal: 5682
-        // min-pair rejections against 0 k-way across every log in the repo, and on
-        // synthetic clouds the two statistics agree to five decimals at every n
-        // (docs/separation_null_by_size.md). sepScore is still computed — it is the
-        // value persisted as dasguptaDeltaNorm and the one the within-node null
-        // diagnostic reads.
-        //
-        // Min-pair is therefore the splitter's only separation gate. What it asks is
-        // "is this partition more than a cut through the node's own elongation?",
-        // which dJ structurally cannot ask, because dJ rewards elongation.
-
-        // The sibling-distinctness guard that used to sit here has been removed. It
-        // tested each proposed child against `node.children` — but this function
-        // returns at its first line unless `node.isLeaf`, and isLeaf is defined as
-        // `children.isEmpty() && crossLinkChildren.isEmpty()`. So the collection it
-        // iterated was ALWAYS empty and `all {}` on it was vacuously true: the guard
-        // could not reject anything, ever. Not a redundant re-test of the min-pair
-        // bar — a comparison against nothing. Confirmed by its log line "Split
-        // Rejected: child too similar to sibling" appearing 0 times in every run in
-        // the repo. Children are created below, after this point, which is why the
-        // list is empty when the guard ran.
+        // Min-pair is the splitter's ONLY separation gate. At routed k=2 the joint
+        // k-way score and the min-pair score are the same number, and above k=2 the
+        // coarsening loop has already merged every pair below the bar, so a separate
+        // joint gate would be dead by construction. What min-pair asks is "is this
+        // partition more than a cut through the node's own elongation?", which dJ
+        // structurally cannot ask, because dJ rewards elongation. sepScore is still
+        // computed — it is the value persisted as dasguptaDeltaNorm and the one the
+        // within-node null diagnostic reads (docs/separation_null_by_size.md).
 
         log.info("Split '${node.label}' (q=${targetQueries.size}, k=${routedClusters.size}${if (routedClusters.size != k) " (em k=$k)" else ""}, sep=${"%.3f".format(java.util.Locale.US, sepScore)}, routed=${routedClusters.map { it.size }}, converged=${mixture.converged}) -> Spawning ${routedClusters.size} children")
 

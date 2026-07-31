@@ -1,6 +1,5 @@
 package taxonomy.controller
 
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.springframework.web.bind.annotation.*
 import taxonomy.service.AgentRating

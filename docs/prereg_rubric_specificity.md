@@ -165,3 +165,22 @@ addendum. The headline separation (p = 1.21e-6) was reproduced from those
 stored artifacts on 2026-07-27. Until they are committed, this result is one
 clean checkout from being unsupported; the caveat travels with the result
 wherever it is cited.
+
+---
+
+# ADDENDUM (2026-07-30) — the random arm's ">= 90%" count, and one attribution corrected
+
+**Nothing above is edited.**
+
+**The missing half of measure 4.** The addendum above records the leaf arm's
+"terms appearing in >= 90% of rubrics" as **0**. The random arm's value was never written
+down. It is **6**. The full contrast is therefore **0 vs 6**, and it is the sharpest of the
+four discriminators — exactly as the amendment predicted it would be. Quote both sides.
+
+**Band attribution, resolved.** `prereg_arena_launch.md` now carries a dated addendum
+accepting this document's ruling: the `<= 0.05` / `>= 0.10` band is stated in that document
+and governs the random arm's absolute own-cell specificity. Both files now agree.
+
+**The artifacts are still untracked.** `tools/analysis/rubric_specificity_null.py` and
+`build/rubric_null/` remain outside version control. The caveat above stands unchanged and
+still travels with the result.

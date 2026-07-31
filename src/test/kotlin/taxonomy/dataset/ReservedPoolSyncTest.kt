@@ -82,7 +82,7 @@ class ReservedPoolSyncTest {
 
     @Test
     fun `a narrower split becomes a separate pool and the first survives`() {
-        // The exact sequence that used to destroy data: a single-domain smoke run follows a
+        // The destructive sequence this guards against: a single-domain smoke run follows a
         // multi-domain baseline. Both pools must remain recorded.
         loader.syncReservedPool(reservedFile)
         val baseline = store.activeReservedPoolId()!!

@@ -1,5 +1,21 @@
 # Peer review — TaxoArena thesis (report/ as of 2026-07-28)
 
+> **STATUS: SUPERSEDED ON FACTS (2026-07-30) by `evidence-audit-2026-07-30.md`.
+> HISTORICAL-KEEP for §(d) defense questions and §(e) the slop audit, which exist nowhere
+> else and are still actionable.**
+>
+> Absorbed into the audit: major 3 (the 0.973/0.936 pair), major 5 and (f)1 (Run B rho
+> untraceable — the audit reproduces every `Delta rho` exactly), minor 8 (draw count),
+> minor 10 (0.884 unsourced), minor 17 (routing ECE).
+>
+> **Two things in it are wrong.** The signs at lines 94-95 and 341-342 are printed as
+> `+0.064 / +0.007`; under the settled convention (`Delta rho` = MAIN - C5, positive
+> favours per-leaf) they are **-0.064 / -0.007**. The verdict is right, the signs are not.
+> And defense Q10 says law is the only domain where the partition has anything to detect;
+> psychology, physics, history and philosophy all met the threshold.
+>
+> Stale by run count: it reviews a two-domain thesis. There are eight paired runs.
+
 Reviewer stance: external examiner + journal referee. Everything below cites file:line.
 Claims were checked against `docs/arena-math-findings.md` (later sections supersede
 earlier), `docs/thesis-plan-v2.md`, `docs/reconciled-argument.md`, `docs/prereg_*.md`,

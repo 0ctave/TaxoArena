@@ -8,20 +8,13 @@ import java.sql.Connection
  *
  * ## Why this exists
  *
- * The reserved pool used to live in exactly two places, neither of them durable: a boolean
- * `eval_results.is_reserved` column, and a mutable `reserved_test_queries.json` at the repo
- * root that every run rewrote. Three consequences, all of which bit:
- *
- *  * **Only one pool could exist.** `markReserved` opened with
- *    `UPDATE eval_results SET is_reserved = 0`, so writing a pool destroyed the previous one.
- *    A 405-query Math smoke run silently replaced a 3599-query 14-domain baseline pool, and a
- *    unit test writing fixture ids reduced it to three questions. Recovering meant copying the
- *    JSON aside by hand and re-syncing.
- *  * **The fact was stored once per model.** "Question 7688 is held out" is a property of the
- *    question, yet it was duplicated across 47 models: expressing a 3437-element set cost
- *    560379 row writes plus the same number of index updates.
- *  * **No provenance.** Nothing recorded which pool a given result was produced against, so
- *    "what was the canonical baseline evaluated on?" was unanswerable from the database.
+ * Neither of the two other places the pool appears is durable on its own: the boolean
+ * `eval_results.is_reserved` column holds exactly one pool (`markReserved` opens with
+ * `UPDATE eval_results SET is_reserved = 0`, so writing a pool destroys the previous one —
+ * a smoke run or a unit test can silently replace the baseline pool), and the mutable
+ * `reserved_test_queries.json` at the repo root is rewritten by every run. Neither records
+ * provenance, so "which pool was this result produced against?" needs a durable answer
+ * somewhere else. This table is that answer.
  *
  * ## Design
  *

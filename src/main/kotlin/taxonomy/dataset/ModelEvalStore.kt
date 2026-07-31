@@ -252,8 +252,8 @@ class ModelEvalStore(
      * Kept for callers that only have a flat id set and no stratification; prefer
      * [saveAndActivateReservedPool] so the domain of each question survives. Pools are
      * content-addressed, so recording the same set twice is idempotent and re-activating a
-     * previous pool is exact — there is no longer any need to keep a copy of
-     * reserved_test_queries.json aside before a run that uses a different split.
+     * previous pool is exact — no copy of reserved_test_queries.json needs to be kept
+     * aside before a run that uses a different split.
      */
     fun markReserved(questionIds: Set<Int>) {
         if (questionIds.isEmpty()) return

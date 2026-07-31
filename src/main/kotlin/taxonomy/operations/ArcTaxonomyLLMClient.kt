@@ -14,6 +14,7 @@ import dev.langchain4j.model.chat.response.StreamingChatResponseHandler
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.contentOrNull
@@ -72,6 +73,10 @@ class ArcTaxonomyLLMClient(
     @org.springframework.beans.factory.annotation.Value("\${arc.ollama.model:ministral-3:14b}") private val configuredModelName: String,
     @org.springframework.beans.factory.annotation.Value("\${arc.ollama.num-ctx:8192}") private val defaultNumCtx: Int,
     @org.springframework.beans.factory.annotation.Value("\${arc.ollama.max-parallel:4}") private val maxParallel: Int,
+    // The 4.0 req/s fallback is the highest rate measured clean on the judge deployment,
+    // so a run that forgets the property lands somewhere safe. See config/application.yml
+    // for the numbers behind the choice.
+    @org.springframework.beans.factory.annotation.Value("\${arc.ollama.target-rps:4.0}") private val configuredTargetRps: Double,
     private val monitor: GenerationMonitor,
     private val config: TaxonomyConfig
 ) : TaxonomyLlmClient {
@@ -84,6 +89,274 @@ class ArcTaxonomyLLMClient(
     override fun setMaxParallel(limit: Int) {
         log.info("Updating LLM client semaphore capacity to $limit")
         semaphore = Semaphore(limit.coerceAtLeast(1))
+    }
+
+    // ── Request-rate pacing ────────────────────────────────────────────────────
+    //
+    // The semaphore bounds CONCURRENCY -- how many calls are in flight. Azure bounds
+    // RATE -- how many calls START per unit time, enforced in sub-minute windows. Those
+    // are different quantities and both must be controlled: a batch dispatches its tasks
+    // staggered by only 10ms, so N permits fire ~N calls inside a fraction of a second,
+    // several times over the per-second budget even when sustained usage is far below
+    // it. Lowering the permit count does not fix a rate problem -- it only lowers the
+    // ceiling on a burst that is over budget anyway.
+    //
+    // This paces call STARTS to `arc.ollama.target-rps`. Each caller reserves the next
+    // slot under a mutex and sleeps until it, so bursts are spread instead of rejected.
+    // Retries are absorbed by the same gate, which prevents the secondary storm where
+    // many backed-off calls resume together and burst again. Pacing does not reduce
+    // steady-state throughput; it only removes the spikes.
+    private val rateMutex = kotlinx.coroutines.sync.Mutex()
+    private var nextSlotNanos = 0L
+    // The target rate must be sized from the TOKEN budget, not the request budget -- at
+    // this prompt size the token limit binds first, and pacing to the request ceiling
+    // puts every call over quota, where each 429 spawns a retry that is itself a paced
+    // call:
+    //
+    //     500,000 TPM / 60          = 8,333 tokens/s
+    //     / ~1,250 tokens per call  = 6.7 calls/s   <- the real ceiling
+    //     minus headroom for retries and the probe  ~ 5 calls/s
+    //
+    // If prompt sizes change materially, recompute: target = 500000 / 60 / tokens_per_call,
+    // then take ~20% off. Initialised from arc.ollama.target-rps, overridable per run
+    // with -Darc.ollama.target-rps=N, which bootRun forwards.
+    @Volatile private var targetRps: Double = configuredTargetRps.coerceAtLeast(0.1)
+
+    fun setTargetRps(rps: Double) {
+        targetRps = rps.coerceAtLeast(0.1)
+        log.info("LLM client request pacing set to ${"%.1f".format(java.util.Locale.US, targetRps)} req/s")
+    }
+
+    @jakarta.annotation.PostConstruct
+    fun logPacing() {
+        log.info("[ARENA-PACING] request pacing at ${"%.1f".format(java.util.Locale.US, targetRps)} req/s, " +
+            "semaphore capacity $maxParallel")
+    }
+
+    /** Blocks until this call's pacing slot; returns the nanoseconds spent waiting. */
+    private suspend fun awaitRateSlot(): Long {
+        val intervalNanos = (1_000_000_000.0 / targetRps).toLong()
+        val waitNanos = rateMutex.withLock {
+            val now = System.nanoTime()
+            val slot = maxOf(now, nextSlotNanos)
+            nextSlotNanos = slot + intervalNanos
+            slot - now
+        }
+        if (waitNanos > 0) delay(waitNanos / 1_000_000)
+        return maxOf(0L, waitNanos)
+    }
+
+    // ── [ARENA-LAT] where a call's wall-clock actually goes ──────────────────────
+    //
+    // Every call spends its life in exactly three places, and which one dominates
+    // decides which knob to turn:
+    //
+    //   rate    -- blocked in awaitRateSlot waiting for a pacing slot.  Lower
+    //              `arc.ollama.target-rps` is the cause; raising it is the fix.
+    //   permit  -- blocked on the semaphore because `max-parallel` calls are already
+    //              in flight.  Raising `max-parallel` is the fix.
+    //   http    -- the request itself.  Neither knob helps; this is the endpoint.
+    //
+    // Measuring the three directly makes "which knob" a glance instead of an inference
+    // reconstructed after the fact from round durations and permit counts — an
+    // inference that is easy to get wrong (raising target-rps buys nothing when the
+    // pacer is under-utilised and the system is permit-bound).
+    //
+    // Deliberately NOT gated behind enableProfiling: profiling is off in every arena
+    // config, so a diagnostic that needs it would not have been collected on any run so
+    // far. The cost is three counters and a periodic log line.
+    private val latRateNs = java.util.concurrent.atomic.AtomicLong(0)
+    private val latPermitNs = java.util.concurrent.atomic.AtomicLong(0)
+    private val latHttpNs = java.util.concurrent.atomic.AtomicLong(0)
+    private val latCalls = java.util.concurrent.atomic.AtomicLong(0)
+    private val latRetries = java.util.concurrent.atomic.AtomicLong(0)
+    private val inFlight = java.util.concurrent.atomic.AtomicInteger(0)
+    private val maxInFlight = java.util.concurrent.atomic.AtomicInteger(0)
+    /** Bounded reservoir of http latencies (ms) for percentiles; oldest dropped. */
+    private val httpSamples = java.util.concurrent.ConcurrentLinkedQueue<Long>()
+
+    fun noteRetry() { latRetries.incrementAndGet() }
+
+    // ── Adaptive pacing (AIMD) ───────────────────────────────────────────────────
+    //
+    // A fixed pacer requires knowing the deployment's real limit in advance, and any
+    // guess is wrong in one direction or the other: too high produces a retry storm,
+    // too low leaves the endpoint under-used with most of each call's wall-clock queued
+    // at the pacer. The account ceiling (500 RPM / 500k TPM) is not the binding
+    // constraint -- the per-deployment limit is, it is undocumented, and it moves.
+    //
+    // So instead of guessing, measure continuously: additive increase, multiplicative decrease.
+    // Rise slowly while the endpoint is quiet, fall hard the moment it pushes back. This is
+    // the standard control for exactly this situation (unknown, non-stationary capacity with
+    // a cheap failure signal) and it converges on the true limit without a probe run.
+    //
+    //   +RPS_STEP every RPS_PROBE_MS with no rate-limit response
+    //   x RPS_BACKOFF on any 429, and the clock restarts
+    //   clamped to [RPS_FLOOR, RPS_CEILING]
+    //
+    // The ceiling is a safety rail, not a target: 8.0/s is ~480 RPM, just under the 500 RPM
+    // account budget, so the controller can never walk past the documented limit even if the
+    // deployment stops answering with 429s.
+    private companion object {
+        const val RPS_STEP = 0.25
+        const val RPS_PROBE_MS = 60_000L
+        const val RPS_BACKOFF = 0.5
+        const val RPS_FLOOR = 1.5
+        const val RPS_CEILING = 8.0
+        /** Back off when the recent p95 exceeds this multiple of the warm baseline. */
+        const val DELAY_TRIGGER = 1.5
+        /** Wait this many calls before fixing the baseline, so it is warm but un-pushed. */
+        const val BASELINE_AFTER_CALLS = 200L
+    }
+    @Volatile private var adaptiveEnabled = true
+    @Volatile private var lastRateAdjustMs = System.currentTimeMillis()
+    private val rateLimitHits = java.util.concurrent.atomic.AtomicLong(0)
+
+    /** Called on every transient failure; [isRateLimit] distinguishes 429 from other faults. */
+    fun noteTransient(isRateLimit: Boolean) {
+        latRetries.incrementAndGet()
+        if (!isRateLimit || !adaptiveEnabled) return
+        rateLimitHits.incrementAndGet()
+        synchronized(this) {
+            val before = targetRps
+            targetRps = (targetRps * RPS_BACKOFF).coerceAtLeast(RPS_FLOOR)
+            lastRateAdjustMs = System.currentTimeMillis()
+            if (targetRps < before) {
+                log.warn(
+                    "[ARENA-PACING] 429 -> backing off %.2f -> %.2f req/s".format(
+                        java.util.Locale.US, before, targetRps)
+                )
+            }
+        }
+    }
+
+    // ── Delay signal ────────────────────────────────────────────────────────────
+    //
+    // 429s are not the only way an endpoint says "too fast", and on this deployment they
+    // are not even the usual way: past the knee the server QUEUES instead — p95 latency
+    // rises steeply while the median barely moves, and no 429 is emitted at all — so a
+    // loss-only controller climbs straight past it. That is counterproductive twice over:
+    // work per round is N*mean_latency/permits, so inflated latency costs more than the
+    // higher rate saves, and the tail closes on the request timeout, where calls time
+    // out, retry, and the retries are themselves paced requests -- load feeding latency
+    // feeding load.
+    //
+    // So back off on delay as well as on loss, which is what every serious congestion
+    // controller does. The baseline is the p95 observed once the run is warm; exceeding
+    // [DELAY_TRIGGER] times it is treated exactly like a 429.
+    @Volatile private var baselineP95Ms = 0L
+    private val recentHttpMs = java.util.concurrent.ConcurrentLinkedQueue<Long>()
+
+    private fun recentP95(): Long {
+        val s = recentHttpMs.toList().sorted()
+        return if (s.isEmpty()) 0L else s[((s.size - 1) * 0.95).toInt()]
+    }
+
+    /** Probe upward when the endpoint has been quiet AND latency has not degraded. */
+    private fun maybeProbeUp() {
+        if (!adaptiveEnabled) return
+        val now = System.currentTimeMillis()
+        if (now - lastRateAdjustMs < RPS_PROBE_MS) return
+
+        val p95 = recentP95()
+        // Establish the baseline once, on a warm but un-pushed system.
+        if (baselineP95Ms == 0L) {
+            if (latCalls.get() < BASELINE_AFTER_CALLS || p95 <= 0L) return
+            synchronized(this) { if (baselineP95Ms == 0L) baselineP95Ms = p95 }
+            log.info("[ARENA-PACING] latency baseline set: p95=${baselineP95Ms}ms " +
+                "(back off above ${(baselineP95Ms * DELAY_TRIGGER).toLong()}ms)")
+            return
+        }
+
+        if (p95 > baselineP95Ms * DELAY_TRIGGER) {
+            synchronized(this) {
+                val before = targetRps
+                targetRps = (targetRps * RPS_BACKOFF).coerceAtLeast(RPS_FLOOR)
+                lastRateAdjustMs = now
+                recentHttpMs.clear()
+                if (targetRps < before) {
+                    log.warn(
+                        "[ARENA-PACING] latency degraded (p95 ${p95}ms > %.1fx baseline ${baselineP95Ms}ms)".format(
+                            java.util.Locale.US, DELAY_TRIGGER) +
+                            " -> backing off %.2f -> %.2f req/s".format(java.util.Locale.US, before, targetRps)
+                    )
+                }
+            }
+            return
+        }
+
+        if (targetRps >= RPS_CEILING) return
+        synchronized(this) {
+            if (now - lastRateAdjustMs < RPS_PROBE_MS) return
+            val before = targetRps
+            targetRps = (targetRps + RPS_STEP).coerceAtMost(RPS_CEILING)
+            lastRateAdjustMs = now
+            if (targetRps > before) {
+                log.info(
+                    "[ARENA-PACING] quiet for %ds, p95 ${p95}ms within baseline -> probing %.2f -> %.2f req/s".format(
+                        java.util.Locale.US, RPS_PROBE_MS / 1000, before, targetRps)
+                )
+            }
+        }
+    }
+
+    private fun recordCall(rateNs: Long, permitNs: Long, httpNs: Long) {
+        latRateNs.addAndGet(rateNs)
+        latPermitNs.addAndGet(permitNs)
+        latHttpNs.addAndGet(httpNs)
+        httpSamples.add(httpNs / 1_000_000)
+        while (httpSamples.size > 2000) httpSamples.poll()
+        // Short window for the delay signal. `httpSamples` is cumulative and so responds
+        // far too slowly to catch a knee; this keeps only the recent past.
+        recentHttpMs.add(httpNs / 1_000_000)
+        while (recentHttpMs.size > 300) recentHttpMs.poll()
+        maybeProbeUp()
+        val n = latCalls.incrementAndGet()
+        if (n % 200L == 0L) log.info(latencySummary())
+    }
+
+    /**
+     * One line naming the bottleneck. Shares sum to ~100% of in-call wall time; the
+     * saturation figure says whether the permit pool was actually the binding limit,
+     * which is the assumption a Little's Law estimate silently makes.
+     */
+    fun latencySummary(): String {
+        val n = latCalls.get().coerceAtLeast(1)
+        val rate = latRateNs.get() / 1e6 / n
+        val permit = latPermitNs.get() / 1e6 / n
+        val http = latHttpNs.get() / 1e6 / n
+        val total = (rate + permit + http).coerceAtLeast(0.001)
+        val s = httpSamples.toList().sorted()
+        fun pct(p: Double) = if (s.isEmpty()) 0L else s[((s.size - 1) * p).toInt()]
+        val dominant = listOf("rate" to rate, "permit" to permit, "http" to http).maxByOrNull { it.second }!!
+        return "[ARENA-LAT] calls=$n retries=${latRetries.get()} | per call: " +
+            "rate=%.0fms (%.0f%%) permit=%.0fms (%.0f%%) http=%.0fms (%.0f%%)".format(
+                java.util.Locale.US, rate, 100 * rate / total, permit, 100 * permit / total,
+                http, 100 * http / total) +
+            " | http p50=${pct(0.50)}ms p95=${pct(0.95)}ms p99=${pct(0.99)}ms" +
+            " | rps=%.2f 429s=%d".format(java.util.Locale.US, targetRps, rateLimitHits.get()) +
+            " | inflight max=${maxInFlight.get()}/$maxParallel" +
+            " | BOTTLENECK=${dominant.first}"
+    }
+
+    /**
+     * Wraps one outbound call: pacing slot, then a permit, then the body — timing each
+     * separately. Both request paths go through this so the accounting is complete.
+     */
+    private suspend fun <T> pacedPermit(block: suspend () -> T): T {
+        val rateNs = awaitRateSlot()
+        val permitStart = System.nanoTime()
+        return semaphore.withPermit {
+            val bodyStart = System.nanoTime()
+            val now = inFlight.incrementAndGet()
+            maxInFlight.getAndUpdate { maxOf(it, now) }
+            try {
+                block()
+            } finally {
+                inFlight.decrementAndGet()
+                recordCall(rateNs, bodyStart - permitStart, System.nanoTime() - bodyStart)
+            }
+        }
     }
     private val streamingModelCache = ConcurrentHashMap<String, StreamingChatModel>()
 
@@ -117,7 +390,14 @@ class ArcTaxonomyLLMClient(
                 .apiKey(apiKey)
                 .deploymentName(name)
                 .serviceVersion(config.llm.azure.apiVersion)
-                .timeout(java.time.Duration.ofMinutes(30))
+                // A timeout is a permit-release deadline as much as a failure deadline: a
+                // stuck call holds one of the semaphore's permits for its whole duration,
+                // so a generous deadline lets a growing latency tail park on permits and
+                // eat throughput. 45s sits just above the measured p99 request latency
+                // (~34s over 1,800 calls) and truncates roughly the slowest 1%; those
+                // calls are retried, and a retry costs one paced request rather than a
+                // held permit.
+                .timeout(java.time.Duration.ofSeconds(45))
                 .build()
         } else {
             val discoveredCtx = discoverModelContext(name)
@@ -158,7 +438,7 @@ class ArcTaxonomyLLMClient(
 
     override suspend fun queryModel(modelName: String, systemPrompt: String?, userPrompt: String): String {
         return runWithRetry(modelName) {
-            semaphore.withPermit {
+            pacedPermit {
                 val slot = monitor.acquireSlot(modelName)
 
                 try {
@@ -195,7 +475,7 @@ class ArcTaxonomyLLMClient(
                         monitor.removeSlot(slot)
                     }
 
-                    return@withPermit responseText
+                    return@pacedPermit responseText
 
                 } catch (e: Exception) {
                     monitor.releaseSlot(slot)
@@ -235,7 +515,7 @@ class ArcTaxonomyLLMClient(
 
         // Ollama: native structured output via ChatRequest + ResponseFormat
         return runWithRetry(modelName) {
-            semaphore.withPermit {
+            pacedPermit {
                 val slot = monitor.acquireSlot(modelName)
 
                 try {
@@ -282,7 +562,7 @@ class ArcTaxonomyLLMClient(
                         monitor.removeSlot(slot)
                     }
 
-                    return@withPermit responseText
+                    return@pacedPermit responseText
 
                 } catch (e: Exception) {
                     monitor.releaseSlot(slot)
@@ -329,6 +609,7 @@ class ArcTaxonomyLLMClient(
                 val jitter = (0.8 + kotlin.random.Random.nextDouble() * 0.4)
                 val finalDelay = (baseDelay * jitter).toLong()
                 
+                noteTransient(isRateLimit)
                 log.warn("Transient error (rateLimit=$isRateLimit) on model '$modelName' (attempt $attempt/$actualMaxRetries): ${t.message}. Retrying in ${finalDelay}ms...")
                 delay(finalDelay)
                 

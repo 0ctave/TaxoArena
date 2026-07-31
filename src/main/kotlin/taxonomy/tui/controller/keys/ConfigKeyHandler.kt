@@ -2,7 +2,6 @@ package taxonomy.tui.controller.keys
 
 import taxonomy.tui.components.SettingItem
 import taxonomy.tui.controller.TuiEvent
-import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.TuiAppState
 

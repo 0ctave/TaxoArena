@@ -1,5 +1,18 @@
 # Report Quality & Style Analysis (2026-07-23)
 
+> **STATUS: STALE-BUT-FIXABLE (2026-07-30). The instructions are right; the measurements
+> are dead.**
+>
+> Struck: "Results/Discussion/Conclusion are stubs (42/24/4 lines)" and the whole balance
+> table built on it — Results is now the largest file in the report. Struck: "no figures in
+> 2,700 lines" — the set is 8 (`figures-plan-v3.md`). Struck: convergence "~iteration 15" —
+> the certificate settles at **iteration 10**. Struck: the suggestion to reconsider the DAG
+> demotion "now that the DAG carries novel machinery" — polyhierarchy was measured and
+> retired as a negative result, so the cross-link operator is exactly what should stay
+> demoted.
+>
+> **Still the right instructions:** the de-duplication table and the eight-item style list.
+
 Scope: `report/03_Content/*.tex` (2,674 lines) + `report/04_Appendix/*.tex`
 (1,258 lines). Results/Discussion/Conclusion are stubs (42/24/4 lines) and are
 excluded except as balance data points. The logic-alignment pass of the same

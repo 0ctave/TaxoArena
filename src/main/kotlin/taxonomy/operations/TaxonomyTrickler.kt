@@ -27,8 +27,8 @@ import kotlin.math.ln
  * 3. Final membership share ([TaxonomyConfig.FormalismConfig.membershipFloor]): memberships
  *    are normalized over the leaves the query actually reached; a leaf counts iff it holds
  *    at least that fraction of the query's own membership. Self-normalized, hence invariant
- *    to depth and fan-out — the previous flat product-vs-floor test made balanced structure
- *    unreachable below depth 2 and forced dominant-child wrapper churn.
+ *    to depth and fan-out — a flat product-vs-floor test would make balanced structure
+ *    unreachable below depth 2 and force dominant-child wrapper churn.
  */
 data class RoutingResult(
     val leaves: Map<GraphNode, Double>,
@@ -203,14 +203,6 @@ class TaxonomyTrickler(
         // is within routingBeamGamma of the BEST sibling's dot product.
         val bestIndices = children.indices.filter { dots[it] >= maxDot - config.formalism.routingBeamGamma }
 
-        // The nearMisses ledger that used to be maintained here is gone. It recorded,
-        // per child, the routing margin of every query that ALMOST landed there,
-        // capped at 200 entries with an eviction scan — under `synchronized`, on the
-        // hot path, for every query on every route. Its only consumer was
-        // proposeCrossLinks, deleted when cross-linking was removed (334b95d), so it
-        // had become a write-only structure whose entire cost was contention on a
-        // lock nothing read.
-
         // Register the query embedding for MRL-projection lookup
         GraphNode.registerEmbedding(embedding)
 
@@ -288,15 +280,11 @@ class TaxonomyTrickler(
             return maxVal + ln(exp(a - maxVal) + exp(b - maxVal))
         }
 
-        // Topological (reverse-postorder) processing of the reachable subgraph.
-        //
-        // This was previously a DFS with backtracking — `pathVisited` was removed again on
-        // exit — so it enumerated every distinct root-to-node PATH and re-walked a node's
-        // entire subtree once per path reaching it. On a tree that is linear (paths = nodes),
-        // but every accepted cross-link multiplies the number of paths into the target's whole
-        // subtree, so routing cost grew combinatorially in the number of bridges. Measured:
-        // per-proposal cost rose 10x (0.30s -> 2.92s) as accepted cross-links went 22 -> 161,
-        // which dominated total runtime and got worse the better the polyhierarchy got.
+        // Topological (reverse-postorder) processing of the reachable subgraph, NOT a
+        // path-enumerating DFS: enumerating every distinct root-to-node path re-walks a
+        // node's entire subtree once per path reaching it, which is linear on a tree but
+        // grows combinatorially with every accepted cross-link (see [trickleReference],
+        // the equivalence oracle for this walk).
         //
         // The quantity being computed is a logSumExp of path masses over an acyclic graph, so
         // it is a dynamic program: visit each node only after all of its predecessors, and push

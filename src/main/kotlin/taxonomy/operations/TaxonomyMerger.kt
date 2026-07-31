@@ -1,14 +1,11 @@
 package taxonomy.operations
 
-import dev.langchain4j.model.chat.request.json.JsonObjectSchema
-import dev.langchain4j.model.chat.request.json.JsonSchema
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import taxonomy.config.TaxonomyConfig
 import taxonomy.dataset.MMLUDatasetFetcher
 import taxonomy.model.*
-import taxonomy.prompts.TaxoPrompts
 import taxonomy.utils.StatisticsUtils
 import kotlin.math.sqrt
 
@@ -64,9 +61,9 @@ class TaxonomyMerger(
 
             for (node in getAllNodes(root)) {
                 // isBridge means BRIDGED — this node has more than one parent. Hosting a
-                // cross-link is a different property (hasCrossLinks) and used to be folded in
-                // here, which flagged 12 of the 14 depth-1 domains as bridges purely for being
-                // hosts and made every "cross-domain node" count meaningless.
+                // cross-link is a different property (hasCrossLinks); folding it in here
+                // would flag nearly every depth-1 domain as a bridge purely for being a
+                // host and make every "cross-domain node" count meaningless.
                 node.isBridge = node.parents.size > 1
             }
         }

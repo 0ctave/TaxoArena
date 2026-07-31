@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test
  *
  *     F^+ = Fc^-1 - J/K^2
  *
- * so the diagonal correction is 1/K^2. The code used 1/K until 2026-07-27, over-subtracting
- * (K-1)/K^2 from every variance — 0.109 at K=8 — which pushed nearly every value into the
- * 1e-6 floor, so reported standard errors were the floor rather than a measurement.
+ * so the diagonal correction is 1/K^2. Subtracting 1/K instead over-subtracts (K-1)/K^2
+ * from every variance — 0.109 at K=8 — pushing nearly every value into the 1e-6 floor,
+ * so reported standard errors become the floor rather than a measurement.
  *
  * This test works on the linear algebra directly rather than through a fitted model,
  * because the identity is what was wrong; a golden-value test would have been written

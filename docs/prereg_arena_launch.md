@@ -71,3 +71,45 @@ smoke run -> read cost against the bands above -> set the cut -> launch.
 
 The 20-cell rubric arm and the hold-out experiments run in parallel with the
 arena; neither touches it.
+
+---
+
+# Addendum (2026-07-30) — outcomes, and one prediction that fired
+
+**Nothing above is edited.**
+
+## The band attribution is resolved, against this document
+
+Line 58-59 above states that the random-cell arm's bands (`<= 0.05` causal, `>= 0.10`
+refuted, between = partial) are fixed in `prereg_rubric_specificity.md`. That document's
+addendum rules the other way: the band is stated **here**, it governs the random arm's
+absolute own-cell specificity, and that document's attribution of the band to this one is an
+error in that document. Recorded so the two files agree on where the band lives.
+
+## The partial band never applied
+
+The random arm landed at **0.012**, inside the `<= 0.05` causal band. Leaf rubrics landed at
+**0.138**, Mann-Whitney one-sided **p = 1.21e-6** over 87 leaf rubrics against 13 random
+cells, with terms appearing in >= 90% of rubrics at **0 vs 6**. The partial reading at lines
+63-65 is moot.
+
+## The constant-allocation warning fired, on mathematics
+
+Lines 33-36 above warn: *"the Math run spent exactly 56 on every cell across a 3.4x size
+range, which was an allocation ... if the new number is also constant, the scheduler is still
+capping rather than converging and the measurement is void again."*
+
+That is the confound that later surfaced. The mathematics paired run covers **20 of 66 model
+pairs**, with the leader in 55% of comparisons, against 66 of 66 in every other domain. It is
+the only paired run predating commits `5e1be09` (bootstrap floor) and `a5c36fd`
+(per-(leaf,pair) shuffle). A re-run is registered under Addendum 4 of
+`prereg_generic_judge_baseline.md` and is pending.
+
+This document predicted the failure mode before the run. Cite it when the confound is
+discussed; a warning that fired is worth more than one that was never tested.
+
+## Not verified
+
+The three smoke-run assertions this document required — that `validateVerdictNodeIds` fires,
+that a non-MAIN verdict CSV is written, and that `rank_history.csv` is populated — have not
+been confirmed to have fired. They remain open.

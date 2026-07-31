@@ -88,7 +88,7 @@ object ValidationService {
 
         // 2. BT Scores from the original run
         val originalStats = buildPairStats(domainResults, models, domain)
-        val originalBtScores = BtMmFitter.fit(models, originalStats)
+        val originalBtScores = BtMmFitter.fit(models, originalStats, context = "validation/original")
 
         val canonicalBtScores = computeCanonicalBtScores(domainResults, models)
         val adaptedBtScores = computeAdaptedBtScoresFromResults(domainResults, models)
@@ -149,7 +149,7 @@ object ValidationService {
             }
 
             val resampledStats = buildPairStats(resampled, models, domain)
-            val resampledBtScores = BtMmFitter.fit(models, resampledStats)
+            val resampledBtScores = BtMmFitter.fit(models, resampledStats, context = "validation/bootstrap")
             val resampledBt = models.map { resampledBtScores[it] ?: 0.0 }
 
             val resampledBtAdapted = computeAdaptedBtScoresFromResults(resampled, models)
@@ -541,7 +541,7 @@ object ValidationService {
                 )
             }
         }
-        return BtMmFitter.fit(models, pooled.values.toList())
+        return BtMmFitter.fit(models, pooled.values.toList(), context = "validation/canonical")
     }
 
     fun computeAdaptedBtScoresFromResults(results: List<QueryBenchmarkResult>, models: List<String>): Map<String, Double> {
@@ -589,7 +589,7 @@ object ValidationService {
                 )
             }
         }
-        return BtMmFitter.fit(models, pooled.values.toList())
+        return BtMmFitter.fit(models, pooled.values.toList(), context = "validation/adapted")
     }
 
     fun computePermutationPValue(
@@ -728,7 +728,7 @@ object ValidationService {
                 )
             }
         }
-        return BtMmFitter.fit(models, pooled.values.toList())
+        return BtMmFitter.fit(models, pooled.values.toList(), context = "validation/softAdapted")
     }
 
     private fun buildPairStatsWithWeights(

@@ -14,8 +14,52 @@ class BtStoppingPolicy(
     val budgetPerPair: Int
 ) {
     private val leafRankHistory = mutableMapOf<String, ArrayDeque<List<String>>>()
-    val globallyResolvedPairs = mutableSetOf<String>()
+
+    /**
+     * Pairs the confidence gate has settled, keyed `"nodeId|modelA|modelB"` — PER CELL.
+     *
+     * WHAT THIS REPLACED, AND WHY (2026-07-31). The set used to be keyed on the pair alone and
+     * populated from the AGGREGATE leaderboard: if the pooled gap between two models exceeded
+     * 2.5 sigma, the pair was suppressed in every cell at once. That inverts the experiment.
+     * Whether a pair's ordering is the same in every cell is the question the per-cell arena
+     * exists to ask, and a cell where the ordering reverses can only reveal it by comparing
+     * those two models IN THAT CELL. Retiring the pair everywhere on the strength of the pooled
+     * result assumes the null and then reports it cannot be rejected.
+     *
+     * Measured on the 2026-07-31 history run: 45 of 66 pairs suppressed after round 1, 57 of 66
+     * by round 4, and NOT ONE of the 44 adjacent pairs across the four cells met the local
+     * resolution test. Three cells were nonetheless declared converged, because
+     * [isLeafConverged] counted a globally suppressed pair as terminal. The run stopped for want
+     * of schedulable work and recorded it as convergence.
+     *
+     * The gate is now evaluated against each cell's own theta and standard errors, so a pair
+     * settled in one cell keeps being sampled in another until that cell settles it too. It is
+     * still a real local criterion, so it may legitimately mark a pair terminal in its own cell.
+     */
+    val resolvedPairs = mutableSetOf<String>()
+
+    fun isPairResolved(nodeId: String, mA: String, mB: String): Boolean =
+        resolvedPairs.contains("$nodeId|${minOf(mA, mB)}|${maxOf(mA, mB)}")
     val pairCustomBudgets = mutableMapOf<String, Int>()
+
+    /**
+     * Comparisons a single pair may accumulate inside one leaf, sized from THAT leaf's
+     * own query pool.
+     *
+     * WHY THIS EXISTS (2026-07-30, for the M=17 replication). The constructor's
+     * [budgetPerPair] is computed once per run in `buildSchedulingParams` and clamped by
+     * `minQuestionsPerLeaf / 2` — the minimum over ALL leaves. On the mathematics re-run
+     * the smallest leaf holds 14 held-out questions, so every pair in every leaf was
+     * capped at 7 comparisons, including leaves with four times the data. One small cell
+     * rationed the evidence budget for the whole domain.
+     *
+     * The floor of 8 keeps the exact binomial test reachable (a unanimous pair resolves
+     * at 9 with Bonferroni over 11 adjacent pairs); the ceiling of 25 stops a large leaf
+     * from consuming budget that buys nothing once a pair is decided.
+     */
+    fun leafBudgetPerPair(leafQueryCount: Int): Int =
+        if (leafQueryCount <= 0) budgetPerPair
+        else (leafQueryCount / 4).coerceIn(8, 25)
 
     // PUBLIC — called by both shouldStop() and BtMatchScheduler
     fun isLeafConverged(
@@ -37,7 +81,8 @@ class BtStoppingPolicy(
 
         if (condition.equals("MAIN", ignoreCase = true)) {
             val queryIds = nodeToQueries[nodeId] ?: emptyList()
-            val leafArena = LeafArena(nodeId, models, queryIds, emptyMap(), budgetPerPair)
+            val leafBudget = leafBudgetPerPair(queryIds.size)
+            val leafArena = LeafArena(nodeId, models, queryIds, emptyMap(), leafBudget)
 
             val nodePairs = pairStats[nodeId] ?: emptyList()
             for (ps in nodePairs) {
@@ -49,21 +94,52 @@ class BtStoppingPolicy(
                 stats.n = ps.totalComparisons.toInt()
             }
 
-            fun epsilon(n: Int, k: Int, bMax: Int): Double {
-                if (n <= 0) return Double.POSITIVE_INFINITY
-                val p = k * (k - 1) / 2
-                return Math.sqrt(Math.log(2.0 * p * bMax / 0.05) / (2.0 * n))
+            // Exact two-sided binomial tail against p = 0.5, Bonferroni-corrected over
+            // the (k-1) ADJACENT pairs this test is actually applied to — only adjacent
+            // pairs are tested below, so a union bound over all k(k-1)/2 pairs would
+            // over-correct by ~6x. The exact tail is used because it is far tighter than
+            // a Hoeffding bound in the lopsided regime that matters here: a unanimous
+            // pair resolves at 9 comparisons where Hoeffding cannot fire before ~23,
+            // which typical per-pair budgets never reach. Adjacent pairs are the CLOSEST
+            // pairs by construction, so most still terminate by exhaustion rather than
+            // resolution — the test is honest and occasionally useful; it does not make
+            // convergence easy.
+            fun logChoose(n: Int, k: Int): Double {
+                var s = 0.0
+                for (i in 1..k) s += Math.log((n - k + i).toDouble()) - Math.log(i.toDouble())
+                return s
             }
+            fun binomTwoSidedP(n: Int, successes: Int): Double {
+                if (n <= 0) return 1.0
+                val kk = Math.min(successes, n - successes)
+                var tail = 0.0
+                for (i in 0..kk) tail += Math.exp(logChoose(n, i) + n * Math.log(0.5))
+                return Math.min(1.0, 2.0 * tail)
+            }
+            val adjacentTests = Math.max(1, models.size - 1)
 
-            val score = models.associateWith { 0.0 }.toMutableMap()
-            for ((key, s) in leafArena.stats) {
-                val (x, y) = key
-                if (s.n == 0) continue
-                val phat = s.sumX / s.n
-                score[x] = score.getValue(x) + phat
-                score[y] = score.getValue(y) + (1.0 - phat)
+            // Rank on the fitted Bradley-Terry strengths, falling back to Copeland only
+            // before a fit exists. This MUST match ActiveBtRacingScheduler.ranking(): the
+            // scheduler samples rank-adjacent pairs and this decides whether those pairs
+            // are terminal, so if the two order models differently they are testing
+            // different pairs and the leaf can never satisfy a criterion the scheduler is
+            // not working toward. Copeland gives a pair with one comparison the same
+            // weight as a pair with thirty, which made the order -- and therefore the
+            // adjacency set -- churn between rounds; see the note on that function.
+            val leafBt = btStates[nodeId]?.btScores ?: emptyMap()
+            val ranked = if (leafBt.isNotEmpty() && models.any { (leafBt[it] ?: 0.0) != 0.0 }) {
+                models.sortedByDescending { leafBt[it] ?: 0.0 }
+            } else {
+                val score = models.associateWith { 0.0 }.toMutableMap()
+                for ((key, s) in leafArena.stats) {
+                    val (x, y) = key
+                    if (s.n == 0) continue
+                    val phat = s.sumX / s.n
+                    score[x] = score.getValue(x) + phat
+                    score[y] = score.getValue(y) + (1.0 - phat)
+                }
+                score.toList().sortedByDescending { it.second }.map { it.first }
             }
-            val ranked = score.toList().sortedByDescending { it.second }.map { it.first }
 
             if (ranked.size < 2) return true
 
@@ -75,10 +151,28 @@ class BtStoppingPolicy(
             for (k in 0 until ranked.size - 1) {
                 val key = ordered(ranked[k], ranked[k + 1])
                 val s = leafArena.stats[key] ?: PairStats()
-                val eps = epsilon(s.n, models.size, budgetPerPair)
-                val phat = if (s.n > 0) s.sumX / s.n else 0.5
-                val resolved = (s.n >= 5) && (abs(phat - 0.5) > eps)
-                val exhausted = s.n >= budgetPerPair
+                // sumX carries half-weighted ties, so round to the nearest whole win count
+                // for the exact tail; ties push it toward n/2 and away from significance,
+                // which is the conservative direction.
+                val wins = Math.round(s.sumX).toInt().coerceIn(0, s.n)
+                val p = binomTwoSidedP(s.n, wins) * adjacentTests
+                val resolved = (s.n >= 5) && (p < 0.05)
+                // Read the SAME per-(leaf, pair) budget the scheduler enforces, defaulting
+                // to this leaf's budget. Comparing against the run-global `budgetPerPair`
+                // would deadlock every pair the scheduler has retired: marking a pair
+                // STABLE or IRRESOLVABLE sets its custom budget down to its current
+                // comparison count and stops sampling it, so `n` freezes below the global
+                // budget, `exhausted` never fires, and the leaf can never converge.
+                val pairBudget = pairCustomBudgets.getOrDefault(
+                    "$nodeId|${key.first}|${key.second}", leafBudget
+                )
+                // A pair the gate has settled IN THIS CELL stops being sampled here, so it
+                // must count as terminal here too; leaving it UNRESOLVED deadlocks the leaf
+                // on a pair nothing will fund. The gate key carries the cell id (see
+                // [resolvedPairs]) — keyed on the pair alone, this line would let a cell
+                // converge on evidence gathered somewhere else.
+                val gateDone = isPairResolved(nodeId, key.first, key.second)
+                val exhausted = gateDone || s.n >= pairBudget
                 if (!resolved && !exhausted) {
                     allTerminal = false
                     break
@@ -104,7 +198,7 @@ class BtStoppingPolicy(
         val allPairs = models.flatMapIndexed { i, mA -> models.drop(i + 1).map { mB -> mA to mB } }
         val informativePairs = allPairs.filter { (mA, mB) ->
             val pairKey = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
-            if (globallyResolvedPairs.contains(pairKey)) return@filter false
+            if (isPairResolved(nodeId, mA, mB)) return@filter false
 
             val ps = (pairStats[nodeId] ?: emptyList()).firstOrNull {
                 (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
@@ -154,10 +248,37 @@ class BtStoppingPolicy(
         totalComparisons: Int,
         nodeToQueries: Map<String, List<Int>> = emptyMap(),
         condition: String = "LEGACY_MAIN",
-        mainConditionTotalComparisons: Int = 72
+        mainConditionTotalComparisons: Int = 72,
+        /**
+         * Distinct judge calls this arm has spent, as opposed to [totalComparisons], which is
+         * leaf-credited and counts one verdict once per cell that admits its question.
+         *
+         * The two diverge under multi-membership, and they diverge ASYMMETRICALLY between
+         * the arms: MAIN spreads its questions over many cells, so a shared question is
+         * credited several times, while C5 has a single cell and cannot inflate. Matching
+         * the arms on the leaf-credited number would therefore hand C5 more real judge
+         * calls than MAIN — extra evidence for the arm the contrast is measured against,
+         * biasing Delta rho against MAIN by construction.
+         *
+         * Budget parity is a claim about judging cost, so it is enforced on verdicts.
+         */
+        verdictsThisArm: Int = 0
     ): Boolean {
-        if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true)) {
-            return totalComparisons >= mainConditionTotalComparisons
+        // ── Arm matching ──────────────────────────────────────────────────────────
+        // C5 stops at MAIN's verdict count instead of running its own convergence rule
+        // to a different total. Delta rho compares the two arms' rank correlation
+        // against ground truth; an arm with less evidence has a noisier Bradley-Terry
+        // fit and therefore a depressed rho, so any difference in arm size biases the
+        // contrast toward whichever arm got more data. Matching the totals removes the
+        // threat by construction. MAIN must run first; TaxonomyBenchmarkService captures
+        // its total when it finishes and passes it here. RANDOM_SCHEDULER is matched the
+        // same way.
+        if (condition.equals("RANDOM_SCHEDULER", ignoreCase = true) ||
+            condition.equals("C5", ignoreCase = true) ||
+            condition.equals("GENERIC_PAIRV2", ignoreCase = true)
+        ) {
+            // Verdicts, not leaf-credited comparisons — see `verdictsThisArm`.
+            return verdictsThisArm >= mainConditionTotalComparisons
         }
         if (round >= maxRounds) return true
         if (condition.equals("ROUND_ROBIN", ignoreCase = true)) return false
@@ -193,7 +314,7 @@ class BtStoppingPolicy(
             // NEW: irresolvable-only leaf — rank noise from tie pairs should not block
             val allPairsResolved = allPairs.all { (mA, mB) ->
                 val pk = "${minOf(mA, mB)}|${maxOf(mA, mB)}"
-                globallyResolvedPairs.contains(pk) ||
+                isPairResolved(leafId, mA, mB) ||
                 (pairStats[leafId] ?: emptyList()).firstOrNull {
                     (it.modelA == mA && it.modelB == mB) || (it.modelA == mB && it.modelB == mA)
                 }?.let { ps ->

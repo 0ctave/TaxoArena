@@ -2,7 +2,6 @@ package taxonomy.tui.controller
 
 import taxonomy.service.AnalysisMode
 import taxonomy.tui.components.SettingItem
-import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.TuiAppState
 
 class CommandController(

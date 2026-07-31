@@ -1,5 +1,30 @@
 # Thesis plan v2 — six chapters, four appendices
 
+> **STATUS: STALE IN ITS RESULTS, CURRENT IN ITS STRUCTURE (2026-07-30).**
+>
+> The chapter architecture, the corrections ledger, the dispositions on reliability / ECE /
+> BT variance, and the negative-presentation frame are all still right. Three blocks are
+> not:
+>
+> * **§5.0 "What was run"** describes **one** arena run at 8 models on Mathematics. There
+>   are many paired runs at a 12-model roster. This is the single most falsified block
+>   in the file, and every "at n = 8" power qualification downstream of it goes with it.
+>   Updated 2026-07-31: the eight-domain M = 12 batch is **superseded** — one complete cell
+>   per domain, the rest starved, and three runs with unequal arms. The results are five
+>   revised-scheduler runs (`newlogic-rerun-record.md`); the M = 12 batch is kept because
+>   every pre-registration points at it (`batch-M12-complete-record.md`).
+> * **§5.2.4 "The domain screen and its two reversals"** uses the 11-band screen p-values
+>   (law 0.008, math 1.000). Those were recomputed at the 12-model roster in Addendum 3 of
+>   `prereg_generic_judge_baseline.md` (law 0.011, math 0.289). And the screen must not be
+>   framed as the thing that picks the domain: philosophy was not flagged and gave the
+>   largest advantage.
+> * **The roster ledger rows** read `binom(12,2) = 66 -> binom(11,2) = 55`. That is
+>   backwards now. Every paired run is 12 models, 66 pairs.
+>
+> Also: `Delta rho` is cut here as an RQ2 metric. It is the headline metric. And §5.1.3
+> still plans a two-page trace-stratum subsection whose figure was cut in
+> `figures-plan-v3.md`.
+
 Status: **written 2026-07-27**, against branch `tree-only` @ `a92a3ed`.
 No `.tex` file was edited in producing this plan.
 

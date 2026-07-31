@@ -1,5 +1,18 @@
 # Report Visualization Plan (2026-07-23)
 
+> **STATUS: SUPERSEDED IN FULL (2026-07-30) by `figures-plan-v3.md`.** Chain:
+> this -> `figures-plan.md` (2026-07-28) -> `figures-plan-v2.md` -> `figures-plan-v3.md`.
+> The current set is **8 figures, 6 main + 2 appendix**.
+>
+> Everything below belongs to a superseded experiment: 16 figure candidates, condition
+> names C1/C2/C3 (the arms are MAIN and C5), `Delta tau` as the RQ2 quantity (it is
+> `Delta rho`), and a three-seed design (every run is seed 42). Item 15's premise, that
+> ECE "currently holds scalars only", is also wrong — ECE is exported at 0.2114 and a
+> reliability diagram would silently inherit its `maxOf` aggregation defect.
+>
+> **Worth salvaging:** §B Conventions — the Okabe-Ito palette, vector-PDF sizing, and the
+> one-script-per-figure reproducibility rule.
+
 Design-first plan: formats, placement, and rationale are fixed now; data is filled in
 once the arena runs exist. Ranking criteria: (a) carries a headline claim (RQ1/RQ2
 first, DQ1 second, mechanism third); (b) data already on disk vs pending arena runs;

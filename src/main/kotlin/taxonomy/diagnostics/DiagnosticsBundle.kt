@@ -190,9 +190,8 @@ object DiagnosticsBundle {
 
                 // A well-formed EMPTY file is the failure mode that looks like success: the
                 // header is present, the parse succeeds, and the absence is only noticed when
-                // the data is needed and the run is gone. iteration_metrics.csv shipped exactly
-                // like that in the first bundle — header written at open(), hook never wired.
-                // Assert every promised file actually received rows.
+                // the data is needed and the run is gone (header written at open(), producer
+                // hook never wired). Assert every promised file actually received rows.
                 for ((name, rows) in listOf(
                     "iteration_metrics.csv" to iterationRows,
                     "proposals.csv" to proposalRows

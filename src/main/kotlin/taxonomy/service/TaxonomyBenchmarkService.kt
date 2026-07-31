@@ -1,8 +1,6 @@
 package taxonomy.service
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import taxonomy.utils.TaxonomyPerformanceTracker
@@ -15,12 +13,9 @@ import taxonomy.dataset.unwrapTraceEnvelope
 import taxonomy.model.*
 import java.io.File
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.encodeToString
 import kotlin.collections.filter
 import kotlin.math.abs
-import kotlin.math.exp
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -40,6 +35,17 @@ class TaxonomyBenchmarkService(
     private val json = Json { ignoreUnknownKeys = true }
     @Volatile
     private var mainConditionTotalComparisons: Int = 72
+
+    /**
+     * Verdicts served from the match cache instead of the judge, over the whole run.
+     *
+     * A non-zero value means the scheduler drew a (leaf, pair, question) triple it had already
+     * judged. That costs nothing and is harmless in itself, but it used to be propagated into
+     * the pair statistics a second time, which is how the leaf-credited comparison total came
+     * to exceed the number of verdicts actually produced. Reported at the end of the run so the
+     * two counts can be reconciled without going to the database.
+     */
+    private val replayedVerdicts = java.util.concurrent.atomic.AtomicInteger(0)
 
     private fun getAllNodes(root: GraphNode): List<GraphNode> {
         val visited = mutableSetOf<String>()
@@ -83,7 +89,20 @@ class TaxonomyBenchmarkService(
         modelB: String,
         outcome: DomainEvaluation,
         snapshotId: String,
-        judgeAgreed: Boolean = true
+        judgeAgreed: Boolean = true,
+        /**
+         * Whether the answer key has an opinion about this match at all.
+         *
+         * The key discriminates only when exactly one of the two models is correct. When both
+         * are right or both are wrong it says "TIE", which is not a judgement about response
+         * quality — it is the key declining to rank. Counting those as agreement checks scores
+         * the judge against a reference that mostly abstains: the judge names a winner ~78% of
+         * the time, the key says TIE far more often, and the exact-match rate lands near 0.45
+         * no matter how good the judge is. That is a property of the comparison, not of the
+         * judge. Only decidable matches are counted, so `agreementWins / agreementChecks` is
+         * the rate at which the judge picks the model that actually answered correctly.
+         */
+        judgeCheckable: Boolean = true
     ) {
         val (wA, wB) = when (outcome.winner.uppercase()) {
             "MODEL A" -> 1.0 to 0.0
@@ -112,8 +131,10 @@ class TaxonomyBenchmarkService(
             existing.ties += if (isTie) 1 else 0
             existing.totalComparisons += 1
             existing.positionFlips += if (outcome.positionFlip) 1 else 0
-            existing.agreementWins += if (judgeAgreed) 1 else 0
-            existing.agreementChecks += 1
+            if (judgeCheckable) {
+                existing.agreementWins += if (judgeAgreed) 1 else 0
+                existing.agreementChecks += 1
+            }
             existing.lastUpdated = System.currentTimeMillis()
             existing
         } else {
@@ -128,8 +149,8 @@ class TaxonomyBenchmarkService(
                 positionFlips = if (outcome.positionFlip) 1 else 0,
                 winAFirst = outcome.winAFirst,
                 winASecond = outcome.winASecond,
-                agreementWins = if (judgeAgreed) 1 else 0,
-                agreementChecks = 1,
+                agreementWins = if (judgeCheckable && judgeAgreed) 1 else 0,
+                agreementChecks = if (judgeCheckable) 1 else 0,
                 lastUpdated = System.currentTimeMillis()
             )
         }
@@ -190,11 +211,18 @@ class TaxonomyBenchmarkService(
             }
         }
 
+        // queryLimit is applied AFTER domain scoping, not here, whenever a construction domain
+        // is set. Applying it here bounded the whole reserved pool BEFORE the scope filter
+        // below dropped everything outside the target domain, so the bound did not mean what
+        // it says: on a Math run, `queryLimit = 24` drew 24 questions from all 14 domains and
+        // only the ~11.4% that route into Math survived — ONE judged question. A smoke test
+        // sized by this bound therefore measured nothing and could not cost a real run.
+        val deferLimit = !req.category.isNullOrBlank()
         val matrix = evalStore.getResultsMatrix(
             models = modelNames,
             category = null,
             reservedOnly = req.reservedOnly,
-            limit = req.queryLimit,
+            limit = if (deferLimit) 0 else req.queryLimit,
             minModelCount = 2
         )
 
@@ -317,9 +345,31 @@ class TaxonomyBenchmarkService(
             }
 
             queryToSoftRouting[qId] = softResult
+            // One query, one cell: only the primary (argmax) leaf is filed, even though
+            // `routeToLeavesSoft` also returns `secondaryMemberships` above the admission
+            // floor. Filing secondaries as well was tried and withdrawn, because crediting
+            // one verdict to several cells makes the leaf-credited total exceed the number
+            // of judge calls, and it biases the paired contrast: MAIN spreads questions
+            // over many cells while C5 has a single cell, so leaf-credited arm matching
+            // would fund C5 with more real judge calls than MAIN. With one query in one
+            // cell, verdict counts and leaf-credited counts coincide by construction.
+            // The sibling propagation downstream tolerates multi-leaf membership; it simply
+            // never fires while every query maps to one leaf.
             val leaf = softResult.primaryLeaf
             nodeToQueries.getOrPut(leaf.id) { mutableListOf() }.add(qId)
             queryToLeaves.getOrPut(qId) { mutableListOf() }.add(leaf.id)
+        }
+        // Now that scoping has run, `queryLimit` can mean "N questions IN THIS DOMAIN".
+        // Deterministic: qIds are sorted, so the same limit always selects the same questions.
+        if (deferLimit && req.queryLimit > 0 && queryToSoftRouting.size > req.queryLimit) {
+            val keep = queryToSoftRouting.keys.sorted().take(req.queryLimit).toSet()
+            val dropped = queryToSoftRouting.size - keep.size
+            queryToSoftRouting.keys.retainAll(keep)
+            queryToLeaves.keys.retainAll(keep)
+            nodeToQueries.values.forEach { it.retainAll(keep) }
+            nodeToQueries.entries.removeIf { it.value.isEmpty() }
+            log.info("[ARENA-POOL] queryLimit=${req.queryLimit} applied AFTER domain scoping: " +
+                "kept ${keep.size} in-domain questions across ${nodeToQueries.size} leaves, dropped $dropped")
         }
         val routeEnd = System.currentTimeMillis()
         if (config.diagnostics.enableProfiling) {
@@ -344,6 +394,32 @@ class TaxonomyBenchmarkService(
             minTotalComparisons = params.minTotalComparisons,
             budgetPerPair = params.budgetPerPair
         )
+        // Seed the per-(leaf, pair) budget map from each leaf's own query pool, so the
+        // scheduler and the stopping policy enforce the SAME number.
+        //
+        // Both sides read `pairCustomBudgets.getOrDefault(key, <default>)`, but their
+        // fallbacks differ: the scheduler falls back to the run-global
+        // `params.budgetPerPair` while the stopping policy sizes budgets per leaf.
+        // Left unseeded, a leaf allowed 25 comparisons per pair would stall at the global
+        // 7 — the scheduler stops issuing matches long before the stopping policy
+        // considers the pair exhausted. Seeding the per-leaf value up front makes the two
+        // agree by construction; the scheduler's own mutations still work, since it caps
+        // a retired pair to its current count and extends budgets by addition.
+        run {
+            var seeded = 0
+            for ((nodeId, qs) in nodeToQueries) {
+                val b = stoppingPolicy.leafBudgetPerPair(qs.size)
+                for (i in modelNames.indices) for (j in i + 1 until modelNames.size) {
+                    val a = modelNames[i]; val c = modelNames[j]
+                    stoppingPolicy.pairCustomBudgets["$nodeId|${minOf(a, c)}|${maxOf(a, c)}"] = b
+                    seeded++
+                }
+            }
+            val sizes = nodeToQueries.values.map { stoppingPolicy.leafBudgetPerPair(it.size) }
+            log.info("[ARENA-BUDGET] seeded $seeded per-(leaf,pair) budgets from leaf size:" +
+                " range [${sizes.minOrNull() ?: 0}, ${sizes.maxOrNull() ?: 0}]," +
+                " run-global fallback was ${params.budgetPerPair}")
+        }
         val scheduler = BtMatchScheduler(
             minQueriesForBenchmark = 1,
             queriesPerPair = params.queriesPerPair,
@@ -467,7 +543,10 @@ class TaxonomyBenchmarkService(
                     hadJudge = true,
                     domainEvaluations = listOf(primaryEval),
                     pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
-                    judgeAccuracyAgreement = mapOf(pairKey to agrees),
+                    // Agreement is recorded only where the key ranks the two responses; on
+                    // undecidable comparisons the entry is omitted, so every consumer
+                    // computes a decidable-only rate.
+                    judgeAccuracyAgreement = if (gtWinner != "tie") mapOf(pairKey to agrees) else emptyMap(),
                     queryId = qId
                 )
             }
@@ -535,7 +614,7 @@ class TaxonomyBenchmarkService(
                         )
                     } else {
                         val fitStart = System.currentTimeMillis()
-                        val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
+                        val scores = BtMmFitter.fit(modelNames, adjustedNodePairs, context = "leaf/$leafId")
                         val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
                         val fitEnd = System.currentTimeMillis()
                         if (config.diagnostics.enableProfiling) {
@@ -713,7 +792,8 @@ class TaxonomyBenchmarkService(
                 totalComparisons = pairStatsMap.values.flatten().sumOf { it.totalComparisons }.toInt(),
                 nodeToQueries = nodeToQueries,
                 condition = req.condition,
-                mainConditionTotalComparisons = mainConditionTotalComparisons
+                mainConditionTotalComparisons = mainConditionTotalComparisons,
+                verdictsThisArm = completedResults.size
             )
             val end = System.currentTimeMillis()
             if (config.diagnostics.enableProfiling) {
@@ -724,19 +804,24 @@ class TaxonomyBenchmarkService(
 
         while (round < params.maxRounds && !checkStoppingPolicy()) {
             completedAtStartOfRound.set(completedResults.size)
-            // Update globally resolved pairs in stoppingPolicy
-            stoppingPolicy.globallyResolvedPairs.clear()
-            currentAggregated?.let { board ->
-                val ranksMap = board.ranks.associateBy { it.modelId }
+            // ── Confidence gate, evaluated PER CELL ──────────────────────────────────
+            // Each cell's pairs are tested against that cell's own theta and standard
+            // errors, never against the aggregate board: gating on the pooled fit would
+            // retire exactly the comparisons that could show a cell ordering differing
+            // from the pooled one — the question the per-cell arena exists to answer.
+            // See BtStoppingPolicy.resolvedPairs.
+            stoppingPolicy.resolvedPairs.clear()
+            run {
                 val allPairs = modelNames.flatMapIndexed { i, mA -> modelNames.drop(i + 1).map { mB -> mA to mB } }
-                for ((mA, mB) in allPairs) {
-                    val rA = ranksMap[mA]
-                    val rB = ranksMap[mB]
-                    if (rA != null && rB != null) {
-                        val gap = abs(rA.btScore - rB.btScore)
-                        val sigma = maxOf(rA.stdError, rB.stdError)
-                        if (gap > 2.5 * sigma) {
-                            stoppingPolicy.globallyResolvedPairs.add("${minOf(mA, mB)}|${maxOf(mA, mB)}")
+                for ((leafId, st) in btStates) {
+                    for ((mA, mB) in allPairs) {
+                        val sA = st.btScores[mA] ?: continue
+                        val sB = st.btScores[mB] ?: continue
+                        val eA = st.stdErrors[mA] ?: continue
+                        val eB = st.stdErrors[mB] ?: continue
+                        val sigma = maxOf(eA, eB)
+                        if (sigma > 0.0 && abs(sA - sB) > 2.5 * sigma) {
+                            stoppingPolicy.resolvedPairs.add("$leafId|${minOf(mA, mB)}|${maxOf(mA, mB)}")
                         }
                     }
                 }
@@ -776,23 +861,26 @@ class TaxonomyBenchmarkService(
             // different evidence per cell for reasons that have nothing to do with the grouping.
             //
             // It is recomputed from scratch each round rather than accumulated, so a pair can
-            // leave the set — but sigma is the AGGREGATE leaderboard SE, which [ARENA-SE] showed
-            // collapsing to 0.139 against an inverse-variance floor of 0.793. An understated sigma
-            // makes 2.5*sigma understated and fires this gate on far too little evidence; the SE
-            // substitution now in place tightens it by the same 5.7x factor.
-            //
-            // None of that was observable: the set is in-memory and was never logged, so "how many
-            // pairs, at what round" could not be answered after a run. Now it can.
+            // leave the set. The gate width is 2.5*sigma, so it is only as trustworthy as the
+            // SE it reads — an understated sigma fires the gate on far too little evidence
+            // (see [ARENA-SE]). The set is in-memory only, so it is logged every round below;
+            // "how many pairs, at what round" must be answerable after a run.
             run {
-                val resolved = stoppingPolicy.globallyResolvedPairs.size
                 val totalPairs = modelNames.size * (modelNames.size - 1) / 2
-                if (resolved > 0) {
-                    val minSigma = currentAggregated?.ranks?.minOfOrNull { it.stdError }
+                // Per-cell breakdown of WHY each pair is or is not still being sampled.
+                // `n>=5` is the precondition for the local binomial test to be eligible at
+                // all; if it stays near zero while the gate count climbs, the local
+                // criterion is unreachable at this budget and convergence is being carried
+                // entirely by the gate.
+                val parts = btStates.keys.sorted().map { leafId ->
+                    val gate = stoppingPolicy.resolvedPairs.count { it.startsWith("$leafId|") }
+                    val eligible = (pairStatsMap[leafId] ?: emptyList()).count { it.totalComparisons >= 5 }
+                    "$leafId gate=$gate/$totalPairs n>=5:$eligible"
+                }
+                if (parts.isNotEmpty()) {
                     log.info(
-                        "[ARENA-SCHED] round $round: $resolved/$totalPairs pair(s) globally resolved" +
-                            " (gap > 2.5*sigma, sigma=max of the two aggregate SEs" +
-                            (if (minSigma != null) ", min aggregate SE=${"%.4f".format(java.util.Locale.US, minSigma)}" else "") +
-                            "); these are suppressed in EVERY leaf this round"
+                        "[ARENA-SCHED] round $round: per-cell confidence gate (gap > 2.5*sigma on that" +
+                            " cell's own theta/SE) — ${parts.joinToString(" | ")}"
                     )
                 }
             }
@@ -837,6 +925,20 @@ class TaxonomyBenchmarkService(
                     completedResults = completedResults.toList()
                 )
             }
+            // ── Empty batch means the scheduler has nothing left to do ──────────────
+            // `shouldStop` only sees btStates and pairStats and cannot know the scheduler
+            // has run dry, so the loop must break here: once every pair is resolved,
+            // exhausted or retired domain-wide, selectNextBatch returns an empty list and
+            // further rounds would idle to maxRounds, making "ran to maxRounds" ambiguous
+            // between a spent budget and an early finish. A replay condition is exempt:
+            // `replayTriples` breaks out on its own when the chunk index passes the end.
+            if (batch.isEmpty()) {
+                log.info("[ARENA-SCHED] round $round: scheduler returned no work — every pair is " +
+                    "resolved, budget-exhausted or globally retired. Ending the ${req.condition} " +
+                    "arm at $round round(s) of ${params.maxRounds} rather than idling to the cap.")
+                break
+            }
+
             val startTime = System.currentTimeMillis()
 
             val roundResults = batch.mapIndexed { i, task ->
@@ -972,19 +1074,36 @@ class TaxonomyBenchmarkService(
                             }
                             val judgeWinnerVal = primaryEval.winner.uppercase()
                             val judgeAgreed = (judgeWinnerVal == accWinner)
+                            // Only matches the key can actually rank count as agreement checks;
+                            // see `judgeCheckable` on propagateOutcome.
+                            val judgeCheckable = (accWinner != "TIE")
 
-                            withContext(dbWriteDispatcher) {
-                                propagateOutcome(
-                                    leafId = leafNode.id,
-                                    modelA = task.modelA,
-                                    modelB = task.modelB,
-                                    outcome = primaryEval,
-                                    snapshotId = snapshotId,
-                                    judgeAgreed = judgeAgreed
-                                )
+                            // A cache hit is a verdict this DB already holds, and it was already
+                            // propagated into the pair statistics when it was first judged.
+                            // Propagating it again would count one judgement as several: win
+                            // counts, `totalComparisons` and the Fisher information all grow
+                            // while no new evidence exists, so the standard errors shrink toward
+                            // a precision the arena never bought. The verdict is still returned
+                            // to the caller, so validation metrics and the trajectory see the
+                            // match; only the fit's counters are left alone.
+                            if (cached == null) {
+                                withContext(dbWriteDispatcher) {
+                                    propagateOutcome(
+                                        leafId = leafNode.id,
+                                        modelA = task.modelA,
+                                        modelB = task.modelB,
+                                        outcome = primaryEval,
+                                        snapshotId = snapshotId,
+                                        judgeAgreed = judgeAgreed,
+                                        judgeCheckable = judgeCheckable
+                                    )
+                                }
+                            } else {
+                                replayedVerdicts.incrementAndGet()
                             }
 
-                            val otherLeaves = queryToLeaves[qId]?.filter { it != task.nodeId } ?: emptyList()
+                            val otherLeaves = if (cached != null) emptyList()
+                                else queryToLeaves[qId]?.filter { it != task.nodeId } ?: emptyList()
                             for (siblingLeafId in otherLeaves) {
                                 val siblingNode = allNodes.firstOrNull { it.id == siblingLeafId } ?: continue
                                 if (siblingNode.judgePrompt == null) continue
@@ -995,7 +1114,8 @@ class TaxonomyBenchmarkService(
                                         modelB = task.modelB,
                                         outcome = primaryEval,
                                         snapshotId = snapshotId,
-                                        judgeAgreed = judgeAgreed
+                                        judgeAgreed = judgeAgreed,
+                                        judgeCheckable = judgeCheckable
                                     )
                                     if (req.updateRankings && cached == null && primaryEval.winner != "INVALID") {
                                         val siblingDomain = siblingNode.label ?: siblingNode.id
@@ -1058,7 +1178,9 @@ class TaxonomyBenchmarkService(
                                 hadJudge = (cached == null && !req.condition.equals("ORACLE", ignoreCase = true)),
                                 domainEvaluations = listOf(primaryEval),
                                 pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
-                                judgeAccuracyAgreement = mapOf(pairKey to agrees),
+                                // Decidable comparisons only -- see the note at the
+                                // reconstruction path above.
+                                judgeAccuracyAgreement = if (gtWinner != "tie") mapOf(pairKey to agrees) else emptyMap(),
                                 queryId = qId,
                                 secondaryMemberships = secondaryMemberships
                             )
@@ -1103,7 +1225,13 @@ class TaxonomyBenchmarkService(
                                 hadJudge = true,
                                 domainEvaluations = listOf(primaryEval),
                                 pairEvaluations = mapOf(pairKey to listOf(primaryEval)),
-                                judgeAccuracyAgreement = mapOf(pairKey to false),
+                                // An INVALID verdict is a judge failure, not a key
+                                // abstention, so it stays countable -- but only where the
+                                // key had an opinion to disagree with. `gtWinner` from the
+                                // judging path is out of scope in this catch block, so
+                                // decidability is recomputed from modelCorrect.
+                                judgeAccuracyAgreement = if (modelCorrect[task.modelA] != modelCorrect[task.modelB])
+                                    mapOf(pairKey to false) else emptyMap(),
                                 queryId = qId,
                                 secondaryMemberships = secondaryMemberships
                             )
@@ -1168,7 +1296,7 @@ class TaxonomyBenchmarkService(
                             )
                         } else {
                             val fitStart = System.currentTimeMillis()
-                            val scores = BtMmFitter.fit(modelNames, adjustedNodePairs)
+                            val scores = BtMmFitter.fit(modelNames, adjustedNodePairs, context = "leaf/$nodeId@r$round")
                             val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
                             val fitEnd = System.currentTimeMillis()
                             if (config.diagnostics.enableProfiling) {
@@ -1201,11 +1329,24 @@ class TaxonomyBenchmarkService(
             }
 
             val elapsedMs = System.currentTimeMillis() - startTime
-            val nConverged = targetLeafIds.count { stoppingPolicy.isLeafConverged(it, btStates, pairStatsMap, modelNames, nodeToQueries) }
+            val convergedIds = targetLeafIds.filter {
+                stoppingPolicy.isLeafConverged(it, btStates, pairStatsMap, modelNames, nodeToQueries, req.condition)
+            }
+            val nConverged = convergedIds.size
+            // The stop decision uses a SIZE-WEIGHTED fraction, not this count. Logging only
+            // the count made the rule unverifiable from the logs: the law run stopped at
+            // "3/6 leaves", which reads as 50% against a 70% bar and is only correct if
+            // those three leaves held 70% of the questions. Nobody could check that.
+            // Both numbers are printed now, and the weighted one is the one that decides.
+            val totalWeight = targetLeafIds.sumOf { (nodeToQueries[it]?.size ?: 1).toDouble() }
+            val convWeight = convergedIds.sumOf { (nodeToQueries[it]?.size ?: 1).toDouble() }
+            val weightedFrac = if (totalWeight > 0) convWeight / totalWeight else 0.0
             val matchesPerSec = if (elapsedMs > 0) (batch.size * 1000.0 / elapsedMs).roundToInt() else 0
             log.info("=== Round $round | ${batch.size} matches | ${elapsedMs}ms | " +
                      "$matchesPerSec matches/s | " +
-                     "converged: $nConverged/${targetLeafIds.size} leaves ===")
+                     "converged: $nConverged/${targetLeafIds.size} leaves, " +
+                     "weighted ${"%.2f".format(java.util.Locale.US, weightedFrac)} " +
+                     "(bar ${"%.2f".format(java.util.Locale.US, params.targetConvergenceFraction)}) ===")
 
             val leafIds = mutableListOf<String>()
             val visited = mutableSetOf<String>()
@@ -1222,9 +1363,22 @@ class TaxonomyBenchmarkService(
                 perfTracker.recordTime("arena.ranking.propagate", aggEnd - aggStart, 1L)
             }
             if (aggregated.ranks.isNotEmpty()) {
-                log.info("--- Bradley-Terry Ratings (Round $round) [aggregated root] ---")
-                aggregated.ranks.forEach { mr ->
-                    log.info("  * ${mr.modelId}: score = ${String.format("%.4f", mr.btScore)} (± ${String.format("%.4f", mr.stdError)})")
+                // An all-zero board with unit errors is what aggregateLeafScores returns when it
+                // had nothing to fit. It prints like an ordinary leaderboard, so say plainly that
+                // it is empty rather than letting twelve zeros pass for a result.
+                val degenerate = aggregated.ranks.all { it.btScore == 0.0 }
+                if (degenerate) {
+                    log.error(
+                        "[ARENA-AGG] round $round: aggregate leaderboard is degenerate — every score is" +
+                            " exactly 0 over ${aggregated.ranks.size} models (${aggregated.leafsEligible} of" +
+                            " ${aggregated.leafsTotal} leaves eligible). Nothing was pooled; this board" +
+                            " carries no information and must not be read as a ranking."
+                    )
+                } else {
+                    log.info("--- Bradley-Terry Ratings (Round $round) [aggregated root] ---")
+                    aggregated.ranks.forEach { mr ->
+                        log.info("  * ${mr.modelId}: score = ${String.format("%.4f", mr.btScore)} (± ${String.format("%.4f", mr.stdError)})")
+                    }
                 }
             }
 
@@ -1257,7 +1411,17 @@ class TaxonomyBenchmarkService(
                         pairwiseWinnerAccuracy = intermediateReport.pairwiseWinnerAccuracy
                     )
                 )
-                log.info("Trajectory [Round $round]: comparisons = $totalComparisons, spearmanRho = ${intermediateReport.spearmanRho}, pairwiseWinnerAccuracy = ${intermediateReport.pairwiseWinnerAccuracy}")
+                // `comparisons` is LEAF-CREDITED, not the number of judge calls: a question that
+                // belongs to several leaves contributes one verdict to each of them, which is
+                // what the per-leaf fits consume. `verdicts` is the distinct judgements behind
+                // it, and is the number to read as budget spent. They are equal only when no
+                // question has multiple memberships.
+                log.info(
+                    "Trajectory [Round $round]: leafCreditedComparisons = $totalComparisons," +
+                        " verdicts = ${completedResults.size}, replayed = ${replayedVerdicts.get()}," +
+                        " spearmanRho = ${intermediateReport.spearmanRho}," +
+                        " pairwiseWinnerAccuracy = ${intermediateReport.pairwiseWinnerAccuracy}"
+                )
             }
 
             round++
@@ -1265,8 +1429,35 @@ class TaxonomyBenchmarkService(
 
         val totalMatches = pairStatsMap.values.flatten().sumOf { it.totalComparisons }
         if (req.condition.equals("MAIN", ignoreCase = true)) {
-            mainConditionTotalComparisons = totalMatches.toInt()
-            log.info("MAIN condition finished. Captured budget limit: $mainConditionTotalComparisons matches.")
+            // Verdicts, not leaf-credited comparisons. Under multi-membership the two differ by
+            // the average number of cells a question belongs to, and only MAIN can inflate —
+            // C5 has a single cell. Capturing the leaf-credited figure here would fund C5 with
+            // that much more real judging. See BtStoppingPolicy.verdictsThisArm.
+            mainConditionTotalComparisons = completedResults.size
+            if (config.llm.judgeOptionMode.equals("RESOLVED", ignoreCase = true)) {
+                val inj = resolvedInjected.get(); val un = resolvedUnavailable.get()
+                val tot = (inj + un).coerceAtLeast(1)
+                log.info(
+                    "[ARENA-OPTMODE] RESOLVED: selected option attached to $inj/${inj + un} traces" +
+                        " (${"%.1f".format(java.util.Locale.US, 100.0 * inj / tot)}%);" +
+                        " $un left verbatim because `pred` was missing or unresolvable"
+                )
+            }
+            // Agreement is reported over the decidable subset only, so the denominator
+            // has to be visible somewhere: from the export alone a reader cannot tell
+            // the rate is conditional.
+            val decidable = completedResults.count { it.judgeAccuracyAgreement.isNotEmpty() }
+            val allCmp = completedResults.size.coerceAtLeast(1)
+            log.info(
+                "[ARENA-AGREE] decidable comparisons: $decidable of ${completedResults.size}" +
+                    " (${"%.1f".format(java.util.Locale.US, 100.0 * decidable / allCmp)}%);" +
+                    " agreement is reported over the decidable subset only"
+            )
+            log.info(
+                "MAIN condition finished. Captured budget limit: $mainConditionTotalComparisons" +
+                    " verdicts (leaf-credited was ${totalMatches.toInt()}; the arms are matched on" +
+                    " verdicts because only the partitioned arm can inflate the leaf-credited count)."
+            )
         }
 
         val pairs = modelNames.flatMapIndexed { i, a -> modelNames.drop(i + 1).map { b -> a to b } }
@@ -1290,177 +1481,6 @@ class TaxonomyBenchmarkService(
 
     // ─── Core per-query logic ────────────────────────────────────────────────
 
-    private suspend fun processPrecomputedQuery(
-        questionId: Int,
-        modelResults: Map<String, ModelEvalResult>,
-        pairs: List<Pair<String, String>>,
-        req: BenchmarkRequest
-    ): QueryBenchmarkResult? = coroutineScope {
-
-        val sample = modelResults.values.firstOrNull() ?: return@coroutineScope null
-        val gtAnswer = sample.gtAnswer      // e.g. "A"
-        val gtCategory = sample.category
-
-        val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"
-        val root = taxonomyService.getGraph() ?: return@coroutineScope null
-        val allNodes = getAllNodes(root)
-        val frozenLeafIds = allNodes.filter { it.children.isEmpty() }.map { it.id }.toSet()
-
-        // Model correctness straight from pre-extracted pred
-        val modelAnswers = modelResults.mapValues { (_, r) -> r.pred ?: "?" }
-        val modelCorrect = modelResults.mapValues { (_, r) -> r.isCorrect }
-
-        // Run all pairs through judges in parallel
-        val pairResults = pairs.map { (modelA, modelB) ->
-            async {
-                val outputA = modelResults[modelA] ?: return@async null
-                val outputB = modelResults[modelB] ?: return@async null
-
-                runCatching {
-                    val leaves = arenaService.routeToLeaves(sample.questionText, frozenLeafIds, sample.category)
-                    val judges = leaves.mapNotNull { arenaService.leafJudge(it) }
-                    val primaryJudge = judges.maxByOrNull { it.depth } ?: return@async null
-                    checkNotNull(primaryJudge.judgePrompt) {
-                        "Attempted to record match for node ${primaryJudge.id} with no judgePrompt"
-                    }
-                    val domainName = requireNotNull(primaryJudge.label) { "Leaf node ${primaryJudge.id} has no label" }
-
-                    val cacheKey = "${sample.questionId}::${sample.questionText}"
-                    val cached = if (req.condition.equals("ORACLE", ignoreCase = true)) null else rankingService.getRecordedMatch(
-                        snapshotId = snapshotId,
-                        domain = domainName,
-                        query = cacheKey,
-                        modelA = modelA,
-                        modelB = modelB
-                    )
-
-                    // Route the question to leaf judges (no model calls — just routing + judging)
-                    val domainEvaluations = if (cached != null) {
-                        val cachedWinner = when {
-                            cached.isTie -> "Tie"
-                            cached.winner == modelA -> "Model A"
-                            cached.winner == modelB -> "Model B"
-                            else -> "Tie"
-                        }
-                        listOf(
-                            DomainEvaluation(
-                                domain = cached.domain,
-                                winner = cachedWinner,
-                                rationale = "Cached match result",
-                                confidence = 1.0
-                            )
-                        )
-                    } else {
-                        arenaService.evaluateWithPrecomputedTraces(
-                            query = sample.questionText,
-                            options = sample.options,
-                            modelA = modelA,
-                            traceA = getRobustTrace(outputA),
-                            modelB = modelB,
-                            traceB = getRobustTrace(outputB),
-                            frozenLeafIds = frozenLeafIds,
-                            gtAnswer = sample.gtAnswer,
-                            condition = req.condition,
-                            isCorrectA = outputA.isCorrect,
-                            isCorrectB = outputB.isCorrect
-                        )
-                    }
-
-                    val primaryEval = domainEvaluations
-                        .filter { it.confidence >= req.confidenceGate }
-                        .maxByOrNull { eval ->
-                            val depth = allNodes.firstOrNull { it.id == eval.nodeId }?.depth ?: 0
-                            depth
-                        }
-
-                    val judgeWinner: String? = primaryEval?.let {
-                        when (it.winner) {
-                            "Model A" -> modelA
-                            "Model B" -> modelB
-                            else -> "tie"
-                        }
-                    }
-
-                    // GT-based winner
-                    val aCorrect = modelCorrect[modelA] ?: false
-                    val bCorrect = modelCorrect[modelB] ?: false
-                    val gtWinner = when {
-                        aCorrect && !bCorrect -> modelA
-                        bCorrect && !aCorrect -> modelB
-                        else -> "tie"
-                    }
-
-                    val agrees = judgeWinner != null && judgeWinner == gtWinner
-
-                    if (req.updateRankings && primaryEval != null && cached == null && primaryEval.winner != "INVALID") {
-                        val isTie = judgeWinner == "tie"
-                        rankingService.recordMatch(
-                            query = cacheKey,
-                            domain = domainName,
-                            winner = if (isTie) modelA else judgeWinner!!,
-                            loser = if (isTie) modelB else if (judgeWinner == modelA) modelB else modelA,
-                            isTie = isTie,
-                            confidence = primaryEval.confidence,
-                            snapshotId = snapshotId,
-                            modelA = modelA,
-                            modelB = modelB
-                        )
-                    }
-
-                    val arenaResult = ArenaResult(
-                        query = sample.questionText,
-                        modelA = modelA,
-                        modelB = modelB,
-                        traceA = outputA.modelOutput,
-                        traceB = outputB.modelOutput,
-                        domainEvaluations = domainEvaluations
-                    )
-
-                    PairResult(
-                        modelA = modelA, modelB = modelB,
-                        arenaResult = arenaResult,
-                        modelAnswers = modelAnswers,
-                        modelCorrect = modelCorrect,
-                        judgeWinner = judgeWinner,
-                        gtWinner = gtWinner,
-                        agreementKey = "${modelA}_vs_${modelB}" to agrees
-                    )
-                }.getOrElse { e ->
-                    log.warn("Judge failed for $modelA vs $modelB on q$questionId: ${e.message}")
-                    null
-                }
-            }
-        }.awaitAll().filterNotNull()
-
-        val leafLabels = pairResults
-            .flatMap { pr -> pr.arenaResult.domainEvaluations.map { e -> e.domainLabel } }.distinct()
-
-        val hadJudge = pairResults.any { pr ->
-            pr.arenaResult.domainEvaluations.any { it.confidence >= req.confidenceGate }
-        }
-
-        val domainEvaluations = pairResults.flatMap { pr -> pr.arenaResult.domainEvaluations }.distinctBy { it.domainLabel }
-        val pairEvaluations = pairResults.associate { pr -> pr.agreementKey.first to pr.arenaResult.domainEvaluations }
-        val judgeAccuracyAgreement = pairResults.map { it.agreementKey }.toMap()
-
-        val softResult = arenaService.routeToLeavesSoft(sample.questionText, frozenLeafIds, sample.category)
-        val secondaryMemberships = softResult?.secondaryMemberships ?: emptyMap()
-
-        QueryBenchmarkResult(
-            query = sample.questionText,
-            gtCategory = gtCategory,
-            gtCorrectAnswer = gtAnswer,
-            modelAnswers = modelAnswers,
-            modelCorrect = modelCorrect,
-            matchedLeafLabels = leafLabels,
-            hadJudge = hadJudge,
-            domainEvaluations = domainEvaluations,
-            pairEvaluations = pairEvaluations,
-            judgeAccuracyAgreement = judgeAccuracyAgreement,
-            queryId = questionId,
-            secondaryMemberships = secondaryMemberships
-        )
-    }
 
     // ─── Aggregation ─────────────────────────────────────────────────────────
 
@@ -1735,11 +1755,15 @@ class TaxonomyBenchmarkService(
         )
     }
 
+    /** Counts how often RESOLVED could and could not attach the selected option. */
+    private val resolvedInjected = java.util.concurrent.atomic.AtomicInteger(0)
+    private val resolvedUnavailable = java.util.concurrent.atomic.AtomicInteger(0)
+
     // Strips the arx JSON envelope (and its correctness-predicting `reason_code`) down to
     // the prose response. See taxonomy.dataset.unwrapTraceEnvelope.
     private fun getRobustTrace(r: ModelEvalResult): String {
         val output = r.modelOutput?.let { unwrapTraceEnvelope(it) }
-        if (!output.isNullOrBlank()) return output
+        if (!output.isNullOrBlank()) return maybeResolveSelection(r, output)
         val pred = r.pred?.trim()?.uppercase() ?: return "The model did not provide a prediction."
         val predChar = pred.firstOrNull() ?: return "The model did not provide a prediction."
         if (predChar in 'A'..'J') {
@@ -1749,6 +1773,40 @@ class TaxonomyBenchmarkService(
             }
         }
         return "The model predicted: \"$pred\"."
+    }
+
+    /**
+     * Under `judgeOptionMode = RESOLVED`, append this model's OWN selected option, resolved
+     * from its `pred` letter to the option text, so a bare "the answer is (C)" carries a
+     * referent once the candidate set is withheld.
+     *
+     * WHY. Measured over 2,000 reserved traces: 72% end in "the answer is (X)" and only 23%
+     * carry the option text anywhere nearby. Withholding the options without this leaves
+     * roughly half the traces' conclusions unreadable — "(C)" against "(F)" — so a fall in
+     * judge agreement cannot be separated into "assessed the reasoning instead" and "could
+     * not tell what was claimed". Resolving the selection holds the second fixed and varies
+     * only the first, which is the question RQ1 asks.
+     *
+     * The injection is ADDITIVE and marked, never a rewrite of the model's prose: the trace
+     * stays verbatim and gains one bracketed line. It is a transformation applied before
+     * judging and must be reported as such.
+     *
+     * ANSWER-KEY BLINDNESS. This appends the model's OWN selection, which is wrong on a
+     * large fraction of comparisons. `gt_answer` is never consulted here or anywhere on the
+     * judging path.
+     */
+    private fun maybeResolveSelection(r: ModelEvalResult, trace: String): String {
+        if (!config.llm.judgeOptionMode.equals("RESOLVED", ignoreCase = true)) return trace
+        val predChar = r.pred?.trim()?.uppercase()?.firstOrNull()
+        if (predChar == null || predChar !in 'A'..'J') {
+            resolvedUnavailable.incrementAndGet(); return trace
+        }
+        val idx = predChar - 'A'
+        if (idx !in r.options.indices) { resolvedUnavailable.incrementAndGet(); return trace }
+        val text = r.options[idx].toString().trim()
+        if (text.isEmpty()) { resolvedUnavailable.incrementAndGet(); return trace }
+        resolvedInjected.incrementAndGet()
+        return "$trace\n\n[This model's selected answer: ($predChar) $text]"
     }
 
     private fun logLeafLeaderboard(nodeId: String, nodeName: String, state: NodeBtState, round: Int) {
@@ -1808,17 +1866,6 @@ class TaxonomyBenchmarkService(
     )
 }
 
-private data class PairResult(
-    val modelA: String,
-    val modelB: String,
-    val arenaResult: ArenaResult,
-    val modelAnswers: Map<String, String>,
-    val modelCorrect: Map<String, Boolean>,
-    val judgeWinner: String?,
-    val gtWinner: String,
-    val agreementKey: Pair<String, Boolean>
-)
-
 private data class SchedulingParams(
     val minComparisonsPerLeaf: Int,
     val targetConvergenceFraction: Double,
@@ -1866,12 +1913,13 @@ private fun buildSchedulingParams(
         .coerceAtLeast(BtMatchScheduler.BATCH_STEP_SIZE * 2)
         .coerceAtMost(maxOf(queriesPerPair, minQuestionsPerLeaf / 2))   // never exceed half the leaf pool unless it drops below queriesPerPair
 
-    // Convergence fraction: relax if many leaves (more likely some will be sparse)
-    val convergenceFraction = when {
-        numLeaves <= 5  -> 0.80   // small run: require most to converge
-        numLeaves <= 20 -> 0.70   // medium
-        else            -> 0.60   // large: 40% sparse leaves acceptable
-    }
+    // Convergence fraction: deliberately CONSTANT across granularities. The central
+    // comparison in this thesis is across granularities (14 domains vs 87 leaves vs 152),
+    // so a leaf-count-dependent stopping rule would let the finer partition stop on less
+    // evidence than the baseline it is measured against — a confound sitting directly
+    // under the link-3 comparison. 0.70 matches the value used by the 6-20 leaf runs
+    // that make up most of the series rather than being tuned for a new result.
+    val convergenceFraction = 0.70
 
     // Separation threshold: stricter with more questions (can afford higher confidence)
     val separationThreshold = when {

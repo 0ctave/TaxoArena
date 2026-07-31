@@ -115,7 +115,7 @@ class ReservedPoolTest {
         ReservedPool.activate(c, big, 2_000L)
         assertEquals(setOf(1, 2, 3, 4, 5), reservedIds())
 
-        // The scenario that previously lost data: a small single-domain run follows a large one.
+        // The destructive scenario this guards against: a small single-domain run follows a large one.
         ReservedPool.activate(c, small, 3_000L)
         assertEquals(setOf(6), reservedIds(), "activation must replace, not union")
 

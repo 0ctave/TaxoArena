@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.*
 import taxonomy.model.GraphNode
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.White
-import com.jakewharton.mosaic.ui.Color.Companion.Green
 
 class MetricsOrInspectorPanelTest {
 

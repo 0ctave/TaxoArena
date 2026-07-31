@@ -1,7 +1,6 @@
 package taxonomy.tui.features.arena
 
 import androidx.compose.runtime.Composable
-import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.Green

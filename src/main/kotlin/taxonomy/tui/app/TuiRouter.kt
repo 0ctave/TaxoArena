@@ -9,7 +9,6 @@ import com.jakewharton.mosaic.modifier.Modifier
 import com.jakewharton.mosaic.ui.Color.Companion.Cyan
 import com.jakewharton.mosaic.ui.Color.Companion.Green
 import com.jakewharton.mosaic.ui.Color.Companion.White
-import com.jakewharton.mosaic.ui.Color.Companion.Yellow
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Row
 import com.jakewharton.mosaic.ui.Spacer
@@ -43,7 +42,6 @@ import taxonomy.tui.features.topology.TopologyPanel
 import taxonomy.tui.service.TuiConfigFacade
 import taxonomy.tui.state.BenchmarkType
 import taxonomy.tui.state.BenchmarkSubScreen
-import taxonomy.tui.state.ConfigSubPanel
 import taxonomy.tui.state.FocusPanel
 import taxonomy.tui.state.MetricsZoneFocus
 import taxonomy.tui.state.NavContext

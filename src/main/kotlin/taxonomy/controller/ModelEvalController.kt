@@ -1,6 +1,5 @@
 package taxonomy.arena
 
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.springframework.web.bind.annotation.*
 import taxonomy.dataset.EvalLoadStats
