@@ -31,7 +31,7 @@ private data class RawEvalItem(
     // present but blank. Omitting this key meant `trace` resolved to "" for every one of
     // those models: the ingest silently stored an empty `model_output` for 34 of 47 models,
     // and `getRobustTrace` then synthesised a one-line stub in place of the real trace.
-    // That drove the 99.4% format preference measured in docs/arena-math-findings.md.
+    // That drove the 99.4% format preference measured in archive/docs/arena-math-findings.md.
     val generated_text: String? = null
 )
 

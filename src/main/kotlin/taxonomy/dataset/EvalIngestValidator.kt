@@ -314,7 +314,7 @@ class EvalIngestValidator(
             "different question-id space: 213 law rows overlap the other models' 287 on " +
             "exactly 1, so ANY roster containing it collapses to a near-empty intersection. " +
             "Was in the 8-model Math arena roster and produced the spurious 'law has only 20 " +
-            "questions' result (docs/arena-math-findings.md).",
+            "questions' result (archive/docs/arena-math-findings.md).",
         "deepseek" to "no trace field in the upstream archive; getRobustTrace substitutes a " +
             "one-line stub, reproducing the 99.4% format preference",
         "flash_0shots_00_35_03" to "no trace field in the upstream archive",

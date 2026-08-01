@@ -920,7 +920,7 @@ EVALUATION MECHANICS (non-negotiable)
         // explicit, and demonstrably not followed. The format artifact is therefore NOT a
         // prompt-design oversight that can be fixed by asking harder, which is the argument
         // for controlling it with a length-matched roster instead. See
-        // docs/arena-math-findings.md and the transferable form: an LLM judge shown a
+        // archive/docs/arena-math-findings.md and the transferable form: an LLM judge shown a
         // reasoned response against a bare answer selects the response 99.4% of the time,
         // regardless of which is correct.
 Bias suppression — ignore completely:

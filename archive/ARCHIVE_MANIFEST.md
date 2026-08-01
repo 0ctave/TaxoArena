@@ -355,3 +355,9 @@ Result reorganisation (not an archive move): the 8-domain batch was grouped unde
 |---|---|
 | `ratings_{math,law,philosophy,history,psychology,engineering}_paired.db` -> `archive/` (git mv) | Databases of the withdrawn twelve-model paired campaign. The thesis withdrew the campaign in its entirety; keeping them at repo root let retired figure scripts silently regenerate withdrawn-data PDFs. Retained for provenance (registration record, corrections register). |
 | `report/Figures/{verdict_mechanism,trace_strata,rho_levels,screen_vs_arena,domain_screen,routing_slopegraph,rubric_specific_not_decisive}.pdf` + their `make_*.py` | Deleted, not archived: all drew withdrawn pilot/twelve-model data or the withdrawn 0.007 threshold; recoverable from git history. `rubric_specificity_null` replaces the surviving offline panel of the last one. |
+
+## Fourth pass — 2026-08-01 (docs consolidation)
+
+| Item | Reason |
+|---|---|
+| `docs/*` -> `archive/docs/` (59 entries, 2.0 MB: all working notes, run records, review reports, figure plans, superseded guides, and the nested `docs/archive/` legacy tree) | The documentation was consolidated to a small core: `docs/README.md`, `docs/IMPLEMENTATION.md`, `docs/RESULTS.md`, the four `prereg_*.md` registration documents, and `separation_null_by_size.md` + `docs/data/`. Everything else is a working artifact of the analysis sessions; the settled content it carried now lives in the thesis (`report/`) and in the three core docs. Code comments that cited `docs/arena-math-findings.md` and `docs/dag-chain-formation-handoff.md` now point at `archive/docs/`. |

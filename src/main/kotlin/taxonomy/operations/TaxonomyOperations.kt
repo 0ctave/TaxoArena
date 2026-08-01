@@ -903,7 +903,7 @@ class TaxonomyOperations(
      * never touches the live tree, construction, or routing, and is independent of
      * (deliberately looser than) TaxonomyMerger's own passthrough-collapse gate, which
      * has to stay conservative for convergence reasons documented in
-     * docs/dag-chain-formation-handoff.md. Here we're only deciding what to print.
+     * archive/docs/dag-chain-formation-handoff.md. Here we're only deciding what to print.
      */
     private fun isDisplayWrapper(node: GraphNode): Boolean =
         node.treeChildren.size == 1 && node.crossLinkChildren.isEmpty() &&
