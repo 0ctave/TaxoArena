@@ -10,6 +10,12 @@
 %------------------------------
 \iflanguage{english}{
 	\renewcommand\nomgroup[1]{%				% defines all different groups, can be extended if necessary
+  		\ifx#1A\relax	% semantic groups, reorganised 2026-07-31
+    	\nomgroupX{Taxonomy Construction}{Symbol}{Description}{}{}
+  		\fi
+  		\ifx#1B\relax
+    	\nomgroupX{Partition and Cells}{Symbol}{Description}{}{}
+  		\fi
   		\ifx#1L\relax	% if the optional argument is L
     	\nomgroupX{Latin Symbols}{Symbol}{Description}{}{Unit}
   		\fi
@@ -40,6 +46,12 @@
 %------------------------------	
 }{\iflanguage{ngerman}{
 	\renewcommand\nomgroup[1]{%								% defines all different groups, can be extended if necessary
+  		\ifx#1A\relax
+    	\nomgroupX{Taxonomie-Konstruktion}{Symbol}{Beschreibung}{}{}
+  		\fi
+  		\ifx#1B\relax
+    	\nomgroupX{Partition und Zellen}{Symbol}{Beschreibung}{}{}
+  		\fi
   		\ifx#1L\relax	% if the optional argument is L
     	\nomgroupX{Lateinische Symbole}{Symbol}{Beschreibung}{}{Einheit}
   		\fi
@@ -53,10 +65,10 @@
     	\nomgroupX{Subskripte}{Symbol}{Beschreibung}{}{}    
   		\fi
   		\ifx#1C\relax
-		\nomgroupX{Konstanten}{Symbol}{Beschreibung}{}{Einheit}     
+		\nomgroupX{Arena und Ranking}{Symbol}{Beschreibung}{}{}
   		\fi
   		\ifx#1D\relax
-		\nomgroupX{Dimensionslose Kennzahlen}{Symbol}{Beschreibung}{}{Definition}      
+		\nomgroupX{Validierung und Statistik}{Symbol}{Beschreibung}{}{}
   		\fi
   		\ifx#1O\relax
 		\nomgroupX{Operatoren}{Symbol}{Beschreibung}{}{Definition}     

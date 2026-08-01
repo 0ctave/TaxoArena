@@ -41,7 +41,9 @@ Values range within $[-1.0, 1.0]$. A positive value close to $1.0$ indicates tha
 
 ## 2. Normalized Mutual Information (NMI)
 
-Standard NMI assumes a flat, hard partition where each query is assigned to exactly one domain. In a polyhierarchical DAG, queries can be assigned to multiple leaf nodes. Standard NMI penalizes this overlap as error.
+Standard NMI assumes a flat, hard partition where each query is assigned to exactly one domain. *(Tree-era note, 2026-07-30: the overlap this variant tolerates cannot occur. The system is a tree, so every query lands in exactly one leaf and overlap-tolerant NMI reduces to standard NMI. The variant is kept because it is what the code computes; its motivation below is historical.)*
+
+In a polyhierarchical DAG, queries can be assigned to multiple leaf nodes. Standard NMI penalizes this overlap as error.
 
 To evaluate overlapping assignments, TaxoArena originally implemented the **Lancichinetti–Fortunato–Kértesz (LFK 2009)** overlapping NMI:
 

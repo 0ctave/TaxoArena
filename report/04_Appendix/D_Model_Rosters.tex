@@ -1,118 +1,151 @@
 \chapter{Model Rosters and Exclusion Policy}\label{app:models}
 
-Three rosters appear in this thesis and they are not interchangeable
-(Section~\ref{sec:exp-rosters}). Model identifiers are given exactly as
-passed to the arena (provider-side API or checkpoint names); access
-type is public knowledge about each family.
+Model identifiers are given exactly as passed to the arena (provider-side API
+or checkpoint names). One roster carries every result in this thesis: the
+eight-model roster of the settled batch. The earlier rosters are recorded here
+as history --- their campaigns are withdrawn, and no number in
+Chapter~\ref{ch:results} rests on them (Section~\ref{sec:exp-rosters}).
 
-\section{The Paired-Run Roster (Run~B)}
+\section{The Settled Roster}\label{sec:roster-settled}
 
-Table~\ref{tab:model-roster} is the roster Run~B actually executed,
-taken from the run manifest
-(\texttt{experiment\_results/arena\_math\_paired/seed\_42/manifest.json})
-rather than from any configuration the run superseded. Twelve models,
-seven families, at most two per family, selected to control the
-response-length artifact: median response length spans 486--1413
-characters ($2.91\times$), and the length--accuracy correlation inside
-the roster is $r = +0.286$ against $+0.597$ across all 36 valid models.
-
-Four properties of this roster bound what its results may claim.
-\texttt{gemini-3.1-pro\_5-shots} is a five-shot prompting condition in
-an otherwise matched roster and is labelled as such wherever it
-appears. \texttt{iask\_pro} and \texttt{arx\_3} are systems of
-unknown provenance --- plausibly retrieval-augmented or ensembles ---
-so rows involving them support arena claims but not claims about base
-LLM capability. \texttt{Meta-Llama-3-8B} is a base (non-instruct)
-model. And \texttt{claude-3-5-sonnet-20241022} /
-\texttt{claude-3.5-sonnet} are two harnesses of nominally the same
-model that agree on only $83.4\%$ of predictions; they were included
-as a pre-registered resolution check. Its outcome: the scheduler never
-paired them directly across 2{,}640 comparisons, leaving two of the
-three registered predictions unevaluable, and they finish at ranks 4
-and 8 of a mid-table whose five scores span $0.957$--$1.091$ --- a
-separation well inside the corrected standard errors.
+Table~\ref{tab:roster-r8} is the roster of the eight-model RESOLVED batch, the
+run every headline result in this thesis is attributed to. It is read from the
+batch's own match histories rather than from any configuration, and it is
+identical across all eight domains.
 
 \begin{table}[htbp]
 \centering
-\caption{The Run~B roster, from the run manifest. At most two models
-per family; length-matched to control the format artifact.}
-\label{tab:model-roster}
-\begin{tabular}{p{5.2cm}p{3.2cm}p{4.4cm}}
+\caption{The settled eight-model roster, with ground-truth accuracy measured on
+the questions the batch actually routed. \emph{Bare} is the share of stored
+outputs under 40 characters, i.e.\ an answer with no reasoning attached.}
+\label{tab:roster-r8}
+\begin{tabular}{lrrrl}
 \toprule
-Model identifier & Family & Note \\
+Model identifier & Accuracy & Bare & Median chars & Note \\
 \midrule
-gemini-3.1-pro\_5-shots & Google Gemini & \textbf{5-shot condition} \\
-iask\_pro & unknown provenance & system, not a base LLM \\
-arx\_3 & unknown provenance & system, not a base LLM \\
-claude-3.5-sonnet & Anthropic & near-clone pair (a) \\
-gpt-4o-2024-08-06 & OpenAI & \\
-deepseek-chat-v2\_5 & DeepSeek & open-weight \\
-gpt-4o-mini & OpenAI & \\
-claude-3-5-sonnet-20241022 & Anthropic & near-clone pair (b) \\
-Qwen1.5-72B-Chat & Alibaba Qwen1.5 & open-weight \\
-Meta-Llama-3-8B-Instruct & Meta Llama 3 & open-weight \\
-Qwen1.5-14B-Chat & Alibaba Qwen1.5 & open-weight \\
-Meta-Llama-3-8B & Meta Llama 3 & open-weight, \textbf{base model} \\
+gemini-3.1-pro\_5-shots      & $90.5\%$ & $2.2\%$  & $792$  & \textbf{5-shot condition} \\
+arx\_0314                    & $81.8\%$ & $21.4\%$ & $826$  & unknown provenance \\
+gpt-4o-2024-08-06            & $72.5\%$ & $0.0\%$  & $1494$ & \\
+Meta-Llama-3\_1-70B-Instruct & $58.0\%$ & $0.3\%$  & $288$  & open-weight \\
+Qwen1.5-72B-Chat             & $43.4\%$ & $0.0\%$  & $487$  & open-weight \\
+Meta-Llama-3\_1-8B           & $33.2\%$ & $0.1\%$  & $234$  & open-weight \\
+Yi-6b-Chat                   & $25.0\%$ & $0.0\%$  & $333$  & open-weight \\
+Llama-2-7b-hf                & $16.5\%$ & $0.2\%$  & $220$  & open-weight, \textbf{base model} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{The eleven-model band is a distinct, earlier roster.} The
-offline domain screen and the reliability-constant fit ($c = 2.52$)
-used an eleven-model band assembled before the envelope unwrap exposed
-\texttt{arx\_0314} as mixed-format ($80.2\%$ substantive); that band
-contains \texttt{arx\_0314} and is not a subset of
-Table~\ref{tab:model-roster}. \todo{Refit the reliability constant and
-re-run the domain screen on the Run~B roster; until then $c=2.52$ and
-the law $p=0.008$ carry a roster mismatch against the arena they
-inform.}
+\paragraph{Why eight, and why this spread.} The roster was cut from twelve to
+eight to buy \emph{decidability}. Whether the answer key can separate two models
+at $N$ routed questions depends on the gap between their accuracies, and a
+roster of closely matched models leaves most pairs unresolvable at any budget
+this thesis can afford (Section~\ref{sec:res-cost}). Spanning $16.5\%$ to
+$90.5\%$ --- a factor of $5.5$ --- makes $24$ to $28$ of the $28$ pairs
+decidable in every domain, which is what allows Chapter~\ref{ch:results} to
+report rank recovery against the key at all.
 
-\section{The Pilot Roster}
+\paragraph{Three properties bound what this roster may claim.} They are stated
+here because the accuracy spread that buys decidability is bought back in other
+coin.
 
-The eight models of the pilot Math run, with their stored response
-format and their ground-truth accuracy on the judged questions, are in
-Table~\ref{tab:model-roster-pilot}. Four of them had no stored response
-text, and the resulting format artifact decided half of that run's
-comparisons; the defect, what it qualifies, and what survives it are
-reported in Section~\ref{sec:res-capture-gap} rather than corrected
-away.
+\emph{The roster is not length-matched.} Median stored output runs from $220$ to
+$1{,}494$ characters, a factor of $6.79$. The earlier twelve-model roster was
+assembled specifically to hold this ratio to $2.91$, and that control has been
+given up. Any residual verbosity preference in the judge is therefore free to
+correlate with capability here, and the thesis cannot separate the two from
+these runs alone. This is a real limitation of the settled batch and is not
+repaired by the option-injection protocol, which changes what the judge is told
+about the answer rather than how long the response is.
 
-\section{The Exclusion Policy}
+\emph{\texttt{arx\_0314} answers bare on $21.4\%$ of items} and is of unknown
+provenance --- plausibly retrieval-augmented or an ensemble. Rows involving it
+support arena claims but not claims about base LLM capability, and its
+format inconsistency reintroduces, inside its own comparisons, the preference
+the exclusion policy below exists to remove. It sits under the policy's
+operative threshold rather than clear of it.
 
-Ten models are excluded at roster load by a hard-coded list that
-raises, each entry carrying its measured reason. The list covers one
-identifier-space mismatch, six archives with no stored reasoning text,
-and three mixed-format models that emit a bare answer on $68.4\%$,
-$35.4\%$ and $27.6\%$ of items respectively. The operative threshold is
-format \emph{consistency}, not text presence: a model that answers
-bare on a third of items reintroduces the format preference inside its
-own comparisons.
+\emph{\texttt{gemini-3.1-pro\_5-shots} is a five-shot prompting condition} in an
+otherwise zero-shot roster, and is labelled as such wherever it appears. It is
+also the strongest model in the roster, so the prompting advantage and the
+capability ranking are confounded at the top.
 
-Three notes belong with the policy.
+\section{The Earlier Rosters}\label{sec:roster-earlier}
 
-\textbf{One name is not the other.} \texttt{Meta-Llama-3\_1-70B-Instruct}
-is in the roster and is clean. \texttt{Meta-Llama-3-70B-Instruct} is
-excluded, sits in a different question-identifier space, and overlaps
-the other models' law questions on exactly one item; its presence in an
-intersection is what collapsed law from 287 questions to 20 and
-inverted a domain recommendation (Section~\ref{sec:res-law}).
+Two earlier rosters belong to the withdrawn run generations and are
+recorded here as history, not as sources of any number. A
+\textbf{twelve-model length-matched band} (seven families, at most two
+per family) carried the withdrawn paired campaign; it was selected to
+control the response-length artifact --- median response length
+$486$--$1{,}413$ characters ($2.91\times$), length--accuracy
+correlation $r = +0.286$ inside the roster against $+0.597$ across all
+$36$ valid models --- and that control is the one property of it the
+settled selection gave up. The \textbf{pilot roster} of eight models
+carried the capture-gap defect, and Table~\ref{tab:model-roster-pilot}
+preserves the one thing it uniquely demonstrates: response format and
+capability were perfectly collinear, which is why format could decide
+half of that run's comparisons and why the exclusion policy below
+tests format consistency.
 
-\textbf{The policy does not generalise.} Six of the ten exclusions are
-for exactly the condition the corpus validator's trace-presence check
-measures and declines to act on, because that check has no failure
-branch. The policy is a ratchet on known failures, not a threshold, and
-a new model that shares the defect would be admitted. The general guard
-is a one-line change and is named as future work
-(Section~\ref{sec:disc-future}).
+\begin{table}[htbp]
+\centering
+\caption{The withdrawn pilot roster, with stored response format and
+ground-truth accuracy on its judged Math questions. The two format
+groups do not overlap in accuracy: trace presence and capability are
+collinear, and a judge that prefers text reproduces the capability
+split for free.}
+\label{tab:model-roster-pilot}
+\begin{tabular}{llr}
+\toprule
+Model & Stored response & Math accuracy \\
+\midrule
+gpt-4o-2024-08-06 & reasoning, median 1211 ch & 78.4\% \\
+claude-3-5-sonnet-20241022 & reasoning, median 630 ch & 75.9\% \\
+deepseek-chat-v2\_5 & reasoning, median 1038 ch & 71.0\% \\
+claude-3-5-haiku-20241022 & reasoning, median 664 ch & 57.7\% \\
+\addlinespace
+Meta-Llama-3\_1-70B-Instruct & \textbf{empty; stub synthesised} & 53.1\% \\
+Qwen1.5-72B-Chat & \textbf{empty; stub synthesised} & 36.5\% \\
+Llama-2-70b-hf & \textbf{empty; stub synthesised} & 13.3\% \\
+Llama-2-13b-hf & \textbf{empty; stub synthesised} & 7.5\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+An eleven-model band, assembled before the envelope unwrap exposed
+\texttt{arx\_0314} as mixed-format, belongs to the reliability-constant fit
+alone. That constant, $c = 2.52$, has not been refitted, so it carries a roster
+mismatch against every run it informs (Section~\ref{sec:disc-debt}).
+
+\section{The Exclusion Policy}\label{sec:roster-exclusion}
+
+Ten models are excluded at roster load by a hard-coded list that raises, each
+entry carrying its measured reason: one identifier-space mismatch, six archives
+with no stored reasoning text, and three mixed-format models that emit a bare
+answer on $68.4\%$, $35.4\%$ and $27.6\%$ of items. The operative threshold is
+format \emph{consistency}, not text presence --- a model that answers bare on a
+third of items reintroduces the format preference inside its own comparisons.
+The policy is live: it aborted a candidate roster for the settled batch.
+
+Three notes belong with it.
+
+\textbf{One name is not the other.} \texttt{Meta-Llama-3\_1-70B-Instruct} is in
+the settled roster and is clean. \texttt{Meta-Llama-3-70B-Instruct} is excluded,
+sits in a different question-identifier space, and overlaps the other models'
+law questions on exactly one item; its presence in an intersection is what
+collapsed law from $287$ questions to $20$ and inverted a domain recommendation
+(Section~\ref{sec:res-law}).
+
+\textbf{The policy does not generalise.} Six of the ten exclusions are for
+exactly the condition the corpus validator's trace-presence check measures and
+declines to act on, because that check has no failure branch. The policy is a
+ratchet on known failures, not a threshold, and a new model sharing the defect
+would be admitted --- which is how \texttt{arx\_0314}, at $21.4\%$ bare, sits in
+the settled roster. The general guard is a one-line change and is named as
+future work (Section~\ref{sec:disc-future}).
 
 \textbf{The judge is in no roster.} The judge model is
-Mistral-Large-3 in every reported run. Two project documents named
-different judge models, so the identity was verified against two
-independent sources rather than read off either document: the Run~B
-run log records \texttt{Mistral-Large-3} on every judge call (four
-occurrences of the identifier, none of any smaller ``ministral''
-variant), and the runtime configuration pins
-\texttt{judge-model: "Mistral-Large-3"}. That model appears in none of
-the three rosters, so there is no self-preference confound in any
-reported run. No constraint enforces this; it is a property of these
-runs.
+\texttt{Mistral-Large-3} in every reported run, verified against the runtime
+configuration and the run logs rather than read off a design document, two of
+which named different models. It appears in none of the rosters above, so there
+is no self-preference confound in any reported run. No constraint enforces
+this; it is a property of these runs.

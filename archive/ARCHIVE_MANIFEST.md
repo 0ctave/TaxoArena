@@ -348,3 +348,10 @@ Same rules as above: moved, not deleted; original relative path preserved under 
 Deleted (regenerable junk, not archived): `snapshots_test.db` (recreated by any test run via TaxonomySnapshotManager), `frozen_triples_stubbed-snapshot_MAIN.json` (test stub output), `tools/tuning/__pycache__/` and `tools/analysis/__pycache__/` (Python bytecode caches).
 
 Result reorganisation (not an archive move): the 8-domain batch was grouped under `experiment_results/r8/<domain>/` — each domain folder now holds its `ratings_r8_<domain>.db` (+sidecars) beside its `seed_42/` exports, plus `verify_agree_philosophy/` with `ratings_verify_agree.db`. See `experiment_results/r8/README.md`. `report/Figures/make_routing_provenance.py` and `make_rubric_reach.py` were updated to the new paths and re-run.
+
+## Third pass — 2026-07-31, evening (figure-review implementation)
+
+| Item | Reason |
+|---|---|
+| `ratings_{math,law,philosophy,history,psychology,engineering}_paired.db` -> `archive/` (git mv) | Databases of the withdrawn twelve-model paired campaign. The thesis withdrew the campaign in its entirety; keeping them at repo root let retired figure scripts silently regenerate withdrawn-data PDFs. Retained for provenance (registration record, corrections register). |
+| `report/Figures/{verdict_mechanism,trace_strata,rho_levels,screen_vs_arena,domain_screen,routing_slopegraph,rubric_specific_not_decisive}.pdf` + their `make_*.py` | Deleted, not archived: all drew withdrawn pilot/twelve-model data or the withdrawn 0.007 threshold; recoverable from git history. `rubric_specificity_null` replaces the surviving offline panel of the last one. |

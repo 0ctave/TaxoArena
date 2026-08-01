@@ -50,7 +50,20 @@ The concentration is estimated in three steps inside
    `R̄ ≤ 0`; `κ_max` for the spike case when `R̄ ≥ 1`).
 
 A `WARN` is logged when `d/N > 10` (degenerate leaf regime); with `d = 256` and
-`minClusterSize = 50` this is rare. The separate **d/N-gated prior blend**
+`minClusterSize = 55` (frozen artifact; this document previously said 50) this is rare.
+
+> **Note (2026-07-27).** The Hornik-Grün factor `(n-1)/(n+d-2)` **scales with n**, and that
+> is not a detail — it is why the pipeline forbids density comparisons in routing. Parents,
+> fitted on larger populations, are systematically sharper than their children, so a
+> likelihood-ratio descent gate mis-residualised 56% of the corpus at the anchors. The
+> descent gate is therefore a direction-only Jensen-tight bound, and sibling competition uses
+> a **shared** concentration. See
+> [`../router-shared-kappa-correction.md`](../router-shared-kappa-correction.md).
+>
+> Second measured property of `kappa` worth knowing here: it never reaches bit-identity
+> between construction iterations, drifting at ~1e-13 forever (constant on 1 of 139 sites,
+> and still 1 of 139 after quantising at 1e-6) while every gate outcome stays fixed. Any
+> cache key or equality test containing `kappa` will therefore never hit. The separate **d/N-gated prior blend**
 (`(1−α_d)·κ_HG + α_d·κ_prior`, performed in `TaxonomyFitter`) is described in
 [Mathematical Foundations §1.2](../paper/MATHEMATICAL_FOUNDATIONS.md).
 

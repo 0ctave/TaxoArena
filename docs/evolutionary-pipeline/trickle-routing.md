@@ -1,5 +1,34 @@
 # Trickle Routing: Top-Down Soft Routing Mechanics
 
+> **STATUS: SUPERSEDED (2026-07-27).** Current specification:
+> [`../dag-logic-and-math.md`](../dag-logic-and-math.md) §4.
+>
+> **What in this document is still right:** §1's core idea — a **shared** sibling
+> concentration `kappa_bar` so that "sibling likelihoods are not distorted by localized
+> variance in cluster density". That is the single most important rule in the system and it
+> is stated correctly here.
+>
+> **What is wrong:** the scoring expression. This document writes
+> `f_i = ln C_d(kappa_bar) + kappa_bar (x^T mu_i)`. The normaliser term is a constant across
+> siblings, so it is harmless *here*; the harmful variant is the **per-child** form
+> `ln C_d(kappa_i) + kappa_i (x^T mu_i)`, which has appeared twice in this codebase and both
+> times produced systematic structural distortion. `logC_d(kappa)` decreases with kappa while
+> `kappa cos` increases, so at d = 256 the per-child form hands boundary queries to the more
+> concentrated sibling by tens of nats, on concentration bookkeeping rather than on
+> direction. The production form is simply `f_i = kappa_bar * (x^T mu_i)`. See
+> [`../router-shared-kappa-correction.md`](../router-shared-kappa-correction.md).
+>
+> **What no longer exists at all:** the temperature-scaled softmax (`routingSoftmaxTau`,
+> default 2.0), the Laplace regulariser, the `assignmentCosineGap` margin filter, and the
+> ground-truth guidance bias. Current mechanism: a **descent-vs-residual gate** (Jensen-tight
+> `max_c <mu_c,x> >= (rbar_v - descentMargin) <mu_v,x>`), an **additive cosine beam**
+> (`routingBeamGamma`, keep `c` iff `<mu_c,x> >= max - gamma`; the argmax always survives), a
+> softmax renormalised over the beam, log-sum-exp path accumulation, a purely numerical
+> 1e-4 path prune with no membership semantics, and a **self-normalised** final membership
+> share (`membershipFloor` = share of *that query's own* membership, not an absolute
+> probability). The old absolute-floor semantics mathematically forbade balanced structure
+> below depth 2 and forced single-child chains.
+
 This document details the log-space soft routing mechanics used to distribute queries through the Directed Acyclic Graph (DAG) in **TaxoArena**. It formalizes the sibling scoring model, temperature scaling, Laplace smoothing, and the path prune filter.
 
 ---

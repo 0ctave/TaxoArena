@@ -1,0 +1,15 @@
+CONTAMINATED OUTPUT - DO NOT QUOTE
+==================================
+
+Produced by an in-process multi-seed run (seeds = [42,137,2048,7,31337]) before the
+runner rejected that configuration. Only seed_42, the FIRST seed in the loop, has valid
+held-out routing metrics.
+
+seed_137, seed_2048, seed_7, seed_31337: NoMatchRate 0.68-0.82, so Top-1, ECE, MacroF1
+and AvgMatchCount are all invalid. The taxonomy structure and the *_BASELINE_* files are
+unaffected (baselines use flat centroid assignment, not graph routing).
+
+Measured proof: seed 137 isolated in its own JVM gives Top-1 74.90% with NoMatchRate 0.0;
+the same seed at position 2 of this loop gives 5.31% with NoMatchRate 0.816.
+
+Valid replacement: experiment_results/cal_iso/s<seed>/ (one JVM per seed).

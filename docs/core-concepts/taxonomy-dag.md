@@ -1,5 +1,30 @@
 # The Union-Based Topological Paradigm & Polyhierarchy
 
+> **STATUS: PARTIALLY SUPERSEDED (2026-07-27).**
+>
+> **§1 (union-based / composite paradigm) is still the correct framing** and is the
+> conceptual justification for the descent gate: a parent has no independent density of its
+> own, so a query in the empty space between children must be *rejected downward* rather
+> than absorbed. The implemented form of that idea is the Jensen-tight bound
+> `max_c <mu_c,x> >= (rbar_v - delta) <mu_v,x>` — see
+> [`../dag-logic-and-math.md`](../dag-logic-and-math.md) §4, not the wording here.
+>
+> **§2 (polyhierarchy & cross-linking) describes a mechanism that no longer exists.**
+> Cross-linking was removed at `334b95d`, verified behaviour-neutral, and is reported as a
+> **negative result** in
+> [`../dag-construction-mechanisms.md`](../dag-construction-mechanisms.md) §7. Note also
+> that the voting/cosine-shift rule described here (`cos_P - cos_N > 0.05`, majority vote)
+> was itself replaced long before removal, by a capture test using the trickler's own
+> descent formula under a J gate. Neither is current. `GraphNode.crossLinkChildren` still
+> exists and is permanently empty.
+>
+> **§3 (transitive reduction) is not reached in the canonical configuration** — its call
+> site is gated on `!enableResidualRouting`, which `DAG_MAX` sets true. It *is* reached by
+> `TREE_BASELINE` calibration configs, where it severs real edges (54 `[TR] Severed N` lines,
+> N up to 23). See [`../known-defects.md`](../known-defects.md).
+>
+> **The system is a tree.** Read "DAG" throughout as "the induced hierarchy".
+
 This document details the theoretical and mathematical foundations of the taxonomy structure in **TaxoArena**. Specifically, it contrasts traditional taxonomy induction paradigms with the **Union-Based Topological Paradigm (Composite GMM)** and describes the **Polyhierarchical DAG** design.
 
 ---

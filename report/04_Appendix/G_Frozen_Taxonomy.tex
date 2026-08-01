@@ -1,0 +1,52 @@
+\chapter{The Frozen Taxonomy}\label{app:frozen-tree}
+
+Every arena result in this thesis is attributed to one construction artefact:
+the taxonomy induced by \texttt{experiment\_configs/freeze\_mcs55.toml} at
+seed~42, stored as snapshot \texttt{20260727\_042523} in \texttt{snapshots.db}.
+The tree was frozen before any arena run reported here was launched and was not
+modified afterwards. This appendix reproduces it, so that a reader can check any
+per-cell claim against the actual partition rather than against a description of
+it.
+
+The tree has $154$ nodes: one root, $14$ anchors at depth~1, and $87$ leaves at
+depths ranging from~2 to~6. Splitting below the anchors is almost entirely
+binary --- $60$ of the $66$ internal splits produce two children, five produce
+three, and one produces four --- so depth, not breadth, is what separates the
+regions the arena scores. Leaves hold between $54$ and $396$ queries, with a
+median of $88$.
+
+\section{Overall Shape}\label{sec:tree-shape}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{frozen_tree}
+\caption{The frozen taxonomy as a horizontal icicle: anchors as rows, depth as
+columns, row height proportional to routed query mass. Only the fourteen anchor
+names are labelled; the leaves are named in Figure~\ref{fig:tree-full}. The
+ragged right edge shows where a branch stopped splitting before the maximum
+depth of~6.}
+\label{fig:frozen-tree}
+\end{figure}
+
+Row heights in Figure~\ref{fig:frozen-tree} are query \emph{memberships}, which
+are not the same as unique queries. The construction placed $8{,}299$ unique
+queries, and that is the figure Chapter~\ref{ch:methodology} reports as the
+placed corpus; summing the query lists of the $87$ leaves gives $9{,}141$. The
+difference is retained multi-membership from construction, with $826$ queries in
+two leaves and $8$ in three. It does not affect the arena results: secondary
+leaf memberships were withdrawn before scoring, so a held-out query routed into
+the tree contributes to exactly one cell. The overlap is a property of the
+construction corpus, not of the evaluation.
+
+\section{The Labelled Tree}\label{sec:tree-full}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{tree_full}
+\caption{The frozen taxonomy in full: all $87$ leaves under their $14$ anchors,
+which are ordered by leaf count and separated by alternating bands. Horizontal
+position is depth within each anchor's subtree, rescaled so every anchor spans
+the same width. Sizes and node identifiers are deliberately omitted --- the
+figure carries structure and names only.}
+\label{fig:tree-full}
+\end{figure}

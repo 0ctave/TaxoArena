@@ -55,7 +55,22 @@ $$ \max_{i} \left| s_i^{(t+1)} - s_i^{(t)} \right| < \epsilon_{\text{tol}} $$
 
 ## 3. Covariance & Standard Error Estimation
 
-To compute confidence intervals for the ratings, we estimate the covariance matrix of $s$. Rather than using a diagonal approximation, TaxoArena estimates standard errors using the full Fisher Information matrix and projects it onto the sum-to-zero constraint space.
+> **STATUS: THIS SECTION DOCUMENTED THE BUG. Corrected 2026-07-30.**
+>
+> The projection term below was written and implemented as $1/K$. It should be $1/K^2$.
+> Consequences, all binding:
+>
+> 1. **No pre-correction standard error in this project is a measurement.** Every stored SE
+>    predates the fix.
+> 2. **Bradley-Terry intervals have not been recomputed, so no confidence interval may
+>    appear anywhere in the thesis.** Not here, not in a figure, not in a table.
+> 3. Do **not** write "every SE was the floor constant" as a flat statement. The pilot's
+>    stored values are mostly substitutions written by the `[ARENA-SE]` guard, so that
+>    sentence describes the guard rather than the fit.
+>
+> The formulas below are corrected in place. See `void-results.md` §2.
+
+To estimate the covariance matrix of $s$, TaxoArena uses the full Fisher Information matrix and projects it onto the sum-to-zero constraint space rather than a diagonal approximation.
 
 ### 1. Build the Full Fisher Information Matrix ($F$)
 The elements of the $K \times K$ Fisher Information matrix $F$ are defined by:
@@ -75,11 +90,13 @@ This matrix is non-singular and invertible as long as the comparison graph is co
 ### 3. Matrix Inversion & Standard Error Extraction
 We compute the inverse covariance matrix $\Sigma = F_{\text{constrained}}^{-1}$ using Gauss-Jordan elimination. The covariance matrix under the zero-sum constraint is given by:
 
-$$ \text{Cov}(s_i, s_j) = \Sigma_{ij} - \frac{1}{K} $$
+$$ \text{Cov}(s_i, s_j) = \Sigma_{ij} - \frac{1}{K^2} $$
 
 The standard error ($SE$) of the log-strength rating $s_i$ is the square root of the diagonal variance:
 
-$$ SE_i = \sqrt{\Sigma_{ii} - \frac{1}{K}} $$
+$$ SE_i = \sqrt{\Sigma_{ii} - \frac{1}{K^2}} $$
+
+*Both terms read $1/K$ until 2026-07-30. Ridging with $\mathbf{1}\mathbf{1}^T$ adds $1$ to the eigenvalue along $\mathbf{1}$, so the inverse carries $\mathbf{1}\mathbf{1}^T/K^2$ — one factor of $K$ per normalised $\mathbf{1}$ — and that is the term to remove. Subtracting $1/K$ removes $K$ times too much, which can drive the variance negative.*
 
 If the comparison graph is disconnected and the matrix is singular (e.g. at round 0 before bootstrap completes), the estimator falls back to the diagonal approximation:
 

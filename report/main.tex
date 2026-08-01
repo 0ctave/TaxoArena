@@ -73,8 +73,6 @@
 	% DEDICATION (dissertation) OR THESIS TASK (thesis)
 	%------------------------------	
 	\input{02_Prematter/b_Declaration}
-	\cleardoublepage	
-	\ifthenelse{\boolean{isDiss}}{\input{02_Prematter/c_Dedication}\cleardoublepage}{\includepdf[pages={1-}]{02_Prematter/c_Task}}
 	\cleardoublepage
 \end{spacing}
 %------------------------------
@@ -83,6 +81,8 @@
 \input{02_Prematter/d_Acknowledgements}
 \cleardoublepage
 \input{02_Prematter/e_Abstract}
+\cleardoublepage
+\input{02_Prematter/i_AIUse}		% AI-tool disclosure required by clause 2 of the affidavit
 \cleardoublepage
 %------------------------------
 % ONLY for dissertations: list of publications (can also be removed for a B/M thesis)
@@ -98,14 +98,17 @@
 	\pagenumbering{roman}		% small roman page numbers
 	\listoffigures 				% make list of figures
 	\listoftables 				% make list of tables
-	\listofalgorithms 			% make list of algorithms
-	\lstlistoflistings			% make list of codes
+	% \listofalgorithms and \lstlistoflistings removed 2026-07-31: the thesis
+	% contains no algorithm or lstlisting environments, so both printed empty
+	% headings. Restore if such an environment is ever added.
 	\include{02_Prematter/g_Nomenclature} % include all symbols in nomenclature
 	\printnomenclature 			% make list of symbols
 	\cleardoublepage
-	\input{02_Prematter/h_Abbreviations}
-	\listoftodos				% make list of todos
-	\todototoc					% add list of todos to list of contents	
+	% h_Abbreviations removed 2026-07-31: e_AbbreviationDefinitions.tex declares
+	% no acronyms and the content chapters use none, so the list printed an
+	% empty chapter. Restore together with \DeclareAcronym definitions if wanted.
+	% \listoftodos / \todototoc removed 2026-07-31: a submitted thesis must not
+	% carry a todo list, and no \todo notes exist in the text.
 	\cleardoublepage
 \end{spacing}
 %------------------------------
@@ -127,9 +130,11 @@
 %------------------------------
 % INDEX
 %------------------------------
-\phantomsection
-\label{ch:index}
-\printindex
+% Removed 2026-07-31: no \index{} entry exists anywhere in the text, so
+% \printindex produced an empty index. Restore if entries are ever added.
+% \phantomsection
+% \label{ch:index}
+% \printindex
 %------------------------------
 % END DOCUMENT
 %------------------------------

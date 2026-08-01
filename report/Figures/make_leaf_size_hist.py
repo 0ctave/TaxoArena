@@ -59,73 +59,70 @@ print(f"  median {med:.0f}, IQR [{q1:.0f}, {q3:.0f}], "
 print(f"  leaves below the birth floor n_min = {N_MIN}: {below}")
 
 # ---------------------------------------------------------------------- plot
-BLUE = "#2a78d6"
-BLUE_LIGHT = "#cde2fb"
-ORANGE = "#eb6834"
-INK = "#0b0b0b"
-MUTED = "#898781"
-GRID = "#e1e0d9"
-BASELINE = "#c3c2b7"
-
+# GREYSCALE ONLY -- the thesis prints in monochrome. The one exceptional leaf
+# is distinguished by a hatch and a leader label, not by hue.
 plt.rcParams.update({
-    "font.family": "serif",
-    "font.serif": ["Latin Modern Roman", "CMU Serif", "Times New Roman",
-                   "DejaVu Serif"],
-    "font.size": 9,
-    "pdf.fonttype": 42,
-    "text.color": INK,
-    "axes.edgecolor": BASELINE,
-    "axes.labelcolor": INK,
-    "xtick.color": INK,
-    "ytick.color": INK,
+    "font.family": "serif", "font.serif": ["DejaVu Serif"],
+    "mathtext.fontset": "dejavuserif",
+    "font.size": 9, "pdf.fonttype": 42,
 })
 
-fig, ax = plt.subplots(figsize=(5.9, 2.9))
+fig, ax = plt.subplots(figsize=(6.4, 2.9))
 ax.set_axisbelow(True)
-ax.grid(axis="y", color=GRID, lw=0.6)
+ax.grid(axis="y", color="0.90", lw=0.6)
 for sp in ("top", "right"):
     ax.spines[sp].set_visible(False)
 
-bins = list(range(50, 410, 10))
-counts, edges, patches = ax.hist(
-    sizes, bins=bins, color=BLUE, edgecolor="white", linewidth=0.8, zorder=3)
+# Log-spaced bins so the long right tail is not compressed into an empty
+# two-thirds of a linear axis (figure-review fix). The first bin [50, 55)
+# is exactly the below-floor leaf; every later edge is geometric from the
+# birth floor to 400.
+bins = [50.0] + [N_MIN * (400.0 / N_MIN) ** (i / 14.0) for i in range(15)]
+counts, edges, _ = ax.hist(sizes, bins=bins, color="0.72", edgecolor="white",
+                           linewidth=0.8, zorder=3)
+assert counts[0] == len(below) == 1, "first bin must be the below-floor leaf"
 
-# highlight the single below-floor leaf (n = 54): it is one unit of the first
-# bin -- redraw that unit in orange so the exception is visible.
-first_bin = next(i for i in range(len(edges) - 1)
-                 if edges[i] <= below[0] < edges[i + 1])
-ax.bar(edges[first_bin], 1, width=edges[first_bin + 1] - edges[first_bin],
-       align="edge", color=ORANGE, edgecolor="white", linewidth=0.8, zorder=4)
+# the single below-floor leaf (n = 54): redraw its unit hatched so the
+# exception is visible without colour.
+ax.bar(edges[0], 1, width=edges[1] - edges[0], align="edge",
+       facecolor="white", edgecolor="black", hatch="////", linewidth=0.9,
+       zorder=4)
 
-# IQR band and median / floor reference lines.
-ax.axvspan(q1, q3, color=BLUE_LIGHT, alpha=0.45, zorder=1)
-ax.axvline(med, color=INK, lw=1.1, zorder=5)
-ax.axvline(N_MIN, color=ORANGE, lw=1.1, ls=(0, (4, 3)), zorder=5)
+# reference lines: the birth floor (dashed) and the median (solid)
+ax.axvline(N_MIN, color="black", lw=1.0, ls=(0, (4, 3)), zorder=5)
+ax.axvline(med, color="black", lw=1.2, zorder=5)
 
 ymax = counts.max()
-ax.set_ylim(0, ymax * 1.28)
+ax.set_ylim(0, ymax * 1.30)
 ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
-ax.text(med + 4, ymax * 1.24, f"median {med:.0f}",
-        ha="left", va="top", fontsize=8, color=INK)
-ax.text(q3 + 4, ymax * 1.02, f"IQR [{q1:.0f}, {q3:.0f}]",
-        ha="left", va="top", fontsize=8, color=MUTED)
-ax.text(N_MIN - 3.5, ymax * 0.66, f"birth floor $n_\\mathrm{{min}}$ = {N_MIN}",
-        ha="right", va="center", fontsize=8, color=ORANGE, rotation=90)
-ax.text(edges[first_bin] - 2, 0.5, str(below[0]), ha="right", va="center",
-        fontsize=7.5, color=ORANGE)
-ax.text(232, ymax * 0.40,
-        f"one leaf sits below the floor\n({below[0]} queries, in orange)",
-        ha="left", va="bottom", fontsize=8, color=INK)
-ax.text(sizes[-1], 1.6, f"max {sizes[-1]}", ha="center", va="bottom",
-        fontsize=7.5, color=MUTED)
+ax.annotate(f"median {med:.0f}", xy=(med, ymax * 1.26), xytext=(4, 0),
+            textcoords="offset points", ha="left", va="top", fontsize=8)
+# two annotations only (figure-review fix); median/IQR/provenance live in
+# the caption
+ax.annotate(f"one leaf (hatched) ended below the birth floor\n"
+            f"(dashed, $n_\\mathrm{{min}} = {N_MIN}$) after later merges: "
+            f"{below[0]} queries",
+            xy=(N_MIN, ymax * 1.055), xytext=(150, ymax * 1.06),
+            ha="left", va="center", fontsize=8, linespacing=1.45,
+            arrowprops=dict(arrowstyle="-", lw=0.7, color="0.35",
+                            shrinkA=3, shrinkB=3))
+ax.annotate(f"the largest leaf holds {sizes[-1]} queries —\n"
+            f"{sizes[-1] / med:.1f}$\\times$ the median, so the arena's\n"
+            f"per-cell power is far from uniform",
+            xy=(sizes[-1], 1.4), xytext=(150, ymax * 0.55),
+            ha="left", va="center", fontsize=8, linespacing=1.45,
+            arrowprops=dict(arrowstyle="-", lw=0.7, color="0.35",
+                            shrinkA=3, shrinkB=3))
 
-ax.set_xlim(40, 410)
-ax.set_xlabel("queries per leaf (construction assignment)")
-ax.set_ylabel("leaves")
-ax.set_title(f"{len(sizes)} leaves, frozen snapshot", fontsize=9,
-             loc="left", pad=8)
+ax.set_xscale("log")
+ax.set_xlim(47, 430)
+ax.set_xticks([50, 70, 100, 140, 200, 280, 400])
+ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+ax.set_xlabel("queries assigned to the leaf at construction (log scale)")
+ax.set_ylabel("number of leaves")
 ax.tick_params(length=0)
 
-fig.tight_layout(pad=0.4)
-fig.savefig(OUT, bbox_inches="tight")
+fig.subplots_adjust(left=0.098, right=0.985, top=0.930, bottom=0.165)
+fig.savefig(OUT)
 print("wrote", OUT)

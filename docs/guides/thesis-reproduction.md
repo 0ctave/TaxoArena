@@ -1,5 +1,46 @@
 # Thesis Reproduction Guide: End-to-End Experimental Protocol
 
+> **STATUS: PARTIALLY SUPERSEDED (2026-07-27).**
+>
+> * **Use `experiment_configs/freeze_mcs55.toml`**, not the config block reproduced later in
+>   this guide. The frozen artifact is 154 nodes / 87 leaves / maxDepth 6 / mass 8299.00 /
+>   J = 0.253129, certified at iteration 10, built from commit `c381211`. The values here
+>   (`minClusterSize = 50`, `separationEpsilon`, etc.) predate the current parameter set. See
+>   [`../frozen-artifact.md`](../frozen-artifact.md).
+> * **The taxonomy is a tree.** Cross-linking was removed at `334b95d`; polyhierarchy is a
+>   reported negative result, so anything below that reads "DAG" as a genuine polyhierarchy
+>   should read "the induced hierarchy". Baselines should be cut at **87** cells to match the
+>   artifact, not 17.
+> * **Do not use a `seeds = [...]` list.** Only the first seed routes held-out queries; the
+>   rest silently take a ~80% NoMatchRate. Run one config per seed.
+> * **Routing ECE IS reportable, with its aggregation named.** *~~This bullet previously
+>   said it is not reportable because `computeRoutingECE` returns 0.0. That was false.
+>   Corrected 2026-07-30.~~* The frozen run exported **0.2114**; the defect is that both
+>   export sites aggregate a domain's leaf shares with `maxOf` instead of summing
+>   ([`../known-defects.md`](../known-defects.md)).
+> * **No confidence interval may be reported anywhere.** The Bradley-Terry variance
+>   correction used `1/K` where it should have used `1/K^2`; the intervals have not been
+>   recomputed. This covers the `overallSpearmanCiLow/High` and per-leaf interval fields
+>   this guide describes below: export them if you like, but do not render them.
+> * **The arena is many paired runs, not one, and not all of them count** (corrected
+>   2026-07-31). Each pairs MAIN (per-leaf rubrics) against C5 (generic MT-Bench prompt) on
+>   an identical question set at a 12-model roster. The eight-domain M = 12 batch is
+>   **superseded**: its bootstrap counted the 66-pair floor over the whole domain and put
+>   every bootstrap match on the largest leaf, so one cell per domain reached complete
+>   coverage and the rest sat at 4 to 33 pairs of 66, and three runs had unequal arms.
+>   Reproduce against the five revised-scheduler runs in
+>   [`../newlogic-rerun-record.md`](../newlogic-rerun-record.md), which name their databases
+>   and hashes. The M = 12 numbers stay in
+>   [`../batch-M12-complete-record.md`](../batch-M12-complete-record.md) because every
+>   pre-registration points at them. **The revised runs are not reproducible from a commit:
+>   the code that produced them is uncommitted.**
+> * **`RANDOMNULL_BASELINE` has a second, higher-value use** than the one described below: it
+>   is the missing control arm for the rubric-specificity measurement. Induce judge rubrics
+>   over it and it becomes the null for link 2 of the argument
+>   ([`../reframed-argument.md`](../reframed-argument.md)).
+> * A 23-run sweep was in progress at the time of writing; figures produced by it are not yet
+>   reflected anywhere in `docs/`.
+
 This guide outlines the step-by-step protocol for reproducing all experimental results, leaderboards, and statistical analyses reported in Chapter 6 (Results) of your Master's Thesis. 
 
 By executing this pipeline, you will:

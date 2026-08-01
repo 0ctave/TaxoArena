@@ -1,5 +1,40 @@
 # TaxoArena — Parameter Guide for Calibration
 
+> **STATUS: SUPERSEDED for parameter values and derivations (2026-07-27).**
+> Current parameter table: [`../dag-logic-and-math.md`](../dag-logic-and-math.md) §10.
+> Current derivations, stated in the defensible direction:
+> [`../frozen-artifact.md`](../frozen-artifact.md).
+>
+> **Parameters documented below that no longer exist:** `constructionMargin`,
+> `assignmentCosineGap`, `deltaAssign`, `routingSoftmaxTau`, `tauKappaScalingFactor`,
+> `emaAlpha`, `separationEpsilon` (as a single unified constant), `secondaryMassFloor`,
+> `bridgeSupportRelFraction`, `bridgeAmbiguityFloor`, `maxParentsPerNode`, and every
+> bridge/Source-A/B knob.
+>
+> **Parameters that exist but whose guidance here is wrong:**
+>
+> * **`minClusterSize`.** This guide calls it "the granularity dial ... the strongest single
+>   lever on leaf count". After `c381211` that is **not** the correct account of what bound
+>   granularity: the binding constraint was a split-time routing check scored with the wrong
+>   rule, and correcting it moved leaves 84 -> 152 at fixed `minClusterSize`. In the frozen
+>   artifact `minClusterSize = 55` is a **judge-budget choice**, licensed by the measured
+>   result that discriminative power is flat from 14 to 152 cells — not a statistical
+>   requirement, and not the reason splitting stops. Per-cell reliability is a consequence,
+>   not a target. See [`../router-shared-kappa-correction.md`](../router-shared-kappa-correction.md)
+>   and [`../prereg_discriminative_power.md`](../prereg_discriminative_power.md).
+> * **`descentMargin`.** Not a nuisance parameter to sweep. It is a **mode selector** with two
+>   justified operating points — 0.12 (routing-optimal, discovery off, the frozen artifact)
+>   and ~0 (discovery on, 9.1% residual reserve, ~5 points of routing degradation). See
+>   [`../incremental-taxonomy.md`](../incremental-taxonomy.md).
+> * **`maxK`.** A cost bound `O(maxK^2)` — but only since the k-fallback. Before it,
+>   `maxK = 6` collapsed the tree to 36 leaves and J 0.181.
+> * **Acceptance.** There is now a `acceptanceZ` gate calibrated against the paired bootstrap
+>   `SE(dJ)`; `tau` alone no longer decides structural edits.
+>
+> The **structure** of this guide — what each knob trades off, and the "symptom -> knob"
+> table at the end — is still a useful map. The values and several of the causal claims are
+> not.
+
 Every tunable parameter: what it controls, how changing it moves the DAG structure
 and the results, its interactions, and calibration guidance. Verified against HEAD
 (TaxonomyConfig.kt). Values are code defaults; your canonical build overrides several.

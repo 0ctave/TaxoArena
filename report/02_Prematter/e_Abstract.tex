@@ -12,13 +12,82 @@
 %------------------------------
 % ENTER TEXT HERE
 %------------------------------
-% TODO(author): German abstract. The English text below is now written
-% against Chapter 5's numbers; translate that text rather than
-% composing a second, differently-scoped abstract. Re-check the
-% figures against Chapter 5 first, since the law run (Run C) may add a
-% sentence.
+% Translation of the English abstract below (settled-batch-final as of
+% 2026-07-31); scope mirrors the English exactly. TODO(author): proofread
+% once before submission.
+Agentische Systeme, die Teilaufgaben an Modelle weiterleiten, werden
+eine Fähigkeitskarte mit feinerer Auflösung benötigen, als ein
+skalares Leaderboard sie liefert. Ob einer solchen Karte zu trauen
+ist, hängt von der Messung ab, auf der sie beruht --- und diese
+Messung ist es, die die vorliegende Arbeit aufbaut und prüft.
+TaxoArena induziert eine semantische Partition über MMLU-Pro und
+betreibt innerhalb ihrer Zellen eine LLM-as-a-Judge-Arena, sodass
+jeder paarweise Vergleich unter einer für die jeweilige Zelle
+verfassten Bewertungsrichtlinie beurteilt wird. Die Partition ist das
+Instrument; das Ergebnis ist eine Messung des Judges.
+
+Auf einem Korpus mit verifizierbarem Antwortschlüssel folgt das Urteil
+des Judges der Antwortkorrektheit und der Stärke des Kandidatenmodells,
+nicht der Qualität der Begründung: Die Übereinstimmung mit dem
+Schlüssel beträgt $91{,}1\%$, wenn das korrekte Modell zugleich das
+stärkere des Paares ist, und $56{,}5\%$, wenn es das schwächere ist.
+Über acht Domänen und acht Modelle rekonstruiert es die Ordnung des
+Schlüssels bei $196$ der $200$ Modellpaare, die der Schlüssel trennen
+kann, und wo es sich auf einen Sieger festlegt, stimmt es in $86\%$
+dieser Vergleiche mit dem Schlüssel überein. Seine Unentschieden-Rate
+steigt deutlich bei Fragen, bei denen der Schlüssel nicht mehr
+diskriminiert. Der Mechanismus ist im Prompt sichtbar: Dem Judge wird
+die Referenzantwort nie gezeigt, aber die Antworten nennen ihre eigene
+Wahl, sodass ein Judge, der die Aufgabe selbst lösen kann, beide
+Seiten verifizieren kann, ohne den Schlüssel zu kennen.
+
+Da sieben der acht Domänen eine \emph{identische}
+Ground-Truth-Ordnung teilen --- die achte weicht um eine einzelne
+Vertauschung zweier nahezu gleichauf liegender Modelle ab --- handelt
+es sich um \emph{eine} Ordnung, die achtmal auf disjunkten
+Fragemengen rekonstruiert wurde, nicht um acht unabhängige
+Ergebnisse; sie wird auch so berichtet.
+
+Die Bewertungsrichtlinie wird anschließend gegen einen generischen
+Prompt ohne jegliche Domänenkriterien getestet, der die Vergleiche
+des zellenbezogenen Arms unter denselben Zellen exakt wiederholt.
+Beide erzeugen in sieben von acht Domänen dieselbe Rangfolge und
+unterscheiden sich in der achten um eine einzelne benachbarte
+Vertauschung --- innerhalb der gemessenen Streuung zwischen
+Scheduler-Seeds. Was sie trennt, ist die Entschiedenheit: Der
+zellenbezogene Arm verzichtet bei $13{,}0\%$ der entscheidbaren
+Vergleiche auf einen Sieger, der generische bei $10{,}9\%$,
+konsistent über alle acht Domänen, während sich die Genauigkeit unter
+der Bedingung einer Festlegung um etwa einen Punkt unterscheidet. Die
+zellenbezogene Bedingung verändert also, wie oft dieser Judge sich
+enthält, nicht, welches Modell er höher einstuft --- und da sich die
+beiden Arme auch im Urteilsformat unterscheiden, ist der Unterschied
+der Bedingung als Ganzem zuzuschreiben, nicht allein dem Text der
+Richtlinie.
+
+Keine Bedingung dieser Arbeit entfernt die Partition. Beide Arme
+teilen die Zellen, die Vergleiche und die Aggregation; gemessen wird
+also Richtlinien-Spezifität bei gleichem Budget, und die registrierte
+Vorhersage für Mathematik ist offen, nicht beantwortet.
+
+Die Konstruktion erreicht einen zertifizierten strukturellen Fixpunkt
+und liefert 87 Zellen, deren induzierte Richtlinien gegenüber einer
+Nullverteilung aus 13 größengleich gezogenen Zufallszellen
+zellspezifisch sind ($p = 1{,}2 \times 10^{-6}$). Was scheitert ---
+unter Präregistrierung und bevor die Arena lief --- ist die Prämisse,
+dass Zellen unterschiedliche wahre Modell-Rangfolgen tragen: Die
+Übereinstimmung der Rangfolgen zwischen Zellen bleibt über eine
+elffache Änderung der Granularität flach, und eine Permutations-Null,
+die die Fragen einer Domäne in Pseudozellen der beobachteten Größen
+mischt, findet in keiner Domäne evaluative Substruktur. Auf einem
+Multiple-Choice-Korpus kann ein fähiger Judge den Weg über die
+Korrektheit abkürzen und die Partition vollständig umgehen; die
+Architektur greift nur dort, wo Korrektheit nicht überprüfbar ist.
+Die Ergebnisse sind eine Studie ausgewählter Domänen --- acht von
+vierzehn, bei einem Seed.
 %------------------------------
-\textbf{Schlüsselwörter:} \itshape \germankeywords
+\par\medskip
+\noindent\textbf{Schlüsselwörter:} \itshape \germankeywords
 \end{otherlanguage}
 %------------------------------
 % ENGLISH
@@ -28,40 +97,65 @@
 %------------------------------
 % ENTER TEXT HERE
 %------------------------------
-Agentic systems dispatch sub-tasks to models and need a capability map
-at a finer resolution than a scalar leaderboard provides. TaxoArena
+Agentic systems that route sub-tasks to models will need a capability
+map at a finer resolution than a scalar leaderboard provides. Whether
+such a map can be trusted depends on the measurement behind it, and
+that measurement is what this thesis builds and tests. TaxoArena
 induces a semantic partition over MMLU-Pro and runs an
 LLM-as-a-judge arena inside its cells, so that every pairwise
 comparison is judged under a rubric written for that cell. The
 partition is the instrument; the result is a measurement of the judge.
 
 On a corpus with a verifiable answer key, the judge's verdict tracks
-answer correctness rather than reasoning quality. It agrees with the
-key on $88.8\%$ of items where exactly one response is correct; its tie
-rate roughly triples on the items where the key stops discriminating;
-and its agreement is \emph{highest} where neither response contains any
-reasoning at all --- $97.0\%$ against $83.2\%$ once model capability is
-controlled. A judge given no cell rubric reaches the same winner on
-$99.4\%$ of comparisons, and a paired arm that removes the partition
-entirely matches the key to within half a percentage point
-($94.2\%$ against $94.7\%$) on an identical question set. Under the
-registered decision rule the rank-correlation contrast on Math
-returned a verdict for the partition-free arm; the gap collapses
-to the registered boundary once ties are dropped, an attribution made
-after the fact and marked as such. On law, the one domain where the
-roster's models measurably reorder, the per-leaf arm leads under one
-tie convention and exactly ties under the other, never reversing.
+answer correctness and candidate model strength rather than reasoning
+quality: agreement with the key is $91.1\%$ where the correct model is
+also the pair's stronger, and $56.5\%$ where it is the weaker. Across eight domains
+and eight models it recovers the key's ordering on $196$ of the $200$
+model pairs the key can separate, and where it commits to a winner it
+agrees with the key on $86\%$ of those comparisons. Its tie rate rises
+sharply on items where the key stops discriminating. The
+mechanism is visible in the prompt: the judge is never shown the
+reference answer, but the responses state their own, so a judge able to
+solve the item can verify both without being told the key.
+
+Because seven of the eight domains share an \emph{identical}
+ground-truth ordering --- the eighth differs by one adjacent swap of
+two nearly-tied models --- this is one ordering recovered eight times
+on disjoint question samples rather than eight independent results,
+and it is reported as such.
+
+The rubric is then tested against a generic prompt carrying no domain
+criteria at all, replaying the cell-scoped arm's own comparisons under
+the same cells. The two produce the \emph{same} ranking in seven of eight
+domains, and differ by one adjacent transposition in the eighth ---
+within the measured seed-to-seed spread. What separates them is
+decisiveness: the cell-scoped arm declines
+to name a winner on $13.0\%$ of decidable comparisons against $10.9\%$
+for the generic prompt, consistently across all eight domains, while
+their accuracy conditional on committing differs by about one point.
+The cell-scoped condition therefore changes how often this judge
+abstains, not which model it ranks higher --- and since the two arms
+also differ in verdict format, the abstention difference belongs to
+the condition as a whole rather than to the rubric text alone.
+
+No condition in this thesis removes the partition. Both arms share the
+cells, the comparisons and the aggregation, so what is measured is
+rubric specificity at matched budget, and the registered prediction for
+mathematics is open rather than answered.
 
 The construction reaches a certified structural fixed point and yields
-87 cells whose induced rubrics are cell-specific against a size-matched
-randomised null ($p = 1.2 \times 10^{-6}$). What fails --- under
-pre-registration, and before the arena ran --- is the premise that
-cells carry different true model rankings: between-cell rank agreement
-is flat across an elevenfold change in granularity. On a
-multiple-choice corpus a capable judge can shortcut to correctness and
-bypass the partition entirely; the architecture binds only where
-correctness is not checkable. Results are a selected-domain study at
-one seed.
+87 cells whose induced rubrics are cell-specific against a null of 13
+random cells drawn to the same sizes ($p = 1.2 \times 10^{-6}$). What
+fails, under pre-registration and before the arena ran, is the premise
+that cells carry different true model rankings. Between-cell rank
+agreement is flat across an elevenfold change in granularity, and a
+permutation null that reshuffles a domain's questions into pseudo-cells
+of the observed sizes finds no domain with evaluative sub-structure. On
+a multiple-choice corpus a capable judge can shortcut to correctness
+and bypass the partition entirely; the architecture binds only where
+correctness is not checkable. Results are a selected-domain study,
+eight domains of fourteen, at one seed.
 %------------------------------
-\textbf{Keywords:} \itshape \englishkeywords
+\par\medskip
+\noindent\textbf{Keywords:} \itshape \englishkeywords
 \end{otherlanguage}

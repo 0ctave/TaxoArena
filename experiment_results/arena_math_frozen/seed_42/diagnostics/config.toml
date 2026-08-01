@@ -1,0 +1,81 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  outputDir: experiment_results/arena_math_frozen
+#  arena_math_frozen.toml — THE MATH ARENA on the frozen construction
+#
+#  Snapshot 20260727_042523 (87 leaves, J 0.253129, certified, 87/87 rubrics).
+#
+#  SCOPING. The reserved pool is the FULL construction's held-out set (3445
+#  queries, content-addressed, regenerateSplit=false so it is used as-is). The
+#  arena then keeps only those whose primary leaf sits under the Math anchor —
+#  routing, leaf structure and rubrics are the real ones; only the judged pool
+#  is restricted.
+#
+#  CONDITIONS. MAIN uses the per-leaf induced rubrics. GENERIC_JUDGE is the
+#  MT-Bench-style general judge — one domain-agnostic prompt for every cell.
+#  That contrast is the arena's half of link 3: coherent cells -> specific
+#  rubrics -> BETTER JUDGMENTS. The offline half (rubrics are cell-specific at
+#  2.1x) is in docs/prereg_rubric_specificity.md.
+#
+#  BUDGET. 8 models = 28 pairs. Smoke run at 3 models identified at 5-8 calls
+#  per cell over 2-3 pairs; a spanning tree over 8 models needs 7 edges, so
+#  ~17-28 calls/cell is the expectation — inside the <=40 band of
+#  docs/prereg_arena_launch.md. Math holds ~13 of the 87 leaves. Read the
+#  ACTUAL [ARENA-IDENT] minimum per node before extrapolating to the full tree.
+#
+#  Roster balanced 4/4 on chain-of-trace presence and spanning 23-77% GT
+#  accuracy, so the RQ1 trace stratification survives and rank correlation has
+#  range.
+# ══════════════════════════════════════════════════════════════════════════
+
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "claude-3-5-sonnet-20241022",
+    "gpt-4o-2024-08-06",
+    "deepseek-chat-v2_5",
+    "claude-3-5-haiku-20241022",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+category      = "Math"
+queryLimit    = 0
+outputDir     = "experiment_results/arena_math_frozen"
+testRatio     = 0.3
+seed          = 42
+
+runPipeline        = false
+regenerateSplit    = false     # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false     # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN", "GENERIC_JUDGE"]
+
+questionsPerRound  = 2
+confidenceGate     = 0.65
+parallelism        = 6
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+numIterations         = 50
+maxLeafAssignments    = 5
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+enableProfiling           = true

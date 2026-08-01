@@ -68,15 +68,16 @@ taxonomy_*.json
 taxonomy_*.html
 taxonomy_*.dot
 
-# Experimental runs, results, and backups
-experiment_results/
+# Experimental runs and backups. experiment_results/ itself is tracked
+# (thesis record); its raw console logs and SQLite sidecars stay out via
+# the global *.log / *.db-* rules, and its .db files are re-included below.
 experiment_results_old/
 experiment_test_run/
 experiment_pipeline_test/
 benchmark_backups/
-snapshots/
+/snapshots/
 plots/
-logs/
+/logs/
 scratch/
 
 # LaTeX build temporaries (allows LaTeX source: .tex, .bib, .sty, .cls, .ist, figures, chapters, appendices)
@@ -106,6 +107,7 @@ scratch/
 pdfa.xmpi
 
 # Generated PDF build output (preserves figure PDFs and prematter PDF assets)
+report/Abschlussarbeit_0510121.pdf
 report/main.pdf
 
 # Local tooling and machine-local state (not part of the handover)
@@ -142,3 +144,9 @@ experiment_*.toml
 reserved_test_queries.json
 eval_results/
 *.zip
+
+# Settled-batch results record: the result databases and the frozen MAIN
+# triples are tracked despite the global *.db / frozen_triples_* rules.
+!experiment_results/**/*.db
+!/ratings.db
+!frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json

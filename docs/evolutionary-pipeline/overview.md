@@ -1,5 +1,17 @@
 # Evolutionary Pipeline: End-to-End Lifecycle
 
+> **STATUS: the six-phase skeleton is still accurate; the gates inside phases 4-6 are not
+> (2026-07-27).** Phase 4 now offers every `k` in `2..maxK` in ascending order and coarsens
+> under-floor components rather than vetoing the split; phases 4 and 5 both route through the
+> `tryProposal` gate, which measures `dJ` against a **paired bootstrap** `SE(dJ)`; phase 6's
+> GED streak has been joined by a four-term **fixed-point certificate** (structure, routing,
+> `mu`, `kappa`) which is what the frozen artifact is certified against. Current
+> specification: [`../dag-logic-and-math.md`](../dag-logic-and-math.md).
+>
+> One clarification worth carrying: phase 3 (trickle) is **skipped at iteration 1**, so the
+> ground-truth anchor bootstrap survives the first split/optimise/refit pass. Any description
+> of a "migration" mechanism applying in the first construction iteration contradicts this.
+
 This document describes the end-to-end evolutionary pipeline of **TaxoArena**, showing how raw evaluation queries are ingested, structured, routed, split, optimized, and stabilized into a self-organizing knowledge taxonomy.
 
 ---

@@ -90,7 +90,24 @@ Stores a model's local or global rating (OpenSkill baseline).
 
 ## 4. System Settings & Configuration
 
-The configuration parameters are managed via TOML (mapped to `TaxonomyConfig` in Kotlin). The canonical experiment is [`experiment_configs/thesis_canonical.toml`](../../experiment_configs/thesis_canonical.toml); the parameter set below is the simplified thesis surface (12 formalism knobs + `dagMode` + a diagnostics block).
+The configuration parameters are managed via TOML (mapped to `TaxonomyConfig` in Kotlin).
+
+> **SUPERSEDED (2026-07-27).** The canonical experiment is now
+> [`experiment_configs/freeze_mcs55.toml`](../../experiment_configs/freeze_mcs55.toml), not
+> `thesis_canonical.toml`. **Eight of the knobs in the block below no longer exist**:
+> `separationEpsilon` (split by role into `proposalSeparationBar`, a LEVEL, and
+> `marginalEps`, a DIFFERENCE), `routingSoftmaxTau`, `assignmentCosineGap`, `deltaAssign`,
+> `emaAlpha`, `secondaryMassFloor`, `bridgeSupportRelFraction`, `tauKappaScalingFactor`. The
+> `dagMode` comment is also wrong: `DAG_MAX` sets `enableStableQuestionIds`,
+> `enableResidualRouting` and `enableResidualSplitGate` — it does **not** enable bridging,
+> which was removed at `334b95d`.
+>
+> Current parameter table with frozen values:
+> [`../dag-logic-and-math.md`](../dag-logic-and-math.md) §10. Derivations:
+> [`../frozen-artifact.md`](../frozen-artifact.md). The node/embedding/rating data models
+> described earlier in this file are still accurate.
+
+The block below is retained as a record of the earlier parameter surface:
 
 ```toml
 dagMode = "DAG_MAX"   # enables stable IDs, residual routing, split gates, bridging, refit

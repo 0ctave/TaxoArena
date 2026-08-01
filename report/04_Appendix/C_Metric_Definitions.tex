@@ -1,156 +1,81 @@
 \chapter{Formal Metric Definitions}\label{app:metrics}
 
-This appendix gives closed-form definitions for the taxonomy-quality
-and structural-characterisation metrics named in
-Section~\ref{sec:exp-metrics} and used in
-Chapter~\ref{ch:results}. It does not cover the arena/ranking metrics
-(Bradley--Terry scores, Kendall $\tau$, Spearman $\rho$,
-pairwise-winner accuracy, top-$k$ Jaccard), which are already
+This appendix gives closed-form definitions for the construction-quality
+metrics the system computes and exports. Arena and ranking metrics
+(Bradley--Terry scores, Spearman $\rho$, pairwise-winner accuracy) are
 formalised in Section~\ref{sec:meth-bt} and
-Section~\ref{sec:meth-validation}.
+Section~\ref{sec:meth-validation} and are not repeated here.
 
-\section{Spherical Silhouette Coefficient}\label{sec:app-metrics-silhouette}
-
-Standard silhouette coefficients use Euclidean distance; for
-L2-normalised embeddings on the unit hypersphere, cosine-based
-angular distance is the geometrically appropriate analogue. For two
-unit vectors $x, y \in \mathcal{S}^{d-1}$, the angular distance is
-\[
-d_\theta(x, y) = \arccos(x^\top y).
-\]
-For each query embedding $x$ with assigned node $A$ and nearest
-neighbouring node $B \neq A$ (by centroid distance),
-\[
-a(x) = \arccos(x^\top \mu_A), \qquad
-b(x) = \min_{B \neq A} \arccos(x^\top \mu_B), \qquad
-s(x) = \frac{b(x) - a(x)}{\max(a(x), b(x))},
-\]
-with $s(x) = 0$ when $\max(a(x), b(x)) = 0$. The reported Spherical
-Silhouette is the mean $\bar{S} = \frac{1}{n}\sum_i s(x_i)$, with
-range $[-1, 1]$; values close to $1$ indicate queries tightly aligned
-with their own node centroid and well separated from the nearest
-neighbouring node.
+% RESOLVED 2026-07-31: AvgMatch (used by the frozen-tree certificate appendix)
+% and Routing ECE (canonical statement of the export defect cited from the debt
+% register) are load-bearing and keep their full text. Dasgupta cost and the
+% purity pair are cited nowhere in the chapters and are compressed below to
+% definition-plus-pointer; their full text lives in version control (this file's
+% history, alongside the Spherical Silhouette and Normalised Sackin Index
+% definitions removed earlier for the same reason).
 
 \section{Total Dasgupta Cost}\label{sec:app-metrics-dasgupta}
 
-The full-tree Dasgupta cost complements the per-split
-chance-corrected separation score used during construction
-(Appendix~\ref{app:dag-formalism}, \S\ref{sec:meth-split}). For similarity
-matrix $W$ with $w_{ij} = \max(x_i^\top x_j, 0)$ (cosine similarity,
-clipped to remove negative weights arising from MRL prefix
-mismatches) and completed hierarchy $T$,
-\[
-\text{cost}(T) = \sum_{i \neq j} w_{ij} \, |\text{Leaves}(\text{LCA}_T(i,j))|,
-\]
-where $\text{LCA}_T(i,j)$ is the lowest common ancestor of queries
-$i$ and $j$ in $T$ and $|\text{Leaves}(\cdot)|$ counts the leaves
-descending from it \parencite{dasgupta2016cost}. Similar query pairs
-that split deep in the hierarchy incur a low penalty; pairs that
-split at the root are penalised by the full leaf count. A lower Total
-Dasgupta Cost indicates a more structurally coherent hierarchy; unlike
-the per-split chance-corrected separation acceptance test of
-Appendix~\ref{app:dag-formalism} (\S\ref{sec:meth-split}), which is
-not a Dasgupta quantity, it is a genuine
-whole-tree Dasgupta-cost measure, computed on a fixed dataset and
-comparable across configurations and
-baselines (Section~\ref{sec:exp-prereg}).
+% Compressed 2026-07-31: uncited in chapters; full text in this file's history.
+The pipeline exports the standard whole-tree cost
+$\text{cost}(T) = \sum_{i \neq j} w_{ij}\,|\text{Leaves}(\text{LCA}_T(i,j))|$
+with $w_{ij} = \max(x_i^\top x_j, 0)$ \parencite{dasgupta2016cost}; lower is
+better. It is distinct from the per-split acceptance test of
+\S\ref{sec:meth-split}, which is not a Dasgupta quantity.
 
-\section{Normalised Sackin Index}\label{sec:app-metrics-sackin}
+\section{Leaf Purity, Flat and LCA-Sensitive}\label{sec:app-metrics-wlp}
 
-The Sackin index $S(T) = \sum_{\ell \in \text{Leaves}} \text{depth}(\ell)$
-sums leaf depths; it is a standard tree-balance statistic in
-phylogenetics. To remove its dependence on leaf count, the
-\textbf{Normalised Sackin Index} is the mean leaf depth,
-\[
-\tilde{S}(T) = \frac{1}{|\text{Leaves}|} \sum_{\ell \in \text{Leaves}} \text{depth}(\ell).
-\]
-A low $\tilde{S}(T)$ indicates a flat hierarchy that splits early and
-close to the root; a high $\tilde{S}(T)$ indicates a deep, uneven
-hierarchy in which some domains decompose much further than others.
+% Compressed 2026-07-31: uncited in chapters; full text in this file's history.
+The pipeline exports a complementary purity pair against the MMLU-Pro
+ground-truth labels: Weighted Leaf Purity, the leaf-size-weighted mean of
+per-leaf majority-label fractions, and standard Dendrogram Purity over the
+tree's unique LCAs (Section~\ref{sec:poly-negative}). WLP flat-tests each leaf;
+Dendrogram Purity additionally penalises same-label pairs split across distant
+subtrees.
 
 \section{Average Match Count}\label{sec:app-metrics-avgmatch}
 
-The taxonomy is a strict tree, but routing is weighted
-multi-membership (Section~\ref{app:dag-formalism}), so a query can
-be assigned to more than one leaf. Writing $\mathcal{L}(q)$ for the
-set of leaves query $q$ is assigned to,
+Routing is weighted multi-membership even though the taxonomy is a strict tree,
+so a query can be assigned to more than one leaf. Writing $\mathcal{L}(q)$ for
+the set of leaves query $q$ reaches,
 \[
 \text{AvgMatch} = \frac{1}{N} \sum_{i=1}^{N} |\mathcal{L}(q_i)|.
 \]
-$\text{AvgMatch} = 1.0$ means routing resolves every query to a single
-leaf; $\text{AvgMatch} > 1.0$ measures how much multi-membership the
-routing beam and the membership floor actually produce
+$\text{AvgMatch} = 1.0$ means routing resolves every query to a single leaf;
+above $1.0$ it measures how much multi-membership the routing beam and the
+membership floor actually produce
 (Appendix~\ref{app:dag-formalism}, \S\ref{sec:meth-routing}).
 
-\section{Weighted Leaf Purity}\label{sec:app-metrics-wlp}
-
-Weighted Leaf Purity (WLP) is not a standard named metric in the
-taxonomy-induction literature; it is defined here as a size-weighted
-average of per-leaf label purity against the MMLU-Pro ground-truth
-label. For leaf $\ell$ with member set $Q_\ell$ and ground-truth label
-function $\text{gt}(\cdot)$,
-\[
-\text{purity}(\ell) = \max_{c} \frac{|\{q \in Q_\ell : \text{gt}(q) = c\}|}{|Q_\ell|},
-\qquad
-\text{WLP} = \sum_{\ell \in \text{Leaves}} \frac{|Q_\ell|}{N} \, \text{purity}(\ell).
-\]
-Because WLP flat-tests each leaf directly rather than through a
-lowest-common-ancestor traversal, it is a useful complement to
-the LCA-sensitive Dendrogram Purity of
-Section~\ref{sec:app-metrics-dendrogram-purity}.
-
-\section{Dendrogram Purity}\label{sec:app-metrics-dendrogram-purity}
-
-Dendrogram purity is defined over a tree, where the lowest
-common ancestor (LCA) of two leaves is unique.
-Because the induced taxonomy is a strict tree
-(Section~\ref{sec:poly-negative}), the
-metric takes its standard form here.
-The implementation retains the more general \emph{shallowest}-LCA
-convention, which coincides with the unique LCA whenever every node
-has one parent, so no reconciliation between the two is required in
-the reported runs.
-Because a same-label pair split across distant subtrees resolves to a
-high and therefore impure ancestor, Dendrogram
-Purity should be read alongside the flat Weighted Leaf Purity of
-Section~\ref{sec:app-metrics-wlp}, which is insensitive to LCA
-placement.
+On the frozen tree the construction corpus gives $9{,}141$ leaf memberships over
+$8{,}299$ unique queries, so $\text{AvgMatch} = 1.101$
+(Appendix~\ref{app:frozen-tree}). This quantity governs the construction corpus
+only: the arena withdraws secondary memberships before scoring, so a routed
+held-out query contributes to exactly one cell.
 
 \section{Routing Expected Calibration Error}\label{sec:app-metrics-ece}
 
-Routing ECE tests whether the soft-routing distribution's confidence
-is calibrated against its accuracy, evaluated at \emph{domain}
-granularity. For each query, its normalized leaf membership weights
-(the real trickle weights of Appendix~\ref{app:dag-formalism},
-\S\ref{sec:meth-routing}) are aggregated onto each leaf's depth-1
-domain ancestors, yielding a per-query distribution over domain
-categories in the same label space as the MMLU-Pro category strings;
-the query's \emph{confidence} is the maximum domain mass and its
-prediction is correct when that argmax domain matches the query's
-MMLU-Pro category. Queries are grouped
-into $B$ equal-width confidence bins; for bin $b$ with queries
-$\mathcal{B}_b$, $\text{acc}(\mathcal{B}_b)$ is the fraction of
-correct predictions in the bin and $\text{conf}(\mathcal{B}_b)$ is
-the bin's mean confidence. Then
+Routing ECE tests whether the soft-routing distribution's confidence is
+calibrated against its accuracy, at \emph{domain} granularity. For each query,
+its normalised leaf membership weights are aggregated onto each leaf's depth-1
+domain ancestors, yielding a per-query distribution over domain categories in
+the same label space as the MMLU-Pro category strings; the query's
+\emph{confidence} is the maximum domain mass, and its prediction is correct when
+that argmax matches the query's category. Queries are grouped into $B$
+equal-width confidence bins, and
 \[
-\text{ECE} = \sum_{b=1}^{B} \frac{|\mathcal{B}_b|}{N} \left| \text{acc}(\mathcal{B}_b) - \text{conf}(\mathcal{B}_b) \right|,
+\text{ECE} = \sum_{b=1}^{B} \frac{|\mathcal{B}_b|}{N} \left| \text{acc}(\mathcal{B}_b) - \text{conf}(\mathcal{B}_b) \right|.
 \]
-the standard binned expected-calibration-error construction applied to
-the domain-aggregated trickle-routing distribution. Lower Routing ECE
-indicates a routing distribution whose confidence is a trustworthy
-proxy for correctness. No temperature-scaling recalibration is applied
-anywhere in this system; the metric is diagnostic only.
+No temperature-scaling recalibration is applied anywhere in this system.
 
-\textbf{The exported number is not this metric.} The definition above
-\emph{sums} a query's leaf membership onto each leaf's depth-1 domain
-ancestor, which is what makes the result a distribution over domains.
-The export path instead takes the \emph{maximum} over a domain's
-leaves, and a maximum over leaves is not a distribution: it does not
-normalise, and it systematically understates confidence for queries
-spread across several leaves of the same domain. The frozen run's
-exported value of $0.2114$ is therefore reported as a routing
-diagnostic with the discrepancy named, and no claim in this thesis
-rests on it (Section~\ref{sec:disc-debt}). Fixing the aggregation will
-move the number in a predictable direction --- confidence rises, so
-apparent under-confidence falls --- by an amount that has not been
-measured.
+\textbf{The exported number is not this metric.} The definition sums a query's
+leaf membership onto each leaf's depth-1 domain ancestor, which is what makes
+the result a distribution over domains. The export path instead takes the
+\emph{maximum} over a domain's leaves, and a maximum over leaves is not a
+distribution: it does not normalise, and it systematically understates
+confidence for queries spread across several leaves of the same domain. The
+frozen run's exported $0.2114$ is therefore a diagnostic with the discrepancy
+named, and no claim in this thesis rests on it
+(Section~\ref{sec:disc-debt}). The direction of the error is known and its size
+is not: fixing the aggregation raises every confidence, so apparent
+under-confidence falls, by an amount nobody has measured. This is the full
+statement of the defect; the other places it is mentioned point here.

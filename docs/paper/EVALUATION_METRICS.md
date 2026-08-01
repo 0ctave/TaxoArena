@@ -5,6 +5,30 @@
 > definitions and code** live in [`../metrics-validation/`](../metrics-validation/);
 > this document is the status/mapping index, not a formula reference.
 
+> **STATUS AMENDMENTS (2026-07-27).**
+>
+> * **"Do NOT interpret low values as failure — they may reflect correct polyhierarchy"** no
+>   longer applies. The system is a tree; cross-linking was removed at `334b95d` and
+>   polyhierarchy is reported as a negative result
+>   ([`../dag-construction-mechanisms.md`](../dag-construction-mechanisms.md) §7). Metrics
+>   that were given a polyhierarchy allowance need re-reading under tree semantics, and any
+>   "best-path vs all-paths" distinction is now vacuous.
+> * **Routing ECE is ✅-with-caveat, not 🔌.** *~~This bullet previously read "must be marked
+>   🔌 … it has never been measured … do not report a value". That was false. Corrected
+>   2026-07-30.~~* It is implemented, reached, and exported: the frozen run wrote
+>   **0.2114**. The defect is that both export sites aggregate a domain's leaf shares with
+>   `maxOf` rather than summing, so the confidences fed to the bins are understated. Report
+>   0.2114 with the aggregation named. See [`../known-defects.md`](../known-defects.md).
+> * **Add the acceptance-gate diagnostics** to the metric map: `dJ`, paired `SE(dJ)` and `z`
+>   are written per proposal to `proposals.csv`, and the fixed-point certificate's four terms
+>   are the construction-convergence evidence. Two of the four certificate fields are
+>   bounded but not reproducible ([`../known-defects.md`](../known-defects.md)).
+> * **`wall_ms` in `iteration_metrics.csv` is declared and never populated.**
+> * **RQ2's metric is under reframing.** See
+>   [`../reframed-argument.md`](../reframed-argument.md): a between-cell rank-divergence
+>   statistic measures a difference that the pre-registered analysis has already shown does
+>   not exist on this corpus for this roster.
+
 ---
 
 ## Status legend
@@ -83,7 +107,7 @@ TripAcc = |{(x,y,z) : triplet correct}| / |{(x,y,z) : sim(x,y) > sim(x,z)}|
 **Implementation:** pending (see `docs/paper/EMPIRICAL_PLAN.md`).
 **Citation:** Vrandečič et al. 2023 (taxonomy quality evaluation).
 
-### Routing ECE (Expected Calibration Error) 📋
+### Routing ECE (Expected Calibration Error) ✅ measured at 0.2114, aggregation defective
 
 Measures whether soft-routing probabilities `p_c` are calibrated:
 
@@ -220,7 +244,7 @@ or add `Ī` alongside it. Cite Fischer et al. 2021 (arXiv:2109.12281) survey.
 | Avg Match Count | Quality | ✅ | — |
 | H-F1 | Quality | 🔌 GT-wiring | Kosmopoulos 2014 |
 | Triplet Accuracy | Quality | 📋 pending | Vrandečič 2023 |
-| Routing ECE | Quality | 📋 pending | Guo 2017 |
+| Routing ECE | Quality | ✅ 0.2114; `maxOf` aggregation defect | Guo 2017 |
 | Total Dasgupta Cost | Quality | 📋 pending | Dasgupta 2016 |
 | Overlapping NMI | Characterisation | ✅ formula; 🔌 GT | Lancichinetti 2009 |
 | ARI | Characterisation | ✅ | Hubert & Arabie 1985 |

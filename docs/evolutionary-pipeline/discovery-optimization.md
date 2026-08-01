@@ -1,5 +1,39 @@
 # Discovery and Topological Optimization
 
+> **STATUS: SUPERSEDED (2026-07-27).** Current specification:
+> [`../dag-logic-and-math.md`](../dag-logic-and-math.md) §5-§7; rationale and the failure
+> each mechanism answers: [`../dag-construction-mechanisms.md`](../dag-construction-mechanisms.md).
+>
+> Every acceptance rule described below has been replaced:
+>
+> * **§1's "Dasgupta Cost Delta"** `1 - C_after/C_before` measured the *remaining* cost
+>   fraction — about 0.82 for every real split, which left any epsilon below that inert.
+>   Replaced by a **chance-corrected** separation score (exactly 0 at k = 1, so a wrapper can
+>   never clear a positive bar). It is not Dasgupta's LCA cost and must not be cited as such.
+> * **k-selection is no longer "largest k whose delta improves by epsilon".** Every k in
+>   `2..maxK` is offered in **ascending** order and the first the global objective accepts
+>   wins — lowest-k-first, deliberately **not** `argmax dJ`, because a maximum over noisy
+>   estimates is biased upward even when all candidates are equivalent.
+> * **A split is no longer rejected outright when a cluster falls below the floor.**
+>   Under-floor components are dropped and their queries re-routed among the survivors
+>   (coarsening), and the coarser partition must clear the same bar.
+> * **§2's kappa-weighted JS-divergence merge gate is gone.** It *grows* with kappa, so it
+>   became unsatisfiable exactly where merging mattered: 11 collapses and 0 merges per
+>   35-iteration run, and an angular tolerance under 0.7 degrees at the kappa deep wrapper
+>   nodes reach. This is instance (a) of the threshold-reuse defect class
+>   ([`../transferable-findings.md`](../transferable-findings.md) §3).
+> * **§3's relative starvation rule** (`n_L < 0.2 * sibling mean` and `n_L < 5`) is replaced
+>   by a flat `branch < minClusterSize` floor, symmetric with the split floor, evaluated as a
+>   three-way J-gated argmax over {keep, prune-absorb, fuse into nearest sibling}.
+> * **Every structural edit is now measured, not predicted**: snapshot, apply, re-route the
+>   whole corpus, measure `dJ` and its **paired bootstrap** `SE(dJ)`, accept iff
+>   `dJ > max(tau, acceptanceZ * SE(dJ))`.
+> * `separationEpsilon` as a single unified constant no longer exists. `epsilon = 0.05` and
+>   `N_min = 20` in the text below are both stale.
+>
+> **Still accurate:** the power-iteration PCA description (§1) and the 32/64/128 size-dependent
+> projection.
+
 This document details the mechanics of domain splitting, component merging, passthrough collapsing, and structural pruning that refine the taxonomy DAG in **TaxoArena**.
 
 ---

@@ -6,19 +6,27 @@ Chapter~\ref{ch:experimental-design}, \S\ref{sec:exp-rosters}.
 \section{Generation Procedure}
 
 The judge rubric generation procedure (Section~\ref{sec:arch-judge}) is
-instantiated as follows. Representative-query packs are drawn from
-each leaf's construction pool at pack size $k = 25$; a leaf with fewer
-than 25 construction queries uses its full pool as a single pack.
-The pool a pack is drawn from is the leaf's construction queries
-\emph{after} two filters: the reserved-set filter, which is audited by
-a build-failing assertion and is what makes the answer-key-blind claim
-enforceable rather than asserted, and a hash filter that thins the pool
-by roughly a fifth. A leaf's rubric is therefore induced from a sample
-of its construction queries rather than from all of them.
+instantiated as follows. A leaf's induction pool is its construction
+queries \emph{after} two filters: the reserved-set filter, which is audited
+by a build-failing assertion and is what makes the answer-key-blind claim
+enforceable rather than asserted, and a hash filter that thins the pool by
+roughly a fifth.
+
+That pool is used in full. \texttt{TaxonomyJudgeService.generateJudgeForNode}
+chunks it into batches of $25$ (\texttt{details.chunked(25)}), induces partial
+guidelines from \emph{every} batch, and synthesises them into one rubric. The
+$25$ is a batch size set by prompt length, not a sample size: a leaf's rubric is
+induced from all of its filtered construction queries, not from a representative
+subset of them.
 The map-step LLM and the reduce-step LLM are the same underlying model
 as the arena judge, to avoid introducing a second
-model's stylistic biases into the rubric; this choice is revisited as
-a limitation in Section~\ref{sec:disc-debt}. Guideline generation is
+model's stylistic biases into the rubric. That choice has a cost, and
+it is stated here because no other section carries it: inducing the
+rubric with the model that will later apply it bakes the judge's own
+priors into the criteria, which weakens the rubric-against-generic
+contrast of Section~\ref{sec:res-c5}. A judge that agrees
+with a rubric written by itself is a weaker test than a judge that
+agrees with a rubric written by someone else. Guideline generation is
 a one-time cost per frozen snapshot: rubrics are computed once at
 snapshot-freeze time and reused for every subsequent arena run against
 that snapshot, regardless of which models are being compared.
@@ -32,16 +40,127 @@ reference-informed content (representative queries, answer-key
 context) is injected into this template at generation time and does
 not modify its structure.
 
-% Full verbatim template goes here — insert the JudgePrompts.kt /
-% GenericPairwiseJudgePrompt.kt template text (structural scaffold,
-% tie-handling instructions, output-format specification) as a
-% \begin{quote} or \lstlisting block once finalized from source.
+The separation the template enforces is what makes the two arms
+comparable, so it is stated explicitly. The induced, leaf-specific half
+defines \emph{what} to evaluate; the fixed half defines \emph{how}. The
+synthesis step that produces each leaf's judge
+(\texttt{JudgePrompts.synthesizeFinalJudge}) is instructed in these
+terms, and the instruction is quoted rather than paraphrased because
+the constraint it imposes is the thesis's control:
+
+\begin{quote}\small
+``This persona defines WHAT to evaluate (domain knowledge, axioms,
+failure modes) --- NOT HOW to evaluate. Verdict format, tie policy, and
+evaluation steps are controlled externally and must NOT appear here.''
+\end{quote}
+
+\noindent It further requires each rubric to ``[s]pecialise strictly''
+to its leaf and to ``ignore generic qualities that do not affect
+technical correctness: formatting, markdown, response length, stylistic
+elegance, model identity'', and forbids any ``compare A vs B'', ``pick
+a winner'', or tie-break instruction from entering the induced text.
+Verdict format is a JSON object with exactly two string keys,
+\texttt{system\_prompt} and \texttt{rubric}.
+
+The generic-rubric arm (C5) replaces the induced half with the MT-Bench
+pairwise judge prompt verbatim (\texttt{GenericPairwiseJudgePrompt}).
+
+\paragraph{The two arms differ in more than the rubric.} This is a limitation of
+the contrast and is stated here because Chapter~\ref{ch:results} reports a
+measured difference between the arms. The generic arm is not the rubric arm with
+its system prompt swapped: it is a separate code path
+(\texttt{TaxonomyArenaService}, the \texttt{isC5} branch), and it differs in four
+respects at once.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{What actually differs between the two arms.}
+\label{tab:arm-differences}
+\begin{tabular}{p{2.6cm}p{4.6cm}p{4.6cm}}
+\toprule
+& Rubric arm (MAIN) & Generic arm (C5) \\
+\midrule
+System prompt & induced per leaf & MT-Bench, verbatim \\
+User message & \texttt{[Question]} / \texttt{[Model A's Response]}, then a
+mandatory four-step critique sequence & MT-Bench template, asking for ``a short
+explanation'' \\
+Output & structured JSON, schema-enforced & free text ending in
+\texttt{[[A]]}, \texttt{[[B]]} or \texttt{[[C]]} \\
+Confidence & reported by the judge & fixed at $0.85$ \\
+\midrule
+\multicolumn{3}{l}{\textit{Identical:} question set, stored responses, judge
+model, dual-call reversal, tie-on-disagreement} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The consequence is that any measured difference between the arms is attributable
+to the bundle, not to the rubric alone. The reasoning scaffold runs in the
+direction opposite to the observed effect --- the rubric arm is the one that
+forces a four-step critique before a verdict --- so scaffolding is unlikely to
+explain a generic-arm advantage, but the output format and the fixed confidence
+are not controlled. Isolating the rubric would require running the MT-Bench
+system prompt through the rubric arm's own user template and parser, which was
+not done.
+
+Under the replay design of Section~\ref{sec:exp-rqmap}, the two arms see the
+same comparison set by construction. Measured overlap is $100\%$ on
+mathematics, physics, psychology and philosophy, and $99.6\%$ on law and
+engineering, where a handful of replays failed and were not retried.
+
+\section{What the Judge Prompt Contains}\label{sec:judge-prompt-contents}
+
+The mechanism behind this thesis's central RQ1 finding is visible in the
+prompt, so what it does and does not contain is stated explicitly. In every
+mode the judge receives the leaf's induced rubric as a system prompt, the
+question stem, and the two stored responses; it never receives the MMLU-Pro
+reference answer. The prompt-construction path asserts that the rendered query
+carries no ground-truth answer block, and the stored correct answer is never
+read on the judging path.
+
+What varies is the option context.
+
+\begin{description}
+\item[\texttt{OPTIONS}] appends the full multiple-choice options block to the
+stem.
+\item[\texttt{RESOLVED}] withholds the options block and instead attaches each
+model's own selected option to its trace as text, so a verdict can refer to an
+answer rather than to a bare letter. This is the settled batch's mode.
+Attachment succeeded on $93.2\%$ to $99.8\%$ of traces by domain; the shortfall
+is traces whose upstream \texttt{pred} field is missing, which are passed
+through verbatim.
+\end{description}
+
+The measured consequence is that ``answer-key-blind'' is a much weaker property
+than ``answer-blind''. Under either mode a judge able to solve the item can
+verify both responses against its own solution without ever being told the key,
+and Chapter~\ref{ch:results} reports that this is what it does. Withholding the
+options block narrows the channel but does not close it, because the responses
+themselves state their answers.
+
+Full source: \texttt{src/main/kotlin/taxonomy/prompts/JudgePrompts.kt}
+and \texttt{src/main/kotlin/taxonomy/prompts/}\allowbreak
+\texttt{GenericPairwiseJudgePrompt.kt}.
+
+\section{A Worked Example}\label{sec:judge-example}
+
+Everything above describes the judge; this section shows one. The prompts below
+are reproduced mechanically from the frozen snapshot and the Kotlin sources by
+\texttt{report/Figures/make\_judge\_example.py}, rather than transcribed, so
+they cannot drift from what the runs actually sent.
+
+\input{Figures/judge_example}
 
 \section{Dual-Call Position-Reversal Protocol}
 
 Each logical comparison is realised as two judge calls with response
 position reversed between calls, per the dual-call protocol of
 Section~\ref{sec:arch-judge}. Disagreement between the two calls is
-resolved as a tie, with each candidate credited half a win
-(\parencite{davidson1970ties}), rather than resolved by a coin flip or
-discarded.
+resolved as a tie, rather than by a coin flip or by discarding the
+comparison. How that tie is then scored is a reporting convention and
+not a modelling choice: every rank correlation appears under both
+half-weighting and dropping. Making tie propensity a fitted parameter,
+as \textcite{davidson1970ties} does, is the alternative this system
+does not implement and is named as the principled repair
+(Section~\ref{subsec:disc-construct-validity}).

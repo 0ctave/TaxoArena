@@ -122,6 +122,20 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     // re-run against a frozen snapshot CLEARS that snapshot's rows before writing -- which is
     // how a smoke test destroyed the frozen Math MAIN results (1736/11/241 -> 66/1/1).
     providers.systemProperty("ranking.db.path").orNull?.let { systemProperty("ranking.db.path", it) }
+    // Global LLM permit count (ArcTaxonomyLLMClient's semaphore). It has a value in
+    // config/application.yml, so this forward exists only to override it per run without
+    // editing that file -- which matters mid-run: if the endpoint starts returning 429s the
+    // fix is to relaunch at a lower number, and a command-line flag is the fast path.
+    providers.systemProperty("arc.ollama.max-parallel").orNull?.let {
+        systemProperty("arc.ollama.max-parallel", it)
+    }
+    // Request-start pacing, in calls/second. Sized from the TOKEN budget: the token
+    // ceiling binds before the request ceiling at these prompt sizes, and pacing to the
+    // request ceiling produced a 429 feedback loop. Forwarded so a run can be re-paced
+    // without editing config/application.yml.
+    providers.systemProperty("arc.ollama.target-rps").orNull?.let {
+        systemProperty("arc.ollama.target-rps", it)
+    }
     // Never up-to-date: an experiment run has no meaningful input/output fingerprint, and a
     // silently skipped run reads exactly like a completed one.
     outputs.upToDateWhen { false }

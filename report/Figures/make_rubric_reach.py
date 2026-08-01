@@ -301,9 +301,12 @@ for k, (nm, (b, lo, hi)) in enumerate(EFF):
     ypos.append(slot)
     labels.append(nm)
     isdiff = nm == "difference"
+    if isdiff:
+        # the difference row carries the claim: shaded band + heavier rule
+        axR.axhspan(slot - 0.34, slot + 0.34, color="0.94", zorder=1)
     axR.plot([lo, hi], [slot, slot], color="0.45" if not isdiff else "black",
-             lw=1.1, solid_capstyle="butt", zorder=4)
-    axR.plot([b], [slot], marker="s" if isdiff else "o", ms=5.4 if isdiff else 5.0,
+             lw=1.1 if not isdiff else 1.7, solid_capstyle="butt", zorder=4)
+    axR.plot([b], [slot], marker="s" if isdiff else "o", ms=5.8 if isdiff else 5.0,
              mfc="black" if isdiff else "white", mec="black", mew=1.0, zorder=5)
     slot += 1
 
@@ -315,10 +318,12 @@ axR.set_xlim(-4.2, 3.2)
 axR.set_xlabel("change per +1 SD of distance (pp)")
 axR.tick_params(length=0)
 axR.annotate("tie rate", xy=(0.02, -0.88), xycoords=("axes fraction", "data"),
-             ha="left", va="center", fontsize=8, style="italic", color="0.30")
+             ha="left", va="center", fontsize=8, style="italic", color="0.30",
+             bbox=dict(fc="white", ec="none", pad=1.0), zorder=6)
 axR.annotate("agreement with the key", xy=(0.02, 2.58),
              xycoords=("axes fraction", "data"),
-             ha="left", va="center", fontsize=8, style="italic", color="0.30")
+             ha="left", va="center", fontsize=8, style="italic", color="0.30",
+             bbox=dict(fc="white", ec="none", pad=1.0), zorder=6)
 axR.set_title("(b) but distance moves the arm with no\nrubric as much as the arm with one"
               "\n95% CI, cell fixed effects, n = 2,788",
               fontsize=8.6, loc="left", pad=24, linespacing=1.5)

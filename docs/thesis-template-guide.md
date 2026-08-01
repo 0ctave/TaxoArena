@@ -42,8 +42,8 @@ compile pipeline — it configures `latexindent` (automatic `.tex`
 reindenting/formatting), a separate, optional tool invoked on demand, not
 during `arara main.tex`.
 
-Build artifacts (`main.pdf`, `main.aux`, `main.bbl`, `main.log`, etc.) are
-written to `report/` itself. `main.pdf` is the output; `main.log` is the
+Build artifacts (`Abschlussarbeit_0510121.pdf`, `main.aux`, `main.bbl`, `main.log`, etc.) are
+written to `report/` itself. `Abschlussarbeit_0510121.pdf` is the output; `main.log` is the
 first place to check for warnings (undefined references, missing
 citations — see below).
 

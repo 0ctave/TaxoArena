@@ -3,6 +3,42 @@
 %------------------------------
 % Define thesis-specific symbols here with
 % \nomenclature[category]{symbol}{description}{}{unit/definition}
-% Categories: L=Latin, G=Greek, X=Superscripts, Z=Subscripts,
-%             C=Constants, D=Dimensionless numbers, O=Operators, I=Indices
-% No symbols are defined yet.
+%
+% Categories are SEMANTIC, not alphabetic (reorganised 2026-07-31): the
+% group heads are defined in d_NomenclatureCommands.tex and sort by
+% their letter, so the printed order is
+%   A  Taxonomy Construction
+%   B  Partition and Cells
+%   C  Arena and Ranking
+%   D  Validation and Statistics
+% The template's original L/G/... categories still exist and may be
+% used for symbols that fit none of the four groups.
+%
+% --- A: Taxonomy construction ---
+\nomenclature[A]{$J$}{Construction objective; the quantity the acceptance gate improves}{}{}
+\nomenclature[A]{$k$}{Number of mixture components proposed at a split}{}{}
+\nomenclature[A]{$n_{\min}$}{Size floor applied to a leaf at split time (\texttt{minClusterSize})}{}{}
+\nomenclature[A]{$z^{*}$}{Acceptance threshold; an edit is taken when $\Delta J/\mathrm{SE}(\Delta J)\geq z^{*}$}{}{}
+\nomenclature[A]{$\tau$}{Fixed-point tolerance, and the per-edit acceptance band}{}{}
+\nomenclature[A]{$\delta$}{Descent margin; selects routing-optimal against discovery-enabled mode}{}{}
+\nomenclature[A]{$\varepsilon_{\mathrm{sep}}$}{Minimum accepted separation between proposed clusters}{}{}
+\nomenclature[A]{$\mu$}{Mean direction of a von Mises--Fisher component}{}{}
+\nomenclature[A]{$\kappa$}{Concentration of a von Mises--Fisher component}{}{}
+%
+% --- B: Partition and cells ---
+\nomenclature[B]{$C$}{Number of cells in a partition}{}{}
+\nomenclature[B]{$D_k$}{Domain anchor; the depth-1 node seeded by MMLU-Pro category $k$}{}{}
+\nomenclature[B]{$\mathcal{L}(D_k)$}{Cells of domain $D_k$; the leaves beneath its anchor. \emph{Cell} and \emph{leaf} are used interchangeably}{}{}
+%
+% --- C: Arena and ranking ---
+\nomenclature[C]{$\theta$}{Fitted Bradley--Terry strength of a model}{}{}
+\nomenclature[C]{$K$}{Number of models in a Bradley--Terry fit}{}{}
+\nomenclature[C]{$B_{\mathrm{logical}}$}{Logical comparison count; judge calls are $2B_{\mathrm{logical}}$}{}{}
+\nomenclature[C]{$\alpha$}{Maturity-driven mixing weight in the comparison scheduler}{}{}
+%
+% --- D: Validation and statistics ---
+\nomenclature[D]{$\rho$}{Spearman rank correlation against ground-truth accuracy}{}{}
+\nomenclature[D]{$\Delta\rho$}{Paired contrast; cell-scoped arm minus generic-rubric arm, reported for continuity and not used as a decision rule}{}{}
+\nomenclature[D]{$M$}{Roster size in a rank correlation}{}{}
+\nomenclature[D]{$c$}{Reliability constant in $r = n/(n+c)$}{}{}
+\nomenclature[D]{$r$}{Reliability of a cell's model ranking at $n$ queries}{}{}

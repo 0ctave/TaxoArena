@@ -1,35 +1,30 @@
-# Smoke test for the post-repair arena, 2026-07-27.
+# physics, PAIRED: MAIN vs C5. 2026-07-31.
 #
-# Two questions, both of which must be answered before the full run is costed:
-#   1. Do the Azure credentials resolve? (AZURE_AI_* are not in the shell; .env is
-#      loaded by spring-dotenv at runtime, which has never been verified directly.)
-#   2. What does a cell cost NOW? The Bradley-Terry variance fix (a92a3ed) took every
-#      standard error off the 1e-6 clamp, and BtMatchScheduler reads those SEs in two
-#      scale-sensitive places -- noiseFloor = 0.15*combinedSE and the median-proximity
-#      kernel scale (seA+seB). Both moved by ~200x, so pair selection differs from the
-#      run that produced 1,736 comparisons and that figure is no longer a valid estimate.
+# WHY PHYSICS. History is the smallest domain in the batch -- 131 routed questions over 4
+# cells, ~33 questions per cell -- and that is the regime where per-cell profiles were
+# shown to be unresolvable at ANY budget: even judging every question in a cell for every
+# adjacent pair leaves 2.5*sigma above the median adjacent gap. An exact null on history
+# is what that predicts, and an exact null is what it returned.
 #
-# MAIN only. GENERIC_JUDGE is a settled negative (99.4% identical winners, BT sign test
-# p=0.227) and re-running it here would double the cost for a second copy of it.
+# Physics has ~10 cells over a larger pool, so questions-per-cell is higher. If the
+# granularity/resolution account is right, Delta rho should favour MAIN more here than on
+# history. If physics also returns a null, the account is wrong and the partition buys
+# nothing at any cell size available in this corpus.
 #
-# ISOLATION (learned the hard way): match_history is keyed by (snapshot_id, condition),
-# and snapshot_id is "<base>_<CONDITION>", so reusing the frozen snapshot with condition
-# MAIN CLEARS the frozen run's 1,736 MAIN rows before writing. The first attempt at this
-# smoke test did exactly that -- 1736/11 cells/241 questions became 66/1/1 -- and was only
-# recoverable because ratings.db had been backed up. Renaming the condition is not a fix
-# either: HeadlessBenchmarkRunner:327,341 special-case "MAIN" for judge-prompt setup.
+# FIRST RUN WITH [ARENA-LAT]. The client now reports, per call, how much wall-clock went
+# to the rate pacer, to waiting for a semaphore permit, and to the request itself, plus
+# http p50/p95/p99 and peak in-flight. On history this had to be reconstructed via
+# Little's Law after the fact and the first conclusion was wrong: target-rps was raised
+# 3 -> 4 and bought nothing, because the pacer sat at 60% utilisation and the system was
+# permit-bound. Watch the BOTTLENECK field in the first two rounds.
 #
-# So this run MUST be launched against a throwaway ranking DB:
+# HISTORY REFERENCE (option-visible, ratings_history_paired_v2.db.SECURED):
+#     MAIN 1,042 verdicts / C5 1,044, 131 questions, 4 cells, 25m46s
+#     half-weighted  d rho  0.000000 ( 0.00 steps)
+#     ties-dropped   d rho -0.006993 (-2.00 steps, exactly on the seam)
 #
-#   ./gradlew bootRun -Dranking.db.path=ratings_smoke.db #       --args="--config experiment_configs/smoke_arena_v2.toml"
-#
-# Roster: 12 models, 7 families, from the 36 that pass validity post-backfill.
-# Length band 486-1413 (2.91x), r(len,acc) = +0.286 against +0.597 for the full 36 --
-# the format artifact that decided half the previous run is controlled by construction.
-# claude-3-5-sonnet-20241022 is paired with claude-3.5-sonnet deliberately: they agree on
-# only 83.4% of predictions and sit 3 points apart, so they are a free resolution check --
-# two near-clones should rank adjacently and tie often, and a judge that separates them
-# confidently is over-resolving. That failure is invisible to rho.
+# NOT REGISTERED.
+
 datasetType   = "MMLU_PRO"
 models        = [
     "gemini-3.1-pro_5-shots",

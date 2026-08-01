@@ -4,6 +4,50 @@
 > this is pure experimental-run work. Priority order reflects reviewer expectations.
 > Updated June 2026.
 
+> **STATUS: PARTIALLY SUPERSEDED (2026-07-27).** The plan below predates the 2026-07
+> corrections. Read the following four amendments before running anything from it.
+>
+> **1. RQ2 is reframed.** The plan implicitly tests "does adapted grouping produce more
+> informative per-cell rankings". A pre-registered analysis has already answered the premise
+> underneath that question, and the answer is no: observed Spearman rho between cells is
+> ~0.91-0.93 at **every** granularity (14 / 87 / 88 / 152) and under **both** routers, and
+> centering out each model's global mean leaves a residual indistinguishable from the
+> mechanical centering null `-1/(C-1)`. Cells do not have different true rankings on this
+> corpus for this roster, so a per-cell `Delta tau` has no room to move. The question the
+> system actually poses is **"does adapted grouping enable better judging"** — a claim about
+> judge generalisation surface, not about rank divergence between cells. See
+> [`../reframed-argument.md`](../reframed-argument.md) and
+> [`../prereg_discriminative_power.md`](../prereg_discriminative_power.md).
+>
+> **2. The ablation matrix references parameters that no longer exist.** A5's
+> `separationEpsilon` is now `proposalSeparationBar` (a level) and `marginalEps` (a
+> difference), decoupled; A6's `deltaAssign` x `assignmentCosineGap` grid is gone entirely —
+> the routing knobs are `descentMargin` (a mode selector, not a sweep axis),
+> `routingBeamGamma` and `membershipFloor`. A7's default is 50 iterations with convergence
+> certified at 10, not 35.
+>
+> **3. Routing ECE is reportable, with its aggregation named.** *~~Amendment 3 previously
+> read "Routing ECE cannot currently be reported; `computeRoutingECE` returns 0.0 in every
+> run in the project's history." That was false. Inverted 2026-07-30.~~* The metric is
+> implemented and reached; the `return 0.0` is guarded on an empty ground-truth map, which
+> a validation run does not produce. The frozen run exported **0.2114**
+> (`experiment_results/freeze_mcs55/seed_42/validation/MAIN_routing_calibration.csv`). The
+> real defect is that both export sites aggregate a domain's leaf shares with `maxOf`
+> instead of summing, so confidences are understated. Cite 0.2114 with that named, or not
+> at all. See [`../known-defects.md`](../known-defects.md).
+>
+> **4. Multi-seed runs must not use the `seeds = [...]` config list.** Only the first seed
+> routes held-out queries; the rest silently take a ~80% NoMatchRate. Run one config per
+> seed.
+>
+> **Two experiments the plan does not contain and should**, both pre-registered or costed
+> already: the **three-arm rubric-specificity test** (leaf-87 / random-87 with matched cell
+> sizes / domain-14, ~174 inductions, no judge calls — and a free within-arm null that may
+> settle it without them), see
+> [`../prereg_rubric_specificity.md`](../prereg_rubric_specificity.md); and the
+> **hold-out-a-domain** recovery experiment, which must be run at `descentMargin ~ 0` or it
+> fails by construction, see [`../incremental-taxonomy.md`](../incremental-taxonomy.md).
+
 ---
 
 ## 1. GT Plumbing (Unblocks H-F1, Overlapping NMI)

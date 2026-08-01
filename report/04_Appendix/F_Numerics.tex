@@ -52,7 +52,7 @@ Each node stores a diagonal Normal-inverse-Wishart posterior over its
 member embeddings (weighted by the trickle weights $w_i$ with
 effective count $n = \sum_i w_i$).
 The prior is
-$m_0$ = the normalised mean of the parents' vMF centroids (the first
+$m_0$ = the parent's vMF centroid (the first
 basis vector at the root), pseudocount $\kappa_0 = 1$, degrees of
 freedom $\nu_0 = d + 2$, and scale
 $\boldsymbol{\Lambda}_0 = \lambda_0 \mathbf{I}_d$ with $\lambda_0 =
@@ -112,6 +112,16 @@ exceeds $4(\hat{\sigma}_i + \hat{\sigma}_j)$ is suppressed entirely
 $0.15(\hat{\sigma}_i + \hat{\sigma}_j)$ is linearly ramped
 (indistinguishable at current precision).
 
+Every guard above is keyed to $\hat{\sigma}$, so this machinery
+degenerates wherever the standard errors do. In the withdrawn runs
+that predate the variance fix the stored standard errors were floored
+or understated (Section~\ref{sec:meth-bt}), which made the gap guards
+close to constant thresholds; in the worst case the resulting
+allocation concentrated on a leader-centric star covering under a
+third of the comparison graph. The scheme is documented as designed;
+the runs that predate the variance fix did not realise it, and every
+settled run does (Section~\ref{sec:res-cost}).
+
 \section{Observed Fisher Information for BT Standard Errors}\label{sec:num-fisher}
 
 The Bradley--Terry log-likelihood over pairs with comparison counts
@@ -151,10 +161,14 @@ two complementary subspaces gives
 $F_c^{-1} = F^{+} + J/K^{2}$, so the term added by the completion ---
 and therefore the term to subtract --- is $1/K^{2}$.
 Subtracting $1/K$ instead over-subtracts $(K-1)/K^{2}$, which is
-$0.109$ at $K = 8$ and exceeds the variance itself at every realistic
-comparison count. Every standard error computed under the wrong
-constant was therefore clamped at the floor of $0.01$ rather than
-measured; correct values are 44 to 209 times larger. The consequence
+$0.109$ at $K = 8$ and exceeds the variance itself at most realistic
+comparison counts. Where it does, the variance goes negative and the
+standard error is clamped at the floor of $0.01$; where it does not,
+a positive but understated value is reported. No value computed under
+the wrong constant is a measurement either way. In the pilot run,
+$45$ of $176$ stored per-node standard errors sit exactly at the floor
+and the rest have a median of $0.09$; correct values are 44 to 209
+times larger. The consequence
 for what may be quoted is stated in
 Section~\ref{sec:disc-debt}.
 If the completed matrix is numerically singular, the implementation
@@ -162,47 +176,36 @@ falls back to the diagonal approximation
 $\operatorname{Var}(\hat{s}_i) \approx 1/\mathcal{I}_{ii}$.
 Reported standard errors are
 $\hat{\sigma}_i = \sqrt{\operatorname{Var}(\hat{s}_i)}$, floored at
-$0.01$; because comparisons sharing a query are treated as
-independent, these standard errors slightly underestimate the true
-uncertainty (Section~\ref{sec:meth-assumptions}).
+$0.01$. Because comparisons sharing a query are treated as
+independent, these standard errors underestimate the true uncertainty
+by a margin this thesis does not measure
+(Section~\ref{sec:meth-assumptions}).
 
 \section{Design-Document Mechanisms with No Implementation}\label{app:not-implemented}
 
-The sections above document what the implementation computes; this one
-inventories what it does not. The following mechanisms were described
-in earlier design documents for this system or are natural to assume
-from the description in Chapter~\ref{ch:methodology}. None of them
-exists in the implementation, and no result in this thesis depends on
-any of them (Section~\ref{sec:meth-not-implemented}).
+The sections above document what the implementation computes; this one records
+what it does not, because several mechanisms are natural to assume from
+Chapter~\ref{ch:methodology} or appear in earlier design documents for this
+system. None exists, and no result in this thesis depends on any of them
+(Section~\ref{sec:meth-not-implemented}).
 
-\begin{itemize}
-\item \textbf{A per-leaf arena state object with a response cache.}
-Responses are not generated during a run, so there is nothing to cache;
-per-leaf state is a Bradley--Terry state record plus a list of per-pair
-statistics.
-\item \textbf{Standard errors initialised to infinity.} They are
-initialised to $10.0$.
-\item \textbf{Named per-pair and per-leaf state machines}
-(\texttt{UNSEEN}, \texttt{INFORMATIVE}, \texttt{RESOLVED},
-\texttt{EXHAUSTED}; \texttt{INITIALISING}, \texttt{ACTIVE},
-\texttt{CONVERGED}, \texttt{BUDGET\_EXHAUSTED}) \textbf{and a utility
-floor $U_{\min}$.} Only the resolution predicate of
-Section~\ref{sec:meth-scheduling} is real.
-\item \textbf{A global escape valve} at $B_{\max}$ total comparisons
-setting an \texttt{escaped} flag. The exit is the round cap.
-\item \textbf{$1/k$ fractional weighting of multi-leaf queries.} The
-propagation path receives only a query's primary leaf and adds weight
-$1.0$. A post-hoc analysis computing membership posteriors exists, but
-it is a different quantity from the one a $1/k$ convention would
-produce, so the two are not a sensitivity pair.
-\item \textbf{Cosine-ordered query selection.} Query selection within
-a scheduled pair is a persisted round-robin offset over the leaf's
-pool (Section~\ref{sec:meth-scheduling}).
-\item \textbf{Judge Cohen's $\kappa$ and a verbosity delta
-$\Delta_{\text{verbosity}}$.} Neither is computed anywhere. What is
-measured instead is the dual-call agreement rate, the tie rate by
-stratum, and the response-format analysis of
-Section~\ref{sec:res-capture-gap}.
-\item \textbf{Temperature-scaling calibration of routing
-confidences.} Not implemented.
-\end{itemize}
+Three of the absences would change how a reader reads a number, and are stated
+in full. \textbf{$1/k$ fractional weighting of multi-leaf queries} is not
+applied: the propagation path receives only a query's primary leaf and adds
+weight $1.0$. A post-hoc analysis computing membership posteriors exists, but it
+is a different quantity from what a $1/k$ convention would produce, so the two
+are not a sensitivity pair. \textbf{Judge Cohen's $\kappa$ and a verbosity delta
+$\Delta_{\text{verbosity}}$} are computed nowhere; what is measured instead is
+the dual-call agreement rate, the tie rate by stratum, and the response-format
+analysis of Section~\ref{sec:res-capture-gap}. \textbf{Query selection within a
+scheduled pair} is a persisted round-robin offset over the leaf's pool, not a
+cosine ordering (Section~\ref{sec:meth-scheduling}).
+
+The remainder are naming or bookkeeping differences with no effect on any
+reported quantity: there is no per-leaf arena state object with a response cache
+(responses are not generated during a run, so there is nothing to cache);
+standard errors are initialised to $10.0$ rather than to infinity; the named
+per-pair and per-leaf state machines and the utility floor $U_{\min}$ do not
+exist, only the resolution predicate of Section~\ref{sec:meth-scheduling}; the
+global escape valve at $B_{\max}$ is in fact the round cap; and no
+temperature-scaling calibration of routing confidences is applied.

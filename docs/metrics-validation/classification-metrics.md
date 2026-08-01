@@ -60,7 +60,7 @@ where $\mathbb{I}(\cdot)$ is the binary indicator function:
 $$ \mathbb{I}(\text{statement}) = \begin{cases} 1 & \text{if statement is true} \\ 0 & \text{if statement is false} \end{cases} $$
 
 ### Interpretation
-EMAR is highly sensitive to cross-branch leakage. If a query is routed to a leaf that introduces even one incorrect parent node (e.g., via an incorrect cross-link), $\mathcal{P}(q) \subseteq \mathcal{T}(q)$ is violated, and the score for that query drops to $0.0$.
+EMAR is highly sensitive to cross-branch leakage. If a query is routed to a leaf whose ancestor path contains even one incorrect node (*tree-era note 2026-07-30: the original text said "e.g., via an incorrect cross-link"; cross-links no longer exist, so the only route to this failure is a wrong descent*), $\mathcal{P}(q) \subseteq \mathcal{T}(q)$ is violated, and the score for that query drops to $0.0$.
 
 EMAR provides a strict upper bound on routing safety. A high EMAR guarantees that queries are never routed into incorrect macro-domains.
 

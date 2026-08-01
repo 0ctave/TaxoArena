@@ -53,6 +53,27 @@
 
 ## 5. Experiment Config Reproducibility
 
+> **SUPERSEDED (2026-07-27).** The YAML block below is stale in every value and references
+> three removed parameters (`separationEpsilon`, `assignmentCosineGap`, `deltaAssign`). The
+> canonical config is [`experiment_configs/freeze_mcs55.toml`](../../experiment_configs/freeze_mcs55.toml),
+> whose header is itself the provenance record (snapshot id, commit, node/leaf counts, J,
+> certificate terms, and a derivation for each parameter). Current parameter table:
+> [`../dag-logic-and-math.md`](../dag-logic-and-math.md) §10.
+>
+> Reproducibility caveats that must be stated with any artifact claim:
+>
+> * **The fixed-point certificate is the reproducibility evidence**, and two of its four
+>   fields (`trickle delta`, `max rel d kappa`) are **bounded, not reproducible** — parallel
+>   float accumulation is not associative. `CERTIFIED`, `final iteration`, `edits delta` and
+>   `max 1-cos(mu)` are exact. An earlier claim of byte-identity was luck.
+>   See [`../known-defects.md`](../known-defects.md).
+> * **The run manifest's `dirty` flag cannot distinguish `src/main` changes from thesis-text
+>   edits.** The frozen artifact's run is flagged dirty from `report/*.tex` alone.
+> * **The `# outputDir:` provenance guard is test-only** (`ExperimentConfigHeaderTest`);
+>   nothing validates it at load time. 42 configs had carried stale sed-inherited headers.
+> * **`--export-config` (proposed below) is a good idea and would have caught the stale-header
+>   class directly.** Not implemented.
+
 Every reported number must be traceable to a config. The recommended approach:
 
 ```yaml

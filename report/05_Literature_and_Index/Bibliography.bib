@@ -116,6 +116,19 @@ url = {https://arxiv.org/abs/2404.13076}
 }
 
 @article{boubdir2024elo,
+% Verified 2026-07-31 against arXiv:2311.17295 (v1, 29 Nov 2023) and its full
+% text. Five-author list confirmed. The paper was accepted at the GEM Workshop,
+% EMNLP 2023, which the entry does not record; kept as an arXiv preprint entry
+% since the workshop version is not separately indexed.
+% CORRECTION applied to Ch. 2 in this round: the paper tests transitivity as an
+% axiom of the RATING SYSTEM, not of LLM preferences. Its finding is that "the
+% transitivity assumed by the Elo rating system can be vulnerable, especially
+% when win rates hover around ~50%", and that "the relative rankings of models
+% that perform similarly are sensitive to the choice of hyperparameters K-factor
+% and Nperms". It does not measure cycles in the underlying win/loss records.
+% The chapter previously said the authors "show that LLMs frequently exhibit
+% non-transitive preferences"; that is not what they show. Cyclic dominance
+% proper is sourced to balduzzi2018melo.
 title = {Elo Uncovered: Robustness and Best Practices in Language Model Evaluation},
 author = {Boubdir, Meriem and Kim, Edward and Ermis, Beyza and Hooker, Sara and Fadaee, Marzieh},
 journal = {arXiv preprint arXiv:2311.17295},
@@ -150,6 +163,17 @@ doi = {10.48550/arXiv.2210.03629}
 % Resolved 2026-07-28: no longer used to source pipeline specifics; cited only as
 % a secondary pointer to Arena's public per-category leaderboards. The documented
 % pipeline critique is now sourced to li2024benchbuilder.
+% Re-verified 2026-07-31 by fetching the URL below. Post dated 2026-05-08 (last
+% updated 2026-05-11), signed "Arena Team". Scope: Code Arena / web development
+% only -- seven categories from 250k+ filtered Code Arena prompts. Method as
+% stated in the post: "We used clustering analysis to identify recurring patterns
+% in user intent and task structure, then refined the resulting groups through an
+% iterative taxonomy-building process", against four criteria (interpretability,
+% coverage, statistical robustness, boundary clarity). Embeddings and LLM
+% labelling are NOT stated. Ch. 2 sec:benchmarks was narrowed accordingly: it no
+% longer attributes an embed-cluster-LLM-label recipe to this post, and no longer
+% generalises from this one release to Arena's per-category leaderboards at
+% large. For the general claim see arena2025expert.
 title = {New Categories for Web Development in Code Arena},
 author = {{Arena Team}},
 howpublished = {LMArena blog post},
@@ -157,7 +181,34 @@ year = {2026},
 url = {https://arena.ai/blog/new-categories-code-arena/}
 }
 
+@misc{arena2025expert,
+% Verified 2026-07-31 by fetching https://arena.ai/blog/arena-expert (the
+% news.lmarena.ai/arena-expert/ URL 301-redirects there). Post dated 2025-11-05,
+% last updated 2025-12-18, signed "Arena Team". Eight occupational leaderboards
+% drawn from 23 categories adapted from the US Bureau of Labor Statistics
+% Standard Occupational Classification (SOC); prompts are tagged by zero-shot
+% LLM classification (Gemini 2.5 Flash). NOTE: this is an external editorial
+% taxonomy plus an LLM classifier -- there is no embedding or clustering step --
+% so this entry must NOT be cited as evidence for an embed-cluster-LLM-label
+% pipeline. It is cited only in the Ch. 2 Synthesis, as evidence that Arena
+% publishes per-category leaderboards spanning its whole query stream rather
+% than one product surface.
+title = {Arena Expert and Occupational Categories},
+author = {{Arena Team}},
+howpublished = {LMArena blog post},
+year = {2025},
+url = {https://arena.ai/blog/arena-expert}
+}
+
 @inproceedings{balduzzi2018melo,
+% Verified 2026-07-31 against arXiv:1806.02643 and its full text (NeurIPS 2018).
+% Four-author list confirmed. Sec. 2.2 gives the Hodge decomposition of an
+% antisymmetric matrix, A = grad(r) + rot(A), separating "transitive (captured by
+% averages or Elo) from cyclic interactions (rock-paper-scissors)"; Sec. 3.1
+% introduces mElo_2k, p_ij = sigma(r_i - r_j + c_i^T Omega c_j), noting "vanilla
+% Elo uses 2k = 0". The Ch. 2 description of this work is accurate as written.
+% Note the paper's headline contribution is Nash averaging; mElo is a supporting
+% construction, and the chapter does not claim otherwise.
 title = {Re-evaluating Evaluation},
 author = {Balduzzi, David and Tuyls, Karl and Perolat, Julien and Graepel, Thore},
 booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
@@ -205,6 +256,9 @@ doi = {10.48550/arXiv.2403.04132}
 @misc{databricks2026memalign,
 % Resolved 2026-07-28: key renamed 2025->2026 to match the post's publication date
 % (2026-02-03); cited in Ch. 2 only as an industrial (non-peer-reviewed) instance.
+% Re-verified 2026-07-31 by fetching https://mlflow.org/blog/memalign/ directly:
+% the post is dated 2026-02-03, so the 2026 year stands. An external fact-check
+% asserting a 2025 release was checked against the primary source and rejected.
 title = {{MemAlign}: Building Better {LLM} Judges From Human Feedback With Scalable Memory},
 author = {Lyu, Veronica and Sreenivasan, Kartik and Moorjani, Samraj and Polyzotis, Alkis and Havens, Sam and Carbin, Michael and Bendersky, Michael and Zaharia, Matei and Chen, Xing},
 howpublished = {MLflow / Databricks blog post},
@@ -271,6 +325,8 @@ doi = {10.1145/3394486.3403244}
 }
 
 @article{huang2025thinkj,
+% Verified 2026-07-31 against arXiv:2505.14268: title and nine-author list
+% confirmed, lead author Huang, 2025.
 title = {{Think-J}: Learning to Think for Generative {LLM}-as-a-Judge},
 author = {Huang, Hui and He, Yancheng and Zhou, Hongli and Zhang, Rui and Liu, Wei and Wang, Weixun and Su, Wenbo and Zheng, Bo and Liu, Jiaheng},
 journal = {arXiv preprint arXiv:2505.14268},
@@ -288,6 +344,15 @@ url = {https://arxiv.org/abs/1109.3701}
 
 
 @article{kosmopoulos2015hmetrics,
+% Verified 2026-07-31 against arXiv:1306.6802 and DOI 10.1007/s10618-014-0382-x.
+% Five-author list, DMKD 29(3):820-865, 2015 -- all confirmed.
+% CORRECTION applied to Ch. 2 in this round: hP/hR/hF and the paper's novel
+% measures (MGIA, LCA-based P/R/F) compare PREDICTED CLASS LABELS against GOLD
+% LABELS within a single, fixed class hierarchy. No measure in the paper compares
+% one hierarchy against another. The chapter previously said these metrics
+% "evaluate an induced hierarchy against a gold one"; the exclusion still holds
+% (they presuppose both a reference hierarchy and gold labels within it), but the
+% description of what they measure was wrong and has been corrected.
 title = {Evaluation Measures for Hierarchical Classification: A Unified View and Novel Approaches},
 author = {Kosmopoulos, Aris and Partalas, Ioannis and Gaussier, Eric and Paliouras, Georgios and Androutsopoulos, Ion},
 journal = {Data Mining and Knowledge Discovery},
@@ -363,6 +428,9 @@ doi = {10.18653/v1/2023.findings-acl.824}
 }
 
 @article{wataoka2025selfpreference,
+% Verified 2026-07-31: arXiv:2410.21819 was submitted in October 2024, so the
+% printed year is 2024. The key retains the "2025" suffix only because some
+% venues index the work under that year; it is cosmetic and not user-visible.
 title = {Self-Preference Bias in {LLM}-as-a-Judge},
 author = {Wataoka, Koki and Takahashi, Tsubasa and Ri, Ryokan},
 journal = {arXiv preprint arXiv:2410.21819},
@@ -435,7 +503,12 @@ url = {https://arxiv.org/abs/2410.02223}
 % ── Entries added 2026-07-28 (Ch. 2 rework per supervisor review) ─────────────
 
 @article{stephan2024calculation,
-% TODO verify: author list against arXiv:2409.04168.
+% Verified 2026-07-31 against arXiv:2409.04168: title and five-author list
+% confirmed, lead author Stephan, arXiv submission year 2024.
+% Re-verified 2026-07-31 (second round) by re-fetching the arXiv abs page:
+% authors are Andreas Stephan, Dawei Zhu, Matthias Assenmacher, Xiaoyu Shen,
+% Benjamin Roth; submitted 2024-09-06. The surname "Stephan" is correct, so
+% the citation key was left unchanged.
 title = {From Calculation to Adjudication: Examining {LLM} Judges on Mathematical Reasoning Tasks},
 author = {Stephan, Andreas and Zhu, Dawei and A{\ss}enmacher, Matthias and Shen, Xiaoyu and Roth, Benjamin},
 journal = {arXiv preprint arXiv:2409.04168},
@@ -506,7 +579,8 @@ url = {https://arxiv.org/abs/2311.01449}
 }
 
 @article{chen2025judgelrm,
-% TODO verify: author list against arXiv:2504.00050.
+% Verified 2026-07-31 against arXiv:2504.00050: title and seven-author list
+% confirmed, lead author Chen, 2025.
 title = {{JudgeLRM}: Large Reasoning Models as a Judge},
 author = {Chen, Nuo and Hu, Zhiyuan and Zou, Qingyun and Wu, Jiaying and Wang, Qian and Hooi, Bryan and He, Bingsheng},
 journal = {arXiv preprint arXiv:2504.00050},
@@ -515,6 +589,17 @@ url = {https://arxiv.org/abs/2504.00050}
 }
 
 @inproceedings{ye2024flask,
+% Verified 2026-07-31 against arXiv:2307.10928 and its full text. Nine-author
+% list confirmed; ICLR 2024 Spotlight.
+% CORRECTION applied to Ch. 2 in this round: the paper does NOT report a
+% coarse-vs-fine comparison in which model orderings reverse. What it shows is
+% (i) an Eval LM selects the top-3 skills each instance requires from 12 defined
+% skills and scores against those; (ii) the relative ordering of models varies
+% BY SKILL (Fig. 7: Claude leads on Problem Handling, GPT-3.5 on Logical Thinking
+% and Background Knowledge); (iii) skill-specific scoring correlates better with
+% human judgement than skill-agnostic scoring (Spearman 0.641 -> 0.680 with
+% GPT-4 as Eval LM, Table 1). The chapter previously claimed the decomposition
+% "changes both scores and model orderings"; it now states (ii) and (iii).
 title = {{FLASK}: Fine-grained Language Model Evaluation based on Alignment Skill Sets},
 author = {Ye, Seonghyeon and Kim, Doyoung and Kim, Sungdong and Hwang, Hyeonbin and Kim, Seungone and Jo, Yongrae and Thorne, James and Kim, Juho and Seo, Minjoon},
 booktitle = {International Conference on Learning Representations (ICLR)},
@@ -607,4 +692,156 @@ volume = {8},
 pages = {1728738},
 year = {2026},
 doi = {10.3389/frai.2025.1728738}
+}
+
+% ── Entries added 2026-07-31 (Ch. 2 fact-check: attribution splits) ───────────
+
+@article{banerjee2005bregman,
+% Verified 2026-07-31 against https://jmlr.org/papers/v6/banerjee05b.html
+% (title, four-author list, volume 6, pages 1705--1749, 2005). Distinct from
+% banerjee2005vmf: the Bregman-divergence equivalence is established here.
+title = {Clustering with {Bregman} Divergences},
+author = {Banerjee, Arindam and Merugu, Srujana and Dhillon, Inderjit S. and Ghosh, Joydeep},
+journal = {Journal of Machine Learning Research},
+volume = {6},
+pages = {1705--1749},
+year = {2005},
+url = {https://jmlr.org/papers/volume6/banerjee05b/banerjee05b.pdf}
+}
+
+@article{ford1957ranking,
+% Verified 2026-07-31 against the Taylor & Francis record for The American
+% Mathematical Monthly 64(8P2):28--33, 1957 (L. R. Ford Jr., RAND).
+% Source of the connected/strongly-connected comparison-graph condition.
+title = {Solution of a Ranking Problem from Binary Comparisons},
+author = {Ford, Jr., Lester R.},
+journal = {The American Mathematical Monthly},
+volume = {64},
+number = {8P2},
+pages = {28--33},
+year = {1957},
+doi = {10.1080/00029890.1957.11989117}
+}
+
+@article{simons1999asymptotics,
+% Verified 2026-07-31 against Project Euclid (euclid.aos/1018031267):
+% The Annals of Statistics 27(3):1041--1060, 1999. Consistency and asymptotic
+% normality of the Bradley--Terry MLE.
+title = {Asymptotics When the Number of Parameters Tends to Infinity in the {Bradley--Terry} Model for Paired Comparisons},
+author = {Simons, Gordon and Yao, Yi-Ching},
+journal = {The Annals of Statistics},
+volume = {27},
+number = {3},
+pages = {1041--1060},
+year = {1999},
+doi = {10.1214/aos/1018031267}
+}
+
+@article{saito2023verbosity,
+% Verified 2026-07-31 against arXiv:2310.10076 (submitted 2023-10-16).
+% Recognised primary attribution for verbosity bias in LLM preference labelling.
+title = {Verbosity Bias in Preference Labeling by Large Language Models},
+author = {Saito, Keita and Wachi, Akifumi and Wataoka, Koki and Akimoto, Youhei},
+journal = {arXiv preprint arXiv:2310.10076},
+year = {2023},
+url = {https://arxiv.org/abs/2310.10076}
+}
+
+@article{dubois2024lengthcontrolled,
+% Verified 2026-07-31 against arXiv:2404.04475 (title, four-author list, 2024).
+title = {Length-Controlled {AlpacaEval}: A Simple Way to Debias Automatic Evaluators},
+author = {Dubois, Yann and Galambosi, Bal{\'a}zs and Liang, Percy and Hashimoto, Tatsunori B.},
+journal = {arXiv preprint arXiv:2404.04475},
+year = {2024},
+url = {https://arxiv.org/abs/2404.04475}
+}
+
+@article{li2026lowrank,
+% Verified 2026-07-31 against arXiv:2605.29395 (title, three-author list,
+% submitted 2026-05-28).
+title = {Low Rank for Rank: Uncertainty-Aware Task-Specific {LLM} Ranking under Sparse Pairwise Comparisons},
+author = {Li, Jiachun and Simchi-Levi, David and Sun, Will Wei},
+journal = {arXiv preprint arXiv:2605.29395},
+year = {2026},
+url = {https://arxiv.org/abs/2605.29395}
+}
+
+@inproceedings{kargupta2025taxoadapt,
+% Verified 2026-07-31 against arXiv:2506.10737 (title, six-author list,
+% ACL 2025 Main Conference).
+title = {{TaxoAdapt}: Aligning {LLM}-Based Multidimensional Taxonomy Construction to Evolving Research Corpora},
+author = {Kargupta, Priyanka and Zhang, Nan and Zhang, Yunyi and Zhang, Rui and Mitra, Prasenjit and Han, Jiawei},
+booktitle = {Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (ACL)},
+year = {2025},
+url = {https://arxiv.org/abs/2506.10737}
+}
+
+@inproceedings{hong2025dialin,
+% Verified 2026-07-31 against arXiv:2412.09049 (title, five-author list;
+% arXiv submission 2024-12-12, accepted to EMNLP 2025 Main Conference).
+title = {{Dial-In LLM}: Human-Aligned {LLM}-in-the-loop Intent Clustering for Customer Service Dialogues},
+author = {Hong, Mengze and Ng, Wailing and Zhang, Chen Jason and Song, Yuanfeng and Jiang, Di},
+booktitle = {Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+year = {2025},
+url = {https://arxiv.org/abs/2412.09049}
+}
+
+% ── Entries added 2026-07-31 (Ch. 2 second-round review: adjacent recent work) ─
+
+@article{maimon2025skills,
+% Verified 2026-07-31 against https://arxiv.org/abs/2507.20208 (abs page and
+% https://arxiv.org/html/2507.20208v2). Five-author list as listed on arXiv;
+% v1 submitted 2025-07-27 under the title "IQ Test for LLMs: An Evaluation
+% Framework for Uncovering Core Skills in LLMs", retitled in v2 (2026-06-11)
+% to the title recorded below, which is the current arXiv title.
+% Factor analysis over a 60x44 model-by-benchmark matrix; the v2 full text
+% reports per-factor internal consistency ("PAF factors consistently exhibit
+% high internal consistency (alpha, omega > 0.80)") and relates the latent
+% skills to Chatbot Arena Elo (Spearman rho = 0.73).
+%
+% Year/title pairing (decided 2026-07-31, third-round review). Re-verified by
+% fetching both https://arxiv.org/abs/2507.20208 (current title "From
+% Benchmarks to Skills ...") and https://arxiv.org/abs/2507.20208v1 (title
+% "IQ Test for LLMs: An Evaluation Framework for Uncovering Core Skills in
+% LLMs", submitted 2025-07-27); v2 is dated 2026-06-11. The previous state of
+% this entry paired the v2 TITLE with the v1 YEAR, so "Maimon et al. 2025,
+% From Benchmarks to Skills" named a document that does not exist.
+% Convention in this file: the printed year is the submission date of the
+% version actually cited, and a mismatched year suffix in the citation key is
+% cosmetic -- cf. boubdir2024elo (key 2024, year 2023) and
+% wataoka2025selfpreference (key 2025, year 2024, with a comment saying so).
+% Chapter 2 cites the omega > 0.80 internal-consistency figure, which is
+% verified in the v2 full text, so v2 is the version cited: v2 title with
+% year 2026, and the journal field pinned to v2. The key is left unchanged
+% per the cosmetic-suffix convention above.
+title = {From Benchmarks to Skills: Low-Rank Factors for {LLM} Evaluation},
+author = {Maimon, Aviya and Cohen, Amir DN and Vishne, Gal and Ravfogel, Shauli and Tsarfaty, Reut},
+journal = {arXiv preprint arXiv:2507.20208v2},
+year = {2026},
+note = {Version 2, 11 June 2026; version 1 (27 July 2025) appeared under the title \textit{IQ Test for LLMs: An Evaluation Framework for Uncovering Core Skills in LLMs}},
+url = {https://arxiv.org/abs/2507.20208v2}
+}
+
+@article{li2026tensor,
+% Verified 2026-07-31 against https://arxiv.org/abs/2604.05460 (title,
+% three-author list, submitted 2026-04-07). Companion in subject matter to
+% li2026lowrank (arXiv:2605.29395) by the same three authors; distinct paper.
+title = {{LLM} Evaluation as Tensor Completion: Low Rank Structure and Semiparametric Efficiency},
+author = {Li, Jiachun and Simchi-Levi, David and Sun, Will Wei},
+journal = {arXiv preprint arXiv:2604.05460},
+year = {2026},
+url = {https://arxiv.org/abs/2604.05460}
+}
+
+@article{neuhof2026rankintervals,
+% Verified 2026-07-31 against https://arxiv.org/abs/2606.08679 (title,
+% two-author list, submitted 2026-06-07). Confidence intervals for
+% task-specific rankings from pairwise comparisons plus conformal prediction
+% intervals for leaderboard-level ranks; evaluated on TabArena and
+% PromptEval/MMLU.
+title = {Rank Intervals for Leaderboards: A Hierarchical Framework for Model Evaluation},
+author = {Neuhof, Bitya and Benjamini, Yuval},
+journal = {arXiv preprint arXiv:2606.08679},
+year = {2026},
+url = {https://arxiv.org/abs/2606.08679}
 }

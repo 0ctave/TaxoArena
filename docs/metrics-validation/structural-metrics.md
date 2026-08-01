@@ -1,10 +1,21 @@
 # Structural Characterization Metrics: Match Count, Contamination, and Sackin Index
 
-This document details the structural metrics used in **TaxoArena** to verify DAG topology, balance, and polyhierarchical coverage.
+> **STATUS: §1 SUPERSEDED (2026-07-30). §2 and §3 are current.**
+>
+> The system is a **tree**. Cross-linking was removed and polyhierarchy is a reported
+> negative result. So `AvgMatch = 1.0` by construction, and §1 no longer measures anything —
+> it is an invariant check, not a coverage statistic. **The "observed values range between
+> 1.1 and 1.3" claim below is dead** and must not be quoted; it described the pre-removal
+> system. Contamination (§2) and Sackin (§3) are unaffected.
+
+This document details the structural metrics used in **TaxoArena** to verify topology and
+balance.
 
 ---
 
-## 1. Average Match Count
+## 1. Average Match Count — now an invariant check
+
+*The paragraph below describes the removed polyhierarchical system. Kept for the record.*
 
 In a polyhierarchical Directed Acyclic Graph (DAG), a single query can route down multiple ancestral paths and land in multiple leaf nodes.
 
@@ -14,8 +25,8 @@ Let $\mathcal{L}(q)$ be the set of leaf nodes assigned to query $q$ by the trick
 $$ \text{AvgMatch} = \frac{1}{N} \sum_{i=1}^{N} \left| \mathcal{L}(q_i) \right| $$
 
 ### Interpretation
-*   $\text{AvgMatch} = 1.0$: The taxonomy acts as a strict tree. No polyhierarchical assignments are active.
-*   $\text{AvgMatch} > 1.0$: Confirms that soft-routing and cross-linking are functioning. Typically, observed values in TaxoArena range between $1.1$ and $1.3$, showing that a fraction of queries are evaluated in multiple specialized arenas (e.g., a "biostatistics" query evaluated by both biology and mathematics judges).
+*   $\text{AvgMatch} = 1.0$: the expected and only valid value in the current system. The taxonomy is a strict tree.
+*   $\text{AvgMatch} > 1.0$: **a bug**, not a finding. It would mean a query reached more than one leaf, which the tree cannot produce. *~~This branch previously read "confirms soft-routing and cross-linking are functioning; observed values range between 1.1 and 1.3". Both the mechanism and the range are gone.~~*
 
 ---
 

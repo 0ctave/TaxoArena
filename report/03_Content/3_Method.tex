@@ -1,36 +1,148 @@
 
 \chapter{Method}\label{ch:methodology}
 
-This chapter specifies the method in three parts.
-Section~\ref{sec:arch-requirements} states what the partition must
-satisfy for the arena to mean anything, points to the measured
-evidence that the induced partition satisfies it (reported with the
-results, Section~\ref{sec:res-construction}), and names the three
-things it does not guarantee; the construction formalism itself is in
-Appendix~\ref{app:dag-formalism}.
-Section~\ref{sec:arch-arena} specifies the arena --- what it judges,
-what the judge sees, and how verdicts become rankings --- and points
-to the inventory of mechanisms that have no implementation
-(Appendix~\ref{app:not-implemented}).
-Section~\ref{sec:meth-discipline} states the four measurement rules
-this thesis holds itself to, each with the failure that produced it, so
-that the results of Chapter~\ref{ch:results} are read against a
-standard the reader already holds.
+This chapter specifies the system in the order a query passes through
+it. Section~\ref{sec:arch-requirements} states what a partition has to
+satisfy for a per-cell arena to mean anything, and
+Section~\ref{sec:arch-taxonomy} gives the construction that produces
+one, ending with the frozen artifact every result is attributed to.
+Section~\ref{sec:arch-arena} specifies the arena: what it judges, what
+the judge sees, how comparisons are scheduled, and how verdicts become
+per-cell and per-domain rankings. Section~\ref{sec:meth-validation}
+gives the two statistics the rankings are validated against.
+Section~\ref{sec:meth-assumptions} and
+Section~\ref{sec:meth-discipline} state what the method assumes and the
+reporting rules it holds itself to.
 
-The ordering is deliberate. The partition is an instrument; the
-question is what the arena measures with it. The main text therefore
-carries only what the arena depends on and the appendix carries the
-formalism, for the measured reason of
-Section~\ref{sec:res-granularity}: the construction's tuning has no
-measured evaluative consequence.
+Figure~\ref{fig:pipeline} is the whole path on one page. Everything
+after it fills in a box.
+
+One term recurs throughout and is easier to define once. Before any
+construction happens the corpus is cut in two. Seventy per cent becomes
+the \emph{construction pool}; the remaining thirty per cent is
+\emph{reserved}, and those are the only queries the arena is ever
+allowed to judge. The tree is built from the construction pool alone,
+and each leaf's rubric is written from the construction pool alone. A
+reserved query is first touched when it is routed into a cell at
+judging time, and its correct answer is not read until every verdict
+has been recorded. \emph{Held-out query} means a member of that
+reserved pool.
+The separation is what the evaluation rests on. If a leaf's rubric had
+been written from the questions that leaf is later asked to grade, a
+judge following the rubric could be recognising a question rather than
+assessing an answer, and no comparison against the answer key would
+mean anything. The split, the filter that enforces it, and the
+build-time assertion that audits the filter are
+Section~\ref{sec:exp-info-separation} and Section~\ref{sec:arch-judge}.
+
+\usetikzlibrary{positioning}
+
+\begin{figure}[htbp]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt,
+              minimum height=9mm, text width=33mm, font=\footnotesize},
+  lab/.style={font=\scriptsize\itshape, align=center, inner sep=1.5pt},
+  ->, thick
+]
+
+% ── the split ────────────────────────────────────────────────────────
+\node[box] (corpus) at (0,0)   {MMLU-Pro corpus};
+\node[box] (split)  at (4.6,0) {seeded $70/30$ split\\[-1pt]
+                                 \scriptsize stratified per domain};
+\draw (corpus) -- (split);
+
+% ── construction lane (left) ─────────────────────────────────────────
+\node[box] (embed) at (0,-2.1) {embed; take a 256-d\\prefix; $\ell_2$-normalise};
+\node[box] (rec)   at (0,-4.3) {recursive split under $J$\\[-1pt]
+                                 \scriptsize accept if every child pair\\[-2pt]
+                                 \scriptsize clears the bar \emph{and}\\[-2pt]
+                                 \scriptsize $\Delta J > 2\,\mathrm{SE}(\Delta J)$};
+\node[box] (cells) at (0,-6.4) {87 cells\\[-1pt]\scriptsize one rubric each};
+
+% ── arena lane (right) ───────────────────────────────────────────────
+\node[box] (route) at (9.2,-2.1) {route a held-out query\\[-1pt]
+                                   \scriptsize to every cell that admits it};
+\node[box] (arena) at (9.2,-4.3) {per-cell arena\\[-1pt]
+                                   \scriptsize one scheduled pair, one query,\\[-2pt]
+                                   \scriptsize two orders, one verdict};
+\node[box] (fit)   at (9.2,-6.4) {per-cell\\Bradley--Terry fit};
+\node[box] (pool)  at (9.2,-8.3) {pool counts across cells,\\refit per domain};
+\node[box] (valid) at (9.2,-10.2){validate against the answer key\\[-1pt]
+                                   \scriptsize agreement, Spearman $\rho$};
+
+% ── branch from the split ────────────────────────────────────────────
+\draw (split.south) -- (4.6,-1.2) -| node[lab, pos=0.28, above]
+      {construction pool, $8{,}299$ placed} (embed.north);
+\draw (split.south) -- (4.6,-1.2) -| node[lab, pos=0.28, above]
+      {reserved pool, $3{,}445$ held out} (route.north);
+
+% ── lane flows ───────────────────────────────────────────────────────
+\draw (embed) -- (rec);
+\draw (rec) -- (cells);
+\draw (route) -- (arena);
+\draw (arena) -- (fit);
+\draw (fit) -- (pool);
+\draw (pool) -- (valid);
+
+% ── the one cross-link: cells supply the rubrics ─────────────────────
+\draw (cells.east) -- node[lab, fill=white, pos=0.55] {rubrics} (arena.west);
+
+% ── the construction loop ────────────────────────────────────────────
+\draw[dashed] (rec.west) -- (-2.5,-4.3) -- (-2.5,-2.1)
+      node[lab, midway, left, rotate=90, anchor=south]
+      {coarsen, re-route, refit} -- (embed.west);
+
+\end{tikzpicture}
+\caption[The pipeline from corpus to validated ranking]{The path a
+query takes. The corpus is split once, under the run's seed, before
+anything else happens. Construction sees only the left lane and
+produces 87 cells with one rubric each; the arena judges only the right
+lane, and the two meet where a cell's rubric becomes the judge's
+instructions. The dashed arrow is the construction loop, which
+alternates editing the tree with re-routing every construction query
+and refitting node parameters until neither moves. Counts are read from
+the corpus store and the frozen snapshot at seed 42; the split is
+$70/30$ and closes exactly, $8{,}673 + 3{,}445 = 12{,}118$}
+\label{fig:pipeline}
+\end{figure}
+
+Three different totals appear in the artefacts, and only one of them is
+the corpus.
+
+MMLU-Pro supplies $12{,}118$ questions that carry evaluation rows for
+this roster. The seeded $70/30$ split sends $8{,}673$ to construction and
+holds out $3{,}445$; those two sum to the corpus exactly. Of the
+construction share, $8{,}299$ are placed in the tree --- the snapshot's
+own \texttt{totalUniqueQueries} --- and the remaining $374$ are dropped
+during routing as outliers. The embedding cache holds $11{,}773$ vectors,
+$345$ short of the corpus, being questions with no usable embedding.
+
+Question identifiers here are \texttt{eval\_results.question\_id}, not
+\texttt{mmlu\_pro.id}. The two occupy different spaces and resolve to
+different questions for the same integer, so the $12{,}118$ above is not
+comparable with the $12{,}000$ items MMLU-Pro is usually quoted as
+holding (Appendix~\ref{app:models}).
 
 \section{What a Good Partition Needs}\label{sec:arch-requirements}
 
-The arena judges responses inside cells and reports a ranking per cell.
-For that to mean anything, four things must hold. They are stated here
-as requirements, before any construction detail, so that the
-construction can be assessed against them rather than described for its
-own sake.
+The design is betting on one thing, and the requirements below are
+conditions for that bet to be testable rather than the bet itself. The
+bet is that two queries whose embeddings point in nearly the same
+direction are asking for the same kind of work: the same concepts, the
+same methods, the same characteristic ways of going wrong. If that
+holds, a cell is a group of queries a model tends to succeed or fail on
+together, a rubric can be written that is true of the whole cell and
+still specific enough to discriminate, and a per-cell ranking becomes a
+statement about a capability rather than about a topic label. Whether
+cell-scoped judging actually produces better judgments is links~2 and~3
+of Section~\ref{sec:research-questions}, and the answer is
+Chapter~\ref{ch:results}.
+
+Four requirements follow. They are stated before any construction
+detail so the construction can be assessed against them.
 
 \begin{description}
 \item[R1 --- Coherence.] Cells must be homogeneous enough that a single
@@ -39,75 +151,232 @@ design exists to serve (Section~\ref{sec:problem-statement}).
 \item[R2 --- Support.] Cells must be large enough that per-cell judging
 is identifiable --- the comparison graph connects --- and that per-cell
 reliability is not dominated by sampling noise.
-\item[R3 --- Stability.] The same corpus must yield the same cells, and
-the construction must reach a state that one further application of its
-own operator would not change.
+\item[R3 --- Stability.] The same corpus \emph{and the same seed} must
+yield the same cells, and the construction must reach a state that one
+further application of its own operator would not change. The seed
+clause is not decorative: leaf counts and leaf boundaries move across
+seeds, and Section~\ref{sec:res-construction} reports by how much.
 \item[R4 --- Verifiability.] The construction's guarantees and its
 non-guarantees must be enumerable, and fixed before any result depends
 on them.
 \end{description}
 
-\subsection{How the Requirements Are Met}\label{sec:arch-taxonomy}
+Whether the construction meets R1--R4 is an empirical question.
+Table~\ref{tab:requirements-evidence}
+(Section~\ref{sec:res-construction}) collects one line of evidence per
+requirement, each marked or and each
+with the caveat that bounds it.
 
-The construction is one paragraph in the main text.
+\section{Building the Partition}\label{sec:arch-taxonomy}
+
 The 14 MMLU-Pro domain labels seed 14 immutable top-level anchor nodes.
 They are held immutable so that every induced cell stays nested under
 one MMLU-Pro top-level domain, which is what allows a per-domain result
 to be set against MMLU-Pro's own published category scores.
+
 Every corpus query is embedded, and a fixed 256-dimensional prefix
 slice of the embedding is $\ell_2$-normalised to the unit hypersphere
-and used at every depth. Queries then migrate by embedding geometry, so
-a query labelled Mathematics may come to sit under a different anchor;
-this is what makes the induced (\textit{adapted}) partition differ from
-the editorial (\textit{canonical}) one.
+and used at every depth. Cutting an embedding short and expecting the
+remainder to still mean something is only safe with a particular kind
+of model. Matryoshka Representation Learning
+\parencite{kusupati2022mrl} trains an embedding so that every prefix of
+it is itself a usable embedding, with the coarsest information packed
+first; without that property, truncating at 256 dimensions would throw
+away whatever happened to land past the cut. The construction needs it
+for two reasons. Narrowing the vector keeps the directional
+concentration estimates well conditioned at the cell sizes this thesis
+works with, and holding one width at every depth puts all nodes on the
+same sphere, so a node can be compared with its siblings and with its
+parent without projecting between spaces. The requirement costs
+nothing in practice: Qwen3-Embedding-8B, the only embedding model this
+project used, has the property, and the only extra step is
+re-normalising after the cut, since MRL preserves meaning but not unit
+norm. The model was served under a moving tag, so the exact revision
+behind that tag is not recoverable; what is recoverable is the
+construction itself, because all $11{,}773$ embeddings are retained at
+their full native width and the tree can be rebuilt from them without
+contacting the model again. The width of $256$ is a fixed operating
+point that this thesis does not ablate, and
+Appendix~\ref{app:dag-formalism} states both the argument for it and
+why an ablation would not isolate what it appears to.
+
+Queries then migrate by embedding geometry, so a query labelled
+Mathematics may come to sit under a different anchor. This is what
+makes the induced (\textit{adapted}) partition differ from the
+editorial (\textit{canonical}) one.
+
+\subsection{The Acceptance Test}\label{sec:arch-acceptance}
+
 Each anchor is recursively split under a chance-corrected separation
-score $J$. $J$ measures how much better the observed split separates
-the queries than chance separates them, where chance is the same
-queries randomly relabelled into clusters of the same sizes, so a high
-$J$ cannot be produced by the cell-size structure alone; the formal
-definition is in Appendix~\ref{app:dag-formalism}.
-A split is accepted only when every child pair clears a
-separation bar of $0.025$ \emph{and} the improvement in $J$ exceeds
-twice its own paired bootstrap standard error. Two coarsening moves
---- absorption of below-floor children and merging of insufficiently
-separated sibling pairs --- run in the same loop, so every operator maps
-a tree to a tree. The loop runs until a certificate reports that one
-more iteration would change nothing.
-The formalism, the parameter derivations, the routing rule and the
-certificate are given in full in Appendix~\ref{app:dag-formalism} and
-Appendix~\ref{app:numerics}.
+score $J$. Chance-corrected means measured against what the same split
+would score by chance, so the threshold does not drift with cell size:
+$J$ measures how much better the observed split separates the queries
+than the same queries randomly relabelled into clusters of the same
+sizes, and a high $J$ therefore cannot be produced by the cell-size
+structure alone. The formal definition is in
+Appendix~\ref{app:dag-formalism}. Candidate splits are proposed in a
+size-dependent principal-component subspace of 32, 64 or 128
+dimensions, and every acceptance gate is evaluated in the full
+256-dimensional routed space, so the subspace shapes the candidates and
+never the decision.
 
-The resulting frozen artifact --- the single construction every result
-in this thesis is attributed to --- is a tree of 154 nodes with 87
-labelled, rubric-carrying leaves; its full statistics, the fixed-point
-certificate, and the evidence per requirement are reported once, with
-the results (Section~\ref{sec:res-construction}).
-The fixed-point certificate is the check that one further application
-of the construction operator to the frozen artifact would change
-nothing about it: no accepted edit, no query moved between cells, and
-no node parameter moved beyond tolerance.
+A split is accepted when two conditions hold together, shown in
+Figure~\ref{fig:acceptance}. Every child pair must clear a separation
+bar of $0.025$, and the improvement $\Delta J$ the split buys must
+exceed twice its own paired bootstrap standard error. The second
+condition is what makes the gate scale-free. $\mathrm{SE}(\Delta J)$
+varies by more than an order of magnitude across sites on this corpus,
+so a fixed threshold on $\Delta J$ would be strict at one site and
+permissive at another; expressing the gate in standard-error units
+removes that.
 
-\subsection{Where the Evidence Is}\label{sec:arch-evidence-pointer}
+Two fallbacks complete the rule and both matter downstream. Where the
+paired standard error is zero, the edit is accepted if it strictly
+reduces the node count, which is how pass-through wrappers dissolve. A
+hard tolerance floor $\tau = 10^{-6}$ applies underneath, which is what
+makes the termination bound finite. On the frozen run that floor never
+bound: the smallest threshold any decision was taken against is
+$88\tau$, so what governed every acceptance was the standard error.
 
-Whether the construction meets R1--R4 is an empirical question, and
-the evidence is reported with the results rather than here:
-Table~\ref{tab:requirements-evidence}
-(Section~\ref{sec:res-construction}) collects one line of evidence per
-requirement, each marked \textsc{measured} or \textsc{argued} and each
-with the caveat that bounds it. In outline: R1 rests on the
-positioning of the separation bar between two measured nulls and,
-independently of the geometry, on the rubric-specificity null of
-Section~\ref{sec:res-rubric-null}; R2 rests on the leaf-size
-distribution and the measured identification cost
-(Section~\ref{sec:res-cost}); R3 rests on the fixed-point certificate;
-and R4 rests on the acceptance gate being expressed in units of its
-own objective's paired standard error
+\begin{figure}[htbp]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  every node/.style={align=center},
+  note/.style={font=\scriptsize, align=center}
+]
+
+% ── left panel: separation between the proposed children ────────────
+\node[font=\footnotesize\bfseries] at (1.7,3.3) {Condition 1: separation};
+\draw[thick] (0.55,1.55) circle (0.72);
+\draw[thick] (3.15,2.05) circle (0.58);
+\node[font=\scriptsize] at (0.55,1.55) {child $A$};
+\node[font=\scriptsize] at (3.15,2.05) {child $B$};
+\draw[<->, thick] (1.28,1.69) -- (2.58,1.94);
+\node[font=\scriptsize] at (1.93,1.35) {$J_{AB}$};
+\node[note] at (1.7,-0.25)
+  {every child pair must reach $J_{AB} \geq 0.025$,\\
+   scored against a random relabelling of the\\
+   same queries into clusters of the same sizes};
+
+% ── right panel: the delta-J test ───────────────────────────────────
+\node[font=\footnotesize\bfseries] at (9.2,3.3) {Condition 2: worth the edit};
+\fill[black!12] (6.6,1.7) rectangle (8.2,2.5);
+\draw[thick, dashed] (8.2,1.55) -- (8.2,2.9);
+\node[font=\scriptsize] at (7.4,2.78) {$2\,\mathrm{SE}(\Delta J)$};
+\draw[thick, ->] (6.2,1.7) -- (11.3,1.7);
+\node[font=\scriptsize] at (11.5,1.7) {$\Delta J$};
+\draw[thick] (6.6,1.56) -- (6.6,1.84);
+\node[font=\scriptsize] at (6.6,1.28) {$0$};
+\fill (9.8,1.7) circle (2.2pt);
+\node[font=\scriptsize] at (9.8,2.12) {observed $\Delta J$};
+\node[note] at (9.2,-0.25)
+  {accept only to the right of the dashed line;\\
+   the shaded band is this split's own paired bootstrap\\
+   noise, which varies by more than an order of\\
+   magnitude across sites};
+
+% ── verdict ─────────────────────────────────────────────────────────
+\node[draw, rounded corners=2pt, inner sep=5pt, font=\scriptsize]
+  at (5.6,-1.85)
+  {both conditions hold $\Rightarrow$ \textbf{accept the split}\quad\quad
+   either fails $\Rightarrow$ \textbf{keep the node whole}};
+
+\end{tikzpicture}
+\caption[What the acceptance test compares]{One accept/reject
+decision. The separation condition asks whether the proposed children
+are far enough apart on the sphere. The second condition asks whether
+the gain in $J$ is larger than the noise in the estimate of that gain,
+which is what stops the construction from accepting edits that a
+resample of the same node would not reproduce. Both are evaluated in
+the full 256-dimensional space, whatever subspace proposed the
+candidate}
+\label{fig:acceptance}
+\end{figure}
+
+Four coarsening moves run in the same loop --- absorption of
+below-floor children, merging of insufficiently separated siblings,
+merging of redundant nodes, and dissolution of pass-through nodes ---
+so every operator maps a tree to a tree. Only the last of the four
+accepted anything in this artifact, twice, and no fusion of any kind
+ever fired; the loop is symmetric by construction and asymmetric in
+use. The loop runs until one of two stopping criteria fires, and both
+are given in limitation~3 below. The formalism, the parameter
+derivations, the routing rule and the certificate are given in full in
+Appendix~\ref{app:dag-formalism} and Appendix~\ref{app:numerics}; how
+the parameters were arrived at is Appendix~\ref{app:tuning-protocol}.
+
+\subsection{The Frozen Artifact}\label{sec:arch-frozen}
+
+Every construction and arena result in this thesis is attributed to one
+snapshot. Table~\ref{tab:frozen-artifact} states it.
+
+\begin{table}[htbp]
+    \centering
+    \caption[The frozen construction artifact]{The frozen construction
+    artifact. Every configuration value is the one recorded in the
+    snapshot's stored settings and echoed on the
+    \texttt{Loaded CLI Configuration} line of every arena run log.}
+    \label{tab:frozen-artifact}
+    \small
+    \begin{tabular}{ll}
+        \toprule
+        Snapshot & \texttt{20260727\_042523\_}\\
+                 & \texttt{Headless\_Run\_Auto\_ge} \\
+        Configuration & \texttt{experiment\_configs/}\\
+                      & \texttt{freeze\_mcs55.toml} \\
+        Seed & $42$ \\
+        Split & \texttt{testRatio} $=0.3$, stratified within each domain \\
+        \addlinespace
+        Nodes / cells / depth & $154$ / $87$ / $6$ \\
+        Construction queries placed & $8{,}299$ of $8{,}673$ \\
+        Reserved (held-out) queries & $3{,}445$ \\
+        Separation score $J$ & $0.253129$ \\
+        Labels and rubrics & $87/87$ cells carry both \\
+        \addlinespace
+        \texttt{minClusterSize} & $55$ \\
+        \texttt{proposalSeparationBar} & $0.025$ \\
+        \texttt{acceptanceZ} & $2.0$ \\
+        $\tau$ (and the separate $\theta$ tolerance) & $10^{-6}$ \\
+        \texttt{maxDepth} (cap; realised depth $6$) & $8$ \\
+        \texttt{maxLeafAssignments} & $5$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Of the $154$ nodes, $87$ are leaves and carry queries, rubrics and
+labels; the other $67$ are internal nodes, which include the root and
+the 14 domain anchors and carry no rubric. ``87 cells'' and ``154
+nodes'' describe the same tree. Where this thesis says \emph{cell} it
+means one of the 87 leaves.
+
+\texttt{minClusterSize} $=55$ is a budget choice rather than a
+statistical requirement. It was set so that the cell count matches what
+the judge budget can identify, and the resulting per-cell reliability
+follows from it. What licenses treating it as free is a measured
+result: discriminative power is flat from 14 to 152 cells
+(Section~\ref{sec:res-granularity}), so the cell count can be chosen on
+cost grounds at no evaluative cost.
+
+The fixed-point certificate is a four-term tolerance test asking
+whether one further application of the construction operator would
+change the frozen artifact. All four terms are magnitudes rather than
+counts: the edit-phase change in $J$, the re-routing change in $J$, and
+the maximum per-node change in direction and in concentration. The two
+objective terms are tested against $\tau$; the two parameter terms are
+tested against a separate tolerance on $\theta$, because $\tau$ bounds
+a change in $J$ and these bound a change in the parameters that produce
+it. Both tolerances are $10^{-6}$, which is a coincidence of value and
+not of meaning. The parameter terms are the reason the certificate
+exists at all: a held-out query is routed through $\theta$, so a check
+over structure and objective alone would not cover the object being
+frozen. The certificate's realised values are reported with the results
 (Section~\ref{sec:res-construction}).
 
-\subsection{Three Things the Construction Does Not Guarantee}\label{sec:arch-limits}
+\subsection{Four Things the Construction Does Not Guarantee}\label{sec:arch-limits}
 
-These are stated here, before Chapter~\ref{ch:results}, rather than
-collected as limitations afterwards.
+These are stated here, before Chapter~\ref{ch:results}.
 
 \begin{enumerate}
 \item \textbf{``Chance-corrected'' means corrected against relabelling,
@@ -119,41 +388,832 @@ its own long axis. The two halves are one topic, but they sit far
 enough apart to beat a random relabelling, so $J$ scores the cut as a
 real split. A subset of accepted splits therefore cannot be
 distinguished from such a cut on the evidence $J$ provides. The counts
-that quantified this exposure --- how many accepted splits are
-affected, and what share of leaf-held queries sit under at least one
-such ancestor --- are \textsc{void as to values}
-(marker defined in Section~\ref{sec:res-construction})
-and are not restated here.
+that quantified this exposure are \textsc{void as to values} (marker
+defined in Section~\ref{sec:res-construction}) and are not restated.
+One bound survives the voiding. The separation bar sits $2.7$ to $4.5$
+times above the isotropic null's $p_{95}$ and below the median of the
+within-node null, so it is conservative against ``separated at all''
+and permissive against ``separated by more than this node's own
+elongation''; the one node that reached that boundary in the frozen run
+was declined.
 
 \item \textbf{The size floor is a birth constraint.} It is enforced on
 the routed partition at split time. Populations drift as later
-iterations re-route queries, so about one leaf in a hundred ends
+iterations re-route queries, so about one cell in a hundred ends
 marginally below it --- 1 of 87 in this artifact, with two further
-consistent instances at other settings. The below-floor leaf is visible
-at the left edge of the leaf-size distribution
-(Figure~\ref{fig:leaf-size-hist}). Any statement of the form
-``every leaf holds at least \texttt{minClusterSize} queries'' is false
-as written. This is a property of the mechanism, not a defect.
+consistent instances at other settings. The below-floor cell is visible
+at the left edge of the cell-size distribution
+(Figure~\ref{fig:leaf-size-hist}). Any statement of the form ``every
+cell holds at least \texttt{minClusterSize} queries'' is false as
+written. This is a property of the mechanism, not a defect.
 
-\item \textbf{Termination uses a five-iteration stability window; the
-certificate tests period 1 only.} The loop stops when the node and edge
-sets have been unchanged for five consecutive iterations, or when the
-objective has moved by less than the tolerance for five consecutive
-iterations; a single quiet iteration does not end a run. The structural
-window excludes oscillations of any period that add or remove a node or
-an edge, since one such iteration resets the count. The objective
-window does not, and it is the weaker of the two: a structure that
-alternates by one node while $J$ sits inside the tolerance satisfies
-it. The certificate is a separate check on the frozen artifact and asks
-only whether one further application of the operator changes anything,
-so an oscillation large enough to move $J$ reports
-\texttt{CERTIFIED: false} indefinitely and is not distinguished
-from divergence. A period-$p$ certificate is not implemented.
+\item \textbf{The loop can stop for either of two reasons, and the
+weaker one is what stopped it.} There are two stopping criteria, and
+satisfying either one ends the run. The first is \emph{structural}: it
+asks whether the tree itself has stopped changing, and requires five
+consecutive iterations at a graph edit distance of zero, meaning no
+node and no edge would have to be added or removed to turn one
+iteration's tree into the next one's. It also cannot fire before
+$\max(0.8 \times \text{anchors}, 5)$ iterations have passed, which is
+11 at fourteen anchors. The second is \emph{objective}: it asks whether
+$J$ has stopped moving, and requires five consecutive iterations in
+which both the change $J$ takes from the editing phase and the change
+it takes from re-routing sit within $\tau$.
+The frozen run stops at iteration~10, below the structural criterion's
+floor, so that criterion could not have fired; the run log agrees,
+recording graph-edit-distance convergence as false throughout and the
+stop as objective stationarity. That is the weaker of the two. A tree
+that keeps rearranging itself without moving $J$ satisfies the
+criterion that actually stopped this run.
+The fixed-point certificate is a separate check, evaluated once on the
+frozen artifact, and it asks only whether one further iteration would
+change it --- period~1. No period-$p$ certificate is implemented, and
+Section~\ref{sec:res-construction} reports seed runs that stop in a
+period-2 cycle neither criterion can see.
+
+\item \textbf{Nothing here guarantees that a held-out query reaches the
+right cell.} Every arena result depends on cell membership for queries
+the construction never saw, and that membership is produced by soft
+routing rather than by the construction. A held-out query is scored
+against every cell, the cells are ranked by posterior, and at most
+$\texttt{maxLeafAssignments} = 5$ are kept --- one primary and up to
+four secondaries --- with an entropy guard that drops all secondaries
+when the posterior over cells is close to uniform. The $0.25$
+membership floor named in the configuration governs construction-time
+trickling and is not a threshold on this admission step. The one
+exported measure of routing quality, expected calibration error at
+$0.2114$, is computed under a defective aggregation that understates
+every confidence (Appendix~\ref{app:metrics}), so its value is a
+diagnostic and not a bound. No result in this thesis validates held-out
+routing directly.
 \end{enumerate}
 
-None of R1--R4 says that the partition helps the arena. R1 and R2 say
-the arena can be run inside these cells and its per-cell estimates
-identified; R3 and R4 say the object being run inside is fixed and
-described. Whether cell-scoped judging produces better judgments is
-links~2 and~3 of Section~\ref{sec:research-questions}, and it is
-Chapter~\ref{ch:results}.
+None of R1--R4 tests the bet stated at the head of
+Section~\ref{sec:arch-requirements}. R1 and R2 say only that the arena
+can be run inside these cells and that its per-cell estimates are
+identified; R3 and R4 say that the object being run inside is fixed and
+described.
+
+
+%% ---- (was 4_Methodology.tex; merged 2026-07-31) ----
+
+\section{The Arena}\label{sec:arch-arena}
+
+\subsection{What the Arena Is}\label{sec:arch-overview}
+
+\textbf{The arena does not query models.} It re-judges responses that
+were generated and stored earlier, in an evaluation corpus that also
+records each model's selected answer. A run consists of routing
+held-out queries through a frozen snapshot, retrieving two stored
+responses per comparison, and issuing judge calls. No response is
+produced during a run.
+
+The responses were not generated for this thesis either. They come from
+the per-model evaluation archives the MMLU-Pro authors publish
+alongside the corpus \parencite{wang2024mmlupro}, one archive per
+model, each holding that model's selected option and, for most models,
+the reasoning text it produced. Ingestion is one archive at a time, and
+each one has to pass a consensus check on question identity before the
+model is admitted to a run; that check and the exclusions it enforces
+are Section~\ref{sec:exp-rosters} and Appendix~\ref{app:models}.
+
+This is stated first because two later results are unintelligible
+without it. First, a model whose response text was never persisted
+cannot be distinguished downstream from one whose text was. The trace
+accessor never returns an empty string, and synthesises a one-line stub
+from the stored answer instead. That is the mechanism behind the
+capture-gap defect; the measured size of the judge's preference for
+the text-bearing side is Section~\ref{sec:res-capture-gap}. That
+measurement is why the settled roster admits no model whose stored
+output is majority-bare, and why the exclusion policy exists at all.
+The settled roster is tabulated in Appendix~\ref{app:models} with the
+selection criteria, the ten named exclusions, and what its
+accuracy-spread selection gives up in length-matching
+(Section~\ref{sec:disc-debt}).
+Second, because the responses are fixed, the two judging conditions of
+Chapter~\ref{ch:experimental-design} see byte-identical inputs. The
+pairing is stronger than that: the generic arm is a \emph{replay}. The
+cell-scoped arm writes out every $(\text{cell}, \text{pair},
+\text{query})$ triple it scheduled, and the generic arm re-judges
+exactly that list. The two arms therefore differ in the rubric the judge
+was given and in nothing else --- which is also why neither of them
+tests the partition. Both judge the same questions in the same cells,
+and rolling per-cell fits up by pooling sufficient statistics is
+arithmetically identical to fitting once at the domain, so the cell
+structure cancels out of the comparison.
+
+\paragraph{Notation.}
+Let $\mathcal{Q}$ be the corpus of MMLU-Pro queries, partitioned once
+before construction into a construction set $\mathcal{Q}_{\text{con}}$
+and a disjoint evaluation set $\mathcal{Q}_{\text{eval}}$.
+$\mathcal{Q}_{\text{con}}$ is the only query set visible to taxonomy
+construction and to rubric generation; $\mathcal{Q}_{\text{eval}}$ is
+reserved for held-out routing and judging.
+At depth $\ell$ the effective representation of $q_i$ is a fixed
+256-dimensional prefix slice
+$\mathbf{x}_i^{(\ell)} \in \mathcal{S}^{d-1}$.
+The anchor set $\mathcal{A} = \{D_1, \ldots, D_{14}\}$ is in one-to-one
+correspondence with the MMLU-Pro domains; each anchor carries a tree of
+internal nodes and cells $\mathcal{L}(D_k)$, and because every node has
+exactly one parent the sets $\mathcal{L}(D_k)$ partition the cell set
+$\mathcal{L}$. The single-parent property is a result rather than an
+assumption: a polyhierarchical variant was implemented, measured and
+removed, and the evidence that retired it is
+Section~\ref{sec:poly-negative}.
+The \textit{canonical partition}
+$Q_{D_k}^{\text{canonical}} = \{q_i : y_i^{\text{MMLU}} = D_k\}$ is the
+editorial one; the \textit{adapted partition}
+$Q_{D_k}^{\text{adapted}} = \{q_i : \hat{D}(q_i) = D_k\}$ is the one
+construction induces, where $\hat{D}(q_i)$ is the anchor of $q_i$'s
+primary cell. The two coincide only absent cross-domain migration, and
+migration is substantial; the per-domain agreement between them is
+Section~\ref{sec:res-adapted-partition}.
+
+For a set of evaluated models $\mathcal{M} = \{m_1, \ldots, m_M\}$ the
+estimand is a per-cell Bradley--Terry log-strength vector
+$\boldsymbol{\theta}$, and the validation objective is its rank
+agreement with per-cell ground-truth accuracy. The quantity the
+rubric claim is actually about is a \emph{paired contrast} in that
+agreement. $\Delta\rho = \rho_{\textsc{main}} - \rho_{\textsc{c5}}$ is
+the difference in Spearman $\rho$ against ground-truth accuracy between
+the cell-scoped arm and the generic arm on an identical question set,
+computed per domain.
+The decisive threshold once registered on this contrast is withdrawn
+(Section~\ref{sec:exp-metrics}); $\rho$ is reported for continuity
+and per-verdict answer-key agreement carries the contrast.
+
+\paragraph{What a domain's cells are.}\label{par:cell-count}
+Every per-domain statement in this thesis --- cell counts, pool sizes,
+and every paired arena run --- is stated over the adapted partition.
+Each of the 14 anchors sits one level below the root and carries a
+subtree. The leaves of that subtree are the domain's cells: mathematics
+has 11, physics 10, philosophy 3, and the fourteen counts sum to the
+frozen artifact's 87 with none left over and none shared.
+A held-out question enters a domain's run when its primary cell lies
+under that domain's anchor. The MMLU-Pro label the question carries
+plays no part in this. A question labelled Mathematics whose primary
+cell sits under the Physics anchor is judged in the physics run and
+counted as physics everywhere in this thesis.
+The alternative count --- assigning each cell to whichever MMLU-Pro
+category most of its routed questions carry, then counting cells per
+category --- describes the label composition of the tree rather than
+its structure, and gives different numbers: 13 and 12 for mathematics
+and physics against the structural 11 and 10, and 3 for computer
+science against 6. It is not used here. Where an earlier registration
+quoted it, the correction is recorded in
+Section~\ref{sec:res-adapted-partition}.
+
+\paragraph{Multi-membership.}
+A held-out query joins the candidate pool of \emph{every} cell that
+admits it, not only its primary one, subject to those cells lying under
+the run's domain anchor. When a comparison on that query produces a
+verdict, the same verdict is credited to each of those cells. The
+reason is evidence density: a cell's Bradley--Terry fit needs every
+model pair to appear in \emph{that cell}, and restricting each query to
+one cell leaves small cells with sparse comparison graphs.
+The cost is that the cells' verdict sets overlap, so per-cell estimates
+are not independent of one another and the domain-level pooled counts
+double-count any query admitted by more than one cell in the same
+domain. Nothing in this thesis corrects for that; it is the reason the
+aggregate standard error of
+Section~\ref{sec:meth-aggregation} is a lower bound rather than an
+estimate.
+
+\subsection{Judge Design}\label{sec:arch-judge}
+
+Each cell carries a rubric induced once per frozen snapshot. The rubric
+is generated by a MapReduce procedure over the cell's construction-pool
+queries: packs of $k = 25$ queries are presented to a strong LLM
+together with their MMLU-Pro reference answers and prompted for the
+quality principles that separate correct from incorrect responses for
+queries of that type; a reduce call consolidates the per-pack principle
+lists into one ranked, cell-specific rubric. Rubrics are stored with
+the snapshot, so every arena run against a snapshot uses identical
+criteria.
+
+\textbf{Held-out queries never enter rubric generation, and this is
+audited rather than asserted.} The induction pool is filtered against
+the reserved set, and the filter is accompanied by an assertion that
+recomputes the membership test independently and \emph{fails the build}
+if the two disagree. This is the strongest information-separation
+guarantee in the system.
+
+A second filter sits in the same path and is a weakness rather than a
+guarantee. Before anything else happens, the induction pool is thinned
+by a hash filter --- a query is kept when the absolute value of its
+text hash is not divisible by five --- so roughly four queries in five
+survive and a cell's rubric is induced from a sample of its
+construction queries.
+That has a cost, and the rubric is the treatment this thesis is about. A cell's \emph{shape} is decided by
+all of its construction queries; its \emph{rubric} is written from
+about four in five of them. Since only $70\%$ of the corpus reaches
+construction to begin with, a little over half of a topic's questions
+ever inform the rubric that will be used to judge it.
+MMLU-Pro is deliberately varied inside each top-level domain, and a
+cell is the narrowest slice of that variety the corpus offers; the
+queries the filter drops are the ones that would have raised the
+failure modes nobody else in the cell raises. A rubric written without
+them will not weight those failure modes, and can over-weight whatever
+the surviving sample happens to emphasise. Nothing in this thesis
+measures how far any particular rubric moved because of it, so this is
+named as a limitation on the rubric's scope rather than bounded.
+
+\paragraph{What the judge is sent.}
+At judging time each comparison $(m_i, m_j, q, L)$ becomes a system
+prompt and a user prompt. The system prompt has three parts in order:
+cell $L$'s generated judge persona, then a shared structural block
+covering bias suppression, the four-step evaluation order, tie rules
+and the output schema, then cell $L$'s rubric. The cell-specific
+material therefore brackets the shared template. The user prompt holds the question, Model~A's
+response, Model~B's response, and the output instructions.
+Each comparison is issued twice with the presentation order swapped; a
+verdict counts as consistent when both calls name the same winner, and
+a disagreement is recorded as \texttt{TIE}, so positional
+disagreement enters the sufficient statistics as an explicit tie
+rather than as noise.
+
+\paragraph{What the judge does and does not see.}
+The judge is \emph{answer-key-blind}. The prompt-construction function
+takes exactly the question, response~A and response~B; there is no
+answer-key parameter on the path, and an assertion fails the call if
+the rendered question contains a ground-truth block. The stored correct
+answer is never read on the judging path.
+The judge is \emph{not} answer-blind, for two reasons.
+Under \texttt{OPTIONS} mode, which every earlier run
+used, the question is rendered with its multiple-choice options
+attached, so a judge capable of solving the item can solve it. Under
+\texttt{RESOLVED} mode, which the settled batch uses, the options block
+is withheld --- but $97.6\%$ of the stored traces end by declaring the
+answering model's own selected option, so the two candidate answers
+remain legible in the responses themselves
+(Appendix~\ref{app:judge-generation}). A judge that can solve the item
+can therefore verify both responses against its own solution without
+being told the key. Chapter~\ref{ch:results} reports that this is what
+it does, and Chapter~\ref{ch:discussion} treats it as a boundary
+condition on the architecture rather than as a defect of it.
+
+Four further properties of the judging path affect how verdicts should
+be read.
+
+\begin{enumerate}
+\item The verdict schema carries a numeric \texttt{confidence}
+alongside the winner, and a gate exists that would rewrite verdicts
+below a threshold into ties. It is described here because the field
+appears in every export, and a reader who saw it there would reasonably
+assume it had filtered something. It did not: the gate is set to zero
+in every paired configuration, and every confidence the pipeline
+produces is at least zero, so no verdict was ever rewritten. That was
+forced rather than chosen --- the generic arm emits a
+near-constant confidence, so any non-zero gate would filter one arm and
+not the other and the two would stop being paired. No result in this
+thesis depends on the field.
+\item Consolidated confidence is forced to $0.5$ whenever the two
+presentation orders disagree, and is capped at $0.95$ otherwise.
+\item A post-hoc adjustment rewrites a pair's win counts when the order
+asymmetry of its verdicts exceeds $0.3$ with at least six comparisons.
+It replaces both win counts with the order-averaged value and leaves
+the tie count and the comparison count alone. This is a correction
+applied to the sufficient statistics, not to the verdicts, and it runs
+before every fit.
+\item A verdict that cannot be parsed is dropped silently: it touches
+no statistic and no export row, and there is no counter for it, so the
+realised comparison count is a lower bound on the calls issued.
+\end{enumerate}
+
+\subsection{Scheduling and Stopping}\label{sec:meth-scheduling}
+
+The arena has a fixed judge budget and many more possible comparisons
+than it can afford: at eight models and eleven cells there are 308
+distinct (cell, pair) slots before any query is chosen. The scheduler
+decides which comparisons to buy. Figure~\ref{fig:scheduling} is the
+loop; the rest of this subsection describes each stage.
+
+\begin{figure}[htbp]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+  node distance=4mm,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=4pt,
+              minimum height=8mm, text width=31mm},
+  small/.style={font=\scriptsize, align=left, text width=45mm},
+  ->, thick
+]
+
+\node[box] (boot) {\textbf{1. Bootstrap floor}\\\scriptsize one comparison for\\\scriptsize every (cell, pair)};
+\node[box, below=7mm of boot] (quota) {\textbf{2. Batch quotas}\\\scriptsize each cell's share $\propto$\\\scriptsize its query-pool size};
+\node[box, below=7mm of quota] (pick) {\textbf{3. Pick a comparison}\\\scriptsize rank-adjacent pair,\\\scriptsize least-used query};
+\node[box, below=7mm of pick] (judge) {\textbf{4. Judge}\\\scriptsize two orders, one verdict\\\scriptsize per admitting cell};
+\node[box, below=7mm of judge] (fit) {\textbf{5. Refit each cell}};
+\node[box, below=7mm of fit] (gate) {\textbf{6. Per-cell gate}\\\scriptsize retire a pair in \emph{this}\\\scriptsize cell if $|\theta_i-\theta_j| > 2.5\sigma$};
+\node[box, below=7mm of gate] (stop) {\textbf{7. Stop?}};
+
+\foreach \a/\b in {boot/quota, quota/pick, pick/judge, judge/fit, fit/gate, gate/stop}
+  \draw (\a) -- (\b);
+
+\draw (stop.west) -- ++(-9mm,0) |- node[pos=0.25, left, font=\scriptsize] {no} (quota.west);
+
+\node[box, right=14mm of stop] (end) {run ends};
+\draw (stop) -- node[above, font=\scriptsize] {yes} (end);
+
+\node[small, right=8mm of boot]  {makes every cell's comparison\\graph complete before any\\adaptivity can shape it};
+\node[small, right=8mm of quota] {a cell holding $5.6\%$ of the\\domain's questions should not\\contribute $10\%$ of the evidence};
+\node[small, right=8mm of pick]  {adjacent pairs are the closest\\ones, so they are where a\\comparison can still change\\the order};
+\node[small, right=8mm of gate]  {a pair settled in one cell keeps\\being sampled in another until\\that cell settles it too};
+\node[small, below=3mm of end, text width=44mm]
+  {round cap reached, a weighted $70\%$\\of cells converged, or an empty batch};
+
+\end{tikzpicture}
+\caption[The scheduling loop]{One round of the arena. The bootstrap
+runs to completion before step~2 begins and does not repeat. A pair is
+terminal inside a cell when an exact binomial test on that cell's
+counts rejects $p = 0.5$ after Bonferroni correction over the adjacent
+pairs tested, when its per-cell budget is spent, or when the gate at
+step~6 retires it in that cell}
+\label{fig:scheduling}
+\end{figure}
+
+\paragraph{The bootstrap floor.}
+Before any adaptive scheduling, every (cell, pair) slot receives one
+comparison. The floor is per (cell, pair) rather than global. A global
+floor --- one comparison per pair anywhere in the domain --- leaves the
+domain-level comparison graph complete while individual cells stay
+sparse, and every per-cell quantity in this thesis rests on those
+per-cell graphs. One comparison per pair per cell is enough to make
+each cell's graph complete rather than merely connected, which is what
+per-cell estimation needs, and it costs $\text{pairs} \times
+\text{cells}$ calls: 308 at eight models and eleven cells. Bootstrap
+tasks round-robin over cells so a run stopped early has balanced
+coverage, and the query is rotated across the cell's pool by a
+per-cell offset, so consecutive bootstrap tasks take consecutive
+questions instead of all 28 pairs judging the same one. When the
+bootstrap completes, an assertion checks that no model has zero
+comparisons and aborts rather than fitting an unidentified ranking.
+
+\paragraph{Batch quotas.}
+Each round has a batch size, and each cell's quota within it is
+proportional to that cell's held-out pool size, floored at one so no
+cell is starved out of a batch entirely. Equal-per-cell allocation was
+the earlier rule and it distorted the domain estimate: on physics each
+of the ten cells took $9.2$ to $11.3\%$ of the comparisons while
+holding $5.6$ to $17.8\%$ of the questions. That is defensible for a
+per-cell fit, whose cost does not scale with cell size, and wrong for
+the domain fit, which pools sufficient statistics and therefore weights
+a cell by its comparison count. When quotas are filled and the batch is
+not, the batch comes back short: topping it up from whichever cell
+still has work would re-introduce exactly the over-weighting the
+quotas remove.
+
+\paragraph{Choosing a pair and a query.}
+Within a cell, models are ordered by their current fitted
+Bradley--Terry strengths and only rank-\emph{adjacent} pairs are
+sampled. Adjacent pairs are the closest by construction, so they are
+where an extra comparison can still change the order; a pair separated
+by several places is already decided. Among the adjacent pairs the
+scheduler takes the one whose confidence interval still straddles a
+coin flip by the widest margin. Ordering on fitted strengths rather
+than on summed win rates matters early in a run, when most pairs carry
+one comparison and a win-rate order is dominated by coin flips, which
+makes the adjacency set churn between rounds.
+The query is then chosen inside that pair by two rules. Queries where
+the two models gave \emph{different} stored answers are preferred,
+because a comparison in which both models answered identically carries
+little signal. Among those, the query judged fewest times anywhere in
+the cell is taken, with ties broken by query identifier so the
+selection is deterministic at a fixed seed. The least-used rule spreads
+a cell's budget over its pool; the earlier rule, lowest unused
+identifier per pair, let all 66 pairs in a cell converge on the same
+handful of questions.
+
+\paragraph{When a pair is finished, and when the run is.}
+A pair is terminal inside a cell under any of three conditions.
+An \emph{exact two-sided binomial test} of that pair's within-cell wins
+against $p = 0.5$ rejects at $\alpha = 0.05$ after Bonferroni
+correction over the $M - 1$ adjacent pairs actually tested, with a
+minimum of five comparisons. Ties enter the test at half weight and are
+rounded to the nearest whole win count, which pushes the statistic
+toward $n/2$ and away from significance.
+Or its \emph{per-(cell, pair) budget} is spent. That budget is sized
+from the cell's own pool, $\lfloor n/4 \rfloor$ clamped to $[8, 25]$,
+so a large cell is not rationed by the smallest cell in the domain. The
+floor of 8 keeps the binomial test reachable --- a pair one model wins
+outright resolves at 9 comparisons under the Bonferroni correction ---
+and the ceiling of 25 stops a large cell spending budget on a pair
+already decided.
+Or the \emph{confidence gate} retires it. At the start of every round
+each cell's pairs are tested against that cell's own $\theta$ and
+standard errors, and a pair is retired in that cell when
+$|\theta_i - \theta_j| > 2.5\max(\sigma_i, \sigma_j)$. The gate is
+keyed \texttt{cell|modelA|modelB} and is recomputed from scratch each
+round. It used to be keyed on the pair alone and fed from the pooled
+leaderboard, which retired a pair in every cell at once on the strength
+of the pooled result --- that assumes the null the per-cell arena
+exists to test, and Section~\ref{sec:res-runs} reports what it did to
+one run.
+
+A run ends when the round counter reaches its cap, when a size-weighted
+$70\%$ of cells are converged, or when the scheduler returns an empty
+batch because every pair is terminal or budget-exhausted. Which of
+these ended each run is recorded with the run.
+
+Two properties of the scheduler bear on how results must be read.
+First, \textbf{it over-samples uncertain pairs}, so mid-ranked models
+face harder average opposition than a uniform design would give them.
+Win-rate ignores opponent strength and is therefore biased by this;
+Bradley--Terry $\theta$ is not, and Chapter~\ref{ch:results} quotes
+$\theta$ throughout. Second, \textbf{the generic arm is stopped
+at the cell-scoped arm's comparison count} rather than run to its own
+convergence rule. An arm with less evidence has a noisier fit and a
+depressed $\rho$, so any difference in arm size biases the contrast
+toward whichever arm got more data. Matching the counts removes the
+threat by construction.
+
+\subsection{Bradley--Terry Estimation}\label{sec:meth-bt}
+
+Nothing in this subsection is new. The model, the estimator, the tie
+handling and the prior are standard choices taken from the
+Bradley--Terry literature, and they are set out in full because the
+numbers they produce are read closely later, and because two of them
+have to be defined before the standard errors below make sense.
+
+The Bradley--Terry model assigns each model $m_i$ a latent strength
+$s_i$ with $P(m_i \succ m_j) = \sigma(s_i - s_j)$
+\parencite{bradley1952rank}. Only differences of strengths are
+observable, so the zero-sum constraint $\sum_i s_i = 0$ is imposed to
+fix the one degree of freedom the data cannot see; it is re-enforced
+after every update sweep.
+Ties contribute a half-win to each side, so $W_{ij} + W_{ji} = N_{ij}$
+and a draw needs no parameter of its own. The alternative would be a
+Davidson tie-propensity term, an extension of Bradley--Terry that gives
+draws their own fitted parameter \parencite{davidson1970ties}. It is not fitted here. The cost of
+that choice is measured rather than assumed: rule~D5 of
+Section~\ref{sec:meth-discipline} exists because how a tie is scored
+moves Spearman $\rho$ by a visible amount, which is why every $\rho$ in
+this thesis is reported under both conventions.
+
+The estimator is the Minorisation--Maximisation update of
+\textcite{hunter2004mm}, an iterative scheme that maximises a simple
+lower bound on the likelihood at each step, written in the
+exponentiated parameters $\pi_i = e^{s_i}$:
+\[
+\pi_i^{(t+1)} \;=\;
+\frac{W_i}{\displaystyle\sum_{j \neq i}
+\frac{N_{ij}}{\pi_i^{(t)} + \pi_j^{(t)}}},
+\qquad W_i = \sum_{j \neq i} W_{ij},
+\]
+applied as a simultaneous (Jacobi) sweep over all models. Iteration
+stops at a tolerance of
+$\max(10^{-6},\, 0.01\,\widehat{\mathrm{SE}}_{\text{lb}})$ or at a cap
+of 200 sweeps.
+
+A Jeffreys prior is applied on top of the counts. The Jeffreys prior
+for a binomial probability is the $\mathrm{Beta}(0.5, 0.5)$
+distribution, the standard uninformative choice; adding it here amounts
+to giving a pair half a phantom win in each direction before the fit
+runs. Its purpose is to keep a fitted win probability away from $0$ and
+$1$ when one model has swept a pair, which is the case where the
+likelihood has no interior maximum and the strength difference would
+otherwise run off to infinity.
+It is applied only to pairs that already carry at least one real
+comparison. Pairs with no data are left untouched, so the prior
+regularises estimates rather than manufacturing edges in the comparison
+graph, and the identifiability check runs on the observed counts alone.
+
+\paragraph{Per-cell standard errors.}
+$\hat{\sigma}_i = \sqrt{[\mathcal{I}(\hat{\mathbf{s}})^{-1}]_{ii}}$ is
+taken from the full observed Fisher information. The zero-sum
+constraint makes $\mathcal{I}$ rank-deficient by one, and the
+implementation does not use a pseudoinverse: it inverts the
+rank-completed matrix $\mathcal{I} + \mathbf{1}\mathbf{1}^{\!\top}$ and
+then removes the completion term, which requires subtracting $1/K^{2}$
+from each diagonal entry. A variance floor of $10^{-6}$ and a standard
+error floor of $0.01$ are applied, the second of which binds first.
+
+\textbf{One correction, and what it left behind.}
+The implementation subtracted $1/K$ rather than $1/K^{2}$; the code
+has since been fixed, but \emph{no Bradley--Terry standard error this
+system stored before the fix is a measurement} --- every pre-fix value
+is either clamped at the floor or understated. The consequence is a
+restriction on what gets printed: \textbf{no Bradley--Terry confidence
+interval appears anywhere in this thesis}, because the pre-fix
+intervals are not measurements, the post-fix ones were never
+recomputed, and nothing claimed here needs one --- every bracketed
+range reported is an interquartile range and says so. The derivation
+and the damage census are in Appendix~\ref{app:numerics} and the debt
+register (Section~\ref{sec:disc-debt}); the correction is recorded in
+the corrections register (Appendix~\ref{app:corrections-register}).
+
+\paragraph{Identifiability.}
+Bradley--Terry parameters are identified only up to an additive
+constant per connected component of the comparison graph, so a cell
+whose graph is disconnected yields incomparable sub-scales. The
+per-(cell, pair) bootstrap of Section~\ref{sec:meth-scheduling} is what
+addresses this: one comparison per pair per cell makes each cell's
+graph complete, which is a stronger condition than connected. The
+guarantee holds only for cells the bootstrap reached; a cell whose
+held-out pool is empty is excluded from the run.
+
+\subsection{Aggregation to Domains}\label{sec:meth-aggregation}
+
+Domain-level rankings pool cell-level sufficient statistics and refit,
+\[
+W_{ij,D_k} = \sum_{L \in \mathcal{D}(D_k)} W_{ij}^{(L)},
+\qquad
+N_{ij,D_k} = \sum_{L \in \mathcal{D}(D_k)} N_{ij}^{(L)},
+\]
+followed by a single fresh MM fit.
+Cell-level parameters are never averaged. Bradley--Terry identification
+is fixed only up to a per-component additive constant, so averaging
+differently normalised cell scales produces no interpretable quantity,
+whereas pooling counts and refitting yields a single shared scale. The
+cell-average ranking is still computed, but only as a diagnostic that
+logs a warning when it disagrees with the pooled order.
+
+Two cells are excluded from the pool. A cell with fewer than five total
+comparisons is dropped, and so is a cell where the judge agreed with
+the answer key on under half of the decidable matches it saw.
+
+The domain-level standard error is an inverse-variance combination of
+the per-cell Fisher standard errors,
+\[
+\mathrm{SE}_{i,D_k} \;=\;
+\Big(\textstyle\sum_{L \in \mathcal{D}(D_k)} \hat{\sigma}_{i,L}^{-2}\Big)^{-1/2},
+\]
+clamped to $[10^{-3}, 10]$. This replaced a query-level bootstrap that
+resampled the domain's queries and refitted. The bootstrap was not
+producing a usable number: on the mathematics re-run it returned
+$0.0010$ for all twelve models against $0.4642$ from the
+inverse-variance combination, a factor of $464$, and its own guard
+marked every run unreliable as a result.
+The replacement has a known bias and it goes the wrong way for comfort.
+Inverse-variance pooling assumes the cell-level estimates are
+independent. They are not, because multi-membership puts the same query
+in several cells, so $\mathrm{SE}_{i,D_k}$ is a \emph{lower bound} on
+the true uncertainty. It is used to order and to gate, never to print
+an interval.
+
+Pooling has a consequence for the partition comparison of
+Section~\ref{sec:res-c5} that must be stated where a reader will see
+it: under pooling, the partition affects only \emph{which rubric judged
+each verdict}, not how the verdicts combine. The two arms of that
+comparison are identical in estimation by construction, so any
+difference between them is attributable to the rubric rather than to
+the roll-up.
+
+\paragraph{Mechanisms with no implementation.}\label{sec:meth-not-implemented}
+Several mechanisms described in earlier design documents for this
+system --- per-pair and per-cell state machines, a global escape valve,
+fractional multi-cell weighting, and five others --- have no
+implementation. None is load-bearing: every result in
+Chapter~\ref{ch:results} was produced by the system as described above
+and would be unchanged if these mechanisms were deleted from the design
+documents. They are named because the design documents are part of this
+project's record, and a reader comparing them against the running
+system would otherwise have to work out which parts were built.
+Appendix~\ref{app:not-implemented} inventories them.
+
+\section{Validation Against the Answer Key}\label{sec:meth-validation}
+
+Ground-truth per-domain accuracy
+$A_{i,D_k} = |\{q \in Q_{D_k} : m_i(q) = y_q^{\text{MMLU}}\}| /
+|Q_{D_k}|$
+is computed strictly after every verdict has been recorded and is used
+only for external, post-hoc validation. $Q_{D_k}$ is the set of
+held-out questions whose primary cell lies under the domain's anchor,
+so it is a partition of the judged set even though the cells inside a
+domain overlap.
+
+Two statistics are reported against it.
+
+The \emph{primary} judge-side statistic is per-verdict agreement
+between the judge's winner and the answer key, counted only on
+\emph{decidable} matches --- those where exactly one of the two models
+answered correctly. When both are right or both are wrong the key says
+``tie'', which is the key declining to rank rather than a judgement
+about response quality. Counting those as agreement checks scores the
+judge against a reference that mostly abstains, and pins the
+exact-match rate near $0.45$ regardless of how good the judge is. On
+decidable matches the statistic is what it claims to be: the rate at
+which the judge picks the model that actually answered correctly. It is
+a proportion over thousands of verdicts.
+% RESOLVED 2026-07-31: the exported agreement path (judgeAccuracyAgreement)
+% now records decidable comparisons only; verified against an independent
+% recomputation on a re-run of philosophy (0.7520 == 0.7520).
+
+The \emph{secondary} statistic is Spearman $\rho$ between the fitted
+$\boldsymbol{\theta}$ and $\mathbf{A}$, which is a rank correlation
+over the model count and is therefore heavily quantised. The grid
+derivation and the reporting rules that follow from it, including the
+requirement that every $\rho$ be reported under both tie conventions,
+are in Section~\ref{sec:exp-metrics}.
+
+\section{Methodological Assumptions}\label{sec:meth-assumptions}
+
+Table~\ref{tab:meth-assumptions} lists the assumptions the method rests
+on, what would go wrong if each failed, and the diagnostic that would
+show it.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Methodological assumptions, failure modes, and diagnostics.}
+    \label{tab:meth-assumptions}
+    \begin{tabular}{p{3.4cm}p{4.4cm}p{4.4cm}}
+        \toprule
+        Assumption & Why it might fail & What would detect it \\
+        \midrule
+        Directional geometry reflects semantic compatibility
+        & Embedding direction encodes surface form rather than task
+        content
+        & The chance-corrected separation score against its two nulls
+        (Section~\ref{sec:arch-requirements}) \\
+        \addlinespace
+        One directional component suffices per node
+        & A node holds two distinct sub-topics at comparable mass
+        & The min-pair separation gate at split time \\
+        \addlinespace
+        Bradley--Terry transitivity holds locally within a coherent cell
+        & Cyclic dominance survives even inside a cell
+        & Per-cell fit residuals; pairwise-winner accuracy \\
+        \addlinespace
+        The judge is reliable under domain conditioning
+        & Rubric conditioning shifts verdicts without improving them
+        & The generic-judge and generic-rubric arms
+        (Section~\ref{sec:res-c5}) \\
+        \addlinespace
+        Cells carry different true model rankings
+        & The corpus is saturated for the roster, so cell identity adds
+        nothing to global capability ordering
+        & The pre-registered granularity analysis
+        (Section~\ref{sec:res-granularity}) \\
+        \addlinespace
+        Comparisons are independent given the Bradley--Terry parameters
+        & Query reuse and multi-membership induce dependence
+        & None applied; the Fisher standard errors treat comparisons as
+        independent and therefore understate uncertainty \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Three of these are load-bearing, and none of the three survived intact.
+The judge-reliability assumption is the one RQ1 is about, and
+Section~\ref{sec:res-judge} reports what the judge actually conditions
+on. The assumption that cells carry different true rankings is the
+premise of the original second research question, and
+Section~\ref{sec:res-granularity} reports it as refused under
+pre-registration. The independence assumption is violated and nothing
+in this thesis corrects for it. The Fisher standard errors are
+optimistic by an unmeasured margin, and the inverse-variance
+combination that produces the domain-level figure inherits the same
+optimism. This costs little in practice, because the headline quantity
+is a paired contrast and no interval is reported.
+
+\section{Measurement Discipline}\label{sec:meth-discipline}
+
+This section states five rules about how a measurement in this thesis
+must be produced and reported. They are not general methodological
+advice. Each one is here because this project broke it at least once,
+got a wrong answer, and only then wrote the rule down, so each is given
+together with the failure that produced it. A rule stated with the
+error behind it can be checked; a rule stated as foresight has to be
+taken on trust. And Chapter~\ref{ch:results} reports several nulls, and
+a null carries information only if the reader knows what would have
+counted as an effect.
+
+\textbf{D1 --- A test that cannot fail is not a test.}
+Before running a check, ask what result would falsify it; if the answer
+is ``none available'', a clean result carries no information.
+Instance: the corpus validator has a \texttt{TRACE\_PRESENCE} check
+that measures whether a model's stored responses contain reasoning
+text, and that check has \emph{no failure branch at all} --- it is
+advisory, and a model with zero stored reasoning is admitted. Six of
+the ten models the system hard-excludes by name are excluded for
+exactly the condition that check measures and declines to act on; the
+resulting policy is a curated list, not a threshold
+(Section~\ref{sec:exp-rosters}).
+% MOVED-CANDIDATE (D1, second instance; was a footnote here --
+% relocate to the corrections register): A second instance: an audit
+% that classified every identifier column by set membership against
+% every known identifier space returned approximately $100\%$
+% everywhere, because these are dense small-integer ranges over one
+% corpus. The spaces coincide as sets while disagreeing about which row
+% each value points to.
+
+\textbf{D2 --- Report a join's overlap before reporting the join's
+result.}
+A join with little key overlap produces a clean-looking null
+indistinguishable from a real one, so any analysis concluding ``no
+effect'' must first report the number of join groups that could have
+shown an effect.
+Instance, and the one that reached the results: the corpus's
+\texttt{mmlu\_pro.id} is not the evaluation table's
+\texttt{question\_id}. The numeric join between them succeeds, returns
+well-formed rows, and is wrong. It is what collapsed the law domain
+from 287 questions to 20 and inverted a domain recommendation
+(Section~\ref{sec:res-law}). Joins in this project go through query
+text.
+% MOVED-CANDIDATE (D2, second instance; was a footnote here --
+% relocate to the corrections register): An earlier instance: a design
+% change was made on measured evidence of ``0 of 36 rescues''. The join
+% was on an iteration counter that one code path hardcoded to $-1$, so
+% the numerator was structurally impossible; the mixed-group count was
+% $0$ of $613$ before the defect was fixed and $97$ of $613$ after ---
+% a single figure that would have caught it at no cost. The corrected
+% join gives 3 rescues in 404, and a subsequent run refuted the change.
+
+\textbf{D3 --- Report a median with its interquartile range, and claim
+only what the spread supports.}
+Instance: $\mathrm{SE}(\Delta J)$ varies by more than an order of
+magnitude across sites on this corpus
+(Section~\ref{sec:res-construction}), which is the entire reason the
+acceptance gate is expressed in standard-error units.
+% MOVED-CANDIDATE (D3, second instance; was inline here -- relocate to
+% the corrections register): Instance: the acceptance gate's apparent
+% dispersion degradation --- a coefficient of variation that rose
+% mechanically because the mean fell, initially read as a real change
+% --- which dissolves under this rule; the full statistical reading is
+% reported with the result (Section~\ref{sec:res-construction}).
+
+\textbf{D4 --- A threshold derived for one quantity at one stage does
+not transfer.}
+Instance: a single separation constant served split acceptance,
+component selection, sibling merging and the global proposal gate;
+because one of those gates weights its divergence by the fitted
+concentration, the same constant meant about $8.1^{\circ}$ of angular
+tolerance at freshly split nodes and under $0.7^{\circ}$ at deep
+ones, which is why it almost never fired.
+% MOVED-CANDIDATE (D4, second and third instances; was a footnote here
+% -- relocate to the corrections register): Two further instances. A
+% second constant served both as a \emph{level} (``is this partition
+% separated at all?'') and as a \emph{difference} (``does one more
+% cluster buy enough over the last?''); these are different quantities
+% and were decoupled into separate fields. A third, a float tolerance,
+% serves simultaneously as a per-edit acceptance band and as a
+% per-iteration fixed-point tolerance; the acceptance half has since
+% been replaced by the standard-error gate, and the certificate half
+% still borrows a constant derived for the other question.
+
+\textbf{D5 --- Report a rank correlation under both tie conventions.}
+This rule is newer than the other four and was forced by the results of
+Section~\ref{sec:res-tie-policy}. Half-weighting ties and dropping tied
+comparisons are both defensible, and on the same verdict set they move
+Spearman $\rho$ by up to $\pm0.029$ in a direction that is not
+consistent across conditions. On one paired contrast the two
+conventions disagree about which arm is ahead by more than the
+registered decisive threshold. That threshold has since been withdrawn
+(Section~\ref{sec:exp-metrics}), and the observation survives it: a
+single $\rho$ from this pipeline is not a result.
+
+\section{Persistence and Reproducibility}\label{sec:arch-infra}
+
+\textbf{What the seed does.}
+A run takes one integer. It is the only randomness the pipeline takes
+from outside itself --- wherever else a shuffle or a sample appears,
+its generator is keyed off the data it is shuffling and is therefore
+fixed once the data is --- and it drives two things.
+First, the split: the corpus is shuffled inside each of the 14
+MMLU-Pro categories and cut $70/30$, so the seed decides which
+questions the construction and the rubrics are allowed to see and which
+are held out for judging.
+Second, arena scheduling: the offsets the bootstrap phase walks across
+each cell's query pool.
+Everything between those two points is deterministic. The directional
+fits at each candidate split have no random initialisation, and the
+acceptance gates are arithmetic on the fitted quantities, so a fixed
+seed and a fixed commit rebuild the same tree --- the same node and
+cell counts, the same queries in the same cells, and the same accepted
+separations. That is what ``reproducible'' means here, and it has been
+checked rather than assumed: a rebuild from the same configuration
+reproduced the then-frozen artifact's cell partition exactly, and all
+50 of its accepted-split separations to nine decimal places.
+The claim stops at the partition. Two fields of the fixed-point
+certificate move in the last few digits between two runs of the same
+commit at the same seed, because routing is parallel and floating-point
+addition is not associative; they are bounded rather than
+bit-identical, and Chapter~\ref{ch:results} says so where the
+certificate is reported.
+
+What the seed does \emph{not} do is make a result seed-independent. It
+fixes which of the possible constructions the thesis is talking about;
+it says nothing about whether a different draw would have given a
+different one. The run-to-run spread that leaves is a real limitation
+and is reported under R3 (Section~\ref{sec:res-construction}). Every
+construction and arena result in this thesis is at seed 42.
+
+State is partitioned across four SQLite stores with distinct write
+lifecycles: the embedding cache, the MMLU-Pro corpus with its per-model
+stored evaluations, the snapshot store, and the ratings store. Only
+frozen snapshots are eligible as arena inputs and a frozen snapshot is
+read-only, and every verdict row carries the snapshot identifier, so
+the taxonomy a verdict was produced under is always recoverable.
+
+Any result is specified by the tuple
+\texttt{(corpusVersion, snapshotId, runId)}, and per-run seeds and
+realised call counts are recorded in a manifest emitted with each run.
+Two qualifications belong with that claim. The manifest's
+working-tree-clean flag does not distinguish a modified source file
+from a modified thesis file, so it fires on benign conditions and
+should not be read as a reproducibility guarantee on its own. And
+\texttt{ratings.db} is keyed by snapshot and condition in a way that
+makes a re-run of the same condition \emph{clear} the previous rows
+rather than accumulate beside them; the results of
+Chapter~\ref{ch:results} were preserved by copying the store before
+each subsequent run.
