@@ -55,7 +55,10 @@ SLICE = 256
 SEED = 20260731
 
 def ro(name):
-    return sqlite3.connect("file:%s?mode=ro" % os.path.join(ROOT, name).replace("\\", "/"),
+    p = os.path.join(ROOT, name)
+    if name == "snapshots.db" and not os.path.exists(p):  # clone fallback
+        p = os.path.join(ROOT, "snapshots_frozen.db")
+    return sqlite3.connect("file:%s?mode=ro" % p.replace("\\", "/"),
                            uri=True)
 
 INT32 = 0xFFFFFFFF

@@ -122,11 +122,10 @@ testing/
 
 # Ratings-store variants (backups, secured copies, trials) and secured export folders
 *.db.*
-*_secured/
+*_secured/*
+!*_secured/MAIN_thesis_metrics.csv
 
-# Regenerable analysis exports and tuning run outputs
-model_domain_scores.csv
-reserved_leaf_assignments.csv
+# Regenerable tuning run outputs
 tuning/runs/*/output/
 
 # Temporary and state output files
@@ -146,3 +145,6 @@ eval_results/
 !experiment_results/**/*.db
 !/ratings.db
 !frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json
+
+# Frozen-snapshot extract for replication (full snapshots.db stays local-only)
+!/snapshots_frozen.db

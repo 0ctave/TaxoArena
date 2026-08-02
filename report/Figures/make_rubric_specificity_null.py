@@ -28,6 +28,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(HERE, "rubric_specificity_null.pdf")
 MEASURES = os.path.join(ROOT, "build", "rubric_null", "measures_all.json")
+if not os.path.exists(MEASURES):  # committed copy (see experiment_results/rubric_null)
+    MEASURES = os.path.join(ROOT, "experiment_results", "rubric_null", "measures_all.json")
 
 # Registered values this script MUST reproduce.
 PUB_LEAF = dict(n=87, median=0.138, positive=81)

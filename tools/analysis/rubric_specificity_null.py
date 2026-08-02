@@ -100,7 +100,10 @@ def induction_subset(texts, qmode):
 
 
 def load_frozen():
-    con = sqlite3.connect(f"file:{os.path.join(ROOT, 'snapshots.db')}?mode=ro", uri=True)
+    snap_db = os.path.join(ROOT, 'snapshots.db')
+    if not os.path.exists(snap_db):  # clone fallback
+        snap_db = os.path.join(ROOT, 'snapshots_frozen.db')
+    con = sqlite3.connect(f"file:{snap_db}?mode=ro", uri=True)
     row = con.execute("SELECT graph FROM snapshots WHERE id = ?", (FROZEN,)).fetchone()
     if row is None:
         sys.exit(f"frozen snapshot {FROZEN} not found")

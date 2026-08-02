@@ -85,7 +85,8 @@ The verdict is produced **jointly by answer verification and a competence prior*
 | artifact | path |
 |---|---|
 | per-domain ratings + exports | `experiment_results/r8/<domain>/` (see its README) |
-| frozen taxonomy | `snapshots.db`, snapshot `20260727_042523_Headless_Run_Auto_ge` |
+| frozen taxonomy | `snapshots_frozen.db` (committed extract), snapshot `20260727_042523_Headless_Run_Auto_ge` |
+| rubric-null artifacts | `experiment_results/rubric_null/` (committed) |
 | frozen MAIN comparison triples | `frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json` |
 | run configs | `experiment_configs/r8_*.toml`, `verify_agree.toml`, `freeze_mcs55.toml` |
 | construction/freeze record | `experiment_results/freeze_mcs55/`, `canonical_freeze/` |

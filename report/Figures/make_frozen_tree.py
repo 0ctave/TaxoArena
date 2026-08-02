@@ -50,6 +50,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(HERE, "frozen_tree.pdf")
 SNAP_DB = os.path.join(ROOT, "snapshots.db")
+if not os.path.exists(SNAP_DB):  # clone without the full local store
+    SNAP_DB = os.path.join(ROOT, "snapshots_frozen.db")
 SNAP_ID = "20260727_042523_Headless_Run_Auto_ge"
 
 # Structural values this script MUST reproduce.

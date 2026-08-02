@@ -49,6 +49,8 @@ OUT = os.path.join(HERE, "granularity_flat.pdf")
 EVAL_DB = os.path.join(ROOT, "mmlu_pro_dataset_cache_v2.db")
 QUERIES_DB = os.path.join(ROOT, "embeddings_cache.db")
 SNAP_DB = os.path.join(ROOT, "snapshots.db")
+if not os.path.exists(SNAP_DB):  # clone without the full local store
+    SNAP_DB = os.path.join(ROOT, "snapshots_frozen.db")
 
 ROSTER = ["Llama-2-13b-hf", "Llama-2-70b-hf", "Meta-Llama-3_1-70B-Instruct",
           "Qwen1.5-72B-Chat", "claude-3-5-haiku-20241022",

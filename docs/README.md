@@ -36,8 +36,10 @@ documented in `archive/ARCHIVE_MANIFEST.md`.
   with its own README describing the layout.
 - `experiment_configs/` — the run configs; `r8_*.toml` are the settled batch,
   `freeze_mcs55.toml` built the frozen taxonomy.
-- `snapshots.db` — frozen taxonomy snapshots; the settled batch uses
-  `20260727_042523_Headless_Run_Auto_ge` (154 nodes, 87 leaves, max depth 6).
+- `snapshots_frozen.db` (committed, 16 MB) — the frozen taxonomy snapshot the settled
+  batch uses (`20260727_042523_Headless_Run_Auto_ge`, 154 nodes, 87 leaves, max depth 6)
+  plus the two granularity-analysis snapshots. The full local `snapshots.db` is not in
+  git; every script that reads it falls back to the extract automatically.
 - `report/` — the LaTeX thesis.
 
 ## Running
@@ -62,3 +64,20 @@ nomenclature step. If nomenclature *entries* change, regenerate manually first:
 directive ignores its options and processes `main.idx` instead).
 
 `config/application.yml` carries local credentials and is never committed.
+
+## Replication from a clean clone
+
+Results checking needs the repository alone: the settled batch's record
+(`experiment_results/r8/`), the frozen snapshot extract (`snapshots_frozen.db`), the
+rubric-null artifacts (`experiment_results/rubric_null/`), and the analysis inputs
+(`reserved_leaf_assignments.csv`, `model_domain_scores.csv`,
+`*_secured/MAIN_thesis_metrics.csv`, `docs/data/`) are all committed, and every
+`report/Figures/make_*.py` script asserts its published numbers before drawing.
+Scripts that read per-question ground truth, and any re-run of construction or the
+arena, additionally need the two local caches (not in git; construction replication
+from them verified 2026-08-02):
+
+```
+sha256(mmlu_pro_dataset_cache_v2.db) = 9e3328ec4707a44303b2f3e6484face237e86ef13f0986693b670c4e6bd5b8e5
+sha256(embeddings_cache.db)          = a416980286a3a0a5065b58e9c661cd0a2898ccb902ca62b9d6f0415ebe6f8891
+```

@@ -376,3 +376,13 @@ Result reorganisation (not an archive move): the 8-domain batch was grouped unde
 Kept deliberately at root: `eval_results/` (raw model-output source zips), `testing/` (own MANIFEST.md), `logs/` + `snapshots/` (live runtime output dirs), `lancedb/` (machine-local), `reserved_test_queries.json` (live reserved pool), `tune.bat` + `tools/tuning/` + `tuning/` (the L9 screening record cited by thesis Appendix A), and the five `*_secured/` directories (figure-script inputs, see above).
 
 Note on the archived regenerable exports: `reserved_leaf_assignments.csv` is read by `tools/analysis/discriminative_flatness.py` and `leaf_substructure_null.py`, and `model_domain_scores.csv` is written by `export_gt_scores.py` and read downstream. To re-run those offline analyses, either regenerate the CSVs or move them back from `archive/`.
+
+## Sixth pass — 2026-08-02 (replication readiness)
+
+| Item | Reason |
+|---|---|
+| `reserved_leaf_assignments.csv`, `model_domain_scores.csv` restored from `archive/` to root and TRACKED | Three offline analyses the thesis cites read them (`discriminative_flatness.py`, `leaf_substructure_null.py`; `export_gt_scores.py` writes the second); regenerating them needs the 925 MB dataset cache, so they are committed as replication inputs. The archive copies remain. |
+| `snapshots_frozen.db` created and TRACKED (16 MB) | Extract of the three analysis snapshots (frozen 87-leaf, 88-leaf, 152-leaf) from the 263 MB local `snapshots.db`; every script that reads `snapshots.db` now falls back to it, so a clean clone can regenerate all snapshot-dependent figures. |
+| `build/rubric_null/*` copied to `experiment_results/rubric_null/` and TRACKED | Closes the registered "untracked artifacts" reproducibility caveat on the rubric-specificity result; thesis narrative updated, registered addendum text unchanged. |
+| Five `*_secured/MAIN_thesis_metrics.csv` TRACKED (gitignore negation) | Inputs to `make_frozen_tree.py`'s assert-before-draw checks. |
+| `report/Figures/{make_tie_signature.py, tie_signature.pdf, make_routing_provenance.py, routing_provenance.pdf}` deleted from git | Neither figure is referenced by the report any longer; recoverable from git history. |
