@@ -23,7 +23,18 @@ Three documents in [`docs/`](docs/README.md) carry the repository-level story:
 
 The thesis itself (`report/`, LaTeX) is the authoritative account.
 
-## Getting started
+## Checking the results
+
+Checking what the thesis reports needs the repository alone — no credentials, no toolchain.
+The settled batch, the frozen taxonomy extract and the analysis inputs are committed, and
+every `report/Figures/make_*.py` asserts its published numbers before drawing.
+[docs/RESULTS.md](docs/RESULTS.md) is the entry point; the raw record is
+[`experiment_results/r8/`](experiment_results/r8/README.md).
+
+Only two things need more than the clone: figure scripts that read per-question ground
+truth, and any re-run of construction or the arena. Both want the local caches below.
+
+## Running it yourself
 
 Toolchain (pinned for deterministic execution): **JDK Temurin 21** (not ≥ 22; the Mosaic TUI
 bindings require 21), **Kotlin 2.1.10**, **Gradle 8.10** via `./gradlew`, **Spring Boot 3.4.3**.
