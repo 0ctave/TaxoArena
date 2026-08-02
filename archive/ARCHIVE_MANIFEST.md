@@ -386,3 +386,4 @@ Note on the archived regenerable exports: `reserved_leaf_assignments.csv` is rea
 | `build/rubric_null/*` copied to `experiment_results/rubric_null/` and TRACKED | Closes the registered "untracked artifacts" reproducibility caveat on the rubric-specificity result; thesis narrative updated, registered addendum text unchanged. |
 | Five `*_secured/MAIN_thesis_metrics.csv` TRACKED (gitignore negation) | Inputs to `make_frozen_tree.py`'s assert-before-draw checks. |
 | `report/Figures/{make_tie_signature.py, tie_signature.pdf, make_routing_provenance.py, routing_provenance.pdf}` deleted from git | Neither figure is referenced by the report any longer; recoverable from git history. |
+| `docs/report-cut-plan.md` -> `archive/docs/` (untracked from git) | Report-editing working document; docs/ carries only reproducibility material (core docs, registrations, null calibration, data). |
