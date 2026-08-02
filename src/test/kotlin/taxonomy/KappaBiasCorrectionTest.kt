@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory
 import taxonomy.model.GraphNode
 import taxonomy.model.NodeBtState
 import taxonomy.model.NodePairStats
-import taxonomy.service.BtMatchScheduler
-import taxonomy.service.BtMmFitter
-import taxonomy.service.BtStoppingPolicy
+import taxonomy.arena.BtMatchScheduler
+import taxonomy.arena.BtMmFitter
+import taxonomy.arena.BtStoppingPolicy
 import taxonomy.utils.StatisticsUtils
 import taxonomy.dataset.ModelEvalResult
 

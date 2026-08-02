@@ -1,4 +1,4 @@
-package taxonomy.service
+package taxonomy.arena
 
 import taxonomy.model.NodePairStats
 import kotlin.math.abs

@@ -24,7 +24,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @SpringBootTest(
-    classes = [org.eclipse.lmos.arc.app.TaxoAdaptApplication::class],
+    classes = [taxonomy.TaxoAdaptApplication::class],
     properties = [
         "taxoadapt.execution.enable-tui=false",
         "taxoadapt.execution.run-batch=false",

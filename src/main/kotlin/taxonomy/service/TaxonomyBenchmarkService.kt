@@ -1,5 +1,6 @@
 package taxonomy.service
 
+import taxonomy.arena.*
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

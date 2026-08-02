@@ -1,5 +1,6 @@
 package taxonomy.service
 
+import taxonomy.arena.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import taxonomy.model.GraphNode

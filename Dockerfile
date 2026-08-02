@@ -1,6 +1,3 @@
-## SPDX-FileCopyrightText: 2025 Deutsche Telekom AG and others
-##
-## SPDX-License-Identifier: Apache-2.0
 ## Stage 1 : unpack fat-jar
 FROM amazoncorretto:21 as builder
 

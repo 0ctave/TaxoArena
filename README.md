@@ -1,78 +1,47 @@
-<!--
-SPDX-FileCopyrightText: 2023 Deutsche Telekom AG
+# TaxoArena
 
-SPDX-License-Identifier: CC0-1.0    
--->
-# 🌌 TaxoArena: Dynamic Hierarchical DAG Taxonomy for Model Evaluation
+TaxoArena induces a semantic **tree** over MMLU-Pro questions from their embeddings, writes a
+judging rubric for every terminal cell, and runs an LLM-as-a-judge pairwise arena inside those
+cells. It is the system built and tested by the Master's thesis in [`report/`](report/)
+(TU Berlin): the partition is the instrument, and the result is a measurement of the judge.
 
-**TaxoArena** builds a **Dynamic Hierarchical Directed Acyclic Graph (DAG)** taxonomy directly from MMLU-Pro query distributions. Questions are embedded, mapped, and clustered into polyhierarchical domains using spherical statistical modeling. Within this taxonomy, leaf nodes host **LLM-judge** pairwise matchups to maintain local model leaderboards fitted using the Bradley-Terry probabilistic model. The result is a self-organizing, geometrically coherent map of knowledge that doubles as an active model-evaluation arena.
+The construction fits von Mises–Fisher mixtures on the unit sphere, accepts splits through a
+chance-corrected separation gate, and runs to a certified structural fixed point. The frozen
+artifact behind every reported result is snapshot `20260727_042523_Headless_Run_Auto_ge`
+(154 nodes, 87 leaves, J = 0.253129), and the settled arena results live in
+[`experiment_results/r8/`](experiment_results/r8/README.md).
 
----
+## Documentation
 
-## 🚀 Key Features
+Three documents in [`docs/`](docs/README.md) carry the repository-level story:
 
-*   **Self-Organizing Polyhierarchy**: Iteratively groups query embeddings on the unit sphere via von Mises–Fisher (vMF) GMMs, performing PCA bisections validated by Dasgupta split criteria.
-*   **Active Dueling Matchmaker**: Prioritizes model comparisons using expected Shannon entropy and rating uncertainty (Fisher standard errors) to minimize evaluation query budget.
-*   **Bayesian Rating Engine**: Updates model strengths dynamically using confidence-gated Weng-Lin updates, propagating domain-specific wins/losses/ties to ancestor categories.
-*   **Interactive Terminal UI**: A real-time Compose-based TUI console featuring a live benchmark leaderboard, node-specific evaluations, metrics dashboard, and system logs.
-*   **Production-Grade Architecture**: Powered by Spring Boot WebFlux, thread-safe asynchronous Kotlin Coroutine dispatchers, and concurrent SQLite WAL database backends.
+| | |
+|---|---|
+| [docs/README.md](docs/README.md) | Orientation: layout, how to run, build rules |
+| [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md) | The system as built, id-space rules, known defects |
+| [docs/RESULTS.md](docs/RESULTS.md) | The settled 8-domain / 8-model results, with artifact paths |
 
----
+The thesis itself (`report/`, LaTeX) is the authoritative account.
 
-## 📖 Project Documentation
+## Getting started
 
-The complete technical context and mathematical specifications live under the [`docs/`](docs/README.md) directory.
+Toolchain (pinned for deterministic execution): **JDK Temurin 21** (not ≥ 22; the Mosaic TUI
+bindings require 21), **Kotlin 2.1.10**, **Gradle 8.10** via `./gradlew`, **Spring Boot 3.4.3**.
 
-### Quick Sitemap
-*   **[Core Concepts](docs/core-concepts/README.md)**: [Taxonomy DAG Topology](docs/core-concepts/taxonomy-dag.md) & [Data Schemas](docs/core-concepts/data-representations.md)
-*   **[Evolutionary Pipeline](docs/evolutionary-pipeline/README.md)**: [vMF GMM Fitting](docs/evolutionary-pipeline/fitting-vmf.md), [Trickle Routing](docs/evolutionary-pipeline/trickle-routing.md), & [Discovery Splits](docs/evolutionary-pipeline/discovery-optimization.md)
-*   **[Arena Evaluations](docs/arena-evaluations/README.md)**: [Judge Design](docs/arena-evaluations/judge-design.md), [Bradley-Terry fit](docs/arena-evaluations/bradley-terry-fit.md), & [Active Matchmaking](docs/arena-evaluations/active-matchmaking.md)
-*   **[Validation Metrics](docs/metrics-validation/README.md)**: [Clustering](docs/metrics-validation/clustering-metrics.md), [Classification (ECE / H-F1)](docs/metrics-validation/classification-metrics.md), & [Structural Balance](docs/metrics-validation/structural-metrics.md)
-*   **[System Architecture](docs/system-architecture/README.md)**: [Compose TUI Dashboard](docs/system-architecture/tui-dashboard.md), [Spring Engine](docs/system-architecture/spring-integration.md), & [SQLite Concurrency](docs/system-architecture/database-concurrency.md)
+Credentials go in a `.env` file (read by `spring-dotenv`, never committed):
 
----
-
-## 🛠️ Getting Started
-
-### 1. Requirements & Toolchain
-The build is pinned to exact toolchain versions for deterministic execution:
-*   **JDK**: Temurin 21 (Compose-Mosaic layout terminal bindings require JDK 21). *Do not run with JDK ≥ 22*.
-*   **Kotlin**: 2.1.10
-*   **Gradle**: 8.10 (bootstrap via `./gradlew`)
-*   **Spring Boot**: 3.4.3 (WebFlux)
-
-### 2. Configure Environment Secrets
-Create a `.env` file at the root of the project to set your credentials (read automatically by `spring-dotenv`):
 ```bash
-cp .env.example .env
+cp .env.example .env   # then fill in HUGGINGFACE_TOKEN, AZURE_AI_API_KEY, AZURE_AI_ENDPOINT, GEMINI_API_KEY
 ```
-Fill in the values in your `.env` file:
-```env
-HUGGINGFACE_TOKEN=hf_your_huggingface_token
-AZURE_AI_API_KEY=your_azure_api_key
-AZURE_AI_ENDPOINT=https://your-resource.services.ai.azure.com/
-GEMINI_API_KEY=your_gemini_api_key
+
+Common commands:
+
+```bash
+./gradlew test          # test suite (~30 s; slow harnesses live in `./gradlew calibration`)
+./gradlew bootRun       # interactive TUI
+./gradlew bootRun --args="--config experiment_configs/<run>.toml"   # headless run
 ```
-*Note: If Azure credentials are left blank, the system automatically falls back to local Ollama endpoints.*
 
-### 3. Basic Commands
-*   **Build the codebase**:
-    ```bash
-    ./gradlew compileKotlin compileTestKotlin
-    ```
-*   **Execute tests**:
-    ```bash
-    ./gradlew test
-    ```
-*   **Run the application**:
-    ```bash
-    ./gradlew bootRun
-    ```
-
----
-
-## 🤝 Code of Conduct & Licensing
-
-This project follows the [REUSE standard for software licensing](https://reuse.software/). Each file contains copyright and license information, and license texts can be found in the [./LICENSES](./LICENSES) folder.
-
-All contributors must abide by the project's [Code of Conduct](./CODE_OF_CONDUCT.md).
+Construction runs need the two local caches (`mmlu_pro_dataset_cache_v2.db`,
+`embeddings_cache.db`); they are not in git. With them in place, a clean clone reproduces the
+frozen construction exactly (verified 2026-08-02).

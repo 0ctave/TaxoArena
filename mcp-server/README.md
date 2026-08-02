@@ -1,8 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2023 Deutsche Telekom AG
 
-SPDX-License-Identifier: CC0-1.0    
--->
 # MCP Test Server
 
 This is an example MCP server implementation for testing purposes.

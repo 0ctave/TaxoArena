@@ -1,4 +1,4 @@
-package taxonomy.service
+package taxonomy.arena
 
 import taxonomy.model.*
 import taxonomy.dataset.ModelEvalResult

@@ -1,4 +1,4 @@
-package taxonomy.arena
+package taxonomy.controller
 
 import kotlinx.serialization.Serializable
 import org.springframework.web.bind.annotation.*

@@ -1,5 +1,6 @@
 package taxonomy.service
 
+import taxonomy.arena.*
 import org.slf4j.LoggerFactory
 import taxonomy.model.BenchmarkReport
 import taxonomy.model.NodePairStats
