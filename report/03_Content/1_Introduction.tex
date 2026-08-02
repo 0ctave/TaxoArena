@@ -38,8 +38,8 @@ question types and model generations~\parencite{zheng2023judging}.
 Chatbot Arena runs that format at scale, with human voters,
 Bradley--Terry aggregation and a public
 leaderboard~\parencite{chiang2024chatbotarena}. Its prompts are
-free-form and carry no answer key, so a vote \emph{is} the measurement
-and there is nothing to check it against. This thesis judges a corpus
+free-form and carry no answer key, so there is nothing to check a
+vote against. This thesis judges a corpus
 that has a key. Every verdict can therefore be checked, and that turns
 out to decide the result.
 
@@ -59,8 +59,8 @@ and a specific rubric was supposed to make a better judge.
 
 The checks show the judge does not decide that way. It works out which
 answer is correct and picks that side. Across the settled eight-domain
-batch, replacing the cell rubric with a generic prompt leaves the
-ranking unchanged and moves only how often the judge abstains
+batch, replacing the cell rubric with a generic prompt moves only how
+often the judge abstains
 (Section~\ref{sec:res-c5}); questions routed off-subject are judged at
 the same agreement rate as on-subject ones
 (Section~\ref{sec:res-offsubject}); and the tie rate nearly doubles
@@ -88,22 +88,16 @@ had little left to improve. The setting where it could matter ---
 open-ended tasks with no verifiable key --- is exactly the routing
 setting, and it is the one this corpus cannot test.
 
-\section{What a Partition Is For}\label{sec:problem-statement}
+\subsection*{What a partition is for}\label{sec:problem-statement}
 
 \textbf{A cell is a scope for a rubric.} A semantic partition of an
 evaluation corpus is usually a reporting device, deciding which bucket
 each score is written into. Here it does something else, and the
-difference decides what this thesis can claim. Splitting a cell reduces
-the surface over which a judge must generalise, which is the whole
-mechanism.
-
-\textbf{Better prompting does not substitute for it.} A rubric that
-must hold over a heterogeneous cell is under-specified by
-construction, for the reason already stated: the criteria that survive
-the intersection of the whole cell are the ones that discriminate
-least. Enlarging the prompt does not change this. It changes which of
-the heterogeneous cases the extra text is about. Narrowing the cell
-changes what the intersection contains.
+difference decides what this thesis can claim: splitting a cell
+reduces the surface over which a judge must generalise, which is the
+whole mechanism, and no amount of prompt enlargement substitutes for
+it --- narrowing the cell is what changes what the criteria's
+intersection contains.
 
 \textbf{Homogeneity is supposed to buy three things.} First, a rubric
 becomes writable in the sense above. Second, pairwise outcomes within
@@ -161,11 +155,8 @@ assertion checks the filter against the membership test itself
 (Section~\ref{sec:arch-judge}).
 
 Answer-key-blind is not answer-blind, and the difference is
-load-bearing for Chapter~\ref{ch:results}: the responses state their
-own answers ($97.6\%$ of stored traces end by declaring the answering
-model's choice), so a judge able to solve the item can verify both
-sides without ever being told the key. What the judge is shown, mode
-by mode, is Section~\ref{sec:arch-judge}.
+load-bearing for Chapter~\ref{ch:results}; the mechanism, and what
+the judge is shown mode by mode, is Section~\ref{sec:arch-judge}.
 
 \textbf{The title terms.} \emph{Dynamic Domains} refers to boundaries
 seeded from MMLU-Pro labels and then adapted by geometric evidence, so
@@ -309,35 +300,25 @@ Chapter~\ref{ch:discussion} treats the second as a measurement of where
 the architecture binds rather than as a defect.
 
 \textbf{Two --- selected domains.} The arena is a selected-domain
-study, not a global validation. Judge-call budget was spent on a subset
-of the fourteen MMLU-Pro domains at high statistical power rather than
-spread across all of them; the selection rule is in
-Chapter~\ref{ch:experimental-design} and the offline screen that
-applies it in Section~\ref{sec:res-law}. That screen sorts domains by
-whether the roster reorders within them relative to its global
-ordering, and it classifies a domain \emph{aggregate}, which is a
-different quantity from whether cells inside that domain differ from
-each other. It is a coarse filter and not a predictor --- and refit at
-the settled roster it saturates, so the eight domains that ran are
+study, not a global validation: judge-call budget was spent on eight
+of the fourteen MMLU-Pro domains at high statistical power rather
+than spread across all of them (selection rule in
+Chapter~\ref{ch:experimental-design}). Refit at the settled roster,
+the screen behind that selection saturates, so the eight domains are
 read as replications of one measurement rather than as screened
 contrasts (Section~\ref{sec:res-law}).
 
 \textbf{Three --- quantisation.} At eight models the Spearman
-statistic moves in steps of $0.0119$, and absolute rank correlations
-are not stable to the third decimal across defensible analysis
-conventions. Paired contrasts within a run are safe; absolute values
-quoted to three decimals are not, and this thesis does not quote them
-that way (Section~\ref{sec:res-tie-policy}).
+statistic moves in steps of $0.0119$, so absolute rank correlations
+are not stable to the third decimal and this thesis does not quote
+them that way (Section~\ref{sec:res-tie-policy}).
 
-\textbf{Four --- the scheduler seed.} Two runs of an identical
-configuration --- same domain, snapshot, question pool and option
-mode, differing only in the scheduler seed --- moved the paired
-$\Delta\rho$ contrast by six grid steps against a registered decisive
-threshold of two --- since withdrawn (Section~\ref{sec:exp-metrics})
---- while per-verdict agreement reproduced to within
-$0.1$ percentage points. A rank-correlation magnitude is a property
-of the schedule as much as of the arms, and this thesis does not read
-one as the latter (Section~\ref{sec:res-tie-policy}).
+\textbf{Four --- the scheduler seed.} A seed replicate moved the
+paired $\Delta\rho$ contrast by six grid steps against a registered
+decisive threshold of two, since withdrawn
+(Section~\ref{sec:exp-metrics}). A rank-correlation magnitude is a
+property of the schedule as much as of the arms, and this thesis does
+not read one as the latter (Section~\ref{sec:res-tie-policy}).
 
 \textbf{Five --- no intervals.} No Bradley--Terry confidence interval
 appears anywhere in this thesis. The variance computation was wrong

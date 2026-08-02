@@ -118,12 +118,12 @@ inversion as findings rather than as revisions.
 \begin{table}[htbp]
 \centering
 \small
-\caption{Registration status by paired domain. ``Replication'' means the run
-used the identical protocol without a prospective registration of its own.
-Every outcome recorded before 2026-07-31 came from the superseded twelve-model
-batch and was read against a decisive threshold since withdrawn, so the
-outcome column records status under the addendum rather than per-domain
-verdicts (Section~\ref{sec:prereg-addendum-p4}).}
+\caption{Registration status by paired domain. ``Replication'': the
+run used the identical protocol without a prospective registration of
+its own. Pre-settlement outcomes came from the superseded
+twelve-model batch, so the outcome column records status under the
+addendum (Section~\ref{sec:prereg-addendum-p4}), not per-domain
+verdicts.}
 \label{tab:domain-registration}
 \begin{tabular}{lllp{2.0cm}p{2.4cm}}
 \toprule
@@ -225,9 +225,20 @@ Earlier versions of this pipeline and of its analysis reported figures this
 thesis corrects or withdraws. Each is told once, here. \textbf{No value computed
 before a correction is quoted anywhere in this thesis.}
 
+\paragraph{The centred-residual quartet.} An earlier draft reported a
+single quartet of centred between-cell residuals ($-0.119$, $-0.024$,
+$-0.024$, $-0.024$); no one centring convention reproduces all four
+values, so the quartet is withdrawn. The roster-specific values that
+replace it, from \texttt{tools/analysis/discriminative\_flatness.py},
+are $+0.024$ (14 domains) and $-0.024$ (87 leaves) at the 8-model
+roster, $-0.109$ and $-0.009$ at the 11-model band, against mechanical
+centring nulls of $-0.077$ and $-0.011$; they have not themselves been
+independently confirmed (Section~\ref{sec:res-granularity}).
+
 \paragraph{Bradley--Terry standard errors.} The zero-sum rank completion
 requires subtracting $1/K^{2}$ after inversion; the implementation subtracted
-$1/K$ (Appendix~\ref{app:numerics}). The over-subtraction of $(K-1)/K^{2}$ ---
+$1/K$ (Appendix~\ref{app:numerics}); fixed as commit \texttt{a92a3ed},
+2026-07-27. The over-subtraction of $(K-1)/K^{2}$ ---
 $0.109$ at $K = 8$ --- exceeds the variance itself at most realistic comparison
 counts, so no standard error reported before the fix is a measurement. Where the
 over-subtraction drove the variance negative the value was clamped at a floor of
@@ -341,3 +352,91 @@ prediction for mathematics stands as recorded; whether it holds is open rather
 than answered, because the run that answered it is superseded. Recording a
 prediction that fails, and a rule that turns out to be unusable, is the point of
 registering them.
+
+\section{The Addenda Sequence and Withdrawn Design Baselines}
+\label{sec:app-addenda-record}
+
+Demoted from Section~\ref{sec:exp-prereg}, which keeps the summary of
+what each registration fixed.
+
+\paragraph{The five addenda, in sequence.} The first is the
+results-written-back addendum to P2 (2026-07-28), described with P2 in
+Section~\ref{app:preregs}. Of the four that extend P4, each but the
+last was written before the runs it governs: the second (2026-07-29)
+registers psychology as a reordering domain and engineering as a null.
+The third (2026-07-30) registers physics as the last untested flagged
+domain and computer science as a third null, and refits the screen at
+the then-current twelve-model roster --- a refit itself since
+superseded by the settled eight-model one. The fourth (2026-07-30)
+registers the mathematics re-run against the coverage confound below,
+and fixes in advance how each of its three possible outcomes is to be
+read. The fifth (2026-07-30) is written after seven runs have results;
+it records the outcomes against the predictions, retires chemistry as
+registered but never run, and states explicitly that philosophy and
+history were never registered prospectively and are reported as
+replications.
+
+\paragraph{The mathematics coverage confound.} In the withdrawn
+twelve-model campaign, mathematics was the only run predating the two
+scheduler repairs --- the mandatory bootstrap coverage floor with its
+in-run assertion, and per-(leaf, pair) query
+shuffling;\footnote{Commits \texttt{5e1be09} and \texttt{a5c36fd}
+respectively.} its comparison graph was a leader-centric star covering
+under a third of the model pairs, and no property of mathematics could
+be inferred from it. That campaign is withdrawn in its entirety, so
+the confound is recorded here as the reason the re-run registration
+exists rather than as a qualification on any reported number. The
+fourth addendum registers a re-run on the repaired scheduler under the
+original null prediction and fixes three readings in advance: a
+reproduced negative means the failed null is real and now rests on a
+complete graph; a null means the original was a scheduler artifact and
+is superseded on stated grounds; a positive means the screen failed in
+the opposite direction from philosophy. Reporting only the re-run is
+excluded under every outcome. That run was outstanding when
+Chapter~\ref{ch:experimental-design} was fixed.
+
+\paragraph{Design baselines that are not reported.} The baseline
+conditions for taxonomy quality specified in an earlier design ---
+flat $k$-means, agglomerative clustering, and a random taxonomy null,
+scored by a family of reference-free hierarchy metrics --- are not
+reported. The supervised hierarchical-classification baselines were
+removed as unimplemented; no gold taxonomy exists for MMLU-Pro, so
+reference-dependent metrics were dropped rather than computed against
+an ad-hoc structure; and the remaining runs were never executed. None
+of those metrics bears on any of the three links of
+Section~\ref{sec:research-questions}, and the construction evidence
+reported instead is the fixed-point certificate, the leaf-size
+distribution, and the separation nulls of
+Section~\ref{sec:arch-requirements}.
+
+\paragraph{A correction to Addendum 3.} The registration for physics
+and computer science described them as having 12 and 3 leaves, with
+pools of 546 and 208 questions. Those figures come from the
+label-composition count that Chapter~\ref{ch:methodology} sets aside:
+they assign each leaf to its majority MMLU-Pro category rather than to
+its anchor. Under the adapted partition the runs actually used, the
+figures are 10 and 6 cells over pools of 338 and 191. The error is
+descriptive and touches no prediction --- both registrations turn on
+the sign and magnitude of $\Delta\rho$, neither of which references a
+cell count. The secondary observation registered for physics also
+survives: mathematics still has the most cells, physics still has the
+second most, and the gap is one cell under either count. The
+correction is recorded here rather than repaired in the registration,
+which is left as written.
+
+\paragraph{Which decision band governs which quantity.} The two
+pre-registration documents state bands for different things, and the
+results-written-back addendum resolves the assignment. The
+$\geq 0.05$-with-$\geq 75\%$-of-cells-positive band governs the
+treatment arm's within-arm specificity, met at $0.138$ with $93\%$ of
+cells positive. The $\leq 0.05$ / $\geq 0.10$ band governs the random
+arm's absolute own-cell specificity, met at $0.012$, and is the band
+Section~\ref{sec:res-rubric-null} quotes.
+
+\paragraph{Housekeeping on the rubric-specificity document.} The
+results-written-back addendum of 2026-07-28 (described with P2 in
+Section~\ref{app:preregs}) closes the document: the headline
+separation ($p = 1.21 \times 10^{-6}$) was reproduced from the stored
+artifacts on 2026-07-27, and the null-arm artifacts sit in an
+untracked build directory --- a reproducibility caveat the document
+carries explicitly (Section~\ref{sec:res-rubric-null}).

@@ -12,7 +12,9 @@ per-cell and per-domain rankings. Section~\ref{sec:meth-validation}
 gives the two statistics the rankings are validated against.
 Section~\ref{sec:meth-assumptions} and
 Section~\ref{sec:meth-discipline} state what the method assumes and the
-reporting rules it holds itself to.
+reporting rules it holds itself to. Section~\ref{sec:arch-infra} closes
+the chapter with what the run seed fixes and what ``reproducible''
+means here.
 
 Figure~\ref{fig:pipeline} is the whole path on one page. Everything
 after it fills in a box.
@@ -93,23 +95,19 @@ Section~\ref{sec:exp-info-separation} and Section~\ref{sec:arch-judge}.
 % ── the construction loop ────────────────────────────────────────────
 \draw[dashed] (rec.west) -- (-2.5,-4.3) -- (-2.5,-2.1)
       node[lab, midway, left, rotate=90, anchor=south]
-      {coarsen, re-route, refit} -- (embed.west);
+      {edit, re-route, refit} -- (embed.west);
 
 \end{tikzpicture}
 \caption[The pipeline from corpus to validated ranking]{The path a
-query takes. The corpus is split once, under the run's seed, before
-anything else happens. Construction sees only the left lane and
-produces 87 cells with one rubric each; the arena judges only the right
-lane, and the two meet where a cell's rubric becomes the judge's
-instructions. The dashed arrow is the construction loop, which
-alternates editing the tree with re-routing every construction query
-and refitting node parameters until neither moves. Counts are read from
-the corpus store and the frozen snapshot at seed 42; the split is
-$70/30$ and closes exactly, $8{,}673 + 3{,}445 = 12{,}118$}
+query takes. The corpus is split $70/30$ once, under the run's seed
+($8{,}673 + 3{,}445$); construction sees only the left lane and
+produces 87 cells with one rubric each, the arena judges only the
+right lane, and the dashed arrow is the construction loop (edit,
+re-route, refit, until neither moves)}
 \label{fig:pipeline}
 \end{figure}
 
-Three different totals appear in the artefacts, and only one of them is
+Three different totals appear in the artifacts, and only one of them is
 the corpus.
 
 MMLU-Pro supplies $12{,}118$ questions that carry evaluation rows for
@@ -118,7 +116,8 @@ holds out $3{,}445$; those two sum to the corpus exactly. Of the
 construction share, $8{,}299$ are placed in the tree --- the snapshot's
 own \texttt{totalUniqueQueries} --- and the remaining $374$ are dropped
 during routing as outliers. The embedding cache holds $11{,}773$ vectors,
-$345$ short of the corpus, being questions with no usable embedding.
+$345$ short of the corpus; the missing questions had no usable
+embedding.
 
 Question identifiers here are \texttt{eval\_results.question\_id}, not
 \texttt{mmlu\_pro.id}. The two occupy different spaces and resolve to
@@ -162,10 +161,8 @@ on them.
 \end{description}
 
 Whether the construction meets R1--R4 is an empirical question.
-Table~\ref{tab:requirements-evidence}
-(Section~\ref{sec:res-construction}) collects one line of evidence per
-requirement, each marked or and each
-with the caveat that bounds it.
+Section~\ref{sec:res-construction} collects one line of evidence per
+requirement, each with the caveat that bounds it.
 
 \section{Building the Partition}\label{sec:arch-taxonomy}
 
@@ -176,29 +173,19 @@ to be set against MMLU-Pro's own published category scores.
 
 Every corpus query is embedded, and a fixed 256-dimensional prefix
 slice of the embedding is $\ell_2$-normalised to the unit hypersphere
-and used at every depth. Cutting an embedding short and expecting the
-remainder to still mean something is only safe with a particular kind
-of model. Matryoshka Representation Learning
-\parencite{kusupati2022mrl} trains an embedding so that every prefix of
-it is itself a usable embedding, with the coarsest information packed
-first; without that property, truncating at 256 dimensions would throw
-away whatever happened to land past the cut. The construction needs it
-for two reasons. Narrowing the vector keeps the directional
-concentration estimates well conditioned at the cell sizes this thesis
-works with, and holding one width at every depth puts all nodes on the
-same sphere, so a node can be compared with its siblings and with its
-parent without projecting between spaces. The requirement costs
-nothing in practice: Qwen3-Embedding-8B, the only embedding model this
-project used, has the property, and the only extra step is
-re-normalising after the cut, since MRL preserves meaning but not unit
-norm. The model was served under a moving tag, so the exact revision
-behind that tag is not recoverable; what is recoverable is the
-construction itself, because all $11{,}773$ embeddings are retained at
-their full native width and the tree can be rebuilt from them without
-contacting the model again. The width of $256$ is a fixed operating
-point that this thesis does not ablate, and
-Appendix~\ref{app:dag-formalism} states both the argument for it and
-why an ablation would not isolate what it appears to.
+and used at every depth. Truncation is safe only because
+Qwen3-Embedding-8B is trained under Matryoshka Representation
+Learning \parencite{kusupati2022mrl}, so every prefix is itself a
+usable embedding. The construction needs the fixed narrow width for
+two reasons: it keeps the directional concentration estimates well
+conditioned at these cell sizes, and one width at every depth puts
+all nodes on the same sphere, comparable without projecting between
+spaces. All $11{,}773$ embeddings are retained at full native width,
+so the tree can be rebuilt without re-contacting the model (which was
+served under a moving tag); the width of $256$ is a fixed operating
+point this thesis does not ablate, and
+Appendix~\ref{sec:meth-mrl} states both the argument for it and why
+an ablation would not isolate what it appears to.
 
 Queries then migrate by embedding geometry, so a query labelled
 Mathematics may come to sit under a different anchor. This is what
@@ -285,13 +272,10 @@ $88\tau$, so what governed every acceptance was the standard error.
 
 \end{tikzpicture}
 \caption[What the acceptance test compares]{One accept/reject
-decision. The separation condition asks whether the proposed children
-are far enough apart on the sphere. The second condition asks whether
-the gain in $J$ is larger than the noise in the estimate of that gain,
-which is what stops the construction from accepting edits that a
-resample of the same node would not reproduce. Both are evaluated in
-the full 256-dimensional space, whatever subspace proposed the
-candidate}
+decision: a split must clear a separation condition (children far
+enough apart on the sphere) and a noise condition (the gain in $J$
+larger than its own standard error). Both are evaluated in the full
+256-dimensional space, whatever subspace proposed the candidate}
 \label{fig:acceptance}
 \end{figure}
 
@@ -408,28 +392,17 @@ cell holds at least \texttt{minClusterSize} queries'' is false as
 written. This is a property of the mechanism, not a defect.
 
 \item \textbf{The loop can stop for either of two reasons, and the
-weaker one is what stopped it.} There are two stopping criteria, and
-satisfying either one ends the run. The first is \emph{structural}: it
-asks whether the tree itself has stopped changing, and requires five
-consecutive iterations at a graph edit distance of zero, meaning no
-node and no edge would have to be added or removed to turn one
-iteration's tree into the next one's. It also cannot fire before
-$\max(0.8 \times \text{anchors}, 5)$ iterations have passed, which is
-11 at fourteen anchors. The second is \emph{objective}: it asks whether
-$J$ has stopped moving, and requires five consecutive iterations in
-which both the change $J$ takes from the editing phase and the change
-it takes from re-routing sit within $\tau$.
-The frozen run stops at iteration~10, below the structural criterion's
-floor, so that criterion could not have fired; the run log agrees,
-recording graph-edit-distance convergence as false throughout and the
-stop as objective stationarity. That is the weaker of the two. A tree
-that keeps rearranging itself without moving $J$ satisfies the
-criterion that actually stopped this run.
-The fixed-point certificate is a separate check, evaluated once on the
-frozen artifact, and it asks only whether one further iteration would
-change it --- period~1. No period-$p$ certificate is implemented, and
-Section~\ref{sec:res-construction} reports seed runs that stop in a
-period-2 cycle neither criterion can see.
+weaker one is what stopped it.} A \emph{structural} criterion (five
+consecutive iterations at graph edit distance zero, with a floor of
+11 iterations at fourteen anchors) and an \emph{objective} criterion
+($J$ stationary within $\tau$ for five consecutive iterations) each
+end the run. The frozen run stopped at iteration~10 on the objective
+criterion, below the structural floor, so a tree that keeps
+rearranging itself without moving $J$ satisfies the criterion that
+actually stopped this run. The fixed-point certificate is a separate,
+period-1 check; Appendix~\ref{subsec:quiescence} details both
+criteria and the seed runs that stop in a period-2 cycle neither can
+see (Section~\ref{sec:res-construction} reports them).
 
 \item \textbf{Nothing here guarantees that a held-out query reaches the
 right cell.} Every arena result depends on cell membership for queries
@@ -609,14 +582,10 @@ all of its construction queries; its \emph{rubric} is written from
 about four in five of them. Since only $70\%$ of the corpus reaches
 construction to begin with, a little over half of a topic's questions
 ever inform the rubric that will be used to judge it.
-MMLU-Pro is deliberately varied inside each top-level domain, and a
-cell is the narrowest slice of that variety the corpus offers; the
-queries the filter drops are the ones that would have raised the
-failure modes nobody else in the cell raises. A rubric written without
-them will not weight those failure modes, and can over-weight whatever
-the surviving sample happens to emphasise. Nothing in this thesis
-measures how far any particular rubric moved because of it, so this is
-named as a limitation on the rubric's scope rather than bounded.
+The dropped queries may carry failure modes no surviving query
+raises; nothing in this thesis measures how far any rubric moved
+because of it, so this is named as a limitation on the rubric's scope
+rather than bounded.
 
 \paragraph{What the judge is sent.}
 At judging time each comparison $(m_i, m_j, q, L)$ becomes a system
@@ -656,17 +625,13 @@ Four further properties of the judging path affect how verdicts should
 be read.
 
 \begin{enumerate}
-\item The verdict schema carries a numeric \texttt{confidence}
-alongside the winner, and a gate exists that would rewrite verdicts
-below a threshold into ties. It is described here because the field
-appears in every export, and a reader who saw it there would reasonably
-assume it had filtered something. It did not: the gate is set to zero
-in every paired configuration, and every confidence the pipeline
-produces is at least zero, so no verdict was ever rewritten. That was
-forced rather than chosen --- the generic arm emits a
-near-constant confidence, so any non-zero gate would filter one arm and
-not the other and the two would stop being paired. No result in this
-thesis depends on the field.
+\item The verdict schema carries a numeric \texttt{confidence}, and a
+gate exists that would rewrite low-confidence verdicts into ties. The
+gate is set to zero in every paired configuration, so no verdict was
+ever rewritten --- forced rather than chosen, because the generic arm
+emits a near-constant confidence and any non-zero gate would filter
+one arm and not the other. No result in this thesis depends on the
+field.
 \item Consolidated confidence is forced to $0.5$ whenever the two
 presentation orders disagree, and is capped at $0.95$ otherwise.
 \item A post-hoc adjustment rewrites a pair's win counts when the order
@@ -686,7 +651,7 @@ The arena has a fixed judge budget and many more possible comparisons
 than it can afford: at eight models and eleven cells there are 308
 distinct (cell, pair) slots before any query is chosen. The scheduler
 decides which comparisons to buy. Figure~\ref{fig:scheduling} is the
-loop; the rest of this subsection describes each stage.
+loop.
 
 \begin{figure}[htbp]
 \centering
@@ -724,96 +689,19 @@ loop; the rest of this subsection describes each stage.
 
 \end{tikzpicture}
 \caption[The scheduling loop]{One round of the arena. The bootstrap
-runs to completion before step~2 begins and does not repeat. A pair is
-terminal inside a cell when an exact binomial test on that cell's
-counts rejects $p = 0.5$ after Bonferroni correction over the adjacent
-pairs tested, when its per-cell budget is spent, or when the gate at
-step~6 retires it in that cell}
+completes before any adaptive step and does not repeat; a pair is
+terminal inside a cell by binomial significance, exhausted budget, or
+the confidence gate (full rules in
+Appendix~\ref{sec:app-scheduler})}
 \label{fig:scheduling}
 \end{figure}
 
-\paragraph{The bootstrap floor.}
-Before any adaptive scheduling, every (cell, pair) slot receives one
-comparison. The floor is per (cell, pair) rather than global. A global
-floor --- one comparison per pair anywhere in the domain --- leaves the
-domain-level comparison graph complete while individual cells stay
-sparse, and every per-cell quantity in this thesis rests on those
-per-cell graphs. One comparison per pair per cell is enough to make
-each cell's graph complete rather than merely connected, which is what
-per-cell estimation needs, and it costs $\text{pairs} \times
-\text{cells}$ calls: 308 at eight models and eleven cells. Bootstrap
-tasks round-robin over cells so a run stopped early has balanced
-coverage, and the query is rotated across the cell's pool by a
-per-cell offset, so consecutive bootstrap tasks take consecutive
-questions instead of all 28 pairs judging the same one. When the
-bootstrap completes, an assertion checks that no model has zero
-comparisons and aborts rather than fitting an unidentified ranking.
-
-\paragraph{Batch quotas.}
-Each round has a batch size, and each cell's quota within it is
-proportional to that cell's held-out pool size, floored at one so no
-cell is starved out of a batch entirely. Equal-per-cell allocation was
-the earlier rule and it distorted the domain estimate: on physics each
-of the ten cells took $9.2$ to $11.3\%$ of the comparisons while
-holding $5.6$ to $17.8\%$ of the questions. That is defensible for a
-per-cell fit, whose cost does not scale with cell size, and wrong for
-the domain fit, which pools sufficient statistics and therefore weights
-a cell by its comparison count. When quotas are filled and the batch is
-not, the batch comes back short: topping it up from whichever cell
-still has work would re-introduce exactly the over-weighting the
-quotas remove.
-
-\paragraph{Choosing a pair and a query.}
-Within a cell, models are ordered by their current fitted
-Bradley--Terry strengths and only rank-\emph{adjacent} pairs are
-sampled. Adjacent pairs are the closest by construction, so they are
-where an extra comparison can still change the order; a pair separated
-by several places is already decided. Among the adjacent pairs the
-scheduler takes the one whose confidence interval still straddles a
-coin flip by the widest margin. Ordering on fitted strengths rather
-than on summed win rates matters early in a run, when most pairs carry
-one comparison and a win-rate order is dominated by coin flips, which
-makes the adjacency set churn between rounds.
-The query is then chosen inside that pair by two rules. Queries where
-the two models gave \emph{different} stored answers are preferred,
-because a comparison in which both models answered identically carries
-little signal. Among those, the query judged fewest times anywhere in
-the cell is taken, with ties broken by query identifier so the
-selection is deterministic at a fixed seed. The least-used rule spreads
-a cell's budget over its pool; the earlier rule, lowest unused
-identifier per pair, let all 66 pairs in a cell converge on the same
-handful of questions.
-
-\paragraph{When a pair is finished, and when the run is.}
-A pair is terminal inside a cell under any of three conditions.
-An \emph{exact two-sided binomial test} of that pair's within-cell wins
-against $p = 0.5$ rejects at $\alpha = 0.05$ after Bonferroni
-correction over the $M - 1$ adjacent pairs actually tested, with a
-minimum of five comparisons. Ties enter the test at half weight and are
-rounded to the nearest whole win count, which pushes the statistic
-toward $n/2$ and away from significance.
-Or its \emph{per-(cell, pair) budget} is spent. That budget is sized
-from the cell's own pool, $\lfloor n/4 \rfloor$ clamped to $[8, 25]$,
-so a large cell is not rationed by the smallest cell in the domain. The
-floor of 8 keeps the binomial test reachable --- a pair one model wins
-outright resolves at 9 comparisons under the Bonferroni correction ---
-and the ceiling of 25 stops a large cell spending budget on a pair
-already decided.
-Or the \emph{confidence gate} retires it. At the start of every round
-each cell's pairs are tested against that cell's own $\theta$ and
-standard errors, and a pair is retired in that cell when
-$|\theta_i - \theta_j| > 2.5\max(\sigma_i, \sigma_j)$. The gate is
-keyed \texttt{cell|modelA|modelB} and is recomputed from scratch each
-round. It used to be keyed on the pair alone and fed from the pooled
-leaderboard, which retired a pair in every cell at once on the strength
-of the pooled result --- that assumes the null the per-cell arena
-exists to test, and Section~\ref{sec:res-runs} reports what it did to
+The loop's full mechanics --- the per-(cell, pair) bootstrap floor,
+pool-proportional batch quotas, adjacent-pair and least-used-query
+selection, and the three conditions under which a pair or a run is
+terminal --- are specified in Appendix~\ref{sec:app-scheduler},
+together with the earlier rules they replaced and what those did to
 one run.
-
-A run ends when the round counter reaches its cap, when a size-weighted
-$70\%$ of cells are converged, or when the scheduler returns an empty
-batch because every pair is terminal or budget-exhausted. Which of
-these ended each run is recorded with the run.
 
 Two properties of the scheduler bear on how results must be read.
 First, \textbf{it over-samples uncertain pairs}, so mid-ranked models
@@ -831,7 +719,7 @@ threat by construction.
 
 Nothing in this subsection is new. The model, the estimator, the tie
 handling and the prior are standard choices taken from the
-Bradley--Terry literature, and they are set out in full because the
+Bradley--Terry literature, and they are stated here because the
 numbers they produce are read closely later, and because two of them
 have to be defined before the standard errors below make sense.
 
@@ -851,32 +739,13 @@ moves Spearman $\rho$ by a visible amount, which is why every $\rho$ in
 this thesis is reported under both conventions.
 
 The estimator is the Minorisation--Maximisation update of
-\textcite{hunter2004mm}, an iterative scheme that maximises a simple
-lower bound on the likelihood at each step, written in the
-exponentiated parameters $\pi_i = e^{s_i}$:
-\[
-\pi_i^{(t+1)} \;=\;
-\frac{W_i}{\displaystyle\sum_{j \neq i}
-\frac{N_{ij}}{\pi_i^{(t)} + \pi_j^{(t)}}},
-\qquad W_i = \sum_{j \neq i} W_{ij},
-\]
-applied as a simultaneous (Jacobi) sweep over all models. Iteration
-stops at a tolerance of
-$\max(10^{-6},\, 0.01\,\widehat{\mathrm{SE}}_{\text{lb}})$ or at a cap
-of 200 sweeps.
-
-A Jeffreys prior is applied on top of the counts. The Jeffreys prior
-for a binomial probability is the $\mathrm{Beta}(0.5, 0.5)$
-distribution, the standard uninformative choice; adding it here amounts
-to giving a pair half a phantom win in each direction before the fit
-runs. Its purpose is to keep a fitted win probability away from $0$ and
-$1$ when one model has swept a pair, which is the case where the
-likelihood has no interior maximum and the strength difference would
-otherwise run off to infinity.
-It is applied only to pairs that already carry at least one real
-comparison. Pairs with no data are left untouched, so the prior
-regularises estimates rather than manufacturing edges in the comparison
-graph, and the identifiability check runs on the observed counts alone.
+\textcite{hunter2004mm}, regularised by a Jeffreys
+$\mathrm{Beta}(0.5, 0.5)$ prior applied only to pairs that already
+carry at least one real comparison, so the prior keeps swept pairs
+finite without manufacturing edges in the comparison graph, and the
+identifiability check runs on the observed counts alone. The update
+rule, stopping tolerance, and the prior's exact application are set
+out in Appendix~\ref{app:numerics}.
 
 \paragraph{Per-cell standard errors.}
 $\hat{\sigma}_i = \sqrt{[\mathcal{I}(\hat{\mathbf{s}})^{-1}]_{ii}}$ is
@@ -889,18 +758,13 @@ from each diagonal entry. A variance floor of $10^{-6}$ and a standard
 error floor of $0.01$ are applied, the second of which binds first.
 
 \textbf{One correction, and what it left behind.}
-The implementation subtracted $1/K$ rather than $1/K^{2}$; the code
-has since been fixed, but \emph{no Bradley--Terry standard error this
-system stored before the fix is a measurement} --- every pre-fix value
-is either clamped at the floor or understated. The consequence is a
-restriction on what gets printed: \textbf{no Bradley--Terry confidence
-interval appears anywhere in this thesis}, because the pre-fix
-intervals are not measurements, the post-fix ones were never
-recomputed, and nothing claimed here needs one --- every bracketed
-range reported is an interquartile range and says so. The derivation
-and the damage census are in Appendix~\ref{app:numerics} and the debt
-register (Section~\ref{sec:disc-debt}); the correction is recorded in
-the corrections register (Appendix~\ref{app:corrections-register}).
+The implementation subtracted $1/K$ rather than $1/K^{2}$, since
+fixed; no pre-fix standard error is a measurement. The consequence:
+\textbf{no Bradley--Terry confidence interval appears anywhere in
+this thesis} --- every bracketed range reported is an interquartile
+range and says so. Derivation and damage census:
+Appendix~\ref{app:numerics} and the debt register
+(Section~\ref{sec:disc-debt}).
 
 \paragraph{Identifiability.}
 Bradley--Terry parameters are identified only up to an additive
@@ -1008,50 +872,14 @@ are in Section~\ref{sec:exp-metrics}.
 
 \section{Methodological Assumptions}\label{sec:meth-assumptions}
 
-Table~\ref{tab:meth-assumptions} lists the assumptions the method rests
-on, what would go wrong if each failed, and the diagnostic that would
-show it.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Methodological assumptions, failure modes, and diagnostics.}
-    \label{tab:meth-assumptions}
-    \begin{tabular}{p{3.4cm}p{4.4cm}p{4.4cm}}
-        \toprule
-        Assumption & Why it might fail & What would detect it \\
-        \midrule
-        Directional geometry reflects semantic compatibility
-        & Embedding direction encodes surface form rather than task
-        content
-        & The chance-corrected separation score against its two nulls
-        (Section~\ref{sec:arch-requirements}) \\
-        \addlinespace
-        One directional component suffices per node
-        & A node holds two distinct sub-topics at comparable mass
-        & The min-pair separation gate at split time \\
-        \addlinespace
-        Bradley--Terry transitivity holds locally within a coherent cell
-        & Cyclic dominance survives even inside a cell
-        & Per-cell fit residuals; pairwise-winner accuracy \\
-        \addlinespace
-        The judge is reliable under domain conditioning
-        & Rubric conditioning shifts verdicts without improving them
-        & The generic-judge and generic-rubric arms
-        (Section~\ref{sec:res-c5}) \\
-        \addlinespace
-        Cells carry different true model rankings
-        & The corpus is saturated for the roster, so cell identity adds
-        nothing to global capability ordering
-        & The pre-registered granularity analysis
-        (Section~\ref{sec:res-granularity}) \\
-        \addlinespace
-        Comparisons are independent given the Bradley--Terry parameters
-        & Query reuse and multi-membership induce dependence
-        & None applied; the Fisher standard errors treat comparisons as
-        independent and therefore understate uncertainty \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+The method rests on six assumptions --- directional geometry as
+semantic compatibility, one directional component per node, local
+Bradley--Terry transitivity inside a cell, judge reliability under
+domain conditioning, distinct true model rankings across cells, and
+independence of comparisons given the Bradley--Terry parameters.
+Table~\ref{tab:meth-assumptions} (Appendix~\ref{app:numerics})
+tabulates each with the failure mode that would break it and the
+diagnostic that would show it.
 
 Three of these are load-bearing, and none of the three survived intact.
 The judge-reliability assumption is the one RQ1 is about, and
@@ -1081,14 +909,10 @@ counted as an effect.
 \textbf{D1 --- A test that cannot fail is not a test.}
 Before running a check, ask what result would falsify it; if the answer
 is ``none available'', a clean result carries no information.
-Instance: the corpus validator has a \texttt{TRACE\_PRESENCE} check
-that measures whether a model's stored responses contain reasoning
-text, and that check has \emph{no failure branch at all} --- it is
-advisory, and a model with zero stored reasoning is admitted. Six of
-the ten models the system hard-excludes by name are excluded for
-exactly the condition that check measures and declines to act on; the
-resulting policy is a curated list, not a threshold
-(Section~\ref{sec:exp-rosters}).
+Instance: the corpus validator's \texttt{TRACE\_PRESENCE} check has no
+failure branch at all, and six of the ten hard-excluded models are
+excluded for exactly the condition it measures and declines to act on
+(the full policy story is Section~\ref{sec:exp-rosters}).
 % MOVED-CANDIDATE (D1, second instance; was a footnote here --
 % relocate to the corrections register): A second instance: an audit
 % that classified every identifier column by set membership against
@@ -1188,8 +1012,7 @@ The claim stops at the partition. Two fields of the fixed-point
 certificate move in the last few digits between two runs of the same
 commit at the same seed, because routing is parallel and floating-point
 addition is not associative; they are bounded rather than
-bit-identical, and Chapter~\ref{ch:results} says so where the
-certificate is reported.
+bit-identical.
 
 What the seed does \emph{not} do is make a result seed-independent. It
 fixes which of the possible constructions the thesis is talking about;
@@ -1198,22 +1021,9 @@ different one. The run-to-run spread that leaves is a real limitation
 and is reported under R3 (Section~\ref{sec:res-construction}). Every
 construction and arena result in this thesis is at seed 42.
 
-State is partitioned across four SQLite stores with distinct write
-lifecycles: the embedding cache, the MMLU-Pro corpus with its per-model
-stored evaluations, the snapshot store, and the ratings store. Only
-frozen snapshots are eligible as arena inputs and a frozen snapshot is
-read-only, and every verdict row carries the snapshot identifier, so
-the taxonomy a verdict was produced under is always recoverable.
-
 Any result is specified by the tuple
-\texttt{(corpusVersion, snapshotId, runId)}, and per-run seeds and
-realised call counts are recorded in a manifest emitted with each run.
-Two qualifications belong with that claim. The manifest's
-working-tree-clean flag does not distinguish a modified source file
-from a modified thesis file, so it fires on benign conditions and
-should not be read as a reproducibility guarantee on its own. And
-\texttt{ratings.db} is keyed by snapshot and condition in a way that
-makes a re-run of the same condition \emph{clear} the previous rows
-rather than accumulate beside them; the results of
-Chapter~\ref{ch:results} were preserved by copying the store before
-each subsequent run.
+\texttt{(corpusVersion, snapshotId, runId)}; the four SQLite stores
+this rests on, and the run manifest with its two qualifications (a
+working-tree flag that fires on benign conditions, and a ratings store
+whose re-runs clear rather than accumulate), are described in
+Appendix~\ref{sec:num-persistence}.

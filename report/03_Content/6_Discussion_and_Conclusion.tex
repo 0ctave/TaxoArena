@@ -2,7 +2,6 @@
 
 \section{Where the Architecture Binds}\label{sec:disc-rq1}
 
-Section~\ref{sec:res-judge}.
 MMLU-Pro is multiple-choice with a verifiable answer key. In the settled
 runs the judge is not shown the options block, but $97.6\%$ of the stored
 traces state the answering model's own selected option
@@ -132,39 +131,24 @@ to matter.
 
 Five instances. None of the following was found by
 looking for it, which is why they are the best available evidence that
-the results the apparatus did \emph{not} overturn are sound.
-
-\textbf{The response-capture gap} was found while sizing the roster for
-a different experiment. It showed that half of the pilot arena's
-comparisons had been decided by which side had text at all, and it
-qualified figures that were already written down
-(Section~\ref{sec:res-capture-gap}).
-
-\textbf{A side-channel in two candidate roster entries} was found by a
-pre-launch format check whose only anomalous column was newline count:
-the two systems' stored output was a raw JSON envelope carrying a
-self-reported code that predicts the very outcome being judged.
-Neither system entered any arena run as stored; the full account is in
-Appendix~\ref{app:corrections-register}.
-
-\textbf{The reliability constant} was caught twice, by two independent
-routes that compounded to the same factor: a re-fit at a different
-roster size, and a units check on a split-half length mismatch
-(Section~\ref{sec:disc-debt}).
-
-\textbf{The domain screen's two reversals} both traced to one cause,
-found only because the screen was re-run at the roster the arena would
-actually use (Section~\ref{sec:res-law}).
-
-\textbf{The first evaluative-diversity null had no valid comparison
-arm}, and this is the most instructive of the five because the error
-was in the null rather than in the treatment. Pseudo-leaves were
-sampled independently, which gave them 11--26\% pairwise question
-overlap where real leaves have 1.6--4.9\%. Overlapping pseudo-leaves
-agree with each other for free, so the null was inflated and the real
-cells looked distinctive against it. Matching the overlap reverses the
-answer (Section~\ref{sec:res-leaf-null}). A comparison arm is a
-measurement and has to be checked like one.
+the results the apparatus did \emph{not} overturn are sound; each is
+told in full where its consequence lands. \textbf{The response-capture
+gap}, found while sizing a roster for a different experiment, showed
+half of the pilot arena's comparisons decided by which side had text
+at all (Section~\ref{sec:res-capture-gap}). \textbf{A side-channel in
+two candidate roster entries} was caught by a pre-launch format check
+whose only anomalous column was newline count; neither system entered
+any arena run (Appendix~\ref{app:corrections-register}). \textbf{The
+reliability constant} was caught twice, by two independent routes
+compounding to the same factor (Section~\ref{sec:disc-debt}).
+\textbf{The domain screen's two reversals} traced to one cause, found
+only because the screen was re-run at the roster the arena would
+actually use (Section~\ref{sec:res-law}). And \textbf{the first
+evaluative-diversity null had no valid comparison arm}: independently
+sampled pseudo-leaves carried $11$--$26\%$ pairwise question overlap
+where real leaves have $1.6$--$4.9\%$, inflating the null; matching
+the overlap reverses the answer (Section~\ref{sec:res-leaf-null}), and
+a comparison arm is a measurement that has to be checked like one.
 
 Two design features did the work in most of these cases, and both are
 cheap. A check whose only informative column is an unglamorous one,
@@ -205,12 +189,24 @@ Discovery is bounded by the corpus available at construction time,
 and there is no incremental insertion mechanism --- a new corpus
 requires a full reconstruction.
 
-The roster exclusion policy is a further external-validity limit. Ten
-models are excluded by a hard-coded list of names, each with a
-recorded reason; the policy is a ratchet on known failures, not a
-threshold, and it does not generalise to any new model
-(Section~\ref{sec:exp-rosters}). A general guard is a one-line change
-and is named as future work.
+\textbf{The judge-call budget is itself a limit.} A paired run makes
+two judge calls per comparison in each arm --- the settled batch's
+$5{,}161$ comparisons per arm cost over $20{,}000$ calls, and the
+eight domains take hours end to end even under heavy parallelisation
+--- so scale is expensive in both time and money. That cost is why the
+scheduler and its matchmaking are conservative (per-(cell, pair)
+budgets, early termination, identification rather than resolution),
+and the resolution gap of Section~\ref{sec:res-cost} is its direct
+consequence. It also bounds the design: a larger roster with more
+nearly-tied pairs, judged over finer cells, is exactly the setting in
+which a per-cell rubric could show its influence more sharply than
+this thesis could afford to test.
+
+The roster exclusion policy is a further external-validity limit: a
+hard-coded list of ten names, a ratchet on known failures rather than
+a threshold that would generalise
+(Section~\ref{sec:exp-rosters}); the general guard is named as future
+work.
 
 \subsection{Construct Validity}\label{subsec:disc-construct-validity}
 
@@ -258,13 +254,10 @@ twelve-model roster was assembled to hold that ratio to $2.91$
 (Appendix~\ref{app:models}). Response length and model capability are
 therefore confounded in these runs and cannot be separated from them. Self-preference
 bias~\parencite{panickssery2024llm} does not arise here, because the
-judge model appears in no roster,\footnote{Verified rather than
-assumed: the judge is Mistral-Large-3 in every reported run, confirmed
-against the Run~B run log (four occurrences of the judge identifier,
-none of any smaller ``ministral'' variant) and the runtime
-configuration; no roster contains it (Appendix~\ref{app:models}).}
-but no constraint enforces that; it
-is a property of these runs rather than of the system.
+judge model appears in no roster (verified rather than assumed;
+Section~\ref{sec:exp-arena-conditions}, footnote), but no constraint
+enforces that; it is a property of these runs rather than of the
+system.
 
 \textbf{Tie approximation.}
 Ties are encoded as half-wins inside the standard Bradley--Terry
@@ -290,32 +283,23 @@ is the corrected state and where each correction binds.
 
 \begin{itemize}
 
-\item \textbf{Bradley--Terry standard errors.} The rank completion
-requires subtracting $1/K^2$ after inversion; the implementation
-subtracted $1/K$, so no pre-correction standard error is a
-measurement --- $45$ of the pilot run's $176$ stored values sit at the
-$0.01$ floor and the rest are understated, against corrected values 44
-to 209 times larger (Section~\ref{sec:meth-bt}). No pre-correction
-interval or ``resolved pair'' determination is quoted. The paired runs
-from law onward postdate the fix and carry measured standard errors;
-across the first five of them, $288$ leaf-level values with a median of
-$0.31$ to $0.48$ by domain, a minimum of $0.149$, and none at the
-floor.
-
-\item \textbf{The scheduler consequence of that bug, and which runs it
-touches.} The fix is dated,\footnote{Commit \texttt{a92a3ed},
-2026-07-27.} and Runs~A and~B predate it. Their schedulers consumed standard errors that
-were floored for about a quarter of nodes and understated for the rest,
-with three likely mechanical consequences: the variance division inside
-$U_{\text{resolve}}$ degenerated toward a constant, so the term
-approached pure entropy; the maturity-driven mixing weight $\alpha$,
-keyed to falling per-leaf standard errors, did not mature as designed;
-and the $3\sigma$ resolve rule tended toward a fixed margin
-$|\hat{s}_i - \hat{s}_j| \geq 0.06$. The allocation those runs produced
-is therefore closer to entropy-driven than to the variance-weighted
-design of Section~\ref{sec:meth-scheduling}, and no reading of either
-may lean on adaptive allocation. The paired runs from law onward
-postdate the fix and ran with measured standard errors.
+\item \textbf{Bradley--Terry standard errors, and the schedulers that
+consumed them.} The rank completion requires subtracting $1/K^2$
+after inversion; the implementation subtracted $1/K$, so no
+pre-correction standard error is a measurement --- $45$ of the pilot
+run's $176$ stored values sit at the $0.01$ floor and the rest are
+understated, against corrected values 44 to 209 times larger
+(Section~\ref{sec:meth-bt}) --- and no pre-correction interval or
+``resolved pair'' determination is quoted. Runs~A and~B predate the
+fix (dated in the corrections register), and their schedulers consumed
+those broken values, so the allocation they produced is closer to
+entropy-driven than to the variance-weighted design of
+Section~\ref{sec:meth-scheduling} and no reading of either may lean on
+adaptive allocation; the three mechanical consequences are traced in
+Appendix~\ref{sec:num-fisher}. The paired runs from law onward
+postdate the fix and carry measured standard errors: across the first
+five, $288$ leaf-level values with a median of $0.31$ to $0.48$ by
+domain, a minimum of $0.149$, and none at the floor.
 
 \item \textbf{The reliability constant and the disattenuation form.}
 The published $c = 7.66$ corrects to $c = 2.52$ --- a split-half
@@ -518,10 +502,7 @@ that reorder at all in the settled-roster screen
 (Section~\ref{sec:res-law}). But the same refit shows the screen
 saturating everywhere else, so additional domains at this roster are
 additional replications of one measurement, and the honest reason to
-run them is coverage, not the hope of a different answer. The
-registered mathematics prediction remains open
-(Appendix~\ref{app:preregs}): the settled batch includes a mathematics
-run, but under a protocol the registration predates.
+run them is coverage, not the hope of a different answer.
 
 \item \textbf{Isolating the rubric text from its bundle.} The two arms
 of the settled batch differ in system prompt, user scaffold, verdict
@@ -544,29 +525,26 @@ that question that could still come out positive, and it is untested.
 power}, rather than a few selected domains at high power.
 
 \item \textbf{A general trace-presence threshold in the corpus
-validator.} The current exclusion policy is a curated list of ten model
-names. A failure branch on the trace-presence check at, say, $0.90$
-turns it into a threshold that generalises to models nobody has
-inspected. It is a one-line change and it makes the limitation of
-Section~\ref{subsec:disc-external-validity} actionable.
+validator}: a failure branch on the trace-presence check at, say,
+$0.90$ turns the curated ten-name exclusion list into a threshold that
+generalises to models nobody has inspected --- a one-line change that
+makes the limitation of Section~\ref{subsec:disc-external-validity}
+actionable.
 
-\item \textbf{A Davidson tie model.} Section~\ref{sec:res-tie-policy}
-shows that the choice between half-weighting and dropping ties is not
-neutral on this pipeline. Fitting tie propensity as a parameter
-replaces a convention that currently changes conclusions with an
-estimate that can be reported with an interval.
+\item \textbf{A Davidson tie model}: fitting tie propensity as a
+parameter replaces a convention that currently changes conclusions
+(Section~\ref{sec:res-tie-policy}) with an estimate that carries an
+interval.
 
 \item \textbf{A direct estimate of judge memorisation}, by verdict
-consistency under paraphrased questions or by a probe set published
-after the judge model's training cutoff. The answer-key-blind protocol
-cannot defend against contamination that sits in the judge's weights.
+consistency under paraphrased questions or a probe set published after
+the judge's training cutoff, because the answer-key-blind protocol
+cannot defend against contamination in the judge's weights.
 
-\item \textbf{A held-out routing check.} Cell membership on held-out
-data is what every arena result depends on, and it is the least
-verified part of the pipeline: routing is soft, its calibration error
-is exported under a defective aggregation, and no result in this thesis
-tests it directly (Section~\ref{sec:arch-limits}). It sits last because
-it changes no reported number, and first among the things that would
-have to hold before any of them is deployed.
+\item \textbf{A held-out routing check}: cell membership on held-out
+data is the least verified thing every arena result depends on
+(Section~\ref{sec:arch-limits}); it sits last because it changes no
+reported number, and first among the things that would have to hold
+before any of this is deployed.
 
 \end{enumerate}

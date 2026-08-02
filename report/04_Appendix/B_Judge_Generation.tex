@@ -1,7 +1,7 @@
 \chapter{Reference-Informed Judge Generation}\label{app:judge-generation}
 
 This appendix details the rubric-generation mechanics referenced in
-Chapter~\ref{ch:experimental-design}, \S\ref{sec:exp-rosters}.
+Chapter~\ref{ch:experimental-design}.
 
 \section{Generation Procedure}
 
@@ -75,7 +75,10 @@ respects at once.
 \begin{table}[htbp]
 \centering
 \small
-\caption{What actually differs between the two arms.}
+\caption{What actually differs between the two arms: four factors
+travel together (system prompt, user message, output format,
+confidence handling), while question set, stored responses, judge
+model and protocol are identical by construction.}
 \label{tab:arm-differences}
 \begin{tabular}{p{2.6cm}p{4.6cm}p{4.6cm}}
 \toprule
@@ -151,6 +154,35 @@ are reproduced mechanically from the frozen snapshot and the Kotlin sources by
 they cannot drift from what the runs actually sent.
 
 \input{Figures/judge_example}
+
+\section{Rubric Reach: The Continuous Analysis}\label{sec:app-rubric-reach}
+
+Demoted from Section~\ref{sec:res-offsubject}, which keeps the
+headline numbers. Measured as cosine distance to the centroid of the
+queries its rubric was induced from, a routed held-out question sits
+at $0.511$ --- $38\%$ of the way from a random reserved question
+($0.607$) toward construction-grade proximity ($0.353$), and only
+$6$--$21\%$ of the way in five of eight domains. The premise of the
+rubric-coverage worry is therefore real: rubrics are applied well
+outside the material they were induced from. The consequence is not:
+within cells, one standard deviation of that distance moves the
+cell-scoped arm's tie rate by $+1.02$ percentage points --- and moves
+the \emph{generic} arm, which carries no domain criteria at all, by
+$+1.06$. The within-triple difference is $-0.04$ points
+($95\%$ CI $[-1.39, +1.30]$, cell fixed effects, $n = 2{,}788$).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{rubric_reach}
+\caption{Panel~(a): per domain, cosine distance from a routed
+held-out question to its rubric's induction-pool centroid (dot),
+between construction-grade proximity (left rule) and a random
+held-out question (right rule). Panel~(b): change in tie rate and key
+agreement per standard deviation of that distance, cell fixed
+effects; the rubric-free arm moves identically, so the effect is not
+rubric coverage.}
+\label{fig:rubric-reach}
+\end{figure}
 
 \section{Dual-Call Position-Reversal Protocol}
 

@@ -52,13 +52,9 @@ inherit the same limitation~\parencite{liang2022holistic}.
 \subsection*{From MMLU to MMLU-Pro}
 
 Saturation and contamination motivated a line of progressively harder
-benchmarks. \textit{BIG-Bench Hard}
-(BBH)~\parencite{suzgun2022bigbench} extracted the 23 BIG-Bench tasks
-on which prior models had not outperformed average human raters; with
-chain-of-thought prompting, PaLM then surpassed the average human
-rater on 10 of the 23 and Codex (code-davinci-002) on 17 of the 23,
-which confirmed the diagnostic value of the harder
-subset~\parencite{suzgun2022bigbench}.
+benchmarks, beginning with \textit{BIG-Bench Hard}'s extraction of
+the 23 BIG-Bench tasks on which prior models had not outperformed
+average human raters~\parencite{suzgun2022bigbench}.
 \textit{MMLU-Pro}~\parencite{wang2024mmlupro} applies the same logic
 to the MMLU lineage: ten answer options per question instead of four,
 trivial and noisy items removed, and reasoning-focused questions
@@ -148,52 +144,6 @@ its outputs on prompts drawn from it.
 
 \section{Unsupervised Taxonomy Induction}\label{sec:taxonomy-construction}
 
-\subsection*{Scope of This Review}
-
-Several neighbouring literatures are not surveyed here, for reasons
-worth stating once. Supervised hierarchical text classification
-(HiAGM, HiTIN~\parencite{zhou2020hiagm, zhu2023hitin}) takes the
-hierarchy as supervision and offers no method for building one; the
-hierarchies it trains against are themselves editorial artefacts
-(Reuters editors for RCV1, domain librarians for WoS). Dasgupta's
-cost function~\parencite{dasgupta2016cost} supplies a principled
-global objective for hierarchical clustering, and Dasgupta shows it
-admits a top-down recursive construction by sparsest cut with an
-approximation guarantee. The objective is nevertheless scored over a
-complete tree: it ranks whole hierarchies against one another and
-does not by itself certify an individual node, which is the local
-question a per-cell acceptance rule has to answer. Reference-dependent hierarchy
-metrics ($h\!F_\beta$ and its
-relatives~\parencite{kosmopoulos2015hmetrics}) score predicted class
-assignments against gold ones over a hierarchy that is itself taken as
-given, so they presuppose both a reference hierarchy and gold labels
-within it --- neither of which a corpus-induced taxonomy over MMLU-Pro
-has.
-
-\subsection*{Term-Level Induction}
-
-\textit{TaxoGen}~\parencite{zhang2018taxogen} builds a topic taxonomy
-top-down by adaptive spherical clustering, retraining local
-embeddings at each node so that terms are represented in the
-sub-space of their own region rather than the global one.
-\textit{CoRel}~\parencite{huang2020corel} extends the idea to the
-seed-guided setting: a user supplies a skeleton hierarchy, and a
-relation-transferring module propagates it along embedding paths,
-encoding the seed as a structural prior that shapes the tree
-throughout construction.
-
-Both operate at the term level, where a node is a cluster of words
-and coherence is assessed through term co-occurrence. Applying the
-same recursion to full natural-language queries changes what a node
-has to represent. A query is a sentence with its own distributional
-geometry, not a point in a vocabulary, so the node model, the rule
-that decides a split, and the measure of coherence all have to be
-restated for that object. Neither method offers an acceptance
-statistic in the inferential sense: splitting proceeds while a
-similarity criterion is met, and how much of a given split is
-attributable to structure rather than to the sampling of the cluster
-is not quantified.
-
 \subsection*{Corpus-Induced Taxonomies in Deployment}
 
 The embed--cluster--LLM-label recipe has become an industrial
@@ -263,24 +213,12 @@ is the condition under which cross-depth comparisons mean anything.
 
 \subsection*{Overlapping and Polyhierarchical Structure}
 
-The models above assign each item to exactly one node per level. That
-is convenient for fitting and false of real query corpora: a question
-about the thermodynamics of a chemical reaction belongs to a
-physics-oriented and a chemistry-oriented sub-domain at once. Two
-distinct relaxations address this. Soft hierarchical clustering
-replaces hard assignment with a fuzzy or probabilistic membership
-function, so an item can hold weight in several
-nodes~\parencite{fuzzyhc1969}. Separately, relaxing the
-\textit{topology} so that a node may have more than one parent yields
-a \textit{polyhierarchy}, a directed acyclic
-graph~\parencite{polyhierarchy2006}. Polyhierarchies are standard in
-knowledge organisation, where they are curated by hand, but
-comparatively rare in corpus-induced construction, where DAG
-structure is more often imposed after the fact than learned from
-overlap evidence. Learned multi-parent exceptions do exist, scattered
-through the taxonomy-expansion literature, but they are not the norm,
-and there is correspondingly little evidence about whether learned
-multi-parent structure earns its additional complexity.
+Relaxing the topology so that a node may have more than one parent
+yields a \textit{polyhierarchy}, a directed acyclic
+graph~\parencite{polyhierarchy2006} --- standard in knowledge
+organisation, where it is curated by hand, but rare in corpus-induced
+construction, with correspondingly little evidence about whether
+learned multi-parent structure earns its additional complexity.
 
 
 \section{LLM-as-a-Judge and Reliability}\label{sec:llm-as-a-judge}
@@ -378,7 +316,7 @@ correctness and finds that the judges it evaluates --- including
 strong general-purpose models and dedicated reward models --- perform
 near chance on them, a result reported for that set of judges at
 publication rather than as a ceiling, since later
-reasoning-optimised judges have since scored well above it on the
+reasoning-optimised judges have scored well above it on the
 same split; \textit{LLMBar}~\parencite{zeng2024llmbar} shows
 judges systematically fail pairs in which superficial quality and
 instruction adherence are dissociated; and
@@ -444,30 +382,15 @@ not something the calibration literature reports.
 
 \subsection*{Elo and Its Limitations}
 
-The \textit{Elo rating system}~\parencite{elo1978rating}, developed
-for zero-sum games such as chess, assumes an agent's performance is a
-random variable centred on a latent skill level $R$. Elo's own
-formulation took that variable to be normally distributed; the
-logistic form below was adopted subsequently by the USCF and FIDE and
-is the variant used throughout the LLM evaluation
-literature~\parencite{boubdir2024elo}. Under it the probability $E_A$
-of agent $A$ defeating agent $B$ is
-\begin{equation}
-    E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}
-    \label{eq:elo-expected}
-\end{equation}
-Elo tracks stable skill levels well but fits LLM evaluation poorly.
-It assumes static skill between matches and models no uncertainty, so
-rankings become unstable under sparse interaction
-data~\parencite{boubdir2024elo}. It is also transitive by
-construction ($A \succ B$ and $B \succ C$ imply $A \succ C$), and
-\textcite{boubdir2024elo} find that the transitivity Elo assumes is
-not consistently preserved in practice: for models whose win rates sit
-near 50\%, the resulting ordering is sensitive to the $K$-factor and
-to the number of match permutations averaged over, so the ranking of
-similarly performing models is not stable. Their finding concerns the
-behaviour of the rating system under near-tied comparisons rather than
-a direct measurement of cyclic preference among models.
+The \textit{Elo rating system}~\parencite{elo1978rating} fits LLM
+evaluation poorly: it assumes static skill between matches and models
+no uncertainty, so rankings become unstable under sparse interaction
+data. \textcite{boubdir2024elo} find that for models with win rates
+near 50\% the ordering is sensitive to the $K$-factor and to the
+number of match permutations averaged over --- an instability of the
+rating system under near-tied comparisons, not a measurement of
+cyclic preference among models. That instability among near-tied
+models is what motivates a likelihood-based aggregate.
 
 \subsection*{Bradley--Terry and Bayesian Extensions}
 
@@ -511,32 +434,23 @@ iteration converges. Both conditions bite hardest where
 comparisons are few, which is exactly the regime a per-domain arena
 creates when it divides a fixed budget across many cells.
 
-Bayesian rating systems such as
-\textit{TrueSkill}~\parencite{herbrich2007trueskill} and the
-Weng--Lin approximations in OpenSkill~\parencite{weng2011bayesian}
-represent skill as a Gaussian with explicit uncertainty and converge
-faster than Elo by weighting each match by its information gain.
-Their online-update design targets streaming match data, where
-ratings must be revised after every result. Hierarchical,
-partial-pooling Bayesian BT models shrink per-group strengths toward a
-population mean~\parencite{cattelan2012paired}, which stabilises
-groups with few comparisons at the cost of making each group's
-estimate depend on the others --- a trade that matters when the groups
-are themselves the object of study.
+Bayesian alternatives exist at both ends: online-update systems for
+streaming match data (TrueSkill~\parencite{herbrich2007trueskill},
+OpenSkill~\parencite{weng2011bayesian}), and hierarchical
+partial-pooling BT models that shrink per-group strengths toward a
+population mean~\parencite{cattelan2012paired} --- stabilising
+sparse groups at the cost of making each group's estimate depend on
+the others, a trade that matters when the groups are themselves the
+object of study.
 
 \subsection*{Active Ranking and Sample Complexity}
 
 Round-robin evaluation of $M$ models requires $\binom{M}{2}$
 comparison pairs per cell. \textit{Active ranking} reduces this by
 selecting, at each step, the comparison most likely to reduce global
-ranking uncertainty. \textcite{jamieson2011activeranking} established
-the theoretical basis: if $n$ items can be embedded in a
-$d$-dimensional metric space consistent with the ranking, a
-sequentially adaptive algorithm recovers the full ranking using only
-$O(d \log n)$ pairwise comparisons on average, whereas random
-sampling requires almost all $\binom{n}{2}$. The saving is governed
-by $d$, so the bound is most useful where the ranking problem is
-genuinely low-dimensional.
+ranking uncertainty; \textcite{jamieson2011activeranking} established
+that adaptive selection can recover a ranking in far fewer
+comparisons than the pair count suggests.
 
 In the stochastic setting, where comparison outcomes are noisy
 Bernoulli variables as with an LLM judge,
@@ -556,30 +470,6 @@ criterion its standard errors provide rather than on sample
 efficiency alone. A scheduler of this family reads those standard
 errors, which makes its behaviour inseparable from the correctness of
 the variance it is given.
-
-\subsection*{Multidimensional Ranking and Intransitivity}
-
-Cyclic dominance, the ``Rock--Paper--Scissors'' effect, arises when
-models excel in some domains and fail in others, in violation of the
-transitivity assumption of scalar
-models~\parencite{balduzzi2018melo}.
-\textit{mELO}~\parencite{balduzzi2018melo} applies Hodge
-decomposition to separate model interactions into a transitive
-(scalar) component and a cyclic (skew-symmetric) component; the
-\textit{Blade-Chest model}~\parencite{chen2016bladechest} infers a
-$d$-dimensional representation per model, with ``offence'' and
-``defence'' modelled separately, which lets it represent the
-intransitive and cyclic preferences Bradley--Terry cannot and
-approximates an arbitrary preference matrix increasingly well as $d$
-grows. Both report more accurate pairwise predictions once
-interactions are modelled directly.
-
-Both also spend parameters on a cyclic component, which earns its
-cost only where cyclic dominance is present. Whether a given corpus
-and roster exhibit it is an empirical property of that pairing rather
-than a general fact about language models, and it is measurable
-before the extra parameters are committed.
-
 
 \section{Query Routing as the Target Use Case}\label{sec:routing}
 
@@ -627,19 +517,14 @@ the domain structure over which models are profiled is either absent
 or inherited from whichever benchmark supplied the training set.
 
 A more recent line induces its routing structure directly from the
-query corpus. \textit{The Avengers}~\parencite{zhang2025avengers}
-embeds and clusters training queries, scores each candidate model per
-cluster, and routes a test query to the models that dominate its
-nearest clusters;
-\textit{Avengers-Pro}~\parencite{zhang2025avengerspro} adds a tunable
-performance--efficiency trade-off. UniRoute's cluster-based variant
-represents each model by its error profile over query
-clusters~\parencite{jitkrittum2025uniroute}, and
-\textit{RouterDC}~\parencite{chen2024routerdc} learns query and model
-embeddings jointly by dual contrastive learning. Standardised router
-evaluations such as
-\textit{RouterBench}~\parencite{hu2024routerbench} make these systems
-comparable to one another.
+query corpus --- embed-and-cluster routers that score each candidate
+model per cluster
+(\textit{The Avengers}~\parencite{zhang2025avengers,
+zhang2025avengerspro}), error-profile and jointly learned embeddings
+(UniRoute's cluster variant~\parencite{jitkrittum2025uniroute};
+\textit{RouterDC}~\parencite{chen2024routerdc}), with
+\textit{RouterBench}~\parencite{hu2024routerbench} standardising
+their comparison.
 
 Their structure is tuned against routing accuracy, which is the
 appropriate objective for a router and has a consequence for what the

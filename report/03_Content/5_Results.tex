@@ -5,11 +5,13 @@ the judge does, then what the partition does. The order matters
 because the strongest result in this project is a measurement of the
 judge, and it is what makes the partition results of
 Section~\ref{sec:res-partition} interpretable. The judge bypasses the
-partition on this corpus by verifying answers against a key it was
-never shown, and the cell-scoped rubric does not change the ranking
-that judging produces: both arms recover the same ordering in every
-domain, and what separates them is how often the cell-scoped arm
-declines to name a winner. A reader who learns in
+partition on this corpus --- verifying answers against a key it was
+never shown where it can, leaning on candidate strength where it
+cannot --- and the cell-scoped rubric does not change the ranking
+that judging produces: both arms recover the same ordering in seven
+of eight domains --- one adjacent transposition, inside seed noise,
+in the eighth --- and what separates them is how often the
+cell-scoped arm declines to name a winner. A reader who learns in
 Section~\ref{sec:res-judge} what the judge conditions on already knows
 why that is a property of the corpus and of the way this judge works,
 not a failure of the construction.
@@ -25,7 +27,8 @@ each is stated once here and not repeated at the point of use.
 tie conventions --- ties half-weighted, then tied comparisons dropped,
 in that order --- per rule~D5 of Section~\ref{sec:meth-discipline};
 the measured instability that forces the rule is
-Section~\ref{sec:res-tie-policy}. Every table keeps both rows.
+Section~\ref{sec:res-tie-policy}. Where a table reports a single
+$\rho$, the two conventions coincide and its caption says so.
 \item \textbf{Estimator.} Bradley--Terry $\theta$ is quoted, never
 win-rate, because the scheduler over-samples uncertain pairs and
 win-rate is biased by opponent strength
@@ -102,9 +105,8 @@ One body of arena evidence and seven offline analyses produced the
 results in this chapter: the settled eight-domain batch, to which every
 arena number in this thesis is attributed. Two earlier bodies of runs
 are absent. A pilot Math arena ran on a corpus whose stored responses
-were incomplete --- for four of its eight models no response text
-survived, and format rather than content decided roughly half of its
-comparisons --- and a twelve-model paired campaign ran before two
+were incomplete (the capture gap of
+Section~\ref{sec:res-capture-gap}), and a twelve-model paired campaign ran before two
 scheduler repairs that the defect analysis of the pilot and its
 successors forced. Both are withdrawn in their entirety
 (Table~\ref{tab:evidence-status}); they survive only in the
@@ -126,10 +128,13 @@ Chapter~\ref{ch:experimental-design}). Two conditions per domain:
 C5 (\textsc{generic}), which replays \textsc{main}'s exact
 $(\text{question}, \text{model pair})$ triples under the same cells and
 a generic MT-Bench-style pairwise prompt. One run per domain,
-sequentially, on 2026-07-31; no run crashed, no verdict was removed by
+sequentially; no run crashed, no verdict was removed by
 the confidence gate, and no rate-limit response occurred in any domain.
 Table~\ref{tab:run-record} is the run record; the results derived from
-it are Section~\ref{sec:res-c5} and the sections that cite them.
+it are Section~\ref{sec:res-c5} and the sections that cite them. Every
+figure in this chapter is generated from the run artifacts by a script
+in \texttt{report/Figures/} that asserts the figure's headline counts
+before drawing; on mismatch the script raises and emits no figure.
 
 \begin{table}[htbp]
 \centering
@@ -156,33 +161,13 @@ total            & 1{,}637 & 52 & 5{,}161 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{rank_recovery_grid}
-\caption{The batch on one page: each model's arena rank displacement
-from its key rank, per domain. White is exact agreement ($45$ of $64$
-cells); upward displacement is blue (deeper blue for the single $+2$,
-psychology), downward dark grey, and every cell prints its signed
-offset, so the encoding survives grayscale. All displacements come
-from two recurring near-tie pairs (Llama-3.1-70B against Qwen1.5-72B; arx\_0314 against
-gpt-4o). A small circle marks a model that sits in at least one
-key-undecidable pair in that domain --- there the key itself does not
-fully constrain its position. Each column reproduces its domain's
-published $\rho$ exactly (asserted by
-\texttt{make\_rank\_recovery\_grid.py}).}
-\label{fig:rank-recovery-grid}
-\end{figure}
-
 \textbf{What ``paired'' means here, exactly.} The second arm replays
-the first arm's comparison list --- the same question, the same model
-pair, the same cell, for every comparison the first arm judged. The two
-arms therefore share questions, comparisons and cells by construction,
-not statistically: measured as the overlap of
-$(\text{question}, \text{model pair})$ tuples, pairing is $100\%$ in
-six domains and $99.6\%$ on law and engineering. What the arms do not
-share is the judge prompt and the verdict format, and
-Table~\ref{tab:arm-differences} (Appendix~\ref{app:judge-generation})
-itemises exactly what travels with that difference.
+the first arm's comparison list, so the arms share questions,
+comparisons and cells by construction --- measured overlap $100\%$ in
+six domains, $99.6\%$ on law and engineering. What they do not share
+is the judge-prompt bundle, itemised in
+Table~\ref{tab:arm-differences}
+(Appendix~\ref{app:judge-generation}).
 
 \textbf{The offline analyses} required no judge calls: the fixed-point
 certificate and the acceptance-gate seed sweep
@@ -212,11 +197,11 @@ itself is nearly indifferent.
 
 \begin{table}[htbp]
 \centering
-\caption{Rank recovery and judge--key agreement on the settled batch,
-\textsc{main} arm. $\rho$ is Spearman against the ground-truth accuracy
-ordering and is \emph{identical under both tie conventions} in every
-domain and both arms, so one column carries it. Agreement is on
-key-decidable comparisons where the judge committed to a winner.}
+\caption{Rank recovery and judge--key agreement per domain, settled
+batch, \textsc{main} arm. $\rho$ is Spearman against the ground-truth
+ordering (identical under both tie conventions in every domain and
+both arms); agreement is on key-decidable comparisons where the judge
+committed.}
 \label{tab:settled-recovery}
 \begin{tabular}{lrrrr}
 \toprule
@@ -239,18 +224,11 @@ pooled           &        & 200/224 & \textbf{196/200} & 86.0\% \\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{settled_validity_scatter}
-\caption{The arena tracks the key wherever the key can see. One point
-per (domain, model pair), $n = 224$: the pair's ground-truth accuracy
-gap against its Bradley--Terry score difference, signed so that
-agreement with the key is positive. Filled points are the $200$
-key-decidable pairs; small grey diamonds the $24$ undecidable ones.
-The grey band extends to the largest gap that is undecidable in any
-domain (the criterion is per-domain, so the band is a summary, not
-the test). The four misses --- in blue, each labelled --- all sit at
-the smallest decidable gaps, where the key itself is nearly
-indifferent.
-Generated by \texttt{make\_settled\_validity\_scatter.py}, which
-asserts the $224/200/196/4$ counts before drawing.}
+\caption{Ground-truth accuracy gap against Bradley--Terry score
+difference, one point per (domain, model pair), $n = 224$, signed so
+that agreement with the key is positive. Filled points: the $200$
+key-decidable pairs; grey diamonds: the $24$ undecidable ones; blue:
+the four misses, all at the smallest decidable gaps.}
 \label{fig:settled-validity}
 \end{figure}
 
@@ -272,12 +250,10 @@ numbers. First, agreement is reported over the decidable subset only
 agree with --- and conditional on the judge committing; the abstention
 behaviour is Section~\ref{sec:res-tie-signature} and the
 committed-versus-abstained decomposition is Section~\ref{sec:res-c5}.
-Second, the judge is answer-key-blind but not answer-blind: in the
-settled runs the options block is withheld, but $97.6\%$ of stored
-traces state the answering model's own selection
-(Section~\ref{sec:arch-judge}). Nothing in the prompt tells the judge
-which option is right; a judge able to solve the item does not need to
-be told.
+Second, the judge is answer-key-blind but not answer-blind
+(Section~\ref{sec:arch-judge}): nothing in the prompt tells the judge
+which option is right, and a judge able to solve the item does not
+need to be told.
 
 \subsection{The Tie Rate Follows the Key}\label{sec:res-tie-signature}
 
@@ -324,24 +300,7 @@ verifiably right answers are easier to call equivalent than two
 wrong ones. The tie rate is
 recorded for the Bradley--Terry sufficient statistics, not as a test of
 anything, which is why this counts as corroboration rather than as
-fit. Figure~\ref{fig:tie-signature} shows the same sixteen rates as
-Table~\ref{tab:tie-by-key} and the tie columns of
-Table~\ref{tab:c5-decisiveness} in one view: eight dumbbells, all
-leaning the same way, in both arms.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{tie_signature}
-\caption{The tie signature, per domain and pooled: the judge's tie
-rate on key-decidable comparisons (circle) against key-undecidable
-ones (arrowhead), cell-scoped arm filled, generic arm hollow,
-right-margin labels giving the cell-scoped ratio. The direction holds
-in every domain and both arms; the generic arm shows the same
-signature from a lower base. Generated by
-\texttt{make\_tie\_signature.py}, which asserts the pooled rates
-before drawing.}
-\label{fig:tie-signature}
-\end{figure}
+fit.
 
 
 \subsection{Verification, and Its Rival: A Competence Prior}\label{sec:res-competence}
@@ -406,17 +365,14 @@ pilot's comparisons. Those verdicts measure the presence of text, not
 model quality, and every number derived from that run is withdrawn
 rather than qualified.
 
-Repair: the cause was in the ingest loader,
-which had dropped stored response text for 34 of the corpus's 47
-evaluated models. Re-ingest backfilled 356{,}402 rows and recovered 24
-of the 34, taking the corpus from 13 models with usable traces to 37;
-ten had no persisted text to recover, and one of the 37 sits in a
-different question-identifier space and is excluded
-(Appendix~\ref{app:models}), so the maximum valid roster is 36 models.
-The settled batch runs entirely on the repaired corpus, and its roster
-admits no model whose stored output is majority-bare --- though one,
-at $21.4\%$ bare, sits under that policy's threshold rather than clear
-of it (Appendix~\ref{app:models}).
+Repair: the cause was in the ingest loader, which had dropped stored
+response text for 34 of the corpus's 47 evaluated models; re-ingest
+backfilled $356{,}402$ rows and took the corpus from 13 models with
+usable traces to a maximum valid roster of 36, with the full census in
+Appendix~\ref{app:models}. The settled batch runs entirely on the
+repaired corpus, and its roster admits no model whose stored output is
+majority-bare --- though one, at $21.4\%$ bare, sits under that
+policy's threshold rather than clear of it.
 
 \subsection{Off-Subject Questions Are Judged Like On-Subject Ones}\label{sec:res-offsubject}
 
@@ -430,7 +386,7 @@ remainder is genuinely off-subject material judged under another
 subject's rubric: a chemistry item under a combinatorics rubric is the
 concrete case.
 
-\textbf{the judge does not care.} Within cells that received at least ten key-decidable
+\textbf{The judge does not care.} Within cells that received at least ten key-decidable
 comparisons on each side ($27$ cells qualify), agreement with the key
 on off-subject questions differs from on-subject ones by a median of
 $+0.95$ percentage points, with $14$ cells favouring on-subject and
@@ -446,41 +402,22 @@ while Section~\ref{sec:res-c5} varies the \emph{prompt}; the two
 measurements agree that on this corpus the cell rubric does not decide
 verdicts, and each covers the other's blind side.
 
-The continuous version of the same question replaces the
-on/off-subject dichotomy with distance
-(Figure~\ref{fig:rubric-reach}). Measured as cosine distance to the
-centroid of the queries its rubric was induced from, a routed held-out
-question sits at $0.511$ --- $38\%$ of the way from a random reserved
-question ($0.607$) toward construction-grade proximity ($0.353$), and
-only $6$--$21\%$ of the way in five of eight domains. The premise of
-the rubric-coverage worry is therefore real: rubrics are applied well
-outside the material they were induced from. The consequence is not:
-within cells, one standard deviation of that distance moves the
-cell-scoped arm's tie rate by $+1.02$ percentage points --- and moves
-the \emph{generic} arm, which carries no domain criteria at all, by
-$+1.06$. The within-triple difference is $-0.04$ points
-($95\%$ CI $[-1.39, +1.30]$, cell fixed effects, $n = 2{,}788$).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{rubric_reach}
-\caption{The rubric is applied far outside its induction pool, and
-the judge does not care. Panel~(a): per domain, the cosine distance
-from a routed held-out question to its rubric's induction-pool
-centroid (dot), between construction-grade proximity (left rule) and
-a random held-out question (right rule). Panel~(b): change in tie
-rate and key agreement per standard deviation of that distance, with
-cell fixed effects; the arm with no rubric moves identically, so the
-effect is not rubric coverage. Intervals are regression confidence
-intervals, not Bradley--Terry intervals. Generated by
-\texttt{make\_rubric\_reach.py}.}
-\label{fig:rubric-reach}
-\end{figure}
+The continuous version of the same question --- distance to the
+rubric's induction-pool centroid instead of the on/off-subject
+dichotomy --- gives the same answer. A routed held-out question sits
+at cosine distance $0.511$, against $0.607$ for a random reserved
+question and $0.353$ for construction-grade proximity, so rubrics are
+applied well outside the material they were induced from; yet within
+cells, one standard deviation of that distance moves the two arms'
+tie rates identically (within-triple difference $-0.04$ points,
+$95\%$ CI $[-1.39, +1.30]$, cell fixed effects, $n = 2{,}788$). The
+regression and its figure are in
+Appendix~\ref{sec:app-rubric-reach}.
 
 \subsection{Tie Policy, Sampler, and the Stability of \texorpdfstring{$\rho$}{rho}}\label{sec:res-tie-policy}
 
-It bounds every rank correlation in this thesis.
-On the settled batch the tie convention moves nothing: half-weighting
+The instability measured here bounds every rank correlation in this
+thesis. On the settled batch the tie convention moves nothing: half-weighting
 ties and dropping tied comparisons produce the identical $\rho$ in
 every domain and both arms (Table~\ref{tab:settled-recovery}), because
 the roster's accuracy spread leaves no adjacent pair close enough for
@@ -577,9 +514,10 @@ triples --- is one condition and one domain, and is named as future
 work (Section~\ref{sec:disc-future}).
 
 For completeness, under the convention that scores an abstention as a
-miss, pooled decidable-comparison agreement is $74.8\%$ against
-$77.7\%$; that blend of decisiveness and accuracy is reported only
-here, and no claim rests on it.
+miss --- the convention behind the cross-paper figure of
+Section~\ref{sec:res-competence} --- pooled decidable-comparison
+agreement is $74.8\%$ against $77.7\%$; no claim rests on that blend
+of decisiveness and accuracy.
 Figure~\ref{fig:discordance-split} separates the two effects the
 convention would blend.
 
@@ -587,13 +525,10 @@ convention would blend.
 \centering
 \includegraphics[width=\textwidth]{discordance_split}
 \caption{RQ2's two effects, kept apart. Panel~(a): tie rate on
-decidable comparisons per domain, cell-scoped (filled) to generic
-(hollow) --- eight slopes, one direction; this is the robust effect.
-Panel~(b): the $37$ both-committed discordant comparisons split
-$11$ against $26$, with the exact $95\%$ interval of the generic-only
-count clearing the even split ($p = 0.020$) --- real, thin, and
-significant in no single domain. Generated by
-\texttt{make\_discordance\_split.py}.}
+decidable comparisons per domain, cell-scoped (filled) against
+generic (hollow) --- eight slopes, one direction. Panel~(b): the $37$
+both-committed discordant comparisons split $11$ against $26$
+($p = 0.020$) --- real, thin, significant in no single domain.}
 \label{fig:discordance-split}
 \end{figure}
 
@@ -626,15 +561,11 @@ short, at this budget, in every cell of every domain.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{budget_vs_resolution}
-\caption{Identification is free and resolution is not. One dot per
-cell: comparisons per model pair achieved in that cell, log scale.
-The grey band is the identification cost (the whole eight-model graph
-connects within $7$--$10$ comparisons, i.e.\ $0.25$--$0.36$ per
-pair); the dashed rule is the $\sim 143$ comparisons per pair needed
-to resolve an adjacent pair. Every cell in every domain sits in the
-gulf between the two. No intervals are drawn, per the no-interval
-rule of Section~\ref{sec:exp-metrics}. Generated by
-\texttt{make\_budget\_vs\_resolution.py}.}
+\caption{Comparisons per model pair achieved in each cell (one dot
+per cell, log scale), between the identification cost (grey band,
+$0.25$--$0.36$ per pair) and the $\sim 143$ per pair needed to
+resolve an adjacent pair (dashed rule). Every cell in every domain
+sits in the gulf between the two.}
 \label{fig:budget-vs-resolution}
 \end{figure}
 
@@ -642,7 +573,8 @@ rule of Section~\ref{sec:exp-metrics}. Generated by
 
 All on the settled batch. The judge
 \textbf{decides on answer correctness}: it recovers the key's ordering
-on $196$ of $200$ decidable pairs and agrees with the key on $86.0\%$
+--- one shared ordering, recovered eight times --- on $196$ of $200$
+decidable pairs and agrees with the key on $86.0\%$
 of decidable comparisons where it commits
 (Section~\ref{sec:res-correctness}); its \textbf{tie rate nearly
 doubles} exactly where the key stops discriminating, in all eight
@@ -699,7 +631,7 @@ verification channel; it does not close it.
 
 \subsection{Link 1: The Construction Meets Its Requirements}\label{sec:res-construction}
 
-Frozen artifact has 154 nodes, 87 leaves,
+The frozen artifact has 154 nodes, 87 leaves,
 maximum depth 6, $J = 0.253129$, and conserved query mass $8299.00$
 with no mass warnings. All 87 leaves are labelled and carry a judge
 rubric. Leaf populations have median 88 queries, IQR $[71, 118]$,
@@ -709,149 +641,57 @@ Section~\ref{sec:arch-limits}.
 
 Construction reaches a certified fixed point at
 iteration 10 on all four terms, every one at or below $10^{-12}$
-against a tolerance of $10^{-6}$ (the exact certificate values are in
-Appendix~\ref{app:dag-formalism}); iterations 8, 9 and 10 are
-identical on every recorded column. The re-routing term is
-the one that cannot be dropped: it is the only operation in the loop that
-moves the objective without passing through the acceptance gate. One further
-application of the operator would change nothing the artifact consists
-of: not the structure, not the partition, and not the fitted node
-parameters, which matters because held-out queries route through those
-parameters. The certificate tests period~1 only: it asks what one more
-iteration would do, not what any longer cycle would do.
-
-It corrects how the stop is usually described.
-The loop's stopping rule is a disjunction of two independent criteria
-(Section~\ref{sec:arch-limits}). The structural arm requires five
-consecutive iterations with zero graph edit distance \emph{and} a
-minimum iteration count of $\max(0.8 \times \text{anchors}, 5)$, which
-is $11$ at fourteen anchors, so it could not have fired at iteration
-$10$. The objective arm requires five consecutive iterations in which
-both the edit-phase and the re-routing changes in $J$ sit within
-$\tau = 10^{-6}$. The frozen run's log closes with ``Early stopping
-triggered in iteration 10 due to convergence (J stationarity)'' and
-reports graph-edit-distance convergence as false at every iteration.
-The criterion that actually fired is therefore objective-based, which
-weakens the guarantee rather than strengthening it: a structural
-oscillation that left $J$ stationary would satisfy it.
+against a tolerance of $10^{-6}$; iterations 8, 9 and 10 are identical
+on every recorded column. One further application of the operator
+would change nothing the artifact consists of --- not the structure,
+not the partition, and not the fitted node parameters held-out queries
+route through. The certificate is period-1, and the stop that actually
+fired is the objective criterion rather than the structural one, the
+weaker of the two guarantees; the certificate values, the
+stopping-rule disjunction, and the seed runs that stop in a period-2
+cycle neither criterion can see are in
+Appendix~\ref{subsec:quiescence}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{leaf_size_hist}
-\caption{Distribution of leaf query counts in the frozen snapshot
-(construction assignment, not the arena's routing), with the birth
-floor $n_{\min} = 55$ marked. The floor is enforced at split time on
-the routed partition and is not an invariant of the final tree; the
-one leaf of 87 that sits below it (54 queries) occupies the first,
-below-floor bin. Median 88, IQR $[71, 118]$, maximum 396.}
+\caption{Leaf query counts in the frozen snapshot (construction
+assignment, not arena routing): median 88, IQR $[71, 118]$, maximum
+396, with the birth floor $n_{\min} = 55$ marked. The floor binds at
+split time only; one leaf of 87 ends below it.}
 \label{fig:leaf-size-hist}
 \end{figure}
 
-\paragraph{The evidence per requirement, in one table.}
-Table~\ref{tab:requirements-evidence} gives one line of evidence for
-each of the four requirements of Section~\ref{sec:arch-requirements},
-each with the caveat that bounds it.
-One marker used in the table and twice more in this thesis is defined
-here once: \textsc{void as to values} means the underlying numbers
-were computed on a tree superseded by the frozen artifact and are
-withdrawn, while the design of the analysis and any comparison
-internal to it survive.
-
-\begin{table}[htbp]
-\centering
-\small
-\caption{Evidence for the four partition requirements of
-Section~\ref{sec:arch-requirements}. Every row is ;
-the caveat column states what the row does not establish. Full
-derivations are in Appendix~\ref{app:dag-formalism}.}
-\label{tab:requirements-evidence}
-\begin{tabular}{p{0.7cm}p{5.6cm}p{5.8cm}}
-\toprule
-Req & Evidence & Caveat \\
-\midrule
-R1
-& A split is accepted only when the minimum chance-corrected separation
-over all child pairs reaches $0.025$. That bar is positioned between two
-measured nulls: an isotropic null whose $p_{95}$ spans $0.0055$--$0.0093$
-over $n = 75\ldots900$, and a within-node null whose median lies well
-above it.
-& The bar is conservative against ``more than nothing'' and permissive
-against ``more than this node's own elongation''. The within-node null
-values are \textsc{void as to values}; the method survives. \\
-\addlinespace
-R1
-& Against a no-taxonomy floor on the same held-out queries and the same
-geometry: the induced 87 leaves score $J = 0.2538$, the editorial
-14 MMLU-Pro categories $0.1270$, and those same categories randomly
-sub-split to 88 cells $0.1260$. Cell count alone buys nothing.
-& A between-partition comparison on held-out top-1 assignment, not a
-reproduction of the construction-pool objective. It shows the induced
-cells are more separated, not that they are better to judge in. \\
-\addlinespace
-R1
-& Independent of the geometry: rubrics induced on these cells are
-specific to their cells against a size-matched randomised null,
-Mann--Whitney $U$, one-sided, $p = 1.21\times10^{-6}$
-(Section~\ref{sec:res-rubric-null}).
-& The measure is lexical. It shows reproduction of a cell's vocabulary,
-not application of its criteria. \\
-\addlinespace
-R2
-& 87 leaves; median 88 queries per leaf, IQR $[71, 118]$, minimum 54,
-maximum 396.
-& \texttt{minClusterSize} is a \emph{birth} constraint enforced at split
-time, not an invariant: populations drift under later re-routing and
-1 of 87 leaves ends below it. \\
-\addlinespace
-R2
-& Identification is reached at 7 model pairs of 28 --- a spanning tree,
-as the theory requires --- within 7 to 10 comparisons per cell in all
-52 settled cells, median 7 (Section~\ref{sec:res-cost}).
-& Identification only. Resolution needs $\sim$143 comparisons per
-pair against the 1.6--5.1 achieved; see the same section. \\
-\addlinespace
-R2
-& Discriminative power is flat across an eleven-fold change in cell
-count, so the number of cells can be chosen on budget grounds
-(Section~\ref{sec:res-granularity}).
-& This is what licenses \texttt{minClusterSize} $= 55$, and it is a
-statement about this corpus and this roster, not about partitioning in
-general. \\
-\addlinespace
-R3
-& Certified fixed point at iteration 10: edit-phase objective change $0$, maximum
-$1 - \cos(\hat{\boldsymbol{\mu}})$ over all nodes
-$1.11\times10^{-16}$, \texttt{CERTIFIED true}. Iterations 8, 9 and 10
-are identical on every recorded column.
-& It certifies \emph{this} artifact, not that the loop terminates from
-an arbitrary start --- it does not. The certificate tests period~1
-only, and the stop itself came from the objective arm of the
-termination rule rather than the structural one. The two objective
-fields accumulate in parallel over a float sum and are reproducible
-to a bound rather than exactly; no repeat run at this configuration
-has been made to measure that bound. \\
-\addlinespace
-R3
-& Across seeds rather than within one: the twenty sweep runs agree on
-held-out leaf assignment at an adjusted Rand index of median $0.677$,
-range $0.573$--$0.757$ over 190 pairs, against a chance level of $0$.
-& Agreement, not equivalence. A fifth to a third of the pairwise
-structure differs between any two seeds, and which leaf a given query
-lands in is not a seed-invariant fact. \\
-\addlinespace
-R4
-& The acceptance gate is expressed in units of its own objective's
-paired standard error. Across the 69 accepted edits that move queries,
-$\mathrm{SE}(\Delta J)$ spans $13.4\times$ ($3.27\times10^{-5}$ to
-$4.38\times10^{-4}$); the gate declined eight split sites whose
-$\Delta J$ cleared $\tau$, four at $z < 1$ and the worst at $z = 0.089$.
-& The gate is defended on coherence alone. Both of its empirical
-corroborations were tested and refuted (see below). \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Three of these rows deserve a sentence rather than a table cell.
+\paragraph{The evidence per requirement.}
+One marker used twice in this thesis is defined here once:
+\textsc{void as to values} means the underlying numbers were computed
+on a tree superseded by the frozen artifact and are withdrawn, while
+the design of the analysis and any comparison internal to it survive.
+For each of the four requirements of
+Section~\ref{sec:arch-requirements}, one line of evidence, with the
+caveat that bounds it. \textbf{R1}: the split bar $0.025$ sits between
+the measured isotropic null ($p_{95}$ of $0.0055$--$0.0093$) and the
+within-node null (whose values are \textsc{void as to values}; the
+method survives); Table~\ref{tab:j-floor} below doubles the editorial
+partition's separation with none of the gain from cell count; and
+rubric specificity is independent, lexical evidence
+(Section~\ref{sec:res-rubric-null}). \textbf{R2}: 87 leaves at median
+88 queries (Figure~\ref{fig:leaf-size-hist}); identification within
+7--10 comparisons per cell in all 52 settled cells, identification
+only (Section~\ref{sec:res-cost}); and the granularity flatness of
+Section~\ref{sec:res-granularity} is the only thing that licenses
+choosing the cell count on budget grounds. \textbf{R3}: the
+certificate above --- which certifies this artifact, not termination
+from an arbitrary start --- plus cross-seed agreement on held-out leaf
+assignment at an adjusted Rand index of median $0.677$ (range
+$0.573$--$0.757$ over 190 pairs): agreement, not equivalence, since a
+fifth to a third of pairwise structure differs between any two seeds.
+\textbf{R4}: the acceptance gate is expressed in units of its own
+objective's paired standard error, which spans $13.4\times$ across the
+69 accepted edits; the declined-proposal detail is in
+Appendix~\ref{sec:meth-proposal-gate}, and the gate's justification is
+coherence alone (below). Full derivations are in
+Appendix~\ref{app:dag-formalism}.
 
 \textbf{On R1, and on the floor the construction is measured against.}
 The objective $J$ has been reported so far only for the artifact, which
@@ -866,10 +706,10 @@ with the same estimator gives Table~\ref{tab:j-floor}.
 \begin{table}[htbp]
 \centering
 \small
-\caption{The construction objective against a no-taxonomy floor.
-All four partitions are scored on one fixed held-out set ($3{,}575$
-queries, an earlier pool generation; see the text) at $d = 256$; the two randomised rows are means over 200 draws with
-2.5th--97.5th percentile intervals.}
+\caption{The construction objective $J$ against a no-taxonomy floor:
+four partitions of one fixed held-out set at $d = 256$ ($3{,}575$
+queries, an earlier pool generation; see text). Randomised rows are
+means over 200 draws with 2.5th--97.5th percentile intervals.}
 \label{tab:j-floor}
 \begin{tabular}{lrr}
 \toprule
@@ -906,64 +746,20 @@ judgeability: the table establishes that the induced cells are more
 internally alike than the editorial ones, not that a judge does better
 inside them; that question is Section~\ref{sec:res-granularity}.
 
-\textbf{On R4.} The weakest proposal the gate declined carried
-$\Delta J = 9.46\times10^{-6}$ against
-$\mathrm{SE}(\Delta J) = 1.06\times10^{-4}$; a rule thresholding on
-$\tau$ alone would have committed it, along with seven others, and
-committing an edit whose measured improvement is a fraction of its own
-measurement error is incoherent regardless of what it does to any
-downstream number. A second measurement makes the point harder: in the
-frozen run the $\tau$ floor never bound at all --- the smallest
-threshold any of the $173$ declined proposals was tested against is
-$88\tau$ --- so every acceptance decision in the artifact was taken
-against a threshold measured from the edit rather than set in advance.
-That is the entire argument for the gate, and it is enough: the two
-things one would naturally cite in its support (that it tightens
-run-to-run stability, and that it raises $J$) were both measured and
-both refuted, as the next paragraph reports. The transferable
-statement is that \emph{a gate can be right because its units are
-right, without improving the number it gates}.
-
-\textbf{On R2.} The cell count is a budget choice, not a statistical
-one: \texttt{minClusterSize} $= 55$ was chosen so that the resulting
-87 cells match what the judge-call budget can identify, and per-cell
-reliability is a consequence of that choice, not its target. The
-ordering is defensible only because of the flatness result of
-Section~\ref{sec:res-granularity}; without it, 55 would be a
-compromise between coherence and support with no evidence behind the
-trade.
-
-\paragraph{The acceptance gate is stability-neutral and $J$-neutral.}
-both results are negative. The gate's effect on
-run-to-run structure is an additive offset of about $4.4$ leaves with
-no detectable change in dispersion. The dispersion reading needs its
-mechanics stated, because the raw numbers point the wrong way: the
-coefficient of variation of leaf counts rose from $14.3\%$ to $15.7\%$
-under the gate and was initially read as a degradation, but the
-standard deviation is unchanged (variance ratio $1.05$ against an
-$F(4,4)$ critical value of $6.39$; the correlation between a seed's
-leaf-count reduction and its deviation from the mean is $+0.006$), and
-the coefficient of variation rises mechanically because the mean fell.
-The correct statement is that no dispersion change is detectable in
-either direction, which is the second instance of rule~D3
-(Section~\ref{sec:meth-discipline}). And the gate does not raise the
-objective it gates: $J$ is higher on 2 of 5 seeds, exact two-sided sign
-test $p = 1.000$, median $\Delta J = -0.0001$; the apparent gain was
-seed 42 alone. An earlier draft quoted $p = 0.812$ for this
-comparison, which no tail of a sign test on five seeds can return; it
-is withdrawn.
-
-The gate is adopted on coherence alone (the On~R4
-paragraph above), and adopted \emph{after} both of its natural
-empirical supports were tested and refused. A corroboration that was
-tested and failed is stronger evidence about a rule's justification
-than one that was never tested at all.
-
-Caveat: the five-seed sweep's leaf counts predate a correction to the
-splitter's routing check and are \textsc{void as to values} (marker
-defined above). The analysis design and its
-two negative results are unaffected (they are comparisons internal
-to the sweep), but the underlying counts need re-deriving.
+\paragraph{The acceptance gate is stability-neutral and $J$-neutral,
+both measured, both negative.} Its effect on run-to-run structure is
+an additive offset of about $4.4$ leaves with no detectable dispersion
+change in either direction, and it does not raise the objective it
+gates ($J$ higher on 2 of 5 seeds, exact sign test $p = 1.000$). The
+gate is adopted on coherence alone --- its units are its own
+objective's measurement error --- and adopted \emph{after} both of its
+natural empirical supports were tested and refused; a corroboration
+that was tested and failed is stronger evidence about a rule's
+justification than one that was never tested at all. The measurement
+mechanics (including the coefficient-of-variation misreading this
+analysis first produced, the withdrawn $p = 0.812$, and the
+\textsc{void as to values} caveat on the underlying five-seed leaf
+counts) are in Appendix~\ref{sec:meth-proposal-gate}.
 
 \subsection{The Adapted Partition, and How Far It Moves}\label{sec:res-adapted-partition}
 
@@ -986,22 +782,14 @@ comparisons in, checked run by run.
 \begin{table}[htbp]
 \centering
 \small
-\caption{The adapted partition of the frozen artifact. Cells are
-$\mathcal{L}(D_k)$, the leaves beneath anchor $D_k$; the pool is the
-held-out questions whose primary leaf lies in that subtree, which is
-the scoping rule every paired run applies. Label agreement is the
-fraction of the pool carrying the matching MMLU-Pro category, and so
-measures how far the induced partition reproduces the editorial one.
-Rows marked $\ast$ ran in the settled batch, and \emph{run pool} is
-the in-scope question count that run recorded at routing time. It is
-a larger quantity than the \emph{judged} question count of
-Table~\ref{tab:run-record}, because a run's budget can end before
-every in-scope question receives a comparison (engineering routed
-$202$ and judged $158$). Cells, pool, median and label agreement come
-from the routing-harness export
-(\texttt{reserved\_leaf\_assignments.csv}); the run pool comes from the
-runs themselves, and the two routing paths do not agree --- see the
-note below the table.}
+\caption{The adapted partition, one row per anchor: cell count,
+held-out pool whose primary leaf lies in that subtree (the scoping
+rule every paired run applies), median cell size, and label agreement
+with the MMLU-Pro category. $\ast$ marks settled-batch domains;
+\emph{run pool} is the count recorded at routing time, never smaller
+than the judged count of Table~\ref{tab:run-record} because a budget
+can end first. The two routing paths behind these columns disagree; see
+the note below.}
 \label{tab:anchor-cells}
 \begin{tabular}{lrrrrr}
 \toprule
@@ -1027,23 +815,19 @@ Total                   & 87 & 3{,}445 & --- & --- & --- \\
 \end{tabular}
 \end{table}
 
-\paragraph{Two routing paths, and where they disagree.} The cell counts
-are a property of the tree and are not in doubt: they are read from the
-frozen snapshot and independently confirmed by every run. The
-\emph{pools} are not so clean. The harness export routes cached
-embeddings through \texttt{TaxonomyTrickler} and assigns all 3{,}445
-held-out questions; each arena run re-routes live and discards 561 of
-them as outliers matching no leaf, the same 561 in all eight runs. The
-remainder does not merely shrink each pool proportionally --- physics
-falls from 338 to 237 while psychology rises from 258 to 265 --- so the
-two paths disagree about composition, not only about coverage. The
-disagreement was found while reconciling the leaf-count definitions and
-is \textsc{not diagnosed}. It bounds nothing in the paired contrasts,
-which compare two arms over one identical question set drawn by one
-routing path, but it does mean the pool column should be read as the
-frozen artifact's assignment and not as the set any run judged. Each
-run's own count is the last column, and each run reports its own
-sampled coverage in the subsection that presents it.
+\paragraph{Two routing paths, and where they disagree.} The cell
+counts are read from the frozen snapshot and confirmed by every run;
+the \emph{pools} are not so clean. The harness export assigns all
+$3{,}445$ held-out questions, while each arena run re-routes live and
+discards the same $561$ as matching no leaf --- and the remainder does
+not shrink proportionally (physics falls from 338 to 237 while
+psychology rises from 258 to 265), so the two paths disagree about
+composition, not only coverage. The disagreement is \textsc{not
+diagnosed}. It bounds nothing in the paired contrasts, which compare
+two arms over one identical question set drawn by one routing path,
+but the pool column should be read as the frozen artifact's
+assignment rather than the set any run judged; each run's own count
+is the last column.
 
 Label agreement runs from $49.7\%$ to $94.6\%$.
 The induced partition is therefore not a relabelling of the editorial
@@ -1073,20 +857,9 @@ is one more reason, independent of the ones in
 Section~\ref{sec:res-law}, not to treat the screen as a clean
 predictor of which domains reward a partition.
 
-\paragraph{A correction to Addendum 3.} The registration for physics
-and computer science described them as having 12 and 3 leaves, with
-pools of 546 and 208 questions. Those figures come from the
-label-composition count that Chapter~\ref{ch:methodology} sets aside:
-they assign each leaf to its majority MMLU-Pro category rather than to
-its anchor. Under the adapted partition the runs actually used, the
-figures are 10 and 6 cells over pools of 338 and 191. The error is
-descriptive and touches no prediction --- both registrations turn on
-the sign and magnitude of $\Delta\rho$, neither of which references a
-cell count. The secondary observation registered for physics also
-survives: mathematics still has the most cells, physics still has the
-second most, and the gap is one cell under either count. The
-correction is recorded here rather than repaired in the registration,
-which is left as written.
+A descriptive correction to Addendum 3's cell counts --- it touches
+no prediction, and the registration is left as written --- is
+recorded in Appendix~\ref{sec:app-addenda-record}.
 
 \subsection{Link 2: Rubric Specificity Against a Randomised Null}\label{sec:res-rubric-null}
 
@@ -1113,15 +886,12 @@ consequence at the verdict.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{rubric_specificity_null}
-\caption{The rubrics are specific to their cells: cumulative
-distributions of own-cell rubric specificity for the 87 induced cells
-against 13 random cells drawn to the same sizes and put through the
-same induction procedure, medians $0.138$ against $0.012$,
-Mann--Whitney $U$, one-sided, $p = 1.21 \times 10^{-6}$. Zero on the
-axis means a rubric says no more about its own cell than about any
-other. The analysis is offline --- rubric text against rubric text ---
-and involves no arena verdict; that the specificity is nonetheless
-inert at the verdict is Section~\ref{sec:res-c5}.}
+\caption{Cumulative distributions of own-cell rubric specificity: the
+87 induced cells against 13 size-matched random cells put through the
+same induction, medians $0.138$ against $0.012$ (Mann--Whitney $U$,
+one-sided, $p = 1.21 \times 10^{-6}$). Zero means a rubric says no
+more about its own cell than about any other; the analysis is
+offline, rubric text only.}
 \label{fig:rubric-specific}
 \end{figure}
 
@@ -1159,8 +929,9 @@ is not a function of its size.
 
 One consequence belongs here rather than in
 Chapter~\ref{ch:discussion}. These are the same rubrics whose
-replacement by a generic prompt leaves the judge's ranking unchanged
-in every settled domain (Section~\ref{sec:res-c5}). Link~2 holds, the
+replacement by a generic prompt moves no settled domain's ranking
+beyond one within-noise transposition (Section~\ref{sec:res-c5}).
+Link~2 holds, the
 cells do produce measurably specific rubrics, and on this corpus that
 specificity is inert at the verdict.
 
@@ -1181,22 +952,13 @@ taken after registration, and it is recorded here because the
 separation would read as stronger if the registered design were
 assumed.
 \item \textbf{The supporting artifacts are untracked.} The null-arm
-generation script and its outputs sit in an untracked build directory.
-The headline separation was reproduced from those stored artifacts on
-2026-07-27 and re-derived independently on 2026-07-30, robust across
-all three specificity definitions (every $p < 10^{-5}$). A dated
-addendum (2026-07-28) records both the written-back results and this
-caveat, because a result whose artifacts are untracked is one clean
-checkout from being unsupported.
+script and outputs sit in an untracked build directory --- one clean
+checkout from being unsupported --- though the separation was
+reproduced from them and later re-derived independently under all
+three specificity definitions (every $p < 10^{-5}$); the dated
+addendum carries the caveat and the band bookkeeping
+(Appendix~\ref{sec:app-addenda-record}).
 \end{enumerate}
-
-The same addendum resolves which decision band governs which quantity,
-because the two pre-registration documents state bands for different
-things. The $\geq 0.05$-with-$\geq 75\%$-of-cells-positive band governs
-the treatment arm's within-arm specificity, met at $0.138$ with $93\%$
-of cells positive. The $\leq 0.05$ / $\geq 0.10$ band governs the
-random arm's absolute own-cell specificity, met at $0.012$, and is the
-band quoted above.
 
 \subsection{Link 3's Premise Fails, and It Was Pre-Registered}\label{sec:res-granularity}
 
@@ -1214,20 +976,16 @@ rankings: for every pair of cells, the Spearman correlation between the
 two cells' ground-truth accuracy rankings of the roster. If cells
 differ in what they measure, that correlation should fall as cells get
 finer. Table~\ref{tab:granularity} reports the medians at four
-granularities.
+granularities. The table is ground truth only and was computed at the
+pre-settlement rosters; the settled-roster refit of
+Section~\ref{sec:res-leaf-null} confirms the flatness it shows.
 
 \begin{table}[htbp]
 \centering
-\caption{Observed between-cell Spearman $\rho$ of ground-truth model
-rankings, across an eleven-fold change in granularity, under two
-assignment conventions (A) and (B) defined in the note below.
-Ground truth only --- no judge verdict enters this table, so the run
-withdrawals do not touch it; it was computed at the pre-settlement
-rosters (the historical eight-model band and the eleven-model band),
-and the settled-roster leaf-substructure refit of
-Section~\ref{sec:res-leaf-null} confirms the flatness it shows. The
-88-leaf and 87-leaf rows differ only in the router used to assign
-queries and are an explicit control.}
+\caption{Median between-cell Spearman $\rho$ of ground-truth model
+rankings at four granularities, under assignment conventions (A) and
+(B) defined in the note below. The 88- and 87-leaf rows differ only
+in router and are an explicit control.}
 \label{tab:granularity}
 \begin{tabular}{lrrrr}
 \toprule
@@ -1263,20 +1021,16 @@ across \emph{routers} as well as across granularities.
 Centring out each model's global mean is a control on that flatness,
 and it is the weakest measurement in this section. If cell identity
 carried nothing, the centred between-cell correlations should sit at
-the mechanical centring null $-1/(C-1)$, which is $-0.077$ at 14
-domains and $-0.011$ at 87 leaves. What the script\footnote{%
+the mechanical centring null $-1/(C-1)$ ($-0.077$ at 14 domains,
+$-0.011$ at 87 leaves); what the script\footnote{%
 \texttt{tools/analysis/discriminative\_flatness.py}.} returns is
-$+0.024$ at 14 domains and $-0.024$ at 87 leaves on the 8-model roster,
-and $-0.109$ and $-0.009$ on the 11-model band. The residual is small
-everywhere, and its sign is unstable across rosters at the 14-domain
-cut. At that cut the 8-model value is nearer zero than the null is, so
-this control cannot separate ``zero'' from ``the centring null'' in
-either direction, and it is reported as small rather than as located.
-An earlier draft reported a single quartet $-0.119$, $-0.024$,
-$-0.024$, $-0.024$; no one centring convention reproduces all four
-values, so the quartet is withdrawn and the four roster-specific values
-above are reported in its place. They have not themselves been
-independently confirmed.
+small everywhere but sign-unstable across rosters at the 14-domain
+cut, so the control cannot separate ``zero'' from ``the centring
+null'' and is reported as small rather than as located. An earlier
+draft's single quartet of centred values is withdrawn --- no one
+centring convention reproduces all four --- and the roster-specific
+values that replace it are recorded in the corrections register
+(Appendix~\ref{app:corrections-register}).
 
 The join underlying this analysis was verified before it was computed,
 per rule~D2: exact, $11769/11769$; all roster models present in every
@@ -1365,8 +1119,8 @@ express. The claim this section supports is therefore bounded: at the
 roster the arena actually ranks, cells create no measurable evaluative
 diversity.
 
-It is the fifth error this apparatus caught in
-its own numbers. The first version of this null sampled pseudo-leaves
+This null carries the fifth error this apparatus caught in
+its own numbers. Its first version sampled pseudo-leaves
 \emph{independently}, which gave them 11--26\% pairwise question
 overlap where real leaves have 1.6--4.9\%. Overlapping pseudo-leaves
 agree with each other for free, so the null was inflated and the real
@@ -1377,7 +1131,7 @@ answer. The first version's conclusion is withdrawn
 Section~\ref{sec:meth-discipline} applied to a comparison arm that had
 never itself been checked.
 
-It locates where the boundary of that claim
+One further measurement locates where the boundary of that claim
 runs. In the settled roster no analysis of near-tied pairs is even
 possible: the smallest aggregate accuracy gap between any two of its
 models is $7.9$ points, so there are no ties for a domain to reorder.
@@ -1425,14 +1179,12 @@ apart everywhere.
 
 \begin{table}[htbp]
 \centering
-\caption{The offline reordering screen on all fourteen MMLU-Pro
-domains, refit at the settled eight-model roster against a size-matched
-1{,}500-draw permutation null (seed 42, reserved split, 3{,}437 covered
-questions). A \emph{low} $p$ means the domain's ground-truth ranking of
-the roster departs from the global ranking more than a random subset of
-the same size does. Domains marked $\bullet$ are the eight the arena
-ran; the selection was fixed under the earlier twelve-model fit and
-carries no endorsement from this one.}
+\caption{The offline reordering screen on all fourteen domains, refit
+at the settled eight-model roster against a $1{,}500$-draw
+size-matched permutation null. Low $p$: the domain's ground-truth
+roster ranking departs from the global one more than a random
+same-size subset does. $\bullet$ marks the eight arena domains; their
+selection predates this fit and carries no endorsement from it.}
 \label{tab:domain-screen}
 \begin{tabular}{lrrl}
 \toprule
@@ -1473,20 +1225,14 @@ ordering of Section~\ref{sec:res-correctness}, seen from the screen's
 side, and it is why no per-domain arena result in this thesis is read
 as evidence about that domain in particular.
 
-The reason this thesis computes the screen at
-the roster the arena actually runs. \textbf{At earlier rosters the
-screen reversed twice, and both reversals had the same cause.} At an
-early 8-model band, math was indistinguishable from a same-size random
-subset and the recommendation was law. After the trace backfill the
-screen was re-run at 37 models, math became significant and the
-recommendation flipped to math --- a flip resting on a model
-intersection poisoned by a single model in a different
-question-identifier space, whose inclusion collapsed law from 287
-questions to 20. Excluding it restored law. Both inversions came from
-evaluating a ranking statistic at a model count that did not match the
-decision it was informing; the saturation of the settled refit is the
-same lesson from the other side, a screen answering only questions
-about the roster it is given.
+The screen is computed at the roster the arena actually runs because
+at earlier rosters it reversed twice, both times from evaluating a
+ranking statistic at a model count that did not match the decision it
+was informing --- the id-space join that collapsed law from 287
+questions to 20 is rule~D2's canonical instance
+(Section~\ref{sec:meth-discipline}). The saturation of the settled
+refit is the same lesson from the other side: a screen answers only
+questions about the roster it is given.
 
 Two caveats bound the whole section. First, the screen uses MMLU-Pro's
 native category labels rather than induced cells, so it bounds what a
@@ -1500,56 +1246,35 @@ rests on it as more than that.
 
 \subsection{Polyhierarchy: A Measured Negative Result}\label{sec:poly-negative}
 
-The construction produces a strict tree: every node below the root has
-exactly one parent. An earlier version of the pipeline admitted
-polyhierarchy (a \emph{concept} belonging to several branches)
-through a dedicated cross-link operator that gave an existing node a
-second parent when the new parent's residual pool demonstrably fitted
-it. The operator is gone from the construction described in this
-thesis; the single-parent invariant that replaced it, and the one
-restriction on fusion needed to hold it, are specified in
-Appendix~\ref{app:cross-link-operator}. Construction-time routing
-remains weighted multi-membership (Appendix~\ref{app:dag-formalism});
-that is a claim about \emph{queries}, not concepts, and it is
-retained. What follows is the evidence that retired the operator.
+The construction produces a strict tree: every node below the root
+has exactly one parent. An earlier version of the pipeline admitted
+polyhierarchy (a \emph{concept} belonging to several branches) through
+a dedicated cross-link operator; the operator is gone, and the
+single-parent invariant that replaced it is specified in
+Appendix~\ref{app:cross-link-operator}, together with the admission
+record and the provenance caveat that bounds what the numbers below
+can be checked against. Construction-time routing remains weighted
+multi-membership over \emph{queries}, not concepts
+(Appendix~\ref{app:dag-formalism}).
 
-Across 42 cross-link proposals on the canonical
-corpus, the capture fraction $f$ that the operator uses to rank
-candidates was uncorrelated with the objective it must satisfy:
-$r(f, \Delta J) = +0.085$, with complete distributional overlap between
-accepted and rejected proposals (median $f$ of $0.802$ accepted against
-$0.818$ rejected).
-The effect sizes were an order of magnitude apart: median $\Delta J$
-was $6.9 \times 10^{-5}$ for cross-links against $5.3 \times 10^{-4}$
-for splits.
-Admission was therefore decided by evaluation order rather than by
-evidence, which the proposal sequence makes explicit: one node was
-accepted at four hosts and rejected at two, and acquired five parents
-by iteration~1.
-
-Cost of removal: the multi-leaf rate of
-held-out queries was $0.1549$ with cross-links and $0.1518$ without,
-so queries that legitimately span domains still reach several leaves
-through the routing beam and the membership floor.
-
-$J$ scores a partition of query mass into cells.
-Giving a node a second parent changes which paths reach its cell, but
-it leaves the cell contents almost unchanged, so $\Delta J$ carries
-little signal about whether the edge is semantically right.
-A partition-based objective is structurally indifferent to
-polyhierarchy, and no threshold on such an objective can separate good
-cross-links from bad ones. The operator was therefore removed rather
-than retuned. What is given up is the concept-level claim, which the
-evidence above could not support in the first place.
-
-One caveat on provenance, stated because it bounds what the numbers in
-this subsection can be checked against. They come from a construction the
-current source can no longer produce: the operator was deleted, and with
-it the proposal type its records were written under, so the proposal logs
-of the frozen artifact and of every run that postdates the deletion
-contain no cross-link rows. The measurements stand as a record of why the
-operator was retired and cannot be re-derived from any artifact this
-thesis reports.
+The evidence that retired the operator: across 42 cross-link proposals
+on the canonical corpus, the capture fraction $f$ it ranks candidates
+by was uncorrelated with the objective it must satisfy
+($r(f, \Delta J) = +0.085$, with complete distributional overlap
+between accepted and rejected proposals); median $\Delta J$ was an
+order of magnitude smaller for cross-links than for splits
+($6.9 \times 10^{-5}$ against $5.3 \times 10^{-4}$), so admission was
+decided by evaluation order rather than by evidence; and removal cost
+almost nothing --- the held-out multi-leaf rate fell from $0.1549$ to
+$0.1518$, so queries that legitimately span domains still reach
+several leaves through the routing beam and the membership floor. The
+diagnosis is structural: $J$ scores a partition of query mass, and a
+second parent changes which paths reach a cell while leaving its
+contents almost unchanged, so a partition-based objective is
+structurally indifferent to polyhierarchy and no threshold on it can
+separate good cross-links from bad ones. The operator was removed
+rather than retuned; what is given up is the concept-level claim,
+which the evidence could not support in the first place.
 
 \section{Chapter Summary}\label{sec:res-summary}
 

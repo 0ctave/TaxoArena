@@ -471,7 +471,7 @@ absolute tolerance is correct at both ends of that range.
 The gate declined eight split sites whose $\Delta J$ exceeded $\tau$, four at $z < 1$
 and the worst at $z = 0.089$ ($\Delta J = 9.46\times10^{-6}$ against
 $\mathrm{SE}(\Delta J) = 1.06\times10^{-4}$); a $\tau$-only rule commits all eight, and
-committing an edit whose measured improvement is a eleventh of its own measurement error
+committing an edit whose measured improvement is an eleventh of its own measurement error
 is incoherent regardless of what it does downstream.
 In the frozen run the $\tau$ arm never bound: the smallest operative threshold across
 the 173 gate rejections is $8.83\times10^{-5}$ ($88\tau$) and the smallest
@@ -481,6 +481,29 @@ governed every decision was measured rather than set.
 The gate's two natural empirical corroborations --- that it tightens run-to-run
 stability \emph{across seeds}, and that it raises $J$ --- were both tested and both
 refuted (Section~\ref{sec:res-construction}), and it is adopted on coherence alone.
+
+\paragraph{The neutrality measurements.} Demoted from
+Section~\ref{sec:res-construction}, which keeps the verdicts. The
+gate's effect on run-to-run structure is an additive offset of about
+$4.4$ leaves. The dispersion reading needs its mechanics stated,
+because the raw numbers point the wrong way: the coefficient of
+variation of leaf counts rose from $14.3\%$ to $15.7\%$ under the gate
+and was initially read as a degradation, but the standard deviation is
+unchanged (variance ratio $1.05$ against an $F(4,4)$ critical value of
+$6.39$; the correlation between a seed's leaf-count reduction and its
+deviation from the mean is $+0.006$), and the coefficient of variation
+rises mechanically because the mean fell. The correct statement is
+that no dispersion change is detectable in either direction, the
+second instance of rule~D3 (Section~\ref{sec:meth-discipline}). On the
+objective: $J$ is higher on 2 of 5 seeds, exact two-sided sign test
+$p = 1.000$, median $\Delta J = -0.0001$; the apparent gain was seed
+42 alone. An earlier draft quoted $p = 0.812$ for this comparison,
+which no tail of a sign test on five seeds can return; it is
+withdrawn. Caveat: the five-seed sweep's leaf counts predate a
+correction to the splitter's routing check and are \textsc{void as to
+values} (marker defined in Section~\ref{sec:res-construction}); the
+two negative results are comparisons internal to the sweep and are
+unaffected, but the underlying counts need re-deriving.
 
 The same argument rules out selecting the branching factor $k$ by $\arg\max \Delta J$
 over candidates: a maximum over noisy estimates is biased upward even when all
@@ -532,3 +555,18 @@ It does \emph{not} determine which leaves a query contributes comparisons to: fo
 arena run reported in this thesis the propagation path received each query's primary leaf
 only, and the secondary memberships were computed and discarded
 (Appendix~\ref{app:numerics}).
+
+\paragraph{The admission record and the provenance caveat.} Demoted
+from Section~\ref{sec:poly-negative}, which keeps the retiring
+evidence. That admission was decided by evaluation order rather than
+by evidence is explicit in the proposal sequence: one node was
+accepted at four hosts and rejected at two, and acquired five parents
+by iteration~1 (median capture fraction $f$ of $0.802$ accepted
+against $0.818$ rejected). One caveat on provenance bounds what those
+numbers can be checked against: they come from a construction the
+current source can no longer produce --- the operator was deleted, and
+with it the proposal type its records were written under, so the
+proposal logs of the frozen artifact and of every run that postdates
+the deletion contain no cross-link rows. The measurements stand as a
+record of why the operator was retired and cannot be re-derived from
+any artifact this thesis reports.

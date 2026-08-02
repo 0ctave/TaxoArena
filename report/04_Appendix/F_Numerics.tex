@@ -1,9 +1,10 @@
 \chapter{Numerical Methods}\label{app:numerics}
 
-This appendix collects the numerical-stability derivations referenced
-from Chapters~\ref{ch:introduction} and~\ref{ch:methodology} and from
-Appendix~\ref{app:dag-formalism}.
-Each subsection documents what the implementation actually computes
+This appendix collects the numerical-stability derivations and
+mechanism specifications referenced from
+Chapters~\ref{ch:introduction}, \ref{ch:methodology}
+and~\ref{ch:discussion} and from Appendix~\ref{app:dag-formalism}.
+Each section documents what the implementation actually does
 (\texttt{StatisticsUtils}, \texttt{TaxonomyFitter},
 \texttt{BtMatchScheduler}, \texttt{BtMmFitter}), not an idealised
 variant.
@@ -118,9 +119,12 @@ that predate the variance fix the stored standard errors were floored
 or understated (Section~\ref{sec:meth-bt}), which made the gap guards
 close to constant thresholds; in the worst case the resulting
 allocation concentrated on a leader-centric star covering under a
-third of the comparison graph. The scheme is documented as designed;
-the runs that predate the variance fix did not realise it, and every
-settled run does (Section~\ref{sec:res-cost}).
+third of the comparison graph. This valley machinery belongs to the
+legacy utility-blend selection path that those withdrawn runs used;
+the settled runs select pairs by the rank-adjacency rules of
+Section~\ref{sec:app-scheduler} and do not consult it. It is
+documented here because the withdrawn runs' behaviour is explained by
+its degeneration.
 
 \section{Observed Fisher Information for BT Standard Errors}\label{sec:num-fisher}
 
@@ -134,7 +138,7 @@ $p_{ij} = \sigma(s_i - s_j)$ has observed information matrix
 \]
 i.e.\ $\mathcal{I}_{ii} = \sum_{j \neq i} n_{ij} p_{ij}(1-p_{ij})$
 and $\mathcal{I}_{ij} = -\,n_{ij} p_{ij}(1-p_{ij})$, evaluated at the
-MM fixed point $\hat{\mathbf{s}}$.
+MM fixed point $\hat{\mathbf{s}}$ (Section~\ref{sec:num-bt-estimator}).
 $\mathcal{I}$ is singular with rank deficiency one (row sums vanish),
 reflecting the additive-constant non-identifiability that the
 zero-sum constraint $\sum_i s_i = 0$ removes.
@@ -180,6 +184,217 @@ $0.01$. Because comparisons sharing a query are treated as
 independent, these standard errors underestimate the true uncertainty
 by a margin this thesis does not measure
 (Section~\ref{sec:meth-assumptions}).
+
+\paragraph{The scheduler consequence of the pre-correction values.}
+Demoted from Section~\ref{sec:disc-debt}, which keeps the verdict.
+The terms below ($U_{\text{resolve}}$, the mixing weight $\alpha$,
+the $3\sigma$ resolve rule) are the legacy utility-blend scheduler's
+own quantities --- the selection path Runs~A and~B used, which the
+settled runs replace with the rules of
+Section~\ref{sec:app-scheduler}. Runs~A and~B consumed standard
+errors that were floored for about a quarter of nodes and understated
+for the rest, with three likely mechanical consequences: the variance
+division inside $U_{\text{resolve}}$ degenerated toward a constant,
+so the term
+approached pure entropy; the maturity-driven mixing weight $\alpha$,
+keyed to falling per-leaf standard errors, did not mature as designed;
+and the $3\sigma$ resolve rule tended toward a fixed margin
+$|\hat{s}_i - \hat{s}_j| \geq 0.06$. Section~\ref{sec:num-kde} traces
+the same degeneration through the pair-weight gap guards.
+
+\section{Persistence Stores and the Run Manifest}\label{sec:num-persistence}
+
+The storage detail below is demoted from Section~\ref{sec:arch-infra};
+the seed semantics and the rebuild check stay there.
+
+State is partitioned across four SQLite stores with distinct write
+lifecycles: the embedding cache, the MMLU-Pro corpus with its per-model
+stored evaluations, the snapshot store, and the ratings store. Only
+frozen snapshots are eligible as arena inputs and a frozen snapshot is
+read-only, and every verdict row carries the snapshot identifier, so
+the taxonomy a verdict was produced under is always recoverable.
+
+Per-run seeds and realised call counts are recorded in a manifest
+emitted with each run. Two qualifications belong with that claim. The
+manifest's working-tree-clean flag does not distinguish a modified
+source file from a modified thesis file, so it fires on benign
+conditions and should not be read as a reproducibility guarantee on
+its own. And \texttt{ratings.db} is keyed by snapshot and condition in
+a way that makes a re-run of the same condition \emph{clear} the
+previous rows rather than accumulate beside them; the results of
+Chapter~\ref{ch:results} were preserved by copying the store before
+each subsequent run.
+
+\section{Methodological Assumptions}\label{sec:num-assumptions}
+
+Table~\ref{tab:meth-assumptions} carries the full assumption
+inventory; Section~\ref{sec:meth-assumptions} keeps the verdict on the
+three load-bearing ones.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Methodological assumptions, failure modes, and diagnostics.}
+    \label{tab:meth-assumptions}
+    \begin{tabular}{p{3.4cm}p{4.4cm}p{4.4cm}}
+        \toprule
+        Assumption & Why it might fail & What would detect it \\
+        \midrule
+        Directional geometry reflects semantic compatibility
+        & Embedding direction encodes surface form rather than task
+        content
+        & The chance-corrected separation score against its two nulls
+        (Section~\ref{sec:arch-requirements}) \\
+        \addlinespace
+        One directional component suffices per node
+        & A node holds two distinct sub-topics at comparable mass
+        & The min-pair separation gate at split time \\
+        \addlinespace
+        Bradley--Terry transitivity holds locally within a coherent cell
+        & Cyclic dominance survives even inside a cell
+        & Per-cell fit residuals; pairwise-winner accuracy \\
+        \addlinespace
+        The judge is reliable under domain conditioning
+        & Rubric conditioning shifts verdicts without improving them
+        & The generic-judge and generic-rubric arms
+        (Section~\ref{sec:res-c5}) \\
+        \addlinespace
+        Cells carry different true model rankings
+        & The corpus is saturated for the roster, so cell identity adds
+        nothing to global capability ordering
+        & The pre-registered granularity analysis
+        (Section~\ref{sec:res-granularity}) \\
+        \addlinespace
+        Comparisons are independent given the Bradley--Terry parameters
+        & Query reuse and multi-membership induce dependence
+        & None applied; the Fisher standard errors treat comparisons as
+        independent and therefore understate uncertainty \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{The Bradley--Terry Estimator and Prior}\label{sec:num-bt-estimator}
+
+Section~\ref{sec:meth-bt} keeps the model, the tie convention, and
+the standard-error correction. Nothing here is new; the choices are
+standard and are recorded for exactness.
+
+The estimator is the Minorisation--Maximisation update of
+\textcite{hunter2004mm}, an iterative scheme that maximises a simple
+lower bound on the likelihood at each step, written in the
+exponentiated parameters $\pi_i = e^{s_i}$:
+\[
+\pi_i^{(t+1)} \;=\;
+\frac{W_i}{\displaystyle\sum_{j \neq i}
+\frac{N_{ij}}{\pi_i^{(t)} + \pi_j^{(t)}}},
+\qquad W_i = \sum_{j \neq i} W_{ij},
+\]
+applied as a simultaneous (Jacobi) sweep over all models. Iteration
+stops at a tolerance of
+$\max(10^{-6},\, 0.01\,\widehat{\mathrm{SE}}_{\text{lb}})$ or at a cap
+of 200 sweeps.
+
+A Jeffreys prior is applied on top of the counts. The Jeffreys prior
+for a binomial probability is the $\mathrm{Beta}(0.5, 0.5)$
+distribution, the standard uninformative choice; adding it here amounts
+to giving a pair half a phantom win in each direction before the fit
+runs. Its purpose is to keep a fitted win probability away from $0$ and
+$1$ when one model has swept a pair, which is the case where the
+likelihood has no interior maximum and the strength difference would
+otherwise run off to infinity.
+It is applied only to pairs that already carry at least one real
+comparison. Pairs with no data are left untouched, so the prior
+regularises estimates rather than manufacturing edges in the comparison
+graph, and the identifiability check runs on the observed counts alone.
+
+\section{Scheduler Mechanics}\label{sec:app-scheduler}
+
+Section~\ref{sec:meth-scheduling} keeps the loop overview and the two
+properties results depend on; the rules below are the loop's full
+specification, and where an earlier rule was replaced, the
+replacement's reason is recorded with it.
+
+\paragraph{The bootstrap floor.}
+Before any adaptive scheduling, every (cell, pair) slot receives one
+comparison. The floor is per (cell, pair) rather than global. A global
+floor --- one comparison per pair anywhere in the domain --- leaves the
+domain-level comparison graph complete while individual cells stay
+sparse, and every per-cell quantity in this thesis rests on those
+per-cell graphs. One comparison per pair per cell is enough to make
+each cell's graph complete rather than merely connected, which is what
+per-cell estimation needs, and it costs $\text{pairs} \times
+\text{cells}$ calls: 308 at eight models and eleven cells. Bootstrap
+tasks round-robin over cells so a run stopped early has balanced
+coverage, and the query is rotated across the cell's pool by a
+per-cell offset, so consecutive bootstrap tasks take consecutive
+questions instead of all 28 pairs judging the same one. When the
+bootstrap completes, an assertion checks that no model has zero
+comparisons and aborts rather than fitting an unidentified ranking.
+
+\paragraph{Batch quotas.}
+Each round has a batch size, and each cell's quota within it is
+proportional to that cell's held-out pool size, floored at one so no
+cell is starved out of a batch entirely. Equal-per-cell allocation was
+the earlier rule and it distorted the domain estimate: on physics each
+of the ten cells took $9.2$ to $11.3\%$ of the comparisons while
+holding $5.6$ to $17.8\%$ of the questions. That is defensible for a
+per-cell fit, whose cost does not scale with cell size, and wrong for
+the domain fit, which pools sufficient statistics and therefore weights
+a cell by its comparison count. When quotas are filled and the batch is
+not, the batch comes back short: topping it up from whichever cell
+still has work would re-introduce exactly the over-weighting the
+quotas remove.
+
+\paragraph{Choosing a pair and a query.}
+Within a cell, models are ordered by their current fitted
+Bradley--Terry strengths and only rank-\emph{adjacent} pairs are
+sampled. Adjacent pairs are the closest by construction, so they are
+where an extra comparison can still change the order; a pair separated
+by several places is already decided. Among the adjacent pairs the
+scheduler takes the one whose confidence interval still straddles a
+coin flip by the widest margin. Ordering on fitted strengths rather
+than on summed win rates matters early in a run, when most pairs carry
+one comparison and a win-rate order is dominated by coin flips, which
+makes the adjacency set churn between rounds.
+The query is then chosen inside that pair by two rules. Queries where
+the two models gave \emph{different} stored answers are preferred,
+because a comparison in which both models answered identically carries
+little signal. Among those, the query judged fewest times anywhere in
+the cell is taken, with ties broken by query identifier so the
+selection is deterministic at a fixed seed. The least-used rule spreads
+a cell's budget over its pool; the earlier rule, lowest unused
+identifier per pair, let all 66 pairs in a cell converge on the same
+handful of questions.
+
+\paragraph{When a pair is finished, and when the run is.}
+A pair is terminal inside a cell under any of three conditions.
+An \emph{exact two-sided binomial test} of that pair's within-cell wins
+against $p = 0.5$ rejects at $\alpha = 0.05$ after Bonferroni
+correction over the $M - 1$ adjacent pairs actually tested, with a
+minimum of five comparisons. Ties enter the test at half weight and are
+rounded to the nearest whole win count, which pushes the statistic
+toward $n/2$ and away from significance.
+Or its \emph{per-(cell, pair) budget} is spent. That budget is sized
+from the cell's own pool, $\lfloor n/4 \rfloor$ clamped to $[8, 25]$,
+so a large cell is not rationed by the smallest cell in the domain. The
+floor of 8 keeps the binomial test reachable --- a pair one model wins
+outright resolves at 9 comparisons under the Bonferroni correction ---
+and the ceiling of 25 stops a large cell spending budget on a pair
+already decided.
+Or the \emph{confidence gate} retires it. At the start of every round
+each cell's pairs are tested against that cell's own $\theta$ and
+standard errors, and a pair is retired in that cell when
+$|\theta_i - \theta_j| > 2.5\max(\sigma_i, \sigma_j)$. The gate is
+keyed \texttt{cell|modelA|modelB} and is recomputed from scratch each
+round. It used to be keyed on the pair alone and fed from the pooled
+leaderboard, which retired a pair in every cell at once on the strength
+of the pooled result --- that assumes the null the per-cell arena
+exists to test, and Section~\ref{sec:res-runs} reports what it did to
+one run.
+
+A run ends when the round counter reaches its cap, when a size-weighted
+$70\%$ of cells are converged, or when the scheduler returns an empty
+batch because every pair is terminal or budget-exhausted. Which of
+these ended each run is recorded with the run.
 
 \section{Design-Document Mechanisms with No Implementation}\label{app:not-implemented}
 

@@ -1,81 +1,156 @@
 \chapter{Formal Metric Definitions}\label{app:metrics}
 
-This appendix gives closed-form definitions for the construction-quality
-metrics the system computes and exports. Arena and ranking metrics
-(Bradley--Terry scores, Spearman $\rho$, pairwise-winner accuracy) are
-formalised in Section~\ref{sec:meth-bt} and
-Section~\ref{sec:meth-validation} and are not repeated here.
+This appendix gives closed-form definitions for the statistics the settled chapters
+quote and for the two construction exports still cited from them. Every arena number
+these definitions govern comes from the settled eight-domain, eight-model
+\texttt{RESOLVED} batch (Section~\ref{sec:res-runs}); each offline analysis names its
+own inputs where it is reported. Bradley--Terry estimation itself --- the MM fit, the
+Jeffreys-prior regularisation, and the variance correction --- is specified in
+Section~\ref{sec:meth-bt} and Appendix~\ref{app:numerics} and is not repeated here.
 
-% RESOLVED 2026-07-31: AvgMatch (used by the frozen-tree certificate appendix)
-% and Routing ECE (canonical statement of the export defect cited from the debt
-% register) are load-bearing and keep their full text. Dasgupta cost and the
-% purity pair are cited nowhere in the chapters and are compressed below to
-% definition-plus-pointer; their full text lives in version control (this file's
-% history, alongside the Spherical Silhouette and Normalised Sackin Index
-% definitions removed earlier for the same reason).
+\section{Key-Decidability, Agreement, and Tie Rate}\label{sec:app-metrics-decidable}
+
+Two granularities of decidability share the name and are used strictly apart. A single
+\emph{comparison} is key-decidable when exactly one of its two responses matches the
+MMLU-Pro key; when both are right or both are wrong, the key abstains. A \emph{model
+pair} is key-decidable in a domain at $N$ routed questions when the two accuracies
+separate by more than twice their pooled binomial standard error,
+$|p_1 - p_2| > 2\sqrt{p_1(1-p_1)/N + p_2(1-p_2)/N}$; the 200-of-224 decidable pairs of
+Section~\ref{sec:res-correctness} use this pair-level test.
+
+\emph{Agreement} is the fraction of key-decidable comparisons, among those on which
+the judge committed to a winner, where that winner is the model that answered
+correctly; the unconditional variant counts abstentions as disagreements and is quoted
+only where named as such. The \emph{tie rate} is the fraction of logical comparisons
+the judge rules a tie, reported stratified by comparison-level decidability
+(Section~\ref{sec:res-tie-signature}). Both are proportions; their standard errors are
+binomial, $\sqrt{\hat p(1-\hat p)/n}$, and are labelled as such wherever printed
+(Section~\ref{sec:exp-metrics}).
+
+\section{Rank Correlation and the Tie Conventions}\label{sec:app-metrics-rho}
+
+Spearman $\rho$ between the fitted Bradley--Terry $\boldsymbol{\theta}$ and
+ground-truth accuracy $\mathbf{A}$ is the Pearson correlation of the two rank vectors,
+with mid-ranks assigned to tied values; for tie-free rankings over $M$ models this
+reduces to $\rho = 1 - 6\sum_i d_i^2 / (M(M^2-1))$ with $d_i$ the per-model rank
+difference. The two \emph{tie conventions} of rule~D5
+(Section~\ref{sec:meth-discipline}) govern how judge ties enter the Bradley--Terry
+sufficient statistics before the fit: under \emph{half-weighting} each tie adds half a
+win in both directions of its pair (the estimator's native accumulation); under
+\emph{dropping}, tied comparisons are deleted before the counts are formed. Every
+reported $\rho$ appears under both; on the settled batch the two coincide in every
+domain and both arms (Section~\ref{sec:res-tie-policy}). At $M$ models $\rho$ moves on
+a grid of spacing $6/(M(M^2-1))$ --- $0.0119$ at $M = 8$ --- an adjacent transposition
+moves it by two grid steps, and differences below one step are not differences.
+
+\section{Exact Binomial and Sign Tests}\label{sec:app-metrics-binomial}
+
+Every paired-count test in this thesis is the same exact test. Among the $n$ paired
+units on which the two sides disagree, $k$ favour the named side; under the null
+$X \sim \mathrm{Binomial}(n, \tfrac{1}{2})$, and the two-sided $p$ is twice the
+smaller tail probability at the observed $k$, capped at $1$. The 11-against-26 arm
+split of Section~\ref{sec:res-c5} ($p = 0.020$) and the per-cell sign tests of
+Section~\ref{sec:res-offsubject} ($14$/$13$, $p = 1.0$; $15$/$12$, $p = 0.70$) are
+instances.
+
+\section{Permutation Nulls and Empirical p-Values}\label{sec:app-metrics-permutation}
+
+A permutation null draws $B$ random re-assignments matched to the observed
+configuration and reports the one-sided empirical $p$: the fraction of draws at or
+beyond the observed statistic in the registered direction, with zero qualifying draws
+reported as an inequality rather than as zero, and Bonferroni correction within each
+test family. Two analyses use this scheme: the leaf-substructure null ($B = 2{,}000$;
+pseudo-leaves of exactly the observed sizes, pairwise question overlap matched to the
+real leaves; Section~\ref{sec:res-leaf-null}) and the domain-reordering screen
+($B = 1{,}500$; size-matched random subsets of the reserved pool, $p$ the fraction of
+draws at or below the observed $\rho$; Section~\ref{sec:res-law}). The
+rubric-specificity null instead compares the treatment arm against a size-matched
+random-cell arm with a one-sided Mann--Whitney $U$ test
+(Section~\ref{sec:res-rubric-null}).
+
+\section{The Chance-Corrected Separation Score}\label{sec:app-metrics-J}
+
+For a set $S$ of unit vectors with (possibly fractional) total count $n_S$, the
+within-set scatter is $W(S) = n_S^2 - \lVert \sum_{x \in S} x \rVert^2$, the total
+pairwise cosine dissimilarity. For a partition $\{S_c\}$ of $n$ vectors,
+\[
+J \;=\; 1 - \frac{\sum_c W(S_c)}{W(S)\,\sum_c n_c(n_c-1)\,/\,(n(n-1))},
+\]
+where the denominator is the exact expectation of the within-scatter under a uniformly
+random partition into the same sizes; $J = 1$ for a perfect partition, $\approx 0$ for
+a random one, exactly $0$ at $k = 1$. The whole-tree value ($J = 0.253129$ on the
+frozen artifact, and the no-taxonomy-floor comparison of
+Section~\ref{sec:res-construction}) evaluates this at $d = 256$ over the terminal
+cells --- the 87 leaves plus any residual-holding internal nodes --- with construction
+membership weights entering as fractional counts. The per-split acceptance gate uses
+the same statistic over a node's proposed children; the gate, and the paired bootstrap
+standard error of $\Delta J$ it thresholds on, are specified in
+Appendix~\ref{app:dag-formalism}.
+
+\section{Split-Half Reliability and Disattenuation}\label{sec:app-metrics-reliability}
+
+The reliability of a cell-level ground-truth ranking at $n$ questions is modelled as
+$r(n) = n/(n + c)$, estimated by splitting a cell's questions into random halves,
+correlating the roster's two half-sample accuracy rankings, and lifting the
+half-length correlation to full length by Spearman--Brown,
+$r = 2r_{1/2}/(1 + r_{1/2})$; $c$ is then fitted across cell sizes. Disattenuation is
+two-sided, $\rho_{\text{obs}}/r$, because both rankings being correlated are
+finite-sample. The corrected constant is $c = 2.52$ at the eleven-model band; it is a
+roster property and a ceiling rather than a prediction, with the caveats of
+Appendix~\ref{app:corrections-register} and Section~\ref{sec:disc-debt}.
+
+\section{Routing On-Subject Rate}\label{sec:app-metrics-onsubject}
+
+A judged held-out question is \emph{on-subject} when its MMLU-Pro category equals the
+category frozen at bootstrap on its cell's depth-1 ancestor --- the domain anchor the
+cell sits under. The rate is the on-subject fraction of all judged questions:
+$77.8\%$ on the settled batch (Section~\ref{sec:res-offsubject}).
 
 \section{Total Dasgupta Cost}\label{sec:app-metrics-dasgupta}
 
-% Compressed 2026-07-31: uncited in chapters; full text in this file's history.
-The pipeline exports the standard whole-tree cost
-$\text{cost}(T) = \sum_{i \neq j} w_{ij}\,|\text{Leaves}(\text{LCA}_T(i,j))|$
-with $w_{ij} = \max(x_i^\top x_j, 0)$ \parencite{dasgupta2016cost}; lower is
-better. It is distinct from the per-split acceptance test of
-\S\ref{sec:meth-split}, which is not a Dasgupta quantity.
-
-\section{Leaf Purity, Flat and LCA-Sensitive}\label{sec:app-metrics-wlp}
-
-% Compressed 2026-07-31: uncited in chapters; full text in this file's history.
-The pipeline exports a complementary purity pair against the MMLU-Pro
-ground-truth labels: Weighted Leaf Purity, the leaf-size-weighted mean of
-per-leaf majority-label fractions, and standard Dendrogram Purity over the
-tree's unique LCAs (Section~\ref{sec:poly-negative}). WLP flat-tests each leaf;
-Dendrogram Purity additionally penalises same-label pairs split across distant
-subtrees.
+The pipeline exports the whole-tree cost \parencite{dasgupta2016cost}
+$\text{cost}(T) = \sum_{i<j} w_{ij}\,|T(v_{ij})|$ over unordered pairs of placed
+queries, with $w_{ij}$ the cosine similarity clipped to $[0,1]$, $v_{ij}$ the deepest
+common ancestor of the two queries' assigned nodes (a multi-member query is attributed
+to its deepest containing node), and $|T(v)|$ the number of placed queries in the
+subtree of $v$; lower is better. Above $5{,}000$ pairs the export is an unbiased
+estimate: the mean contribution of $5{,}000$ uniformly sampled pairs rescaled by the
+exact pair count. It is distinct from the acceptance score above, which is not a
+Dasgupta quantity.
 
 \section{Average Match Count}\label{sec:app-metrics-avgmatch}
 
-Routing is weighted multi-membership even though the taxonomy is a strict tree,
-so a query can be assigned to more than one leaf. Writing $\mathcal{L}(q)$ for
-the set of leaves query $q$ reaches,
-\[
-\text{AvgMatch} = \frac{1}{N} \sum_{i=1}^{N} |\mathcal{L}(q_i)|.
-\]
-$\text{AvgMatch} = 1.0$ means routing resolves every query to a single leaf;
-above $1.0$ it measures how much multi-membership the routing beam and the
-membership floor actually produce
-(Appendix~\ref{app:dag-formalism}, \S\ref{sec:meth-routing}).
-
-On the frozen tree the construction corpus gives $9{,}141$ leaf memberships over
-$8{,}299$ unique queries, so $\text{AvgMatch} = 1.101$
-(Appendix~\ref{app:frozen-tree}). This quantity governs the construction corpus
-only: the arena withdraws secondary memberships before scoring, so a routed
-held-out query contributes to exactly one cell.
+Writing $\mathcal{L}(q)$ for the set of leaves holding query $q$,
+$\text{AvgMatch} = \frac{1}{N} \sum_{i=1}^{N} |\mathcal{L}(q_i)|$ over the $N$ unique
+leaf-assigned construction queries; $1.0$ means every query resolves to a single leaf.
+The frozen tree carries $9{,}141$ memberships over $8{,}299$ queries, so
+$\text{AvgMatch} = 1.101$ (Appendix~\ref{app:frozen-tree}). The quantity governs the
+construction corpus only: the arena withdraws secondary memberships before scoring, so
+a routed held-out query contributes to exactly one cell.
 
 \section{Routing Expected Calibration Error}\label{sec:app-metrics-ece}
 
-Routing ECE tests whether the soft-routing distribution's confidence is
-calibrated against its accuracy, at \emph{domain} granularity. For each query,
-its normalised leaf membership weights are aggregated onto each leaf's depth-1
-domain ancestors, yielding a per-query distribution over domain categories in
-the same label space as the MMLU-Pro category strings; the query's
-\emph{confidence} is the maximum domain mass, and its prediction is correct when
-that argmax matches the query's category. Queries are grouped into $B$
-equal-width confidence bins, and
+Routing ECE tests whether the soft-routing distribution's confidence is calibrated
+against its accuracy, at \emph{domain} granularity. For each query, its normalised
+leaf membership weights are summed onto each leaf's depth-1 domain ancestors, yielding
+a per-query distribution over domain categories in the same label space as the
+MMLU-Pro category strings; the query's \emph{confidence} is the maximum domain mass,
+and its prediction is correct when that argmax matches the query's category. Queries
+are grouped into $B$ equal-width confidence bins, and
 \[
-\text{ECE} = \sum_{b=1}^{B} \frac{|\mathcal{B}_b|}{N} \left| \text{acc}(\mathcal{B}_b) - \text{conf}(\mathcal{B}_b) \right|.
+\text{ECE} = \sum_{b=1}^{B} \frac{|\mathcal{B}_b|}{N}
+\left| \text{acc}(\mathcal{B}_b) - \text{conf}(\mathcal{B}_b) \right|.
 \]
 No temperature-scaling recalibration is applied anywhere in this system.
 
-\textbf{The exported number is not this metric.} The definition sums a query's
-leaf membership onto each leaf's depth-1 domain ancestor, which is what makes
-the result a distribution over domains. The export path instead takes the
-\emph{maximum} over a domain's leaves, and a maximum over leaves is not a
-distribution: it does not normalise, and it systematically understates
-confidence for queries spread across several leaves of the same domain. The
-frozen run's exported $0.2114$ is therefore a diagnostic with the discrepancy
-named, and no claim in this thesis rests on it
-(Section~\ref{sec:disc-debt}). The direction of the error is known and its size
-is not: fixing the aggregation raises every confidence, so apparent
-under-confidence falls, by an amount nobody has measured. This is the full
-statement of the defect; the other places it is mentioned point here.
+\textbf{The exported number is not this metric.} The definition sums a query's leaf
+membership onto each leaf's depth-1 domain ancestor, which is what makes the result a
+distribution over domains. The export path instead takes the \emph{maximum} over a
+domain's leaves, and a maximum over leaves is not a distribution: it does not
+normalise, and it systematically understates confidence for queries spread across
+several leaves of the same domain. The frozen run's exported $0.2114$ is therefore a
+diagnostic with the discrepancy named, and no claim in this thesis rests on it
+(Section~\ref{sec:disc-debt}). The direction of the error is known and its size is
+not: fixing the aggregation raises every confidence, so apparent under-confidence
+falls, by an amount nobody has measured. This is the full statement of the defect; the
+other places it is mentioned point here.
