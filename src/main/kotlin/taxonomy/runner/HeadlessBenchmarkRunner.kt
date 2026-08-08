@@ -128,6 +128,7 @@ class HeadlessBenchmarkRunner(
 
         log.info("Starting Headless Benchmark Mode with config: $configPath")
         try {
+            RatingsDbGuard.assertNotTracked()
             runHeadlessBenchmark(configPath)
             log.info("Headless Benchmark finished successfully.")
             kotlin.system.exitProcess(0)

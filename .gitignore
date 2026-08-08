@@ -143,8 +143,16 @@ eval_results/
 # Settled-batch results record: the result databases and the frozen MAIN
 # triples are tracked despite the global *.db / frozen_triples_* rules.
 !experiment_results/**/*.db
-!/ratings.db
 !frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json
+
+# /ratings.db is NOT tracked (untracked 2026-08-08). It is the DEFAULT write target
+# of any run launched without -Dranking.db.path, so tracking it meant a routine run
+# silently modified a committed 8 MB binary — which is exactly what happened during
+# the cross-domain trial. Nothing in the replication path reads it: the settled
+# results live in experiment_results/r8/*/ratings_r8_*.db, and generate_baselines.py
+# reads mmlu_pro_dataset_cache_v2.db despite the variable being named ratings_db.
+# HeadlessBenchmarkRunner now refuses to start when the resolved database is
+# git-tracked; see taxonomy.runner.RatingsDbGuard.
 
 # Frozen-snapshot extract for replication (full snapshots.db stays local-only)
 !/snapshots_frozen.db
