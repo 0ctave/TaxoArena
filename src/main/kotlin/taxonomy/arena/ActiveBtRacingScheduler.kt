@@ -25,13 +25,34 @@ class LeafArena(
     val modelIds: List<String>,
     val queryIds: List<Int>,
     val predictions: Map<String, Map<Int, String>>,
-    val pairBudget: Int,                      // hard cap per pair (B_max)
+    val pairBudget: Int,                      // hard cap per pair (B_max), fallback only
     /**
      * Fitted Bradley-Terry log-strengths for this leaf, or empty before the first fit.
      * Used to order models when deciding which pairs are rank-adjacent.
      */
     val btScores: Map<String, Double> = emptyMap(),
+    /**
+     * Per-pair cap, when the caller sizes budgets from each leaf's own query pool.
+     *
+     * WHY THIS EXISTS (2026-08-08). [pairBudget] used to be the only cap, and callers
+     * passed the RUN-GLOBAL `params.budgetPerPair` into it. That number is computed once
+     * per run from the smallest leaf, so it is systematically below what
+     * `BtStoppingPolicy.leafBudgetPerPair` allows each individual leaf — the service
+     * seeds `pairCustomBudgets` at 8-25 while this class was capping every pair at 3-12.
+     * Measured on the settled r8 batch: in all eight domains the largest comparison count
+     * any (leaf, pair) reached equals the run-global scalar exactly, and in four of them
+     * that scalar sat BELOW n = 9, the minimum at which the local binomial test can fire
+     * at all. Those domains could not resolve a single pair by construction.
+     *
+     * The stopping policy already reads the per-(leaf, pair) map. This lets the scheduler
+     * read the same numbers, so the two agree on when a pair is finished — which is the
+     * property `TaxonomyBenchmarkService` seeds the map to obtain.
+     */
+    val pairBudgetFor: ((PairKey) -> Int)? = null,
 ) {
+    /** Cap for one pair: the caller's per-pair number when supplied, else [pairBudget]. */
+    fun budgetFor(key: PairKey): Int = pairBudgetFor?.invoke(key) ?: pairBudget
+
     val pairs: List<PairKey> = modelIds.flatMapIndexed { i, a ->
         modelIds.drop(i + 1).map { b -> ordered(a, b) }
     }
@@ -56,6 +77,75 @@ class LeafArena(
 
     fun used(key: PairKey): Set<Int> =
         (reserved[key] ?: emptySet()) + (completed[key] ?: emptySet())
+
+    /**
+     * Models whose rank slot in THIS cell is already determined, when placement stopping is
+     * enabled. Empty means the question was never asked, so nothing is treated as settled.
+     * Filled once per batch from settled counts, which do not move inside a batch.
+     */
+    var placedModels: Set<String> = emptySet()
+}
+
+/**
+ * Which models' positions in a cell's order are already pinned down.
+ *
+ * Each model is assessed against the others as fixed anchors: its own record supplies the
+ * likelihood, the rest of the board supplies the slots. A model counts as settled when its
+ * posterior puts 1 - alpha of the mass inside a run of [slack] + 1 adjacent slots, OR when the
+ * only models it cannot be ordered against are equivalent to each other anyway — see
+ * `ModelPlacement.isSettled`. Without that second clause a model inside a tied cluster never
+ * finishes, which on this roster is the normal case rather than the corner case.
+ *
+ * This is the stopping rule that replaces counting comparisons. What it costs is set by how
+ * crowded the board is around each model rather than by any constant — a model in a sparse
+ * stretch settles in a handful of comparisons, one inside a cluster keeps being sampled — and
+ * a cell is finished when there is nothing left to learn about the ORDER, which is the thing
+ * the arena is for.
+ *
+ * Shared by the scheduler and the stopping policy on purpose. The two must agree on what
+ * "finished" means, or one waits on evidence the other will never fund; see the budget defect
+ * recorded in [LeafArena.pairBudgetFor].
+ *
+ * [priorFor] supplies a pooled or parent-level prior as (mean, sd). Passing only a mean is
+ * worth nothing — measured, a re-centred prior two logits wide saves nothing at all, while the
+ * same mean carried with its standard error cuts the cost by about 40%.
+ */
+fun placedModels(
+    placement: ModelPlacement,
+    modelIds: List<String>,
+    btScores: Map<String, Double>,
+    stats: Map<PairKey, PairStats>,
+    slack: Int = 0,
+    priorFor: (String) -> Pair<Double, Double>? = { null },
+): Set<String> {
+    if (btScores.isEmpty()) return emptySet()
+    val played = modelIds.filter { m ->
+        stats.any { (k, s) -> s.n > 0 && (k.first == m || k.second == m) }
+    }
+    // Two anchors are the minimum that define a bounded slot; below that every position is
+    // open-ended and "placed" would mean nothing.
+    if (played.size < 3) return emptySet()
+
+    val out = HashSet<String>()
+    for (m in played) {
+        val anchors = ModelPlacement.anchorsFrom(btScores, emptyMap(), (played - m).toSet())
+        if (anchors.size < 2) continue
+        val outcomes = anchors.mapNotNull { anc ->
+            val key = ordered(m, anc.model)
+            val s = stats[key] ?: return@mapNotNull null
+            if (s.n == 0) return@mapNotNull null
+            // sumX is wins for key.first with ties already half-weighted.
+            val wins = if (key.first == m) s.sumX else s.n - s.sumX
+            ModelPlacement.Outcome(anc.model, wins = wins, losses = s.n - wins)
+        }
+        if (outcomes.isEmpty()) continue
+        val prior = priorFor(m)
+        val belief =
+            if (prior != null) placement.posterior(anchors, outcomes, prior.first, prior.second)
+            else placement.posterior(anchors, outcomes)
+        if (placement.isSettled(belief, anchors, slack)) out += m
+    }
+    return out
 }
 
 // ─── Active BT Racing Scheduler ──────────────────────────────────────────────
@@ -71,6 +161,13 @@ class ActiveBtRacingScheduler(
      * rather than reaching for a global keeps this class testable in isolation.
      */
     private val externallyResolved: (String, PairKey) -> Boolean = { _, _ -> false },
+    /**
+     * Enables placement stopping: a pair is finished once BOTH its models' rank slots are
+     * pinned, whatever their comparison count. Null keeps the count-and-budget behaviour, so
+     * the settled batch's path is unchanged unless a caller asks for the new rule.
+     */
+    private val placement: ModelPlacement? = null,
+    private val placementSlack: Int = 0,
 ) {
 
     /** Hoeffding radius with union bound over P pairs and Bmax peeks. */
@@ -159,6 +256,10 @@ class ActiveBtRacingScheduler(
         // per leaf; a domain-wide key would let one leaf's evidence retire the pair in
         // every other leaf.
         if (externallyResolved(a.leafId, key)) return "RESOLVED"
+        // Placement stopping: if neither model's position can move, more comparisons between
+        // them buy nothing the ranking will use. This is what retires a pair on a decision
+        // rather than on a comparison count.
+        if (key.first in a.placedModels && key.second in a.placedModels) return "RESOLVED"
         val s = a.stats.getOrPut(key) { PairStats() }
         val n = effectiveN(a, key)
         // Exact binomial, Bonferroni over the (k-1) adjacent pairs actually tested.
@@ -166,10 +267,11 @@ class ActiveBtRacingScheduler(
         val adjTests = maxOf(1, a.modelIds.size - 1)
         val resolved = (s.n >= nMin) && (binomTwoSidedP(s.n, wins) * adjTests < alpha)
         if (resolved) return "RESOLVED"
-        if (n >= a.pairBudget) {
+        val budget = a.budgetFor(key)
+        if (n >= budget) {
             // Only latch exhaustion on SETTLED counts. Reservations can be dropped if a
             // task fails, so latching on them would retire a pair that never ran.
-            if (s.n >= a.pairBudget) a.pairExhausted[key] = true
+            if (s.n >= budget) a.pairExhausted[key] = true
             return "PAIR_EXHAUSTED"
         }
         return "UNRESOLVED"
@@ -208,7 +310,7 @@ class ActiveBtRacingScheduler(
                     allResolved = false
                     val s = a.stats.getValue(key)
                     val n = effectiveN(a, key)
-                    val eps = epsilon(n, a.modelIds.size, a.pairBudget)
+                    val eps = epsilon(n, a.modelIds.size, a.budgetFor(key))
                     val phat = if (s.n > 0) s.sumX / s.n else 0.5
                     // effectiveN, so a pair already reserved to nMin this batch stops
                     // returning +infinity and the batch moves on to the next-neediest.
@@ -265,7 +367,7 @@ class ActiveBtRacingScheduler(
             val key = ordered(ranked[k], ranked[k + 1])
             if (pairStatus(a, key) != "UNRESOLVED") continue
             val s = a.stats.getValue(key)
-            val eps = epsilon(effectiveN(a, key), a.modelIds.size, a.pairBudget)
+            val eps = epsilon(effectiveN(a, key), a.modelIds.size, a.budgetFor(key))
             val phat = if (s.n > 0) s.sumX / s.n else 0.5
             d += (eps - abs(phat - 0.5)).coerceAtLeast(0.0)
         }
@@ -281,7 +383,13 @@ class ActiveBtRacingScheduler(
         batchSize: Int,
         completedResults: List<QueryBenchmarkResult>,
         budgetPerPair: Int,
-        btStates: Map<String, NodeBtState> = emptyMap()
+        btStates: Map<String, NodeBtState> = emptyMap(),
+        /**
+         * Cap for one (leaf, pair), when the caller sizes budgets per leaf. Omitted, every
+         * pair falls back to the run-global [budgetPerPair] — see [LeafArena.pairBudgetFor]
+         * for why that fallback truncated the settled batch.
+         */
+        pairBudgetFor: ((String, PairKey) -> Int)? = null
     ): List<BtMatchTask> {
         // Build LeafArenas
         val arenas = targetNodes.map { node ->
@@ -294,7 +402,8 @@ class ActiveBtRacingScheduler(
             }
             val leafArena = LeafArena(
                 leafId, models, queryIds, predictions, budgetPerPair,
-                btScores = btStates[node.id]?.btScores ?: emptyMap()
+                btScores = btStates[node.id]?.btScores ?: emptyMap(),
+                pairBudgetFor = pairBudgetFor?.let { f -> { key: PairKey -> f(leafId, key) } }
             )
 
             // Populate completed
@@ -321,6 +430,14 @@ class ActiveBtRacingScheduler(
                 val winsFirst = if (isModelA) ps.winsA else ps.winsB
                 stats.sumX = winsFirst + 0.5 * ps.ties
                 stats.n = ps.totalComparisons.toInt()
+            }
+
+            // Once per batch, from settled counts: reservations move inside a batch but the
+            // evidence does not, so a model cannot become placed part-way through one.
+            if (placement != null) {
+                leafArena.placedModels = placedModels(
+                    placement, models, leafArena.btScores, leafArena.stats, placementSlack
+                )
             }
 
             leafArena

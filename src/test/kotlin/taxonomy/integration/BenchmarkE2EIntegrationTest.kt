@@ -350,6 +350,10 @@ class BenchmarkE2EIntegrationTest {
         val allReport = benchmarkService.runBenchmark(allReq)
 
         assertEquals(reservedIds.size, reservedReport.queryResults.size)
+
+        val judged = allReport.queryResults.map { it.query }.toSet()
+        val inScope = questions.map { it.text }.toSet()
+        assertTrue(inScope.containsAll(judged), "judged questions outside the shared set: ${judged - inScope}")
         assertEquals(questions.size, allReport.queryResults.size)
         assertTrue(
             allReport.queryResults.size > reservedReport.queryResults.size,

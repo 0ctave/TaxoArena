@@ -46,6 +46,10 @@ tasks.withType<Test> {
 // path. Kept for provenance only -- see the class KDoc.
 tasks.named<Test>("test") {
     exclude("**/NullSeparationCalibrationTest*")
+    // Fifth harness (`gradlew placementReplay`): replays the settled r8 verdicts through the
+    // placement stopping rule, refitting Bradley-Terry at every step. Seconds per domain,
+    // read-only against the results databases, prints a table and asserts nothing.
+    exclude("**/PlacementReplayHarness*")
     exclude("**/SeparationNullBySizeTest*")
     // Third harness (`gradlew randomCellRubrics`): it makes REAL Azure judge-induction calls,
     // so it must never run as part of the suite.
@@ -78,6 +82,16 @@ tasks.register<Test>("calibration") {
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     filter { includeTestsMatching("*NullSeparationCalibrationTest*") }
+}
+
+tasks.register<Test>("placementReplay") {
+    description = "Replays the settled r8 verdicts through the placement stopping rule."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    filter { includeTestsMatching("*PlacementReplayHarness*") }
+    testLogging { showStandardStreams = true }
 }
 
 tasks.register<Test>("nullBySize") {

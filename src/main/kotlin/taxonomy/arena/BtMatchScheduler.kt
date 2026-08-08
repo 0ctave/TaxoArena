@@ -379,7 +379,11 @@ class BtMatchScheduler(
                 alpha = 0.05, nMin = 5,
                 externallyResolved = { leafId, key ->
                     stoppingPolicy.isPairResolved(leafId, key.first, key.second)
-                }
+                },
+                // Taken from the policy rather than configured here, so the scheduler and the
+                // policy cannot be given different stopping rules.
+                placement = stoppingPolicy.placement,
+                placementSlack = stoppingPolicy.placementSlack
             )
             return activeRacing.selectNextBatch(
                 targetNodes = targetNodes,
@@ -390,7 +394,11 @@ class BtMatchScheduler(
                 batchSize = batchSize,
                 completedResults = completedResults,
                 budgetPerPair = budgetPerPair,
-                btStates = btStates
+                btStates = btStates,
+                // Read the SAME per-(leaf, pair) budgets the stopping policy enforces.
+                // Passing only the run-global scalar capped every pair at the smallest
+                // leaf's allowance; see [LeafArena.pairBudgetFor].
+                pairBudgetFor = { leafId, key -> pairBudget(leafId, key.first, key.second) }
             )
         }
 
@@ -718,6 +726,19 @@ class BtMatchScheduler(
         return (alpha * sScore + (1.0 - alpha) * rScore) * (1.0 - 0.3 * repeatDiscount) * mask
     }
 
+    /**
+     * Cap for one (leaf, pair): the seeded per-leaf budget when the caller supplied one,
+     * else the run-global fallback.
+     *
+     * The fallback deliberately stays `budgetPerPair` rather than deriving one from the
+     * leaf's pool. `leafBudgetPerPair` is the pool itself, which for a small leaf is BELOW
+     * the run-global number, so deriving a fallback would silently lower the cap for callers
+     * that never seeded the map. Seeding is what `TaxonomyBenchmarkService` does before every
+     * real run; unseeded callers keep the behaviour they had.
+     *
+     * Either way this is now a backstop rather than the stopping rule: with placement on by
+     * default, a cell finishes when its order is pinned, usually far below this number.
+     */
     private fun pairBudget(nodeId: String, mA: String, mB: String): Int {
         val key = "$nodeId|${minOf(mA, mB)}|${maxOf(mA, mB)}"
         return stoppingPolicy.pairCustomBudgets.getOrDefault(key, budgetPerPair)

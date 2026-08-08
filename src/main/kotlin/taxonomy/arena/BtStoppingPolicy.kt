@@ -11,7 +11,21 @@ class BtStoppingPolicy(
     val stabilityRounds: Int = 2,
     val separationThreshold: Double = 1.0,
     val minTotalComparisons: Int = 20,
-    val budgetPerPair: Int
+    val budgetPerPair: Int,
+    /**
+     * Placement stopping, when enabled. MUST match what the scheduler was given: the scheduler
+     * stops sampling a pair whose models are both placed, so if this policy does not also count
+     * that pair terminal the leaf waits forever on evidence nothing will fund. That is exactly
+     * the disagreement the per-leaf budget defect produced in the other direction.
+     */
+    val placement: ModelPlacement? = ModelPlacement(),
+    /**
+     * Rank slots a placement claim may span. 2, because the measured boards cluster: the three
+     * frontier models sit within 0.06 logits of each other in the settled batch, so "top tier,
+     * order undetermined" is both the honest claim and the only affordable one. At 0 the rule
+     * fired in one cell of 51 and saved nothing.
+     */
+    val placementSlack: Int = 2
 ) {
     private val leafRankHistory = mutableMapOf<String, ArrayDeque<List<String>>>()
 
@@ -43,23 +57,28 @@ class BtStoppingPolicy(
     val pairCustomBudgets = mutableMapOf<String, Int>()
 
     /**
-     * Comparisons a single pair may accumulate inside one leaf, sized from THAT leaf's
-     * own query pool.
+     * Comparisons a single pair may accumulate inside one leaf: the leaf's own question pool,
+     * which is the only real bound — a pair cannot be judged on more distinct questions than
+     * exist.
      *
-     * WHY THIS EXISTS (2026-07-30, for the M=17 replication). The constructor's
-     * [budgetPerPair] is computed once per run in `buildSchedulingParams` and clamped by
-     * `minQuestionsPerLeaf / 2` — the minimum over ALL leaves. On the mathematics re-run
-     * the smallest leaf holds 14 held-out questions, so every pair in every leaf was
-     * capped at 7 comparisons, including leaves with four times the data. One small cell
-     * rationed the evidence budget for the whole domain.
+     * WHY THIS IS NO LONGER A FORMULA (2026-08-08). It used to be `(pool / 4).coerceIn(8, 25)`,
+     * and every part of that was a guess doing a job the stopping rule should do. The ceiling
+     * of 25 was meant to stop a large leaf buying evidence it did not need; the floor of 8 was
+     * meant to keep the binomial test reachable, and did not even manage that — resolution
+     * needs n >= 9 at eight models, so the floor sat below the threshold it existed to clear.
+     * Worse, both numbers decided how much evidence a cell got WITHOUT looking at whether the
+     * cell's ordering was in doubt, which is the only thing that should decide it.
      *
-     * The floor of 8 keeps the exact binomial test reachable (a unanimous pair resolves
-     * at 9 with Bonferroni over 11 adjacent pairs); the ceiling of 25 stops a large leaf
-     * from consuming budget that buys nothing once a pair is decided.
+     * Placement stopping now answers that question directly: a cell is finished when every
+     * model's rank slot is pinned, which costs what the local crowding demands and nothing
+     * more. A well-separated cell stops far below this cap; a bunched one keeps going until it
+     * earns its position or runs out of questions. See [placement] and `placedModels`.
+     *
+     * What remains here is a backstop, not a policy. [budgetPerPair] still applies when the
+     * leaf's pool is unknown.
      */
     fun leafBudgetPerPair(leafQueryCount: Int): Int =
-        if (leafQueryCount <= 0) budgetPerPair
-        else (leafQueryCount / 4).coerceIn(8, 25)
+        if (leafQueryCount <= 0) budgetPerPair else leafQueryCount
 
     // PUBLIC — called by both shouldStop() and BtMatchScheduler
     fun isLeafConverged(
@@ -147,6 +166,14 @@ class BtStoppingPolicy(
                 return false
             }
 
+            // Placement stopping: the cell is finished when every model's position in its order
+            // is pinned to the required precision. Read the same way the scheduler reads it, so
+            // both agree on which pairs are still worth funding.
+            val placed = placement?.let {
+                placedModels(it, models, leafBt, leafArena.stats, placementSlack)
+            } ?: emptySet()
+            if (placement != null && placed.isNotEmpty() && placed.containsAll(models)) return true
+
             var allTerminal = true
             for (k in 0 until ranked.size - 1) {
                 val key = ordered(ranked[k], ranked[k + 1])
@@ -172,7 +199,8 @@ class BtStoppingPolicy(
                 // [resolvedPairs]) — keyed on the pair alone, this line would let a cell
                 // converge on evidence gathered somewhere else.
                 val gateDone = isPairResolved(nodeId, key.first, key.second)
-                val exhausted = gateDone || s.n >= pairBudget
+                val bothPlaced = key.first in placed && key.second in placed
+                val exhausted = gateDone || bothPlaced || s.n >= pairBudget
                 if (!resolved && !exhausted) {
                     allTerminal = false
                     break
