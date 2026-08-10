@@ -1,0 +1,78 @@
+# CROSS-DOMAIN CONFIRMATORY RUN (E1) — pooled interaction test, PRE-REGISTERED.
+#
+# WHY THIS RUN EXISTS (2026-08-10). The exploratory cross-domain run
+# (x8_crossdomain_deep.toml, 2026-08-08) registered a per-pair Q/df test that came back
+# null, then a POST-HOC pooled likelihood-ratio test on the same 4,186 verdicts found the
+# model x domain-group interaction at p_perm = 0.003, with the two registered models
+# carrying the two largest named-direction swings (arx_0314 +0.50 logits toward math,
+# Llama-2-7b-hf +0.59 toward law+psychology). A test devised after seeing the data cannot
+# confirm anything. This run re-collects fresh verdicts and registers that pooled test as
+# primary BEFORE launch.
+#
+# REGISTRATION, frozen here before the run starts:
+#
+#   Primary test: tools/analysis/crossdomain_interaction_lrt.py as committed at 6433111,
+#   run UNCHANGED on this run's database. Additive Bradley-Terry against per-group
+#   Bradley-Terry over the groups Math / Law+Psychology / other (cells mapped to groups
+#   by their anchor ancestor in the frozen snapshot); ties half-weighted; Jeffreys 0.5
+#   pseudo-count; permutation null = group labels shuffled within pair, NPERM = 1000,
+#   permutation RNG seed 42.
+#
+#   CONFIRMED if all three hold:
+#     (1) p_perm < 0.05;
+#     (2) arx_0314 delta(math - lawpsy) > 0;
+#     (3) Llama-2-7b-hf delta(math - lawpsy) < 0.
+#   Any other pattern is reported as-is: (1) alone is "interaction present, direction
+#   unconfirmed"; none is "not recoverable at this evidence depth, twice".
+#
+#   No other test on this run's data counts toward the claim. The per-pair Q/df script
+#   may be run for description but adjudicates nothing.
+#
+# DESIGN. Identical to x8_crossdomain_deep.toml except: fresh matchmaking seed (43),
+# its own outputDir, and its own untracked ratings database (the tracked deep-run db is
+# refused by RatingsDbGuard by design). Fresh verdicts come from re-sampling the judge;
+# the reserved pool, snapshot, rubrics and roster are unchanged. Expected scale ~4-5k
+# logical comparisons (placement stopping decides the exact number, as before).
+#
+# MAIN ONLY, NOT a thesis result: the settled batch stands as published; this run
+# adjudicates the follow-up claim recorded in the deep config's outcome block.
+#
+datasetType   = "MMLU_PRO"
+models        = [
+    "gemini-3.1-pro_5-shots",
+    "arx_0314",
+    "gpt-4o-2024-08-06",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "Meta-Llama-3_1-8B",
+    "Yi-6b-Chat",
+    "Llama-2-7b-hf"
+]
+snapshotId    = "20260727_042523_Headless_Run_Auto_ge"
+# category deliberately ABSENT: the whole reserved pool routes, across every domain's cells.
+queryLimit    = 0
+outputDir     = "experiment_results/x8_crossdomain_confirm"
+testRatio     = 0.3
+seed          = 43
+
+runPipeline        = false
+regenerateSplit    = false   # load-bearing: use the canonical reserved pool as-is
+runBenchmark       = true
+runTrickle         = false
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false   # rubrics already in the snapshot
+judgeInduction     = false
+
+conditions         = ["MAIN"]
+questionsPerRound  = 250
+confidenceGate     = 0.0
+parallelism        = 4
+reservedOnly       = true
+
+dagMode = "DAG_MAX"
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+
+judgeOptionMode = "RESOLVED"
