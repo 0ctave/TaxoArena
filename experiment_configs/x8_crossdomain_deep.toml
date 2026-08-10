@@ -31,6 +31,32 @@
 #
 # NOT REGISTERED as a thesis result. Exploratory; the settled batch stands as published.
 #
+# ── OUTCOME (2026-08-10, run of 2026-08-08: 4,186 verdicts, 8,372 judge calls) ──
+#
+# The registered test did NOT confirm the prediction. Per-pair Q/df for the named
+# pairs: median 0.84 against a shuffled null of 0.76 (0.72 vs 0.73 at cell-min n=3),
+# no named pair below p_emp 0.05; the only two significant pairs of 21 are unnamed,
+# about what alpha=0.05 hands out by chance. All four registered directional
+# contrasts have the CORRECT sign (arx_0314 math over law+psych +8.8pp z=+1.79;
+# Llama-2-7b law over math +7.9pp z=+1.52; sign test 4/4, p=0.0625 one-sided) but
+# none reach significance. Script: tools/analysis/crossdomain_pair_qdf.py.
+#
+# POST-HOC (devised after the null result; cannot rescue the registration): pooling
+# all 4,186 verdicts into one likelihood-ratio test -- additive BT against
+# per-group BT over Math / Law+Psychology / other -- gives LRT 19.24 against a
+# within-pair permutation null of median 2.51, p95 9.68: p_perm = 0.003. The two
+# registered models carry the two largest named-direction swings (arx_0314 +0.50
+# logits toward math, Llama-2-7b-hf +0.59 toward law+psych; the ground-truth screen
+# predicted ~1.5 and ~1.2, so the arena recovers the direction at a third to a half
+# of the screened magnitude). Script: tools/analysis/crossdomain_interaction_lrt.py.
+#
+# READING. The interaction is present and recoverable from arena verdicts, but not
+# by the per-pair route this registration named: placement stopping retires
+# lopsided pairs the moment their ORDER is pinned, and the interaction lives in
+# those pairs' per-cell margins, which the rule deliberately declines to fund (the
+# Llama-2-7b pairs ended with 2-5 usable cells of 87). A confirmatory run should
+# pre-register the pooled LRT as the primary test.
+#
 datasetType   = "MMLU_PRO"
 models        = [
     "gemini-3.1-pro_5-shots",
