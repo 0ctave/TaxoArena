@@ -200,11 +200,14 @@ class BtSchedulerRedesignTest {
     }
 
     // REMOVED: testPositionBiasDebiasing. It never called production code. The real
-    // adjustForPositionBias lives at TaxonomyBenchmarkService.kt:1625 and is referenced
-    // nowhere in src/test; this test re-derived the arithmetic inline and asserted against
-    // its own copy, so gutting the production function to `return stats` left it green.
-    // Position-bias debiasing is consequently UNCOVERED -- as it always was. Testing it for
-    // real means reaching the private method (visibility change or reflection).
+    // adjustForPositionBias was private, referenced nowhere in src/test; this test
+    // re-derived the arithmetic inline and asserted against its own copy, so gutting the
+    // production function to `return stats` left it green.
+    // EPILOGUE (2026-09-05): the coverage hole was exactly where the bug lived. The
+    // 2026-09-05 audit found adjustForPositionBias double-counted ties, one-directionally;
+    // it was removed. The pipeline is now the pure PairStatsLedger (accumulate +
+    // auditOrderBias, detection without mutation), covered by PairStatsInvariantTest —
+    // whose regression test was mutation-verified against the old formula (3 tests red).
 
     @Test
     fun testIrresolvableOnlyLeafConvergence() {

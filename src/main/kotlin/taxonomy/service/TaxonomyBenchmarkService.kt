@@ -105,56 +105,19 @@ class TaxonomyBenchmarkService(
          */
         judgeCheckable: Boolean = true
     ) {
-        val (wA, wB) = when (outcome.winner.uppercase()) {
-            "MODEL A" -> 1.0 to 0.0
-            "MODEL B" -> 0.0 to 1.0
-            "TIE"     -> 0.0 to 0.0
-            else      -> return
-        }
-        val isTie = outcome.winner.equals("TIE", ignoreCase = true)
-
         val list = rankingService.getNodePairStats(leafId, snapshotId)
-        val existing = list.firstOrNull { 
+        val existing = list.firstOrNull {
             (it.modelA == modelA && it.modelB == modelB) || (it.modelA == modelB && it.modelB == modelA)
         }
-        val stats = if (existing != null) {
-            if (existing.modelA == modelA) {
-                existing.winsA += wA
-                existing.winsB += wB
-                existing.winAFirst += outcome.winAFirst
-                existing.winASecond += outcome.winASecond
-            } else {
-                existing.winsA += wB
-                existing.winsB += wA
-                existing.winAFirst += (1.0 - outcome.winAFirst)
-                existing.winASecond += (1.0 - outcome.winASecond)
-            }
-            existing.ties += if (isTie) 1 else 0
-            existing.totalComparisons += 1
-            existing.positionFlips += if (outcome.positionFlip) 1 else 0
-            if (judgeCheckable) {
-                existing.agreementWins += if (judgeAgreed) 1 else 0
-                existing.agreementChecks += 1
-            }
-            existing.lastUpdated = System.currentTimeMillis()
-            existing
-        } else {
-            NodePairStats(
-                nodeId = leafId,
-                modelA = modelA,
-                modelB = modelB,
-                winsA = wA,
-                winsB = wB,
-                ties = if (isTie) 1.0 else 0.0,
-                totalComparisons = 1.0,
-                positionFlips = if (outcome.positionFlip) 1 else 0,
-                winAFirst = outcome.winAFirst,
-                winASecond = outcome.winASecond,
-                agreementWins = if (judgeCheckable && judgeAgreed) 1 else 0,
-                agreementChecks = if (judgeCheckable) 1 else 0,
-                lastUpdated = System.currentTimeMillis()
-            )
-        }
+        val stats = PairStatsLedger.accumulate(
+            existing = existing,
+            nodeId = leafId,
+            modelA = modelA,
+            modelB = modelB,
+            outcome = outcome,
+            judgeAgreed = judgeAgreed,
+            judgeCheckable = judgeCheckable
+        ) ?: return
         rankingService.saveNodePairStats(stats, snapshotId)
     }
 
@@ -595,11 +558,10 @@ class TaxonomyBenchmarkService(
                 statsMapForNode.values.forEach { stats ->
                     rankingService.saveNodePairStats(stats, snapshotId)
                 }
-                val nodePairs = rankingService.getNodePairStats(leafId, snapshotId)
-                val adjustedNodePairs = adjustForPositionBias(nodePairs)
-                pairStatsMap[leafId] = adjustedNodePairs.toMutableList()
+                val nodePairs = PairStatsLedger.auditOrderBias(rankingService.getNodePairStats(leafId, snapshotId))
+                pairStatsMap[leafId] = nodePairs.toMutableList()
                 
-                if (adjustedNodePairs.isNotEmpty()) {
+                if (nodePairs.isNotEmpty()) {
                     // Refuse to persist a fit whose comparison graph cannot identify one scale.
                     // Bradley-Terry pins theta only up to a constant per connected component, so a
                     // leaf split into components (or with models that never played) yields scores
@@ -607,7 +569,7 @@ class TaxonomyBenchmarkService(
                     // upward, and pooling across components mixes incommensurable quantities —
                     // which fails silently, with ordinary-looking numbers and exit code 0. Not
                     // persisting is what keeps such a leaf out of the aggregate entirely.
-                    val ident = BtMmFitter.assessIdentifiability(modelNames, adjustedNodePairs)
+                    val ident = BtMmFitter.assessIdentifiability(modelNames, nodePairs)
                     if (!ident.identified) {
                         log.warn(
                             "[ARENA-BT] leaf '$leafId': refusing the fit — ${ident.describe()}." +
@@ -615,8 +577,8 @@ class TaxonomyBenchmarkService(
                         )
                     } else {
                         val fitStart = System.currentTimeMillis()
-                        val scores = BtMmFitter.fit(modelNames, adjustedNodePairs, context = "leaf/$leafId")
-                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
+                        val scores = BtMmFitter.fit(modelNames, nodePairs, context = "leaf/$leafId")
+                        val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
                         val fitEnd = System.currentTimeMillis()
                         if (config.diagnostics.enableProfiling) {
                             perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
@@ -626,7 +588,7 @@ class TaxonomyBenchmarkService(
                             btScores = scores,
                             stdErrors = stdErrors,
                             fitVersion = (btStates[leafId]?.fitVersion ?: 0) + 1,
-                            totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
+                            totalComparisons = nodePairs.sumOf { it.totalComparisons }.toInt(),
                             lastFitAt = System.currentTimeMillis()
                         )
                         rankingService.saveBtState(state, snapshotId)
@@ -1278,18 +1240,17 @@ class TaxonomyBenchmarkService(
 
             withContext(dbWriteDispatcher) {
                 for (nodeId in dirtyNodes) {
-                    val nodePairs = rankingService.getNodePairStats(nodeId, snapshotId)
-                    val adjustedNodePairs = adjustForPositionBias(nodePairs)
-                    log.trace("Round $round - updated nodePairs for $nodeId: ${adjustedNodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
-                    pairStatsMap[nodeId] = adjustedNodePairs.toMutableList()
+                    val nodePairs = PairStatsLedger.auditOrderBias(rankingService.getNodePairStats(nodeId, snapshotId))
+                    log.trace("Round $round - updated nodePairs for $nodeId: ${nodePairs.map { "${it.modelA}_vs_${it.modelB}:${it.totalComparisons}" }}")
+                    pairStatsMap[nodeId] = nodePairs.toMutableList()
 
-                    if (adjustedNodePairs.isNotEmpty()) {
+                    if (nodePairs.isNotEmpty()) {
                         // Same connectivity refusal as the pre-round fit above: an unidentified
                         // leaf must not reach aggregateLeafScores, because theta is only defined
                         // up to a constant per component and pooling components is meaningless.
                         // Early rounds legitimately hit this while the scheduler is still filling
                         // pairs in, so it is logged at debug until the round is the last word.
-                        val ident = BtMmFitter.assessIdentifiability(modelNames, adjustedNodePairs)
+                        val ident = BtMmFitter.assessIdentifiability(modelNames, nodePairs)
                         if (!ident.identified) {
                             log.debug(
                                 "[ARENA-BT] round $round, node '$nodeId': fit not identified" +
@@ -1297,8 +1258,8 @@ class TaxonomyBenchmarkService(
                             )
                         } else {
                             val fitStart = System.currentTimeMillis()
-                            val scores = BtMmFitter.fit(modelNames, adjustedNodePairs, context = "leaf/$nodeId@r$round")
-                            val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, adjustedNodePairs)
+                            val scores = BtMmFitter.fit(modelNames, nodePairs, context = "leaf/$nodeId@r$round")
+                            val stdErrors = BtMmFitter.estimateStdErrors(modelNames, scores, nodePairs)
                             val fitEnd = System.currentTimeMillis()
                             if (config.diagnostics.enableProfiling) {
                                 perfTracker.recordTime("arena.bt_fit.mm_update", fitEnd - fitStart, 1L)
@@ -1308,7 +1269,7 @@ class TaxonomyBenchmarkService(
                                 btScores = scores,
                                 stdErrors = stdErrors,
                                 fitVersion = (btStates[nodeId]?.fitVersion ?: 0) + 1,
-                                totalComparisons = adjustedNodePairs.sumOf { it.totalComparisons }.toInt(),
+                                totalComparisons = nodePairs.sumOf { it.totalComparisons }.toInt(),
                                 lastFitAt = System.currentTimeMillis()
                             )
                             rankingService.saveBtState(state, snapshotId)
@@ -1828,26 +1789,11 @@ class TaxonomyBenchmarkService(
         log.info(lines.toString())
     }
 
-    private fun adjustForPositionBias(stats: List<NodePairStats>): List<NodePairStats> {
-        return stats.map { ps ->
-            val n = ps.totalComparisons
-            if (n >= 6) {
-                val delta = (ps.winAFirst - ps.winASecond) / n.toDouble()
-                if (abs(delta) > 0.3) {
-                    // Debias: rebalance winsA and winsB to reflect average win rate
-                    val correctedWinA = (ps.winAFirst + ps.winASecond) / 2.0
-                    // Note: correctedWinB relies on ps.ties being exactly consistent with winAFirst/winASecond bookkeeping.
-                    // If they ever diverge, correctedWinB might become slightly negative, which we defensively clamp with coerceAtLeast(0.0).
-                    val correctedWinB = n.toDouble() - correctedWinA - ps.ties
-                    ps.copy(
-                        winsA = correctedWinA,
-                        winsB = correctedWinB.coerceAtLeast(0.0)
-                        // totalComparisons and ties unchanged — no data discarded
-                    )
-                } else ps
-            } else ps
-        }
-    }
+    // adjustForPositionBias was removed 2026-09-05: it double-counted ties (the order
+    // ledgers half-credit them and BtMmFitter adds 0.5*ties again) and only ever in
+    // favour of modelA, the lexicographically smaller model on every pair. Detection
+    // lives on as PairStatsLedger.auditOrderBias; debiasing happens at the verdict
+    // level, where an order-inconsistent split is forced to a TIE.
 
     private fun logRoundSummary(round: Int, summaries: List<PairRoundSummary>) {
         log.info("--- Round $round Pair Summary (${summaries.size} pairs) ---")
