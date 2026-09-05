@@ -494,7 +494,9 @@ class TaxonomyBenchmarkService(
                     rationale = "Reconstructed from database",
                     confidence = 1.0,
                     positionFlip = false,
-                    nodeId = allNodes.firstOrNull { it.label == cm.domain }?.id ?: "unknown"
+                    // node_id straight from the row when present; label lookup only for
+                    // legacy rows written before the node_id column existed.
+                    nodeId = cm.nodeId ?: allNodes.firstOrNull { it.label == cm.domain }?.id ?: "unknown"
                 )
 
                 QueryBenchmarkResult(
@@ -520,7 +522,12 @@ class TaxonomyBenchmarkService(
             // Rebuild node_pair_stats and node_bt_states from reconstructed matches
             val reconstructedPairs = mutableMapOf<String, MutableMap<String, NodePairStats>>()
             cachedMatches.forEach { cm ->
-                val leafNode = allNodes.firstOrNull { it.label == cm.domain || it.id == cm.domain } ?: return@forEach
+                // Key the leaf by node_id (unique by construction); the label match survives
+                // only for legacy rows without node_id. A label collision here would silently
+                // misattribute matches and make resume re-judge already-paid slots.
+                val leafNode = allNodes.firstOrNull { it.id == cm.nodeId }
+                    ?: allNodes.firstOrNull { it.label == cm.domain || it.id == cm.domain }
+                    ?: return@forEach
                 val leafId = leafNode.id
                 val pairKey = "${cm.modelA}_vs_${cm.modelB}"
                 val pairStatsMapForNode = reconstructedPairs.getOrPut(leafId) { mutableMapOf() }

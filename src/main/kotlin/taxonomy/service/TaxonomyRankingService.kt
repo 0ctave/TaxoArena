@@ -58,7 +58,11 @@ data class CachedMatchResultWithQuery(
     val domain: String,
     val winner: String,
     val loser: String,
-    val isTie: Boolean
+    val isTie: Boolean,
+    // Preferred leaf key on resume. `domain` holds the leaf LABEL, which is unique in the
+    // frozen snapshot but not guaranteed unique in general; nodeId is. Nullable because
+    // legacy rows predate the node_id column.
+    val nodeId: String? = null
 )
 
 @Serializable
@@ -1444,8 +1448,8 @@ data class AggregatedLeaderboard(
         try {
             withConn { conn ->
                 val sql = """
-                    SELECT query, model_a, model_b, domain, winner, loser, is_tie 
-                    FROM match_history 
+                    SELECT query, model_a, model_b, domain, winner, loser, is_tie, node_id
+                    FROM match_history
                     WHERE snapshot_id = ?
                 """.trimIndent()
                 conn.prepareStatement(sql).use { pstmt ->
@@ -1460,7 +1464,8 @@ data class AggregatedLeaderboard(
                                 domain = rs.getString("domain"),
                                 winner = rs.getString("winner"),
                                 loser = rs.getString("loser"),
-                                isTie = rs.getInt("is_tie") == 1
+                                isTie = rs.getInt("is_tie") == 1,
+                                nodeId = rs.getString("node_id")
                             )
                         )
                     }
