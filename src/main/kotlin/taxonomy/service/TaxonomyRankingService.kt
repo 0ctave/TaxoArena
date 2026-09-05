@@ -1422,6 +1422,23 @@ data class AggregatedLeaderboard(
         }
     }
 
+    /** Number of match_history rows for [snapshotId] — cheap existence check for resume. */
+    fun countRecordedMatches(snapshotId: String): Int {
+        var n = 0
+        try {
+            withConn { conn ->
+                conn.prepareStatement("SELECT COUNT(*) FROM match_history WHERE snapshot_id = ?").use { pstmt ->
+                    pstmt.setString(1, snapshotId)
+                    val rs = pstmt.executeQuery()
+                    if (rs.next()) n = rs.getInt(1)
+                }
+            }
+        } catch (e: Exception) {
+            log.warn("countRecordedMatches failed for '$snapshotId': ${e.message}")
+        }
+        return n
+    }
+
     fun getAllRecordedMatches(snapshotId: String): List<CachedMatchResultWithQuery> {
         val list = mutableListOf<CachedMatchResultWithQuery>()
         try {

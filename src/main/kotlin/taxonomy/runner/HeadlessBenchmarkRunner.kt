@@ -46,6 +46,11 @@ data class HeadlessCliConfig(
     val parallelism: Int = 6,
     val questionsPerRound: Int = 12,
     val reservedOnly: Boolean = true,
+    // Resume a stopped/crashed run: keep the condition's existing match_history rows and
+    // let the benchmark service reconstruct pair stats from them instead of wiping the
+    // slate. Default false = the historical clear-and-start-fresh behaviour. A registered
+    // run must never mix resume with a changed config/pool — same config, same db only.
+    val resumeBenchmark: Boolean = false,
     val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
@@ -426,8 +431,24 @@ class HeadlessBenchmarkRunner(
                     val suffixedSnapshotId = "${snapshotId}_$condition"
                     taxonomyService.setActiveSnapshotId(suffixedSnapshotId)
                     
-                    // Clear existing snapshot data to ensure clean, reproducible experimental runs from scratch
-                    rankingService.clearRatings(suffixedSnapshotId)
+                    // Fresh run: clear this condition's prior state so the experiment starts from
+                    // scratch. Resume run: KEEP match_history — the benchmark service reconstructs
+                    // pair stats and completed slots from it, so already-paid verdicts are not
+                    // re-judged. Before 2026-09-05 this clear was unconditional, which made every
+                    // relaunch silently wipe a crashed run's verdicts and re-judge from zero.
+                    if (cliConfig.resumeBenchmark) {
+                        val kept = rankingService.countRecordedMatches(suffixedSnapshotId)
+                        if (kept > 0) {
+                            log.warn("[RESUME] resumeBenchmark=true: keeping $kept recorded matches for" +
+                                " '$suffixedSnapshotId'; pair stats will be reconstructed from them." +
+                                " Resume REQUIRES the identical config, pool and db as the interrupted run.")
+                        } else {
+                            log.info("[RESUME] resumeBenchmark=true but no recorded matches for" +
+                                " '$suffixedSnapshotId' — starting fresh.")
+                        }
+                    } else {
+                        rankingService.clearRatings(suffixedSnapshotId)
+                    }
 
                     val modelSources = cliConfig.models.map { ModelSource(it) }
                     val request = BenchmarkRequest(
@@ -1331,6 +1352,7 @@ class HeadlessBenchmarkRunner(
         var parallelism = 6
         var questionsPerRound = 12
         var reservedOnly = true
+        var resumeBenchmark = false
         var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
@@ -1416,6 +1438,7 @@ class HeadlessBenchmarkRunner(
                 "parallelism" -> parallelism = rawVal.toInt()
                 "questionsPerRound" -> questionsPerRound = rawVal.toInt()
                 "reservedOnly" -> reservedOnly = rawVal.toBoolean()
+                "resumeBenchmark" -> resumeBenchmark = rawVal.toBoolean()
                 "conditions" -> conditions = parseStringList(rawVal)
                 "outputDir" -> outputDir = rawVal.trim('"', '\'')
                 "testRatio" -> testRatio = rawVal.toDouble()
@@ -1485,6 +1508,7 @@ class HeadlessBenchmarkRunner(
             parallelism = parallelism,
             questionsPerRound = questionsPerRound,
             reservedOnly = reservedOnly,
+            resumeBenchmark = resumeBenchmark,
             conditions = conditions,
             outputDir = outputDir,
             testRatio = testRatio,
