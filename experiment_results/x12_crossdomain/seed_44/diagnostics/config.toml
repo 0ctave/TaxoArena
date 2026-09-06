@@ -68,38 +68,6 @@
 #
 # MAIN ONLY, NOT a thesis result: the settled batch stands as published.
 #
-# ── OUTCOME (2026-09-06, run 00:36-02:39: 9,144 verdicts, 18,288 judge calls) ──
-#
-# CONFIRMED on the letter of all five registered criteria, primary test run unchanged:
-#   (1) LRT 39.48 against a permutation null of median -2.77, p95 5.98 -> p_perm = 0.001
-#       (strongest of the three cross-domain runs; the 8-model pair gave 0.003 twice);
-#   (2) arx_0314           delta(math - lawpsy) = +0.548 > 0   (third replication);
-#   (3) Llama-2-7b-hf      delta = -0.379 < 0                  (third replication);
-#   (4) iask_pro           delta = +0.002 > 0  — BOUNDARY PASS, stated plainly: the sign
-#       is positive but the magnitude is indistinguishable from zero against a GT
-#       prediction of +1.31. A confirmation that hangs on 0.002 logits confirms nothing
-#       about iask_pro specifically; criterion (4) is met formally, not substantively.
-#   (5) c4ai-command-r-v01 delta = -0.161 < 0                  (new family, law side).
-#
-# Registered secondaries (descriptive): deepseek chem-law +0.718 from per-anchor fits
-# (GT +1.35, direction correct at ~half magnitude; its primary-axis delta +0.674 is the
-# largest in the roster); Llama-2-13b-hf delta -0.418 (within-family corroboration,
-# stronger than its 7b sibling); global 12-model ordering vs reserved GT rho = 0.951,
-# tau = 0.848 (iask_pro tops the board at +2.36 +/- 0.04).
-#
-# RECORDED ANOMALY, for follow-up rather than spin: the three strongest models' domain
-# deltas collapsed or flipped relative to GT (gemini +1.18 -> -0.22; gpt-4o +0.57 ->
-# -0.59; iask_pro +1.31 -> +0.00). The interaction the LRT detects is carried by the
-# mid- and low-tier contrasts. Plausible mechanism: top-cluster matches are tie-heavy
-# (40-49% in the preflight) and mostly rank-adjacent among near-equals, compressing
-# per-group differences exactly where GT says they are largest. Testing that is a
-# stratified-depth (profile-mode) question, not resolvable from this run's design.
-#
-# OPERATIONAL PROVENANCE: the launch process was killed at ~5,970 verdicts (01:52);
-# relaunching the same command resumed via match_history reconstruction and completed
-# with no verdicts lost and no duplicate slots. The manifest's llmJudgeApiCalls counts
-# reconstructed comparisons; actual paid calls = 9,144 x 2 plus 331 rate-limit retries.
-#
 datasetType   = "MMLU_PRO"
 models        = [
     "gemini-3.1-pro_5-shots",
