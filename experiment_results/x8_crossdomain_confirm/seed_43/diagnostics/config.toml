@@ -37,26 +37,6 @@
 # MAIN ONLY, NOT a thesis result: the settled batch stands as published; this run
 # adjudicates the follow-up claim recorded in the deep config's outcome block.
 #
-# ── OUTCOME (2026-08-10, run 16:01-17:31: 4,186 verdicts, 8,372 judge calls) ──
-#
-# CONFIRMED on all three registered criteria, test run unchanged as frozen above:
-#   (1) LRT 18.60 against a permutation null of median 3.25, p95 10.29 -> p_perm = 0.003;
-#   (2) arx_0314 delta(math - lawpsy) = +0.451 > 0;
-#   (3) Llama-2-7b-hf delta(math - lawpsy) = -0.548 < 0.
-# Exploratory-run values were LRT 19.24 / +0.503 / -0.589: the effect reproduces at
-# essentially the same magnitude.
-#
-# INDEPENDENCE CAVEAT, stated because it bounds what "confirmed" means. The scheduler
-# is deterministic given the pool and budgets, so 83% of this run's comparison slots
-# (3,467 of 4,186) repeat the exploratory run's schedule; the fresh randomness is the
-# judge's re-sampling (verdicts agree on only 91.4% of shared slots, consistent with
-# the judge's known self-consistency -- a replay would agree on 100%). This run
-# therefore confirms that the interaction is not a one-off artifact of judge noise on
-# an essentially fixed comparison design; it is NOT an independent redraw of the
-# design itself, and the two runs' p-values must not be combined as independent
-# evidence. A run with a perturbed schedule (different questionsPerRound, or a
-# scheduler-side sampling seed) would be needed for full design independence.
-#
 datasetType   = "MMLU_PRO"
 models        = [
     "gemini-3.1-pro_5-shots",
