@@ -383,7 +383,8 @@ class BtMatchScheduler(
                 // Taken from the policy rather than configured here, so the scheduler and the
                 // policy cannot be given different stopping rules.
                 placement = stoppingPolicy.placement,
-                placementSlack = stoppingPolicy.placementSlack
+                placementSlack = stoppingPolicy.placementSlack,
+                profile = stoppingPolicy.profile
             )
             return activeRacing.selectNextBatch(
                 targetNodes = targetNodes,

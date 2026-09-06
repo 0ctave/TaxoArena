@@ -168,6 +168,13 @@ class ActiveBtRacingScheduler(
      */
     private val placement: ModelPlacement? = null,
     private val placementSlack: Int = 0,
+    /**
+     * PROFILE mode, when non-null: pairs never resolve on order (no placement, no
+     * binomial, no external gate) — they retire only when their stratum meets its SE
+     * target or their budget (= the leaf's pool) is spent, and priority follows the
+     * SE deficit of the models involved rather than rank adjacency. See [ProfileTargets].
+     */
+    private val profile: ProfileTargets? = null,
 ) {
 
     /** Hoeffding radius with union bound over P pairs and Bmax peeks. */
@@ -250,6 +257,21 @@ class ActiveBtRacingScheduler(
 
     fun pairStatus(a: LeafArena, key: PairKey): String {
         if (a.pairExhausted[key] == true) return "PAIR_EXHAUSTED"
+        // PROFILE mode: only two ways out — the stratum met its SE target, or the pair
+        // spent its budget. Order-based resolution (gate, placement, binomial) is
+        // deliberately bypassed; retiring on order is what starves margin evidence.
+        if (profile != null) {
+            val stratum = profile.stratumOf(a.leafId)
+            if (stratum != null && profile.converged(stratum)) return "RESOLVED"
+            val s = a.stats.getOrPut(key) { PairStats() }
+            val n = effectiveN(a, key)
+            val budget = a.budgetFor(key)
+            if (n >= budget) {
+                if (s.n >= budget) a.pairExhausted[key] = true
+                return "PAIR_EXHAUSTED"
+            }
+            return "UNRESOLVED"
+        }
         // Settled by the confidence gate IN THIS LEAF: the scheduler already refuses to
         // sample it, so it must count as terminal here too — treated as UNRESOLVED, the
         // leaf would wait forever on a pair nothing will ever fund. The gate is keyed
@@ -294,6 +316,41 @@ class ActiveBtRacingScheduler(
         if (a.pairs.any { effectiveN(a, it) == 0 }) {
             a.state = LeafState.EXHAUSTED
             return null
+        }
+
+        // PROFILE mode considers ALL pairs, not just rank-adjacent ones: SE targets need
+        // evidence on the margins too. Priority = the models' SE deficit in this leaf's
+        // stratum, times the pair's expected information, discounted by evidence already
+        // held so the budget spreads across pairs instead of pounding the neediest one.
+        if (profile != null) {
+            val stratum = profile.stratumOf(a.leafId)
+            var bestProfile: PairKey? = null
+            var bestPriority = Double.NEGATIVE_INFINITY
+            var anyExhausted = false
+            for (key in a.pairs) {
+                when (pairStatus(a, key)) {
+                    "RESOLVED" -> { /* keep */ }
+                    "PAIR_EXHAUSTED" -> { anyExhausted = true }
+                    else -> {
+                        val s = a.stats.getValue(key)
+                        val phat = if (s.n > 0) s.sumX / s.n else 0.5
+                        val info = phat * (1.0 - phat) + 0.05
+                        val need = if (stratum != null)
+                            profile.deficit(stratum, key.first) + profile.deficit(stratum, key.second)
+                        else 1.0
+                        val n = effectiveN(a, key)
+                        val priority = need * info / (1.0 + n)
+                        if (priority > bestPriority) {
+                            bestPriority = priority
+                            bestProfile = key
+                        }
+                    }
+                }
+            }
+            if (bestProfile == null) {
+                a.state = if (anyExhausted) LeafState.EXHAUSTED else LeafState.RESOLVED
+            }
+            return bestProfile
         }
 
         val ranked = ranking(a)
@@ -361,6 +418,12 @@ class ActiveBtRacingScheduler(
     fun debt(a: LeafArena): Double {
         if (a.state != LeafState.ACTIVE) return 0.0
         if (a.pairs.any { effectiveN(a, it) == 0 }) return Double.POSITIVE_INFINITY
+        // PROFILE mode: leaf priority is its stratum's worst SE deficit — batches flow
+        // to the strata furthest from target and dry up as they converge.
+        if (profile != null) {
+            val stratum = profile.stratumOf(a.leafId) ?: return 0.0
+            return profile.stratumDeficit(stratum)
+        }
         val ranked = ranking(a)
         var d = 0.0
         for (k in 0 until ranked.size - 1) {
@@ -434,7 +497,8 @@ class ActiveBtRacingScheduler(
 
             // Once per batch, from settled counts: reservations move inside a batch but the
             // evidence does not, so a model cannot become placed part-way through one.
-            if (placement != null) {
+            // Skipped in PROFILE mode — placement is an order-stopping rule.
+            if (placement != null && profile == null) {
                 leafArena.placedModels = placedModels(
                     placement, models, leafArena.btScores, leafArena.stats, placementSlack
                 )

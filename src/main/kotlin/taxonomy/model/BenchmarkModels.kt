@@ -34,7 +34,11 @@ data class BenchmarkRequest(
     val updateRankings: Boolean = true,
     val reservedOnly: Boolean = true,  // benchmark only the reserved test pool by default
     val condition: String = "MAIN",
-    val seed: Long = 42L
+    val seed: Long = 42L,
+    // PROFILE mode (both must be supplied): stop on SE targets per model x stratum
+    // instead of on rank decisions. See taxonomy.arena.ProfileTargets.
+    val profileSeTarget: Double? = null,
+    val profileStrata: Map<String, String> = emptyMap()   // leafId -> stratumId
 )
 
 @Serializable

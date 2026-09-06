@@ -350,13 +350,26 @@ class TaxonomyBenchmarkService(
         )
         log.info("Scheduling params: $params")
 
+        val profileTargets = if (req.profileSeTarget != null && req.profileStrata.isNotEmpty()) {
+            ProfileTargets(req.profileSeTarget, req.profileStrata)
+        } else null
+        if (profileTargets != null) {
+            log.info("[PROFILE] mode ON: SE target ${profileTargets.seTarget} over " +
+                "${profileTargets.allStrata().size} strata (${req.profileStrata.size} leaves mapped). " +
+                "Placement/binomial/gate stopping disabled; pairs retire on stratum " +
+                "convergence or pool exhaustion only.")
+        }
         val stoppingPolicy = BtStoppingPolicy(
-            maxRounds = params.maxRounds,
+            // Profile runs are budgeted in SEs, not rounds: the decision-mode round cap
+            // would truncate them mid-estimation, so it is lifted far above reach and
+            // stratum convergence / pool exhaustion does the stopping.
+            maxRounds = if (profileTargets != null) maxOf(params.maxRounds, 500) else params.maxRounds,
             minComparisonsPerLeaf = params.minComparisonsPerLeaf,
             targetLeafConvergenceFraction = params.targetConvergenceFraction,
             separationThreshold = params.separationThreshold,
             minTotalComparisons = params.minTotalComparisons,
-            budgetPerPair = params.budgetPerPair
+            budgetPerPair = params.budgetPerPair,
+            profile = profileTargets
         )
         // Seed the per-(leaf, pair) budget map from each leaf's own query pool, so the
         // scheduler and the stopping policy enforce the SAME number.
@@ -772,16 +785,45 @@ class TaxonomyBenchmarkService(
             return res
         }
 
-        while (round < params.maxRounds && !checkStoppingPolicy()) {
+        while (round < stoppingPolicy.maxRounds && !checkStoppingPolicy()) {
             completedAtStartOfRound.set(completedResults.size)
+            // ── PROFILE mode: refresh per-stratum SEs from pooled fits ───────────────
+            // Once per round, before any scheduling decision: pool each stratum's pair
+            // stats across its leaves, fit, publish per-model SEs to the shared
+            // ProfileTargets. Scheduler and policy both read that object this round.
+            stoppingPolicy.profile?.let { prof ->
+                val byStratum = HashMap<String, MutableList<NodePairStats>>()
+                for ((leafId, list) in pairStatsMap) {
+                    val s = prof.stratumOf(leafId) ?: continue
+                    byStratum.getOrPut(s) { mutableListOf() }.addAll(list)
+                }
+                val seMap = HashMap<String, Map<String, Double>>()
+                for ((s, statsList) in byStratum) {
+                    if (statsList.isEmpty()) continue
+                    val pooled = ProfileTargets.poolPairStats(statsList)
+                    val ident = BtMmFitter.assessIdentifiability(modelNames, pooled)
+                    if (!ident.identified) continue   // no SEs yet -> stratum stays open
+                    val scores = BtMmFitter.fit(modelNames, pooled, context = "profile/$s")
+                    seMap[s] = BtMmFitter.estimateStdErrors(modelNames, scores, pooled)
+                }
+                prof.seByStratum = seMap
+                val summary = prof.allStrata().sorted().joinToString(" ") { st ->
+                    val worst = prof.worstSe(st)
+                    val shown = if (worst == Double.MAX_VALUE) "-" else String.format(java.util.Locale.ROOT, "%.3f", worst)
+                    "$st=$shown${if (prof.converged(st)) "*" else ""}"
+                }
+                log.info("[PROFILE] round $round worst SE by stratum (target ${prof.seTarget}, * = converged): $summary")
+            }
             // ── Confidence gate, evaluated PER CELL ──────────────────────────────────
             // Each cell's pairs are tested against that cell's own theta and standard
             // errors, never against the aggregate board: gating on the pooled fit would
             // retire exactly the comparisons that could show a cell ordering differing
             // from the pooled one — the question the per-cell arena exists to answer.
             // See BtStoppingPolicy.resolvedPairs.
+            // In PROFILE mode the gate stays OFF: retiring a pair on a 2.5-sigma gap is
+            // an order decision, and profile mode funds evidence past order decisions.
             stoppingPolicy.resolvedPairs.clear()
-            run {
+            if (stoppingPolicy.profile == null) run {
                 val allPairs = modelNames.flatMapIndexed { i, mA -> modelNames.drop(i + 1).map { mB -> mA to mB } }
                 for ((leafId, st) in btStates) {
                     for ((mA, mB) in allPairs) {

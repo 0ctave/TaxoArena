@@ -4,6 +4,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
@@ -51,6 +54,12 @@ data class HeadlessCliConfig(
     // slate. Default false = the historical clear-and-start-fresh behaviour. A registered
     // run must never mix resume with a changed config/pool — same config, same db only.
     val resumeBenchmark: Boolean = false,
+    // PROFILE mode: stop on SE targets per model x stratum instead of on rank
+    // decisions (taxonomy.arena.ProfileTargets). profileStrataFile is the frozen
+    // leaf->stratum map (experiment_configs/strata_profile_v1.json format).
+    val profileMode: Boolean = false,
+    val profileSeTarget: Double = 0.15,
+    val profileStrataFile: String? = null,
     val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
@@ -451,6 +460,23 @@ class HeadlessBenchmarkRunner(
                     }
 
                     val modelSources = cliConfig.models.map { ModelSource(it) }
+                    val profileStrata: Map<String, String> = if (cliConfig.profileMode) {
+                        val path = cliConfig.profileStrataFile
+                            ?: throw IllegalStateException("profileMode = true requires profileStrataFile")
+                        val f = File(path)
+                        check(f.exists()) { "profileStrataFile not found: " + f.absolutePath }
+                        val root = Json.parseToJsonElement(f.readText()).jsonObject
+                        val map = HashMap<String, String>()
+                        for (el in root["strata"]!!.jsonArray) {
+                            val o = el.jsonObject
+                            val sid = o["id"]!!.jsonPrimitive.content
+                            for (l in o["leafIds"]!!.jsonArray) map[l.jsonPrimitive.content] = sid
+                        }
+                        log.info("[PROFILE] loaded " + map.size + " leaf->stratum mappings over " +
+                            map.values.toSet().size + " strata from " + path +
+                            " (SE target " + cliConfig.profileSeTarget + ")")
+                        map
+                    } else emptyMap()
                     val request = BenchmarkRequest(
                         models = modelSources,
                         queryLimit = cliConfig.queryLimit,
@@ -461,7 +487,9 @@ class HeadlessBenchmarkRunner(
                         updateRankings = true,
                         reservedOnly = cliConfig.reservedOnly,
                         condition = condition,
-                        seed = currentSeed
+                        seed = currentSeed,
+                        profileSeTarget = if (cliConfig.profileMode) cliConfig.profileSeTarget else null,
+                        profileStrata = profileStrata
                     )
 
                     val report = benchmarkService.runBenchmark(request)
@@ -1353,6 +1381,9 @@ class HeadlessBenchmarkRunner(
         var questionsPerRound = 12
         var reservedOnly = true
         var resumeBenchmark = false
+        var profileMode = false
+        var profileSeTarget = 0.15
+        var profileStrataFile: String? = null
         var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
@@ -1439,6 +1470,9 @@ class HeadlessBenchmarkRunner(
                 "questionsPerRound" -> questionsPerRound = rawVal.toInt()
                 "reservedOnly" -> reservedOnly = rawVal.toBoolean()
                 "resumeBenchmark" -> resumeBenchmark = rawVal.toBoolean()
+                "profileMode" -> profileMode = rawVal.toBoolean()
+                "profileSeTarget" -> profileSeTarget = rawVal.toDouble()
+                "profileStrataFile" -> profileStrataFile = rawVal.trim('"', '\'')
                 "conditions" -> conditions = parseStringList(rawVal)
                 "outputDir" -> outputDir = rawVal.trim('"', '\'')
                 "testRatio" -> testRatio = rawVal.toDouble()
@@ -1509,6 +1543,9 @@ class HeadlessBenchmarkRunner(
             questionsPerRound = questionsPerRound,
             reservedOnly = reservedOnly,
             resumeBenchmark = resumeBenchmark,
+            profileMode = profileMode,
+            profileSeTarget = profileSeTarget,
+            profileStrataFile = profileStrataFile,
             conditions = conditions,
             outputDir = outputDir,
             testRatio = testRatio,

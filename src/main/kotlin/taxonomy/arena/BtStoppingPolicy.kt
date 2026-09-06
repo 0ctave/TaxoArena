@@ -25,7 +25,14 @@ class BtStoppingPolicy(
      * order undetermined" is both the honest claim and the only affordable one. At 0 the rule
      * fired in one cell of 51 and saved nothing.
      */
-    val placementSlack: Int = 2
+    val placementSlack: Int = 2,
+    /**
+     * PROFILE mode, when non-null: stop on estimation precision (SE targets per model x
+     * stratum) instead of on rank decisions. Overrides placement/binomial/gate stopping —
+     * see [ProfileTargets] for why. Shared with the scheduler via BtMatchScheduler so the
+     * two cannot be given different stopping rules.
+     */
+    val profile: ProfileTargets? = null
 ) {
     private val leafRankHistory = mutableMapOf<String, ArrayDeque<List<String>>>()
 
@@ -99,6 +106,29 @@ class BtStoppingPolicy(
         }
 
         if (condition.equals("MAIN", ignoreCase = true)) {
+            // ── PROFILE mode ─────────────────────────────────────────────────────────
+            // A leaf is finished when its STRATUM has met the SE target for every model,
+            // or when every pair in the leaf has spent its budget (= the leaf's pool, so
+            // this is pool exhaustion). No placement, no binomial, no gate: those retire
+            // pairs on ORDER decisions, and profile mode exists precisely because that
+            // starves the margins the SE targets need.
+            if (profile != null) {
+                val stratum = profile.stratumOf(nodeId) ?: return true
+                if (profile.converged(stratum)) return true
+                val queryCount = nodeToQueries[nodeId]?.size ?: 0
+                val fallbackBudget = leafBudgetPerPair(queryCount)
+                val byPair = HashMap<String, Int>()
+                for (ps in pairStats[nodeId] ?: emptyList()) {
+                    val key = "${minOf(ps.modelA, ps.modelB)}|${maxOf(ps.modelA, ps.modelB)}"
+                    byPair[key] = (byPair[key] ?: 0) + ps.totalComparisons.toInt()
+                }
+                for (i in models.indices) for (j in i + 1 until models.size) {
+                    val key = "${minOf(models[i], models[j])}|${maxOf(models[i], models[j])}"
+                    val budget = pairCustomBudgets.getOrDefault("$nodeId|$key", fallbackBudget)
+                    if ((byPair[key] ?: 0) < budget) return false
+                }
+                return true
+            }
             val queryIds = nodeToQueries[nodeId] ?: emptyList()
             val leafBudget = leafBudgetPerPair(queryIds.size)
             val leafArena = LeafArena(nodeId, models, queryIds, emptyMap(), leafBudget)
@@ -312,6 +342,15 @@ class BtStoppingPolicy(
         if (condition.equals("ROUND_ROBIN", ignoreCase = true)) return false
         if (totalComparisons < minTotalComparisons) return false
         if (targetLeafIds.isEmpty()) return false
+
+        // PROFILE mode: the run is done when EVERY leaf is done (stratum at target or
+        // pool exhausted). No convergence fraction, no rank-stability requirement — those
+        // exist to call an ORDER settled, and profile mode does not stop on order.
+        if (profile != null && condition.equals("MAIN", ignoreCase = true)) {
+            return targetLeafIds.all { leafId ->
+                isLeafConverged(leafId, btStates, pairStats, models, nodeToQueries, condition)
+            }
+        }
 
         if (round >= maxRounds - 3) {
             // Last 3 rounds: stop if at least 50% are structurally converged
