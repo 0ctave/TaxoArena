@@ -464,9 +464,15 @@ class TaxonomyBenchmarkService(
             .map { it.id }.toSet()
         log.info("Benchmark scope: ${targetLeafIds.size} eligible leaf nodes")
 
+        // Profile mode must reach isLeafConverged's profile branch (condition-dispatched
+        // under "MAIN"); decision-mode runs keep the historical LEGACY_MAIN selection
+        // criterion so their behavior stays bit-identical to the settled runs.
+        val targetSelectionCondition =
+            if (stoppingPolicy.profile != null) req.condition else "LEGACY_MAIN"
         var targetNodes = scheduler.selectTargetNodes(
             allNodes, btStates, nodeToQueries,
-            pairStats = pairStatsMap, models = modelNames, maxNodes = 100
+            pairStats = pairStatsMap, models = modelNames, maxNodes = 100,
+            condition = targetSelectionCondition
         )
 
         var round = btStates.values.map { it.fitVersion }.maxOrNull() ?: 0
@@ -900,9 +906,16 @@ class TaxonomyBenchmarkService(
             // Re-select each round: converged leaves are excluded, uncertain ones are promoted
             targetNodes = scheduler.selectTargetNodes(
                 allNodes, btStates, nodeToQueries,
-                pairStats = pairStatsMap, models = modelNames, maxNodes = 100
+                pairStats = pairStatsMap, models = modelNames, maxNodes = 100,
+                condition = targetSelectionCondition
             )
-            if (targetNodes.isEmpty() && replayTriples == null) break
+            if (targetNodes.isEmpty() && replayTriples == null) {
+                // This exit used to be silent, which made the round-38 profile stop look
+                // like convergence; a run that ends here must say so.
+                log.info("[ARENA-SCHED] round $round: selectTargetNodes returned no candidate " +
+                    "leaves — ending the ${req.condition} arm.")
+                break
+            }
             log.debug("Round $round — active leaves: ${targetNodes.size} / ${targetLeafIds.size} " +
                       "(converged: ${targetLeafIds.size - targetNodes.size})")
 

@@ -75,6 +75,17 @@
 # AFTER the run (and any resume): restore
 # frozen_triples_20260727_042523_Headless_Run_Auto_ge_MAIN.json from HEAD.
 #
+# IMPLEMENTATION INCIDENT (2026-09-06, disclosed; criteria unchanged). The first
+# launch ended after round 38 (9,235 verdicts) with ZERO strata at target: the
+# scheduler's selectTargetNodes called isLeafConverged without the condition
+# argument, fell into the LEGACY_MAIN decision-mode branch, and retired every leaf
+# on order-pinned criteria — exactly the stopping behavior this run exists to turn
+# off. Fixed by passing the condition through (profile runs only; decision-mode
+# target selection is bit-identical to the settled runs), regression-tested, and
+# the run RESUMED on the same database: all 9,235 paid verdicts reconstruct, and
+# sampling continues toward the registered SE 0.15 / pool-exhaustion stop. The
+# frozen analysis and criteria above are untouched by the fix.
+#
 # MAIN ONLY, NOT a thesis result: the settled batch stands as published.
 #
 datasetType   = "MMLU_PRO"

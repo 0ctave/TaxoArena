@@ -109,6 +109,37 @@ class ProfileModeTest {
     }
 
     @Test
+    fun `selectTargetNodes keeps unconverged-stratum leaves that legacy criteria would retire`() {
+        // Regression for the 2026-09-06 profile run: selectTargetNodes called
+        // isLeafConverged WITHOUT the condition argument, fell into the LEGACY_MAIN
+        // branch, judged every leaf converged by decision-mode rules at round 38, and
+        // silently ended the run with zero strata at target. In profile mode a leaf
+        // with unspent budget and an unconverged stratum must stay a candidate no
+        // matter how lopsided its records look to the legacy criterion.
+        val prof = targets(seTarget = 0.15)
+        val policy = BtStoppingPolicy(budgetPerPair = 30, profile = prof)
+        val models = listOf("a", "b")
+        val queries = mapOf("leaf-1" to (1..40).toList())
+        policy.pairCustomBudgets["leaf-1|a|b"] = 40
+        val sched = BtMatchScheduler(
+            minQueriesForBenchmark = 1, queriesPerPair = 2,
+            budgetPerPair = 3, stoppingPolicy = policy, seed = 1
+        )
+        val nodes = listOf(GraphNode(id = "leaf-1", label = "leaf-1", depth = 2))
+        // 20-0: unanimously resolved to any decision-mode rule, budget far from spent.
+        val stats = mapOf("leaf-1" to listOf(
+            NodePairStats("leaf-1", "a", "b", winsA = 20.0, winsB = 0.0, ties = 0.0, totalComparisons = 20.0)))
+
+        val underMain = sched.selectTargetNodes(nodes, emptyMap(), queries, stats, models, 100, condition = "MAIN")
+        assertEquals(listOf("leaf-1"), underMain.map { it.id },
+            "profile-mode MAIN must keep the leaf: stratum unconverged, budget unspent")
+
+        // Stratum reaching target releases the leaf.
+        prof.seByStratum = mapOf("s1" to mapOf("a" to 0.1, "b" to 0.1))
+        assertTrue(sched.selectTargetNodes(nodes, emptyMap(), queries, stats, models, 100, condition = "MAIN").isEmpty())
+    }
+
+    @Test
     fun `simulated profile tournament terminates with every stratum at target`() {
         val seTarget = 0.55
         val prof = ProfileTargets(seTarget, mapOf("leaf-1" to "s1", "leaf-2" to "s1", "leaf-3" to "s2"))

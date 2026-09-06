@@ -751,12 +751,18 @@ class BtMatchScheduler(
         nodeToQueries: Map<String, List<Int>>,
         pairStats: Map<String, List<NodePairStats>> = emptyMap(),
         models: List<String> = emptyList(),
-        maxNodes: Int = 100
+        maxNodes: Int = 100,
+        // Must be the RUN's condition, not the "LEGACY_MAIN" default: isLeafConverged
+        // dispatches on it, and profile mode's branch only exists under "MAIN". The
+        // 2026-09-06 profile run ended at round 38 with zero strata converged because
+        // this call site left the default in place and every leaf satisfied the legacy
+        // decision-mode criterion.
+        condition: String = "LEGACY_MAIN"
     ): List<GraphNode> {
         val candidates = allNodes.filter { node ->
             node.children.isEmpty()
             && (nodeToQueries[node.id]?.size ?: 0) >= minQueriesForBenchmark
-            && !stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries)
+            && !stoppingPolicy.isLeafConverged(node.id, btStates, pairStats, models, nodeToQueries, condition)
         }
 
         data class SortCandidate(
