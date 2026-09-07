@@ -1497,4 +1497,336 @@ class SeparationNullBySizeTest {
         println("wrote docs/data/within_null_frozen_anchors.csv  (${nulls.size} anchors)")
         println("wrote docs/data/within_null_frozen_splits.csv   (${rows.size} accepted splits)")
     }
+
+    // ── siteNull: SITE-level + DEFLATED nulls on every accepted split (P2) ────────
+
+    /** id -> 256-slice unit vector, so child-region centroids can be resolved
+     *  against the site's own vectors without a second DB pass per child. */
+    private fun loadVectorsById(conn: java.sql.Connection, ids: Collection<String>): Map<String, DoubleArray> {
+        val out = LinkedHashMap<String, DoubleArray>()
+        ids.chunked(400).forEach { chunk ->
+            conn.prepareStatement(
+                "SELECT q.id, e.vector FROM queries q JOIN embeddings e ON e.query = q.distilled_text " +
+                    "WHERE q.id IN (${chunk.joinToString(",") { "?" }})"
+            ).use { stmt ->
+                chunk.forEachIndexed { i, id -> stmt.setString(i + 1, id) }
+                val rs = stmt.executeQuery()
+                while (rs.next()) {
+                    val qid = rs.getString(1)
+                    val bytes = rs.getBytes(2) ?: continue
+                    val buf = java.nio.ByteBuffer.wrap(bytes)
+                    val full = FloatArray(bytes.size / 4) { buf.getFloat() }
+                    if (full.size < 256) continue
+                    val v = DoubleArray(256) { full[it].toDouble() }
+                    var norm = 0.0
+                    for (x in v) norm += x * x
+                    norm = sqrt(norm)
+                    if (norm > 0) { for (i in v.indices) v[i] /= norm; out[qid] = v }
+                }
+            }
+        }
+        return out
+    }
+
+    /** Orthonormal basis of the between-child-centroid subspace: span{c_j - c_1},
+     *  Gram-Schmidt, near-zero residuals dropped. k=2 gives exactly the
+     *  between-centroid direction; k children give at most k-1 dims. */
+    private fun betweenCentroidBasis(centroids: List<DoubleArray>): List<DoubleArray> {
+        if (centroids.size < 2) return emptyList()
+        val dirs = mutableListOf<DoubleArray>()
+        val base = centroids[0]
+        for (j in 1 until centroids.size) {
+            val d = DoubleArray(base.size) { centroids[j][it] - base[it] }
+            for (u in dirs) {
+                var dot = 0.0
+                for (i in d.indices) dot += d[i] * u[i]
+                for (i in d.indices) d[i] -= dot * u[i]
+            }
+            var nrm = 0.0
+            for (x in d) nrm += x * x
+            nrm = sqrt(nrm)
+            if (nrm > 1e-9) dirs.add(DoubleArray(d.size) { d[it] / nrm })
+        }
+        return dirs
+    }
+
+    /**
+     * SITE-LEVEL + DEFLATED WITHIN-NODE NULLS on the frozen mcs=55 artifact
+     * (`gradlew siteNull`). Implements plan P2 (docs/v2_validation_plan.md, criteria
+     * frozen 2026-09-08).
+     *
+     * The anchor-level arm above (`withinNull`) scores every accepted split against
+     * its DEPTH-1 anchor's null, which is anti-conservative for smaller descendant
+     * sites (the null narrows with n). This arm removes the approximation: each of
+     * the accepted split sites is scored against a null fitted to the SITE'S OWN
+     * population — the same anisotropy-preserving generator (Gaussian moment-matched
+     * to the site's 256-slice mean/covariance, projected to the sphere), same
+     * production `splitSingleNode` at the frozen config, same unconditional-quantile
+     * convention (non-reached replicates score 0).
+     *
+     * DEFLATED variant (the "natural projection" version, labelled as such): the
+     * observed split's between-child-centroid subspace (child-region centroids of the
+     * frozen tree, Gram-Schmidt, <= k-1 dims) is projected out of the CENTERED
+     * observations before sampling — C' = (I - UU^T) applied to each centered row —
+     * so the null carries the site's texture MINUS the elongation along the very axis
+     * the split cut. The mean mu is kept intact (a mean offset creates no
+     * bimodality). A genuinely heterogeneous node has covariance elongated along its
+     * own between-cluster axis, so the plain within-node null is inflated by the
+     * structure under test; the deflated null asks "does the observed separation
+     * exceed what the REMAINING texture produces?" and is the statistic meant to
+     * separate elongated texture from real heterogeneity the elongated null hides.
+     *
+     * Certification: a site is certified at site-level p95 iff its persisted
+     * dasguptaDeltaNorm >= the unconditional p95 of its own null (q <= ~0.05);
+     * analogously for the deflated null. Guards, both recorded as feasibility flags
+     * rather than fabricated q's: NULL-INFEASIBLE (n < 2*minClusterSize — the
+     * production splitter cannot even be driven) and DEGENERATE (< 20 of the
+     * replicates reached the separation gate, the file-wide usability floor; a
+     * collapsed null certifies nothing).
+     *
+     * The CERTIFIED TRUNK is the maximal all-certified prefix of the tree: a site is
+     * a trunk member iff it is certified AND every ancestor split site is a trunk
+     * member. A view — nothing is deleted.
+     */
+    @Test
+    fun `siteNull - site-level and deflated nulls on every accepted split of the frozen artifact`() {
+        (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
+        val embDb = java.io.File("embeddings_cache.db")
+        org.junit.jupiter.api.Assumptions.assumeTrue(embDb.exists(), "embeddings_cache.db not present")
+        val frozen = System.getProperty("snapshotId") ?: "20260727_042523_Headless_Run_Auto_ge"
+        val loaded = loadFrozenGraph(frozen)
+        org.junit.jupiter.api.Assumptions.assumeTrue(loaded != null, "frozen snapshot $frozen not available")
+        val (snapId, g) = loaded!!
+        val byId = g.nodes.associateBy { it.id }
+        // Site enumeration: identical to the withinNull stage-2 arm (66 accepted splits).
+        val sites = g.nodes.filter { it.childIds.size >= 2 && it.dasguptaDeltaNorm > 0.0 }
+            .sortedWith(compareBy({ it.depth }, { -(regionQueryIds(it, byId).size) }))
+        val r = reps(300)
+        val mcs = 55
+
+        val config = canonicalConfig(mcs)
+        val splitter = TaxonomySplitter(config, NoLlm, MMLUDatasetFetcher(config, ""), TaxonomyFitter(config))
+        val capture = Capture()
+        val splitLog = LoggerFactory.getLogger("taxonomy.Splitter") as ch.qos.logback.classic.Logger
+        capture.context = splitLog.loggerContext
+        capture.start(); splitLog.level = Level.DEBUG; splitLog.isAdditive = false; splitLog.addAppender(capture)
+
+        println("=".repeat(132))
+        println("SITE-LEVEL + DEFLATED WITHIN-NODE NULLS — FROZEN ARTIFACT.  snapshot=$snapId  minClusterSize=$mcs  bar=${config.formalism.proposalSeparationBar}")
+        println("${sites.size} accepted split sites, reps=$r per site per arm. Null fitted to each SITE'S OWN population.")
+        println("q = fraction of ALL null replicates >= observed (unconditional; non-reached score 0). cert = observed >= null p95.")
+        println("deflated = between-child-centroid subspace (<= k-1 dims) projected out of the centered observations before sampling.")
+        println("=".repeat(132))
+        println(
+            "%-46s %5s %5s %3s | %8s | %8s %8s %6s %6s | %2s %8s %8s %6s %6s | %s".format(
+                "site", "depth", "n", "k", "observed",
+                "siteP50", "siteP95", "qSite", "reach%",
+                "dd", "deflP50", "deflP95", "qDefl", "reach%", "verdict"
+            )
+        )
+
+        data class SiteNullRow(
+            val id: String, val label: String, val depth: Int, val n: Int, val k: Int,
+            val observed: Double,
+            val siteP50: Double, val siteP95: Double, val qSite: Double,
+            val siteReach: Double, val siteAcc: Double,
+            val deflDims: Int,
+            val deflP50: Double, val deflP95: Double, val qDefl: Double,
+            val deflReach: Double, val deflAcc: Double,
+            val feasibility: String,        // OK | NULL-INFEASIBLE | DEGENERATE(-DEFL)
+            val certSite: Boolean, val certDefl: Boolean
+        )
+        val rows = mutableListOf<SiteNullRow>()
+
+        fun runArm(tagPrefix: String, seedBase: Long, siteId: String,
+                   mu: DoubleArray, centered: List<DoubleArray>, n: Int): List<Rep> =
+            runBlocking {
+                coroutineScope {
+                    (0 until r).map { rep ->
+                        async(Dispatchers.Default) {
+                            val rng = java.util.Random(
+                                seedBase + siteId.hashCode().toLong() * 2654435761L + rep * 104729L
+                            )
+                            runReplicate(
+                                splitter, capture, "${tagPrefix}_${siteId}_$rep",
+                                withinNodeCloud(mu, centered, n, rng)
+                            )
+                        }
+                    }.awaitAll()
+                }
+            }
+
+        val ro = org.sqlite.SQLiteConfig().apply { setReadOnly(true) }.toProperties()
+        java.sql.DriverManager.getConnection("jdbc:sqlite:${embDb.absolutePath}", ro).use { conn ->
+            for (site in sites) {
+                val ids = regionQueryIds(site, byId)
+                val vecById = loadVectorsById(conn, ids)
+                // Cache-only, hard-fail: never silently measure a subset of the frozen population.
+                check(vecById.size == ids.size) {
+                    "embedding cache miss for '${site.label}': ${vecById.size}/${ids.size} vectors recovered"
+                }
+                val vectors = ids.map { vecById.getValue(it) }
+                val m = vectors.size
+                val label = site.label ?: site.id
+                val obs = site.dasguptaDeltaNorm
+                if (m < 2 * mcs) {
+                    // Cannot be driven through splitSingleNode: record, don't fabricate.
+                    rows.add(SiteNullRow(site.id, label, site.depth, m, site.childIds.size, obs,
+                        Double.NaN, Double.NaN, Double.NaN, 0.0, 0.0, 0,
+                        Double.NaN, Double.NaN, Double.NaN, 0.0, 0.0,
+                        "NULL-INFEASIBLE", certSite = false, certDefl = false))
+                    println("%-46s %5d %5d %3d | %8.5f | NULL-INFEASIBLE (n < 2*minClusterSize=%d)".format(
+                        java.util.Locale.US, label.take(46), site.depth, m, site.childIds.size, obs, 2 * mcs))
+                    continue
+                }
+                val dim = 256
+                val mu = DoubleArray(dim)
+                for (v in vectors) for (i in 0 until dim) mu[i] += v[i] / m
+                val centered = vectors.map { v -> DoubleArray(dim) { i -> v[i] - mu[i] } }
+
+                // Deflation basis: centroids of the frozen tree's child regions.
+                val childCentroids = site.childIds.mapNotNull { cid ->
+                    val child = byId[cid] ?: return@mapNotNull null
+                    val cIds = regionQueryIds(child, byId).filter { vecById.containsKey(it) }
+                    if (cIds.isEmpty()) return@mapNotNull null
+                    val c = DoubleArray(dim)
+                    for (qid in cIds) { val v = vecById.getValue(qid); for (i in 0 until dim) c[i] += v[i] / cIds.size }
+                    c
+                }
+                val basis = betweenCentroidBasis(childCentroids)
+                val deflated = centered.map { c ->
+                    val out = c.copyOf()
+                    for (u in basis) {
+                        var dot = 0.0
+                        for (i in out.indices) dot += out[i] * u[i]
+                        for (i in out.indices) out[i] -= dot * u[i]
+                    }
+                    out
+                }
+
+                val plain = runArm("SN", 20260908L, site.id, mu, centered, m)
+                val defl = runArm("SND", 88820260908L, site.id, mu, deflated, m)
+
+                fun stats(res: List<Rep>): DoubleArray {
+                    val all = res.map { it.sepKway }.sorted()
+                    val reached = all.count { it > 0.0 }
+                    return doubleArrayOf(
+                        percentile(all, 0.50), percentile(all, 0.95),
+                        all.count { it >= obs }.toDouble() / all.size,
+                        100.0 * reached / all.size,
+                        100.0 * res.count { it.accepted } / all.size,
+                        reached.toDouble()
+                    )
+                }
+                val ps = stats(plain)
+                val pd = stats(defl)
+                val plainUsable = ps[5] >= 20
+                val deflUsable = pd[5] >= 20
+                val feas = when {
+                    plainUsable && deflUsable -> "OK"
+                    !plainUsable && !deflUsable -> "DEGENERATE"
+                    !plainUsable -> "DEGENERATE-SITE"
+                    else -> "DEGENERATE-DEFL"
+                }
+                val certSite = plainUsable && obs >= ps[1]
+                val certDefl = deflUsable && obs >= pd[1]
+                rows.add(SiteNullRow(site.id, label, site.depth, m, site.childIds.size, obs,
+                    ps[0], ps[1], ps[2], ps[3], ps[4], basis.size,
+                    pd[0], pd[1], pd[2], pd[3], pd[4], feas, certSite, certDefl))
+                println(
+                    "%-46s %5d %5d %3d | %8.5f | %8.5f %8.5f %6.3f %5.1f%% | %2d %8.5f %8.5f %6.3f %5.1f%% | %s%s%s".format(
+                        java.util.Locale.US, label.take(46), site.depth, m, site.childIds.size, obs,
+                        ps[0], ps[1], ps[2], ps[3], basis.size, pd[0], pd[1], pd[2], pd[3],
+                        if (certSite) "SITE-CERT" else "site-fail",
+                        if (certDefl) " DEFL-CERT" else " defl-fail",
+                        if (feas != "OK") " [$feas]" else ""
+                    )
+                )
+            }
+        }
+        splitLog.detachAppender(capture); capture.stop(); splitLog.isAdditive = true
+
+        // ── Certified trunk: maximal all-certified prefix ────────────────────────
+        val rowById = rows.associateBy { it.id }
+        val isSite = { node: taxonomy.service.SerialNode -> node.childIds.size >= 2 && node.dasguptaDeltaNorm > 0.0 }
+        fun parentOf(node: taxonomy.service.SerialNode): taxonomy.service.SerialNode? =
+            (listOfNotNull(node.treeParentId) + node.parentIds).firstNotNullOfOrNull { byId[it] }
+        val trunkMemo = HashMap<String, Boolean>()
+        fun inTrunk(id: String): Boolean = trunkMemo.getOrPut(id) {
+            val row = rowById[id] ?: return@getOrPut false
+            if (!row.certSite) return@getOrPut false
+            var cur = byId[id]?.let { parentOf(it) }
+            val guard = HashSet<String>()
+            while (cur != null && guard.add(cur.id)) {
+                if (isSite(cur) && !inTrunk(cur.id)) return@getOrPut false
+                if (cur.depth <= 0) break
+                cur = parentOf(cur)
+            }
+            true
+        }
+        val trunk = rows.filter { inTrunk(it.id) }
+
+        // ── CSV export ───────────────────────────────────────────────────────────
+        fun esc(s: String) = "\"" + s.replace("\"", "\"\"") + "\""
+        fun fmt(x: Double, p: String) = if (x.isNaN()) "" else p.format(java.util.Locale.US, x)
+        val outDir = java.io.File("docs/data").apply { mkdirs() }
+        java.io.File(outDir, "site_null_frozen.csv").printWriter().use { w ->
+            w.println("snapshot_id,node_id,label,depth,n,k,observed_sep," +
+                "site_null_p50,site_null_p95,q_site,site_reach_pct,site_accept_pct," +
+                "defl_dims,defl_null_p50,defl_null_p95,q_deflated,defl_reach_pct,defl_accept_pct," +
+                "cert_site_p95,cert_deflated_p95,trunk_member,feasibility,reps")
+            rows.forEach { row ->
+                w.println("${esc(snapId)},${esc(row.id)},${esc(row.label)},${row.depth},${row.n},${row.k}," +
+                    fmt(row.observed, "%.6f") + "," +
+                    fmt(row.siteP50, "%.6f") + "," + fmt(row.siteP95, "%.6f") + "," +
+                    fmt(row.qSite, "%.4f") + "," + fmt(row.siteReach, "%.1f") + "," + fmt(row.siteAcc, "%.1f") + "," +
+                    "${row.deflDims}," +
+                    fmt(row.deflP50, "%.6f") + "," + fmt(row.deflP95, "%.6f") + "," +
+                    fmt(row.qDefl, "%.4f") + "," + fmt(row.deflReach, "%.1f") + "," + fmt(row.deflAcc, "%.1f") + "," +
+                    "${row.certSite},${row.certDefl},${inTrunk(row.id)},${row.feasibility},$r")
+            }
+        }
+        println()
+        println("wrote docs/data/site_null_frozen.csv  (${rows.size} sites)")
+
+        // ── Registered checks (FROZEN in docs/v2_validation_plan.md, P2) ─────────
+        println()
+        println("=".repeat(132))
+        println("REGISTERED CHECKS (P2, frozen 2026-09-08)")
+        val cs = rows.firstOrNull { it.depth == 1 && it.label == "Computer science" }
+        val phil1 = rows.firstOrNull { it.depth == 1 && it.label == "Philosophy" }
+        val phil2 = rows.firstOrNull { it.label == "Core Philosophical Concepts and Theorists" }
+        fun v(x: SiteNullRow?, defl: Boolean) = when {
+            x == null -> "MISSING"
+            defl -> "qDefl=%.3f %s".format(java.util.Locale.US, x.qDefl, if (x.certDefl) "CERT" else "uncert")
+            else -> "qSite=%.3f %s".format(java.util.Locale.US, x.qSite, if (x.certSite) "CERT" else "uncert")
+        }
+        val powerPass = cs?.certDefl == true && phil1 != null && !phil1.certDefl && phil2 != null && !phil2.certDefl
+        println("(a) POWER CHECK — deflated null certifies the CS contamination split, leaves Philosophy's two sites uncertified:")
+        println("      Computer science depth-1 ............ ${v(cs, true)}   (required: CERT)")
+        println("      Philosophy depth-1 (n00000014) ...... ${v(phil1, true)}   (required: uncert)")
+        println("      Core Philosophical Concepts/Theorists ${v(phil2, true)}   (required: uncert)")
+        println("      => ${if (powerPass) "PASS" else "FAIL"}")
+        val certified = rows.filter { it.certSite }
+        val chem = rows.firstOrNull { it.depth == 1 && it.label == "Chemistry" }
+        val bio = rows.firstOrNull { it.depth == 1 && it.label == "Biology" }
+        val trunkPass = certified.size >= 15 && chem?.certSite == true && bio?.certSite == true
+        println("(b) TRUNK VIABILITY — >= 15 sites certified at site-level p95, including Chemistry and Biology depth-1:")
+        println("      certified at site-level p95 ......... ${certified.size}/${rows.size}   (required: >= 15)")
+        println("      Chemistry depth-1 ................... ${v(chem, false)}   (required: CERT)")
+        println("      Biology depth-1 ..................... ${v(bio, false)}   (required: CERT)")
+        println("      => ${if (trunkPass) "PASS" else "FAIL"}")
+        println()
+        println("CERTIFIED TRUNK (maximal all-certified prefix, site-level p95): ${trunk.size} sites")
+        trunk.sortedWith(compareBy({ it.depth }, { -it.n })).forEach {
+            println("      depth=%d  %-52s n=%-4d qSite=%.3f".format(
+                java.util.Locale.US, it.depth, it.label.take(52), it.n, it.qSite))
+        }
+        println()
+        println("Summary: site-cert ${certified.size}/${rows.size}, defl-cert ${rows.count { it.certDefl }}/${rows.size}, " +
+            "both ${rows.count { it.certSite && it.certDefl }}, trunk ${trunk.size}, " +
+            "infeasible ${rows.count { it.feasibility == "NULL-INFEASIBLE" }}, " +
+            "degenerate ${rows.count { it.feasibility.startsWith("DEGENERATE") }}")
+        println("=".repeat(132))
+    }
 }

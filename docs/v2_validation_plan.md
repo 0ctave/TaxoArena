@@ -96,3 +96,23 @@ exceeds J-gated baseline recurrence; reserved pool touched exactly once.
   Also: the embeddinggemma arm failed twice on an Ollama-internal socket-exhaustion
   error (its runner, not our code); parked — nomic already carries the
   second-embedder axis (75 leaves, Top-1 0.716, Philosophy splits x4).
+
+- P2 (2026-09-08): **FALSIFIED on both registered checks** (`gradlew siteNull`, 300 reps
+  per site per arm; table `docs/data/site_null_frozen.csv`; full readout in
+  `docs/separation_null_by_size.md` "SITE-LEVEL (2026-09-08)"). (a) power check FAIL —
+  the deflated null certifies CS depth-1 (q_defl=0.043) but ALSO Philosophy depth-1, at
+  exactly q_defl=0.050 (obs 0.03188 vs deflated p95 0.03162); at 300 reps the two q's are
+  statistically indistinguishable (binomial SE ~0.013), so the construction lacks the
+  registered discrimination — substantive, not a rounding accident. Philosophy's second
+  site stays uncertified (0.257) as required. (b) trunk viability FAIL — matched
+  site-level nulls certify 6/66 (9%): Chemistry 0.000, Biology 0.000, Math 0.013,
+  Engineering 0.013, Business 0.027 (depth 1) + one depth-4 Math site (0.047); the
+  registered falsifier (< 15: "trunk tier too thin; strata absorb its role") fires even
+  though Chemistry and Biology certify as required. The anchor-level 35% clear was
+  confirmed as an upper bound (collapses 4x under matched nulls). CERTIFIED TRUNK =
+  {Chemistry, Math, Business, Engineering, Biology} depth-1 splits only; the drift clause
+  is moot and unmeasured (offline geometry, no routing arm). Downstream: P3's candidate
+  twig set must be re-derived against this 5-site trunk or its gate redesigned; P5's
+  strata inherit the trunk tier's measurement role. Deflated null survives as a
+  per-site diagnostic (q's in the CSV), not as the CS-vs-Philosophy discriminator;
+  dip-test / mixture-BIC variants are unregistered future work.
