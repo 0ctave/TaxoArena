@@ -125,6 +125,24 @@
 # (gaps 1.2-1.6 logits) remains ~5 sigma under either SE. Output archived at
 # experiment_results/x12_profile/question_perm_robustness.txt.
 #
+# EXPLORATORY MECHANISM (2026-09-07, post-hoc, adjudicates nothing, disclosed):
+# the top-cluster divergence appears to be VERBOSITY BIAS where correctness
+# saturates. Chain of evidence, all from existing data: (1) logistic verdict ~
+# lengthDiff + gtDiff gives beta_len = +0.39 per 1,000 chars (z = 14.6),
+# essentially identical under cell and generic rubrics and +0.34 for grok —
+# judges reward length beyond what correctness explains, cross-family; (2) mean
+# response length correlates with arena-vs-GT residuals (r = +0.37, n = 12):
+# the two most over-rated models (iask 1,303 ch, gpt-4o 1,474 ch) are the
+# longest writers, the most under-rated (gemini 882 ch) is far shorter;
+# (3) refitting the top-4 on LENGTH-MATCHED matches (|dlen| <= 300 ch) flips
+# gemini above iask in BOTH x12 (674 matches) and R2 (2,894 matches), yielding
+# gemini > iask > arx > gpt-4o — one adjacent swap from the GT order — and moves
+# grok's board the same directions. Interpretation: when both answers are
+# correct (the frontier regime), the judge falls back on elaboration.
+# Length-matching is post-hoc conditioning; a registered confirmation (length-
+# controlled judging or a length-instructed rubric arm) is queued in the
+# hardening roadmap before this is claimed as settled.
+#
 # READING, stated plainly: arena verdicts carry real sub-domain structure (p=0.001,
 # fourth consecutive run), and per-model direction predictions from the GT screen
 # replicate for mid- and low-tier models. Where GT and judge disagree — top-tier
