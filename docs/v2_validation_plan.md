@@ -68,3 +68,17 @@ named descriptive.
 Design recorded in the proposals doc; no test frozen yet. Prerequisite: P1+P2
 baseline stable. When scheduled: primary = cross-seed recurrence of ll-gated splits
 exceeds J-gated baseline recurrence; reserved pool touched exactly once.
+
+## OUTCOMES (updated as tests adjudicate)
+
+- P1 (2026-09-08): **FALSIFIED** by the registered primary. Disjoint-half consensus
+  ARI = 0.6533 (bar >= 0.90, falsifier < 0.80), vs baseline mean pairwise build ARI
+  0.663 (0.585-0.704) — consensus over 10 builds agrees across halves NO BETTER than
+  two individual seed builds. The v1 procedure (nearest-centroid assignments,
+  average-linkage at co-assignment 0.6, min-cell 55 merges) does not stabilize leaf
+  identity; the instability does not average out at B=10. Full-consensus descriptives:
+  67 cells, size median 88. Artifacts: tools/analysis/consensus_tree.py,
+  experiment_results/consensus_p1_report.txt, consensus_cells_v1.json. Possible
+  procedure variants (higher B, co-assignment-weighted warm start, different cut)
+  remain open but are NEW proposals needing their own registrations; P1 as designed
+  is dead and the v2 recipe reorders around P2.
