@@ -948,7 +948,7 @@ class TaxonomyMerger(
                 val statsA = statsByChild[nodeA] ?: continue
                 val statsB = statsByChild[nodeB] ?: continue
                 val sep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
-                if (sep < config.formalism.proposalSeparationBar) pairsToMerge.add(Triple(nodeA, nodeB, sep))
+                if (sep < barFor(config, nodeA)) pairsToMerge.add(Triple(nodeA, nodeB, sep))
             }
         }
 
@@ -1013,7 +1013,7 @@ class TaxonomyMerger(
                 val statsB = branchStats(nodeB, commonDim)
                 if (statsA == null || statsB == null) continue
                 val pairSep = StatisticsUtils.chanceCorrectedSeparation(listOf(statsA, statsB))
-                if (pairSep < config.formalism.proposalSeparationBar) {
+                if (pairSep < barFor(config, nodeA)) {
                     ops.tryProposal(dag = dag, site = root, allEmbeddings = allEmbeddings, groundTruthMap = groundTruthMap, currentIteration = currentIteration, proposalType = ProposalType.SHRINK) {
                         fuseNodes(nodeA, nodeB)
                         true

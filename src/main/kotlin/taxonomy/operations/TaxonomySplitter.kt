@@ -95,7 +95,7 @@ class TaxonomySplitter(
                             val sep = StatisticsUtils.chanceCorrectedSeparation(
                                 listOf(resStats, clusterStats(sibQueries, resDim))
                             )
-                            sep >= config.formalism.proposalSeparationBar
+                            sep >= barFor(config, node)
                         }
                     }
                 }
@@ -160,7 +160,7 @@ class TaxonomySplitter(
         val minClusterFrac = minClusterSize.toDouble() / targetQueries.size
         // Negative marginalEps means "not set" -> keep the historical coupling.
         val marginal = config.formalism.marginalEps.let {
-            if (it >= 0.0) it else config.formalism.proposalSeparationBar
+            if (it >= 0.0) it else barFor(config, node)
         }
 
         // No separate maxK=2 probe is needed before this call: runVmfEm has NO
@@ -287,7 +287,7 @@ class TaxonomySplitter(
         // margin that doubled the bar below 2*minClusterSize is unreachable here: the
         // feasibility check at the top of this function already requires
         // mass >= 2*minClusterSize.)
-        val requiredEps = config.formalism.proposalSeparationBar
+        val requiredEps = barFor(config, node)
 
         // ── Stabilize the proposal onto the feasible set ─────────────────────
         // Two coarsening moves, both of which strictly reduce k and re-route with

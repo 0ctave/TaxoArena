@@ -164,6 +164,9 @@ class TaxonomyConfig {
         // exceeds this value, guaranteeing the two children are geometrically
         // separated in vMF space.
         var proposalSeparationBar: Double = 0.04
+        // Per-anchor bars (depth-1 label -> bar); empty = use the global bar everywhere.
+        // See taxonomy.operations.barFor. Loaded from TOML adaptiveBarFile.
+        var adaptiveBars: Map<String, Double> = emptyMap()
 
         // ── Routing ───────────────────────────────────────────────────────────
         // Final membership share: after the trickle walk, a query's memberships are

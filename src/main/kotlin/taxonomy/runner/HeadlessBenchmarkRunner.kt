@@ -66,6 +66,8 @@ data class HeadlessCliConfig(
     val tau: Double? = null,
     // Post-loop final-metrics block; null = keep the code default.
     val enableFinalMetrics: Boolean? = null,
+    // JSON file mapping depth-1 anchor label -> per-anchor separation bar; null = global bar.
+    val adaptiveBarFile: String? = null,
     val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
@@ -180,6 +182,12 @@ class HeadlessBenchmarkRunner(
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
         cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
         cliConfig.tau?.let { config.formalism.tau = it }
+        cliConfig.adaptiveBarFile?.let { f ->
+            val bars = kotlinx.serialization.json.Json.parseToJsonElement(java.io.File(f).readText())
+            config.formalism.adaptiveBars = (bars as kotlinx.serialization.json.JsonObject)
+                .mapValues { (_, v) -> (v as kotlinx.serialization.json.JsonPrimitive).content.toDouble() }
+            log.info("[ADAPTIVE-BAR] loaded ${config.formalism.adaptiveBars.size} per-anchor bars from $f")
+        }
         cliConfig.enableFinalMetrics?.let { config.execution.enableFinalMetrics = it }
         cliConfig.acceptanceZ?.let { config.formalism.acceptanceZ = it }
         cliConfig.marginalEps?.let { config.formalism.marginalEps = it }
@@ -1396,6 +1404,7 @@ class HeadlessBenchmarkRunner(
         var maxQueryReuse = Int.MAX_VALUE
         var tau: Double? = null
         var enableFinalMetrics: Boolean? = null
+        var adaptiveBarFile: String? = null
         var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
@@ -1488,6 +1497,7 @@ class HeadlessBenchmarkRunner(
                 "maxQueryReuse" -> maxQueryReuse = rawVal.toInt()
                 "tau" -> tau = rawVal.toDouble()
                 "enableFinalMetrics" -> enableFinalMetrics = rawVal.toBoolean()
+                "adaptiveBarFile" -> adaptiveBarFile = rawVal.trim('"', '\'')
                 "conditions" -> conditions = parseStringList(rawVal)
                 "outputDir" -> outputDir = rawVal.trim('"', '\'')
                 "testRatio" -> testRatio = rawVal.toDouble()
@@ -1570,6 +1580,7 @@ class HeadlessBenchmarkRunner(
             maxQueryReuse = maxQueryReuse,
             tau = tau,
             enableFinalMetrics = enableFinalMetrics,
+            adaptiveBarFile = adaptiveBarFile,
             conditions = conditions,
             outputDir = outputDir,
             testRatio = testRatio,
