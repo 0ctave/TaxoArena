@@ -18,3 +18,26 @@ DISCLOSURES: the placebo intentionally carries the descent-gate-loosening side e
   it is the control for edge mechanics, gate effects included. The smoke run (n=200) was
   seen before this freeze: (B−T) −0.019, (P−T) +0.014, D −0.033 (p=0.12); the full pool
   is 18x larger and the criteria above were fixed without further peeking.
+
+## OUTCOME (2026-09-07, full pool, analysis run unchanged)
+
+TREE VERDICT under the frozen criteria — decisively. Primary D = (B−T) − (P−T),
+n = 3,599: mean −0.0141, 95% CI [−0.0244, −0.0037] (excludes 0, NEGATIVE side),
+sign test p = 0.043 with the negative majority. The registered claim "bridges add
+predictive fit" required D > 0; instead real bridges UNDERPERFORM placebo edges:
+(P−T) = +0.019 [+0.012, +0.027] (edge mechanics help slightly), (B−T) = +0.005
+[−0.003, +0.013] (real bridges capture less of even that mechanical benefit).
+Bridging the genuinely-overlapping E1 pairs diverts beam mass in ways that reduce
+held-out fit. Per-domain: the largest negative is Philosophy (−0.11), the bridged
+leaf pulls mass from its own anchor; no domain shows the DAG-predicted gain.
+Routing health identical across conditions (0 NoMatch; Top-1 agreement B 98.6%,
+P 99.6%).
+
+Reading: combined with E1 (overlap is real and pair-concentrated, p = 0.0005),
+this is the SHARPENED TREE VERDICT the analysis agent gave 60% prior mass:
+the overlap exists, soft routing already carries it, and structural edge-bridges
+add nothing — measured this time by a DAG-sensitive criterion with a placebo
+control, not by the partition objective. NOTE the scope limit: E2 tests
+EDGE-bridges (second parent for an existing leaf). Shared-child EXTRACTION (E3)
+is the one DAG variant still untested; per the registered sequence it only ran
+if E2 favored bridges, so the program records it as the remaining open variant.
