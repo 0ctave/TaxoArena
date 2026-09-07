@@ -148,6 +148,10 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     // re-run against a frozen snapshot CLEARS that snapshot's rows before writing -- which is
     // how a smoke test destroyed the frozen Math MAIN results (1736/11/241 -> 66/1/1).
     providers.systemProperty("ranking.db.path").orNull?.let { systemProperty("ranking.db.path", it) }
+    // Embedding-model override for the H9 embedder arms: the EmbeddingModel bean and the
+    // per-model EmbeddingCache file both read this at Spring startup, so it must arrive as
+    // a system property (a TOML key would be applied too late to matter).
+    providers.systemProperty("taxoadapt.llm.embedding-model").orNull?.let { systemProperty("taxoadapt.llm.embedding-model", it) }
     // Global LLM permit count (ArcTaxonomyLLMClient's semaphore). It has a value in
     // config/application.yml, so this forward exists only to override it per run without
     // editing that file -- which matters mid-run: if the endpoint starts returning 429s the

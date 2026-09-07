@@ -31,7 +31,17 @@ class EmbeddingCache(
     // In-memory cache for the CURRENT run only. Prevents repeated DB calls for the same query.
     private val sessionCache = ConcurrentHashMap<String, FloatArray>()
 
-    private val dbUrl = "jdbc:sqlite:embeddings_cache.db?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
+    // The cache is keyed by query TEXT alone, so vectors from different embedding
+    // models must never share a file: a model switch with the shared cache would
+    // silently reuse the old model's vectors (H9 embedder-swap hazard, 2026-09-08).
+    // The historical file name is preserved for the canonical qwen3 model so every
+    // existing run and fixture keeps working; any other model gets its own file.
+    private val dbFile: String = run {
+        val m = config.llm.embeddingModel
+        if (m.isBlank() || m.startsWith("qwen3-embedding")) "embeddings_cache.db"
+        else "embeddings_cache_" + m.replace(Regex("[^A-Za-z0-9._-]"), "_") + ".db"
+    }
+    private val dbUrl = "jdbc:sqlite:$dbFile?journal_mode=WAL&synchronous=NORMAL&busy_timeout=10000"
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     val dimensionality: Int
