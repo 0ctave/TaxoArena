@@ -19,6 +19,27 @@
 # frozen artifact; per-anchor bars are not captured in the snapshot's
 # EffectiveConfig provenance (disclosed limitation of this exploration).
 #
+# ── OUTCOME (2026-09-08, run completed, certified J-stationary at iteration 9) ──
+# 49 nodes / 35 leaves / depth 4; held-out Top-1 0.742 (0.8pp BELOW the 20-seed
+# floor minimum 0.750 — reported as-is; consistent with the flat-bar arms' small
+# real routing cost); anchor drift 0.09pp; zero cycle-detector fires (the
+# per-anchor create/destroy consistency holds).
+#
+# EXPECTATION PARTIALLY WRONG, in an informative direction: structure did NOT
+# concentrate in the big-separation anchors (Chemistry, Biology, Business are
+# UNSPLIT) but in the TIGHT-NULL anchors: Physics 7 sub-leaves, Other 5, Math 4,
+# CS 4, Economics 3, Psychology 3, Engineering 2. Under per-anchor honest nulls,
+# certification is signal RELATIVE to the anchor's own texture — Chemistry's
+# large absolute separations are matched by an equally heavy texture null
+# (p95 0.066) and a fresh greedy build could not certify any split there, while
+# Physics' tight null (p95 0.036) certifies modest separations. The certified
+# taxonomy is a different OBJECT, not a subset of the frozen one (mu-match 30/87).
+#
+# READING: an honest-null-certified tree exists (35 leaves, every split cleared
+# by construction), costs ~3pp routing accuracy, and reshapes WHERE granularity
+# lives. Whether its rubrics judge better than the frozen tree's is an open
+# question for the ladder methodology; the frozen instrument stands.
+#
 datasetType   = "MMLU_PRO"
 
 models        = [
