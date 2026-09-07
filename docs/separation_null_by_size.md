@@ -15,6 +15,8 @@
 >   frozen mcs=55 artifact ([`frozen-artifact.md`](frozen-artifact.md)). The same applies to
 >   the `docs/data/within_node_null_*.csv` exports and to the lambda1/lambda-bar proxy fitted
 >   against these targets (R^2 0.865, LOO Q^2 0.851 — method survives, values do not).
+>   **DONE 2026-09-07: see "CURRENT (2026-09-07, frozen mcs=55 artifact)" at the bottom of
+>   this file (`gradlew withinNull`).**
 > * **The configuration described is not the frozen one.** This sweep was run at
 >   `minClusterSize = 30`; the frozen artifact uses 55, so the grid, the split-eligible
 >   population and the `2*minClusterSize` prefilter all shift. The **bar** it justifies
@@ -264,3 +266,120 @@ gradlew nullBySize -PnullReps=300 --tests "*SeparationNullBySizeTest*production 
 
 Arms B-E of the same test cover the mcs=20 floor (the only way to reach n=40), an exact vMF
 generator, a concentration sweep, and the Philosophy fidelity replay.
+
+---
+
+## CURRENT (2026-09-07, frozen mcs=55 artifact): within-node null re-derived
+
+**This section supersedes, as to values, everything the scope note at the top voids**: the
+50-site within-node table, its q values, the six named marginal splits, the leaf-lineage
+exposure numbers and the `docs/data/within_node_null_*.csv` exports, all of which were
+measured on the pre-`c381211` 88-leaf mcs=30 tree. The isotropic table above remains
+current and is not touched. The METHOD is unchanged and is restated exactly below.
+
+Measured by `gradlew withinNull` (`SeparationNullBySizeTest`, arm
+"withinNull - anisotropy-preserving null per frozen depth-1 anchor") against the frozen
+artifact **snapshot `20260727_042523_Headless_Run_Auto_ge`** (154 nodes / 87 leaves /
+14 depth-1 anchors, `minClusterSize = 55`, `proposalSeparationBar = 0.025`,
+`freeze_mcs55.toml`), read from the tracked `snapshots_frozen.db` extract. Embeddings are
+served strictly from `embeddings_cache.db` (read-only, hard-fail on any cache miss; coverage
+was 8299/8299 anchor-region queryIds, no duplicates).
+
+**Null model (the anisotropy-preserving generator, same as the voided run):** for each
+depth-1 anchor, fit the anchor's own 256-slice mean `mu` and empirical covariance, then draw
+`x = normalize(mu + C^T g)` where `C`'s rows are the centered observations scaled by
+`1/sqrt(m)` and `g ~ N(0, I_m)`. Draws are Gaussian moment-matched to the node — every
+per-principal-component variance preserved, every discrete sub-cluster destroyed — then
+projected to the sphere. "Texture but no sub-topics." **Statistic:** each replicate cloud
+(same n as the anchor) is driven through the production `TaxonomySplitter.splitSingleNode`
+at the frozen config (`minClusterSize = 55`, bar = 0.025) and `node.dasguptaDeltaNorm` is
+recorded uncensored, exactly as the isotropic arms record it. `acceptanceZ` stays 0.0
+because the z-gate lives in `TaxonomyOperations`' edit acceptance, outside
+`splitSingleNode`; it cannot censor this statistic. 300 replicates per anchor, deterministic
+seeds keyed on anchor id and replicate index.
+
+| anchor | n | p50 | p90 | **p95** | p99 | p95 95% CI | reach% | accept% |
+|---|---:|---:|---:|---:|---:|:--:|---:|---:|
+| Chemistry | 934 | 0.04349 | 0.04836 | **0.06627** | 0.07056 | [0.06319, 0.06816] | 100.0 | 100.0 |
+| Physics | 873 | 0.03315 | 0.03523 | **0.03555** | 0.03627 | [0.03539, 0.03604] | 100.0 | 100.0 |
+| Math | 870 | 0.03659 | 0.03871 | **0.03943** | 0.04060 | [0.03898, 0.04002] | 100.0 | 100.0 |
+| Law | 738 | 0.05073 | 0.07319 | **0.07531** | 0.07816 | [0.07393, 0.07751] | 100.0 | 100.0 |
+| Psychology | 624 | 0.02613 | 0.02802 | **0.02899** | 0.02970 | [0.02835, 0.02931] | 100.0 | 81.7 |
+| Business | 606 | 0.03486 | 0.03760 | **0.03856** | 0.04167 | [0.03794, 0.03988] | 100.0 | 100.0 |
+| Engineering | 604 | 0.06407 | 0.06832 | **0.06989** | 0.07272 | [0.06902, 0.07188] | 100.0 | 100.0 |
+| Biology | 571 | 0.03252 | 0.03524 | **0.03578** | 0.03702 | [0.03556, 0.03648] | 100.0 | 100.0 |
+| Economics | 568 | 0.03493 | 0.03749 | **0.03844** | 0.04119 | [0.03796, 0.03975] | 100.0 | 100.0 |
+| Computer science | 549 | 0.03215 | 0.03504 | **0.03565** | 0.03680 | [0.03536, 0.03627] | 100.0 | 99.7 |
+| Health | 525 | 0.03015 | 0.03291 | **0.03365** | 0.03466 | [0.03331, 0.03419] | 100.0 | 99.7 |
+| Other | 511 | 0.03006 | 0.03228 | **0.03347** | 0.03468 | [0.03258, 0.03388] | 100.0 | 99.7 |
+| Philosophy | 402 | 0.04027 | 0.04467 | **0.04954** | 0.06347 | [0.04539, 0.06163] | 100.0 | 100.0 |
+| History | 320 | 0.05140 | 0.06984 | **0.07344** | 0.07657 | [0.07128, 0.07495] | 100.0 | 100.0 |
+
+Reach is 100% at every anchor (n >= 320 is far above the EM-collapse regime), so
+unconditional and conditional quantiles coincide and the censoring caveat that dominated the
+voided mcs=30 reading does not arise here.
+
+### Where the frozen bar sits
+
+The within-node p95 band is **0.02899 (Psychology) .. 0.07531 (Law)**. The frozen bar
+0.025 sits **below the entire band** — below even the lowest anchor's p95, and below every
+anchor's p50 except Psychology's by a wide margin. Both earlier statements therefore
+sharpen into one: against the isotropic null (p95 0.0055-0.0093) the bar is conservative by
+2.7-4.5x; against every anchor's own anisotropy-preserving null it is permissive,
+full stop. The `accept%` column makes it operational: the FULL pipeline accepts
+99.7-100% of structureless-but-anisotropic clouds at 12 of 14 anchors (81.7% at
+Psychology). **The bar controls the isotropic false-positive rate and provides essentially
+no control against anisotropy-carving.** Whatever distinguishes real sub-topics from
+elongation in the frozen tree, it is not the separation bar.
+
+### Accepted splits against their anchor's null
+
+Every accepted split of the frozen tree (66 sites with k >= 2 and persisted
+`dasguptaDeltaNorm > 0`) is scored against its depth-1 anchor's null:
+q = fraction of ALL 300 null replicates >= the split's persisted separation.
+Full listing: `docs/data/within_null_frozen_splits.csv`.
+
+* **Depth-1 splits (exactly matched null — same population, same n, same covariance):
+  5/14 (36%) clear their own null p95** (Chemistry q=0.000, Biology q=0.000,
+  Engineering q=0.007, Math q=0.010, Business q=0.043); 11/14 (79%) are above their own
+  null p50; median q = 0.183. The three below their own p50: Economics (q=0.963),
+  Health (q=0.787), and Philosophy (q=1.000) — the Philosophy split the mcs=55 run
+  accepted (sep 0.0319) is one its own elongation null beats in every replicate.
+* **Deeper splits (anchor-null approximation): 18/52 (35%) clear their anchor's p95;
+  all accepted splits together: 23/66 (35%).** The approximation's direction is known:
+  the null narrows with n, so the larger-n anchor null is anti-conservative for smaller
+  descendant sites — their own within-node p95 would be higher, and 35% is an upper bound
+  on the clear rate under matched site-level nulls.
+
+### Interpretation limit (unchanged from the voided section, still binding)
+
+A genuinely heterogeneous node has covariance already elongated along the between-cluster
+axis; the bootstrap reproduces that elongation, so the true split scores unremarkably
+against it. Low q is necessary evidence of anisotropy-carving, not sufficient — and high
+`accept%` is a statement about the bar, not about any individual split's truth. The mcs=30
+run's worked example (Computer science) showed exactly this configuration; at mcs=55 the
+Computer science depth-1 split sits at q=0.273 with both its children's subtrees clearing
+their anchor p95 at deeper levels (`Probabilistic and Algebraic Reasoning in CS` q=0.003,
+`Statistical Methods in Econometrics and Simulation` q=0.003).
+
+### Comparison to the voided mcs=30 values
+
+The voided within-node band (p95 0.068-0.130, p50 0.033-0.063, measured per-site on the
+superseded 88-leaf tree) is replaced by the anchor-level band above (p95 0.029-0.075, p50
+0.026-0.064). The direction of the conclusion survives the re-derivation: the bar is
+permissive relative to the within-node null on the frozen artifact too, and by a wider
+operational margin than the old numbers suggested (accept% ~100% here; the voided run did
+not report an accept rate against its null).
+
+### Reproducing
+
+```
+gradlew withinNull -PnullReps=300
+```
+
+Reads `snapshots_frozen.db` (tracked; falls back to the full local `snapshots.db`) and
+`embeddings_cache.db`, both opened read-only; refuses to run on any snapshot other than the
+one passed via `-DsnapshotId` (default: the frozen id). Writes
+`docs/data/within_null_frozen_anchors.csv` and `docs/data/within_null_frozen_splits.csv`.
+Site-level (rather than anchor-level) nulls remain available as the stage-2 harness above
+run with `-DsnapshotId=20260727_042523_Headless_Run_Auto_ge`; not done here.
