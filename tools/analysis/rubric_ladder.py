@@ -138,16 +138,25 @@ def unit_corpora():
                 bs, bi = s, lid
         return bi
 
+    import struct
     by_anchor, by_stratum = defaultdict(list), defaultdict(list)
-    n_train = n_skipped = 0
+    n_train = n_reserved = n_unmatched = n_badvec = 0
     for qtext, vecraw in emb.execute("SELECT query, vector FROM embeddings"):
-        if qtext in reserved_texts or qtext not in items:
-            n_skipped += 1
+        if qtext in reserved_texts:
+            n_reserved += 1
             continue
+        if qtext not in items:
+            n_unmatched += 1
+            continue
+        # Vectors are stored as big-endian float32 blobs (JVM DataOutputStream),
+        # 4,096 raw dims; the pipeline's MRL projection = first 256, renormalized.
         try:
-            vec = json.loads(vecraw) if isinstance(vecraw, (str, bytes)) else list(vecraw)
+            if isinstance(vecraw, bytes) and len(vecraw) % 4 == 0:
+                vec = list(struct.unpack(">%df" % (len(vecraw) // 4), vecraw))
+            else:
+                vec = json.loads(vecraw)
         except Exception:
-            n_skipped += 1
+            n_badvec += 1
             continue
         lid = best_leaf(vec)
         n_train += 1
@@ -155,7 +164,9 @@ def unit_corpora():
         sid = leaf2stratum.get(lid)
         if sid:
             by_stratum[sid].append(qtext)
-    print("train questions assigned: %d (skipped %d)" % (n_train, n_skipped))
+    print("train questions assigned: %d (reserved %d, unmatched %d, bad-vector %d)"
+          % (n_train, n_reserved, n_unmatched, n_badvec))
+    assert n_train > 5000, "corpus assignment failed — refusing to induce from a broken join"
     rng = random.Random(SEED_CORPUS)
     units = {}
     for a, qs in by_anchor.items():
