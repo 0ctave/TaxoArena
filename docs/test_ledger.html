@@ -49,7 +49,7 @@
 <div class="wrap">
   <h1>TaxoArena Test Ledger</h1>
   <p class="lede">Every experiment of the publication campaign: its condition, registration, status, and result, with the evidence pointer (commit or artifact in the repo). Updated as results land.</p>
-  <p class="meta">v4 · 2026-09-07 · legend: REGISTERED = criteria frozen &amp; committed before launch · EXPLORATORY = post-hoc, disclosed, adjudicates nothing</p>
+  <p class="meta">v5 · 2026-09-08 · legend: REGISTERED = criteria frozen &amp; committed before launch · EXPLORATORY = post-hoc, disclosed, adjudicates nothing</p>
 
   <h2>Core campaign — completed</h2>
   <div class="tablewrap"><table>
@@ -91,6 +91,20 @@
     <tr><td class="id">E2</td><td>Do real bridges beat placebo bridges on held-out fit?</td><td>K=8 bridges on E1 pairs vs placebo edges, full reserved pool (3,599), registered two-sided</td><td><span class="chip ok">TREE VERDICT</span></td><td class="nums">D = −0.014 [−0.024, −0.004], sign p=0.043: real bridges UNDERPERFORM placebo; soft routing already carries the overlap</td><td class="ev">e2_registration.md · 5e66bfe</td></tr>
     <tr><td class="id">E3</td><td>Shared-child extraction vs a plain finer tree cell</td><td>gated on E2 favoring bridges — it did not; recorded as the one untested DAG variant</td><td><span class="chip plan">MOOT (open variant)</span></td><td>—</td><td class="ev">e2_registration.md outcome note</td></tr>
     <tr><td class="id">E4</td><td>Do bridge-mass questions behaviorally live in two cells?</td><td>dual-rubric judging, ~6k calls, paired McNemar; only if E1–E3 signal</td><td><span class="chip plan">CONTINGENT</span></td><td>—</td><td class="ev">roadmap Phase 3</td></tr>
+  </table></div>
+
+  <h2>v2 construction program (proposals + adjudications, 2026-09-08)</h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>question</th><th>status</th><th>result</th><th>evidence</th></tr>
+    <tr><td class="id">ADAPT</td><td>Can a tree be honest-null certified by construction?</td><td><span class="chip ok">CURVE MEASURED</span></td><td class="nums">p95 35 leaves/0.742 · p90 45/0.737 · p50 70/0.755 (in seed floor); in-loop gating loses q=0.000 structure — certify by pruning, not gating (amended)</td><td class="ev">h9_adaptive.toml · 3922070</td></tr>
+    <tr><td class="id">EMBED</td><td>Is construction embedder-bound?</td><td><span class="chip ok">DONE (nomic)</span></td><td class="nums">75 leaves, Top-1 0.716 (qwen3 better by ~4pp); Philosophy splits ×4 under nomic — its unsplittability is geometry-specific; gemma parked (Ollama runner fault)</td><td class="ev">h9_embed_nomic.toml · 99dce12</td></tr>
+    <tr><td class="id">P1</td><td>Does consensus over seed builds stabilize leaf identity?</td><td><span class="chip null">FALSIFIED</span></td><td class="nums">half-consensus ARI 0.653 vs bar 0.90 — no better than raw pairwise builds (0.663)</td><td class="ev">consensus_tree.py · b0763e8</td></tr>
+    <tr><td class="id">P2</td><td>Site-matched + deflated nulls → certified trunk?</td><td><span class="chip null">FALSIFIED ×2</span></td><td class="nums">6/66 site-certified (anchor-level 35% was 4× optimistic); trunk = 5 depth-1 splits (&lt;15 bar); deflated null can't separate CS from Philosophy at 300 reps</td><td class="ev">site_null_frozen.csv · d7e992f</td></tr>
+    <tr><td class="id">P6</td><td>Does fusing genuine twins beat placebo fusion?</td><td><span class="chip null">NULL — PROGRAM CLOSED</span></td><td class="nums">both fusion arms hurt outright (F−T −0.73; biggest twin −6.85); sign p=0.092 fails; soft routing vindicated vs bridges AND fusions; E3 stays unrun</td><td class="ev">E2FusionRunner · 372ce02</td></tr>
+    <tr><td class="id">P7</td><td>Is construction bit-reproducible?</td><td><span class="chip warn">SPLIT</span></td><td class="nums">structure PASS (dag hash-identical); evaluation path FAIL (bootstrap SE order-instability + validation float drift) — work items named</td><td class="ev">p7_det_{1,2} · c5f25ed</td></tr>
+    <tr><td class="id">LADDER</td><td>Rubric value vs granularity: generic ≤ anchor ≤ stratum ≤ leaf?</td><td><span class="chip run">RUNNING</span></td><td class="nums">34 rubrics induced; anchor arm 2,000/2,000 done; stratum arm in progress</td><td class="ev">rubric_ladder.py · 4c4e5e7</td></tr>
+    <tr><td class="id">P3</td><td>Functional twig gate (twig rubric beats parent's)</td><td><span class="chip plan">DESIGNED — awaits go</span></td><td class="nums">cheaper now: candidates derive from the 5-split trunk; ~15k judge calls</td><td class="ev">v2_validation_plan.md</td></tr>
+    <tr><td class="id">P5</td><td>Support-derived strata floors (≥240 reserved)</td><td><span class="chip plan">QUEUED</span></td><td class="nums">registered rider on the next profile run</td><td class="ev">v2_validation_plan.md</td></tr>
   </table></div>
 
   <h2>Queued</h2>
