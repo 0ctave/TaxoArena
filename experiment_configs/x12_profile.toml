@@ -115,6 +115,16 @@
 # Mid/low-tier replications hold: arx +0.438, deepseek +0.803, L2-7b -0.523,
 # L2-13b -0.552 — fourth independent dataset, same signs.
 #
+# POST-HOC ROBUSTNESS (2026-09-07, disclosed): matches sharing a question are
+# correlated (measured query-level design effect: median 2.0x, worst 3.7x across
+# strata), and the registered permutation shuffles at match level. A cluster-
+# respecting question-level permutation (tools/analysis/atlas_question_perm.py,
+# same LRT/fits/NPERM/seed) widens the null as expected (p95 -16.3 -> +24.8) and
+# the primary still clears it: p_perm = 0.002. Honest query-level SEs run
+# 0.14-0.245 against the 0.15 match-level target; the top-cluster divergence
+# (gaps 1.2-1.6 logits) remains ~5 sigma under either SE. Output archived at
+# experiment_results/x12_profile/question_perm_robustness.txt.
+#
 # READING, stated plainly: arena verdicts carry real sub-domain structure (p=0.001,
 # fourth consecutive run), and per-model direction predictions from the GT screen
 # replicate for mid- and low-tier models. Where GT and judge disagree — top-tier
