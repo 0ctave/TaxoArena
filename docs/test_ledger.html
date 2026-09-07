@@ -1,0 +1,107 @@
+<title>TaxoArena Test Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper:#F7F8F5; --ink:#23292B; --muted:#5C6A66; --accent:#2F6B4F;
+    --accent-soft:#E3EEE7; --card:#FFFFFF; --line:#DDE4DE; --mono-bg:#EEF2EE;
+    --amber:#9A6A1F; --amber-soft:#F4EAD5; --blue:#2C5B7A; --blue-soft:#E1ECF2;
+    --red:#8C3A2E; --red-soft:#F5E3DF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#15191A; --ink:#E2E7E3; --muted:#93A29B; --accent:#6FBF95;
+      --accent-soft:#1E2E26; --card:#1B2122; --line:#2C3634; --mono-bg:#20282A;
+      --amber:#D9A84E; --amber-soft:#33290F; --blue:#7FB3D3; --blue-soft:#16242E;
+      --red:#E08A7C; --red-soft:#32201C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#15191A; --ink:#E2E7E3; --muted:#93A29B; --accent:#6FBF95;
+    --accent-soft:#1E2E26; --card:#1B2122; --line:#2C3634; --mono-bg:#20282A;
+    --amber:#D9A84E; --amber-soft:#33290F; --blue:#7FB3D3; --blue-soft:#16242E;
+    --red:#E08A7C; --red-soft:#32201C;
+  }
+  body { background:var(--paper); color:var(--ink); font-family:"Public Sans",system-ui,sans-serif; line-height:1.5; margin:0; font-size:15px; }
+  .wrap { max-width:1020px; margin:0 auto; padding:2.6rem 1.25rem 5rem; }
+  h1 { font-family:"Fraunces",Georgia,serif; font-weight:650; font-size:2.1rem; margin:0 0 .3rem; }
+  .lede { color:var(--muted); max-width:70ch; margin:0 0 .5rem; }
+  .meta { font-family:"IBM Plex Mono",monospace; font-size:.75rem; color:var(--muted); }
+  h2 { font-family:"Fraunces",Georgia,serif; font-weight:650; font-size:1.3rem; margin:2.4rem 0 .7rem; }
+  .tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--card); }
+  table { border-collapse:collapse; width:100%; font-size:.84rem; }
+  th { text-align:left; font-size:.66rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted);
+       border-bottom:2px solid var(--line); padding:.55rem .7rem; white-space:nowrap; }
+  td { border-bottom:1px solid var(--line); padding:.5rem .7rem; vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  td.id { font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--accent); white-space:nowrap; }
+  td.ev { font-family:"IBM Plex Mono",monospace; font-size:.74rem; color:var(--muted); }
+  .chip { font-family:"IBM Plex Mono",monospace; font-size:.63rem; letter-spacing:.04em; padding:.13rem .45rem; border-radius:99px; white-space:nowrap; }
+  .ok   { background:var(--accent-soft); color:var(--accent); }
+  .run  { background:var(--blue-soft); color:var(--blue); }
+  .plan { background:var(--mono-bg); color:var(--muted); }
+  .warn { background:var(--amber-soft); color:var(--amber); }
+  .null { background:var(--red-soft); color:var(--red); }
+  .nums { font-variant-numeric:tabular-nums; }
+  p.note { font-size:.85rem; color:var(--muted); max-width:76ch; }
+</style>
+
+<div class="wrap">
+  <h1>TaxoArena Test Ledger</h1>
+  <p class="lede">Every experiment of the publication campaign: its condition, registration, status, and result, with the evidence pointer (commit or artifact in the repo). Updated as results land.</p>
+  <p class="meta">v2 · 2026-09-07 · legend: REGISTERED = criteria frozen &amp; committed before launch · EXPLORATORY = post-hoc, disclosed, adjudicates nothing</p>
+
+  <h2>Core campaign — completed</h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>question</th><th>condition / design</th><th>type</th><th>status</th><th>result</th><th>evidence</th></tr>
+    <tr><td class="id">X8-DEEP</td><td>Do arena verdicts carry the model×domain interaction?</td><td>8 models, decision-mode, seed 42, 4,186 verdicts</td><td><span class="chip warn">REG + POST-HOC</span></td><td><span class="chip null">REG. TEST NULL</span></td><td class="nums">registered per-pair Q/df null; post-hoc pooled LRT p=0.003; 4/4 contrast signs</td><td class="ev">x8_crossdomain_deep.toml · 6433111</td></tr>
+    <tr><td class="id">X8-CONF</td><td>Does the pooled LRT replicate under frozen criteria?</td><td>8 models, seed 43; 83% schedule overlap caveat</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">CONFIRMED</span></td><td class="nums">LRT 18.60, p=0.003; arx +0.451, L2-7b −0.548</td><td class="ev">x8_crossdomain_confirm.toml · 6861ea8</td></tr>
+    <tr><td class="id">X12</td><td>Interaction + ranking recovery at 12 models</td><td>12 models, seed 44, 9,144 verdicts, all 87 cells</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">CONFIRMED 5/5</span></td><td class="nums">LRT 39.48 p=0.001; ρ=0.951 τ=0.848 vs GT; iask +0.002 boundary pass; top-cluster anomaly recorded</td><td class="ev">x12_crossdomain.toml · 17de9b7/5fae41f</td></tr>
+    <tr><td class="id">R3</td><td>Is the board judge-family specific?</td><td>grok re-judge, 1,980 stratified matches, byte-identical prompts</td><td><span class="chip plan">DESCRIPTIVE</span></td><td><span class="chip ok">ROBUST</span></td><td class="nums">97.8% decisive agreement, board ρ=0.993, one adjacent swap (iask/gemini)</td><td class="ev">rejudge_grok.py · fb8fb5b</td></tr>
+    <tr><td class="id">RUBRIC</td><td>Do cell rubrics beat a generic judge?</td><td>paired 2×2 {Mistral, grok} × {cell, generic}, same matches</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">CONFIRMED</span></td><td class="nums">McNemar p=0.0001 (+1.5pp, 196:127); grok +2.4pp p=0.021; ordering ρ=1.000</td><td class="ev">rubric_value_contrast.py · 7037035/70e867d</td></tr>
+    <tr><td class="id">R2</td><td>Atlas at guaranteed precision; is the anomaly sampling or judge?</td><td>profile mode, SE≤0.15 × 20 strata, 36,871 verdicts</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip warn">PRIMARY MET, 2/4 SIGNS</span></td><td class="nums">LRT 60.24 p=0.001; direction pattern unconfirmed; registered question: divergence PERSISTS → judge-level; round-38 incident disclosed</td><td class="ev">x12_profile.toml · 2aba5ee/e17162c</td></tr>
+    <tr><td class="id">R2-QP</td><td>Does p=0.001 survive question clustering?</td><td>question-level (cluster-respecting) permutation, same LRT/seed</td><td><span class="chip warn">ROBUSTNESS</span></td><td><span class="chip ok">SURVIVES</span></td><td class="nums">null p95 −16.3→+24.8; p=0.002</td><td class="ev">atlas_question_perm.py · a8bfcb8</td></tr>
+  </table></div>
+
+  <h2>Bias audit (Phase 0) — completed, rerunnable via <span class="meta">tools/analysis/bias_audit.py</span></h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>question</th><th>condition / data</th><th>status</th><th>result</th><th>evidence</th></tr>
+    <tr><td class="id">H1</td><td>Do generated rubrics favor any model?</td><td>θ_cell − θ_generic per model, 300-fold bootstrap, both 9,144-verdict arms</td><td><span class="chip ok">CLEAN</span></td><td class="nums">0/12 CIs exclude 0 (max +0.14)</td><td class="ev">bias_audit.py h1 · d76b1db</td></tr>
+    <tr><td class="id">H2</td><td>Do rubrics leak answers?</td><td>pattern scan over all 87 cell rubrics + prompts</td><td><span class="chip ok">CLEAN</span></td><td class="nums">0 hits, all patterns</td><td class="ev">bias_audit.py h2</td></tr>
+    <tr><td class="id">H3</td><td>Length/verbosity bias?</td><td>verdict ~ lenDiff + gtDiff logistic, decisive only, 3 arms</td><td><span class="chip warn">BIAS FOUND</span></td><td class="nums">β=+0.39/1k chars (z=14.6), rubric-invariant, cross-family</td><td class="ev">bias_audit.py h3</td></tr>
+    <tr><td class="id">H3b</td><td>Does length explain the top-cluster anomaly?</td><td>top-4 refit on |Δlen|≤300 matches, x12 + R2 + grok</td><td><span class="chip warn">EXPLORATORY</span></td><td class="nums">gemini flips above iask in BOTH runs; matched order 1 swap from GT; mechanism → registered test in H7</td><td class="ev">x12_profile.toml disclosure · cb5b5d8</td></tr>
+    <tr><td class="id">H4</td><td>Residual order bias?</td><td>flip-asymmetry flags vs matched order-symmetric null</td><td><span class="chip ok">BOUNDED</span></td><td class="nums">5.0% vs 3.0% chance (R2); absorbed by flip→tie</td><td class="ev">bias_audit.py h4</td></tr>
+    <tr><td class="id">H5</td><td>Routing vs benchmark labels?</td><td>primary-anchor purity on 3,445 reserved questions</td><td><span class="chip ok">SENSIBLE</span></td><td class="nums">73.6%; flows on ambiguous boundaries (Phys↔Chem, Math↔CS)</td><td class="ev">bias_audit.py h5</td></tr>
+    <tr><td class="id">H6</td><td>Does the tree shape leak into the ladder?</td><td>board refit under 4 cell weightings</td><td><span class="chip ok">INVARIANT</span></td><td class="nums">ordering identical, ρ=1.0000 all weightings</td><td class="ev">bias_audit.py h6</td></tr>
+    <tr><td class="id">H6b</td><td>Is question support sufficient? ("enough queries")</td><td>query-level vs match-level bootstrap, 20 strata</td><td><span class="chip warn">DEFF FOUND</span></td><td class="nums">design effect median 2.0×, worst 3.7×; rule q ≥ k/S² (~120–190 for SE 0.15); scheduler reuse cap shipped</td><td class="ev">memory + ee56c74</td></tr>
+  </table></div>
+
+  <h2>Running now</h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>question</th><th>condition / design</th><th>type</th><th>status</th><th>evidence</th></tr>
+    <tr><td class="id">H7</td><td>Placebo control: does rubric SPECIFICITY matter, and does a length clause cut the bias?</td><td>3 Mistral arms, 4,200 matches, 0 invalid</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">PRIMARY CONFIRMED · SECONDARY NULL</span></td><td class="ev nums">cell 77.0% vs random 74.9%, McNemar p=0.006; cell ≥ sibling ≥ random holds; length clause: β_len unchanged (+0.278→+0.285) — verbosity bias is not promptable-away · fd4d776</td></tr>
+    <tr><td class="id">H9-1</td><td>Construction variance floor: seed sensitivity at the frozen config</td><td>4 rebuilds, seeds {137, 2048, 7, 31337}, all certified fixed points</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">α + β PASS</span></td><td class="ev nums">Top-1 spread 1.6pp (&lt;2.5); anchor drift ≤0.42pp (&lt;5) while leaves span 72–87 and μ-match 71–85% · h9_stability.py · 394786a</td></tr>
+    <tr><td class="id">E2</td><td>Held-out routing fit: tree vs bridged vs placebo edges</td><td>K=8 bridges on E1 pairs vs 8 placebo edges; harness being built in a worktree (agent); adjudicating run gets its own registration</td><td><span class="chip plan">HARNESS BUILD</span></td><td><span class="chip run">RUNNING</span></td><td class="ev">worktree agent</td></tr>
+  </table></div>
+
+  <h2>Tree-vs-DAG program</h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>question</th><th>condition / design</th><th>status</th><th>result</th><th>evidence</th></tr>
+    <tr><td class="id">E1</td><td>Does overlap mass concentrate on leaf pairs?</td><td>411 multi-leaf reserved questions; marginal-preserving null B=2000 (beam-aware v2 rides on H9)</td><td><span class="chip ok">DONE</span></td><td class="nums">top-10 pair share 17.8% vs 5.1% null, p=0.0005; pairs match H5 flows → E2 warranted</td><td class="ev">overlap_concentration.py · 703d8aa</td></tr>
+    <tr><td class="id">E2</td><td>Do real bridges beat placebo bridges on held-out fit?</td><td>K=8 bridges on E1 pairs vs placebo edges, full reserved pool (3,599), registered two-sided</td><td><span class="chip ok">TREE VERDICT</span></td><td class="nums">D = −0.014 [−0.024, −0.004], sign p=0.043: real bridges UNDERPERFORM placebo; soft routing already carries the overlap</td><td class="ev">e2_registration.md · 5e66bfe</td></tr>
+    <tr><td class="id">E3</td><td>Shared-child extraction vs a plain finer tree cell</td><td>gated on E2 favoring bridges — it did not; recorded as the one untested DAG variant</td><td><span class="chip plan">MOOT (open variant)</span></td><td>—</td><td class="ev">e2_registration.md outcome note</td></tr>
+    <tr><td class="id">E4</td><td>Do bridge-mass questions behaviorally live in two cells?</td><td>dual-rubric judging, ~6k calls, paired McNemar; only if E1–E3 signal</td><td><span class="chip plan">CONTINGENT</span></td><td>—</td><td class="ev">roadmap Phase 3</td></tr>
+  </table></div>
+
+  <h2>Queued</h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>item</th><th>condition</th><th>status</th></tr>
+    <tr><td class="id">H9b</td><td>Construction-process fixes: starved-leaf gate through tryProposal; unknown TOML keys fatal (after adding real parse cases for tau/enableFinalMetrics — verify what the x12 configs' unparsed values actually did); determinism (sorted NiW/J accumulation + byte-diff CI); certificate μ-delta logging</td><td>code + tests, free</td><td><span class="chip plan">NEXT</span></td></tr>
+    <tr><td class="id">H9-2..5</td><td>Sweep arms: order shuffle · bar {0.045, 0.07} · mcs {40, 75} · embedding swap</td><td>local compute, after H9-1 baseline</td><td><span class="chip plan">QUEUED</span></td></tr>
+    <tr><td class="id">H10</td><td>Full arena on the most divergent counterfactual tree</td><td>~18k calls, registered, overnight</td><td><span class="chip plan">QUEUED</span></td></tr>
+    <tr><td class="id">LADDER</td><td>Blind insertion of 2 new models (mid-tier + frontier) into the frozen board</td><td>registered point-predictions; ~2–6k calls</td><td><span class="chip plan">DESIGNED</span></td></tr>
+    <tr><td class="id">X16</td><td>16-model roster expansion</td><td>—</td><td><span class="chip null">DEPRIORITIZED</span> (anomaly is judge-level; verbosity mechanism supersedes)</td></tr>
+  </table></div>
+
+  <p class="note">Companion pages: the <em>Hardening Plan</em> artifact holds each test's full design and decision rules; the <em>Blog Series Roadmap</em> holds the publication plan. All evidence pointers are commits on <span class="meta">main</span> of github.com/0ctave/TaxoArena or committed files under <span class="meta">tools/analysis/</span> and <span class="meta">experiment_results/</span>.</p>
+</div>
