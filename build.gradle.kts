@@ -121,6 +121,21 @@ tasks.register<Test>("withinNull") {
     filter { includeTestsMatching("*SeparationNullBySizeTest*withinNull*") }
 }
 
+tasks.register<Test>("siteNull") {
+    description = "Site-level + deflated within-node separation nulls on every accepted split of the frozen mcs=55 artifact (P2 certification)."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    maxHeapSize = "6g"
+    workingDir = rootDir
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
+    systemProperty("nullReps", providers.gradleProperty("nullReps").getOrElse("300"))
+    systemProperty("snapshotId", providers.systemProperty("snapshotId").getOrElse("20260727_042523_Headless_Run_Auto_ge"))
+    filter { includeTestsMatching("*SeparationNullBySizeTest*siteNull*") }
+}
+
 tasks.register<Test>("randomCellRubrics") {
     description = "Induces judge rubrics on synthetic random cells (null arm of the rubric-specificity prereg). MAKES REAL AZURE CALLS."
     group = "verification"

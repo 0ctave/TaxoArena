@@ -383,3 +383,99 @@ one passed via `-DsnapshotId` (default: the frozen id). Writes
 `docs/data/within_null_frozen_anchors.csv` and `docs/data/within_null_frozen_splits.csv`.
 Site-level (rather than anchor-level) nulls remain available as the stage-2 harness above
 run with `-DsnapshotId=20260727_042523_Headless_Run_Auto_ge`; not done here.
+
+---
+
+## SITE-LEVEL (2026-09-08): per-site + deflated nulls, certification by pruning (P2)
+
+Measured by `gradlew siteNull` (`SeparationNullBySizeTest`, arm "siteNull - site-level and
+deflated nulls on every accepted split of the frozen artifact"), adjudicating proposal P2
+against the criteria frozen in `docs/v2_validation_plan.md` before the run. Same frozen
+artifact (`20260727_042523_Headless_Run_Auto_ge`, mcs=55, bar=0.025), same
+anisotropy-preserving generator and production-`splitSingleNode` statistic as the
+anchor-level section above, with the anchor approximation removed: each of the **66
+accepted split sites** is scored against a null fitted to **its own population** (the
+site's region queryIds, 256-slice, cache-only with hard-fail on any miss), 300 replicates
+per site per arm, deterministic seeds keyed on site id and replicate index. Guards, both
+recorded as feasibility flags rather than fabricated q's: NULL-INFEASIBLE
+(n < 2*minClusterSize = 110 — cannot be driven through the splitter) and DEGENERATE
+(< 20 replicates reached the separation gate). **Neither fired**: all 66 sites have
+n >= 126, reach is >= 91% everywhere and 100% at 59/66 sites. Seed-independence check:
+the 14 depth-1 sites re-derive the anchor arm's q values under fully independent seeds to
+within 0.033 (e.g. CS 0.240 vs 0.273, Economics 0.990 vs 0.963).
+
+**Deflated variant** (the natural-projection construction, labelled as such): the observed
+split's between-child-centroid subspace — frozen child-region centroids, Gram-Schmidt,
+<= k-1 dims, exactly the between-centroid direction at k=2 — is projected out of the
+centered observations before sampling; the mean is kept (a mean offset creates no
+bimodality). This removes precisely the elongation that a genuinely two-cluster node bakes
+into its own covariance, i.e. the circularity named in the interpretation-limit sections
+above: the plain within-node null is inflated by the structure under test, the deflated
+null is not, so it is the statistic intended to separate elongated texture from real
+heterogeneity the elongated null hides.
+
+Full table: `docs/data/site_null_frozen.csv` (one row per site: observed sep, both nulls'
+p50/p95, q_site, q_deflated, reach/accept rates, cert flags, trunk membership,
+feasibility). Certification rule, fixed in the harness: observed >= the null's
+unconditional p95.
+
+### Headline numbers
+
+* **Site-level certification: 6/66 (9%).** Chemistry (q=0.000), Biology (0.000),
+  Math (0.013), Engineering (0.013), Business (0.027) at depth 1, plus one deep site,
+  Elementary Quantitative Reasoning and Symbolic Logic (depth 4, k=3, q=0.047). The
+  anchor-level readout (23/66 = 35% clear) was registered as an upper bound because the
+  anchor null narrows with n; matched site-level nulls collapse it fourfold. The
+  direction was predicted; the magnitude ends the trunk tier as designed.
+* **Deflated certification: 24/66 (36%).** The deflated null is much narrower (Chemistry
+  p95 0.0667 -> 0.0295; Physics 0.0358 -> 0.0311) — but the production bar accepts its
+  clouds at ~100% too, so deflation reorders sites rather than rescuing the bar.
+* **Certified trunk (maximal all-certified prefix): 5 sites** — the depth-1 splits of
+  **Chemistry, Math, Business, Engineering, Biology**. Nothing below depth 1 survives the
+  prefix rule: the one deep certified site sits under two uncertified Math splits
+  (q=0.963 and q=1.000) and drops out.
+
+### Registered checks (frozen before the run; verdicts as coded)
+
+**(a) Power check — FAIL.** Required: the deflated null certifies the CS contamination
+split while leaving Philosophy's two sites uncertified. Observed: CS depth-1 certifies
+(q_defl = 0.043) and 'Core Philosophical Concepts and Theorists' stays uncertified
+(q_defl = 0.257) — but **Philosophy depth-1 also certifies, at exactly q_defl = 0.050**
+(observed 0.03188 against a deflated p95 of 0.03162). The honest read is not "one
+replicate away from PASS": at 300 reps the binomial SE of a q near 0.05 is ~0.013, so
+CS (0.043) and Philosophy (0.050) are statistically indistinguishable. The deflated null
+as constructed does **not** have the power to separate the CS-contamination configuration
+from Philosophy at the domain level, and the check fails substantively, not numerically.
+
+**(b) Trunk viability — FAIL.** Required: >= 15 sites certified at site-level p95,
+including Chemistry and Biology depth-1. Observed: Chemistry and Biology both certify at
+q=0.000, but the count is 6 — P2's own falsifier ("site-level nulls certify < 15 splits:
+trunk tier too thin; strata absorb its role") fires. The plan's trunk-drift clause
+(<= 0.5pp) is moot at this count and was not measured; this harness is offline geometry
+with no routing arm.
+
+### Consequences
+
+P2-as-registered is falsified the same way P1 was: the mechanism works (the harness runs,
+the nulls are honest, the trunk is a well-defined view) but the certified object is far
+smaller than the proposal predicted — a 5-split trunk containing 19 nodes' worth of
+structure, not the ~30-55 leaves P2 projected. Two downstream effects: (1) P3's candidate
+twig set ("every leaf whose parent is inside the certified trunk") must be re-derived
+against this 5-site trunk or P3's gate redesigned — with the trunk this thin, the
+functional tier starts essentially at depth 2; (2) the strata (P5) inherit the
+measurement role the trunk tier was meant to carry, exactly as the falsifier clause
+anticipated. The deflated-null idea survives as a diagnostic (its per-site q's are in the
+CSV) but is not, at 300 reps and this construction, the CS-vs-Philosophy discriminator
+the plan required; dip-test / mixture-BIC alternatives from the proposal text remain
+unexplored and would need their own registration.
+
+### Reproducing
+
+```
+gradlew siteNull -PnullReps=300
+```
+
+Reads `snapshots_frozen.db` (tracked) and `embeddings_cache.db` read-only, hard-fails on
+cache misses, refuses any snapshot but the one passed via `-DsnapshotId` (default: the
+frozen id). Writes `docs/data/site_null_frozen.csv` and prints the registered-check
+verdicts and trunk membership. Runtime ~9 min at 300 reps (66 sites x 2 arms).
