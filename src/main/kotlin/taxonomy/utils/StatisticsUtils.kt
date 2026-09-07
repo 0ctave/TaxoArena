@@ -256,7 +256,8 @@ object StatisticsUtils {
         
         for (leaf in leaves) {
             val cellIdx = cellToIndex[leaf.id] ?: continue
-            for ((text, weight) in leaf.queryWeights) {
+            // Deterministic accumulation order (H9b fix): see TaxonomyFitter.
+            for ((text, weight) in leaf.queryWeights.entries.sortedBy { it.key }) {
                 val emb = GraphNode.getEmbedding(text) ?: continue
                 val proj = emb.projectTo(d)
                 cellN[cellIdx] += weight
@@ -267,7 +268,7 @@ object StatisticsUtils {
         }
         for (parent in residualParents) {
             val cellIdx = cellToIndex[parent.id + "_residual"] ?: continue
-            for (qIdOrText in parent.residualQueries) {
+            for (qIdOrText in parent.residualQueries.sorted()) {
                 val emb = GraphNode.getEmbedding(qIdOrText) 
                     ?: embMap[qIdOrText]
                     ?: rawEmbMap[qIdOrText]

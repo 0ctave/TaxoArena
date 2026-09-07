@@ -23,6 +23,10 @@ class TaxonomyFitter(
     private val highDOverNCount = java.util.concurrent.atomic.AtomicInteger(0)
     private val muHistory = java.util.concurrent.ConcurrentHashMap<String, MutableList<FloatArray>>()
     private val driftSums = java.util.concurrent.CopyOnWriteArrayList<Double>()
+
+    /** Max (1 - cos) between a kept (early-out) stored mu and its fresh MLE, this fit
+     *  pass. Written only by the fitter; read by the engine's certificate. */
+    @Volatile var lastMaxFreshMuDeviation: Double = 0.0
     private val oscillationCount = java.util.concurrent.atomic.AtomicInteger(0)
     private val earlyOutCount = java.util.concurrent.atomic.AtomicInteger(0)
     private val totalMuCount = java.util.concurrent.atomic.AtomicInteger(0)
@@ -35,6 +39,7 @@ class TaxonomyFitter(
         highDOverNCount.set(0)
 
         driftSums.clear()
+        lastMaxFreshMuDeviation = 0.0
         oscillationCount.set(0)
         earlyOutCount.set(0)
         totalMuCount.set(0)
@@ -259,6 +264,13 @@ class TaxonomyFitter(
             if (dot >= 0.9975) {
                 earlyOutCount.incrementAndGet()
                 node.vmfMu = oldMu
+                // H9b fix: the early-out keeps the stored mu, which makes the
+                // certificate's stored-vs-stored delta read 0 even when the fresh MLE
+                // sits up to 1-cos = 2.5e-3 away. Track the fresh deviation so the
+                // certificate can report it instead of silently overclaiming.
+                synchronized(this) {
+                    lastMaxFreshMuDeviation = maxOf(lastMaxFreshMuDeviation, 1.0 - dot)
+                }
             } else {
                 node.vmfMu = mu
             }
@@ -328,7 +340,11 @@ class TaxonomyFitter(
         val lambda = 1.0 / (priorKappa.coerceAtLeast(1e-3) * fitDim)
 
         val sampleMean = DoubleArray(fitDim)
-        for ((qText, w) in queryWeightsMap) {
+        // Deterministic accumulation order (H9b fix): queryWeights is populated by
+        // parallel routing, so map order is timing-dependent and float sums in that
+        // order are not reproducible. The mu path already sorts; NiW must too.
+        val sortedEntries = queryWeightsMap.entries.sortedBy { it.key }
+        for ((qText, w) in sortedEntries) {
             val emb = GraphNode.getEmbedding(qText) ?: continue
             val proj = emb.projectTo(fitDim)
             for (i in 0 until fitDim) {
@@ -345,7 +361,7 @@ class TaxonomyFitter(
         }
 
         val lambdaN = FloatArray(fitDim)
-        for ((qText, w) in queryWeightsMap) {
+        for ((qText, w) in sortedEntries) {
             val emb = GraphNode.getEmbedding(qText) ?: continue
             val proj = emb.projectTo(fitDim)
             for (i in 0 until fitDim) {

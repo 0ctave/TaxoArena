@@ -50,7 +50,8 @@ internal object DiagFmt {
  *
  * Note the arms are alternatives, not layers: with `zGate > 0` the lexicographic tie-break
  * applies only in the `SE == 0` case, so a J-neutral simplification with SE > 0 cannot
- * commit. That is why `acceptanceZ = 0` is canonical.
+ * commit. The frozen artifact (freeze_mcs55.toml, 2026-07-27) was built with the
+ * z-gate arm at acceptanceZ = 2.0; `acceptanceZ = 0` is the legacy lexicographic arm.
  */
 internal fun isProposalAccepted(
     deltaJ: Double,
@@ -108,7 +109,7 @@ class ProposalStats {
  */
 @Service
 class TaxonomyOperations(
-    private val fitter: TaxonomyFitter,
+    val fitter: TaxonomyFitter,
     private val trickler: TaxonomyTrickler,
     private val splitter: TaxonomySplitter,
     private val merger: TaxonomyMerger,

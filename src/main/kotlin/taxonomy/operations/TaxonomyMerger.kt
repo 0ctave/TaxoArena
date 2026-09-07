@@ -824,12 +824,22 @@ class TaxonomyMerger(
         }
         walkReg(root)
 
+        // Every J-changing edit in the construction goes through the tau / z*SE
+        // acceptance rule. This pass used to be the one exception (a raw three-way
+        // float argmax with no threshold, no SE, no diagnostics — construction-audit
+        // risk #2, 2026-09-07); it accepted nothing in the frozen run, but any
+        // counterfactual run could have exercised it. It now applies the SAME gate as
+        // isProposalAccepted, with SE(dJ) from the same paired bootstrap tryProposal
+        // uses, and reports an auditable summary line.
+        var candidates = 0
+        var accepted = 0
         for (child in leaves) {
             val parent = child.parents.firstOrNull() ?: continue
-
+            candidates++
 
             // Keep L as is (Proposal 3 / Base)
             val baseJ = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+            val baseCapture = taxonomy.utils.JBootstrap.capture(root, allEmbeddings)
 
             // Proposal 1: Prune/Absorb child into parent
             val backupPrune = GraphStateBackup(root)
@@ -838,6 +848,8 @@ class TaxonomyMerger(
             ops.clearGraphQueries(root)
             ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             val J_prune = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+            val sePrune = taxonomy.utils.JBootstrap.pairedDeltaSe(
+                baseCapture, taxonomy.utils.JBootstrap.capture(root, allEmbeddings))
             backupPrune.restore(registry)
 
             // Proposal 2: Merge child into nearest sibling
@@ -847,34 +859,48 @@ class TaxonomyMerger(
                 else StatisticsUtils.dotProduct(child.vmfMu.map { it.toDouble() }.toDoubleArray(), sib.vmfMu)
             }
             var J_merge = Double.NEGATIVE_INFINITY
-            var backupMerge: GraphStateBackup? = null
+            var seMerge = 0.0
             if (nearestSibling != null) {
-                backupMerge = GraphStateBackup(root)
+                val backupMerge = GraphStateBackup(root)
                 fuseNodes(nearestSibling, child)
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
                 ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
-                val J_merge_val = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
-                J_merge = J_merge_val
+                J_merge = StatisticsUtils.computeDagSeparationJ(root, allEmbeddings)
+                seMerge = taxonomy.utils.JBootstrap.pairedDeltaSe(
+                    baseCapture, taxonomy.utils.JBootstrap.capture(root, allEmbeddings))
                 backupMerge.restore(registry)
             }
 
-            val bestJ = maxOf(baseJ, J_prune, J_merge)
-            if (bestJ == baseJ) {
-                log.debug("Starved Node: Keeping '${child.label}' (best option)")
-            } else if (bestJ == J_prune) {
+            // Both edits remove one node (deltaV = -1); pick the better and gate it.
+            val pruneWins = J_prune >= J_merge
+            val deltaJ = (if (pruneWins) J_prune else J_merge) - baseJ
+            val se = if (pruneWins) sePrune else seMerge
+            val pass = isProposalAccepted(
+                deltaJ = deltaJ, deltaV = -1,
+                tau = config.formalism.tau, zGate = config.formalism.acceptanceZ,
+                seDeltaJ = se
+            )
+            if (!pass) {
+                log.debug("[STARVED] keeping '${child.label}': best dJ=$deltaJ se=$se fails the acceptance gate")
+            } else if (pruneWins) {
+                accepted++
                 pruneSingleNodeTentatively(parent, child)
-                log.info("[ACCEPTED STARVED PRUNE] '${child.label}' pruned into '${parent.label}' (Delta J: ${J_prune - baseJ})")
+                log.info("[ACCEPTED STARVED PRUNE] '${child.label}' pruned into '${parent.label}' (Delta J: ${J_prune - baseJ}, SE: $sePrune)")
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
                 ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
-            } else if (bestJ == J_merge && nearestSibling != null) {
+            } else if (nearestSibling != null) {
+                accepted++
                 fuseNodes(nearestSibling, child)
-                log.info("[ACCEPTED STARVED MERGE] '${child.label}' merged into '${nearestSibling.label}' (Delta J: ${J_merge - baseJ})")
+                log.info("[ACCEPTED STARVED MERGE] '${child.label}' merged into '${nearestSibling.label}' (Delta J: ${J_merge - baseJ}, SE: $seMerge)")
                 root.updateAllShrinkages()
                 ops.clearGraphQueries(root)
                 ops.reassignQueries(dag, allEmbeddings, groundTruthMap, currentIteration)
             }
+        }
+        if (candidates > 0) {
+            log.info("[STARVED-PASS] accepted $accepted of $candidates starved-leaf edits (tau/z*SE gated)")
         }
 
         pruneDeadInternalNodes(root)

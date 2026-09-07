@@ -62,6 +62,10 @@ data class HeadlessCliConfig(
     val profileStrataFile: String? = null,
     // Soft per-question reuse cap for the scheduler; Int.MAX_VALUE = historical behaviour.
     val maxQueryReuse: Int = Int.MAX_VALUE,
+    // Acceptance floor for construction edits; null = keep the code default.
+    val tau: Double? = null,
+    // Post-loop final-metrics block; null = keep the code default.
+    val enableFinalMetrics: Boolean? = null,
     val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
@@ -175,6 +179,8 @@ class HeadlessBenchmarkRunner(
         cliConfig.membershipFloor?.let { config.formalism.membershipFloor = it }
         cliConfig.routingBeamGamma?.let { config.formalism.routingBeamGamma = it }
         cliConfig.descentMargin?.let { config.formalism.descentMargin = it }
+        cliConfig.tau?.let { config.formalism.tau = it }
+        cliConfig.enableFinalMetrics?.let { config.execution.enableFinalMetrics = it }
         cliConfig.acceptanceZ?.let { config.formalism.acceptanceZ = it }
         cliConfig.marginalEps?.let { config.formalism.marginalEps = it }
         cliConfig.maxK?.let { config.formalism.maxK = it }
@@ -1374,7 +1380,7 @@ class HeadlessBenchmarkRunner(
         return s
     }
 
-    private fun parseToml(text: String): HeadlessCliConfig {
+    internal fun parseToml(text: String): HeadlessCliConfig {
         var snapshotId = "unsaved"
         var models = listOf<String>()
         var queryLimit = 0
@@ -1388,6 +1394,8 @@ class HeadlessBenchmarkRunner(
         var profileSeTarget = 0.15
         var profileStrataFile: String? = null
         var maxQueryReuse = Int.MAX_VALUE
+        var tau: Double? = null
+        var enableFinalMetrics: Boolean? = null
         var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
@@ -1478,6 +1486,8 @@ class HeadlessBenchmarkRunner(
                 "profileSeTarget" -> profileSeTarget = rawVal.toDouble()
                 "profileStrataFile" -> profileStrataFile = rawVal.trim('"', '\'')
                 "maxQueryReuse" -> maxQueryReuse = rawVal.toInt()
+                "tau" -> tau = rawVal.toDouble()
+                "enableFinalMetrics" -> enableFinalMetrics = rawVal.toBoolean()
                 "conditions" -> conditions = parseStringList(rawVal)
                 "outputDir" -> outputDir = rawVal.trim('"', '\'')
                 "testRatio" -> testRatio = rawVal.toDouble()
@@ -1535,7 +1545,13 @@ class HeadlessBenchmarkRunner(
                 "numIterations" -> numIterations = rawVal.toInt()
                 "defaultKappaPrior" -> defaultKappaPrior = rawVal.toDouble()
                 "runBaselines" -> runBaselines = rawVal.toBoolean()
-                else -> log.warn("[CONFIG WARN] Unknown or deprecated configuration key in TOML file: '$key' = '$rawVal'")
+                // H9b fix (2026-09-07): unknown keys are FATAL. The frozen config's own
+                // 'tau' key was silently unparsed for weeks and worked only because the
+                // code default coincided; a registration must never be able to assert a
+                // value the run ignores.
+                else -> throw IllegalArgumentException(
+                    "[CONFIG] Unknown configuration key in TOML file: '$key' = '$rawVal' — " +
+                        "unknown keys are fatal; add a parse case or remove the key")
             }
         }
         return HeadlessCliConfig(
@@ -1552,6 +1568,8 @@ class HeadlessBenchmarkRunner(
             profileSeTarget = profileSeTarget,
             profileStrataFile = profileStrataFile,
             maxQueryReuse = maxQueryReuse,
+            tau = tau,
+            enableFinalMetrics = enableFinalMetrics,
             conditions = conditions,
             outputDir = outputDir,
             testRatio = testRatio,

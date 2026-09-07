@@ -702,6 +702,10 @@ class TaxonomyEngine(
                                 appendLine("edits delta     : ${"%.6e".format(java.util.Locale.US, lastEditsDelta)}")
                                 appendLine("trickle delta   : ${"%.6e".format(java.util.Locale.US, lastTrickleDelta)}")
                                 appendLine("max 1-cos(mu)   : ${"%.6e".format(java.util.Locale.US, lastMaxMuDelta)}")
+                                // H9b fix: the stored-vs-stored mu delta above reads 0 whenever the
+                                // fitter's 0.9975 early-out kept the old mu; the fresh-MLE line keeps
+                                // the certificate honest about how far the true MLE sits.
+                                appendLine("max 1-cos(mu) vs fresh MLE (early-out band): ${"%.6e".format(java.util.Locale.US, ops.fitter.lastMaxFreshMuDeviation)}")
                                 appendLine("max rel d kappa : ${"%.6e".format(java.util.Locale.US, lastMaxKappaRel)}")
                                 appendLine("tolerance (tau) : ${"%.6e".format(java.util.Locale.US, tol)}")
                                 appendLine("tolerance (theta): ${"%.6e".format(java.util.Locale.US, epsMu)}")
