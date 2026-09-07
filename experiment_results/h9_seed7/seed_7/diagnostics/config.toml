@@ -28,21 +28,6 @@
 # OPS: one seed per process; fresh outputDir and -Dranking.db.path per run; the
 # frozen artifact and snapshots are never modified (new snapshot ids only).
 #
-# ── OUTCOME, ARM 1 (2026-09-07, all four runs + frozen baseline; analysis =
-# tools/analysis/h9_stability.py, output experiment_results/h9_arm1_outcome.txt) ──
-# ALPHA PASS: held-out Top-1 spread 1.6pp across the five runs (0.759-0.775),
-#   under the registered 2.5pp bar. Evaluative function is seed-invariant.
-# BETA PASS: worst per-anchor mass-share drift 0.42pp (bar 5pp) — anchors are
-#   rigid — while leaf identity genuinely moves: leaf counts 72-87 (17% spread)
-#   and only 71-85% of frozen leaves have a mu-counterpart at cos >= 0.95.
-#   DISCLOSED SUBSTITUTION: per-question ARI was registered but the runs' exports
-#   carry no per-question assignments; mu-matching + leaf-count spread assess the
-#   same clause (leaf-level instability) and show it MORE directly.
-# All four runs certified fixed points (9-10 iterations); mcs=55 compresses the
-# seed spread vs the historical mcs=30 record (63-104 -> 72-87), as expected.
-# Reading: the taxonomy's leaf inventory is one draw from a distribution; what is
-# stable is the anchor skeleton and the evaluative behavior — exactly claims a/b.
-#
 datasetType   = "MMLU_PRO"
 
 models        = [
@@ -65,9 +50,9 @@ models        = [
 
 category      = ""
 queryLimit    = 0
-outputDir     = "experiment_results/h9_seed137"
+outputDir     = "experiment_results/h9_seed7"
 testRatio     = 0.3
-seed          = 137
+seed          = 7
 
 runPipeline        = true
 runBenchmark       = false
