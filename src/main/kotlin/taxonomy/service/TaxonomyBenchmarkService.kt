@@ -402,7 +402,8 @@ class TaxonomyBenchmarkService(
             queriesPerPair = params.queriesPerPair,
             budgetPerPair = params.budgetPerPair,
             stoppingPolicy = stoppingPolicy,
-            seed = req.seed
+            seed = req.seed,
+            maxQueryReuse = req.maxQueryReuse
         )
 
         val snapshotId = taxonomyService.activeSnapshotId() ?: "unsaved"

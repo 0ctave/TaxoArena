@@ -140,6 +140,38 @@ class ProfileModeTest {
     }
 
     @Test
+    fun `pickQuery under maxQueryReuse prefers fresh agreement questions over over-cap disagreement ones`() {
+        // Measured on R2: the disagreement filter outranked the least-used spread, so
+        // 36,871 matches drew on 2,883 distinct questions (design effect 2.0x median).
+        // Under the cap, a fresh agreement question must beat an over-ground
+        // disagreement question; with the cap at default the historical rule holds.
+        val preds = mapOf(
+            "a" to mapOf(1 to "X", 2 to "X", 3 to "Q"),
+            "b" to mapOf(1 to "Y", 2 to "X", 3 to "Q")   // query 1 disagrees; 2 and 3 agree
+        )
+        fun arena() = LeafArena("leaf-1", listOf("a", "b"), listOf(1, 2, 3), preds, 40)
+
+        // Default cap: disagreement wins regardless of reuse (historical behaviour).
+        val default = ActiveBtRacingScheduler()
+        val a1 = arena()
+        repeat(12) { a1.noteQueryUsed(1) }
+        assertEquals(1, default.pickQuery(a1, ordered("a", "b")))
+
+        // Cap of 10: query 1 is over-ground, the fresh agreement question wins.
+        val capped = ActiveBtRacingScheduler(maxQueryReuse = 10)
+        val a2 = arena()
+        repeat(12) { a2.noteQueryUsed(1) }
+        assertEquals(2, capped.pickQuery(a2, ordered("a", "b")))
+
+        // When everything under-cap is spent for this pair, over-cap stays usable —
+        // the cap is soft and no pair starves.
+        val a3 = arena()
+        repeat(12) { a3.noteQueryUsed(1) }
+        a3.completed[ordered("a", "b")] = hashSetOf(2, 3)
+        assertEquals(1, capped.pickQuery(a3, ordered("a", "b")))
+    }
+
+    @Test
     fun `simulated profile tournament terminates with every stratum at target`() {
         val seTarget = 0.55
         val prof = ProfileTargets(seTarget, mapOf("leaf-1" to "s1", "leaf-2" to "s1", "leaf-3" to "s2"))

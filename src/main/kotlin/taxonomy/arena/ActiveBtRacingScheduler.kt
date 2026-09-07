@@ -175,6 +175,21 @@ class ActiveBtRacingScheduler(
      * SE deficit of the models involved rather than rank adjacency. See [ProfileTargets].
      */
     private val profile: ProfileTargets? = null,
+    /**
+     * Soft cap on how many times one question may be judged in a leaf across ALL pairs.
+     *
+     * Measured on the R2 profile run (2026-09-07): 36,871 matches drew on only 2,883
+     * distinct questions (mean reuse 12.8, max 38) because the disagreement filter in
+     * [pickQuery] outranks the least-used spread — a pair with a small disagreement set
+     * re-grinds it while agreement questions in the same leaf go unasked (median 77% of
+     * each leaf's pool used, min 32%). Question reuse correlates verdicts, so match-level
+     * SEs understate question-population uncertainty (measured design effect: median
+     * 2.0x, worst 3.7x). Under the cap, a FRESH agreement question outranks an over-cap
+     * disagreement question; over-cap questions remain usable when nothing else is left,
+     * so no pair ever starves. Int.MAX_VALUE (the default) reproduces the historical
+     * behaviour exactly.
+     */
+    private val maxQueryReuse: Int = Int.MAX_VALUE,
 ) {
 
     /** Hoeffding radius with union bound over P pairs and Bmax peeks. */
@@ -408,7 +423,16 @@ class ActiveBtRacingScheduler(
         val predX = a.predictions[x] ?: emptyMap()
         val predY = a.predictions[y] ?: emptyMap()
         val disagree = a.queryIds.filter { q -> q !in used && predX[q] != predY[q] && !predX[q].isNullOrBlank() && !predY[q].isNullOrBlank() }
-        val pool = disagree.ifEmpty { a.queryIds.filter { it !in used } }
+        val anyUnused = a.queryIds.filter { it !in used }
+        // Tiered under [maxQueryReuse]: fresh disagreement first, then fresh agreement,
+        // then over-cap disagreement, then anything unused-by-this-pair. With the cap at
+        // its Int.MAX_VALUE default tiers 2 and 3 are empty-by-construction and this
+        // reduces to the historical disagree-else-any rule.
+        fun underCap(q: Int) = (a.queryUseCount[q] ?: 0) < maxQueryReuse
+        val pool = disagree.filter(::underCap)
+            .ifEmpty { anyUnused.filter(::underCap) }
+            .ifEmpty { disagree }
+            .ifEmpty { anyUnused }
         // Least-used across the leaf, then lowest id. Not `minOrNull()`.
         return pool.minWithOrNull(
             compareBy({ a.queryUseCount[it] ?: 0 }, { it })

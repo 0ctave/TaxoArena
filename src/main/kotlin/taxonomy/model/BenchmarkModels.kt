@@ -38,7 +38,10 @@ data class BenchmarkRequest(
     // PROFILE mode (both must be supplied): stop on SE targets per model x stratum
     // instead of on rank decisions. See taxonomy.arena.ProfileTargets.
     val profileSeTarget: Double? = null,
-    val profileStrata: Map<String, String> = emptyMap()   // leafId -> stratumId
+    val profileStrata: Map<String, String> = emptyMap(),   // leafId -> stratumId
+    // Soft cap on per-question reuse within a leaf across all pairs; Int.MAX_VALUE
+    // keeps historical behaviour. See ActiveBtRacingScheduler.maxQueryReuse.
+    val maxQueryReuse: Int = Int.MAX_VALUE
 )
 
 @Serializable

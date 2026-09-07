@@ -25,7 +25,9 @@ class BtMatchScheduler(
     val queriesPerPair: Int = 20,
     budgetPerPair: Int? = null,
     val stoppingPolicy: BtStoppingPolicy,
-    val seed: Long = 42L
+    val seed: Long = 42L,
+    /** Soft per-question reuse cap forwarded to [ActiveBtRacingScheduler.pickQuery]. */
+    val maxQueryReuse: Int = Int.MAX_VALUE
 ) {
     val budgetPerPair: Int = budgetPerPair ?: stoppingPolicy.budgetPerPair
     /**
@@ -384,7 +386,8 @@ class BtMatchScheduler(
                 // policy cannot be given different stopping rules.
                 placement = stoppingPolicy.placement,
                 placementSlack = stoppingPolicy.placementSlack,
-                profile = stoppingPolicy.profile
+                profile = stoppingPolicy.profile,
+                maxQueryReuse = maxQueryReuse
             )
             return activeRacing.selectNextBatch(
                 targetNodes = targetNodes,

@@ -60,6 +60,8 @@ data class HeadlessCliConfig(
     val profileMode: Boolean = false,
     val profileSeTarget: Double = 0.15,
     val profileStrataFile: String? = null,
+    // Soft per-question reuse cap for the scheduler; Int.MAX_VALUE = historical behaviour.
+    val maxQueryReuse: Int = Int.MAX_VALUE,
     val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
@@ -489,7 +491,8 @@ class HeadlessBenchmarkRunner(
                         condition = condition,
                         seed = currentSeed,
                         profileSeTarget = if (cliConfig.profileMode) cliConfig.profileSeTarget else null,
-                        profileStrata = profileStrata
+                        profileStrata = profileStrata,
+                        maxQueryReuse = cliConfig.maxQueryReuse
                     )
 
                     val report = benchmarkService.runBenchmark(request)
@@ -1384,6 +1387,7 @@ class HeadlessBenchmarkRunner(
         var profileMode = false
         var profileSeTarget = 0.15
         var profileStrataFile: String? = null
+        var maxQueryReuse = Int.MAX_VALUE
         var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
@@ -1473,6 +1477,7 @@ class HeadlessBenchmarkRunner(
                 "profileMode" -> profileMode = rawVal.toBoolean()
                 "profileSeTarget" -> profileSeTarget = rawVal.toDouble()
                 "profileStrataFile" -> profileStrataFile = rawVal.trim('"', '\'')
+                "maxQueryReuse" -> maxQueryReuse = rawVal.toInt()
                 "conditions" -> conditions = parseStringList(rawVal)
                 "outputDir" -> outputDir = rawVal.trim('"', '\'')
                 "testRatio" -> testRatio = rawVal.toDouble()
@@ -1546,6 +1551,7 @@ class HeadlessBenchmarkRunner(
             profileMode = profileMode,
             profileSeTarget = profileSeTarget,
             profileStrataFile = profileStrataFile,
+            maxQueryReuse = maxQueryReuse,
             conditions = conditions,
             outputDir = outputDir,
             testRatio = testRatio,
