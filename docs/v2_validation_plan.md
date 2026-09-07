@@ -82,3 +82,17 @@ exceeds J-gated baseline recurrence; reserved pool touched exactly once.
   procedure variants (higher B, co-assignment-weighted warm start, different cut)
   remain open but are NEW proposals needing their own registrations; P1 as designed
   is dead and the v2 recipe reorders around P2.
+
+- P7 (2026-09-08): SPLIT VERDICT. Structure is bit-reproducible (dag_snapshots.jsonl
+  hash-identical across two same-config builds at HEAD) — the core claim PASSES.
+  The full byte-diff FAILS on 7 files, decomposing into: (i) JBootstrap SE column in
+  proposals.csv differs at the 4th significant digit (deltaJ and decisions identical)
+  — the paired bootstrap's capture iteration is not order-stable despite its fixed
+  seed; (ii) trickle/routing/quality validation CSVs differ — evaluation-path float
+  accumulation, the same family as the disclosed 0.9pp July-vs-HEAD Top-1 drift;
+  (iii) timestamps (benign). Work items: sort JBootstrap capture iteration;
+  deterministic accumulation in trickle validation; strip volatile fields from the
+  gate's file set. Artifacts: experiment_results/p7_det_{1,2}/, p7 chain log.
+  Also: the embeddinggemma arm failed twice on an Ollama-internal socket-exhaustion
+  error (its runner, not our code); parked — nomic already carries the
+  second-embedder axis (75 leaves, Top-1 0.716, Philosophy splits x4).
