@@ -1,0 +1,59 @@
+# H9 EXTENDED SWEEP RUN — see experiment_configs/h9_sweep/REGISTRATION.md (frozen before launch)
+#
+datasetType   = "MMLU_PRO"
+
+models        = [
+    "gpt-4o-2024-08-06",
+    "claude-3-5-sonnet-20241022",
+    "gemini-1.5-pro-002",
+    "deepseek-chat-v2_5",
+    "Meta-Llama-3_1-70B-Instruct",
+    "Qwen1.5-72B-Chat",
+    "gpt-4o-mini",
+    "claude-3-5-haiku-20241022",
+    "Mixtral-8x7B-Instruct-v0.1",
+    "c4ai-command-r-v01",
+    "Qwen1.5-14B-Chat",
+    "Meta-Llama-3_1-8B-Instruct",
+    "gemini-1.5-flash-002",
+    "Llama-2-70b-hf",
+    "Llama-2-13b-hf"
+]
+
+category      = ""
+queryLimit    = 0
+outputDir     = "experiment_results/h9_sweep/s777"
+testRatio     = 0.3
+seed          = 777
+
+runPipeline        = true
+runBenchmark       = false
+runTrickle         = true
+runBaselines       = false
+enableFinalMetrics = false
+enableLabeling     = false
+judgeInduction     = false
+
+dagMode = "DAG_MAX"
+
+maxDepth              = 8
+minClusterSize        = 55
+proposalSeparationBar = 0.025
+tau                   = 1e-6
+acceptanceZ           = 2.0
+enableRefitGate       = false
+
+membershipFloor       = 0.25
+routingBeamGamma      = 0.2
+descentMargin         = 0.12
+
+effectiveSupportFloor = 2.0
+defaultKappaPrior     = 10.0
+
+numIterations         = 50
+maxLeafAssignments    = 5
+
+fusionSimilarityThreshold = 0.90
+enableGtWarmStart         = false
+
+enableProfiling           = true
