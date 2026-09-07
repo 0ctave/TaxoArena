@@ -71,6 +71,17 @@ exceeds J-gated baseline recurrence; reserved pool touched exactly once.
 
 ## OUTCOMES (updated as tests adjudicate)
 
+- P6 (2026-09-08): **NULL — overlap program closed, soft routing vindicated.** Full pool
+  n = 3,599: D = (F−T) − (Pf−T) mean +0.1987, CI [+0.0495, +0.3478], but exact sign test
+  p = 0.0923 with a NEGATIVE nonzero majority (+1007/−1085) — the conjunctive criterion
+  fails. Both arms hurt the tree outright: F−T −0.728 (p 3.9e-22), Pf−T −0.927 (p 3.3e-17);
+  every real pair negative on its own subset (Thermo, the largest twin, −6.85). Fusion
+  implemented as the labeled QUERY-MOVE variant (no cross-anchor parent redirect).
+  Artifacts: E2FusionRunner.kt, scripts/e2_fusion_analysis.py,
+  experiment_configs/p6_fusion_registration.md, experiment_results/e2_fusion/. With E1+E2
+  this closes every structural response to overlap (edge, bridge, merge); E3 stays unrun
+  per the registered sequence.
+
 - P1 (2026-09-08): **FALSIFIED** by the registered primary. Disjoint-half consensus
   ARI = 0.6533 (bar >= 0.90, falsifier < 0.80), vs baseline mean pairwise build ARI
   0.663 (0.585-0.704) — consensus over 10 builds agrees across halves NO BETTER than
