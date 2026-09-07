@@ -34,3 +34,9 @@ mf015: it 10 nodes 158 leaves 91 depth 5 top1 0.762 | anchor drift 0.29pp | mu-m
 mf035: it 10 nodes 148 leaves 84 depth 6 top1 0.770 | anchor drift 0.21pp | mu-match 79/87
 z0: it 10 nodes 159 leaves 90 depth 6 top1 0.769 | anchor drift 0.01pp | mu-match 87/87
 alpha: Top-1 spread 5.0pp (registered bar 2.5pp): FAIL
+
+NOTE (2026-09-08): the "alpha ... FAIL" line above is a SCRIPT-SCOPE artifact —
+it computes the Top-1 spread over ALL 34 arms including the bar-collapse runs,
+which the registered alpha claim never covered. The registered adjudication
+(seed arms only) is alpha PASS at 1.6pp (5 runs) / 2.6pp descriptive (n=20);
+see experiment_configs/h9_sweep/REGISTRATION.md outcome.

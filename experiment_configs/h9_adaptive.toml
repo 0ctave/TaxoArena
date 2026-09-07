@@ -19,6 +19,16 @@
 # frozen artifact; per-anchor bars are not captured in the snapshot's
 # EffectiveConfig provenance (disclosed limitation of this exploration).
 #
+# ── AMENDMENT (2026-09-08, from the v2 design review) ── the "structure
+# concentrates where nulls are tight" reading above is PARTLY A GREEDY-SEARCH
+# ARTIFACT, not purely a statistical truth: the frozen Chemistry depth-1 split
+# (sep 0.0968) clears Chemistry's honest p95 at q=0.000, yet the adaptive run
+# gating IN-LOOP at that same p95 left Chemistry unsplit — raising the in-loop
+# bar makes the greedy wander to a different object rather than selecting the
+# certified subset of the good tree. Lesson for v2: certify by POST-HOC scoring
+# and pruning of a permissively built tree, never by in-loop gating
+# (docs/v2_construction_proposals.md, P2 and DON'T list).
+#
 # ── QUANTILE CURVE (2026-09-08, p90/p50 arms, both certified fixed points) ──
 # bar quantile  leaves  depth  heldout Top-1   mu-match vs frozen
 #   p95            35     4       0.742            30/87
