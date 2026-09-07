@@ -1239,4 +1239,262 @@ class SeparationNullBySizeTest {
             }
         }
     }
+
+    // ── withinNull: the within-node null RE-DERIVED on the frozen mcs=55 artifact ─
+
+    /**
+     * Loader for the FROZEN artifact. Prefers the tracked `snapshots_frozen.db`
+     * extract (16 MB, in every clone) over the full local-only `snapshots.db`, and —
+     * unlike [loadGraph] — never falls back to "latest": an audit harness that
+     * silently measured a different tree would be worse than one that refused to run.
+     */
+    private fun loadFrozenGraph(snapshotId: String): Pair<String, taxonomy.service.SerializedGraph>? {
+        val ro = org.sqlite.SQLiteConfig().apply { setReadOnly(true) }.toProperties()
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        for (name in listOf("snapshots_frozen.db", "snapshots.db")) {
+            val db = java.io.File(name)
+            if (!db.exists()) continue
+            java.sql.DriverManager.getConnection("jdbc:sqlite:${db.absolutePath}", ro).use { conn ->
+                conn.prepareStatement("SELECT id, graph FROM snapshots WHERE id = ?").use { stmt ->
+                    stmt.setString(1, snapshotId)
+                    val rs = stmt.executeQuery()
+                    if (rs.next()) return rs.getString(1) to json.decodeFromString(rs.getString(2))
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * WITHIN-NODE NULL ON THE FROZEN mcs=55 ARTIFACT (`gradlew withinNull`).
+     *
+     * Closes construction-audit risk #1: the within-node null values in
+     * docs/separation_null_by_size.md were measured pre-freeze on the superseded
+     * 88-leaf mcs=30 tree and are VOID as to values. This re-derives them against
+     * snapshot 20260727_042523 (154 nodes / 87 leaves / 14 depth-1 anchors,
+     * minClusterSize=55) with the METHOD that survived:
+     *
+     *   Null model (unchanged from the voided run, labelled explicitly): parametric
+     *   bootstrap on the anchor's OWN empirical covariance — x = normalize(mu + C^T g),
+     *   where C's rows are the centered observations scaled by 1/sqrt(m) and g ~ N(0, I_m).
+     *   Draws are Gaussian with exactly the node's mean and covariance (all per-PC
+     *   variances preserved, every discrete sub-cluster destroyed), then projected to
+     *   the sphere. "Texture but no sub-topics."
+     *
+     *   Statistic: the PRODUCTION splitter's own — each replicate cloud is driven
+     *   through the real `splitSingleNode` at the frozen config (minClusterSize=55,
+     *   bar=0.025) and `node.dasguptaDeltaNorm` is recorded UNCENSORED (it is stored
+     *   before either separation gate fires), exactly as the isotropic `nullBySize`
+     *   arms measure it. acceptanceZ stays 0.0 because the z-gate lives in
+     *   TaxonomyOperations' edit acceptance, outside `splitSingleNode`; it cannot
+     *   censor the statistic measured here. Replicates that never reach the gate
+     *   contribute 0.0 (the file-wide convention).
+     *
+     * Stage 2 evaluates every accepted split of the frozen tree against its depth-1
+     * anchor's null: q = fraction of ALL null replicates >= the split's persisted
+     * dasguptaDeltaNorm. For the 14 depth-1 splits this is an EXACTLY matched
+     * comparison (same population, same n, same covariance as the null). For deeper
+     * sites it is approximate in a known direction: the null narrows with n, so the
+     * larger-n anchor null is ANTI-conservative for smaller descendant sites (their
+     * own null would be wider). Site-level nulls remain a per-site re-run of the
+     * stage-2 harness above with -DsnapshotId set to the frozen id.
+     */
+    @Test
+    fun `withinNull - anisotropy-preserving null per frozen depth-1 anchor`() {
+        (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
+        val embDb = java.io.File("embeddings_cache.db")
+        org.junit.jupiter.api.Assumptions.assumeTrue(embDb.exists(), "embeddings_cache.db not present")
+        val frozen = System.getProperty("snapshotId") ?: "20260727_042523_Headless_Run_Auto_ge"
+        val loaded = loadFrozenGraph(frozen)
+        org.junit.jupiter.api.Assumptions.assumeTrue(loaded != null, "frozen snapshot $frozen not available")
+        val (snapId, g) = loaded!!
+        val byId = g.nodes.associateBy { it.id }
+        val anchors = g.nodes.filter { it.depth == 1 }
+            .map { it to regionQueryIds(it, byId) }
+            .sortedByDescending { it.second.size }
+        val r = reps(300)
+        val mcs = 55
+
+        val config = canonicalConfig(mcs)
+        val splitter = TaxonomySplitter(config, NoLlm, MMLUDatasetFetcher(config, ""), TaxonomyFitter(config))
+        val capture = Capture()
+        val splitLog = LoggerFactory.getLogger("taxonomy.Splitter") as ch.qos.logback.classic.Logger
+        capture.context = splitLog.loggerContext
+        capture.start(); splitLog.level = Level.DEBUG; splitLog.isAdditive = false; splitLog.addAppender(capture)
+
+        println("=".repeat(120))
+        println("WITHIN-NODE NULL — FROZEN ARTIFACT.  snapshot=$snapId  minClusterSize=$mcs  bar=${config.formalism.proposalSeparationBar}")
+        println("${anchors.size} depth-1 anchors, reps=$r each. Null = anisotropy-preserving parametric bootstrap")
+        println("(Gaussian moment-matched to the anchor's own mean/covariance, projected to the sphere),")
+        println("driven through the real splitSingleNode. Quantiles UNCONDITIONAL (non-reached replicates score 0).")
+        println("=".repeat(120))
+        println(
+            "%-18s %5s | %9s %9s %9s %9s | %19s | %9s | %7s %6s".format(
+                "anchor", "n", "p50", "p90", "p95", "p99", "p95 95%CI", "condP95", "reach%", "acc%"
+            )
+        )
+
+        class AnchorNull(
+            val label: String, val n: Int,
+            val all: List<Double>, val reached: List<Double>, val accepted: Int
+        )
+        val nulls = LinkedHashMap<String, AnchorNull>()
+
+        val ro = org.sqlite.SQLiteConfig().apply { setReadOnly(true) }.toProperties()
+        java.sql.DriverManager.getConnection("jdbc:sqlite:${embDb.absolutePath}", ro).use { conn ->
+            for ((anchor, ids) in anchors) {
+                val vectors = loadVectors(conn, ids)
+                // Cache-only, hard-fail: this harness must never fall back to Ollama
+                // or silently measure a subset of the frozen population.
+                check(vectors.size == ids.size) {
+                    "embedding cache miss for '${anchor.label}': ${vectors.size}/${ids.size} vectors recovered"
+                }
+                val m = vectors.size
+                val dim = 256
+                val mu = DoubleArray(dim)
+                for (v in vectors) for (i in 0 until dim) mu[i] += v[i] / m
+                val centered = vectors.map { v -> DoubleArray(dim) { i -> v[i] - mu[i] } }
+
+                val results = runBlocking {
+                    coroutineScope {
+                        (0 until r).map { rep ->
+                            async(Dispatchers.Default) {
+                                val rng = java.util.Random(
+                                    20260907L + anchor.id.hashCode().toLong() * 2654435761L + rep * 104729L
+                                )
+                                runReplicate(
+                                    splitter, capture, "WNF_${anchor.id}_$rep",
+                                    withinNodeCloud(mu, centered, m, rng)
+                                )
+                            }
+                        }.awaitAll()
+                    }
+                }
+                val all = results.map { it.sepKway }.sorted()
+                val reached = all.filter { it > 0.0 }
+                val acc = results.count { it.accepted }
+                nulls[anchor.id] = AnchorNull(anchor.label ?: anchor.id, m, all, reached, acc)
+                val ci = quantileCi(all, 0.95)
+                println(
+                    "%-18s %5d | %9.5f %9.5f %9.5f %9.5f | [%8.5f,%8.5f] | %9.5f | %6.1f%% %5.1f%%".format(
+                        java.util.Locale.US, (anchor.label ?: anchor.id).take(18), m,
+                        percentile(all, 0.50), percentile(all, 0.90), percentile(all, 0.95), percentile(all, 0.99),
+                        ci.first, ci.second,
+                        if (reached.size >= 20) percentile(reached, 0.95) else Double.NaN,
+                        100.0 * reached.size / r, 100.0 * acc / r
+                    )
+                )
+            }
+        }
+        splitLog.detachAppender(capture); capture.stop(); splitLog.isAdditive = true
+
+        // ── Stage 2: every accepted split of the frozen tree vs its anchor's null ──
+        fun anchorIdOf(node: taxonomy.service.SerialNode): String? {
+            var cur: taxonomy.service.SerialNode? = node
+            val guard = HashSet<String>()
+            while (cur != null && guard.add(cur.id)) {
+                if (cur.depth == 1) return cur.id
+                // treeParentId can dangle (parent removed by a later coarsening); fall
+                // back to the first RESOLVABLE parent id rather than the first id.
+                cur = (listOfNotNull(cur.treeParentId) + cur.parentIds).firstNotNullOfOrNull { byId[it] }
+            }
+            return null
+        }
+        val sites = g.nodes.filter { it.childIds.size >= 2 && it.dasguptaDeltaNorm > 0.0 }
+            .sortedWith(compareBy({ it.depth }, { -(regionQueryIds(it, byId).size) }))
+
+        println()
+        println("=".repeat(120))
+        println("ACCEPTED SPLITS vs THEIR ANCHOR'S WITHIN-NODE NULL  (q = fraction of ALL null replicates >= observed)")
+        println("depth-1 rows are exactly matched (own population = null population); deeper rows use the anchor null,")
+        println("which narrows with n and is therefore ANTI-conservative for smaller descendant sites.")
+        println("=".repeat(120))
+        println(
+            "%-46s %5s %5s %3s | %8s | %-16s %8s %8s | %6s %s".format(
+                "split site", "depth", "n", "k", "observed", "anchor", "nullP50", "nullP95", "q", "vs p95"
+            )
+        )
+
+        data class SiteRow(
+            val id: String, val label: String, val depth: Int, val n: Int, val k: Int,
+            val observed: Double, val anchorId: String, val anchorLabel: String,
+            val nullP50: Double, val nullP95: Double, val q: Double, val clears: Boolean
+        )
+        val rows = mutableListOf<SiteRow>()
+        for (site in sites) {
+            val aId = anchorIdOf(site)
+            val an = aId?.let { nulls[it] }
+            if (an == null) {
+                println("%-46s %5d  (no depth-1 anchor null — skipped)".format((site.label ?: site.id).take(46), site.depth))
+                continue
+            }
+            val n = regionQueryIds(site, byId).size
+            val obs = site.dasguptaDeltaNorm
+            val q = an.all.count { it >= obs }.toDouble() / an.all.size
+            val p50 = percentile(an.all, 0.50)
+            val p95 = percentile(an.all, 0.95)
+            val clears = obs >= p95
+            rows.add(SiteRow(site.id, site.label ?: site.id, site.depth, n, site.childIds.size,
+                obs, aId, an.label, p50, p95, q, clears))
+            println(
+                "%-46s %5d %5d %3d | %8.5f | %-16s %8.5f %8.5f | %6.3f %s".format(
+                    java.util.Locale.US, (site.label ?: site.id).take(46), site.depth, n, site.childIds.size,
+                    obs, an.label.take(16), p50, p95, q,
+                    if (clears) "CLEARS" else "below"
+                )
+            )
+        }
+
+        println()
+        println("=".repeat(120))
+        val d1 = rows.filter { it.depth == 1 }
+        val deeper = rows.filter { it.depth > 1 }
+        println("SUMMARY  (snapshot=$snapId, reps=$r, minClusterSize=$mcs)")
+        println("  anchor null p95 band: %.5f .. %.5f  (bar = %.4f)".format(
+            java.util.Locale.US,
+            nulls.values.minOf { percentile(it.all, 0.95) },
+            nulls.values.maxOf { percentile(it.all, 0.95) },
+            config.formalism.proposalSeparationBar))
+        fun frac(xs: List<SiteRow>, p: (SiteRow) -> Boolean) =
+            "%d/%d (%.0f%%)".format(java.util.Locale.US, xs.count(p), xs.size, 100.0 * xs.count(p) / xs.size)
+        if (d1.isNotEmpty()) {
+            println("  depth-1 splits (exactly matched null):  clear own p95: " + frac(d1) { it.clears } +
+                "   above own p50: " + frac(d1) { it.observed >= it.nullP50 } +
+                "   median q: " + "%.3f".format(java.util.Locale.US, d1.map { it.q }.sorted().let { percentile(it, 0.5) }))
+        }
+        if (deeper.isNotEmpty()) {
+            println("  deeper splits (anchor-null approx):     clear anchor p95: " + frac(deeper) { it.clears } +
+                "   median q: " + "%.3f".format(java.util.Locale.US, deeper.map { it.q }.sorted().let { percentile(it, 0.5) }))
+        }
+        println("  all accepted splits:                    clear anchor p95: ${frac(rows) { it.clears }}")
+        println("=".repeat(120))
+
+        // ── CSV exports (new files; the voided mcs=30 exports are left untouched) ──
+        fun esc(s: String) = "\"" + s.replace("\"", "\"\"") + "\""
+        val outDir = java.io.File("docs/data").apply { mkdirs() }
+        java.io.File(outDir, "within_null_frozen_anchors.csv").printWriter().use { w ->
+            w.println("snapshot_id,anchor_id,label,n,p50,p90,p95,p99,p95_ci_lo,p95_ci_hi,cond_p95,reach_pct,accept_pct,reps")
+            nulls.forEach { (id, an) ->
+                val ci = quantileCi(an.all, 0.95)
+                w.println("${esc(snapId)},${esc(id)},${esc(an.label)},${an.n}," +
+                    "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.1f,%.1f,%d".format(
+                        java.util.Locale.US,
+                        percentile(an.all, 0.50), percentile(an.all, 0.90),
+                        percentile(an.all, 0.95), percentile(an.all, 0.99),
+                        ci.first, ci.second,
+                        if (an.reached.size >= 20) percentile(an.reached, 0.95) else Double.NaN,
+                        100.0 * an.reached.size / an.all.size, 100.0 * an.accepted / an.all.size, an.all.size))
+            }
+        }
+        java.io.File(outDir, "within_null_frozen_splits.csv").printWriter().use { w ->
+            w.println("snapshot_id,node_id,label,depth,n,k,observed_sep,anchor_id,anchor_label,anchor_null_p50,anchor_null_p95,q,clears_p95,exact_match")
+            rows.forEach { row ->
+                w.println("${esc(snapId)},${esc(row.id)},${esc(row.label)},${row.depth},${row.n},${row.k}," +
+                    "%.6f,${esc(row.anchorId)},${esc(row.anchorLabel)},%.6f,%.6f,%.4f,${row.clears},${row.depth == 1}".format(
+                        java.util.Locale.US, row.observed, row.nullP50, row.nullP95, row.q))
+            }
+        }
+        println("wrote docs/data/within_null_frozen_anchors.csv  (${nulls.size} anchors)")
+        println("wrote docs/data/within_null_frozen_splits.csv   (${rows.size} accepted splits)")
+    }
 }
