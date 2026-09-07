@@ -127,3 +127,14 @@ exceeds J-gated baseline recurrence; reserved pool touched exactly once.
   strata inherit the trunk tier's measurement role. Deflated null survives as a
   per-site diagnostic (q's in the CSV), not as the CS-vs-Philosophy discriminator;
   dip-test / mixture-BIC variants are unregistered future work.
+
+- LADDER (2026-09-08, registered 4c4e5e7): **PRIMARY FAILS — the specificity curve
+  is not monotone.** generic 0.761 < anchor 0.774 > stratum 0.757 < leaf 0.770
+  (n=967 fully paired); leaf-vs-anchor 35:38 discordant, p=0.68. Anchor-level
+  induced rubrics match leaf rubrics and beat generic; the knee sits at or before
+  ANCHOR granularity. No contradiction with the confirmed cell>generic (p=0.0001)
+  and cell>wrong-cell (p=0.006) results: rubric value = domain-correct content,
+  wrong specificity harms, finer-than-anchor right specificity adds ~nothing here.
+  Old-vs-fresh session confound disclosed (leaf/generic arms reused as registered).
+  Consequence: P3's twig gate loses its premise as designed; a same-session leaf
+  re-judge (~4k calls) is the follow-up if the knee needs settling.
