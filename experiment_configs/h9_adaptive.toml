@@ -19,6 +19,19 @@
 # frozen artifact; per-anchor bars are not captured in the snapshot's
 # EffectiveConfig provenance (disclosed limitation of this exploration).
 #
+# ── QUANTILE CURVE (2026-09-08, p90/p50 arms, both certified fixed points) ──
+# bar quantile  leaves  depth  heldout Top-1   mu-match vs frozen
+#   p95            35     4       0.742            30/87
+#   p90            45     4       0.737            41/87
+#   p50            70     4       0.755            63/87   <- back INSIDE the
+#                                                             20-seed floor
+#   (frozen 0.025)  87     6       0.775            —
+# READING: texture-aware p50 bars recover 80% of the frozen granularity and
+# floor-level routing while every split still clears at least the MEDIAN of its
+# anchor's honest null — the defensible sweet spot between the fully-certified
+# 35-leaf tree and the functional frozen 87. The granularity-vs-certification
+# trade is now a measured curve, not a choice of rhetoric.
+#
 # ── OUTCOME (2026-09-08, run completed, certified J-stationary at iteration 9) ──
 # 49 nodes / 35 leaves / depth 4; held-out Top-1 0.742 (0.8pp BELOW the 20-seed
 # floor minimum 0.750 — reported as-is; consistent with the flat-bar arms' small
