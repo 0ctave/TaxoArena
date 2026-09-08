@@ -89,15 +89,16 @@ top-cluster BT order under the reasoning judge has fewer GT violations than Mist
 Falsifier: no accuracy gain on top-cluster pairs => the divergence is not a
 capability ceiling but a shared preference (verbosity/style), and J3/J4 carry it.
 
-J1 LAUNCH PARAMETERS (recorded 2026-09-08 before the first judged call): judge =
-deepseek-ai/DeepSeek-R1-0528 via the Hugging Face inference router (no reasoning model
-is deployed on the Foundry resource; Gemini key not API-registered), max_tokens 8192,
-default temperature, <think> stripped before parsing; sample = the R3 1,980 matches
-(rejudge_grok.sample_matches, seed 42), prompts = v1 templates byte-identical to R3;
-harness tools/analysis/rejudge_reasoning.py, cache experiment_results/x12_crossdomain/
-rejudge_r1.db. Family disclosure: deepseek-chat-v2_5 is a mid-tier contestant; no top-4
-model is DeepSeek, so the primary is not self-preference-confounded; the all-pairs and
-full-board readouts carry the caveat. Pilot of 12 matches precedes the full run.
+J1 LAUNCH PARAMETERS (recorded 2026-09-08 before the first judged call; amended the
+same day when the judge changed, before the full run): judge = **grok-4-1-fast-reasoning**,
+a Foundry deployment on the same resource as Mistral-Large-3 and the R3 grok
+(xAI has no contestant in the roster — no family confound), max_tokens 8192, default
+temperature; sample = the R3 1,980 matches (rejudge_grok.sample_matches, seed 42),
+prompts = v1 templates byte-identical to R3; harness tools/analysis/rejudge_reasoning.py
+--provider azure, cache experiment_results/x12_crossdomain/rejudge_grok_4_1_fast_reasoning.db.
+The first attempt used deepseek-ai/DeepSeek-R1-0528 via the Hugging Face router (3 matches
+judged, then 402 — credits exhausted; cache rejudge_deepseek_r1_0528.db kept, not used).
+Pilot of 12 matches precedes the full run.
 
 ### J3 — Prompt v2: correctness-first tie policy + hygiene  (~2k calls)
 The four "both-correct" ranking criteria are elaboration proxies; H7 added an
