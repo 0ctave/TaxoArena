@@ -207,6 +207,22 @@ verdict rate there IS the bias signature. Extends tools/analysis/bias_audit.py.
   the R2 top-4 puts gemini first. If the secondary still fails, the top-cluster
   divergence has a component that is not length, and J1 (judge strength) is the test.
 
+- **J4c (2026-09-08, registered d024f0f): FAIL on both registered clauses.** beta_nondisc =
+  +0.162/1k (z = 7.3, n = 13,349) vs beta_decidable = +0.028 (z = 1.6) on R2 (5.7x —
+  the DIRECTION of the 2606.09409 claim holds), +0.282 vs +0.095 on x12; but R2's
+  12-model board is unchanged (5 violations, rho 0.951) and its top-4 is unchanged.
+  x12 improves as in J4b (4 -> 3, gemini first). Reading across J4/J4b/J4c: the
+  non-discriminative coefficient (+0.16) is far below the top-4-only coefficient
+  (+1.32), so "both correct" is NOT the regime in which length dominates — the frontier
+  cluster is its own regime (weak-model both-wrong pairs are non-discriminative too and
+  dilute the tier). No global or tiered length covariate corrects R2's top cluster; only
+  a model fitted within the cluster does, which is a per-tier board, not a correction.
+  The free-refit line is CLOSED here (3 registered variants, all reported): the
+  measurement-side mitigation is a per-tier length term reported as a corrected board
+  alongside the raw one, and the substantive fixes are design-level — J3 (remove the
+  elaboration criteria that reward length when both are correct) and J1 (a judge whose
+  correctness signal does not saturate on the frontier). Both need judge calls.
+
 ## Recommended order
 J5 and J4 first (free, both refits, and they may already explain most of the
 top-cluster divergence). Then J1 (settles ceiling vs preference). Then J3 as prompt

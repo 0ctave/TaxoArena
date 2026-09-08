@@ -55,9 +55,24 @@ ground truth (key accuracy on the frozen pool, 12 models): gemini-3.1-pro_5-shot
 SUMMARY
   J5 registered (R2, primary dataset): PASS | x12 (secondary): FAIL
   J4 registered (<=1 adjacent violation in BOTH): PASS | beta_len identified in both: yes
-
 == EXPLORATORY: LC-BT fitted on top-4 matches only (beta identified within the cluster) ==
   R2 top-4 matches n=6094 | raw iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (viol 3) | LC gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (viol 1) | beta_len +1.321/1k z=+26.4
       mean answer length (chars): gemini 861, arx_0314 881, iask_pro 1301, gpt 1519
   x12 top-4 matches n=1165 | raw iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 (viol 2) | LC gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (viol 1) | beta_len +0.883/1k z=+9.7
       mean answer length (chars): gemini 905, arx_0314 896, iask_pro 1361, gpt 1622
+== J4b (registered e840c8f): LC-BT with beta_len x GT-gap tier (<0.10 narrow / >=0.10 wide) ==
+  R2: beta_narrow +0.447/1k (z=+13.7, n=10503) | beta_wide -0.036/1k (z=-2.2) | ratio -12.6x
+      12-model board pairwise violations vs GT: raw 5 -> tiered-LC 4 (of 66 pairs) | rho 0.9510 -> 0.9580
+      top-4: raw iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (viol 3) | tiered-LC iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (viol 3)
+  x12: beta_narrow +0.279/1k (z=+5.3, n=1468) | beta_wide +0.046/1k (z=+1.2) | ratio 6.1x
+      12-model board pairwise violations vs GT: raw 4 -> tiered-LC 3 (of 66 pairs) | rho 0.9650 -> 0.9790
+      top-4: raw iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 (viol 2) | tiered-LC gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (viol 1)
+  REGISTERED J4b PRIMARY (violations strictly below raw on BOTH): PASS
+== J4c (registered d024f0f): LC-BT with beta_len x key status (non-discriminative / decidable) ==
+  R2: beta_nondisc +0.162/1k (z=+7.3, n=13349) | beta_decidable +0.028/1k (z=+1.6) | ratio 5.7x
+      12-model violations vs GT: raw 5 -> keyed-LC 5 | rho 0.9510 -> 0.9510
+      top-4: raw iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (viol 3) | keyed-LC iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (viol 3, adj 1)
+  x12: beta_nondisc +0.282/1k (z=+4.1, n=1029) | beta_decidable +0.095/1k (z=+2.8) | ratio 3.0x
+      12-model violations vs GT: raw 4 -> keyed-LC 3 | rho 0.9650 -> 0.9790
+      top-4: raw iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 (viol 2) | keyed-LC gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (viol 1, adj 1)
+  REGISTERED J4c PRIMARY (violations strictly below raw on BOTH): FAIL | SECONDARY (R2 top-4 within one adjacent swap): FAIL

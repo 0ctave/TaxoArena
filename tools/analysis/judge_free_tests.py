@@ -324,3 +324,80 @@ def j4b():
 
 if __name__ == "__main__" and "--j4b" in sys.argv:
     j4b()
+
+
+# ── J4c (registered d024f0f BEFORE this ran): beta_len x key status (non-discriminative vs decidable) ──
+def load_key_status(path):
+    st = {}
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            if r["Rationale"].startswith("Reconstructed"):
+                continue
+            ca, cb = r["CorrectA"] == "true", r["CorrectB"] == "true"
+            st[(int(r["QueryId"]), r["ModelA"], r["ModelB"])] = "decidable" if ca != cb else "nondisc"
+    return st
+
+
+def lc_bt_keyed(rows, L, status, models):
+    idx = {m: i for i, m in enumerate(models)}
+    k = len(models) - 1
+    X, Y, W = [], [], []
+    for r in rows:
+        la, lb = L.get((r["q"], r["a"])), L.get((r["q"], r["b"]))
+        s = status.get((r["q"], r["a"], r["b"]))
+        if la is None or lb is None or s is None:
+            continue
+        x = np.zeros(k + 2)
+        if idx[r["a"]] < k: x[idx[r["a"]]] += 1
+        if idx[r["b"]] < k: x[idx[r["b"]]] -= 1
+        x[k if s == "nondisc" else k + 1] = (la - lb) / 1000.0
+        if r["w"] == "TIE":
+            X += [x, x]; Y += [1.0, 0.0]; W += [0.5, 0.5]
+        else:
+            X.append(x); Y.append(1.0 if r["w"] == r["a"] else 0.0); W.append(1.0)
+    X, Y, W = np.array(X), np.array(Y), np.array(W)
+    beta = np.zeros(k + 2)
+    for _ in range(80):
+        p = 1 / (1 + np.exp(-np.clip(X @ beta, -30, 30)))
+        g = X.T @ (W * (Y - p))
+        H = (X * (W * p * (1 - p))[:, None]).T @ X + 1e-9 * np.eye(k + 2)
+        step = np.linalg.solve(H, g)
+        beta += step
+        if np.max(np.abs(step)) < 1e-9:
+            break
+    cov = np.linalg.inv(H)
+    theta = {m: (beta[idx[m]] if idx[m] < k else 0.0) for m in models}
+    return theta, (beta[k], math.sqrt(cov[k, k])), (beta[k + 1], math.sqrt(cov[k + 1, k + 1]))
+
+
+def j4c():
+    r2, x12 = load_live(R2), load_live(X12)
+    models = sorted({m for r in r2 for m in (r["a"], r["b"])})
+    acc, L = gt_and_lengths(set(models))
+    gt_order = sorted(TOP4, key=lambda m: -acc[m])
+    print("\n== J4c (registered d024f0f): LC-BT with beta_len x key status (non-discriminative / decidable) ==")
+    prim, sec = [], None
+    for tag, rows, path in (("R2", r2, R2), ("x12", x12, X12)):
+        ms = sorted({m for r in rows for m in (r["a"], r["b"])})
+        status = load_key_status(path)
+        raw = board_from(current_votes(rows), ms)
+        theta, (bn, sn), (bd, sd) = lc_bt_keyed(rows, L, status, ms)
+        vr, vl = pair_violations_all(raw, acc, ms), pair_violations_all(theta, acc, ms)
+        oR, pR, _ = violations(raw, gt_order)
+        oL, pL, aL = violations(theta, gt_order)
+        n_nd = sum(1 for r in rows if status.get((r["q"], r["a"], r["b"])) == "nondisc")
+        print("  %s: beta_nondisc %+.3f/1k (z=%+.1f, n=%d) | beta_decidable %+.3f/1k (z=%+.1f) | ratio %.1fx"
+              % (tag, bn, bn / sn, n_nd, bd, bd / sd, bn / bd if bd else float("inf")))
+        print("      12-model violations vs GT: raw %d -> keyed-LC %d | rho %.4f -> %.4f"
+              % (vr, vl, rho(raw, acc, ms), rho(theta, acc, ms)))
+        print("      top-4: raw %s (viol %d) | keyed-LC %s (viol %d, adj %d)"
+              % (" > ".join(oR), pR, " > ".join(oL), pL, aL))
+        prim.append(vl < vr)
+        if tag == "R2":
+            sec = aL <= 1 and pL <= 1
+    print("  REGISTERED J4c PRIMARY (violations strictly below raw on BOTH): %s | SECONDARY (R2 top-4 within one adjacent swap): %s"
+          % ("PASS" if all(prim) else "FAIL", "PASS" if sec else "FAIL"))
+
+
+if __name__ == "__main__" and "--j4c" in sys.argv:
+    j4c()
