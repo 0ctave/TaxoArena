@@ -119,6 +119,44 @@ gated board still puts iask first (the bias is confident).
   Confidence-weighted board: rho 0.951 → 0.958, top-4 unchanged (3 violations) — the
   confidence field is a usable per-verdict weight but does not touch the frontier cluster.
 
+- **F4 — UNDERPOWERED (direction as predicted).** Harness tools/analysis/free_tests_f4_f7.py,
+  output experiment_results/free_tests_f4_f7_output.txt. CERT-STRICT n = 24: cell 0.792
+  vs sibling 0.708 (+0.083; 3:1, p = 0.63); UNCERTIFIED n = 439: +0.014 (15:9, p = 0.31);
+  difference +0.070 [−0.087, +0.236]. Same conclusion as F1: the frozen tree cannot
+  power a certified-leaf question; the D2-tree certified ladder can.
+
+- **F5 — PRIMARY PASS; prediction correct.** Leaf-over-category LOO improvement (x1000):
+  UNCERTIFIED leaves (n = 6,616) +2.18 [+1.01, +3.28] — capability structure exists
+  below the certified geometry; CERT-STRICT (n = 1,086) +2.49 [+0.09, +4.87], not
+  distinguishable from uncertified (+0.31 [−2.34, +2.89]); CERT-IMMEDIATE — the leaves
+  of the one certified depth-4 Math site (n = 204) — +31.45 [+19.26, +43.24], by far the
+  most capability-informative cells in the tree. Reading: certification (geometric
+  reality) and capability relevance are different criteria; P2's 6/66 is a floor on
+  rubric-relevant structure, not on profile-relevant structure.
+
+- **F6 — d512 PASS, abt2 FAIL; ranking as predicted except frozen >= d512.** n = 10,925
+  keyed questions, nearest-centroid cells, leaf-level LOO improvement (x1000): frozen
+  +14.25, d256_s137 +14.11, d512_s2048 +13.98, d512_s137 +13.80, abt2_s137 +12.76,
+  abt2_s2048 +12.59, nomic +12.36; category +10.79; every tree's anchors ~= category
+  (+10.3 to +10.8). Paired vs frozen: d512 −0.45 [−1.12, +0.21] and −0.27 [−0.90,
+  +0.31] (no loss, PASS); abt2 −1.49 [−2.22, −0.81] and −1.66 [−2.37, −0.95] (FAIL);
+  nomic −1.89. Reading: abt2's 61-63 certifiable cells resolve LESS capability structure
+  than the frozen tree's 87 mostly-uncertified ones — certification buys rubric-grade
+  cells at the price of profile resolution; d512 keeps both. D2 should therefore centre
+  on 512 dims (and abt2 x 512 to see whether the loss is the leaf count or the PCs).
+
+- **F7 — letter FAILS by 0.011; substance is the batch's most useful result.** Within
+  top-4 matches, beta_len by confidence band: < 0.85 (n = 4,044, 50% ties) +1.02 [+0.89,
+  +1.15]; 0.85–0.95 (n = 1,530) +2.61 [+2.34, +2.88]; >= 0.95 (n = 520) +0.68 [+0.46,
+  +0.90]. Non-monotone: the verbosity effect PEAKS in the 0.85–0.95 band — exactly the
+  "default to 0.7–0.85 for clear wins" band the prompt instructs — and is smallest where
+  the judge is most sure. The confidence-gated (>= 0.95) top-4 board is
+  gemini > iask > arx > gpt-4o (1 violation): the frontier divergence disappears on the
+  judge's own high-confidence verdicts, with no length model at all. Consequences: a
+  confidence-gated or confidence-weighted board is a legitimate corrected board (F3
+  showed confidence is calibrated); J3's prompt v2 has a specific target — the
+  mid-confidence "both correct, pick by depth" verdicts.
+
 DATA NOTE (found by F2's first run, which is VOID and superseded): `eval_results.
 question_text` is stored PER ROW, and the ingested file of Meta-Llama-3-70B-Instruct
 carries wrong question texts on 8.4% of its rows (every other model: 0.1%). A text→id

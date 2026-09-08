@@ -1,0 +1,38 @@
+
+== F4: cell-over-SIBLING rubric gain, certified vs uncertified leaves (H7 swap_sibling arm) ==
+  CERT-STRICT     n=  24 | cell 0.792  sibling 0.708  gain +0.083 | discordant 3:1  McNemar p=0.625
+  CERT-IMMEDIATE  n=  12 | cell 0.833  sibling 0.917  gain -0.083 | discordant 0:1  McNemar p=1.000
+  UNCERTIFIED     n= 439 | cell 0.777  sibling 0.763  gain +0.014 | discordant 15:9  McNemar p=0.307
+  CERT-STRICT minus UNCERTIFIED gain: +0.070, question-bootstrap 95% [-0.087, +0.236] -> UNDERPOWERED (REGISTERED PRIMARY)
+  CERT-IMMEDIATE minus UNCERTIFIED gain: -0.097, question-bootstrap 95% [-0.301, +0.002] -> UNDERPOWERED (secondary)
+
+== F5: leaf-over-category LOO improvement by leaf certification (frozen tree, F2 mapping) ==
+  CERT-STRICT     n= 1086 | leaf - category improvement (x1000)  +2.49  95% [+0.09, +4.87]
+  CERT-IMMEDIATE  n=  204 | leaf - category improvement (x1000) +31.45  95% [+19.26, +43.24]
+  UNCERTIFIED     n= 6616 | leaf - category improvement (x1000)  +2.18  95% [+1.01, +3.28]
+  anchor-leaf     n=0
+  REGISTERED PRIMARY (positive within UNCERTIFIED leaves): PASS
+  secondary CERT-STRICT minus UNCERTIFIED: +0.31  95% [-2.34, +2.89]
+
+== F7: within-top-4 length coefficient by verdict confidence (R2 live) ==
+  band < 0.85    n= 4044 (ties 0.50) | beta_len +1.017/1k  95% [+0.889, +1.146]
+  band 0.85-0.95 n= 1530 (ties 0.01) | beta_len +2.612/1k  95% [+2.340, +2.884]
+  band >= 0.95   n=  520 (ties 0.06) | beta_len +0.680/1k  95% [+0.459, +0.900]
+  REGISTERED PRIMARY (beta(<0.85) > beta(>=0.95), non-overlapping CIs): FAIL
+  confidence-gated (>=0.95) top-4 board on 520 matches: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (violations 1; GT gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06)
+
+== F6: key-only validation of construction variants (nearest-centroid cells, LOO Brier) ==
+  frozen      dim 256 leaves  87 | n=10925 | LOO improvement x1000: leaf +14.25  anchor +10.44  (category +10.79) | anchor==category 75.4%
+  d256_s137   dim 256 leaves  84 | n=10925 | LOO improvement x1000: leaf +14.11  anchor +10.70  (category +10.79) | anchor==category 76.2%
+  d512_s137   dim 512 leaves  75 | n=10925 | LOO improvement x1000: leaf +13.80  anchor +10.70  (category +10.79) | anchor==category 76.7%
+  d512_s2048  dim 512 leaves  84 | n=10925 | LOO improvement x1000: leaf +13.98  anchor +10.81  (category +10.79) | anchor==category 77.0%
+  abt2_s137   dim 256 leaves  63 | n=10925 | LOO improvement x1000: leaf +12.76  anchor +10.28  (category +10.79) | anchor==category 74.1%
+  abt2_s2048  dim 256 leaves  61 | n=10925 | LOO improvement x1000: leaf +12.59  anchor +10.31  (category +10.79) | anchor==category 73.6%
+  nomic       dim 256 leaves  75 | n=10925 | LOO improvement x1000: leaf +12.36  anchor +10.35  (category +10.79) | anchor==category 71.0%
+  -- paired difference vs frozen (leaf level, x1000; REGISTERED: d512/abt2 >= -0.5 with CI upper > 0) --
+     d256_s137    -0.14  95% [-0.69, +0.38]
+     d512_s137    -0.45  95% [-1.12, +0.21]  -> PASS
+     d512_s2048   -0.27  95% [-0.90, +0.31]  -> PASS
+     abt2_s137    -1.49  95% [-2.22, -0.81]  -> FAIL
+     abt2_s2048   -1.66  95% [-2.37, -0.95]  -> FAIL
+     nomic        -1.89  95% [-2.71, -1.09]
