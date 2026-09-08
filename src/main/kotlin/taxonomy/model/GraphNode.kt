@@ -356,8 +356,18 @@ data class GraphNode(
  * would scatter the literal 256 across all of them and make reintroducing a ladder —
  * or changing the width for a different embedding model — an edit in 11 places
  * instead of one. The unused parameter is the price of keeping the seam.
+ *
+ * The width itself is [EmbeddingSlice.width]: 256 unless a run sets
+ * `embeddingSliceDim` (D1 dimension sweep). Process-global because every persisted
+ * node, every cached projection and the J statistic must agree on one width; a run
+ * sets it once at startup, before the first node is built.
  */
-fun dimForDepth(depth: Int): Int = 256
+fun dimForDepth(depth: Int): Int = EmbeddingSlice.width
+
+object EmbeddingSlice {
+    @Volatile
+    var width: Int = 256
+}
 
 // Phase completion flags
 const val PHASE_EMBEDDED = 1

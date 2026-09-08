@@ -69,6 +69,41 @@ Design recorded in the proposals doc; no test frozen yet. Prerequisite: P1+P2
 baseline stable. When scheduled: primary = cross-seed recurrence of ll-gated splits
 exceeds J-gated baseline recurrence; reserved pool touched exactly once.
 
+## D1 — slice width and within-node anisotropy (dimension sweep; registered 2026-09-08)
+Question: does the MRL slice width, or removing a node's dominant shared directions
+before the split proposal, change how much CERTIFIABLE sub-anchor structure the
+construction finds? Motivation: the within-node null runs 3x the isotropic null
+(shared dominant directions, not dimensionality per se), and the repo's own MRL
+ladder (128 at the root) was abandoned for costing coarse-level accuracy.
+Arms, 2 seeds each (137, 2048; body = p7_det_1, labeling off, structure only):
+  d128 / d256 (baseline) / d512 — `embeddingSliceDim`;
+  abt2 — 256 with the top-2 within-node principal components dropped before EM
+  (`splitDropTopPcs = 2`, all-but-the-top); white — 256 with variance-whitened PCA
+  coordinates before EM (`splitWhiten = true`). Both PCA variants act on the PROPOSAL
+  only; routing, vMF fits and the separation gate stay on the raw slice.
+Bar 0.025 flat in every arm. Registered confound: the isotropic null scales with the
+width, so the same bar is looser at 128 and tighter at 512 — measured by
+`gradlew isoNullByDim` (n = 130/406/900, 300 reps) and reported alongside; the
+primary metric below is self-calibrated per arm and does not depend on it.
+Metrics per build: (a) site-level certification count (`gradlew siteNull` at the
+arm's own geometry, 300 reps, on the build's own snapshot; CSV per build under
+experiment_results/dimsweep/); (b) cross-seed ARI of nearest-leaf-centroid train
+assignments (P1 metric; baseline 0.663); (c) held-out Top-1 with Wilson CI;
+(d) Philosophy leaf count and (e) leaf count, descriptive.
+GATE: d256_s137 must reproduce experiment_results/p7_det_1's dag_snapshots.jsonl
+hash — the refactor that made the width configurable must be a no-op at 256/0/false
+or the sweep is void until it is.
+REGISTERED PRIMARY (per arm vs d256): an arm IMPROVES granularity coherence iff
+(a) exceeds d256's count in BOTH seeds AND (c)'s Wilson CI overlaps d256's in both
+seeds AND (b) >= ARI(d256) - 0.02. Any other pattern = NO IMPROVEMENT.
+PREDICTIONS (committed before launch): d128 loses certifications and Top-1; d512
+changes little; abt2 and white are the only arms that can raise (a). Because they
+change the proposal only, a null there is informative: it says the acceptance
+geometry (raw-slice routing + min-pair gate), not the proposal, is the bottleneck,
+which is the premise for a stage-2 representation-level whitening arm (pre-authorized
+"more complex dimension management", to be registered separately if reached).
+Readout: tools/analysis/dimsweep_report.py.
+
 ## OUTCOMES (updated as tests adjudicate)
 
 - P6 (2026-09-08): **NULL — overlap program closed, soft routing vindicated.** Full pool

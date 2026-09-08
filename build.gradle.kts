@@ -133,7 +133,26 @@ tasks.register<Test>("siteNull") {
     outputs.upToDateWhen { false }
     systemProperty("nullReps", providers.gradleProperty("nullReps").getOrElse("300"))
     systemProperty("snapshotId", providers.systemProperty("snapshotId").getOrElse("20260727_042523_Headless_Run_Auto_ge"))
+    // D1 sweep: put the harness on the build's geometry and keep its table out of the frozen one.
+    providers.systemProperty("sliceDim").orNull?.let { systemProperty("sliceDim", it) }
+    providers.systemProperty("dropTop").orNull?.let { systemProperty("dropTop", it) }
+    providers.systemProperty("whiten").orNull?.let { systemProperty("whiten", it) }
+    providers.systemProperty("outCsv").orNull?.let { systemProperty("outCsv", it) }
     filter { includeTestsMatching("*SeparationNullBySizeTest*siteNull*") }
+}
+
+tasks.register<Test>("isoNullByDim") {
+    description = "Isotropic separation null of the production splitter at slice widths 128/256/512 (D1 sweep confound readout)."
+    group = "verification"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    maxHeapSize = "6g"
+    workingDir = rootDir
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
+    systemProperty("nullReps", providers.gradleProperty("nullReps").getOrElse("300"))
+    filter { includeTestsMatching("*SeparationNullBySizeTest*isoNullByDim*") }
 }
 
 tasks.register<Test>("randomCellRubrics") {

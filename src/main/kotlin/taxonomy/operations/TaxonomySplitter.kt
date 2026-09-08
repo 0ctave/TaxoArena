@@ -136,7 +136,11 @@ class TaxonomySplitter(
             else                    -> 128
         }.coerceAtMost(rawVectors.first().size)
 
-        val pcaProjected = StatisticsUtils.pcaProject(rawVectors, splitDim)
+        val pcaProjected = StatisticsUtils.pcaProject(
+            rawVectors, splitDim,
+            dropTop = config.formalism.splitDropTopPcs,
+            whiten = config.formalism.splitWhiten
+        )
 
         // ── k-ary mixture selection ───────────────────────────────────────────
         //

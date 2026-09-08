@@ -54,7 +54,7 @@ object JBootstrap {
     }
 
     /** Cell assignment of the current structure, for later paired bootstrapping. */
-    fun capture(root: GraphNode, allEmbeddings: List<Embedding>, d: Int = 256): Capture {
+    fun capture(root: GraphNode, allEmbeddings: List<Embedding>, d: Int = taxonomy.model.dimForDepth(0)): Capture {
         val embMap = allEmbeddings.associateBy {
             if (it.queryId != -1) it.queryId.toString() else it.rawText
         }
@@ -109,7 +109,7 @@ object JBootstrap {
         after: Capture,
         replicates: Int = 200,
         seed: Long = 987654321L,
-        d: Int = 256
+        d: Int = taxonomy.model.dimForDepth(0)
     ): Double {
         fun sig(v: Capture.QueryView?): List<Pair<String, Double>> =
             v?.cells?.sortedBy { it.first } ?: emptyList()
@@ -201,7 +201,7 @@ object JBootstrap {
         allEmbeddings: List<Embedding>,
         replicates: Int = 200,
         seed: Long = 987654321L,
-        d: Int = 256
+        d: Int = taxonomy.model.dimForDepth(0)
     ): Result {
         val embMap = allEmbeddings.associateBy {
             if (it.queryId != -1) it.queryId.toString() else it.rawText

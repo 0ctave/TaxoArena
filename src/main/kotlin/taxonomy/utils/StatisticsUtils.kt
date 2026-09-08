@@ -244,8 +244,8 @@ object StatisticsUtils {
         val cellCount = leaves.size + residualParents.size
         if (cellCount < 2) return 0.0
         
-        val d = 256
-        
+        val d = taxonomy.model.dimForDepth(0)
+
         val cellN = DoubleArray(cellCount)
         val cellSum = Array(cellCount) { DoubleArray(d) }
         
@@ -625,11 +625,26 @@ object StatisticsUtils {
         return node.niwLambda.sumOf { ln(it.toDouble().coerceAtLeast(1e-9)) }
     }
 
-    fun pcaProject(vectors: List<DoubleArray>, k: Int): List<DoubleArray> {
+    /**
+     * Centered PCA of [vectors] onto the leading [k] components, each row L2-normalized.
+     *
+     * [dropTop] discards the first [dropTop] components before keeping [k] ("all-but-the-top",
+     * Mu & Viswanath 2018): a node's dominant directions are shared by every question in it
+     * (the anisotropy the within-node null measures at 3x the isotropic null) and swamp the
+     * sub-topic directions EM is looking for. [whiten] scales each kept coordinate by
+     * 1/sqrt(variance along that component), so no single elongation axis dominates the
+     * proposal. Both act on the PROPOSAL only — routing, the vMF fits and the separation
+     * gate still read the raw slice — so a proposal found this way must still survive
+     * the unchanged acceptance geometry. Defaults reproduce the historical projection
+     * exactly (dropTop = 0, whiten = false).
+     */
+    fun pcaProject(vectors: List<DoubleArray>, k: Int, dropTop: Int = 0, whiten: Boolean = false): List<DoubleArray> {
         val n = vectors.size
         if (n == 0) return emptyList()
         val d = vectors[0].size
         if (d == 0) return vectors
+        val skip = dropTop.coerceIn(0, d - 1)
+        val keep = k.coerceAtMost(d - skip)
 
         // 1. Center
         val mean = DoubleArray(d)
@@ -640,11 +655,11 @@ object StatisticsUtils {
         }
         val centered = vectors.map { v -> DoubleArray(d) { i -> v[i] - mean[i] } }
 
-        // 2. Power iteration for top-k eigenvectors (cheap, no LAPACK needed)
+        // 2. Power iteration for top-(skip + keep) eigenvectors (cheap, no LAPACK needed)
         val components = mutableListOf<DoubleArray>()
         var residual = centered.map { it.copyOf() }
 
-        repeat(k) { comp ->
+        repeat(skip + keep) { comp ->
             // Deterministic init: ThreadLocalRandom here made every run's split proposals
             // start from different vectors, so the "fixed seed" runs produced different
             // DAGs (observed: 66-69 leaves, 94-275 residuals across identical-code
@@ -690,22 +705,37 @@ object StatisticsUtils {
             }
         }
 
-        // 3. Project
-        return centered.map { row ->
-            val proj = DoubleArray(k) { j ->
-                val comp = components[j]
+        // 3. Project onto the kept components (the first `skip` are discarded)
+        val kept = components.subList(skip, skip + keep)
+        val raw = centered.map { row ->
+            DoubleArray(keep) { j ->
+                val comp = kept[j]
                 var dot = 0.0
                 for (i in 0 until d) {
                     dot += row[i] * comp[i]
                 }
                 dot
             }
+        }
+        // Whitening scale: per-component sd of the projected coordinates (variance along
+        // the eigenvector). A degenerate component (sd ~ 0) is left unscaled.
+        val scale = DoubleArray(keep) { 1.0 }
+        if (whiten) {
+            for (j in 0 until keep) {
+                var ss = 0.0
+                for (row in raw) ss += row[j] * row[j]
+                val sd = sqrt(ss / n)
+                if (sd > 1e-10) scale[j] = 1.0 / sd
+            }
+        }
+        return raw.map { proj ->
+            for (j in 0 until keep) proj[j] *= scale[j]
             var normSq = 0.0
-            for (i in 0 until k) {
+            for (i in 0 until keep) {
                 normSq += proj[i] * proj[i]
             }
             val norm = sqrt(normSq)
-            if (norm > 1e-10) DoubleArray(k) { proj[it] / norm } else proj
+            if (norm > 1e-10) DoubleArray(keep) { proj[it] / norm } else proj
         }
     }
 }

@@ -66,7 +66,10 @@ data class EffectiveConfig(
         val enableGtWarmStart: Boolean = false,
         val fusionSimilarityThreshold: Double = 0.92,
         val effectiveSupportFloor: Double = 2.0,
-        val defaultKappaPrior: Double = 10.0
+        val defaultKappaPrior: Double = 10.0,
+        val embeddingSliceDim: Int = 256,
+        val splitDropTopPcs: Int = 0,
+        val splitWhiten: Boolean = false
     )
 
     @Serializable

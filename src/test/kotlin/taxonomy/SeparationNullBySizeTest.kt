@@ -56,11 +56,28 @@ import kotlin.math.sqrt
 class SeparationNullBySizeTest {
 
     // ── Config: canonical_freeze.toml, verbatim on every split-relevant field ─────
+    /**
+     * D1 dimension-sweep overrides: -DsliceDim / -DdropTop / -Dwhiten put the harness on
+     * the same geometry as the build under test, so a null measured here drives the
+     * production splitter exactly as that build's construction did. Absent = frozen
+     * geometry (256 / 0 / false). Applied at config time; the slice width is process-global.
+     */
+    private val sliceDimProp = System.getProperty("sliceDim")?.toIntOrNull() ?: 256
+    private val dropTopProp = System.getProperty("dropTop")?.toIntOrNull() ?: 0
+    private val whitenProp = System.getProperty("whiten")?.toBoolean() ?: false
+    // In-test override of the slice width (isoNullByDim loops over widths inside one JVM).
+    @Volatile private var sliceDimOverride: Int? = null
+
     private fun canonicalConfig(minClusterSize: Int = 30): TaxonomyConfig =
         TaxonomyConfig().apply {
+            val dim = sliceDimOverride ?: sliceDimProp
             formalism.maxDepth = 8
             formalism.minClusterSize = minClusterSize
             formalism.proposalSeparationBar = 0.025
+            formalism.embeddingSliceDim = dim
+            formalism.splitDropTopPcs = dropTopProp
+            formalism.splitWhiten = whitenProp
+            taxonomy.model.EmbeddingSlice.width = dim
             formalism.tau = 1e-6
             formalism.acceptanceZ = 0.0
             formalism.enableRefitGate = false
@@ -340,6 +357,35 @@ class SeparationNullBySizeTest {
 
     private fun reps(default: Int) = System.getProperty("nullReps")?.toIntOrNull() ?: default
 
+    /**
+     * ISOTROPIC NULL BY SLICE WIDTH (`gradlew isoNullByDim`) — the D1 sweep's confound
+     * readout. The flat bar (0.025) was calibrated at 256 dims; the isotropic null of the
+     * production splitter scales with the width (random-direction cosine sd ~ 1/sqrt(d)),
+     * so the SAME bar is looser at 128 and tighter at 512. This measures that ratio at
+     * three node sizes so the sweep's build-level readouts (leaf count, Top-1) can be
+     * read against it; the site-level certification metric is self-calibrated per arm
+     * and does not need it.
+     */
+    @Test
+    fun `isoNullByDim - isotropic null p95 of the production splitter at 128, 256, 512 dims`() {
+        (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
+        val r = reps(300)
+        val sigma = 0.5
+        val saved = taxonomy.model.EmbeddingSlice.width
+        try {
+            for (dim in listOf(128, 256, 512)) {
+                sliceDimOverride = dim
+                sweep(
+                    "ISO-NULL sliceDim=$dim (sigma=$sigma), minClusterSize=55",
+                    listOf(130, 406, 900), r, 55
+                ) { n, rep -> singleModeCloud(n, dim, sigma, java.util.Random(1234L + n * 7919L + rep * 104729L + dim * 13L)) }
+            }
+        } finally {
+            sliceDimOverride = null
+            taxonomy.model.EmbeddingSlice.width = saved
+        }
+    }
+
     @Test
     fun `null separation as a function of node population - production splitter`() {
         (LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger).level = Level.WARN
@@ -451,6 +497,7 @@ class SeparationNullBySizeTest {
 
     private fun loadVectors(conn: java.sql.Connection, ids: Collection<String>): List<DoubleArray> {
         val out = mutableListOf<DoubleArray>()
+        val dim = taxonomy.model.dimForDepth(0)
         ids.chunked(400).forEach { chunk ->
             conn.prepareStatement(
                 "SELECT e.vector FROM queries q JOIN embeddings e ON e.query = q.distilled_text " +
@@ -462,8 +509,8 @@ class SeparationNullBySizeTest {
                     val bytes = rs.getBytes(1) ?: continue
                     val buf = java.nio.ByteBuffer.wrap(bytes)
                     val full = FloatArray(bytes.size / 4) { buf.getFloat() }
-                    if (full.size < 256) continue
-                    val v = DoubleArray(256) { full[it].toDouble() }
+                    if (full.size < dim) continue
+                    val v = DoubleArray(dim) { full[it].toDouble() }
                     var norm = 0.0
                     for (x in v) norm += x * x
                     norm = sqrt(norm)
@@ -1504,6 +1551,7 @@ class SeparationNullBySizeTest {
      *  against the site's own vectors without a second DB pass per child. */
     private fun loadVectorsById(conn: java.sql.Connection, ids: Collection<String>): Map<String, DoubleArray> {
         val out = LinkedHashMap<String, DoubleArray>()
+        val dim = taxonomy.model.dimForDepth(0)
         ids.chunked(400).forEach { chunk ->
             conn.prepareStatement(
                 "SELECT q.id, e.vector FROM queries q JOIN embeddings e ON e.query = q.distilled_text " +
@@ -1516,8 +1564,8 @@ class SeparationNullBySizeTest {
                     val bytes = rs.getBytes(2) ?: continue
                     val buf = java.nio.ByteBuffer.wrap(bytes)
                     val full = FloatArray(bytes.size / 4) { buf.getFloat() }
-                    if (full.size < 256) continue
-                    val v = DoubleArray(256) { full[it].toDouble() }
+                    if (full.size < dim) continue
+                    val v = DoubleArray(dim) { full[it].toDouble() }
                     var norm = 0.0
                     for (x in v) norm += x * x
                     norm = sqrt(norm)
@@ -1679,7 +1727,7 @@ class SeparationNullBySizeTest {
                         java.util.Locale.US, label.take(46), site.depth, m, site.childIds.size, obs, 2 * mcs))
                     continue
                 }
-                val dim = 256
+                val dim = taxonomy.model.dimForDepth(0)
                 val mu = DoubleArray(dim)
                 for (v in vectors) for (i in 0 until dim) mu[i] += v[i] / m
                 val centered = vectors.map { v -> DoubleArray(dim) { i -> v[i] - mu[i] } }
@@ -1769,8 +1817,11 @@ class SeparationNullBySizeTest {
         // ── CSV export ───────────────────────────────────────────────────────────
         fun esc(s: String) = "\"" + s.replace("\"", "\"\"") + "\""
         fun fmt(x: Double, p: String) = if (x.isNaN()) "" else p.format(java.util.Locale.US, x)
-        val outDir = java.io.File("docs/data").apply { mkdirs() }
-        java.io.File(outDir, "site_null_frozen.csv").printWriter().use { w ->
+        // -DoutCsv redirects a non-frozen build's table (D1 sweep) so the frozen artifact's
+        // registered P2 table is never overwritten by a sweep arm.
+        val outFile = java.io.File(System.getProperty("outCsv") ?: "docs/data/site_null_frozen.csv")
+        outFile.absoluteFile.parentFile?.mkdirs()
+        outFile.printWriter().use { w ->
             w.println("snapshot_id,node_id,label,depth,n,k,observed_sep," +
                 "site_null_p50,site_null_p95,q_site,site_reach_pct,site_accept_pct," +
                 "defl_dims,defl_null_p50,defl_null_p95,q_deflated,defl_reach_pct,defl_accept_pct," +
@@ -1787,7 +1838,7 @@ class SeparationNullBySizeTest {
             }
         }
         println()
-        println("wrote docs/data/site_null_frozen.csv  (${rows.size} sites)")
+        println("wrote ${outFile.path}  (${rows.size} sites; geometry sliceDim=${taxonomy.model.dimForDepth(0)} dropTop=$dropTopProp whiten=$whitenProp)")
 
         // ── Registered checks (FROZEN in docs/v2_validation_plan.md, P2) ─────────
         println()

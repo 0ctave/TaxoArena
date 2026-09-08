@@ -68,6 +68,10 @@ data class HeadlessCliConfig(
     val enableFinalMetrics: Boolean? = null,
     // JSON file mapping depth-1 anchor label -> per-anchor separation bar; null = global bar.
     val adaptiveBarFile: String? = null,
+    // D1 dimension sweep: MRL slice width and split-proposal PCA variants; null = code default.
+    val embeddingSliceDim: Int? = null,
+    val splitDropTopPcs: Int? = null,
+    val splitWhiten: Boolean? = null,
     val conditions: List<String> = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER"),
     val outputDir: String = "experiment",
     val testRatio: Double = 0.3,           // 70/30 split
@@ -188,6 +192,14 @@ class HeadlessBenchmarkRunner(
                 .mapValues { (_, v) -> (v as kotlinx.serialization.json.JsonPrimitive).content.toDouble() }
             log.info("[ADAPTIVE-BAR] loaded ${config.formalism.adaptiveBars.size} per-anchor bars from $f")
         }
+        cliConfig.embeddingSliceDim?.let { config.formalism.embeddingSliceDim = it }
+        cliConfig.splitDropTopPcs?.let { config.formalism.splitDropTopPcs = it }
+        cliConfig.splitWhiten?.let { config.formalism.splitWhiten = it }
+        // Must precede the first GraphNode/projection: every node's sliceDim and every
+        // cached projection read this width at construction time.
+        taxonomy.model.EmbeddingSlice.width = config.formalism.embeddingSliceDim
+        log.info("[SLICE] embedding slice width = ${config.formalism.embeddingSliceDim}, " +
+            "split PCA dropTop=${config.formalism.splitDropTopPcs} whiten=${config.formalism.splitWhiten}")
         cliConfig.enableFinalMetrics?.let { config.execution.enableFinalMetrics = it }
         cliConfig.acceptanceZ?.let { config.formalism.acceptanceZ = it }
         cliConfig.marginalEps?.let { config.formalism.marginalEps = it }
@@ -1405,6 +1417,9 @@ class HeadlessBenchmarkRunner(
         var tau: Double? = null
         var enableFinalMetrics: Boolean? = null
         var adaptiveBarFile: String? = null
+        var embeddingSliceDim: Int? = null
+        var splitDropTopPcs: Int? = null
+        var splitWhiten: Boolean? = null
         var conditions = listOf("MAIN", "ORACLE", "GENERIC_JUDGE", "RANDOM_SCHEDULER")
         var outputDir = "experiment"
         var testRatio = 0.3
@@ -1498,6 +1513,9 @@ class HeadlessBenchmarkRunner(
                 "tau" -> tau = rawVal.toDouble()
                 "enableFinalMetrics" -> enableFinalMetrics = rawVal.toBoolean()
                 "adaptiveBarFile" -> adaptiveBarFile = rawVal.trim('"', '\'')
+                "embeddingSliceDim" -> embeddingSliceDim = rawVal.toInt()
+                "splitDropTopPcs" -> splitDropTopPcs = rawVal.toInt()
+                "splitWhiten" -> splitWhiten = rawVal.toBoolean()
                 "conditions" -> conditions = parseStringList(rawVal)
                 "outputDir" -> outputDir = rawVal.trim('"', '\'')
                 "testRatio" -> testRatio = rawVal.toDouble()
@@ -1581,6 +1599,9 @@ class HeadlessBenchmarkRunner(
             tau = tau,
             enableFinalMetrics = enableFinalMetrics,
             adaptiveBarFile = adaptiveBarFile,
+            embeddingSliceDim = embeddingSliceDim,
+            splitDropTopPcs = splitDropTopPcs,
+            splitWhiten = splitWhiten,
             conditions = conditions,
             outputDir = outputDir,
             testRatio = testRatio,

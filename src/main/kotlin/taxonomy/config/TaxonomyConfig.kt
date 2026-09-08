@@ -168,6 +168,16 @@ class TaxonomyConfig {
         // See taxonomy.operations.barFor. Loaded from TOML adaptiveBarFile.
         var adaptiveBars: Map<String, Double> = emptyMap()
 
+        // ── Embedding geometry (D1 dimension sweep) ───────────────────────────
+        // MRL slice width every node, projection and statistic runs at. Applied to
+        // taxonomy.model.EmbeddingSlice.width at run start; 256 is the frozen value.
+        var embeddingSliceDim: Int = 256
+        // Split PROPOSAL only (StatisticsUtils.pcaProject): leading within-node principal
+        // components discarded before EM ("all-but-the-top"), and whether the kept
+        // components are variance-whitened. 0/false = the historical projection.
+        var splitDropTopPcs: Int = 0
+        var splitWhiten: Boolean = false
+
         // ── Routing ───────────────────────────────────────────────────────────
         // Final membership share: after the trickle walk, a query's memberships are
         // normalized over the leaves it actually reached, and a leaf counts as a genuine
@@ -316,6 +326,7 @@ class TaxonomyConfig {
         sb.append("│   - Max Depth:            ${formalism.maxDepth}\n")
         sb.append("│   - Min Cluster Size:     ${formalism.minClusterSize}\n")
         sb.append("│   - Separation Bar:       ${formalism.proposalSeparationBar}\n")
+        sb.append("│   - Slice Dim / PCA:      ${formalism.embeddingSliceDim} / dropTop=${formalism.splitDropTopPcs} whiten=${formalism.splitWhiten}\n")
         sb.append("│   - Lexicographic Tau:    ${formalism.tau}\n")
         sb.append("│   - Membership Floor:     ${formalism.membershipFloor}\n")
         sb.append("│   - Routing Beam Gamma:   ${formalism.routingBeamGamma}\n")
@@ -366,7 +377,10 @@ class TaxonomyConfig {
             enableGtWarmStart = formalism.enableGtWarmStart,
             fusionSimilarityThreshold = formalism.fusionSimilarityThreshold,
             effectiveSupportFloor = formalism.effectiveSupportFloor,
-            defaultKappaPrior = formalism.defaultKappaPrior
+            defaultKappaPrior = formalism.defaultKappaPrior,
+            embeddingSliceDim = formalism.embeddingSliceDim,
+            splitDropTopPcs = formalism.splitDropTopPcs,
+            splitWhiten = formalism.splitWhiten
         ),
         diagnostics = EffectiveConfig.Diagnostics(
             enableProfiling = diagnostics.enableProfiling
@@ -409,6 +423,9 @@ class TaxonomyConfig {
         formalism.fusionSimilarityThreshold = c.formalism.fusionSimilarityThreshold
         formalism.effectiveSupportFloor = c.formalism.effectiveSupportFloor
         formalism.defaultKappaPrior = c.formalism.defaultKappaPrior
+        formalism.embeddingSliceDim = c.formalism.embeddingSliceDim
+        formalism.splitDropTopPcs = c.formalism.splitDropTopPcs
+        formalism.splitWhiten = c.formalism.splitWhiten
 
         diagnostics.enableProfiling = c.diagnostics.enableProfiling
     }
