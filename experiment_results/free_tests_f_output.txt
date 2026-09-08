@@ -1,0 +1,42 @@
+
+== F1: leaf-over-anchor rubric gain, certified vs uncertified leaves ==
+  CERT-STRICT     n=  48 | leaf 0.792  anchor 0.750  gain +0.042 | discordant 2:0  McNemar p=0.500
+  CERT-IMMEDIATE  n=  20 | leaf 0.900  anchor 0.750  gain +0.150 | discordant 3:0  McNemar p=0.250
+  UNCERTIFIED     n= 899 | leaf 0.766  anchor 0.775  gain -0.009 | discordant 30:38  McNemar p=0.396
+  anchor-leaf     n=0
+  CERT-STRICT minus UNCERTIFIED gain: +0.051, question-bootstrap 95% [+0.001, +0.120] -> UNDERPOWERED (REGISTERED PRIMARY)
+  CERT-IMMEDIATE minus UNCERTIFIED gain: +0.159, question-bootstrap 95% [+0.009, +0.330] -> UNDERPOWERED (secondary)
+
+== F2: keyed capability profile — embedding cells vs MMLU-Pro categories (LOO Brier) ==
+  questions 7754 (train-side via text join 6734, reserved 1020) | models 46 | anchor != category on 1998 (25.8%)
+  -- ALL questions (n=7754): mean LOO Brier improvement over the marginal (x1000) --
+     category   +10.53
+     anchor     +10.67
+     stratum    +11.59
+     leaf       +13.68
+     anchor - category:   +0.14  95% [-0.53, +0.83] -> TIE (REGISTERED PRIMARY)
+     stratum - category:   +1.06  95% [+0.30, +1.81] -> WINS (secondary)
+     leaf - category:   +3.15  95% [+2.07, +4.20] -> WINS (secondary)
+  -- DISAGREEMENT subset (n=1998): mean LOO Brier improvement over the marginal (x1000) --
+     category    +3.02
+     anchor      +3.46
+     stratum     +3.86
+     leaf        +5.50
+     anchor - category:   +0.44  95% [-2.14, +2.89] -> TIE (REGISTERED PRIMARY)
+     stratum - category:   +0.84  95% [-1.77, +3.41] -> TIE (secondary)
+     leaf - category:   +2.48  95% [-0.55, +5.26] -> TIE (secondary)
+
+== F3: judge confidence calibration (R2 live, key-decidable, decisive) ==
+  n=12782 | accuracy 0.881 | mean confidence 0.909
+  bin        n    conf   acc
+  [0.60,0.65)     7  0.625  0.714
+  [0.65,0.70)    22  0.670  0.545
+  [0.70,0.75)   162  0.717  0.593
+  [0.75,0.80)   461  0.765  0.638
+  [0.80,0.85)  1676  0.826  0.727
+  [0.85,0.90)  1892  0.877  0.820
+  [0.90,0.95)  1597  0.919  0.877
+  [0.95,1.00)  6957  0.950  0.960
+  ECE 0.039 | AUC 0.752 [0.738, 0.764] -> REGISTERED: confidence INFORMATIVE
+  board raw                  rho 0.9510 | top-4 iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (violations 3)
+  board confidence-weighted  rho 0.9580 | top-4 iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (violations 3)
