@@ -2,12 +2,12 @@
 REASONING-class judge, byte-identical prompts (docs/judge_improvement_proposals.md, J1;
 criteria frozen at 7a4391a; launch parameters recorded there before the first call).
 
-Judge: deepseek-ai/DeepSeek-R1-0528 via the Hugging Face inference router (provider-routed;
-the provider and inference id are recorded per call). No reasoning model is deployed on the
-Foundry resource that serves Mistral-Large-3 / grok; the Gemini key is not API-registered.
-Family disclosure: deepseek-chat-v2_5 is a mid-tier CONTESTANT; no top-4 model is a
-DeepSeek model, so the registered primary (top-cluster key-decidable accuracy) is not
-self-preference-confounded; the full-board secondary is reported with that caveat.
+Judge: chosen per run. Default `--provider azure --model grok-4-1-fast-reasoning` — a
+Foundry deployment on the same resource that serves Mistral-Large-3 and the non-reasoning
+grok (xAI has no contestant in the roster: no family confound). Fallback `--provider hf
+--model deepseek-ai/DeepSeek-R1-0528` (Hugging Face router; validated on 3 matches before
+its credits ran out; family disclosure: deepseek-chat-v2_5 is a mid-tier CONTESTANT, but
+no top-4 model is DeepSeek, so the registered primary is not self-preference-confounded).
 
 Sample: rejudge_grok.sample_matches() — the same 1,980 matches R3 judged (seed 42,
 100 per top-cluster pair + the rest spread), so Mistral / grok / R1 are all paired.
@@ -28,21 +28,41 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 import rejudge_grok as rj
 
-JUDGE_MODEL = "deepseek-ai/DeepSeek-R1-0528"
+# Provider is chosen on the command line: --provider azure --model <Foundry deployment name>
+# (the resource that serves Mistral-Large-3 / grok; the key is resource-level) or
+# --provider hf --model deepseek-ai/DeepSeek-R1-0528 (Hugging Face router). Each judge
+# model gets its own cache DB so arms never mix.
+PROVIDER = "azure"
+JUDGE_MODEL = "grok-4-1-fast-reasoning"
 ROUTER = "https://router.huggingface.co/v1/chat/completions"
-CACHE_DB = os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_r1.db")
 MAX_TOKENS = 8192
 TOP4 = ["iask_pro", "gemini-3.1-pro_5-shots", "gpt-4o-2024-08-06", "arx_0314"]
 TOKEN = None
+AZURE_ENDPOINT = None
+AZURE_KEY = None
+
+
+def cache_path():
+    tag = re.sub(r"[^A-Za-z0-9]+", "_", JUDGE_MODEL.split("/")[-1]).strip("_").lower()
+    return os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_%s.db" % tag)
 
 
 def load_env():
-    global TOKEN
+    global TOKEN, AZURE_ENDPOINT, AZURE_KEY
+    kv = {}
     for line in open(os.path.join(ROOT, ".env"), encoding="utf-8"):
         line = line.strip().replace("\r", "")
-        if line.startswith("HUGGINGFACE_TOKEN="):
-            TOKEN = line.split("=", 1)[1]
-    assert TOKEN, "HUGGINGFACE_TOKEN missing from .env"
+        if "=" in line and not line.startswith("#"):
+            k, v = line.split("=", 1)
+            kv[k] = v
+    TOKEN = kv.get("HUGGINGFACE_TOKEN")
+    if "AZURE_AI_ENDPOINT" in kv:
+        AZURE_ENDPOINT = kv["AZURE_AI_ENDPOINT"].rstrip("/") + "/models/chat/completions?api-version=2024-05-01-preview"
+        AZURE_KEY = kv.get("AZURE_GROK_API_KEY") or kv.get("AZURE_AI_API_KEY")
+    if PROVIDER == "hf":
+        assert TOKEN, "HUGGINGFACE_TOKEN missing from .env"
+    else:
+        assert AZURE_ENDPOINT and AZURE_KEY, "AZURE_AI_ENDPOINT / AZURE_GROK_API_KEY missing from .env"
 
 
 THINK = re.compile(r"<think>.*?</think>", re.S)
