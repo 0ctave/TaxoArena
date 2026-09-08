@@ -103,6 +103,16 @@ geometry (raw-slice routing + min-pair gate), not the proposal, is the bottlenec
 which is the premise for a stage-2 representation-level whitening arm (pre-authorized
 "more complex dimension management", to be registered separately if reached).
 Readout: tools/analysis/dimsweep_report.py.
+SPLIT HYGIENE (added 2026-09-08 mid-sweep, no design change): each arm builds on its
+OWN seed split (splitSeed = seed), so ~69% of the frozen arena pool p2dca21ab5f4ef3ae
+sits on these trees' TRAIN side and every build ACTIVATES its own pool in the dataset
+DB. Consequences: (i) sweep trees are structural evidence only — any arm promoted to
+arena use must be rebuilt with splitSeed = 42 (the frozen split) and its rubrics induced
+in that run; (ii) after the chain, the frozen pool is re-pinned
+(`tools/analysis/pool_guard.py --activate`) before any judged run or is_reserved-based
+analysis. The metrics above are unaffected (site nulls use the build's own train
+population; Top-1 uses the build's own held-out split; ARI uses questions outside the
+frozen pool).
 
 ## OUTCOMES (updated as tests adjudicate)
 

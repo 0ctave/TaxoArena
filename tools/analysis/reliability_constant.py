@@ -20,6 +20,8 @@ import sqlite3, math, random
 from collections import defaultdict
 
 D = sqlite3.connect('mmlu_pro_dataset_cache_v2.db')
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from pool_guard import assert_frozen_pool; assert_frozen_pool(D)  # is_reserved mirrors the ACTIVE pool
 
 BAND11 = ['gemini-3.1-pro_5-shots', 'arx_0314', 'arx_3', 'claude-3-5-sonnet-20241022',
           'claude-3.5-sonnet', 'deepseek-chat-v2_5', 'claude-3-5-haiku-20241022',

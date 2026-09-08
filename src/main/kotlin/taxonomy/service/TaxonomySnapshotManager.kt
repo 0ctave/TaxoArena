@@ -257,7 +257,12 @@ class TaxonomySnapshotManager(
         encodeDefaults = true 
     }
     private var lastSyncedReservedQueriesJson: String? = null
-    
+
+    /** Content id of the reserved pool carried by the most recently loaded snapshot; the
+     *  benchmark path pins judging to it (HeadlessBenchmarkRunner [POOL-PIN]). */
+    @Volatile
+    var lastLoadedReservedPoolId: String? = null
+
     private val dbUrl = if (System.getProperty("java.class.path")?.contains("junit") == true ||
         System.getProperty("org.gradle.test.worker") != null
     ) {
@@ -729,31 +734,35 @@ class TaxonomySnapshotManager(
             val serializedGraphJson = graphStr ?: return null
             val graph = json.decodeFromString<SerializedGraph>(serializedGraphJson)
             
-            // Restore reserved_test_queries.json
-            // Restore reserved_test_queries.json
+            // Restore reserved_test_queries.json and PIN the active pool to the snapshot's own.
+            // Every construction run rewrites the JSON and activates its own split, so by the
+            // time a snapshot is judged the active pool is usually some other build's — whose
+            // train side overlaps this snapshot's held-out set (~70% by chance). The
+            // construction/arena split is the contamination guarantee of the whole method, so
+            // any failure to restore it is FATAL here; the former WARN-and-continue let a run
+            // proceed on whatever pool happened to be active.
             val reservedQueriesStrClean = reservedQueriesStr?.trim()
             if (!reservedQueriesStrClean.isNullOrEmpty()) {
-                if (reservedQueriesStrClean != lastSyncedReservedQueriesJson) {
-                    try {
-                        val reservedFile = File("reserved_test_queries.json")
-                        // Validate deserialization to make sure it's valid JSON map
-                        val reservedQueries = safeDecodeReservedIds(reservedQueriesStrClean)
-                        val prettyJson = Json { prettyPrint = true }
-                        reservedFile.writeText(prettyJson.encodeToString(reservedQueries))
-                        log.info("Successfully restored reserved_test_queries.json from snapshot $snapshotId with ${reservedQueries.size} domains.")
-                        try {
-                            evalLoader.syncReservedPool(reservedFile)
-                            lastSyncedReservedQueriesJson = reservedQueriesStrClean
-                            log.info("Re-synced is_reserved flags for snapshot $snapshotId")
-                        } catch (e: Exception) {
-                            log.warn("syncReservedPool failed after loading snapshot $snapshotId: ${e.message}")
-                        }
-                    } catch (e: Exception) {
-                        log.error("Failed to restore reserved_test_queries.json from snapshot $snapshotId", e)
-                    }
-                } else {
-                    log.info("Skipping redundant reserved pool sync for snapshot $snapshotId; already synced.")
+                val reservedQueries = safeDecodeReservedIds(reservedQueriesStrClean)
+                // Same sentinel filtering as ModelEvalLoader.syncReservedPool, so the ids agree.
+                val expectedPool = taxonomy.dataset.ReservedPool.computePoolId(
+                    reservedQueries.mapValues { (_, ids) -> ids.filter { it > 0 } }.filterValues { it.isNotEmpty() }
+                )
+                val alreadyActive = reservedQueriesStrClean == lastSyncedReservedQueriesJson &&
+                    evalLoader.activeReservedPoolId() == expectedPool
+                if (!alreadyActive) {
+                    val reservedFile = File("reserved_test_queries.json")
+                    reservedFile.writeText(Json { prettyPrint = true }.encodeToString(reservedQueries))
+                    log.info("Restored reserved_test_queries.json from snapshot $snapshotId (${reservedQueries.size} domains).")
+                    evalLoader.syncReservedPool(reservedFile)
+                    lastSyncedReservedQueriesJson = reservedQueriesStrClean
                 }
+                val active = evalLoader.activeReservedPoolId()
+                check(active == expectedPool) {
+                    "[POOL-PIN] snapshot $snapshotId carries reserved pool $expectedPool but the active pool is $active — refusing to load"
+                }
+                lastLoadedReservedPoolId = expectedPool
+                log.info("[POOL-PIN] snapshot $snapshotId -> reserved pool $expectedPool active${if (alreadyActive) " (already)" else ""}")
             } else {
                 // If there's no reserved_queries saved, delete the file so it falls back to splitting
                 val reservedFile = File("reserved_test_queries.json")
@@ -761,6 +770,7 @@ class TaxonomySnapshotManager(
                     reservedFile.delete()
                 }
                 lastSyncedReservedQueriesJson = null
+                lastLoadedReservedPoolId = null
                 log.warn("No reserved queries found in snapshot $snapshotId database entry. Cleaned up reserved_test_queries.json.")
             }
 

@@ -132,6 +132,9 @@ class ModelEvalLoader(
      * reserved_test_queries.json produced by MMLUDatasetFetcher.splitTrainTest().
      * Must be called once after initial loads — subsequent loads check the link table.
      */
+    /** Content id of the pool currently mirrored onto `eval_results.is_reserved`, or null. */
+    fun activeReservedPoolId(): String? = store.activeReservedPoolId()
+
     fun syncReservedPool(reservedQueriesJson: File = File(reservedFilePath)) {
         if (!reservedQueriesJson.exists()) {
             log.warn("reserved_test_queries.json not found — skipping reserved sync"); return

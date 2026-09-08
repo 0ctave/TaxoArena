@@ -43,6 +43,8 @@ def archive_model(path):
 
 
 con = sqlite3.connect(DB)
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from pool_guard import assert_frozen_pool; assert_frozen_pool(con)  # is_reserved mirrors the ACTIVE pool
 cur = con.cursor()
 
 # ---- pre-flight fingerprint of everything we must NOT change ----

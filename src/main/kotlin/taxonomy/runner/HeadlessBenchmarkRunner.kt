@@ -324,6 +324,16 @@ class HeadlessBenchmarkRunner(
                 )
                 log.info("Syncing database reserved pool...")
                 evalLoader.syncReservedPool()
+                taxonomy.diagnostics.DiagnosticsBundle.recordCorpus(
+                    seed = currentSeed, splitSeed = cliConfig.splitSeed,
+                    corpusSize = dataset.values.sumOf { it.size },
+                    trainSize = trainSet.values.sumOf { it.size },
+                    testSize = testSet.values.sumOf { it.size },
+                    domains = targetDomains.toList(),
+                    reservedPoolId = evalStore.activeReservedPoolId(),
+                    embeddingModel = config.llm.embeddingModel, judgeModel = config.llm.judgeModel
+                )
+                log.info("[POOL] this construction run owns reserved pool ${evalStore.activeReservedPoolId()} (seed=$effectiveSplitSeed); it is now the ACTIVE pool")
 
                 log.info("Running GMM splitting and trickle routing pipeline...")
                 root = taxonomyEngine.adaptTaxonomy(
@@ -366,6 +376,13 @@ class HeadlessBenchmarkRunner(
                 log.info("Loading pre-existing snapshot: $snapshotId")
                 root = snapshotManager.loadSnapshot(snapshotId)
                     ?: throw IllegalStateException("Could not load snapshot: $snapshotId")
+                taxonomy.diagnostics.DiagnosticsBundle.recordCorpus(
+                    seed = currentSeed, splitSeed = cliConfig.splitSeed,
+                    corpusSize = -1, trainSize = -1, testSize = -1,
+                    domains = targetDomains.toList(),
+                    reservedPoolId = snapshotManager.lastLoadedReservedPoolId,
+                    embeddingModel = config.llm.embeddingModel, judgeModel = config.llm.judgeModel
+                )
             }
 
             // Apply fallback judge prompts to all nodes in the loaded/generated tree to prevent runtime IllegalStateException
@@ -521,6 +538,21 @@ class HeadlessBenchmarkRunner(
                         maxQueryReuse = cliConfig.maxQueryReuse
                     )
 
+                    // [POOL-PIN] A judged run must score exactly the pool its snapshot was built
+                    // against. Construction runs own their split (just written and synced);
+                    // snapshot runs must still see the pool loadSnapshot pinned — any other
+                    // process (a sweep build in another JVM) can have re-activated a different
+                    // pool in the meantime, whose questions sit on this tree's TRAIN side.
+                    run {
+                        val active = evalStore.activeReservedPoolId()
+                        if (!cliConfig.runPipeline && request.reservedOnly) {
+                            val pinned = snapshotManager.lastLoadedReservedPoolId
+                            check(pinned != null && active == pinned) {
+                                "[POOL-PIN] refusing to judge $condition: snapshot pool=$pinned, active pool=$active"
+                            }
+                        }
+                        log.info("[POOL-PIN] judging $condition on reserved pool $active")
+                    }
                     val report = benchmarkService.runBenchmark(request)
                     reportsByCondition[condition] = report
                     val logicalComparisons = report.queryResults.size

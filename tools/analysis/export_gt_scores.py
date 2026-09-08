@@ -28,6 +28,8 @@ ROSTER = [
 ROSTER[4] = 'claude-3.5-sonnet'
 
 con = sqlite3.connect(DB)
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from pool_guard import assert_frozen_pool; assert_frozen_pool(con)  # is_reserved mirrors the ACTIVE pool
 rows = []
 for split, where in (('reserved', 'AND is_reserved=1'), ('full', '')):
     for m in ROSTER:

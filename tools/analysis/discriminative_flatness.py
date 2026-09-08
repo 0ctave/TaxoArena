@@ -21,6 +21,8 @@ ORIG8 = ['Llama-2-13b-hf', 'Llama-2-70b-hf', 'Meta-Llama-3_1-70B-Instruct',
          'deepseek-chat-v2_5', 'gpt-4o-2024-08-06']
 
 D = sqlite3.connect('mmlu_pro_dataset_cache_v2.db')
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from pool_guard import assert_frozen_pool; assert_frozen_pool(D)  # is_reserved mirrors the ACTIVE pool
 rec = defaultdict(dict); cat = {}
 for q, c, m, ic in D.execute(
         'select question_id,category,model_name,is_correct from eval_results where is_reserved=1'):

@@ -143,6 +143,8 @@ def _ranks(v):
 
 def main():
     db = sqlite3.connect(DB)
+    import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    from pool_guard import assert_frozen_pool; assert_frozen_pool(db)  # is_reserved mirrors the ACTIVE pool
     qs = ','.join('?' * len(ROSTER))
     rows = db.execute(
         f"""SELECT model_name, model_output, pred, gt_answer, options_json, is_correct
