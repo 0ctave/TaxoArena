@@ -52,15 +52,23 @@ def call_judge(system, user, retries=6):
     body = json.dumps({"model": JUDGE_MODEL, "max_tokens": MAX_TOKENS,
                        "messages": [{"role": "system", "content": system},
                                     {"role": "user", "content": user}]}).encode("utf-8")
+    if PROVIDER == "hf":
+        url, headers = ROUTER, {"Content-Type": "application/json", "Authorization": "Bearer " + TOKEN}
+    else:
+        url, headers = AZURE_ENDPOINT, {"Content-Type": "application/json", "api-key": AZURE_KEY}
     for attempt in range(retries):
-        req = urllib.request.Request(ROUTER, data=body, method="POST", headers={
-            "Content-Type": "application/json", "Authorization": "Bearer " + TOKEN})
+        req = urllib.request.Request(url, data=body, method="POST", headers=headers)
         t0 = time.time()
         try:
             with urllib.request.urlopen(req, timeout=600) as r:
-                provider = r.headers.get("x-inference-provider", "")
+                provider = r.headers.get("x-inference-provider", "") if PROVIDER == "hf" else "azure:" + ""
                 payload = json.loads(r.read().decode("utf-8"))
-            content = payload["choices"][0]["message"].get("content") or ""
+            if PROVIDER != "hf":
+                provider = "azure:" + str(payload.get("model", JUDGE_MODEL))
+            msg = payload["choices"][0]["message"]
+            # Some reasoning deployments return the final answer in content and the chain
+            # in reasoning_content; others inline <think>. Either way only content is parsed.
+            content = msg.get("content") or ""
             usage = payload.get("usage") or {}
             return content, provider, usage.get("completion_tokens"), time.time() - t0
         except urllib.error.HTTPError as e:
@@ -79,7 +87,7 @@ def strip_think(text):
 
 
 def open_cache():
-    con = sqlite3.connect(CACHE_DB)
+    con = sqlite3.connect(cache_path())
     con.execute("""CREATE TABLE IF NOT EXISTS verdicts (
         match_id INTEGER PRIMARY KEY, model_a TEXT, model_b TEXT, node_id TEXT, qid INTEGER,
         mistral_winner TEXT,
@@ -225,7 +233,15 @@ if __name__ == "__main__":
     ap.add_argument("--pilot", type=int, default=None)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--analyze", action="store_true")
+    ap.add_argument("--provider", choices=["azure", "hf"], default="azure")
+    ap.add_argument("--model", default=None)
     a = ap.parse_args()
+    PROVIDER = a.provider
+    if a.model:
+        JUDGE_MODEL = a.model
+    elif PROVIDER == "hf":
+        JUDGE_MODEL = "deepseek-ai/DeepSeek-R1-0528"
+    print("judge=%s provider=%s cache=%s" % (JUDGE_MODEL, PROVIDER, os.path.basename(cache_path())), flush=True)
     if a.analyze:
         analyze()
     else:
