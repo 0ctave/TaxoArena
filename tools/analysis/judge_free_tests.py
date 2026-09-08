@@ -258,3 +258,69 @@ def j4_top4():
 
 if __name__ == "__main__" and "--top4" in sys.argv:
     j4_top4()
+
+
+# ── J4b (registered in docs/judge_improvement_proposals.md, commit e840c8f, BEFORE this ran) ──
+def lc_bt_tiered(rows, L, acc, models, cut=0.10):
+    idx = {m: i for i, m in enumerate(models)}
+    k = len(models) - 1
+    X, Y, W = [], [], []
+    for r in rows:
+        la, lb = L.get((r["q"], r["a"])), L.get((r["q"], r["b"]))
+        if la is None or lb is None:
+            continue
+        x = np.zeros(k + 2)
+        if idx[r["a"]] < k: x[idx[r["a"]]] += 1
+        if idx[r["b"]] < k: x[idx[r["b"]]] -= 1
+        narrow = abs(acc[r["a"]] - acc[r["b"]]) < cut
+        x[k if narrow else k + 1] = (la - lb) / 1000.0
+        if r["w"] == "TIE":
+            X += [x, x]; Y += [1.0, 0.0]; W += [0.5, 0.5]
+        else:
+            X.append(x); Y.append(1.0 if r["w"] == r["a"] else 0.0); W.append(1.0)
+    X, Y, W = np.array(X), np.array(Y), np.array(W)
+    beta = np.zeros(k + 2)
+    for _ in range(80):
+        p = 1 / (1 + np.exp(-np.clip(X @ beta, -30, 30)))
+        g = X.T @ (W * (Y - p))
+        H = (X * (W * p * (1 - p))[:, None]).T @ X + 1e-9 * np.eye(k + 2)
+        step = np.linalg.solve(H, g)
+        beta += step
+        if np.max(np.abs(step)) < 1e-9:
+            break
+    cov = np.linalg.inv(H)
+    theta = {m: (beta[idx[m]] if idx[m] < k else 0.0) for m in models}
+    return theta, (beta[k], math.sqrt(cov[k, k])), (beta[k + 1], math.sqrt(cov[k + 1, k + 1]))
+
+
+def pair_violations_all(theta, acc, models):
+    ms = sorted(models, key=lambda m: -acc[m])
+    return sum(1 for i in range(len(ms)) for j in range(i + 1, len(ms)) if theta[ms[i]] < theta[ms[j]])
+
+
+def j4b():
+    r2, x12 = load_live(R2), load_live(X12)
+    models = sorted({m for r in r2 for m in (r["a"], r["b"])})
+    acc, L = gt_and_lengths(set(models))
+    gt_order = sorted(TOP4, key=lambda m: -acc[m])
+    print("\n== J4b (registered e840c8f): LC-BT with beta_len x GT-gap tier (<0.10 narrow / >=0.10 wide) ==")
+    prim = []
+    for tag, rows in (("R2", r2), ("x12", x12)):
+        ms = sorted({m for r in rows for m in (r["a"], r["b"])})
+        raw = board_from(current_votes(rows), ms)
+        theta, (bn, sn), (bw, sw) = lc_bt_tiered(rows, L, acc, ms)
+        vr, vl = pair_violations_all(raw, acc, ms), pair_violations_all(theta, acc, ms)
+        oR, pR, _ = violations(raw, gt_order)
+        oL, pL, _ = violations(theta, gt_order)
+        n_narrow = sum(abs(acc[r["a"]] - acc[r["b"]]) < 0.10 for r in rows)
+        print("  %s: beta_narrow %+.3f/1k (z=%+.1f, n=%d) | beta_wide %+.3f/1k (z=%+.1f) | ratio %.1fx"
+              % (tag, bn, bn / sn, n_narrow, bw, bw / sw, bn / bw if bw else float("inf")))
+        print("      12-model board pairwise violations vs GT: raw %d -> tiered-LC %d (of %d pairs) | rho %.4f -> %.4f"
+              % (vr, vl, len(ms) * (len(ms) - 1) // 2, rho(raw, acc, ms), rho(theta, acc, ms)))
+        print("      top-4: raw %s (viol %d) | tiered-LC %s (viol %d)" % (" > ".join(oR), pR, " > ".join(oL), pL))
+        prim.append(vl < vr)
+    print("  REGISTERED J4b PRIMARY (violations strictly below raw on BOTH): %s" % ("PASS" if all(prim) else "FAIL"))
+
+
+if __name__ == "__main__" and "--j4b" in sys.argv:
+    j4b()

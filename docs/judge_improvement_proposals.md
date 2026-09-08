@@ -187,6 +187,26 @@ verdict rate there IS the bias signature. Extends tools/analysis/bias_audit.py.
   order becomes gemini > iask > arx > gpt-4o (the remaining iask/arx swap is a 1.7pp
   GT gap the pool cannot resolve at SE 0.15).
 
+- **J4b (2026-09-08, registered e840c8f, run immediately after): PRIMARY PASS, secondary
+  half.** beta_narrow (GT gap < 0.10) = +0.447/1k (z = 13.7, n = 10,503) vs beta_wide =
+  -0.036 (z = -2.2) on R2; +0.279 (z = 5.3) vs +0.046 (z = 1.2) on x12 — the predicted
+  > 5x ratio holds. 12-model board pairwise violations vs GT: R2 5 -> 4, x12 4 -> 3
+  (rho 0.951 -> 0.958, 0.965 -> 0.979). Secondary: x12's top-4 becomes
+  gemini > iask > arx > gpt-4o (one adjacent swap from GT — met); R2's top-4 is
+  unchanged (iask > gemini > gpt-4o > arx — NOT met, prediction wrong there). Why the
+  tier proxy is insufficient: gemini-vs-gpt-4o has a GT gap of 0.163 and lands in the
+  "wide" tier where the coefficient is ~0, yet it is exactly the verbose-vs-terse pair
+  the within-cluster fit (beta 1.32) says length dominates. Gap tier is a proxy for
+  "correctness does not separate the pair"; the key labels that per MATCH.
+  REGISTERED J4c (frozen here before running; the LAST free variant — further variants
+  need judge calls, not more refits): LC-BT with beta_len interacted with the match's
+  key status — NON-DISCRIMINATIVE (both correct or both wrong) vs DECIDABLE. Primary =
+  12-model pairwise violations vs GT strictly below raw on BOTH datasets (same as J4b);
+  secondary = R2 top-4 within one adjacent swap of GT. Prediction: beta_nondisc >>
+  beta_decidable (the 2606.09409 "bias lives in non-discriminative pairs" claim), and
+  the R2 top-4 puts gemini first. If the secondary still fails, the top-cluster
+  divergence has a component that is not length, and J1 (judge strength) is the test.
+
 ## Recommended order
 J5 and J4 first (free, both refits, and they may already explain most of the
 top-cluster divergence). Then J1 (settles ceiling vs preference). Then J3 as prompt
