@@ -76,12 +76,12 @@
     <tr><td class="id">H6b</td><td>Is question support sufficient? ("enough queries")</td><td>query-level vs match-level bootstrap, 20 strata</td><td><span class="chip warn">DEFF FOUND</span></td><td class="nums">design effect median 2.0×, worst 3.7×; rule q ≥ k/S² (~120–190 for SE 0.15); scheduler reuse cap shipped</td><td class="ev">memory + ee56c74</td></tr>
   </table></div>
 
-  <h2>Running now</h2>
+  <h2>Running now (and the registered runs that completed since v5)</h2>
   <div class="tablewrap"><table>
     <tr><th>id</th><th>question</th><th>condition / design</th><th>type</th><th>status</th><th>evidence</th></tr>
     <tr><td class="id">H7</td><td>Placebo control: does rubric SPECIFICITY matter, and does a length clause cut the bias?</td><td>3 Mistral arms, 4,200 matches, 0 invalid</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">PRIMARY CONFIRMED · SECONDARY NULL</span></td><td class="ev nums">cell 77.0% vs random 74.9%, McNemar p=0.006; cell ≥ sibling ≥ random holds; length clause: β_len unchanged (+0.278→+0.285) — verbosity bias is not promptable-away · fd4d776</td></tr>
     <tr><td class="id">H9-1</td><td>Construction variance floor: seed sensitivity at the frozen config</td><td>4 rebuilds, seeds {137, 2048, 7, 31337}, all certified fixed points</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip ok">α + β PASS</span></td><td class="ev nums">Top-1 spread 1.6pp (&lt;2.5); anchor drift ≤0.42pp (&lt;5) while leaves span 72–87 and μ-match 71–85% · h9_stability.py · 394786a</td></tr>
-    <tr><td class="id">E2</td><td>Held-out routing fit: tree vs bridged vs placebo edges</td><td>K=8 bridges on E1 pairs vs 8 placebo edges; harness being built in a worktree (agent); adjudicating run gets its own registration</td><td><span class="chip plan">HARNESS BUILD</span></td><td><span class="chip run">RUNNING</span></td><td class="ev">worktree agent</td></tr>
+    <tr><td class="id">J1</td><td>Judge-strength ceiling: does a reasoning-class judge fix the frontier top cluster?</td><td>grok-4-1-fast-reasoning (Foundry), R3's 1,980 matches, byte-identical prompts, 3,936 calls, 16 workers; launched 2026-09-08 ~12:05</td><td><span class="chip ok">REGISTERED</span></td><td><span class="chip run">RUNNING</span></td><td class="ev">rejudge_reasoning.py · 601f1ab</td></tr>
   </table></div>
 
   <h2>Tree-vs-DAG program</h2>
