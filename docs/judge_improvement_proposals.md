@@ -143,6 +143,50 @@ insertion, sentiment) on 300 matched pairs; and a NON-DISCRIMINATIVE-pair audit 
 both-correct pairs (8,264 in R2) are where the verdict cannot be right or wrong, so the
 verdict rate there IS the bias signature. Extends tools/analysis/bias_audit.py.
 
+## OUTCOMES
+
+- **J5 (2026-09-08, harness 3254c96, output experiment_results/judge_free_tests_output.txt):
+  PASS on the letter, NULL in substance.** On R2 (27,657 live verdicts) the order-aggregated
+  board is IDENTICAL to the forced-tie board: rho 0.9510 both, same top-4 order, same 3
+  pairwise violations; paired bootstrap of the rho difference [+0.000, +0.007]. x12
+  (secondary) moves within noise (-0.001, CI straddles 0). Reason, obvious in hindsight:
+  under BT with ties scored 1/2, a position flip (one order A, the other B) contributes
+  exactly 1/2 either way, so the two rules coincide except on the ~4% of matches where
+  one order emitted a tie. The literature effect (3-13pp) is about single-verdict
+  accuracy, not about the aggregated board; J5's expected value was mis-ranked and is
+  withdrawn as a board correction. Descriptives that DO stand: position inconsistency is
+  19-28% for GT gaps < 0.20 and 7% for larger gaps (tracks the quality gap, as
+  2406.07791 predicts); pooled over both orders the first-shown answer wins 44.9% of
+  decisive single-order votes (n = 52,919) — a 5pp preference for the SECOND position,
+  already neutralised by the dual-order protocol. The raw WinAFirst skew is the
+  scheduler: ModelA is the GT-weaker model in 66.5% of R2 matches.
+- **J4 (same run): registered letter PASS but non-discriminating; the informative
+  result is post-hoc and labelled so.** Global LC-BT: beta_len = +0.082/1k (z = 6.0) on
+  R2, +0.135 (z = 4.4) on x12; the R2 top-4 board is UNCHANGED by the covariate
+  (iask > gemini > gpt-4o > arx, 3 violations — the raw board also has <= 1 ADJACENT
+  violation, so the registered clause cannot separate them; adjacent-violation count
+  was the wrong metric and pairwise violations are reported alongside). x12's LC board
+  does move to gemini > iask > arx > gpt-4o (1 violation, rho 0.965 -> 0.979). The
+  matching-threshold sweep: 100/200/300 chars give gemini > iask > arx > gpt-4o on both
+  datasets; 500/800 revert R2 to iask first — 300 was not special, but the matched order
+  is stable below it. EXPLORATORY (post-hoc, `--top4`): fitting LC-BT on top-4 matches
+  only gives beta_len = +1.32/1k (z = 26.4, n = 6,094) on R2 and +0.88 (z = 9.7) on x12 —
+  16x and 6x the global coefficient — and the within-cluster LC board is
+  gemini > iask > arx > gpt-4o on BOTH datasets (1 violation each), reproducing the
+  length-matched refit without discarding data. Mean answer lengths on those matches:
+  gemini 861 / arx 881 chars (under-rated) vs iask 1,301 / gpt-4o 1,519 (over-rated).
+  Interpretation: the length effect is HETEROGENEOUS — negligible where correctness
+  separates the pair, dominant where it saturates. A single global length covariate
+  cannot correct the board; the LC design that can is one whose length coefficient
+  varies with the pair's quality gap (or with both-correct status).
+  REGISTERED FOLLOW-UP (J4b, to be frozen before running): LC-BT with beta_len
+  interacted with the GT-gap tier (< 0.10 / >= 0.10), primary = pairwise violations of
+  the 12-model board vs GT strictly below the raw board's on BOTH datasets, secondary =
+  top-4 order gemini > arx > iask > gpt-4o or one adjacent swap. Prediction: the
+  interaction coefficient for the narrow tier is > 5x the wide tier's, and the top-4
+  order becomes gemini > iask > arx > gpt-4o (the remaining iask/arx swap is a 1.7pp
+  GT gap the pool cannot resolve at SE 0.15).
+
 ## Recommended order
 J5 and J4 first (free, both refits, and they may already explain most of the
 top-cluster divergence). Then J1 (settles ceiling vs preference). Then J3 as prompt

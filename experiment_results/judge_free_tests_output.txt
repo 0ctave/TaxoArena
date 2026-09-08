@@ -1,0 +1,63 @@
+ground truth (key accuracy on the frozen pool, 12 models): gemini-3.1-pro_5-shots 0.913, arx_0314 0.834, iask_pro 0.817, gpt-4o-2024-08-06 0.750, deepseek-chat-v2_5 0.657, Meta-Llama-3_1-70B-Instruct 0.630, Qwen1.5-72B-Chat 0.474, Meta-Llama-3_1-8B 0.371, c4ai-command-r-v01 0.363, Yi-6b-Chat 0.271, Llama-2-13b-hf 0.235, Llama-2-7b-hf 0.178
+
+== J5 [R2]: order-aggregated BT vs forced-tie rule (n=27657 live verdicts) ==
+  GT top-4 (key accuracy on frozen pool): gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06
+  A current rule : rho=0.9510 | top-4 iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 | pair viol 3 adj 1
+  B order-agg    : rho=0.9510 | top-4 iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 | pair viol 3 adj 1
+  paired bootstrap rho(B)-rho(A): mean +0.0001, 95% [+0.0000, +0.0070]
+  REGISTERED J5 -> PASS (rho equal, pair violations 3 -> 3)
+  position: P(first-shown wins | decisive) order1 0.242 (n=26421), order2 0.656 (n=26498); pooled 0.449
+  scheduler: ModelA is the GT-weaker model in 66.5% of matches (explains raw WinAFirst skew)
+  flip rate by |GT accuracy gap|:
+    [0.00,0.02) n= 1533 flip 0.282  emitted-tie 0.026
+    [0.02,0.05) n= 1241 flip 0.221  emitted-tie 0.017
+    [0.05,0.10) n= 7729 flip 0.285  emitted-tie 0.040
+    [0.10,0.20) n= 7594 flip 0.194  emitted-tie 0.020
+    [0.20,1.00) n= 9560 flip 0.070  emitted-tie 0.003
+
+== J5 [x12]: order-aggregated BT vs forced-tie rule (n=3184 live verdicts) ==
+  GT top-4 (key accuracy on frozen pool): gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06
+  A current rule : rho=0.9650 | top-4 iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 | pair viol 2 adj 1
+  B order-agg    : rho=0.9580 | top-4 iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 | pair viol 2 adj 1
+  paired bootstrap rho(B)-rho(A): mean -0.0013, 95% [-0.0140, +0.0070]
+  REGISTERED J5 -> FAIL (rho DOWN, pair violations 2 -> 2)
+  position: P(first-shown wins | decisive) order1 0.329 (n=3098), order2 0.523 (n=3109); pooled 0.426
+  scheduler: ModelA is the GT-weaker model in 52.0% of matches (explains raw WinAFirst skew)
+  flip rate by |GT accuracy gap|:
+    [0.00,0.02) n=  218 flip 0.206  emitted-tie 0.041
+    [0.02,0.05) n=  187 flip 0.214  emitted-tie 0.016
+    [0.05,0.10) n= 1063 flip 0.261  emitted-tie 0.021
+    [0.10,0.20) n= 1102 flip 0.198  emitted-tie 0.005
+    [0.20,1.00) n=  614 flip 0.117  emitted-tie 0.003
+
+== J4 [R2]: length-covariate BT (n=27657 live verdicts) ==
+  GT top-4: gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06
+  raw BT : rho=0.9510 | top-4 iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 | pair viol 3 adj 1
+  LC-BT  : rho=0.9510 | top-4 iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 | pair viol 3 adj 1 | beta_len +0.0824/1k (z=+6.0, n=33264)
+  -- length-matched top-4 refit, threshold sweep (descriptive) --
+    |dlen|<= 100 n=  912  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 200 n= 1703  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 300 n= 2362  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 500 n= 3370  iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06  (pair viol 2 adj 1)
+    |dlen|<= 800 n= 4346  iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06  (pair viol 2 adj 1)
+
+== J4 [x12]: length-covariate BT (n=3184 live verdicts) ==
+  GT top-4: gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06
+  raw BT : rho=0.9650 | top-4 iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 | pair viol 2 adj 1
+  LC-BT  : rho=0.9790 | top-4 gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 | pair viol 1 adj 1 | beta_len +0.1350/1k (z=+4.4, n=3878)
+  -- length-matched top-4 refit, threshold sweep (descriptive) --
+    |dlen|<= 100 n=  150  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 200 n=  270  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 300 n=  389  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 500 n=  579  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+    |dlen|<= 800 n=  776  gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06  (pair viol 1 adj 1)
+
+SUMMARY
+  J5 registered (R2, primary dataset): PASS | x12 (secondary): FAIL
+  J4 registered (<=1 adjacent violation in BOTH): PASS | beta_len identified in both: yes
+
+== EXPLORATORY: LC-BT fitted on top-4 matches only (beta identified within the cluster) ==
+  R2 top-4 matches n=6094 | raw iask_pro > gemini-3.1-pro_5-shots > gpt-4o-2024-08-06 > arx_0314 (viol 3) | LC gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (viol 1) | beta_len +1.321/1k z=+26.4
+      mean answer length (chars): gemini 861, arx_0314 881, iask_pro 1301, gpt 1519
+  x12 top-4 matches n=1165 | raw iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 (viol 2) | LC gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (viol 1) | beta_len +0.883/1k z=+9.7
+      mean answer length (chars): gemini 905, arx_0314 896, iask_pro 1361, gpt 1622

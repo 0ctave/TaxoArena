@@ -233,3 +233,28 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ── exploratory (post-hoc, labelled): LC-BT on the top-4 subset only ─────────────
+def j4_top4():
+    r2, x12 = load_live(R2), load_live(X12)
+    models = sorted({m for r in r2 for m in (r["a"], r["b"])})
+    acc, L = gt_and_lengths(set(models))
+    gt_order = sorted(TOP4, key=lambda m: -acc[m])
+    print("\n== EXPLORATORY: LC-BT fitted on top-4 matches only (beta identified within the cluster) ==")
+    for tag, rows in (("R2", r2), ("x12", x12)):
+        sub = [r for r in rows if r["a"] in TOP4 and r["b"] in TOP4]
+        raw = board_from(current_votes(sub), TOP4)
+        theta, bl, se, n = lc_bt(sub, L, TOP4)
+        oR, pR, _ = violations(raw, gt_order)
+        oL, pL, _ = violations(theta, gt_order)
+        both = [r for r in sub if r["w"] != "TIE"]
+        print("  %s top-4 matches n=%d | raw %s (viol %d) | LC %s (viol %d) | beta_len %+.3f/1k z=%+.1f"
+              % (tag, len(sub), " > ".join(oR), pR, " > ".join(oL), pL, bl, bl / se))
+        # mean length per model on this subset's questions
+        ml = {m: np.mean([L[(r["q"], m)] for r in sub if (r["q"], m) in L and m in (r["a"], r["b"])]) for m in TOP4}
+        print("      mean answer length (chars): " + ", ".join("%s %.0f" % (m.split("-")[0], ml[m]) for m in gt_order))
+
+
+if __name__ == "__main__" and "--top4" in sys.argv:
+    j4_top4()
