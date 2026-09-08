@@ -49,7 +49,7 @@
 <div class="wrap">
   <h1>TaxoArena Test Ledger</h1>
   <p class="lede">Every experiment of the publication campaign: its condition, registration, status, and result, with the evidence pointer (commit or artifact in the repo). Updated as results land.</p>
-  <p class="meta">v6 · 2026-09-08 · legend: REGISTERED = criteria frozen &amp; committed before launch · EXPLORATORY = post-hoc, disclosed, adjudicates nothing</p>
+  <p class="meta">v7 · 2026-09-08 · legend: REGISTERED = criteria frozen &amp; committed before launch · EXPLORATORY = post-hoc, disclosed, adjudicates nothing</p>
 
   <h2>Core campaign — completed</h2>
   <div class="tablewrap"><table>
@@ -105,6 +105,19 @@
     <tr><td class="id">LADDER</td><td>Rubric value vs granularity: generic ≤ anchor ≤ stratum ≤ leaf?</td><td><span class="chip null">PRIMARY FAILS — NOT MONOTONE</span></td><td class="nums">generic 0.761 &lt; anchor 0.774 &gt; stratum 0.757 &lt; leaf 0.770 (n=967); leaf vs anchor 35:38, p=0.68 — the knee sits AT OR BEFORE anchor granularity; domain-correct content is the value, wrong specificity the harm; session confound disclosed</td><td class="ev">rubric_ladder_outcome.txt · 306f5fa</td></tr>
     <tr><td class="id">P3</td><td>Functional twig gate (twig rubric beats parent's)</td><td><span class="chip null">PREMISE LOST</span></td><td class="nums">the ladder shows finer-than-anchor rubric text adds ~nothing — the gate as designed has no value to detect; superseded by an optional same-session leaf re-judge (~4k calls)</td><td class="ev">ladder outcome · v2_validation_plan.md</td></tr>
     <tr><td class="id">P5</td><td>Support-derived strata floors (≥240 reserved)</td><td><span class="chip plan">QUEUED</span></td><td class="nums">registered rider on the next profile run</td><td class="ev">v2_validation_plan.md</td></tr>
+    <tr><td class="id">D1</td><td>Slice width (128/256/512) and within-node anisotropy (all-but-the-top, whitening) → certifiable granularity?</td><td><span class="chip warn">1 of 4 IMPROVES</span></td><td class="nums">d512 IMPROVES (13 vs 7–9 certified, trunk 7/7, Top-1 up; prediction wrong; flat bar is 6.2× the 512 noise floor vs 3.6× at 256 — bar-equalized rerun is stage 2) · d128 loses (95 leaves, 3–5 certified, ARI 0.58) · abt2 certifies 63–72% of sites incl. Philosophy depth-1 in both seeds but misses the ARI clause by 0.001 → NO IMPROVEMENT as registered · white collapses (5/3 accepted splits) — the acceptance geometry, not the proposal, binds</td><td class="ev">dimsweep/ · 523b85d/311cc61</td></tr>
+  </table></div>
+
+  <h2>Judge program (J-series, 2026-09-08) — <span class="meta">docs/judge_improvement_proposals.md</span></h2>
+  <div class="tablewrap"><table>
+    <tr><th>id</th><th>question</th><th>status</th><th>result</th><th>evidence</th></tr>
+    <tr><td class="id">POOL-PIN</td><td>Can a judged run inherit a construction build's split?</td><td><span class="chip ok">CLOSED</span></td><td class="nums">every campaign run logged the frozen pool p2dca21ab5f4ef3ae (clean); restore is now FATAL on mismatch, benchmark pinned, manifest records the pool id, Python analyses assert it; verified from a mismatched state</td><td class="ev">pool_guard.py · 368b6b5</td></tr>
+    <tr><td class="id">J5</td><td>Order-aggregated BT instead of forced ties?</td><td><span class="chip null">NULL</span></td><td class="nums">R2 board IDENTICAL (ρ 0.951, same top-4) — a flip contributes ½ under either rule; position: second-shown wins 55.1% of single-order votes (n=52,919), inconsistency 19–28% at gaps &lt;0.20 vs 7% above</td><td class="ev">judge_free_tests.py · e840c8f</td></tr>
+    <tr><td class="id">J4</td><td>Global length-covariate board recovers the top cluster?</td><td><span class="chip null">NO (letter passes, non-discriminating)</span></td><td class="nums">β=+0.08/1k globally; R2 top-4 unchanged (3/6 pairs inverted); post-hoc: top-4-only β=+1.32/1k (z=26), within-cluster board 1 swap from GT — length regime is cluster-specific</td><td class="ev">judge_free_tests.py · e840c8f</td></tr>
+    <tr><td class="id">J4b/c</td><td>Tiered length coefficient (GT-gap tier / key status)?</td><td><span class="chip warn">J4b PRIMARY PASS · J4c FAIL</span></td><td class="nums">gap-tier: 12-model violations 5→4 and 4→3, narrow β 12× wide, R2 top-4 unchanged; key-status: β_nondisc 5.7× β_decidable but board unchanged (+0.16 ≪ +1.32) — free-refit line CLOSED; fixes are design-level (J3, J1)</td><td class="ev">judge_free_tests.py · d024f0f/2252461</td></tr>
+    <tr><td class="id">J1</td><td>Is the frontier divergence a judge-capability ceiling?</td><td><span class="chip plan">BLOCKED (billing)</span></td><td class="nums">harness validated on 3 matches (DeepSeek-R1-0528 via HF router, byte-identical prompts); HF credits exhausted (402). Needs either a grok-4-1-fast-reasoning Foundry deployment (cleanest, no family overlap) or ~$25 HF credit; 3,960 calls, resumes from cache</td><td class="ev">rejudge_reasoning.py · 6163e6a</td></tr>
+    <tr><td class="id">J3</td><td>Prompt v2: correctness-first tie policy (drop elaboration criteria), comment removed</td><td><span class="chip plan">DESIGNED</span></td><td class="nums">~2k calls; target β_len(top-4) 1.32 → lower; guard: key-decidable accuracy −0.5pp max</td><td class="ev">judge_improvement_proposals.md</td></tr>
+    <tr><td class="id">J2 / J6</td><td>Independent synthetic reference · contrastive/frontier-induced rubrics</td><td><span class="chip plan">DESIGNED</span></td><td class="nums">~7.6k / ~4k calls; both respect the construction/arena split</td><td class="ev">judge_improvement_proposals.md</td></tr>
   </table></div>
 
   <h2>Queued</h2>
