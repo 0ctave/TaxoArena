@@ -173,6 +173,43 @@ frozen pool).
   per-site diagnostic (q's in the CSV), not as the CS-vs-Philosophy discriminator;
   dip-test / mixture-BIC variants are unregistered future work.
 
+- D1 (2026-09-08, registered 523b85d; gate PASSED — d256_s137 hash-identical to
+  p7_det_1; tables experiment_results/dimsweep/site_null_<arm>_s<seed>.csv, report.txt,
+  iso_null_by_dim.out; frozen pool re-pinned after the chain):
+  **d512 IMPROVES (prediction "changes little" WRONG); d128, abt2, white NO IMPROVEMENT.**
+
+  | arm | leaves | certified sites | trunk anchors | Top-1 | cross-seed ARI |
+  |---|---|---|---|---|---|
+  | d256 (base) | 84 / 83 | 7/60, 9/65 | 5, 7 | 0.737, 0.749 | 0.678 |
+  | d128 | 95 / 94 | 5/75, 3/76 | 2, 2 | 0.719, 0.729 | 0.580 |
+  | d512 | 75 / 84 | 13/54, 13/57 | 7, 7 | 0.747, 0.771 | 0.679 |
+  | abt2 | 63 / 61 | 17/27, 18/25 | 15, 18 | 0.731, 0.755 | 0.657 |
+  | white | 20 / 17 | 2/5, 1/3 | 2, 1 | 0.734, 0.744 | 0.756 |
+
+  d128: more leaves, fewer certified, trunk collapses to Engineering+Math, Top-1 -2pp,
+  ARI -0.10 — fewer dimensions manufacture noise splits (the MRL tail carries signal).
+  d512: fewer splits, twice the certified count, trunk 7/7 (Law and Physics join),
+  Top-1 up, ARI unchanged — passes all three clauses. Confound (registered): isotropic
+  p95 at n=406 is 0.0115 / 0.0069 / 0.0040 at 128 / 256 / 512 dims, so the flat bar is
+  2.2x / 3.6x / 6.2x the noise floor — 512 runs a stricter effective bar, which prunes
+  but cannot by itself ADD certified sites (13 vs 7-9). A bar-equalized 512 arm
+  (bar ~0.0145) is the stage-2 test that separates width from bar.
+  abt2 (top-2 within-node PCs dropped before EM, geometry unchanged so NO bar
+  confound): 63-72% of accepted sites certify (vs 12-14% baseline), trunk 15-18 of 14
+  anchors' worth of sites INCLUDING Philosophy depth-1 in both seeds — the first arm ever
+  to certify a Philosophy split; Top-1 within CI; ARI 0.6566 vs floor 0.6575 — misses
+  the registered clause by 0.001 and is adjudicated NO IMPROVEMENT as registered.
+  ARI across trees of different leaf counts is a blunt stability metric; this is the
+  arm with the strongest signal in the sweep and the obvious stage-2 registration
+  (abt1 / abt3, abt2 x 512 dims, bar-equalized).
+  white: variance-whitened proposals almost never survive the raw-geometry gate —
+  5 and 3 accepted splits, 20/17 leaves; ARI 0.756 is the stability of a near-stump.
+  Confirms the proposal-only design's premise the other way: the acceptance geometry,
+  not the proposal, is the binding constraint, and only proposals that stay compatible
+  with it (abt2) get through.
+  Split hygiene: all ten trees are structural evidence only (own-seed splits); any arm
+  promoted to arena use is rebuilt with splitSeed = 42.
+
 - LADDER (2026-09-08, registered 4c4e5e7): **PRIMARY FAILS — the specificity curve
   is not monotone.** generic 0.761 < anchor 0.774 > stratum 0.757 < leaf 0.770
   (n=967 fully paired); leaf-vs-anchor 35:38 discordant, p=0.68. Anchor-level
