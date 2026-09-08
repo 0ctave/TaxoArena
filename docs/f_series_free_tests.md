@@ -50,6 +50,40 @@ rho vs GT and top-4 violations. Prediction: weakly informative (AUC 0.55-0.60),
 over-confident (ECE > 0.10 given the prompt's "default to 0.7-0.85" instruction), and
 the weighted board changes nothing in the top cluster.
 
+## F4 — sibling test on certified splits (registered 2026-09-08, after F1-F3, before running)
+Data: H7's `swap_sibling` arm (rubric_swap.db, 1,000 matches judged under the SIBLING
+leaf's rubric) paired with the x12 MAIN cell-rubric verdict on the same match;
+key-decidable only; ties wrong. Strata by the match's leaf as in F1 (CERT-STRICT /
+CERT-IMMEDIATE / UNCERTIFIED). REGISTERED PRIMARY: cell-over-sibling gain positive in
+CERT-STRICT (McNemar p < 0.05) AND larger than in UNCERTIFIED (question bootstrap CI
+excluding 0); F1's underpowered rule applies. Prediction: positive direction, underpowered.
+
+## F5 — where the leaf-level capability information lives
+F2's per-question leaf-over-category LOO improvement grouped by the leaf's certification
+(F1 definitions). REGISTERED PRIMARY: the improvement is positive (bootstrap CI excluding
+0) WITHIN UNCERTIFIED leaves — i.e. capability structure exists below the certified
+geometry. SECONDARY: certified minus uncertified difference. Prediction: primary holds;
+the certified/uncertified difference is not resolvable.
+
+## F6 — functional (key-only) validation of construction variants
+Trees: frozen (mcs55 seed 42), d256_s137, d512_s137, d512_s2048, abt2_s137, abt2_s2048,
+nomic (h9_embed_nomic). All keyed questions mapped by the options key (F2 rule), same
+model set and question set for every tree. Assignment = nearest-leaf-centroid on the
+tree's own slice and embedder for ALL questions (uniform across trees; each tree's cells
+were fit on ~70% of these questions, an in-sample optimism that is equal across trees
+and disclosed). Statistic = mean LOO Brier improvement over the marginal at LEAF and at
+ANCHOR level; paired 2,000-fold question bootstrap of each tree minus the frozen tree.
+REGISTERED PRIMARY: d512 and abt2 (both seeds) each lose NO leaf-level capability
+information vs the frozen tree — difference >= -0.5 (x1000) with the CI's upper bound
+> 0. Descriptive: the full ranking. Prediction: d512 >= frozen >= abt2 > nomic.
+
+## F7 — is the within-cluster length bias confidence-dependent?
+R2 live top-4 matches (n = 6,094), verdict confidence bands < 0.85 / 0.85-0.95 / >= 0.95;
+within-cluster LC-BT beta_len per band with SE. REGISTERED PRIMARY: beta(< 0.85) >
+beta(>= 0.95) with non-overlapping 95% CIs. Descriptive: confidence-gated board
+(verdicts >= 0.95 only) top-4 vs GT. Prediction: beta falls with confidence but the
+gated board still puts iask first (the bias is confident).
+
 ## OUTCOMES (2026-09-08; harness tools/analysis/free_tests_f.py; output experiment_results/free_tests_f_output.txt)
 
 - **F1 — direction as predicted, UNDERPOWERED as registered.** CERT-STRICT n = 48:
