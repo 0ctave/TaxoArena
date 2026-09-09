@@ -145,8 +145,11 @@ Prediction: SATURATED — certification within ±2 of bareq512, F6 flat, Top-1 f
 
 ## D4 — domain arrival: does unseeded structure re-emerge certified? (registered 2026-09-09)
 Two arms, seed 137, D1 body at 512 dims / bar 0.0145 (the bareq512 recipe), labeling off:
-`excludeFromAnchoring = ["philosophy"]` and `excludeFromAnchoring = ["law"]` — the domain's
+`excludeFromAnchoring = ["Philosophy"]` and `excludeFromAnchoring = ["Law"]` — the domain's
 questions enter the corpus but get no depth-1 anchor and must route from the root.
+(Launch note 2026-09-09 22:09: the first launch used lowercase keys and aborted at the
+fail-closed membership check — the dataset keys are capitalised; configs corrected, nothing
+was built or measured, the registration is unchanged.)
 Readouts: where the excluded domain's train questions end up (host anchors, residual pool,
 new splits), whether any accepted split whose region is >= 60% the excluded domain
 CERTIFIES at site level, and the held-out routing purity of that domain's questions.
