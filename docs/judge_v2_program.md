@@ -90,6 +90,31 @@ violation (reasoning judge: 1; Mistral v1: 2); (4) decidable tie rate ≤ 15%; (
   vs 9.7% (Mistral v1 no-ref, J1 record) — position sensitivity is NOT reduced by the reference;
   decidable tie rate 5.9%.
 
+- **L1-V (2026-09-10 00:57): PRIMARY FAIL — the reference does NOT remove the elaboration
+  vulnerability; it dents it.** 337 matches (of L1's 359; 22 lack a reference) with all three arms:
+  original 0.772, truncate 0.350, pad 0.783. Truncation drop 0.421 (142:0, p < 1e-4) against L1's
+  0.507 (183:1); the truncate arm rises from 0.259 to 0.350 — one sixth of the gap closed, far from
+  the registered halving (drop ≤ 0.25, truncate ≥ 0.55). Secondary PASS: padding does nothing
+  (+0.012). Reading: on this subset (top-cluster pairs where the CORRECT answer is the long one) the
+  reference adds almost nothing to the original arm (0.772 vs 0.766: the length heuristic already
+  picks right here), and when the correct answer is cut to a terse one the judge still follows the
+  displayed reasoning of the wrong answer 65% of the time WITH the reference in hand. So the +7.6pp
+  of J2-R comes from pairs where the length heuristic points the wrong way, not from disarming the
+  heuristic itself. The v1 mechanics never tell the judge to check the final answer before weighing
+  the reasoning; v2 does, and J3-R showed +2.2pp exactly where the reference is right. Registered
+  follow-up: **L1-V2** below. Cache experiment_results/causal_length/mistral_refgrok.db, output
+  l1v_outcome.txt.
+
+### L1-V2 — truncation under the reference AND the v2 mechanics (~2k Mistral calls; registered 2026-09-10 01:00)
+L1's matches, three arms, Mistral, reference as in L1-V, SYSTEM template = v2 (prompt_v2.py:
+verify the final answer first; a wrong final answer cannot win; no depth criteria). Harness
+`causal_length.py --reference grok-reasoning --prompt v2`, cache mistral_refgrok_v2.db.
+REGISTERED PRIMARY: truncate-arm correct-verdict rate > L1-V's 0.350 by paired McNemar p < 0.05 on
+the common matches (the mechanics, not the reference, are the variable). SECONDARY: original arm
+≥ 0.772 − 0.02 (no loss where the long answer is right) and pad within ±0.03 of original.
+Prediction: truncate arm 0.45–0.55 — the verify-first instruction moves the judge but does not
+cure it; if the truncate arm reaches ≥ 0.55, the v2 mechanics enter STACK as a second arm.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question

@@ -32,6 +32,7 @@ FILLER = ("Before concluding, it is worth restating that the approach taken abov
 ARMS = ("original", "truncate", "pad")
 ENDPOINT = KEY = MODEL = None
 REFERENCE = None   # --reference grok-reasoning = L1-V (docs/judge_v2_program.md): every arm's question carries the J2-R reference
+PROMPT = "v1"      # --prompt v2 = L1-V2: the v2 SYSTEM mechanics (prompt_v2.build_system_prompt_v2) on top of the reference
 
 
 def load_env(judge):
@@ -108,6 +109,7 @@ def pad_to(text, target):
 def open_cache(judge):
     os.makedirs(OUT_DIR, exist_ok=True)
     name = judge if REFERENCE is None else "%s_ref%s" % (judge, REFERENCE.replace("-reasoning", "").replace("-", ""))
+    if PROMPT == "v2": name += "_v2"
     con = sqlite3.connect(os.path.join(OUT_DIR, "%s.db" % name))
     con.execute("CREATE TABLE IF NOT EXISTS verdicts (qid INTEGER, cm TEXT, wm TEXT, arm TEXT, node_id TEXT, "
                 "len_c INTEGER, len_w INTEGER, vote1 TEXT, vote2_raw TEXT, winner TEXT, flip INTEGER, invalid INTEGER, "
@@ -150,7 +152,11 @@ def run(judge, workers, pilot):
             ow = pad_to(ow, len(oc))
         tc = rj.maybe_resolve(oc, rc[3], rc[1]) if oc.strip() else rj.robust_trace(rc[2], rc[3], rc[1])
         tw = rj.maybe_resolve(ow, rw[3], rw[1]) if ow.strip() else rj.robust_trace(rw[2], rw[3], rw[1])
-        system = rj.build_system_prompt(nodes[matches[k]])
+        if PROMPT == "v2":
+            import prompt_v2
+            system = prompt_v2.build_system_prompt_v2(nodes[matches[k]])
+        else:
+            system = rj.build_system_prompt(nodes[matches[k]])
         # presentation: correct model as A in order 1 (the arena's own A/B is arbitrary; we
         # keep the same convention across arms so the dual-order combination is comparable)
         raw1 = call(system, rj.build_user_prompt(qtext, tc, tw))
@@ -187,7 +193,7 @@ def mcnemar_p(b, c):
 
 
 def analyze():
-    names = list(JUDGES) + [j + "_refgrok" for j in JUDGES]
+    names = list(JUDGES) + [j + "_refgrok" for j in JUDGES] + [j + "_refgrok_v2" for j in JUDGES]
     for judge in names:
         p = os.path.join(OUT_DIR, "%s.db" % judge)
         if not os.path.exists(p):
@@ -200,7 +206,7 @@ def analyze():
         full = {k: v for k, v in rows.items() if all(a in v for a in ARMS)}
         if not full:
             print("[%s] no complete triples yet" % judge); continue
-        print("=== L1%s [%s]: %d matches with all three arms ===" % ("-V" if "_ref" in judge else "", judge, len(full)))
+        print("=== L1%s [%s]: %d matches with all three arms ===" % ("-V2" if "_v2" in judge else ("-V" if "_ref" in judge else ""), judge, len(full)))
         for arm in ARMS:
             acc = sum(v[arm][0] for v in full.values()) / len(full)
             lc = sum(v[arm][1] for v in full.values()) / len(full); lw = sum(v[arm][2] for v in full.values()) / len(full)
@@ -220,6 +226,27 @@ def analyze():
             print("  L1-V SECONDARY (pad within +/-0.03 of original): pad %.3f vs original %.3f -> %s" % (pad, orig, "PASS" if abs(pad - orig) <= 0.03 else "FAIL"))
 
 
+def analyze_v2_vs_v1():
+    pa, pb = os.path.join(OUT_DIR, "mistral_refgrok.db"), os.path.join(OUT_DIR, "mistral_refgrok_v2.db")
+    if not (os.path.exists(pa) and os.path.exists(pb)): return
+    def load(p):
+        c = sqlite3.connect("file:%s?mode=ro" % p, uri=True); out = defaultdict(dict)
+        for q, cm, wm, arm, w, inv in c.execute("SELECT qid, cm, wm, arm, winner, invalid FROM verdicts"):
+            if not inv: out[(q, cm, wm)][arm] = (w == cm)
+        return out
+    A, B = load(pa), load(pb)
+    common = [k for k in A if k in B and all(a in A[k] and a in B[k] for a in ARMS)]
+    if not common: return
+    print("=== L1-V2 vs L1-V (same matches, %d): v2 mechanics + reference vs v1 + reference ===" % len(common))
+    for arm in ARMS:
+        b = sum(1 for k in common if B[k][arm] and not A[k][arm]); c = sum(1 for k in common if A[k][arm] and not B[k][arm])
+        ra = sum(A[k][arm] for k in common) / len(common); rb = sum(B[k][arm] for k in common) / len(common)
+        tag = ""
+        if arm == "truncate": tag = "  -> L1-V2 REGISTERED PRIMARY %s" % ("PASS" if (rb > ra and mcnemar_p(b, c) < 0.05) else "FAIL")
+        if arm == "original": tag = "  -> secondary (>= v1 - 0.02) %s" % ("OK" if rb >= ra - 0.02 else "FAIL")
+        print("  %-9s v2 %.3f vs v1 %.3f (%+.3f) | %d:%d | p=%.4f%s" % (arm, rb, ra, rb - ra, b, c, mcnemar_p(b, c), tag))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--judge", choices=list(JUDGES), default="mistral")
@@ -227,10 +254,12 @@ if __name__ == "__main__":
     ap.add_argument("--pilot", type=int, default=None)
     ap.add_argument("--analyze", action="store_true")
     ap.add_argument("--reference", choices=["grok-reasoning"], default=None)
+    ap.add_argument("--prompt", choices=["v1", "v2"], default="v1")
     a = ap.parse_args()
     REFERENCE = a.reference
+    PROMPT = a.prompt
     if a.analyze:
-        analyze()
+        analyze(); analyze_v2_vs_v1()
     else:
         run(a.judge, a.workers, a.pilot)
-        analyze()
+        analyze(); analyze_v2_vs_v1()
