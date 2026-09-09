@@ -115,6 +115,16 @@ the common matches (the mechanics, not the reference, are the variable). SECONDA
 Prediction: truncate arm 0.45–0.55 — the verify-first instruction moves the judge but does not
 cure it; if the truncate arm reaches ≥ 0.55, the v2 mechanics enter STACK as a second arm.
 
+- **J2-D (2026-09-10 01:13): NULL, direction negative — the branch is closed.** Disagree stratum,
+  349 key-decidable: two references 0.748 vs the reasoning reference alone 0.774 (−2.6pp, 14:23,
+  p = 0.19) vs no reference 0.705. The second candidate dilutes a good reference (reasoning-ref-correct
+  stratum, n = 269: 0.862 → 0.810) and rescues only the 42 cases where Mistral's answer was the right
+  one (0.571 → 0.690); where neither is right (n = 38) both reference arms sit at 0.368, below the
+  no-reference 0.474. Design rule confirmed: ONE reference from the strongest available solver, never a
+  set of candidates; when the reference is wrong the judge is worse than with none, so reference
+  quality is the whole game (B3). Cache experiment_results/x12_crossdomain/rejudge_mistral_two_refs.db,
+  output j2d_outcome.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
