@@ -343,3 +343,39 @@ Prediction: held-out purity ~68–70%.
   at bootstrap (the trickle's own out-of-distribution fallback location), the corpus is gathered
   from the root, and a tree-membership guard replaces the label-map guard. No effect on runs
   without `excludeFromAnchoring`. The registration is unchanged; the arms are rebuilt.
+
+- D4 (2026-09-09, rebuilt 22:39–23:12 with the withheld queries placed at the root; registered
+  above): **both arms ABSORBED on the letter; Law is rediscovered as content but not as a
+  certified split — the prediction was right for Philosophy and wrong for Law.**
+  Philosophy (349 unanchored train questions; tree 88 leaves, 11/72 sites certified): they
+  settle under Other (51%), Psychology (26%), Computer science (12%), History (8%) and re-emerge
+  as four 77–81%-Philosophy regions — a depth-3 split under Other (n=176, 80%, itself two ~80%
+  leaves) and a 93-question leaf under Psychology. The largest region does NOT certify (observed
+  separation 0.022 vs its site null p95 0.038) and captures 35% of held-out Philosophy (150);
+  held-out Philosophy routes Other 68 / Psychology 35 / CS 33. ABSORBED, as predicted (into
+  Other/Psychology rather than Psychology/History).
+  Law (~715 unanchored train questions, 761 leaf memberships; tree 98 leaves, 10/84 sites
+  certified): Law TAKES OVER two host anchors — the Philosophy anchor's region becomes 94% Law
+  (n=386) and Other's 72% (n=494) — and re-emerges as twelve 90–100%-Law regions (the two
+  depth-2 splits n=372 at 97% and n=319 at 94%). Held-out Law (330) routes 89% into Law-dominated
+  structure (Other 165, Philosophy 149), but no single region reaches the registered 50%: the two
+  big ones carry 45% and 44% each, and the Other anchor site carries exactly 50.0% but does not
+  certify (0.027 vs p95 0.073); no Law-dominated split site certifies (Philosophy anchor 0.052 vs
+  0.072; depth-2 sites 0.035 vs 0.075 / 0.097; depth-3 0.050 vs 0.077, 0.040 vs 0.066). ABSORBED
+  on the letter; the prediction "ARRIVES" was wrong.
+  Reading: (i) routing recovers an unseeded domain — its questions form near-pure regions and
+  its held-out questions land in them; (ii) certification does not — a within-node null run on a
+  population that is itself 94–97% Law measures Law-internal structure, and the Law-vs-host
+  boundary at the anchor level does not clear the anchor's null either, consistent with the
+  campaign-wide rarity of certified sites (10–11 of 72–84 here; 11/67 in D2); (iii) the
+  construction has no mechanism to BIRTH a depth-1 anchor — an arriving domain can only split an
+  existing anchor's region, so it splits itself across the two nearest hosts (Philosophy/Other
+  for Law; Other/Psychology for Philosophy). The "evolving tree" claim therefore holds for
+  routing and cell formation but NOT for anchor-level structure without a root-level split
+  proposal, which the loop deliberately never makes (the root is never a split candidate).
+  Harness note: the first launch (22:22) was void — see the entry above; the fix (withheld
+  queries at the root, tree-membership guard) is inert without `excludeFromAnchoring`.
+  Wall: builds 119 s / 290 s (new code), site-nulls 1,082 s / ~800 s at 512 dims; the
+  overlapped chain's two nulls collided on Gradle's shared test-results directory once
+  (serialised since, d25fc35). Artifacts: experiment_results/dimsweep4/ (d4_outcome.txt,
+  site_null_arrive_*.csv; the void runs kept as *_VOID for the record).
