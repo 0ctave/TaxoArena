@@ -62,6 +62,32 @@ concurrent sweeps) is inconsistent; sweep snapshots built alone are consistent.
 
 ## OUTCOMES (2026-09-09; outputs experiment_results/m1_online_replay_output.txt, m2_match_budget_output.txt)
 
+- **M3 — (i) PASS, (ii) PASS, (iii) FAIL; the scaling answer is "placement cost is flat,
+  rank resolution is not".** 46 models, 11,436 keyed questions, 5 seeds
+  (experiment_results/m3_synthetic_arena_output.txt).
+  ORACLE judge, 400 matches per newcomer: median newcomer rank error 0 / 0 / 1 / 1 at roster
+  16 / 24 / 32 / 46 — clause (i) holds (≤ 400 matches place a newcomer within a median of
+  ±1 rank at every size) — but "within ±1" falls 98% → 88% → 72% → 61%: the cost in MATCHES
+  is flat, the difficulty in RANKS grows because adjacent models get closer as the roster
+  fills (a fixed θ precision buys fewer rank positions). NOISY judge (12% flips, coin-flip
+  non-decidables), 400 per newcomer: board rho 0.947 → 0.955 → 0.969 → 0.975 as the roster
+  grows — clause (ii) PASSES (0.975 ≥ 0.95 at 46), and MORE MODELS HELP under a noisy judge
+  (more nearby anchors), while under the oracle rho is flat at ~0.99. Clause (iii) FAILS:
+  the noisy judge needs > 4x the matches of the oracle for the same rank error at roster
+  46 (NOISY@400 median error 2.0 vs ORACLE@100 1.5); prediction "~2x" was optimistic — noise
+  compounds with roster density. Joint round-robin at the same total budget (18,400
+  matches): rho 0.994 oracle / 0.971 noisy vs sequential insertion 0.989 / 0.975 — one-by-one
+  insertion costs nothing at the board level. Deployment reading: ~400 matches per new
+  model at any roster size; expect ±1–2 rank uncertainty at 46 models with a Mistral-class
+  judge and ±1 with a key-like verifier; the judge, not the roster, is what sets the bill.
+
+- **AUDIT — prediction correct: only the frozen snapshot is inconsistent.** 132 snapshot rows
+  (snapshots.db + snapshots_frozen.db), 65 checkable against a run log: 63 OK, 2 MISMATCH —
+  both are 20260727_042523_Headless_Run_Auto_ge (present in both DBs). Every sweep and
+  promoted build stores its own split; every seed-42 build since 2026-09-08 (adaptive,
+  nomic, the wrong-split promoted build) produced p8a29, so p2dca was never a seed-42 split
+  of the current dataset. experiment_results/snapshot_pool_audit.txt.
+
 - **M2 — REGISTERED CLAIM PASSES, and the curve says something sharper: budget buys
   stability, the judge buys accuracy.** At 2,000 matches rho >= 0.93 in 100% of draws for
   every Mistral run (x12, R2-all, R2-live); at 1,000 matches 97–100%; at 500, 88–98%.

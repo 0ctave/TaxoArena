@@ -78,8 +78,25 @@ def activate(pool_id=FROZEN_POOL_ID):
     print("[POOL-GUARD] activated %s: %d eval_results rows flagged; reserved_test_queries.json restored" % (pool_id, n))
 
 
+def activate_id(pool_id):
+    """Activate an already-recorded pool by id WITHOUT touching reserved_test_queries.json
+    (used transiently, e.g. T3 routing of p8a29; always follow with --activate to re-pin)."""
+    conn = sqlite3.connect(DATASET_DB)
+    known = conn.execute("SELECT COUNT(*) FROM reserved_pool WHERE pool_id = ?", (pool_id,)).fetchone()[0]
+    assert known > 0, "pool %s is not recorded" % pool_id
+    with conn:
+        conn.execute("UPDATE eval_results SET is_reserved = 0 WHERE is_reserved = 1")
+        n = conn.execute("UPDATE eval_results SET is_reserved = 1 WHERE question_id IN "
+                         "(SELECT question_id FROM reserved_pool WHERE pool_id = ?)", (pool_id,)).rowcount
+        conn.execute("INSERT OR REPLACE INTO active_reserved_pool (only_row, pool_id, active_at) VALUES (1, ?, ?)",
+                     (pool_id, int(time.time() * 1000)))
+    print("[POOL-GUARD] TRANSIENT activation of %s: %d rows flagged (JSON untouched; re-pin with --activate)" % (pool_id, n))
+
+
 def main():
-    if "--activate" in sys.argv:
+    if "--activate-id" in sys.argv:
+        activate_id(sys.argv[sys.argv.index("--activate-id") + 1])
+    elif "--activate" in sys.argv:
         activate()
     conn = sqlite3.connect("file:%s?mode=ro" % DATASET_DB, uri=True)
     active = active_pool_id(conn)

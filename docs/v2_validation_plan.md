@@ -143,6 +143,27 @@ Also recorded: the 1024 isotropic p95 (the concentration rate — 128→256→51
 Prediction: SATURATED — certification within ±2 of bareq512, F6 flat, Top-1 flat or
 −1pt; the isotropic null at 1024 ≈ 0.0023.
 
+## D4 — domain arrival: does unseeded structure re-emerge certified? (registered 2026-09-09)
+Two arms, seed 137, D1 body at 512 dims / bar 0.0145 (the bareq512 recipe), labeling off:
+`excludeFromAnchoring = ["philosophy"]` and `excludeFromAnchoring = ["law"]` — the domain's
+questions enter the corpus but get no depth-1 anchor and must route from the root.
+Readouts: where the excluded domain's train questions end up (host anchors, residual pool,
+new splits), whether any accepted split whose region is >= 60% the excluded domain
+CERTIFIES at site level, and the held-out routing purity of that domain's questions.
+REGISTERED: ARRIVES iff a certified split with >= 60% excluded-domain region exists and
+the domain's held-out questions route to it (>= 50% of them) — the evolving-tree claim in
+miniature; ABSORBED iff they spread over host anchors with no certified split; PARKED iff
+they sit in residual pools. Prediction: Law ARRIVES (large, distinctive); Philosophy is
+ABSORBED into Psychology/History (its geometry is diffuse: the only arms that ever certify
+it drop the top PCs).
+
+## T3 — routing inflation of the pool of record (registered 2026-09-09)
+`routeReserved` on the frozen snapshot with p8a29 activated (its true held-out pool), then
+re-pin p2dca. Readout: primary-anchor purity of p8a29 (held-out) vs p2dca (in-sample 71%,
+H5: 73.6%) and the leaf-assignment agreement rate. REGISTERED: the in-sample figure
+overstates held-out purity by >= 3pp (else the routing claims need no correction).
+Prediction: held-out purity ~68–70%.
+
 ## OUTCOMES (updated as tests adjudicate)
 
 - P6 (2026-09-08): **NULL — overlap program closed, soft routing vindicated.** Full pool
