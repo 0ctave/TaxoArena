@@ -268,6 +268,9 @@ def f6():
     models, G, cat, text, qs_all = keyed_questions()
     per_q = {}
     for name, run_dir, db in TREES:
+        if run_dir and not os.path.exists(os.path.join(ROOT, run_dir, "dag_snapshots.jsonl")):
+            print("  %-11s (build not present, skipped)" % name)
+            continue
         leaves = tree_leaves(run_dir)
         dim = len(leaves[0][1])
         vec = embed_matrix(db, list(text.values()), dim)

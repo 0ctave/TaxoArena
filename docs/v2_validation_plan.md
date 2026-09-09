@@ -225,6 +225,32 @@ rebuild before any arena use); frozen pool re-pinned by the chain itself at the 
   Split hygiene: all ten trees are structural evidence only (own-seed splits); any arm
   promoted to arena use is rebuilt with splitSeed = 42.
 
+- D2 (2026-09-09, registered cc8b42c; tables experiment_results/dimsweep2/, report.txt,
+  f6_d2.txt; frozen pool re-pinned by the chain): **(i) PASS — the width effect is real;
+  (ii) FAIL as predicted; bareq512 is the best tree measured so far on every axis.**
+
+  | arm | leaves | certified | trunk | Top-1 | ARI | F6 leaf loss vs frozen (x1000) |
+  |---|---|---|---|---|---|---|
+  | bareq512 (512 dims, bar 0.0145) | 84 / 88 | 11/67, 11/71 | 6, 6 | 0.747, 0.771 | 0.688 | −0.10 [−0.74,+0.52], −0.23 [−0.87,+0.39] |
+  | abt2d512 (512 dims, drop top-2 PCs) | 35 / 34 | 11/11, 7/12 | 11, 7 | 0.744, 0.759 | 0.670 | −2.68, −3.13 (CIs exclude 0) |
+  | abt1 (256 dims, drop top-1 PC) | 81 / 73 | 16/49, 10/45 | 13, 9 | 0.741, 0.749 | 0.461 | −0.60 [−1.33,+0.13], −2.22 |
+  | (D1 refs) d256 / d512 | 84,83 / 75,84 | 7,9 / 13,13 | 5,7 / 7,7 | 0.737,0.749 / 0.747,0.771 | 0.678 / 0.679 | 0 / −0.45, −0.27 |
+
+  (i) bareq512 certifies 11 and 11 >= d256's 7 and 9 at EQUAL leaf counts (84/88 vs
+  84/83), with d512's Top-1, the highest cross-seed ARI of any arm (0.688) and no
+  key-only capability loss — so D1's d512 gain was not the stricter effective bar. This
+  arm dominates the frozen configuration on certification, Top-1 and stability while
+  matching it on profile information; it is the construction to promote (rebuild with
+  splitSeed = 42 before any arena use). (ii) abt2d512 certifies 11/11 (seed 137: every
+  accepted split passes its own null) and 7/12, i.e. fewer sites than d512's 13, and
+  loses 2.7–3.1/1000 of key-only capability information — abt2's loss is the leaf count
+  (~35 cells), not the dropped components. It is the instrument for the certified-leaf
+  ladder (all leaves certified), not a profile tree. (iii) abt1 dose-response: dropping
+  one PC already lifts certification to 22–33% of sites and certifies Philosophy in
+  both seeds, but cross-seed ARI collapses to 0.46 — the top principal component
+  carries the stable part of the structure, and removing it trades stability for
+  certifiability. Whitening (D1) is the limit of that trade.
+
 - LADDER (2026-09-08, registered 4c4e5e7): **PRIMARY FAILS — the specificity curve
   is not monotone.** generic 0.761 < anchor 0.774 > stratum 0.757 < leaf 0.770
   (n=967 fully paired); leaf-vs-anchor 35:38 discordant, p=0.68. Anchor-level
