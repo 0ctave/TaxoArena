@@ -52,7 +52,11 @@ candidate is noise); the point is to close the design branch with data.
 ### FORMAT — style perturbation (CALM-style; ~1.2k Mistral calls; conditional)
 Eligibility: key-decidable R3 pairs whose two traces differ in formatting (markdown/LaTeX/list
 markers present in one, absent in the other) — prevalence measured before launch and recorded
-below; the test runs only if ≥ 150 such pairs exist. Arm: strip the formatting from the formatted
+below; the test runs only if ≥ 150 such pairs exist. PREVALENCE (recorded 2026-09-09 23:55, before
+launch, markdown-only definition): 383 of 946 key-decidable R3 pairs have exactly one formatted trace;
+the formatted side is the correct one in 270 (70%). Formatting is confounded with model tier (iask 85%,
+gpt-4o 78%, arx 63% of traces formatted; the small open models ≤ 9%), which is why only the causal
+perturbation can answer the question. Arm: strip the formatting from the formatted
 trace (markers removed, content and answer line intact); compare against the cached v1 verdict.
 REGISTERED: verdict flip rate toward the unformatted side and the change in correct-verdict rate;
 a format bias exists iff correct-verdict rate changes by > 3pp with p < 0.05. Prediction: no
