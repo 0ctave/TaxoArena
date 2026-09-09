@@ -141,6 +141,18 @@ at n ≈ 950, with the gain — where there is one — in the discursive anchors
 judge is competent; the +1.5pp p = 0.0001 of the contaminated run is not recoverable as a
 headline. Cache experiment_results/rubric_512/bareq512_s42.db, output outcome.txt.
 
+## RUBRIC-512-SS — same-session control for RUBRIC-512 (registered 2026-09-09, NOT launched)
+RUBRIC-512's GENERIC arm is the cached verdict set from the earlier rubric-contrast session;
+its CELL arm was judged on 2026-09-09. The ladder showed session drift of the same order as
+the effect (old-vs-fresh confound). Design: re-judge the GENERIC arm (production GENERIC_JUDGE
+text, byte-identical templates) on the same 1,980 R3 matches, Mistral, in one session
+interleaved with nothing else (~4k calls, ~1 h at 12 workers); primary = paired McNemar of
+RUBRIC-512's CELL verdicts vs the fresh GENERIC verdicts on key-decidable matches.
+REGISTERED: the rubric-value claim is publishable as significant iff cell > generic at
+p < 0.05 against the SAME-SESSION generic; otherwise the claim is "0 to +2pp, not
+significant". Secondary: discursive gain > quantitative gain. Prediction: +1pp, p > 0.1 —
+the boundary p = 0.0498 does not survive the session control.
+
 ## J2-R — J2 with the reasoning judge's references (registered)
 As J2 (Mistral judges, same 1,980 matches, same templates) but the reference is
 grok-4-1-fast-reasoning's S1 answer (85.6% correct). REGISTERED: all-decidable gain > J2's
