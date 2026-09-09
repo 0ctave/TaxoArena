@@ -274,6 +274,24 @@ verdict rate there IS the bias signature. Extends tools/analysis/bias_audit.py.
   registered follow-up, J2-R, ~4k calls). Cache experiment_results/x12_crossdomain/
   rejudge_mistral_reference.db, output j2_outcome.txt.
 
+- **J2-R (2026-09-09, registered in docs/incident_reserved_pool_mismatch_2026-09-09.md):
+  PRIMARY PASS — the prediction landed.** Same 1,980 matches, Mistral judge, reference =
+  grok-4-1-fast-reasoning's S1 answer (correct 85.6%); 1,974 judged, 0 invalid, 6 skipped
+  (no reference). All key-decidable (n = 944): with reference 0.849 vs without 0.772
+  (+7.6pp; 88:16, p < 1e-4) — registered bar was "> J2's +3.4pp at p < 0.05", predicted
+  ≈ +7. Top cluster (n = 266): 0.665 vs 0.526 (+13.9pp; 45:8, p < 1e-4). Strata: reference
+  CORRECT (n = 817) +9.4pp (82:5); reference WRONG (n = 127) −3.9pp (6:11, p = 0.33). Ties
+  15.3% vs 19.9%, flips 12.8%. Reading: Mistral + a reasoning reference equals the reasoning
+  judge itself (J1: 0.847 all pairs, 0.647 top cluster) at a fraction of the cost — the
+  reference is ONE reasoning call per question, amortized over every match on that
+  question (x12: ~3.3 matches × 2 orders ≈ 6.5 judge calls per question), and the judge
+  stays the cheap non-reasoning model. The judge follows the hint slightly less blindly
+  than with its own reference (ref-wrong loss −3.9 vs −7.1), consistent with a
+  better-argued reference being easier to check. This is the design recommendation for the
+  reference-free router: verify-then-judge with the strongest available solver as the
+  reference generator, not as the judge. Cache experiment_results/x12_crossdomain/
+  rejudge_mistral_reference_grok_reasoning.db, output j2r_outcome.txt.
+
 ## Recommended order
 J5 and J4 first (free, both refits, and they may already explain most of the
 top-cluster divergence). Then J1 (settles ceiling vs preference). Then J3 as prompt

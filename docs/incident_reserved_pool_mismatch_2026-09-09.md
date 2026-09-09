@@ -127,6 +127,12 @@ grok-4-1-fast-reasoning's S1 answer (85.6% correct). REGISTERED: all-decidable g
 +3.4pp with McNemar p < 0.05; strata reported. Prediction from J2's strata arithmetic
 (+9.7 x 0.856 − 7.1 x 0.144): ≈ +7pp overall.
 
+### J2-R OUTCOME (2026-09-09): **PASS, as predicted.** 1,974 judged, 0 invalid. All decidable
+(n = 944) +7.6pp (0.849 vs 0.772; 88:16, p < 1e-4); top cluster +13.9pp (0.665 vs 0.526;
+45:8); reference-correct +9.4 (82:5), reference-wrong −3.9 (6:11, n.s.). Mistral with a
+reasoning reference matches the reasoning judge of J1 (0.847 / 0.647). Full record in
+docs/judge_improvement_proposals.md; output experiment_results/x12_crossdomain/j2r_outcome.txt.
+
 ## Options (decision for the author)
 A. Re-analyse on the clean subset and DISCLOSE — every affected claim restated with the clean
    numbers; the rubric-value claim is withdrawn as a significant result (direction positive,
