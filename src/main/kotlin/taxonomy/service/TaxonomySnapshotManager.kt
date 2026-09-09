@@ -507,7 +507,13 @@ class TaxonomySnapshotManager(
         return null
     }
 
-    fun saveSnapshot(root: GraphNode, description: String, logsToSave: List<String>? = null): DagSnapshot {
+    /**
+     * [expectedPoolId], when given, is the content id of the split THIS run made. The stored
+     * reserved list is read from the shared root file at save time, and on 2026-07-27 a
+     * concurrent run had rewritten that file between the split and the save, so the frozen
+     * snapshot carried a foreign pool for six weeks. The check makes that FATAL.
+     */
+    fun saveSnapshot(root: GraphNode, description: String, logsToSave: List<String>? = null, expectedPoolId: String? = null): DagSnapshot {
         val startSave = System.currentTimeMillis()
         val timestampStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         val fileTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
@@ -573,6 +579,17 @@ class TaxonomySnapshotManager(
             }
         } else {
             emptyMap()
+        }
+        if (expectedPoolId != null) {
+            val stored = taxonomy.dataset.ReservedPool.computePoolId(
+                reservedQueries.mapValues { (_, ids) -> ids.filter { it > 0 } }.filterValues { it.isNotEmpty() }
+            )
+            check(reservedQueries.isNotEmpty() && stored == expectedPoolId) {
+                "[POOL-PIN] refusing to save snapshot: reserved_test_queries.json now hashes to $stored but this " +
+                    "run's own split is $expectedPoolId — another process rewrote the root file (do not run two " +
+                    "constructions in one repo root)"
+            }
+            log.info("[POOL-PIN] snapshot stores this run's own reserved pool $stored")
         }
 
         val effectiveConfig = config.toEffectiveConfig()

@@ -65,6 +65,15 @@ is defensible; if PAD drops, the judge rewards bytes, which is not. Cost: 361 x 
 
 ## OUTCOMES
 
+- **L1-R (2026-09-09, descriptive): the reasoning judge is hurt less by truncation and is
+  NOT fooled by padding — it penalises it.** grok-4-1-fast-reasoning, same 361 matches (355
+  complete triples): original vs TRUNCATE drop 0.303 (112:5, p < 1e-4) vs Mistral's 0.507 —
+  a judge that can solve the question still leans on shown reasoning, but half as much;
+  original vs PAD drop −0.037 (3:16, p = 0.004): padding the WRONG answer with filler made
+  the reasoning judge pick the correct one MORE often — it reads filler as a negative
+  signal, where Mistral was indifferent. Prediction (drop < 15 points) was wrong on the
+  magnitude, right on the direction. Cache experiment_results/causal_length/grok-reasoning.db.
+
 - **S1 (2026-09-09): PRIMARY FAILS — significantly in the OPPOSITE direction; SECONDARY
   FAILS (null). The ceiling map itself is the durable result.** 2,796 questions solved
   by all three judges (11 identical request rejections; caches experiment_results/

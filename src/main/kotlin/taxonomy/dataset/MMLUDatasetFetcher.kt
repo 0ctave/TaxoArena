@@ -723,6 +723,48 @@ class MMLUDatasetFetcher(
         return Pair(train, test)
     }
 
+    /**
+     * Train/test split from an EXPLICIT held-out id file (the reserved_test_queries.json format:
+     * domain -> ids, sentinels included) instead of a seed. A seed does not reproduce a split
+     * once the dataset's load order changes (2026-09-09: today's seed-42 split differs from the
+     * frozen pool by 70%), so a construction that must be judged on an existing pool takes
+     * that pool's ids directly. The file is copied to reserved_test_queries.json verbatim so
+     * the snapshot stores exactly this pool, and the pool is recorded/activated as usual.
+     */
+    fun splitByReservedFile(
+        dataset: Map<String, List<MMLUQuery>>,
+        reservedFile: java.io.File,
+    ): Pair<Map<String, List<MMLUQuery>>, Map<String, List<MMLUQuery>>> {
+        val idsByDomain: Map<String, List<Int>> = Json.decodeFromString(reservedFile.readText())
+        val held = idsByDomain.values.flatten().toHashSet()
+        val train = mutableMapOf<String, List<MMLUQuery>>()
+        val test = mutableMapOf<String, List<MMLUQuery>>()
+        for ((category, queries) in dataset) {
+            val (t, tr) = queries.partition { it.id in held }
+            train[category] = tr
+            if (t.isNotEmpty()) test[category] = t
+        }
+        val found = test.values.sumOf { it.size }
+        log.info(
+            "Train/test split from reserved file '${reservedFile.name}': ${train.values.sumOf { it.size }} train /" +
+                " $found test (file lists ${held.size} ids; ${held.size - found} not present in the loaded dataset)."
+        )
+        java.io.File("reserved_test_queries.json").writeText(reservedFile.readText())
+        try {
+            val judgeable = idsByDomain.mapValues { (_, ids) -> ids.filter { it > 0 } }.filterValues { it.isNotEmpty() }
+            connection.use { c ->
+                val poolId = ReservedPool.save(
+                    c, judgeable, dataset = getTableName(), corpusSize = dataset.values.sumOf { it.size },
+                    seed = null, testRatio = null, nowMillis = System.currentTimeMillis()
+                )
+                log.info("Reserved pool '$poolId' recorded from file (${judgeable.values.sumOf { it.size }} judgeable ids).")
+            }
+        } catch (e: Exception) {
+            log.warn("Failed to record the file-defined reserved pool: ${e.message}")
+        }
+        return Pair(train, test)
+    }
+
     fun getAvailableDomains(): List<Pair<String, Int>> {
         val table = getTableName()
         val list = mutableListOf<Pair<String, Int>>()

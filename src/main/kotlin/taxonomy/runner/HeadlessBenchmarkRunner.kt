@@ -82,6 +82,9 @@ data class HeadlessCliConfig(
     // construction, which is the only way to separate sample variation from algorithmic
     // nondeterminism: with one knob driving both, a cross-seed spread confounds the two.
     val splitSeed: Long? = null,
+    // Explicit held-out id file (reserved_test_queries.json format). Overrides the seeded split:
+    // a seed does not reproduce a split across dataset-order changes (incident 2026-09-09).
+    val reservedPoolFile: String? = null,
     val regenerateSplit: Boolean = false,
     val runPipeline: Boolean = false,
     val maxDepth: Int? = null,
@@ -300,6 +303,7 @@ class HeadlessBenchmarkRunner(
 
                 var snapshotId = cliConfig.snapshotId
                 var root: GraphNode
+                var ownPoolId: String? = null
 
             if (cliConfig.runPipeline) {
                 log.info("Headless pipeline execution enabled. Starting DAG generation pipeline...")
@@ -313,17 +317,21 @@ class HeadlessBenchmarkRunner(
                     selectedDomains = targetDomains
                 )
                 val effectiveSplitSeed = cliConfig.splitSeed ?: currentSeed
-                log.info(
-                    "Splitting dataset into train/test (ratio=${cliConfig.testRatio}," +
-                        " splitSeed=$effectiveSplitSeed, constructionSeed=$currentSeed)..."
-                )
-                val (trainSet, testSet) = datasetFetcher.splitTrainTest(
-                    dataset,
-                    testRatio = cliConfig.testRatio,
-                    seed = effectiveSplitSeed
-                )
+                val (trainSet, testSet) = if (cliConfig.reservedPoolFile != null) {
+                    log.info("Splitting dataset from the explicit reserved-pool file ${cliConfig.reservedPoolFile} (seed ignored for the split)")
+                    datasetFetcher.splitByReservedFile(dataset, File(cliConfig.reservedPoolFile))
+                } else {
+                    log.info(
+                        "Splitting dataset into train/test (ratio=${cliConfig.testRatio}," +
+                            " splitSeed=$effectiveSplitSeed, constructionSeed=$currentSeed)..."
+                    )
+                    datasetFetcher.splitTrainTest(dataset, testRatio = cliConfig.testRatio, seed = effectiveSplitSeed)
+                }
                 log.info("Syncing database reserved pool...")
                 evalLoader.syncReservedPool()
+                // The pool this run will be judged against, captured now: saveSnapshot verifies
+                // the root file still hashes to it (a concurrent run can rewrite that file).
+                ownPoolId = evalStore.activeReservedPoolId()
                 taxonomy.diagnostics.DiagnosticsBundle.recordCorpus(
                     seed = currentSeed, splitSeed = cliConfig.splitSeed,
                     corpusSize = dataset.values.sumOf { it.size },
@@ -348,7 +356,7 @@ class HeadlessBenchmarkRunner(
 
                 log.info("Saving generated DAG snapshot to database...")
                 val snapshotDesc = "Headless Run Auto-generated DAG"
-                val snapshot = snapshotManager.saveSnapshot(root, snapshotDesc)
+                val snapshot = snapshotManager.saveSnapshot(root, snapshotDesc, expectedPoolId = ownPoolId)
                     ?: throw IllegalStateException("Failed to save snapshot for the newly generated DAG")
                 snapshotId = snapshot.id
                 log.info("Successfully generated and saved snapshot. Snapshot ID: $snapshotId")
@@ -1458,6 +1466,7 @@ class HeadlessBenchmarkRunner(
         var seed = 42L
         var seeds = listOf<Long>()
         var splitSeed: Long? = null
+        var reservedPoolFile: String? = null
         var regenerateSplit = false
         var runPipeline = false
         var maxDepth: Int? = null
@@ -1578,6 +1587,7 @@ class HeadlessBenchmarkRunner(
                 "domains" -> domains = parseStringList(rawVal)
                 "seeds" -> seeds = parseStringList(rawVal).map { it.toLong() }
                 "splitSeed" -> splitSeed = rawVal.toLong()
+                "reservedPoolFile" -> reservedPoolFile = rawVal.trim('"', '\'')
                 "enableStableQuestionIds" -> enableStableQuestionIds = rawVal.toBoolean()
                 "enableResidualRouting" -> enableResidualRouting = rawVal.toBoolean()
                 "enableResidualSplitGate" -> enableResidualSplitGate = rawVal.toBoolean()
@@ -1640,6 +1650,7 @@ class HeadlessBenchmarkRunner(
             seed = seed,
             seeds = seeds,
             splitSeed = splitSeed,
+            reservedPoolFile = reservedPoolFile,
             regenerateSplit = regenerateSplit,
             runPipeline = runPipeline,
             maxDepth = maxDepth,
