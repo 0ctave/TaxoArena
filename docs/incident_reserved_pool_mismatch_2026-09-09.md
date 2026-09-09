@@ -55,6 +55,20 @@ repo root.
    reproduce a split across dataset-order changes.
 3. Standing rule: never run two construction processes concurrently in the same repo root.
 
+## Decision (2026-09-09): options A and D
+- A: tools/analysis/clean_subset_reanalysis.py re-scores every affected claim on the clean
+  subset; results appended below and disclosed in the ledger.
+- D: promoted builds bareq512_s42 and abt2d512_s42 rebuilt with `reservedPoolFile =
+  experiment_configs/reserved_pool_frozen_p2dca.json` (queued behind D3). REGISTERED
+  follow-up **RUBRIC-512** (before running): on the R3 stratified sample (1,980 matches),
+  Mistral, byte-identical prompts, the clean 512-dim tree's LEAF rubric (question routed
+  through that tree, `routeReserved`) vs the cached GENERIC verdict, key-decidable, paired
+  McNemar. PASS iff cell > generic at p < 0.05. Prediction, from the clean-subset numbers:
+  positive direction, +1 to +2pp, NOT significant at n ≈ 950 decidable — i.e. the honest
+  rubric-value effect under a non-reasoning judge is small; S1 says it should concentrate in
+  the discursive anchors (secondary: gain in {Philosophy, History, Psychology, Biology,
+  Health} > gain in {Math, Physics, Chemistry, Engineering}).
+
 ## Options (decision for the author)
 A. Re-analyse on the clean subset and DISCLOSE — every affected claim restated with the clean
    numbers; the rubric-value claim is withdrawn as a significant result (direction positive,
