@@ -31,6 +31,7 @@ FILLER = ("Before concluding, it is worth restating that the approach taken abov
           "reasoning presented. ")
 ARMS = ("original", "truncate", "pad")
 ENDPOINT = KEY = MODEL = None
+REFERENCE = None   # --reference grok-reasoning = L1-V (docs/judge_v2_program.md): every arm's question carries the J2-R reference
 
 
 def load_env(judge):
@@ -106,7 +107,8 @@ def pad_to(text, target):
 
 def open_cache(judge):
     os.makedirs(OUT_DIR, exist_ok=True)
-    con = sqlite3.connect(os.path.join(OUT_DIR, "%s.db" % judge))
+    name = judge if REFERENCE is None else "%s_ref%s" % (judge, REFERENCE.replace("-reasoning", "").replace("-", ""))
+    con = sqlite3.connect(os.path.join(OUT_DIR, "%s.db" % name))
     con.execute("CREATE TABLE IF NOT EXISTS verdicts (qid INTEGER, cm TEXT, wm TEXT, arm TEXT, node_id TEXT, "
                 "len_c INTEGER, len_w INTEGER, vote1 TEXT, vote2_raw TEXT, winner TEXT, flip INTEGER, invalid INTEGER, "
                 "raw1 TEXT, raw2 TEXT, ts REAL, PRIMARY KEY (qid, cm, wm, arm))")
@@ -125,7 +127,12 @@ def run(judge, workers, pilot):
     cache = open_cache(judge)
     done = {(r[0], r[1], r[2], r[3]) for r in cache.execute("SELECT qid, cm, wm, arm FROM verdicts")}
     todo = [(k, arm) for k in keys for arm in ARMS if (k[0], k[1], k[2], arm) not in done]
-    print("judge=%s | eligible matches %d | jobs %d (%d calls) | workers %d" % (judge, len(keys), len(todo), 2 * len(todo), workers), flush=True)
+    refs = None
+    if REFERENCE is not None:
+        import rejudge_reference as rref
+        rref.set_reference(REFERENCE); refs = rref.references()
+        todo = [(k, arm) for k, arm in todo if k[0] in refs]
+    print("judge=%s | reference=%s | eligible matches %d | jobs %d (%d calls) | workers %d" % (judge, REFERENCE, len(keys), len(todo), 2 * len(todo), workers), flush=True)
     lock = threading.Lock()
     ok = err = 0
 
@@ -133,6 +140,9 @@ def run(judge, workers, pilot):
         q, cm, wm = k
         rc, rw = evals[(q, cm)], evals[(q, wm)]
         qtext = rc[0]
+        if refs is not None:
+            import rejudge_reference as rref
+            qtext = rref.with_reference(qtext, refs[q])
         oc, ow = rj.unwrap_envelope(rc[2] or "") if rc[2] else "", rj.unwrap_envelope(rw[2] or "") if rw[2] else ""
         if arm == "truncate":
             oc = truncate_to(oc, len(ow))
@@ -177,7 +187,8 @@ def mcnemar_p(b, c):
 
 
 def analyze():
-    for judge in JUDGES:
+    names = list(JUDGES) + [j + "_refgrok" for j in JUDGES]
+    for judge in names:
         p = os.path.join(OUT_DIR, "%s.db" % judge)
         if not os.path.exists(p):
             continue
@@ -189,7 +200,7 @@ def analyze():
         full = {k: v for k, v in rows.items() if all(a in v for a in ARMS)}
         if not full:
             print("[%s] no complete triples yet" % judge); continue
-        print("=== L1 [%s]: %d matches with all three arms ===" % (judge, len(full)))
+        print("=== L1%s [%s]: %d matches with all three arms ===" % ("-V" if "_ref" in judge else "", judge, len(full)))
         for arm in ARMS:
             acc = sum(v[arm][0] for v in full.values()) / len(full)
             lc = sum(v[arm][1] for v in full.values()) / len(full); lw = sum(v[arm][2] for v in full.values()) / len(full)
@@ -201,6 +212,12 @@ def analyze():
             drop = (sum(v["original"][0] for v in full.values()) - sum(v[arm][0] for v in full.values())) / len(full)
             print("  original vs %-8s drop %+.3f | discordant orig-only %d vs %s-only %d | McNemar p=%.4f -> %s (%s)"
                   % (arm, drop, b, arm, cc, p_, "PASS" if (drop > 0 and p_ < 0.05) else "FAIL", tag))
+        if "_ref" in judge:
+            tr = sum(v["truncate"][0] for v in full.values()) / len(full); orig = sum(v["original"][0] for v in full.values()) / len(full)
+            pad = sum(v["pad"][0] for v in full.values()) / len(full)
+            print("  L1-V REGISTERED PRIMARY (truncation drop <= 0.25 AND truncate arm >= 0.55; L1 was -0.507 / 0.259): drop %+.3f, truncate %.3f -> %s"
+                  % (orig - tr, tr, "PASS" if (orig - tr <= 0.25 and tr >= 0.55) else "FAIL"))
+            print("  L1-V SECONDARY (pad within +/-0.03 of original): pad %.3f vs original %.3f -> %s" % (pad, orig, "PASS" if abs(pad - orig) <= 0.03 else "FAIL"))
 
 
 if __name__ == "__main__":
@@ -209,7 +226,9 @@ if __name__ == "__main__":
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--pilot", type=int, default=None)
     ap.add_argument("--analyze", action="store_true")
+    ap.add_argument("--reference", choices=["grok-reasoning"], default=None)
     a = ap.parse_args()
+    REFERENCE = a.reference
     if a.analyze:
         analyze()
     else:
