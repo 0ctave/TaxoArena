@@ -177,6 +177,13 @@ tasks.register<Test>("randomCellRubrics") {
 // configurations behave identically.
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     workingDir = rootDir
+    // Spring Boot's "optimized launch" adds -XX:TieredStopAtLevel=1 (C1 only) to the forked
+    // JVM: good for a web app's startup, but construction spends 94% of its wall time in
+    // tight double loops (PCA power iteration, EM, J) that never reached the optimising
+    // tier, while the test-harness JVMs (siteNull, isoNullByDim) always had it. Disabled so
+    // the build runs under the same JIT as the harnesses. Replay-verified bit-identical
+    // structure (docs/perf_review_2026-09-09.md, gate #1).
+    optimizedLaunch.set(false)
     // bootRun forks a JVM, so a -D on the Gradle command line reaches Gradle's JVM and NOT the
     // application. Forward the ones that matter explicitly. `ranking.db.path` isolates a run
     // onto a throwaway ratings DB: match_history is keyed by (snapshot_id, condition), so a
