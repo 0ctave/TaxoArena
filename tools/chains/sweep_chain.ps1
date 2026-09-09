@@ -34,7 +34,7 @@ L "SWEEP CHAIN start: arms=$($Arms -join ',') dim=$Dim dropTop=$DropTop whiten=$
 $nulls = @()
 foreach ($tag in $Arms) {
     $cfg = Join-Path $ConfigDir "$tag.toml"
-    if (-not (Test-Path $cfg)) { L "$tag: config $cfg missing, skipping"; continue }
+    if (-not (Test-Path $cfg)) { L "${tag}: config $cfg missing, skipping"; continue }
     $seed = (Select-String -Path $cfg -Pattern '^\s*seed\s*=\s*(\d+)' | Select-Object -First 1).Matches[0].Groups[1].Value
     $runDir = Join-Path $Sweep "$tag\seed_$seed"
     if (Test-Path (Join-Path $runDir "dag_snapshots.jsonl")) { L "$tag build present, skipping build" }
