@@ -296,3 +296,20 @@ Prediction: held-out purity ~68–70%.
   Old-vs-fresh session confound disclosed (leaf/generic arms reused as registered).
   Consequence: P3's twig gate loses its premise as designed; a same-session leaf
   re-judge (~4k calls) is the follow-up if the knee needs settling.
+
+- D3 (2026-09-09, registered above): **TURNED at 1024 — on certification, not on routing.**
+  bareq1024 (bar 0.0087 from the MEASURED isotropic p95 0.00240 at n=406; 128→256→512→1024
+  p95 0.0115/0.0069/0.0040/0.0024, i.e. ~1.7x per doubling throughout): 80/88 leaves,
+  site-certified 6/66 and 6/73 (bareq512: 11/67, 11/71) — below 11 in BOTH seeds, so the
+  registered TURNED clause fires; depth-1 certified 4 and 3 (bareq512: 6 and 6). The other
+  readouts do not turn: Top-1 0.765 [0.751,0.779] / 0.776 [0.762,0.790] overlaps (and
+  numerically exceeds) bareq512's 0.747 / 0.771; cross-seed ARI 0.697 (the highest of any
+  arm; bareq512 0.688); F6 key-only leaf-level loss vs frozen −0.49 / +0.24 (x1000), inside
+  the −0.5 clause, with anchor==category 78–79% (bareq512 76.6–76.9%). Reading: the width
+  gain in certifiable structure peaks at 512 — at 1024 the within-node null tightens faster
+  than the observed separations, and half the splits that certified at 512 no longer clear
+  their site null, while routing and capability information are unchanged or marginally
+  better. Prediction (SATURATED, certification within ±2) was wrong on certification (−5)
+  and right on Top-1/F6. bareq512 remains the construction to promote. Wall: build 594 s,
+  site-null 2,114 / 2,205 s per seed at 1024. Artifacts: experiment_results/dimsweep3/
+  (report.txt, f6_d3.txt, bar_derivation.txt, site-null CSVs).
