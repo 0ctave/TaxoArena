@@ -308,3 +308,37 @@ keeps the thesis's induced-rubric story. J7 last. J9 runs on every arm.
   the cell's characteristic failure modes — the granularity argument restated in
   functional terms (a cell is worth its own rubric iff its failure modes differ from
   its parent's), which is the same functional-validation criterion the ladder applies.
+
+## Launch records 2026-09-09 (late) — registered before any call
+
+### J3-R — prompt v2 on top of the reasoning reference (~4k Mistral calls)
+Setup = J2-R exactly (R3's 1,980 matches, Mistral-Large-3, frozen-tree cell system prompt,
+grok-reasoning S1 answer inserted as "[Reference solution — produced independently, may be
+wrong]"), with the SYSTEM template changed to v2 and nothing else:
+  (i) the embedded Kotlin comment block is removed;
+  (ii) the "both correct → rank by mechanistic depth / edge cases / precision / scope" block is
+       replaced by: verify each model's FINAL ANSWER against the reference first; a response
+       whose final answer is wrong cannot win against one whose final answer is right; when
+       both final answers are right, prefer the response with fewer errors or unsupported
+       steps, and output TIE if neither has any — depth, scope and elaboration are not criteria;
+  (iii) everything else byte-identical (bias-suppression list, evaluation order, rubric slot,
+       user template, schema).
+Harness tools/analysis/prompt_v2.py (the v2 text is derived from v1 by two exact string
+replacements and asserted). Cache experiment_results/x12_crossdomain/rejudge_mistral_v2_refgrok.db.
+REGISTERED PRIMARY: key-decidable accuracy v2+ref > J2-R's v1+ref (0.849) on the same matches,
+paired McNemar p < 0.05. GUARDS (either failing = FAIL): top-cluster accuracy ≥ J2-R's 0.665
+− 2pp; reference-wrong stratum ≥ J2-R's 0.425 − 5pp. DESCRIPTIVE: tie rate (J2-R 15.3%) and the
+long-wrong preference rate on top-cluster decidable pairs where the SHORTER response is the
+correct one. Prediction: +1 to +3pp overall, ties below 12%, long-wrong preference down; the
+reference, not the prompt, remains the main lever.
+
+### RUBRIC-512-R — cell rubric value for the REASONING judge (~8k grok-reasoning calls)
+As RUBRIC-512 (R3's 1,980 matches; CELL = bareq512_s42 leaf rubric via routeReserved; GENERIC =
+production GENERIC_JUDGE text; byte-identical v1 templates) but judge = grok-4-1-fast-reasoning,
+BOTH arms fresh in the same session (no cached arm). Harness tools/analysis/rubric_512_r.py, caches
+experiment_results/rubric_512/grok_reasoning_{cell,generic}.db.
+REGISTERED PRIMARY: cell > generic on key-decidable, paired McNemar p < 0.05. SECONDARY: the
+reasoning judge's gain exceeds Mistral's RUBRIC-512 gain (+1.8pp) — S1's "rubric gain tracks judge
+competence" carried to a stronger judge. Prediction: +0 to +2pp, NOT significant; secondary FAILS
+(the reasoning judge sits at 0.85 with little headroom on keyed questions) — i.e. cell rubrics are
+not the lever for either judge tier.
