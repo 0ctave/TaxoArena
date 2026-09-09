@@ -121,6 +121,26 @@ mistral.db, output outcome.txt. (The verdict rate is higher here than on x12's d
 subset, 0.82 vs 0.77, because pairs were sampled uniformly among decidable pairs rather
 than by the arena's placement schedule — disclosed; it does not affect the paired contrast.)
 
+### RUBRIC-512 OUTCOME (2026-09-09): **PRIMARY PASS at the boundary; SECONDARY PASS.** Tree
+bareq512_s42 (built with reservedPoolFile = p2dca, 87 leaves, all with induced rubrics; snapshot
+20260909_212117), R3's 1,980 matches, Mistral, 0 invalid; 946 key-decidable paired matches:
+cell 0.773 vs generic 0.755 (+1.8pp), discordant 42:25, McNemar p = 0.0498. Discursive anchors
+(n = 514) +3.7pp, 34:15, p = 0.009; quantitative anchors (n = 432) −0.5pp, 8:10, p = 0.81.
+Per anchor: Philosophy +16.7 (5:0), Biology +7.4 (4:0), Business +6.1, Psychology +4.4,
+Health +3.4; Physics −1.6, Engineering −4.7. Prediction (+1 to +2pp, NOT significant; secondary
+holds) was right on the effect size and wrong on the letter — the p-value sits on the threshold.
+Two disclosures: (i) the GENERIC arm is the cached verdict set from the earlier rubric-contrast
+session, the CELL arm was judged today (the ladder's old-vs-fresh session confound applies; a
+same-session GENERIC re-judge of the same 1,980 matches, ~4k calls, would remove it and is the
+registered follow-up RUBRIC-512-SS if the claim is to be published as significant); (ii) the two
+clean measurements disagree on the anchor pattern: RUBRIC-P8 (frozen tree's rubrics on p8a29,
+same session) found 0.0pp with discursive −0.5 / quantitative +0.8, RUBRIC-512 finds +1.8 with
+discursive +3.7 / quantitative −0.5. What can be claimed after both: cell rubrics induced without
+the judged questions are worth 0 to +2pp to a non-reasoning judge on keyed questions, borderline
+at n ≈ 950, with the gain — where there is one — in the discursive anchors where S1 showed the
+judge is competent; the +1.5pp p = 0.0001 of the contaminated run is not recoverable as a
+headline. Cache experiment_results/rubric_512/bareq512_s42.db, output outcome.txt.
+
 ## J2-R — J2 with the reasoning judge's references (registered)
 As J2 (Mistral judges, same 1,980 matches, same templates) but the reference is
 grok-4-1-fast-reasoning's S1 answer (85.6% correct). REGISTERED: all-decidable gain > J2's
