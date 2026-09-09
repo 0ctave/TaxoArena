@@ -257,6 +257,23 @@ verdict rate there IS the bias signature. Extends tools/analysis/bias_audit.py.
   the judge solve-rate map (next) can make a prediction. Cost: 3,960 calls, ~273
   completion tokens each.
 
+- **J2 (2026-09-09, launch record in docs/s_l_series_registration.md): PRIMARY PASS —
+  verify-then-judge with an independent, fallible reference helps, and the pitfall is
+  exactly as large as the L1 mechanism predicts.** Mistral, R3's 1,973 judged matches (1
+  invalid; 6 questions without an S1 reference skipped), reference = Mistral's own S1 answer
+  (a separate call, correct 66%). All key-decidable (n = 943): with reference 0.806 vs
+  without 0.772 (+3.4pp; 66:34, p = 0.0018). Top cluster (n = 266): 0.586 vs 0.526 (+6.0pp;
+  32:16, p = 0.029) — half of the reasoning judge's +12 (J1), from a judge that cannot solve
+  the question but can VERIFY against a hint. Strata: reference CORRECT (n = 590) +9.7pp
+  (60:3, p < 1e-4); reference WRONG (n = 353) −7.1pp (6:31, p < 1e-4). Net +3.4. Ties
+  17.5% vs 19.9%. Reading: the judge follows the reference almost blindly in both
+  directions — the gain is a bet on the reference's accuracy, which is the judge's own
+  solve rate (S1) — so J2's value scales with a BETTER reference: a verifier (agent tasks),
+  or a stronger solver used only for the reference call (grok-reasoning solves 85.6%: the
+  expected net gain with its references is ~+8pp by the same strata arithmetic — a
+  registered follow-up, J2-R, ~4k calls). Cache experiment_results/x12_crossdomain/
+  rejudge_mistral_reference.db, output j2_outcome.txt.
+
 ## Recommended order
 J5 and J4 first (free, both refits, and they may already explain most of the
 top-cluster divergence). Then J1 (settles ceiling vs preference). Then J3 as prompt
