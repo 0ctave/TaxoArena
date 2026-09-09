@@ -234,6 +234,29 @@ verdict rate there IS the bias signature. Extends tools/analysis/bias_audit.py.
   elaboration criteria that reward length when both are correct) and J1 (a judge whose
   correctness signal does not saturate on the frontier). Both need judge calls.
 
+- **J1 (2026-09-08/09, registered 7a4391a, launch record 601f1ab): PRIMARY PASS, SECONDARY
+  MET — the frontier divergence is a judge-capability ceiling.** grok-4-1-fast-reasoning
+  re-judged all 1,980 R3 matches (0 invalid; a DNS outage cost 308 matches on the first
+  pass, resumed from cache with 0 errors; cache experiment_results/x12_crossdomain/
+  rejudge_grok_4_1_fast_reasoning.db, output j1_grok_reasoning_outcome.txt).
+  Top-cluster key-decidable (n = 266): reasoning judge 0.647 vs Mistral 0.526 (+12.0pp),
+  discordant 47:15, McNemar p = 0.0001; non-reasoning grok on the same matches 0.568.
+  All decidable pairs (n = 946): 0.847 vs 0.772 (+7.5pp), 96:25, p < 1e-4. Ties 13.2% vs
+  19.9%; position flips 9.7%. Top-4 board on the 600 top-cluster matches: Mistral
+  iask > gemini > arx > gpt-4o (2 violations) → reasoning judge gemini > iask > arx >
+  gpt-4o (1 violation; the remaining iask/arx swap is a 1.7pp GT gap). Caveat for the
+  secondary: the non-reasoning grok also produced that order on this sample (R3 had it
+  one adjacent swap off on the full x12), so the board-level move is not unique to
+  reasoning; the ACCURACY gain is — +8pp over grok non-reasoning, +12pp over Mistral,
+  concentrated exactly where the contestants are at or above the judge (JudgeBench's
+  "judge accuracy mirrors solver accuracy"). Consequences: (i) the R2/x12 top-cluster
+  divergence is attributable to Mistral's ceiling, not to the taxonomy or the rubrics;
+  (ii) the F7 confidence-gated board and the reasoning judge reach the same order from
+  two independent directions; (iii) a judge-strength axis (Mistral < grok < grok-
+  reasoning) now exists for the paper's "rubric gain tracks judge weakness" claim, which
+  the judge solve-rate map (next) can make a prediction. Cost: 3,960 calls, ~273
+  completion tokens each.
+
 ## Recommended order
 J5 and J4 first (free, both refits, and they may already explain most of the
 top-cluster divergence). Then J1 (settles ceiling vs preference). Then J3 as prompt

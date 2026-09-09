@@ -1,0 +1,9 @@
+judge=grok-4-1-fast-reasoning provider=azure cache=rejudge_grok_4_1_fast_reasoning.db
+=== J1: grok-4-1-fast-reasoning vs Mistral-Large-3 (paired, same matches, same prompts) ===
+judged 1980 | invalid 0 | flips 9.7% | ties R1 13.2% vs Mistral 19.9% | providers ['azure:grok-4-1-fast-reasoning'] | mean completion tokens 273
+  TOP-CLUSTER pairs (REGISTERED PRIMARY): n_dec=266 | correct-verdict rate (ties wrong): R1 0.647 vs Mistral 0.526 (+0.120) | discordant R1-only 47 vs Mistral-only 15 | McNemar p=0.0001 | grok 0.568 (n=266)
+  REGISTERED J1 PRIMARY (R1 > Mistral on top-cluster key-decidable, p < 0.05): PASS
+  all pairs: n_dec=946 | correct-verdict rate (ties wrong): R1 0.847 vs Mistral 0.772 (+0.075) | discordant R1-only 96 vs Mistral-only 25 | McNemar p=0.0000 | grok 0.743 (n=946)
+  top-4 board [Mistral] on 600 matches: iask_pro > gemini-3.1-pro_5-shots > arx_0314 > gpt-4o-2024-08-06 (pairwise violations 2, GT gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06)
+  top-4 board [R1] on 600 matches: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (pairwise violations 1, GT gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06)
+  top-4 board [grok]: gemini-3.1-pro_5-shots > iask_pro > arx_0314 > gpt-4o-2024-08-06 (violations 1)
