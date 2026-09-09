@@ -146,6 +146,31 @@ class TaxonomyEngine(
                             " — ${distilledData.size - anchorable.size} queries will enter unanchored"
                     )
                 }
+                // Withheld queries START AT THE ROOT with full weight — the same place the
+                // trickle's own fallback puts an out-of-distribution query — so they are in the
+                // routable corpus (gathered from the root below) and get re-routed from the
+                // root by every trickle pass from iteration 2 on, exactly as the D4 registration
+                // states ("must route from the root"). The first D4 run (2026-09-09 22:22) had
+                // no such placement: the corpus was gathered from the anchored branches only,
+                // so the 349 withheld queries never entered the tree, the guard below (which
+                // checks groundTruthMap, not tree membership) passed, and both arms came out
+                // "ABSORBED" for the wrong reason — the vacuity this comment block warns about.
+                // No effect on any run without excludeFromAnchoring (nothing is withheld).
+                if (excluded.isNotEmpty()) {
+                    val withheld = distilledData.filter { it.first in excluded }
+                    var placed = 0
+                    for ((cat, raw, keywords) in withheld) {
+                        val vec = embeddingCache.get(keywords) ?: continue
+                        val emb = Embedding(raw, keywords, vec, cat)
+                        GraphNode.registerEmbedding(emb)
+                        if (!root.queryWeights.containsKey(raw)) {
+                            root.queryWeights[raw] = 1.0
+                            root.queries.add(emb)
+                            placed++
+                        }
+                    }
+                    log.warn("[HOLD-OUT] $placed withheld queries placed at the root (unanchored) for routing")
+                }
                 val categoryGroups = anchorable.groupBy { it.first }
                 categoryGroups.forEach { (name, items) ->
                     val node = GraphNode(label = name, depth = 1)
@@ -208,6 +233,13 @@ class TaxonomyEngine(
                     "[HOLD-OUT] excluded categories vanished from groundTruthMap — the filter removed" +
                         " the queries, not just their anchor; recovery could not be scored"
                 }
+                // Tree membership, not just the label map: the withheld queries must be IN the
+                // DAG (at the root) or the run is vacuous.
+                val inTree = root.queries.count { it.groundTruthCategory in ex }
+                check(inTree > 0) {
+                    "[HOLD-OUT] withheld queries are not in the DAG — they were filtered out of the" +
+                        " routable corpus instead of being placed unanchored at the root"
+                }
                 log.warn("[HOLD-OUT] ${root.children.size} anchors seeded; $retained withheld queries retained unanchored")
                 // The one guard that can fail. Presence checks pass on a vacuous run;
                 // a count check does not.
@@ -226,7 +258,11 @@ class TaxonomyEngine(
             log.info("Initial DAG Structure (Before Statistical Fitting)")
             ops.printHierarchy(root)
 
-            val uniqueEmbs = root.children.flatMap { gatherAllEmbeddingsInBranch(it) }.distinctBy { it.rawText }
+            // Gathered from the ROOT (its own direct queries + every branch): identical to the
+            // per-branch gather when the root holds no direct queries, which is every run
+            // without excludeFromAnchoring; with it, the withheld queries placed at the root
+            // above are part of the routable corpus.
+            val uniqueEmbs = gatherAllEmbeddingsInBranch(root).distinctBy { it.rawText }
 
             stabilizer.reset()
             val activeNodeHashes = mutableListOf<Int>()
