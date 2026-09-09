@@ -1,0 +1,46 @@
+M2 match-budget curve | 12 models | GT top-4 gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06 | 200 draws per budget
+  x12 Mistral (n=9144)
+      budget |  rho_med  rho_p05 rho>=.93 | top4viol_md gemini1st
+         250 |    0.951    0.902      78% |        3.0    28%
+         500 |    0.951    0.937      98% |        3.0    28%
+        1000 |    0.951    0.937     100% |        3.0    12%
+        2000 |    0.951    0.944     100% |        3.0     8%
+        4000 |    0.951    0.951     100% |        3.0     0%
+        9144 |    0.951    0.951     100% |        3.0     0%
+  R2 Mistral (all) (n=36871)
+      budget |  rho_med  rho_p05 rho>=.93 | top4viol_md gemini1st
+         250 |    0.937    0.888      66% |        3.0    14%
+         500 |    0.951    0.923      94% |        3.0     6%
+        1000 |    0.951    0.937     100% |        3.0     4%
+        2000 |    0.951    0.937     100% |        3.0     0%
+        4000 |    0.951    0.951     100% |        3.0     0%
+       36871 |    0.951    0.951     100% |        3.0     0%
+  R2 live (n=27636)
+      budget |  rho_med  rho_p05 rho>=.93 | top4viol_md gemini1st
+         250 |    0.937    0.895      66% |        3.0    10%
+         500 |    0.951    0.916      88% |        3.0     7%
+        1000 |    0.951    0.930      97% |        3.0     1%
+        2000 |    0.951    0.937     100% |        3.0     0%
+        4000 |    0.951    0.951     100% |        3.0     0%
+       27636 |    0.951    0.951     100% |        3.0     0%
+  R2 live (n=27636) confidence-weighted
+      budget |  rho_med  rho_p05 rho>=.93 | top4viol_md gemini1st
+         250 |    0.937    0.895      66% |        3.0    11%
+         500 |    0.951    0.916      90% |        3.0     8%
+        1000 |    0.951    0.930      97% |        3.0     2%
+        2000 |    0.958    0.944     100% |        3.0     0%
+        4000 |    0.958    0.951     100% |        3.0     0%
+       27636 |    0.958    0.958     100% |        3.0     0%
+  R3 sample, grok-reasoning (n=1980)
+      budget |  rho_med  rho_p05 rho>=.93 | top4viol_md gemini1st
+         250 |    0.951    0.916      92% |        2.0    79%
+         500 |    0.965    0.937     100% |        1.0    86%
+        1000 |    0.965    0.951     100% |        1.0    97%
+        1980 |    0.974    0.974     100% |        1.0   100%
+  R3 sample, Mistral (same matches) (n=1980)
+      budget |  rho_med  rho_p05 rho>=.93 | top4viol_md gemini1st
+         250 |    0.944    0.902      80% |        3.0    16%
+         500 |    0.951    0.930      96% |        3.0     8%
+        1000 |    0.951    0.937     100% |        3.0     0%
+        1980 |    0.951    0.951     100% |        3.0     0%
+REGISTERED CLAIM: rho >= 0.93 in >= 95%% of draws at 2,000 matches for the Mistral runs (see rho>=.93 column at budget 2000).

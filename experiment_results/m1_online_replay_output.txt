@@ -1,0 +1,30 @@
+M1 replay: 36871 verdicts, 12 models, block 500, kappa 30, gate None | evaluation on matches 18435..36871
+  evaluated decisive verdicts: 14659 | key-decidable among them: 8217
+  global  log-loss 0.3837 | Brier 0.1225 | win-prediction accuracy 0.828
+  anchor  log-loss 0.3775 | Brier 0.1195 | win-prediction accuracy 0.838
+  cell    log-loss 0.4089 | Brier 0.1282 | win-prediction accuracy 0.838
+  hier    log-loss 0.3916 | Brier 0.1228 | win-prediction accuracy 0.838
+  hier    vs global: log-loss improvement -0.0078  95% [-0.0102, -0.0055] -> WORSE (REGISTERED PRIMARY)
+  anchor  vs global: log-loss improvement +0.0062  95% [+0.0041, +0.0084] -> PASS (secondary a)
+  cell    vs global: log-loss improvement -0.0251  95% [-0.0286, -0.0219] -> WORSE (secondary b)
+  -- router utility (key-decidable, n=8217): correct-pick rate --
+     global  0.844
+     anchor  0.848
+     cell    0.848
+     hier    0.851
+     oracle  0.870
+     hier vs global discordant 130:73, McNemar p=0.0001 -> PASS (secondary c)
+  -- log-loss improvement hier vs global by anchor --
+     History            n=  831  +0.0068
+     Engineering        n= 1962  +0.0044
+     Law                n=  299  +0.0025
+     Economics          n= 1939  -0.0023
+     Business           n= 2279  -0.0081
+     Chemistry          n= 1994  -0.0104
+     Other              n= 1663  -0.0131
+     Math               n= 1189  -0.0131
+     Philosophy         n=  727  -0.0158
+     Health             n=  684  -0.0164
+     Biology            n=  542  -0.0211
+     Computer science   n=  457  -0.0253
+     Physics            n=   93  -0.0354
