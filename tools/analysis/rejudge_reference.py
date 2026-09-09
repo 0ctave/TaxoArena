@@ -19,8 +19,16 @@ sys.path.insert(0, HERE)
 import rejudge_grok as rj
 
 MODEL = "Mistral-Large-3"
+REFERENCE = "mistral"   # --reference grok-reasoning = J2-R (the reasoning judge's S1 answers, 85.6% correct)
 SOLVE_DB = os.path.join(ROOT, "experiment_results", "judge_solve", "mistral.db")
 CACHE_DB = os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_mistral_reference.db")
+
+
+def set_reference(name):
+    global REFERENCE, SOLVE_DB, CACHE_DB
+    REFERENCE = name
+    SOLVE_DB = os.path.join(ROOT, "experiment_results", "judge_solve", "%s.db" % name)
+    CACHE_DB = os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_mistral_reference%s.db" % ("" if name == "mistral" else "_" + name.replace("-", "_")))
 TOP4 = {"iask_pro", "gemini-3.1-pro_5-shots", "gpt-4o-2024-08-06", "arx_0314"}
 ENDPOINT = KEY = None
 
@@ -158,7 +166,7 @@ def analyze():
     ev = sqlite3.connect("file:%s?mode=ro" % rj.EVAL_DB, uri=True)
     G = {(q, m): bool(c) for q, m, c in ev.execute("SELECT question_id, model_name, is_correct FROM eval_results")}
     valid = [r for r in rows if not r[7]]
-    print("=== J2: Mistral + independent reference vs Mistral without (paired, %d judged, %d invalid, flips %.1f%%, ties ref %.1f%% vs base %.1f%%) ==="
+    print("=== J2 [reference=%s]: Mistral + independent reference vs Mistral without" % REFERENCE + " (paired, %d judged, %d invalid, flips %.1f%%, ties ref %.1f%% vs base %.1f%%) ==="
           % (len(valid), len(rows) - len(valid), 100 * sum(r[8] for r in valid) / len(valid),
              100 * sum(r[5] == "TIE" for r in valid) / len(valid), 100 * sum(r[4] == "TIE" for r in valid) / len(valid)))
 
@@ -193,7 +201,10 @@ if __name__ == "__main__":
     ap.add_argument("--pilot", type=int, default=None)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--analyze", action="store_true")
+    ap.add_argument("--reference", choices=["mistral", "grok-reasoning"], default="mistral")
     a = ap.parse_args()
+    set_reference(a.reference)
+    print("J2 reference = %s | cache %s" % (REFERENCE, os.path.basename(CACHE_DB)), flush=True)
     if a.analyze:
         analyze()
     else:

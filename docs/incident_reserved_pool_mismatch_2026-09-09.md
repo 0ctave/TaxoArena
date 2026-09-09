@@ -93,6 +93,28 @@ non-reasoning judge, not distinguishable from zero at n ≈ 1,250, and no better
 anchor rubric — consistent with S1 (rubrics help where the judge is already competent)
 and with the ladder. RUBRIC-512 (option D) is the registered clean measurement.
 
+## RUBRIC-P8 — the clean, powered test of the frozen tree's OWN rubrics (registered 2026-09-09, before any call)
+Questions: the frozen tree's true held-out pool p8a29 (3,437; its rubrics never saw any of
+them). Matches: 1,000 key-decidable pairs among the 12 arena models, stratified by anchor
+(~72 per anchor), pairs sampled uniformly among decidable pairs per question, seed 42.
+Routing: nearest-leaf-centroid on the 256-slice (the disclosed approximation of routing
+used for every rubric corpus; in-sample for none of these questions). Arms, same session,
+Mistral-Large-3, dual order, byte-identical v1 templates: CELL (the routed leaf's induced
+persona + rubric) vs GENERIC (the production GENERIC_JUDGE text via
+rubric_value_contrast.build_generic_system_prompt). REGISTERED PRIMARY: cell > generic,
+paired McNemar p < 0.05 on the decidable matches (all are decidable by construction).
+SECONDARY (S1's prediction): the gain in discursive anchors {Philosophy, History,
+Psychology, Biology, Health, Law, Economics, Business, Other} exceeds the gain in quantitative
+anchors {Math, Physics, Chemistry, Engineering, Computer science}. Prediction: +1 to +2pp,
+not significant at n = 1,000 (the clean-subset estimate); secondary direction holds.
+~4,000 calls. Harness tools/analysis/rubric_p8.py.
+
+## J2-R — J2 with the reasoning judge's references (registered)
+As J2 (Mistral judges, same 1,980 matches, same templates) but the reference is
+grok-4-1-fast-reasoning's S1 answer (85.6% correct). REGISTERED: all-decidable gain > J2's
++3.4pp with McNemar p < 0.05; strata reported. Prediction from J2's strata arithmetic
+(+9.7 x 0.856 − 7.1 x 0.144): ≈ +7pp overall.
+
 ## Options (decision for the author)
 A. Re-analyse on the clean subset and DISCLOSE — every affected claim restated with the clean
    numbers; the rubric-value claim is withdrawn as a significant result (direction positive,

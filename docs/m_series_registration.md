@@ -35,6 +35,31 @@ confidence weighting (live R2 only). REGISTERED CLAIM: at 2,000 matches, rho >= 
 stated in the match-budget analysis). Descriptive: the budget at which the top-4 order
 first matches the reasoning judge's full-sample order.
 
+## M3 — synthetic arena: how far and how cheap does one-by-one insertion scale? (registered 2026-09-09)
+Roster: the 46 models with >= 95% coverage of the 12,118 keyed questions (Meta-Llama-3-70B-
+Instruct excluded). Verdict oracle: ORACLE = the key (winner = the correct model when exactly
+one is correct, TIE otherwise); NOISY = ORACLE with each decidable verdict flipped with
+probability 0.12 (Mistral's measured 12% error on decidable pairs) and each non-decidable
+match decided by a coin flip with probability 0.8 (real judges tie 13–20%, not 60%).
+Protocol: base board of 8 models (seeded random subset), 100 matches per pair on random
+questions; then models inserted ONE AT A TIME in random order with ADAPTIVE PLACEMENT — 4
+anchors chosen sequentially by bisection of the current board (each anchor gets b matches),
+then a full BT refit; per-model budget b x 4 in {25, 50, 100} (100 / 200 / 400 matches per
+newcomer). Recorded at roster sizes 8, 16, 24, 32, 46: the newcomer's rank error vs the
+key-accuracy rank (median over the insertions in that band), Spearman rho of the whole
+board vs key accuracy, and the matches spent. Five seeds. Also a JOINT baseline: the same
+total budget spread round-robin over all pairs.
+REGISTERED: (i) under ORACLE the median matches-to-place a newcomer within ±1 rank stays
+<= 400 from roster 16 through 46 (placement cost does not grow with the roster); (ii) rho
+at roster 46 with 400 matches per model is >= 0.95 under NOISY; (iii) the NOISY multiplier
+on matches for the same rank error is <= 3x. Predictions: (i) holds; (ii) holds; (iii) ~2x.
+
+## AUDIT — do other snapshots store a pool that is not their own split? (registered)
+For every snapshot in snapshots.db and snapshots_frozen.db: the stored reserved list's pool
+id vs the "Reserved pool '...' active" line in the snapshot's own captured log trace (or run
+log when present). Report every mismatch. Prediction: only 20260727_042523 (the freeze run,
+concurrent sweeps) is inconsistent; sweep snapshots built alone are consistent.
+
 ## OUTCOMES (2026-09-09; outputs experiment_results/m1_online_replay_output.txt, m2_match_budget_output.txt)
 
 - **M2 — REGISTERED CLAIM PASSES, and the curve says something sharper: budget buys
