@@ -42,4 +42,25 @@ is defensible; if PAD drops, the judge rewards bytes, which is not. Cost: 361 x 
 2,166 calls. A grok-reasoning replication of the arm that moves is queued as descriptive.
 
 ## OUTCOMES
-(filled after the runs)
+
+- **L1 (2026-09-09): PRIMARY PASS, SECONDARY FAIL — by the interpretation rule stated
+  above, the judge rewards CONTENT length (reasoning steps), not bytes.** 359 matches
+  with all three arms (6 request rejections), Mistral-Large-3, same session, dual order,
+  cache experiment_results/causal_length/mistral.db, output l1_outcome.txt.
+  Correct-verdict rate: original 0.766 (correct answer 1,821 chars vs wrong 840);
+  TRUNCATE 0.259 (correct cut to 770 chars) — drop 0.507, discordant 183:1, p < 1e-4;
+  PAD 0.769 (wrong padded to 2,013 chars with content-free filler) — drop −0.003,
+  10:11, p = 1.0. Reading: adding filler to the wrong answer changes nothing; removing
+  the correct answer's reasoning steps (its explicit final answer is still stated)
+  flips half the verdicts to the wrong answer. So the "verbosity bias" measured
+  observationally (beta_len +0.39/1k globally, +1.32 within the top cluster) is
+  elaboration-as-evidence: the judge cannot verify a terse correct answer on its own
+  and treats demonstrated reasoning as the correctness signal — which is exactly the
+  capability-ceiling mechanism J1 established (a judge that can solve the question
+  needs fewer steps shown). Defensible as judging behaviour, but it over-rates verbose
+  models against the key. Consequences: (i) the prompt fix J3 targets the wrong lever
+  if it asks the judge to "ignore length" — it should ask the judge to VERIFY the final
+  answer (J2's synthetic reference is the mechanism); (ii) the length-matched refits and
+  the confidence-gated board are corrections for a real judging limitation, not for a
+  stylistic preference; (iii) queued descriptive: the TRUNCATE arm on grok-reasoning
+  (does a judge that can solve the question survive truncation?).
