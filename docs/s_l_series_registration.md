@@ -41,6 +41,28 @@ TRUNCATE drops and PAD does not, the judge rewards CONTENT length (reasoning ste
 is defensible; if PAD drops, the judge rewards bytes, which is not. Cost: 361 x 6 =
 2,166 calls. A grok-reasoning replication of the arm that moves is queued as descriptive.
 
+## Launched 2026-09-09 (after S1/L1), recorded before the first call
+- **J2 launch record**: judge Mistral-Large-3, R3's 1,980 matches, v1 prompts byte-identical
+  except the question block gains "[Reference solution — produced independently, may be
+  wrong]\n(<letter>) <option text>", where the letter is Mistral's OWN S1 answer (a separate
+  call that never saw the traces; correct 66.3% overall, ~52% in Math). No-reference arm =
+  the x12 MAIN verdict on the same match (as J1). Criteria as registered in
+  docs/judge_improvement_proposals.md J2: gain > 0 at p < 0.05 on all key-decidable pairs
+  AND net-positive across the reference-correct / reference-wrong strata; both strata
+  reported. Prediction (from L1): the judge verifies rather than counts steps when a
+  reference is present — gain >= +5pp on all decidable, larger in quantitative anchors;
+  reference-wrong stratum loses (the named pitfall) but less than reference-correct gains.
+  Harness tools/analysis/rejudge_reference.py, cache rejudge_mistral_reference.db.
+- **L1-R (descriptive)**: the three L1 arms replicated on grok-4-1-fast-reasoning
+  (same 361 matches). Prediction: a judge that can solve the question (85.6%) resists
+  truncation — drop < 15 points vs Mistral's 51.
+- **PROMOTED builds** (not tests): bareq512_s42 and abt2d512_s42 — the frozen mcs=55
+  recipe (labeling + rubric induction ON, seed 42) on the FROZEN split (splitSeed 42 →
+  pool p2dca21ab5f4ef3ae) at the D2 geometries; reserved pool routed through each
+  (experiment_results/promoted/<tag>_reserved_leaf_assignments.csv). bareq512_s42 is the
+  profile tree to carry forward; abt2d512_s42 is the certified-leaf ladder's instrument.
+  Configs experiment_configs/promoted/.
+
 ## OUTCOMES
 
 - **S1 (2026-09-09): PRIMARY FAILS — significantly in the OPPOSITE direction; SECONDARY
