@@ -125,6 +125,12 @@ cure it; if the truncate arm reaches ≥ 0.55, the v2 mechanics enter STACK as a
   quality is the whole game (B3). Cache experiment_results/x12_crossdomain/rejudge_mistral_two_refs.db,
   output j2d_outcome.txt.
 
+- **FORMAT (2026-09-10 01:25): no format bias (B5 closed).** 383 key-decidable pairs with exactly one
+  markdown-formatted trace, formatting stripped from it: correct-verdict rate 0.786 vs 0.791 original
+  (−0.5pp; 6:8; p = 0.79); zero flips toward the unformatted side. Markdown carries no verdict weight
+  for Mistral; the 70% "formatted side is correct" is model tier, not style. No mitigation needed.
+  Cache experiment_results/x12_crossdomain/rejudge_mistral_format_stripped.db, output format_outcome.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
