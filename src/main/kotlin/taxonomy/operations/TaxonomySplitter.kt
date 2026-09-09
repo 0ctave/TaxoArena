@@ -136,7 +136,9 @@ class TaxonomySplitter(
             else                    -> 128
         }.coerceAtMost(rawVectors.first().size)
 
-        val pcaProjected = StatisticsUtils.pcaProject(
+        // Memoised on exact input content: the k = 2..4 fallback loop re-enters here with
+        // the same node and population, and only `forcedK` differs (see pcaProjectMemo).
+        val pcaProjected = StatisticsUtils.pcaProjectMemo(
             rawVectors, splitDim,
             dropTop = config.formalism.splitDropTopPcs,
             whiten = config.formalism.splitWhiten

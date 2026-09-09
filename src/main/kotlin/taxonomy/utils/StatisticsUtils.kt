@@ -638,6 +638,37 @@ object StatisticsUtils {
      * the unchanged acceptance geometry. Defaults reproduce the historical projection
      * exactly (dropTop = 0, whiten = false).
      */
+    /**
+     * Single-slot memo in front of [pcaProject], keyed on the EXACT input: the same
+     * (k, dropTop, whiten) and element-wise identical vectors in the same order. The
+     * k-fallback loop in TaxonomyOperations.splitNodesRecursive calls splitSingleNode for
+     * k = 2, 3, 4 on the same node; `forcedK` only changes the EM call, so the projection
+     * (the dominant cost of a proposal: 30 power iterations x splitDim components over the
+     * n x d residual) was recomputed up to three times from bit-identical input. The memo
+     * removes the repeats and nothing else: a hit requires full content equality (no
+     * hashing — an O(n·d) compare is ~1/4000 of the projection it saves), so the site-null
+     * harness, whose replicates reuse queryIds with different clouds, never hits; misses
+     * return exactly what [pcaProject] returns; hits return fresh copies of the memoised
+     * rows so a downstream in-place edit cannot leak into the next caller.
+     */
+    private class PcaSlot(val k: Int, val dropTop: Int, val whiten: Boolean,
+                          val input: List<DoubleArray>, val output: List<DoubleArray>)
+    @Volatile private var pcaSlot: PcaSlot? = null
+    private val pcaSlotLock = Any()
+
+    fun pcaProjectMemo(vectors: List<DoubleArray>, k: Int, dropTop: Int = 0, whiten: Boolean = false): List<DoubleArray> {
+        val slot = pcaSlot
+        if (slot != null && slot.k == k && slot.dropTop == dropTop && slot.whiten == whiten &&
+            slot.input.size == vectors.size &&
+            slot.input.indices.all { slot.input[it].contentEquals(vectors[it]) }) {
+            return slot.output.map { it.copyOf() }
+        }
+        val input = vectors.map { it.copyOf() }
+        val output = pcaProject(input, k, dropTop, whiten)
+        synchronized(pcaSlotLock) { pcaSlot = PcaSlot(k, dropTop, whiten, input, output) }
+        return output.map { it.copyOf() }
+    }
+
     fun pcaProject(vectors: List<DoubleArray>, k: Int, dropTop: Int = 0, whiten: Boolean = false): List<DoubleArray> {
         val n = vectors.size
         if (n == 0) return emptyList()
@@ -696,12 +727,19 @@ object StatisticsUtils {
                 vec = if (norm > 1e-10) DoubleArray(d) { proj[it] / norm } else proj
             }
             components.add(vec)
-            residual = residual.map { row ->
+            // Deflate IN PLACE: `residual` is a private copy of `centered` (made above), so
+            // nothing else observes it. The previous `map { DoubleArray(d) { ... } }` allocated
+            // n fresh rows per component (~1 GB per call at n=961, d=1024, 128 components),
+            // which made the site-null harness GC-bound. Same arithmetic, same evaluation
+            // order per element -> bit-identical output (PcaProjectEquivalenceTest).
+            for (row in residual) {
                 var dot = 0.0
                 for (i in 0 until d) {
                     dot += row[i] * vec[i]
                 }
-                DoubleArray(d) { i -> row[i] - dot * vec[i] }
+                for (i in 0 until d) {
+                    row[i] = row[i] - dot * vec[i]
+                }
             }
         }
 
