@@ -220,6 +220,17 @@ TREES = [
     ("abt2_s2048", "experiment_results/dimsweep/abt2_s2048/seed_2048", EMB_DB),
     ("nomic", "experiment_results/h9_embed_nomic/seed_42", os.path.join(ROOT, "embeddings_cache_nomic-embed-text_latest.db")),
 ]
+# D2 trees (registered clause (ii) of D2 uses the leaf-level loss vs frozen): `f6 d2` adds them.
+TREES_D2 = [
+    ("bareq512_s137", "experiment_results/dimsweep2/bareq512_s137/seed_137", EMB_DB),
+    ("bareq512_s2048", "experiment_results/dimsweep2/bareq512_s2048/seed_2048", EMB_DB),
+    ("abt2d512_s137", "experiment_results/dimsweep2/abt2d512_s137/seed_137", EMB_DB),
+    ("abt2d512_s2048", "experiment_results/dimsweep2/abt2d512_s2048/seed_2048", EMB_DB),
+    ("abt1_s137", "experiment_results/dimsweep2/abt1_s137/seed_137", EMB_DB),
+    ("abt1_s2048", "experiment_results/dimsweep2/abt1_s2048/seed_2048", EMB_DB),
+]
+if "d2" in sys.argv:
+    TREES = [TREES[0]] + TREES_D2
 
 
 def tree_leaves(run_dir):
@@ -323,5 +334,5 @@ def f7():
 
 
 if __name__ == "__main__":
-    for w in [a.lower() for a in sys.argv[1:]] or ["f4", "f5", "f6", "f7"]:
+    for w in [a.lower() for a in sys.argv[1:] if a.lower() in ("f4", "f5", "f6", "f7")] or ["f4", "f5", "f6", "f7"]:
         {"f4": f4, "f5": f5, "f6": f6, "f7": f7}[w]()

@@ -43,6 +43,39 @@ is defensible; if PAD drops, the judge rewards bytes, which is not. Cost: 361 x 
 
 ## OUTCOMES
 
+- **S1 (2026-09-09): PRIMARY FAILS — significantly in the OPPOSITE direction; SECONDARY
+  FAILS (null). The ceiling map itself is the durable result.** 2,796 questions solved
+  by all three judges (11 identical request rejections; caches experiment_results/
+  judge_solve/<judge>.db, output s1_outcome.txt). Overall solve accuracy: Mistral
+  0.663, grok non-reasoning 0.579, grok-reasoning 0.856; top-4 contestants 0.70–0.90 per
+  anchor. Mistral is BELOW the top-4 contestants' accuracy in 14/14 anchors (worst gaps:
+  Math 0.52 vs 0.90, Business 0.55 vs 0.90, Physics 0.67 vs 0.86); grok-reasoning is at
+  or above them in the quantitative anchors (Math 0.95, Physics 0.92, Business 0.95,
+  Chemistry 0.88) and slightly below in the discursive ones (History, Philosophy,
+  Psychology, Other). This is the ceiling J1 measured, seen directly: a judge weaker
+  than the contestants on the question itself.
+  PRIMARY: Mistral's per-anchor rubric gain vs its own solve accuracy: rho = +0.516,
+  perm p = 0.032 — rubric gain is LARGEST where Mistral solves BEST (Philosophy +6.0pp
+  at 0.67, Biology +5.4 at 0.86, History +3.5, Economics +2.7, Health +2.2) and ~0 where
+  it solves worst (Math +1.3 at 0.52, Engineering 0.0, Chemistry −0.9, Business +0.6).
+  "Rubric gain tracks judge weakness" is falsified; the earlier exploratory reading
+  (rubric_value_contrast, 2026-09-06: "gain concentrates in qualitative domains,
+  tracks judge weakness") had the domains right and the mechanism wrong. Reading that
+  fits L1 and J1: a rubric is a checklist for applying knowledge the judge has; where
+  the judge cannot solve the question (quantitative anchors) no checklist helps, and
+  where it can, the checklist sharpens the verdict. Prediction rho ≈ −0.5 was wrong.
+  SECONDARY: J1's per-anchor accuracy gain vs the reasoning−Mistral solve gap:
+  rho = −0.125, p = 0.33 — the reasoning judge's advantage is not proportional to its
+  solve advantage per anchor (14 points, noisy; the R3 sample is stratified by pair,
+  not by anchor). Prediction wrong.
+  Consequences: (i) rubric induction should be expected to pay off in discursive
+  anchors and not in quantitative ones under a non-reasoning judge — a testable, and
+  now specific, scope statement for the paper; (ii) in quantitative anchors the lever
+  is judge capability (J1) or a verified reference (J2), for which these solve calls
+  are the synthetic reference (Mistral's own reference would be wrong ~45% of the time
+  in Math — the pitfall the J2 registration names); (iii) the caches double as a
+  per-question "judge can solve it" covariate for every past verdict.
+
 - **L1 (2026-09-09): PRIMARY PASS, SECONDARY FAIL — by the interpretation rule stated
   above, the judge rewards CONTENT length (reasoning steps), not bytes.** 359 matches
   with all three arms (6 request rejections), Mistral-Large-3, same session, dual order,

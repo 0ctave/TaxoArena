@@ -108,9 +108,10 @@ def run(judge, workers, pilot):
     cache = open_cache(judge)
     done = {r[0] for r in cache.execute("SELECT question_id FROM answers")}
     todo = [q for q in sorted(qs) if q not in done]
+    n_cached = len(qs) - len(todo)
     if pilot:
         todo = todo[:pilot]
-    print("judge=%s model=%s | questions %d | cached %d | to solve %d | workers %d" % (judge, model, len(qs), len(qs) - len(todo), len(todo), workers), flush=True)
+    print("judge=%s model=%s | questions %d | cached %d | to solve %d | workers %d" % (judge, model, len(qs), n_cached, len(todo), workers), flush=True)
     lock = threading.Lock()
     ok = err = correct = 0
 
@@ -218,7 +219,7 @@ def analyze():
             if a in gain and gain[a][0] >= 20:
                 xs.append(acc_j["mistral"][a]); ys.append((gain[a][1] - gain[a][2]) / gain[a][0]); labels.append(a)
         rho, p = spearman_perm(xs, ys)
-        print("\n  REGISTERED PRIMARY: Mistral rubric gain (cell − generic, key-decidable) vs Mistral solve accuracy over %d anchors: rho = %+.3f, perm p = %.4f -> %s"
+        print("\n  REGISTERED PRIMARY: Mistral rubric gain (cell - generic, key-decidable) vs Mistral solve accuracy over %d anchors: rho = %+.3f, perm p = %.4f -> %s"
               % (len(xs), rho, p, "PASS" if (rho < 0 and p < 0.05) else "FAIL"))
         for a, x, y in sorted(zip(labels, xs, ys), key=lambda t: t[1]):
             print("     %-18s solve %.3f  rubric gain %+.3f" % (a[:18], x, y))
@@ -241,7 +242,7 @@ def analyze():
                 if a in g and g[a][0] >= 20:
                     xs.append(acc_j["grok-reasoning"][a] - acc_j["mistral"][a]); ys.append((g[a][1] - g[a][2]) / g[a][0])
             rho, p = spearman_perm(xs, ys)
-            print("  SECONDARY: J1 accuracy gain per anchor vs solve-rate gap (reasoning − Mistral) over %d anchors: rho = %+.3f, perm p = %.4f -> %s"
+            print("  SECONDARY: J1 accuracy gain per anchor vs solve-rate gap (reasoning - Mistral) over %d anchors: rho = %+.3f, perm p = %.4f -> %s"
                   % (len(xs), rho, p, "PASS" if (rho > 0 and p < 0.05) else "FAIL"))
 
 
