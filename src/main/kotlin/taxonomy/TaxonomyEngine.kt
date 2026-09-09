@@ -122,11 +122,12 @@ class TaxonomyEngine(
                 // groundTruthMap below and the routable corpus both still contain these
                 // queries — they lose their anchor, not their existence.
                 val excluded = config.formalism.excludeFromAnchoring
-                // Membership check against the ACTUAL dataset keys. Dataset keys are
-                // lowercase ("chemistry"); depth-1 tree labels are capitalised
-                // ("Chemistry"), and `it.first in excluded` is exact string equality —
-                // so the wrong case silently excludes nothing. Deliberately not
-                // case-insensitive: normalising would paper over the two-space problem
+                // Membership check against the ACTUAL dataset keys. The MMLU-Pro fetcher
+                // keeps the dataset's own capitalised category strings ("Philosophy"), so
+                // a lowercase key ("philosophy") matches nothing and `it.first in excluded`
+                // (exact string equality) would silently exclude nothing — hence the hard
+                // failure below (it fired on the first D4 launch, 2026-09-09). Deliberately
+                // not case-insensitive: normalising would paper over the two-space problem
                 // rather than surfacing it.
                 if (excluded.isNotEmpty()) {
                     val available = dataset.keys
