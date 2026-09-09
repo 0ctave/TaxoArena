@@ -153,6 +153,18 @@ p < 0.05 against the SAME-SESSION generic; otherwise the claim is "0 to +2pp, no
 significant". Secondary: discursive gain > quantitative gain. Prediction: +1pp, p > 0.1 —
 the boundary p = 0.0498 does not survive the session control.
 
+### RUBRIC-512-SS OUTCOME (2026-09-10 00:24): **PRIMARY FAIL, as predicted — the boundary pass does not
+survive the session control.** Fresh GENERIC on the same 1,980 matches (0 invalid), 946 key-decidable
+triples: cell 0.773 vs fresh generic 0.763 (+1.0pp), 35:26, p = 0.31. The session drift itself is
++0.8pp (fresh 0.763 vs cached 0.755, 27:19, p = 0.30) — almost half of RUBRIC-512's +1.8. Secondary
+holds again: discursive +2.5pp (26:13, p = 0.053), quantitative −0.9pp (9:13); Philosophy +23.3pp on
+7:0 (n = 30), Physics −3.2, Engineering −2.3. FINAL rubric-value statement for the non-reasoning judge
+on keyed questions, from three clean measurements (P8 0.0pp; 512 +1.8 boundary; 512-SS +1.0 n.s.):
+cell rubrics add about +1pp overall, not distinguishable from zero at n ≈ 950, with a repeatable
+concentration in the discursive anchors (Philosophy in particular) and nothing or slightly negative
+in the quantitative ones. The contaminated p = 0.0001 is withdrawn for good; the STACK judge uses the
+anchor rubric. Cache experiment_results/rubric_512/generic_ss.db, output generic_ss_outcome.txt.
+
 ## J2-R — J2 with the reasoning judge's references (registered)
 As J2 (Mistral judges, same 1,980 matches, same templates) but the reference is
 grok-4-1-fast-reasoning's S1 answer (85.6% correct). REGISTERED: all-decidable gain > J2's
