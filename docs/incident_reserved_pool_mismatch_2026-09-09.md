@@ -109,6 +109,18 @@ anchors {Math, Physics, Chemistry, Engineering, Computer science}. Prediction: +
 not significant at n = 1,000 (the clean-subset estimate); secondary direction holds.
 ~4,000 calls. Harness tools/analysis/rubric_p8.py.
 
+### RUBRIC-P8 OUTCOME (2026-09-09): **NULL — exactly zero.** 994 matches on p8a29 (the frozen
+tree's true held-out pool; its rubrics never saw any of these questions), Mistral, same session,
+dual order, 0 invalid: cell 0.823 vs generic 0.823, discordant 20:20, McNemar p = 1.0.
+Discursive anchors −0.5pp (13:16), quantitative +0.8pp (7:4); no anchor beyond ±4pp on
+n = 71 each (Chemistry/Health +4.2 on 3:0; Psychology −5.6 on 0:4). Secondary FAILS.
+This is the clean, powered measurement the withdrawn p = 0.0001 result should have been:
+for a non-reasoning judge on key-verifiable questions, the frozen tree's induced cell
+rubrics add nothing over the production generic judge. Cache experiment_results/rubric_p8/
+mistral.db, output outcome.txt. (The verdict rate is higher here than on x12's decidable
+subset, 0.82 vs 0.77, because pairs were sampled uniformly among decidable pairs rather
+than by the arena's placement schedule — disclosed; it does not affect the paired contrast.)
+
 ## J2-R — J2 with the reasoning judge's references (registered)
 As J2 (Mistral judges, same 1,980 matches, same templates) but the reference is
 grok-4-1-fast-reasoning's S1 answer (85.6% correct). REGISTERED: all-decidable gain > J2's
