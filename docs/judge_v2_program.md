@@ -131,6 +131,20 @@ cure it; if the truncate arm reaches ≥ 0.55, the v2 mechanics enter STACK as a
   for Mistral; the 70% "formatted side is correct" is model tier, not style. No mitigation needed.
   Cache experiment_results/x12_crossdomain/rejudge_mistral_format_stripped.db, output format_outcome.txt.
 
+- **L1-V2 (2026-09-10 01:58): PRIMARY PASS — the first causal evidence that a prompt change moves
+  the elaboration bias; secondary misses by 0.001.** Same 337 matches as L1-V, 0 errors. Truncate arm
+  0.433 vs L1-V's 0.350 (+8.3pp; 42:14; p = 0.0002): with the verify-first mechanics the judge keeps the
+  terse correct answer 43% of the time instead of 35% (L1 without reference: 26%). Cost: original arm
+  0.751 vs 0.772 (−2.1pp; 11:18; p = 0.26) — the registered floor was −2.0pp, missed by 0.001; pad
+  0.763 vs 0.783 (−2.1, n.s.). Reading: v2 trades a small, non-significant loss where the long answer
+  is right for a large gain where the terse answer is right; on the full R3 sample that nets +1.4pp
+  (J3-R). Truncation drop is now 0.318 (L1 0.507 → L1-V 0.421 → L1-V2 0.318): the reference and the
+  mechanics each remove a slice, and 43% is still far from a judge that reads the answer rather than the
+  reasoning. The auto-trigger for a v2 STACK arm (truncate ≥ 0.55) was not reached; adoption rule (a)
+  bias metric moved on a paired test — YES; (b) overall accuracy did not fall — YES (J3-R +1.4); so a
+  **STACK-v2 arm (~4k calls) is the author's call**, recommended. Cache
+  experiment_results/causal_length/mistral_refgrok_v2.db, output l1v2_outcome.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
