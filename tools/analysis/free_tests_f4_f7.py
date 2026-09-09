@@ -229,8 +229,16 @@ TREES_D2 = [
     ("abt1_s137", "experiment_results/dimsweep2/abt1_s137/seed_137", EMB_DB),
     ("abt1_s2048", "experiment_results/dimsweep2/abt1_s2048/seed_2048", EMB_DB),
 ]
+TREES_D3 = [
+    ("bareq1024_s137", "experiment_results/dimsweep3/bareq1024_s137/seed_137", EMB_DB),
+    ("bareq1024_s2048", "experiment_results/dimsweep3/bareq1024_s2048/seed_2048", EMB_DB),
+    ("bareq512_s137", "experiment_results/dimsweep2/bareq512_s137/seed_137", EMB_DB),
+    ("bareq512_s2048", "experiment_results/dimsweep2/bareq512_s2048/seed_2048", EMB_DB),
+]
 if "d2" in sys.argv:
     TREES = [TREES[0]] + TREES_D2
+if "d3" in sys.argv:
+    TREES = [TREES[0]] + TREES_D3
 
 
 def tree_leaves(run_dir):

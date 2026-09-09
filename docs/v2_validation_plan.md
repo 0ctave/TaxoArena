@@ -129,6 +129,20 @@ d512); (ii) FAILS on the F6 clause — abt2's loss is the leaf count, and abt2d5
 also have ~60 leaves. Split hygiene as D1 (structural evidence only; splitSeed = 42
 rebuild before any arena use); frozen pool re-pinned by the chain itself at the end.
 
+## D3 — does the width gain continue at 1024? (registered 2026-09-09, before launch)
+Arm: bareq1024 (`embeddingSliceDim 1024`, bar = 0.025 x p95_iso(1024, n=406) / 0.0069,
+MEASURED by `gradlew isoNullByDim -DisoDims=1024` at the head of the chain and written
+into the configs before building — never extrapolated), seeds 137 / 2048, body = D1.
+Reference = bareq512 (D2): 84/88 leaves, 11/11 certified, Top-1 0.747/0.771, ARI 0.688,
+F6 leaf-level loss −0.10/−0.23.
+REGISTERED: CONTINUES iff certified > 11 in both seeds AND Top-1 Wilson CI overlaps
+bareq512's in both seeds AND F6 loss vs frozen >= −0.5 (x1000). TURNED iff certified < 11
+in either seed OR Top-1 CI entirely below bareq512's in either seed. Otherwise SATURATED.
+Also recorded: the 1024 isotropic p95 (the concentration rate — 128→256→512 shrank by
+~1.7x per doubling, faster than sqrt(2)); build wall time; site-null wall time.
+Prediction: SATURATED — certification within ±2 of bareq512, F6 flat, Top-1 flat or
+−1pt; the isotropic null at 1024 ≈ 0.0023.
+
 ## OUTCOMES (updated as tests adjudicate)
 
 - P6 (2026-09-08): **NULL — overlap program closed, soft routing vindicated.** Full pool

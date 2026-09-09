@@ -373,7 +373,10 @@ class SeparationNullBySizeTest {
         val sigma = 0.5
         val saved = taxonomy.model.EmbeddingSlice.width
         try {
-            for (dim in listOf(128, 256, 512)) {
+            // -DisoDims=1024 (comma-separated) restricts the sweep; default = the D1 trio.
+            val dims = System.getProperty("isoDims")?.split(",")?.mapNotNull { it.trim().toIntOrNull() }
+                ?: listOf(128, 256, 512)
+            for (dim in dims) {
                 sliceDimOverride = dim
                 sweep(
                     "ISO-NULL sliceDim=$dim (sigma=$sigma), minClusterSize=55",

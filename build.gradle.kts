@@ -152,6 +152,7 @@ tasks.register<Test>("isoNullByDim") {
     testLogging { showStandardStreams = true }
     outputs.upToDateWhen { false }
     systemProperty("nullReps", providers.gradleProperty("nullReps").getOrElse("300"))
+    providers.systemProperty("isoDims").orNull?.let { systemProperty("isoDims", it) }
     filter { includeTestsMatching("*SeparationNullBySizeTest*isoNullByDim*") }
 }
 
