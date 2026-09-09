@@ -99,11 +99,13 @@ def analyze(domain):
             r = site.get(nid); cert = (r or {}).get("cert_site_p95", "n/a")
             cands.append((nid, n, cnt[domain] / n, cert, nodes[nid]["depth"], bool(nodes[nid].get("childIds"))))
     print("  regions >= %.0f%% %s (n >= 20): %d" % (100 * SHARE, domain, len(cands)))
-    for nid, n, s, cert, d, internal in sorted(cands, key=lambda x: -x[1]):
-        print("     %s depth %d %-8s n=%4d share %.2f cert_site_p95=%s under %s" % (nid, d, "split" if internal else "leaf", n, s, cert, anchor(nid) if d > 1 else "(anchor)"))
-    certified = [c for c in cands if c[5] and str(c[3]).lower() == "true"]
     routes = held_out_routes(run_dir)
     dom_routes = [(d, l) for d, l in routes if d == domain]
+    for nid, n, s, cert, d, internal in sorted(cands, key=lambda x: -x[1]):
+        lv = set(desc_leaves(nid)); ho = sum(1 for _, l in dom_routes if l in lv)
+        print("     %s depth %d %-8s n=%4d share %.2f cert_site_p95=%s under %s | held-out %s routed under it: %d/%d (%.0f%%)"
+              % (nid, d, "split" if internal else "leaf", n, s, cert, anchor(nid) if d > 1 else "(anchor)", domain, ho, len(dom_routes), 100 * ho / max(1, len(dom_routes))))
+    certified = [c for c in cands if c[5] and str(c[3]).lower() == "true"]
     print("  held-out %s questions: %d | routed to anchors: %s" % (domain, len(dom_routes), ", ".join("%s %d" % (a, k) for a, k in Counter(anchor(l) for _, l in dom_routes if l in nodes).most_common(5))))
     under = 0
     if certified:

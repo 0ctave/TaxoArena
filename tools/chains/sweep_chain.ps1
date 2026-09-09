@@ -58,6 +58,15 @@ foreach ($tag in $Arms) {
         & .\gradlew.bat @nullArgs *> $outFile
         L "$tag SITENULL exit=$LASTEXITCODE wall=$([int]$sw.Elapsed.TotalSeconds)s"
     } else {
+        # Site-nulls are serialised among themselves: two concurrent `gradlew siteNull` invocations
+        # share the Test task's output directory (build/test-results/siteNull) and the second one
+        # fails at start-up with "Unable to delete directory ... output.bin" (observed 2026-09-09
+        # 22:46, D4 Law arm). Builds are shorter than nulls, so waiting here still lets every null
+        # overlap the NEXT build.
+        if ($nulls.Count -gt 0) {
+            $prev = $nulls[-1]
+            if (-not $prev.proc.HasExited) { L "$tag waiting for $($prev.tag) SITENULL to finish before launching its own"; $prev.proc.WaitForExit() }
+        }
         L "$tag SITENULL launched DETACHED (overlaps the next build) snapshot=$snap"
         $p = Start-Process -FilePath (Resolve-Path .\gradlew.bat) -ArgumentList $nullArgs -RedirectStandardOutput $outFile -RedirectStandardError "$outFile.err" -WindowStyle Hidden -PassThru
         $nulls += @{ tag = $tag; proc = $p; started = Get-Date }
