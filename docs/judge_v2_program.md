@@ -73,6 +73,23 @@ violation (reasoning judge: 1; Mistral v1: 2); (4) decidable tie rate ≤ 15%; (
 12.8%; (6) long-wrong preference on short-correct top-cluster pairs < v1's. Prediction: passes
 (1)–(5); (6) improves only if J3-R passes.
 
+## Outcomes (appended as they land)
+
+- **RUBRIC-512-SS (2026-09-10 00:24): B4 settled.** Cell vs same-session generic +1.0pp (35:26,
+  p = 0.31); session drift alone +0.8pp. Cell rubrics ≈ +1pp for Mistral on keyed questions, not
+  significant; discursive-only. STACK uses the anchor rubric (the ladder's clean anchor rubrics,
+  induced with the pool of record withheld).
+- **J3-R (2026-09-10 00:38): PRIMARY FAIL on the letter (p = 0.053), guards OK, direction positive.**
+  v2+reference 0.862 vs v1+reference 0.849 (+1.4pp, 26:13); top cluster +1.1; reference-correct
+  +2.2 (p = 0.002); reference-wrong −3.9 (n.s.). Long-wrong preference on short-correct top-cluster
+  pairs 0.241 vs 0.259. B6 check: tie rate on KEY-DECIDABLE pairs is 5.9% under both v1+ref and
+  v2+ref (identical) — the extra ties of v2 (22.6% vs 15.3% of all matches) fall entirely on
+  non-decidable pairs, where TIE is the intended verdict. Per the STACK registration (v2 only if the
+  primary passes), the assembled judge runs with the v1 mechanics; v2 stays a secondary arm.
+- Free re-measurements under the reference (J2-R cache vs x12 MAIN, same matches): flip rate 12.8%
+  vs 9.7% (Mistral v1 no-ref, J1 record) — position sensitivity is NOT reduced by the reference;
+  decidable tie rate 5.9%.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question

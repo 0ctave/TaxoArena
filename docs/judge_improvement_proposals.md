@@ -342,3 +342,19 @@ reasoning judge's gain exceeds Mistral's RUBRIC-512 gain (+1.8pp) — S1's "rubr
 competence" carried to a stronger judge. Prediction: +0 to +2pp, NOT significant; secondary FAILS
 (the reasoning judge sits at 0.85 with little headroom on keyed questions) — i.e. cell rubrics are
 not the lever for either judge tier.
+
+- **J3-R (2026-09-10 00:38): PRIMARY FAIL on the letter (p = 0.053), guards OK, direction
+  positive everywhere.** Same 1,974 matches as J2-R (0 invalid), 944 key-decidable: v2+reference
+  0.862 vs v1+reference 0.849 (+1.4pp; 26:13; p = 0.053). Top cluster 0.677 vs 0.665 (+1.1; 10:7);
+  reference-correct stratum 0.936 vs 0.914 (+2.2; 25:7; p = 0.002); reference-wrong 0.386 vs 0.425
+  (−3.9; 1:6; n.s., inside the −5pp guard). Long-wrong preference on the 174 top-cluster pairs where
+  the shorter answer is correct: 0.241 vs 0.259 (−1.8pp). Tie rate on ALL judged matches 22.6% vs
+  15.3% (v2 permits TIE when both final answers are right, which is the intended behaviour on
+  both-correct pairs); on key-decidable pairs the tie rates are reported in the program doc.
+  Reading: the v2 mechanics help exactly where they should — when the reference is right, the
+  judge that verifies the final answer first gets 2.2pp more — and cost a little where the
+  reference is wrong (a wrong reference is now followed slightly more). The prompt is a
+  second-order lever next to the reference (+7.6): the registered bar was p < 0.05 and it missed
+  by 0.003, so by the STACK registration the assembled judge runs with the v1 mechanics; v2 is
+  recorded as directionally positive and re-tested only as a secondary STACK arm if budget allows.
+  Cache experiment_results/x12_crossdomain/rejudge_mistral_v2_refgrok.db, output j3r_outcome.txt.
