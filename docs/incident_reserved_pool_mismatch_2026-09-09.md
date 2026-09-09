@@ -69,6 +69,30 @@ repo root.
   the discursive anchors (secondary: gain in {Philosophy, History, Psychology, Biology,
   Health} > gain in {Math, Physics, Chemistry, Engineering}).
 
+## Option A results (2026-09-09, experiment_results/clean_subset_reanalysis.txt)
+CLEAN = 1,020 questions held out under both pools; CONTAMINATED = the 2,425 on the frozen tree's
+train side. Paired McNemar on key-decidable matches, ties wrong.
+
+| claim | CLEAN | CONTAMINATED | status |
+|---|---|---|---|
+| Cell rubric > generic (Mistral) | +0.9pp, 52:41, p=0.30 (n=1,252) | +1.8pp, 144:86, p=0.0002 | **WITHDRAWN as significant**; direction positive |
+| Cell rubric > generic (grok) | +2.3pp, 14:8, p=0.29 (n=264) | +2.5pp, 43:26, p=0.05 | withdrawn; direction positive |
+| H7 cell > random-anchor rubric | +0.7, 11:9, p=0.82 | +2.7, 28:10, p=0.005 | **WITHDRAWN** |
+| H7 cell > sibling | 0.0, 5:5 | +2.0, p=0.17 | null (was null) |
+| H7 length clause (cell vs cell+clause) | +1.1, p=0.73 | +1.1, p=0.33 | unchanged (null) |
+| Ladder: leaf / stratum / generic vs anchor | −1.4 / −1.8 / −1.1, all p>0.35 | +0.1 / −1.6 / −1.3 | **STANDS**: anchor-level rubrics are as good as anything, on clean and contaminated alike |
+| 12-model board rho vs key (x12, R2) | 0.951 | 0.951 | **STANDS** (identical top-4 and violations in every subset) |
+| Model×domain interaction LRT (R2, question-level permutation) | LRT 38.8 vs null p95 21.0, p=0.002 | LRT 94.1, p=0.001 | **STANDS** on clean questions |
+| Verbosity beta_len (x12 decisive) | +0.284/1k, z=6.7 | +0.457/1k, z=13.2 | **STANDS**; magnitude smaller on clean (reported) |
+| R2 strata profile | 22–38% clean questions per stratum | — | in-sample routing for the rest; per-stratum precision not recoverable without re-measurement |
+
+Net: the rubric-specificity results (RUBRIC, H7 random) do not survive; the anchor-knee,
+ranking, interaction and verbosity results do. What the campaign can claim about rubrics
+after this: a cell rubric induced WITHOUT the judged question is worth about +1pp to a
+non-reasoning judge, not distinguishable from zero at n ≈ 1,250, and no better than an
+anchor rubric — consistent with S1 (rubrics help where the judge is already competent)
+and with the ladder. RUBRIC-512 (option D) is the registered clean measurement.
+
 ## Options (decision for the author)
 A. Re-analyse on the clean subset and DISCLOSE — every affected claim restated with the clean
    numbers; the rubric-value claim is withdrawn as a significant result (direction positive,
