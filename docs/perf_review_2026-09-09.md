@@ -151,3 +151,42 @@ double loops is typically 2–4× slower than the top tier (not measured here).
 - `category`/`options_json` constancy per question in `eval_results` (#6); whether `Z:` is a network
   drive (decides whether the 1 GB scans cost 3 s or 30 s+).
 - Judge-induction end time; actual 429 thresholds for Mistral/grok (no 429 in any log).
+
+## Gate outcome (2026-09-09 22:12–22:19, HEAD 96d2f85, experiment_results/perf_replay/)
+
+Items #4 (in-place deflation), #2 (exact-content PCA memo) and #1 (full JIT for bootRun)
+were merged and replayed on the D2 arm bareq512_s137 (label-free, seed 137, 512 dims):
+arm A = new code under the old C1-only JIT (`JAVA_TOOL_OPTIONS=-XX:TieredStopAtLevel=1`),
+arm B = new code under the full JIT. Reference = experiment_results/dimsweep2/bareq512_s137.
+
+| artifact | ref vs A | ref vs B | p7_det_1 vs p7_det_2 (identical code, old JIT) |
+|---|---|---|---|
+| dag_snapshots.jsonl (both copies) | IDENTICAL | IDENTICAL | IDENTICAL |
+| proposals.csv | dJ and decisions identical; SE_dJ / z columns differ in the 4th–6th digit | same | same |
+| fixed_point_certificate.txt | trickle delta 0 vs −2.2e-16 | 0 vs −5.6e-16 | 5.6e-16 vs 0 |
+| iteration_metrics.csv | one signed zero (−0.000000000000) at iteration 10 | same | identical |
+| validation ECE / Brier / J / purity | last-digit float drift | same | same |
+| routing diagnostics, flow matrix, Top-k, leaf support | IDENTICAL | IDENTICAL | IDENTICAL |
+
+The DAG and every routing readout are bit-identical under both arms. The residual
+differences are exactly the class P7 already documented for two runs of IDENTICAL code
+(bootstrap-SE order instability in the dJ SE column, parallel-reduction float drift in the
+validation aggregates; the p7_det diff is in p7_identical_code_diff.txt) — they are not
+introduced by the change, and the extra signed zero is the trickle-delta drift printed
+through a format that preserves the sign. Verdict: structure bit-identical; the JIT change
+and the PCA changes are adopted. `replay_diff.py`'s STRUCTURE list has been narrowed to the
+DAG files accordingly; proposals.csv and the certificate are reported under the P7 caveat.
+
+Timing (phase 4 = construction.phase4_split total from performance_report.json; wall = chain
+BUILD wall including Gradle/Spring startup, validation and shutdown):
+
+| arm | phase 4 | build wall |
+|---|---|---|
+| reference (old code, old JIT) | 235.9 s | 360 s (chain wall incl. the --rerun-tasks recompile) |
+| A: new code, old JIT (#2 + #4) | 163.0 s (−31 %) | 253 s |
+| B: new code, full JIT (#1 + #2 + #4) | 76.0 s (−68 %) | 125 s |
+
+Iterations 6–10 (tree fixed, 457 proposals re-tried each) went 19.6–20.4 s → 4.9 s each; the
+proposal memo across iterations (#8) would remove them entirely and remains "needs care".
+Next in this order: overlapped sweep chain (#3, first use = the D4 arms), then #8 with a
+two-config replay.

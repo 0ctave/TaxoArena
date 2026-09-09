@@ -2,17 +2,20 @@
 
   python tools/analysis/replay_diff.py <reference_run_dir> <replay_run_dir> [<replay_run_dir> ...]
 
-Prints IDENTICAL / DIFFERS per artifact. Structure artifacts (dag_snapshots.jsonl,
-fixed_point_certificate.txt, diagnostics/proposals.csv) must be IDENTICAL for the gate to pass;
-timing/manifest files are skipped; evaluation-path files (iteration_metrics.csv, validation/*.csv)
-are reported but carry the known P7 caveat (bootstrap-SE order instability, validation float
-drift) — a difference there is shown with its first differing line so it can be classified.
+Prints IDENTICAL / DIFFERS per artifact. The DAG (dag_snapshots.jsonl, both copies) must be
+IDENTICAL for the gate to pass; timing/manifest files are skipped; evaluation-path files
+(proposals.csv's bootstrap SE column, the certificate's trickle delta, iteration_metrics.csv,
+validation/*.csv) are reported but carry the known P7 caveat — two runs of IDENTICAL code differ
+there (experiment_results/perf_replay/p7_identical_code_diff.txt) — and a difference is shown
+with its first differing line so it can be classified.
 """
 import os, sys, hashlib
 
-STRUCTURE = ["dag_snapshots.jsonl", "fixed_point_certificate.txt", "diagnostics/proposals.csv",
-             "diagnostics/dag_snapshots.jsonl"]
-EVAL = ["diagnostics/iteration_metrics.csv", "diagnostics/rank_history.csv", "validation"]
+STRUCTURE = ["dag_snapshots.jsonl", "diagnostics/dag_snapshots.jsonl"]
+# proposals.csv carries the bootstrap SE of dJ (order-unstable between identical-code runs, P7)
+# and the certificate carries the trickle delta (float drift): both are reported, not gated.
+EVAL = ["diagnostics/proposals.csv", "fixed_point_certificate.txt", "diagnostics/iteration_metrics.csv",
+        "diagnostics/rank_history.csv", "validation"]
 SKIP = {"headless_run.log", "performance_report.json", "diagnostics/run_manifest.json",
         "diagnostics/headless_run.log", "diagnostics/config.toml"}
 
