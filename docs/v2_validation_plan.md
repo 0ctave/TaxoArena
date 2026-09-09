@@ -316,3 +316,17 @@ Prediction: held-out purity ~68–70%.
   and right on Top-1/F6. bareq512 remains the construction to promote. Wall: build 594 s,
   site-null 2,114 / 2,205 s per seed at 1024. Artifacts: experiment_results/dimsweep3/
   (report.txt, f6_d3.txt, bar_derivation.txt, site-null CSVs).
+
+- T3 (2026-09-09, registered above): **FAIL — there is no routing inflation to correct.**
+  The frozen tree routes its TRUE held-out pool p8a29 (3,433 routed of 3,437) at 74.0%
+  primary-anchor purity [72.5, 75.5], against 73.6% on the arena pool p2dca (71% in-sample):
+  in-sample minus held-out = −0.5pp; the registered ≥ 3pp overstatement does not exist. Within
+  p2dca the train-side 2,425 route at 72.2% and the clean 1,020 at 76.8% — the questions the
+  tree was built on route WORSE, not better (construction assigns hard, boundary questions to
+  foreign-anchored leaves and routing keeps them there; held-out questions are placed by
+  centroid similarity alone). Per category the two pools agree within ±3pp except Biology
+  (held-out +7.3). Determinism check: the 1,020 questions present in both pools route to the
+  same leaf in both runs (100%). Consequence: H5's 73.6% and the arena-side routing figures
+  stand as honest held-out estimates; the incident's "in-sample routing" caveat is retained as
+  disclosure but carries no measurable bias. Prediction (68–70%) wrong. Artifacts:
+  experiment_results/dimsweep4/frozen_p8a29_leaf_assignments.csv, t3_outcome.txt.
