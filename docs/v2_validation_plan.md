@@ -114,6 +114,21 @@ analysis. The metrics above are unaffected (site nulls use the build's own train
 population; Top-1 uses the build's own held-out split; ARI uses questions outside the
 frozen pool).
 
+## D2 — stage-2 dimension sweep (registered 2026-09-09, before launch)
+Arms, seeds 137 / 2048, body = D1: abt2d512 (`embeddingSliceDim 512`, `splitDropTopPcs
+2`), bareq512 (512 dims, bar 0.0145 = 0.025 x isotropic-null ratio 0.0040/0.0069 — the
+bar-equalized control for d512), abt1 (256 dims, `splitDropTopPcs 1` — dose-response).
+Metrics: D1's (site-level certification at the arm's geometry, Top-1, cross-seed ARI,
+Philosophy leaves) plus F6's key-only leaf-level LOO Brier vs the frozen tree.
+REGISTERED: (i) bareq512 — the d512 certification gain is NOT a bar artefact iff
+bareq512's certified count >= d256's (7, 9) in both seeds; (ii) abt2d512 IMPROVES iff its
+certified count > d512's (13, 13) in both seeds AND its F6 leaf-level loss vs frozen is
+>= −0.5 (x1000) — i.e. it certifies more without abt2's capability-information loss;
+(iii) abt1 descriptive. Predictions: (i) holds (width effect real, with more leaves than
+d512); (ii) FAILS on the F6 clause — abt2's loss is the leaf count, and abt2d512 will
+also have ~60 leaves. Split hygiene as D1 (structural evidence only; splitSeed = 42
+rebuild before any arena use); frozen pool re-pinned by the chain itself at the end.
+
 ## OUTCOMES (updated as tests adjudicate)
 
 - P6 (2026-09-08): **NULL — overlap program closed, soft routing vindicated.** Full pool

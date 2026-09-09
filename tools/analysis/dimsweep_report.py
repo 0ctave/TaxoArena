@@ -18,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 import consensus_tree as ct  # noqa: E402
 
-SWEEP = os.path.join(ROOT, "experiment_results", "dimsweep")
+SWEEP = os.path.join(ROOT, "experiment_results", "dimsweep")  # overridden by --sweep
 
 
 def build_dir(arm, seed):
@@ -94,7 +94,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arms", default="d128,d256,d512,abt2,white")
     ap.add_argument("--seeds", default="137,2048")
+    ap.add_argument("--sweep", default="dimsweep", help="experiment_results/<sweep> (D2 uses dimsweep2)")
     a = ap.parse_args()
+    global SWEEP
+    SWEEP = os.path.join(ROOT, "experiment_results", a.sweep)
     arms = a.arms.split(",")
     seeds = [int(s) for s in a.seeds.split(",")]
 
