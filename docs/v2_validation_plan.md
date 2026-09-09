@@ -330,3 +330,16 @@ Prediction: held-out purity ~68–70%.
   stand as honest held-out estimates; the incident's "in-sample routing" caveat is retained as
   disclosure but carries no measurable bias. Prediction (68–70%) wrong. Artifacts:
   experiment_results/dimsweep4/frozen_p8a29_leaf_assignments.csv, t3_outcome.txt.
+
+- D4 first measurement (2026-09-09 22:22–22:27, builds arrive_philosophy_s137 / arrive_law_s137
+  on the corrected keys): **VOID — harness defect, not a result.** Both arms came out "ABSORBED"
+  with ZERO withheld train questions in any leaf or residual pool: the routable corpus was
+  gathered from the anchored depth-1 branches only, so the 349 (Philosophy) / ~715 (Law)
+  unanchored queries never entered the DAG, and the `[HOLD-OUT] retained` guard passed because
+  it checked the label map rather than tree membership — exactly the vacuity the guard was
+  written to prevent. The held-out routing readouts of those runs (Philosophy → Other 54,
+  Psychology 38, CS 31; Law → Philosophy 113, Other 86) describe how an ABSENT domain routes and
+  are kept as a descriptive only. Fix: withheld queries are placed at the root with full weight
+  at bootstrap (the trickle's own out-of-distribution fallback location), the corpus is gathered
+  from the root, and a tree-membership guard replaces the label-map guard. No effect on runs
+  without `excludeFromAnchoring`. The registration is unchanged; the arms are rebuilt.
