@@ -42,8 +42,12 @@ AZURE_ENDPOINT = None
 AZURE_KEY = None
 
 
+REFERENCE = None   # --reference grok-reasoning = J1-R: the reasoning judge WITH the J2-R reference (docs/judge_v2_program.md)
+
+
 def cache_path():
     tag = re.sub(r"[^A-Za-z0-9]+", "_", JUDGE_MODEL.split("/")[-1]).strip("_").lower()
+    if REFERENCE: tag += "_ref" + REFERENCE.replace("-reasoning", "").replace("-", "")
     return os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_%s.db" % tag)
 
 
@@ -126,6 +130,11 @@ def judge_one(match, nodes, evals):
     if ra is None or rb is None:
         return None
     qtext = ra[0]
+    if REFERENCE:
+        import rejudge_reference as rref
+        ref = REFS.get(qid)
+        if ref is None: return None
+        qtext = rref.with_reference(qtext, ref)
     ta, tb = rj.robust_trace(ra[2], ra[3], ra[1]), rj.robust_trace(rb[2], rb[3], rb[1])
     system = rj.build_system_prompt(nodes[nid])
     raw1, p1, k1, l1 = call_judge(system, rj.build_user_prompt(qtext, ta, tb))
@@ -138,7 +147,14 @@ def judge_one(match, nodes, evals):
             w_name, int(flip), int(invalid), raw1, raw2, p1, p2, k1, k2, l1, l2, time.time())
 
 
+REFS = {}
+
+
 def run(pilot=None, workers=16):
+    global REFS
+    if REFERENCE:
+        import rejudge_reference as rref
+        rref.set_reference(REFERENCE); REFS = rref.references()
     load_env()
     nodes = rj.load_nodes()
     sample = rj.sample_matches()
@@ -255,7 +271,9 @@ if __name__ == "__main__":
     ap.add_argument("--analyze", action="store_true")
     ap.add_argument("--provider", choices=["azure", "hf"], default="azure")
     ap.add_argument("--model", default=None)
+    ap.add_argument("--reference", choices=["grok-reasoning"], default=None)
     a = ap.parse_args()
+    REFERENCE = a.reference
     PROVIDER = a.provider
     if a.model:
         JUDGE_MODEL = a.model
