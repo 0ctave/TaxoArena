@@ -67,7 +67,7 @@ def wrong_answers(items):
     out = defaultdict(list)
     marks = ",".join("?" * len(FRONTIER6))
     for cat, qtext, pred, ans, outp in ev.execute(
-            "SELECT category, question_text, predicted_answer, correct_answer, model_output FROM eval_results "
+            "SELECT category, question_text, pred, gt_answer, model_output FROM eval_results "
             "WHERE is_reserved=0 AND is_correct=0 AND length(model_output) > 200 AND model_name IN (%s)" % marks, FRONTIER6):
         if qtext in items:
             out[cat.capitalize() if cat != "computer science" else "Computer science"].append((qtext, pred, ans, rj.unwrap_envelope(outp or "")[:600]))
@@ -126,7 +126,7 @@ def leakage_audit(sets):
     ev = sqlite3.connect("file:%s?mode=ro" % rj.EVAL_DB, uri=True)
     sample = rj.sample_matches(); qids = {int(m[1]) for m in sample}
     opts = {}
-    for q, o, a in ev.execute("SELECT question_id, options_json, correct_answer FROM eval_results WHERE model_name='gpt-4o-2024-08-06'"):
+    for q, o, a in ev.execute("SELECT question_id, options_json, gt_answer FROM eval_results WHERE model_name='gpt-4o-2024-08-06'"):
         if q in qids and o:
             try: lst = json.loads(o); i = "ABCDEFGHIJ".find((a or "")[:1]); opts[q] = lst[i] if 0 <= i < len(lst) else ""
             except Exception: pass
