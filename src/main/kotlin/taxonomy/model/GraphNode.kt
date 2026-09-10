@@ -147,7 +147,7 @@ data class GraphNode(
         var sumW = 0.0
         for (i in 0 until k) {
             val child = childrenList[i]
-            val mass = child.queryWeights.values.sum()
+            val mass = taxonomy.utils.orderedSum(child.queryWeights)
             weights[i] = mass
             sumW += mass
         }
@@ -330,7 +330,7 @@ data class GraphNode(
         var sum = 0.0
         fun walk(node: GraphNode) {
             if (!visited.add(node.id)) return
-            sum += node.queryWeights.values.sum()
+            sum += taxonomy.utils.orderedSum(node.queryWeights)
             node.treeChildren.forEach { walk(it) }
             node.crossLinkChildren.forEach { walk(it) }
         }

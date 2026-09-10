@@ -470,3 +470,17 @@ Prediction: held-out purity ~68–70%.
   decisions (|z − 2| ≲ 0.05); the bootstrap SE varies ~3% run to run"; every tree of record is a
   saved snapshot, which is what the arena and the analyses load, so no published number depends on
   re-running construction.
+  RESOLVED 05:14 (commit below): the residual source was the unordered `values.sum()` over
+  ConcurrentHashMap query-weight maps on the construction path (fitter nEffective → kappa; splitter
+  mass/ESS gate; operations cN and totalAssignedMass; two GraphNode mass sums) — the instrumented
+  deviant (run 7) showed the SAME affected-set size and mass but different MEMBERS at the first
+  differing proposal, i.e. the temporary split's fit differed in the last bit and near-tie queries
+  changed sides. With every reduction ordered (taxonomy.utils.orderedSum / orderedSumOf) plus the sorted
+  bootstrap, three consecutive builds of the promoted config are BYTE-IDENTICAL: DAG, proposals.csv
+  including every SE_dJ, the bootstrap inputs, 14 iterations (runs 10–12). Unit suite 262/262 after the
+  change. P7 is therefore closed: construction is bit-reproducible from this commit on. Consequence for
+  artifacts: the ordered sums change last bits, so trees built before this commit (including the
+  promoted 20260909_212117) are reproducible only as saved snapshots, not by rebuilding — which is how
+  every analysis and arena run consumes them. A rebuild of bareq512_s42 under the deterministic code
+  yields a third, equally valid tree (dag 1d1a0645…, 14 iterations); it is NOT promoted, the snapshot of
+  record stays.

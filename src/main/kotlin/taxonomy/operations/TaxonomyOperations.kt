@@ -391,7 +391,7 @@ class TaxonomyOperations(
 
         var pairFrac = 0.0
         for (leaf in leaves) {
-            val cN = leaf.queryWeights.values.sum()
+            val cN = taxonomy.utils.orderedSum(leaf.queryWeights)
             pairFrac += cN * (cN - 1.0)
         }
         for (parent in residualParents) {
@@ -771,7 +771,7 @@ class TaxonomyOperations(
             }
         }
 
-        val totalAssignedMass = queryWeights.values.sum()
+        val totalAssignedMass = taxonomy.utils.orderedSum(queryWeights)
         if (totalAssignedMass == 0.0) return
 
         val recursiveSum = root.getRecursiveSoftMass()

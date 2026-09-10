@@ -60,8 +60,8 @@ class TaxonomySplitter(
     suspend fun splitSingleNode(node: GraphNode, forcedK: Int? = null, currentIteration: Int = -1): Boolean {
         if (!node.isLeaf) return false
         val localWeights = node.queryWeights
-        val mass = localWeights.values.sum()
-        val ess = if (mass > 0.0) (mass * mass / localWeights.values.sumOf { it * it }) else 0.0
+        val mass = taxonomy.utils.orderedSum(localWeights)
+        val ess = if (mass > 0.0) (mass * mass / taxonomy.utils.orderedSumOf(localWeights) { it * it }) else 0.0
         val threshold = 2 * config.formalism.minClusterSize
         if (mass < threshold || ess < threshold) return false
 

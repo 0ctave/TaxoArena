@@ -202,7 +202,7 @@ class TaxonomyFitter(
         
         // 1. Get query weights in the region and total effective count
         val queryWeightsMap = node.getRegionQueryWeights()
-        val nEffective = queryWeightsMap.values.sum()
+        val nEffective = taxonomy.utils.orderedSum(queryWeightsMap)
         
         // 2. Fixed MRL slice selection (single source of truth: dimForDepth)
         val fitDim = dimForDepth(node.depth)
