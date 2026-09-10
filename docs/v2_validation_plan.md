@@ -437,3 +437,22 @@ Prediction: held-out purity ~68–70%.
   too small and too under-determined to be worth estimating from verdicts until a cell holds several
   hundred distinct questions. Prediction (λ = 0.25 wins at V ≥ 120 oracle) wrong except at 400.
   Output experiment_results/leaf_profile_shrink.txt.
+
+- HYGIENE-REPLICA (2026-09-10 04:33–04:36, registered as a byte-identity check of the promoted tree):
+  **the promoted bareq512_s42 build and its label-free replica are NOT the same tree — and the cause is
+  a z-gate flip on the bootstrap SE, not labeling.** Labeling is strictly post-pass (the promoted log
+  starts labeling at 20:55:03, after iteration 18). Iterations 1–6 are identical proposal-by-proposal
+  (181 proposals, identical decisions). At iteration 7 the proposal GROW n00000191 has the SAME dJ
+  (0.000152082) in both runs but SE_dJ 0.000076077 (z = 1.9990 → REJECTED) in the promoted run and
+  0.000075678 (z = 2.0096 → ACCEPTED) in the replica; the trees diverge from there (18 vs 15
+  iterations; final 158 nodes both, 37 nodes differ by ±1 query and kappa; leaf count, depth
+  distribution, held-out Top-1 and the migration matrix identical). Consequence for P7: "structure is
+  bit-reproducible" holds only when no proposal lands within the bootstrap SE's run-to-run noise of the
+  acceptance threshold (z = 2.0); the evaluation-path instability P7 recorded CAN propagate into
+  structure through the gate. P7's two runs and the perf replay gate passed because no borderline
+  proposal occurred in those configs. Replica 2 (same label-free config, same code) is running to show
+  whether identical code flips the same decision. Fix: an order-independent (sorted-accumulation)
+  bootstrap SE in JBootstrap — a P7 work item, small; it changes SE_dJ in the last digits and makes the
+  gate deterministic. Until then, the promoted snapshot 20260909_212117 is the tree of record (its
+  rubrics, routing CSV and every RUBRIC-512 / STACK verdict use it); the replica is not promoted.
+  Artifacts: experiment_results/hygiene/ (diff.txt, the two run dirs).
