@@ -258,6 +258,21 @@ card to the judge verbatim; it is the cleaner test of the idea.
   reference (13 rejected by the endpoint's content filter, the known class); reference accuracy 0.860
   over the whole pool.
 
+- **J6 (2026-09-10 05:56): PRIMARY FAIL — the contrastive rubric is significantly WORSE; authorship
+  does nothing.** 5,939 jobs, 1 filtered; 944 key-decidable matches with all three arms, no reference,
+  one session: contrastive 0.761 vs Mistral-induced 0.779 (−1.8pp; 23:40; p = 0.043); frontier-induced
+  0.773 vs 0.779 (−0.5; 27:32; p = 0.60); contrastive vs frontier −1.3 (n.s.). The loss concentrates in
+  the quantitative anchors (−2.8pp, 9:21, p = 0.043; discursive −1.0 n.s.). Mistral-induced anchor vs
+  the same-day generic: +1.5pp (44:30, p = 0.13) — the anchor rubric's ≈ +1pp again. Reading, with the
+  caveat recorded before the result: the pipeline's persona-synthesis stage turned the contrastive
+  corpus into a longer, more prescriptive checklist with "(CRITICAL)" priority tags rather than a
+  failure catalogue, and that text made a non-verifying judge slightly worse, most where answers are
+  numeric. Two conclusions: (i) who writes the rubric is irrelevant (frontier = Mistral); (ii) under the
+  current induction pipeline, more or stronger rubric TEXT is at best neutral and can hurt — rubric
+  text is not the lever, which is the fifth clean null on rubric content and the first significant
+  negative. The direct test of contrastive CONTENT delivered verbatim (RK-1, the kit) started 05:55.
+  Caches experiment_results/x12_crossdomain/rubric_j6.db, output j6_outcome.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
