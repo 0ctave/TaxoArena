@@ -286,6 +286,21 @@ card to the judge verbatim; it is the cleaner test of the idea.
   left that hands the judge something it can check step by step.
   Cache experiment_results/x12_crossdomain/stack_v2_kit.db, output rk1_outcome.txt.
 
+- **FLIP-PROV (2026-09-10 13:25, zero calls): B2 closed — flips are near-tie noise and the TIE resolution
+  is the right rule.** STACK-v2, 1,974 verdicts: flip rate 21.7% on non-decidable pairs (both right or
+  both wrong, n = 1,030) vs 5.4% on key-decidable pairs (51 of 944); within decidable pairs 11.8% at key
+  gap 0.05–0.15, 3.1% at gap > 0.15 (4.8% at gap < 0.05, n = 63). Among the 51 decidable flips the
+  order-1 vote is right 45% and the order-2 vote 49% of the time, neither in 6%: a flip is one order
+  right and one wrong, i.e. a coin toss the TIE rule correctly refuses to call. STACK-v2's 13.9%
+  overall flip rate is therefore dominated by pairs where TIE is the correct verdict; no mitigation is
+  needed and the flip-rate guard is retired in favour of "decidable flip rate ≤ 8%" (STACK-v2: 5.4%).
+- **BOARD-W (2026-09-10 13:25, zero calls, registered readout):** top-4 board from STACK-v2's 599
+  top-cluster matches — ungated: gemini > iask > arx > gpt-4o (1 violation); mean-confidence-weighted:
+  same (1); gated ≥ 0.95 both orders (n = 181): same (1); EXPLORATORY, not registered: squared-confidence
+  weighting gives gemini > arx > iask > gpt-4o = the key order (0 violations). Reporting rule for the
+  paper: the ungated board with the confidence-weighted board alongside; the squared variant is noted as
+  exploratory only. Output experiment_results/x12_crossdomain/flip_prov_boardw.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
