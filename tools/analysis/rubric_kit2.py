@@ -64,6 +64,12 @@ def datacard():
         if q in meta and p and p[:1] != meta[q][1]: preds[q][p[:1]] += 1
     sample = rj.sample_matches(); judged = {int(m[1]) for m in sample}
     judged_correct = {meta[q][0]["ABCDEFGHIJ".find(meta[q][1])].strip().lower() for q in judged if q in meta and 0 <= "ABCDEFGHIJ".find(meta[q][1]) < len(meta[q][0])}
+    # The judge-time audit refuses any 5-gram shared with a judged question's correct option (formulaic
+    # phrases such as "it's not the case that" included); apply the same rule when selecting pairs.
+    judged_grams = set()
+    for t in judged_correct:
+        if len(t.split()) >= 5: judged_grams |= rk.grams(t)
+    def shares(t): return bool(rk.grams(t) & judged_grams)
     nodes = r512.load_graph(r512.snapshot_id("bareq512_s42")); labels = {n["id"]: n["label"] for n in nodes.values()}
     by_leaf = defaultdict(list)
     for q in qs:
@@ -93,7 +99,8 @@ def datacard():
                 # the aggregate error signature carries the numeric information). Drop empty/nan options.
                 if (k / nw >= 0.4 and 0 <= pi < len(opts) and opts[ki].strip().lower() not in judged_correct
                         and vals[ki] is None and vals[pi] is None and opts[ki].strip().lower() not in ("", "nan") and opts[pi].strip().lower() not in ("", "nan")
-                        and sum(ch.isdigit() for ch in opts[ki]) < 3 and sum(ch.isdigit() for ch in opts[pi]) < 3):   # conceptual text only
+                        and sum(ch.isdigit() for ch in opts[ki]) < 3 and sum(ch.isdigit() for ch in opts[pi]) < 3   # conceptual text only
+                        and not shares(opts[ki]) and not shares(opts[pi])):
                     pairs.append((k / nw, nw, opts[ki].strip(), opts[pi].strip()))
         pairs.sort(key=lambda x: -x[0] * x[1])
         lines = ["Answer form in this subdomain: %d%% of questions have numeric options" % round(100 * numeric / max(1, len(lq)))]
