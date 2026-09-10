@@ -120,3 +120,13 @@ an arena question), which turns K3 into genuine worked examples; the answer-form
 spacing, error signature) is a free, data-only leaf guideline that no induction produced. RK-1b
 (registered here, zero induction calls): the data-only leaf card (answer form + error signature +
 attractor pairs) vs STACK-v2, same design as RK-1.
+
+### RK-1b / RK-1c — registered 2026-09-10 06:50, before any judged call (tools/analysis/rubric_kit2.py)
+RK-1b: STACK-v2 vs STACK-v2 + the DATA-ONLY leaf card (answer form, distractor spacing, numeric error
+signature, up to 6 conceptual misconception pairs from train-side attractors; zero induction calls;
+pairs whose correct text equals a judged question's correct option are dropped; 5-gram audit at judge
+time). RK-1c: as RK-1b plus two worked neighbours whose solutions are the reasoning model's own solves
+of the TRAIN-side neighbour questions, kept only when key-verified (never an arena question). Both:
+R3's 1,980 matches, Mistral, arms fresh and interleaved, ~8k calls each; PRIMARY +1pp at paired
+McNemar p < 0.05; SECONDARY quantitative > discursive. Predictions: RK-1b +0 to +2pp; RK-1c +1 to +3pp.
+Queue: RK-1 (running) → RK-1b → RK-1c (after the ~2k neighbour solves on grok-reasoning, running now).
