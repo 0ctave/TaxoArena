@@ -23,8 +23,10 @@ paired McNemar; BT refits via refit_bt_from_matches.py; bias_audit.py).
   quantitative precision, scope accuracy"; a Kotlin comment block is embedded in the
   string literal and reaches the judge; swap-disagreement is forced to TIE at conf 0.5.
 - Rubric induction sees: every non-reserved train question in the node, all options with
-  the correct one marked, and the reference chain-of-thought. It never sees a model
-  answer. (Response-blind, key-informed.)
+  the correct one marked — and NOT the reference chain-of-thought: CORRECTION 2026-09-10,
+  `mmlu_pro.cot_content` is empty for all 12,000 cached questions (MMLU-Pro ships CoT only for its
+  70-question validation split), so the "Correct Reasoning" line was never emitted. It never sees a
+  model answer. (Response-blind, key-informed, reasoning-blind.)
 - Verdict exports keep the per-order votes (WinAFirst / WinASecond) for every LIVE verdict:
   R2 27,657 of 36,892 (the 9,235 resumed rows lost them); x12 3,184 of 9,154.
 

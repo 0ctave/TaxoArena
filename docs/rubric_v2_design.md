@@ -61,3 +61,62 @@ Honest prior: after four nulls on rubric text, the expected total gain of the ki
 ## Build plan
 - `tools/analysis/rubric_kit.py`: `--induce` builds K1 and K2 per leaf of bareq512_s42 on the reasoning model from train-side material only (2 calls per leaf, ~175 calls); `--neighbours` precomputes K3 (zero calls); `--judge` runs RK-1 (STACK-v2 mechanics + kit) with its own cache; `--analyze`.
 - Registration lines above are the commitments; outcomes append below.
+
+## What the data can tell a judge about a leaf (LEAF-SIGNALS, 2026-09-10, zero calls; tools/analysis/leaf_guideline_signals.py)
+
+**Correction of record first.** `mmlu_pro.cot_content` is EMPTY for all 12,000 questions in the dataset
+cache (MMLU-Pro ships chain-of-thought only for its 70-question validation split). The induction
+pipeline (`TaxonomyJudgeService`, and the ladder/J6 replicas) appends "Correct Reasoning" only when the
+field is non-empty, so every rubric in the campaign was induced from question + ten options + key, with
+the template forbidding option content. The proposals doc's "induction sees … the reference
+chain-of-thought" was wrong. This is the second half of the root cause: no worked reasoning in, no
+verifiable content out. The kit's knowledge card (K2) was likewise built from questions and keys only —
+and still came out as formulas with validity conditions, because the reasoning model reconstructs them;
+worked neighbours (K3) currently carry question + options + key, not a derivation.
+
+**Pipeline per leaf (promoted bareq512_s42):** corpus = the leaf's train-side region questions (mean 86
+after withholding the pool of record; 1–3 withheld per leaf, i.e. the routing puts a few arena
+questions into every region and they are excluded), chunked by 25 → 4 batch-guideline calls + 1 master
+synthesis + 1 persona/rubric synthesis ≈ 6 calls per leaf; the third stage compresses everything into a
+"short bullet checklist" (J6 caveat). Arena side: 36 reserved questions per leaf at the median (p10 23,
+min 17, max 171). Per-leaf rubric EVALUATION is therefore impossible at any budget on this pool (a +2pp
+effect needs ~2,000 decidable matches per leaf); rubric value can only be measured pooled across leaves,
+which is what every test did. Enlarging the reserved pool would not help: the binding quantity for a
+per-leaf verdict is distinct questions per leaf (H6b, LEAF-POWER), and every question moved to the
+arena side is removed from the induction corpus (86 → fewer) and from construction.
+
+**Signals mined per leaf (85 leaves ≥ 40 keyed questions), and whether they are leaf-specific**
+(within-anchor share of total variance ≥ 0.5):
+
+| signal | source | leaf-specific? | what a guideline can say |
+|---|---|---|---|
+| option spacing: correct value vs nearest distractor | options + key | YES (0.78) | "distractors sit within 10% of the right value here: a near-miss is wrong; carry precision" |
+| near-miss error share (46 models' wrong picks) | preds + options | YES (0.90) | same, with the measured rate |
+| factor-2 error share | preds + options | YES (0.79) | "half the wrong numeric answers are off by ×2 or ÷2 here: check the ½ / 2π / diameter-radius step" |
+| hedging-vs-correctness correlation | model outputs + key | YES (0.63) | whether hedged language signals error in this cell |
+| numeric-option share | options | no (0.14) | anchor-level |
+| attractor strength (share of wrong picks on one distractor) | preds | no (0.12) | anchor-level in strength; but the attractor TEXT is per question |
+| tier gap (top-5 minus rest) | key | no (0.23) | anchor-level |
+| length-vs-correctness correlation | outputs + key | no (0.36) | see below |
+| formula-density correlation | outputs + key | no (0.25) | anchor-level |
+| sign errors | preds | none anywhere | drop |
+
+**Length is not a correctness cue in any leaf.** Across 85 leaves, longer outputs are more often correct
+(corr > 0.15) in zero leaves, less often correct in six, neutral in 79. The judge's elaboration heuristic
+(L1) therefore tracks nothing in the data; it is a pure bias.
+
+**Attractors are the misconception catalogue the data already contains.** In 119 of 400 Physics
+train-side questions, ≥ 50% of all wrong picks land on ONE distractor (e.g. correct "dark" vs attractor
+"black"; "21.2 MeV" vs "22.1 MeV"; E = (h/2)ν vs E = (h/2)(K/µ)^½). The distractor text IS the
+misconception, key-labelled, with a prevalence — better raw material for K1 than model-output excerpts,
+and zero LLM calls to collect. Constraint: only train-side questions may be used (for an arena
+question the attractor implies the key).
+
+**Consequences for the kit.** K1 should be built from train-side attractor pairs (correct text vs
+dominant distractor text, with prevalence) rather than from output excerpts; K2 and K3 should be
+regenerated once a reasoning source exists — either MMLU-Pro's validation CoT where a question has it
+(70 only) or the reasoning model's own solve of the TRAIN-side neighbour (one call per neighbour, never
+an arena question), which turns K3 into genuine worked examples; the answer-form card (numeric share,
+spacing, error signature) is a free, data-only leaf guideline that no induction produced. RK-1b
+(registered here, zero induction calls): the data-only leaf card (answer form + error signature +
+attractor pairs) vs STACK-v2, same design as RK-1.
