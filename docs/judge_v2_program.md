@@ -290,3 +290,25 @@ card to the judge verbatim; it is the cleaner test of the idea.
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
 (amortised over every match on it) + two cheap judge calls per match.
+
+## Registered 2026-09-10 13:20 (before any call)
+- **J1-R — the reasoning judge WITH the reasoning reference** (ceiling of verify-then-judge at reference
+  accuracy 0.86): grok-4-1-fast-reasoning, R3's 1,980 matches, v1 template, frozen-tree cell prompt as
+  in J1, question carrying the J2-R reference. Comparator: J1's cached verdicts (same judge, no
+  reference). REGISTERED: all-decidable gain > 0 at p < 0.05; DESCRIPTIVE: distance of STACK-v2 (0.865)
+  to this ceiling. Prediction: 0.87–0.89 — the reference adds little to a judge that already solves 86%.
+- **FLIP-PROV — flip provenance under STACK-v2** (zero calls): on key-decidable pairs, P(flip) vs the
+  key accuracy gap of the pair and vs whether the two single-order votes were right; on non-decidable
+  pairs the flip rate as the natural tie. REGISTERED READOUT: if flips concentrate on |gap| < 0.05 pairs
+  and both single-order votes are wrong about equally often, position sensitivity is a symptom of
+  genuine near-ties and needs no mitigation; else B2 stays open.
+- **BOARD-W — confidence-weighted vs gated board** (zero calls): top-4 board from STACK-v2's 599
+  top-cluster matches with verdict weight = mean confidence (all verdicts kept) vs the ≥ 0.95 gate
+  (n = 117) vs ungated; key-order violations for each. Registered readout only.
+- **SPLIT-RATIO — reserved-pool ratio study** (3 label-free builds, ~8 min, plus a synthetic arena,
+  zero calls): the promoted config with testRatio 0.20 / 0.30 / 0.40 and their own seed splits (structural
+  evidence only; pool re-pinned after): leaves, certified sites, Top-1, train questions per leaf; then
+  LEAF-POWER's synthetic arena at each ratio's arena questions per leaf. REGISTERED READOUT: the ratio at
+  which anchor-level profile SE at R2's budget stays ≤ 0.15 while construction certification is within
+  2 of the 0.30 build. Prediction: 0.30 is already the knee; 0.40 costs certification without buying
+  leaf resolution.
