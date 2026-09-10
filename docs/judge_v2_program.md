@@ -145,6 +145,32 @@ cure it; if the truncate arm reaches ≥ 0.55, the v2 mechanics enter STACK as a
   **STACK-v2 arm (~4k calls) is the author's call**, recommended. Cache
   experiment_results/causal_length/mistral_refgrok_v2.db, output l1v2_outcome.txt.
 
+- **STACK (2026-09-10 02:10): 5 of 6 checks pass; REGISTERED FAIL on the board check.** 1,974 judged
+  (1 invalid), 944 key-decidable. (1) all-decidable 0.843 ≥ 0.839 OK; (2) top cluster 0.662 ≥ 0.645 OK;
+  (3) top-4 board on 599 top-cluster matches = iask > gemini > arx > gpt-4o, 2 pairwise violations vs
+  the key order gemini > arx > iask > gpt-4o (limit 1) — FAIL; (4) decidable ties 6.2% OK; (5) flips
+  12.3% OK; (6) long-wrong preference 0.270 vs production 0.293 OK. Paired: STACK vs production v1
+  (no reference) +7.1pp (85:18, p < 1e-4); STACK vs J2-R (cell rubric + reference) −0.6pp (12:17,
+  p = 0.46) — the anchor rubric is as good as the leaf rubric under the reference, at zero induction
+  cost. Reading: the assembled judge is a large, significant accuracy gain over production and passes
+  every bias guard, but the top-cluster BOARD still puts iask above gemini, the same judge-level
+  divergence R2 established; accuracy 0.662 on top-cluster pairs is not enough to flip a board built
+  from 600 noisy pairwise verdicts. EXPLORATORY (not registered; F7's rule applied to STACK's own
+  confidences): the board built from verdicts with both-order confidence ≥ 0.95 (n = 117) is
+  gemini > iask > arx > gpt-4o with 1 violation; at ≥ 0.85 (n = 322) still iask-first. Cache
+  experiment_results/x12_crossdomain/stack_v2.db, output stack_outcome.txt.
+  DEPLOYMENT: per the rule below, production does NOT change on this result alone. Two registered
+  routes remain: (i) STACK-v2 (below); (ii) adopt the confidence-gated board as the reported board,
+  which was already registered by F7 and passes here as an exploratory replication.
+
+### STACK-v2 — the assembled judge with the v2 mechanics (~4k Mistral calls; registered 2026-09-10 02:15)
+STACK's configuration with the SYSTEM template = v2 (prompt_v2.v2_system_template on the anchor
+rubric); same 1,980 matches, Mistral, one session. Motivation: J3-R (+1.4 overall, +1.1 top cluster,
+n.s.) and L1-V2 (+8.3pp on the truncated arm, p = 0.0002; long-wrong preference 0.241). REGISTERED:
+the six STACK checks, with (3) evaluated on the ungated board; PRIMARY = check (3) ≤ 1 violation AND
+(1)–(2) hold. Prediction: (1),(2),(4),(5),(6) pass; (3) 50/50 — the iask/gemini gap is a 1.7pp key
+gap and the v2 long-wrong preference (0.241) may or may not be enough to flip it.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
