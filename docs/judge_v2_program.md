@@ -273,6 +273,19 @@ card to the judge verbatim; it is the cleaner test of the idea.
   negative. The direct test of contrastive CONTENT delivered verbatim (RK-1, the kit) started 05:55.
   Caches experiment_results/x12_crossdomain/rubric_j6.db, output j6_outcome.txt.
 
+- **RK-1 (2026-09-10 12:35): PRIMARY FAIL — the induced verification kit adds +0.7pp, not
+  significant; the only signal is in the top cluster.** 3,933 jobs (interleaved arms, judged 06:02–07:30
+  and resumed 12:31–12:35 after a session restart; 12 skipped for missing references), 944 key-decidable:
+  kit 0.875 vs STACK-v2 0.868 (+0.7pp; 28:21; p = 0.39). Top cluster 0.729 vs 0.688 (+4.1pp; 20:9;
+  p = 0.061) — the kit's whole effect sits on the frontier pairs where the judge is weakest; quantitative
+  +0.7 = discursive +0.8 (secondary FAIL); Chemistry +4.5, History +4.8; Other −2.6, Engineering −2.3.
+  Reading: induced content (card + catalogue + neighbours without solutions) is worth about nothing
+  overall and possibly a few points on the hardest pairs — consistent with S1's and J1's picture that
+  the judge's limit on frontier pairs is verification, which a card of formulas eases slightly. Not
+  adopted. RK-1b (data-only card) and RK-1c (verified worked solutions) run next; RK-1c is the one test
+  left that hands the judge something it can check step by step.
+  Cache experiment_results/x12_crossdomain/stack_v2_kit.db, output rk1_outcome.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
