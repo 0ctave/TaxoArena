@@ -217,6 +217,18 @@ McNemar p < 0.05; SECONDARY frontier > Mistral-induced; leakage audit clean. Pre
   the author's call under the deployment rule below; the rule's letter ("STACK passes") is met on the
   registered primary and missed on one guard by 1.1pp.
 
+### RK-1 — the verification kit (registered 2026-09-10 03:20, before any judged call; design in docs/rubric_v2_design.md)
+Kit per leaf of bareq512_s42 (train-side only): K2 knowledge card (≤ 12 checkable facts/formulas from
+≤ 40 solved train items) + K1 failure catalogue (5–8 error patterns with sign and check, from ≤ 20
+key-labelled wrong train-side answers of frontier contestants) + K3 two worked neighbours (nearest
+train questions of the same leaf by cosine on the 512-slice, option-overlap filtered; built 03:15 for
+1,376 of the R3 questions, median top-1 cosine 0.67). Judging: STACK-v2 (reference + v2 mechanics +
+anchor rubric) vs STACK-v2 + kit, both fresh and interleaved, Mistral, R3's 1,980 matches (~8k calls).
+PRIMARY: kit > STACK-v2 by ≥ +1pp at paired McNemar p < 0.05; SECONDARY: quantitative anchors' gain >
+discursive; leakage audit clean (5-grams vs correct options). Prediction: +1 to +3pp, quantitative-led.
+Pilot card/catalogue (Chemistry thermodynamics leaf) recorded in the harness log: the card is a list of
+formulas with validity conditions, the catalogue is error / sign / check triples — the intended shape.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
