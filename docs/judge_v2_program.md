@@ -195,6 +195,28 @@ anchor rubric, frontier-induced, contrastive; ~12k calls). PRIMARY contrastive >
 McNemar p < 0.05; SECONDARY frontier > Mistral-induced; leakage audit clean. Prediction: both null
 (+0 to +1pp); a contrastive gain > +2pp reopens induction as a design axis.
 
+- **STACK-v2 (2026-09-10 02:50): REGISTERED PRIMARY PASS — the board is now key-ordered at the top;
+  5 of 6 checks pass, the flip-rate guard misses by 1.1pp.** 1,974 judged (0 invalid), 944 key-decidable.
+  (1) 0.865 ≥ 0.839 OK — the best accuracy of any Mistral configuration measured; (2) top cluster 0.699
+  ≥ 0.645 OK — above the reasoning judge's own 0.647 (J1); (3) top-4 board gemini > iask > arx > gpt-4o,
+  1 violation vs the key order (limit 1) OK — the ungated board is now gemini-first, which no Mistral
+  configuration had achieved; (4) decidable ties 5.6% OK; (5) flip rate 13.9% vs the 12.8% limit —
+  FAIL by 1.1pp (STACK-v1 12.3%, J2-R 12.8%, Mistral v1 9.7%: position sensitivity is the one bias the
+  reference and v2 do not improve; flips resolve to TIE, and decidable ties stayed at 5.6%, so the cost
+  is verdict yield, not accuracy); (6) long-wrong preference 0.230 vs production 0.293 OK — the lowest
+  measured. Paired: vs J2-R (leaf rubric, v1 mechanics, reference) +1.6pp (29:13, p = 0.02) — with the
+  v2 mechanics the anchor rubric stack is significantly better than the cell-rubric stack; vs
+  production v1 (no reference) +9.3pp (105:17, p < 1e-4). Cache
+  experiment_results/x12_crossdomain/stack_v2_promptv2.db, output stack_v2_outcome.txt.
+  DEPLOYMENT RECOMMENDATION: adopt STACK-v2 as the production judge — cheap judge + one reasoning
+  reference per question + clean anchor rubric + v2 verify-first mechanics + dual order + confidence —
+  with the flip rate disclosed (13.9%) and, as F7/STACK showed, the ≥ 0.95-confidence board reported
+  alongside. Every other registered bias metric moved the right way on a paired test (B1: L1-V2 +8.3pp
+  on the truncated arm and long-wrong 0.293 → 0.230; B3: one strongest reference, J2-D; B4: anchor
+  rubric, four nulls; B5: no format bias; B6: ties 5.6%; B7: reference; B8: confidence kept). This is
+  the author's call under the deployment rule below; the rule's letter ("STACK passes") is met on the
+  registered primary and missed on one guard by 1.1pp.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
