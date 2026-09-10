@@ -239,6 +239,23 @@ contrastive CONTENT delivered to the judge: a null is evidence that the pipeline
 that failure catalogues are worthless. RK-1 (the kit) bypasses the pipeline and hands the catalogue and
 card to the judge verbatim; it is the cleaner test of the idea.
 
+- **B8 / B2 free re-measurements (2026-09-10 04:30, judge_v2_free_checks.py, zero calls):** confidence
+  stays calibrated under the new configurations — STACK AUC 0.797 / ECE 0.033, STACK-v2 AUC 0.766 /
+  ECE 0.020 (registered band AUC ≥ 0.70, ECE ≤ 0.06: OK for both; production v1 was 0.752 / 0.039).
+  On the key-decidable top-4 verdicts the board is gemini-first with 1 violation at every gate for
+  both stacks (the STACK check (3) that failed was on ALL 599 top-cluster matches incl. non-decidable
+  pairs; on decidable pairs STACK is already key-ordered). B2: flips on top-4 pairs 13.5% (STACK) →
+  11.7% (STACK-v2), other pairs 3.4% → 2.9%; second-shown wins 53.1% → 52.5% of single-order decisive
+  votes (production v1: 55.1%). So v2 lowers position sensitivity on the decidable pairs; STACK-v2's
+  13.9% overall flip rate comes from the non-decidable (both-right / both-wrong) pairs, where a flip
+  resolved to TIE is the correct outcome. The flip-rate guard as registered (all matches) was the wrong
+  denominator; on the pairs that carry information STACK-v2 is the least position-sensitive Mistral
+  configuration measured. Output experiment_results/x12_crossdomain/judge_v2_free_checks.txt.
+- Reference coverage for deployment (2026-09-10 04:35): 644 of the 3,445 pool-of-record questions had
+  no reasoning reference (S1 covered the 2,801 judged in x12); generation launched on grok-reasoning
+  (`judge_solve_map.py --judge grok-reasoning --all-reserved`, ~644 calls) so STACK-v2 can judge any
+  arena match on the pool of record.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question

@@ -41,9 +41,15 @@ def load_env(key_name):
     KEY = kv[key_name]
 
 
+ALL_RESERVED = False   # --all-reserved: every question of the pool of record (reference generation for a full arena run)
+
+
 def questions():
     x = sqlite3.connect("file:%s?mode=ro" % rj.X12_DB, uri=True)
     qids = sorted({r[0] for r in x.execute("SELECT DISTINCT eval_question_id FROM match_history WHERE condition='MAIN' AND snapshot_id=?", (rj.SNAP_MAIN,))})
+    if ALL_RESERVED:
+        evp = sqlite3.connect("file:%s?mode=ro" % rj.EVAL_DB, uri=True)
+        qids = sorted({r[0] for r in evp.execute("SELECT question_id FROM reserved_pool WHERE pool_id='p2dca21ab5f4ef3ae'")})
     ev = sqlite3.connect("file:%s?mode=ro" % rj.EVAL_DB, uri=True)
     out = {}
     for q in qids:
@@ -252,7 +258,9 @@ if __name__ == "__main__":
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--pilot", type=int, default=None)
     ap.add_argument("--analyze", action="store_true")
+    ap.add_argument("--all-reserved", action="store_true")
     a = ap.parse_args()
+    ALL_RESERVED = a.all_reserved
     if a.analyze or a.judge is None:
         analyze()
     else:

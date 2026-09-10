@@ -1,0 +1,16 @@
+== B8 confidence calibration and B2 position sensitivity under the new configurations (zero calls) ==
+   key order top-4: gemini-3.1-pro_5-shots > arx_0314 > iask_pro > gpt-4o-2024-08-06
+
+  STACK (v1+ref+anchor): 885 decisive key-decidable verdicts with confidence
+     AUC(conf -> correct) 0.797 | ECE 0.033 | mean conf 0.927 | accuracy 0.899  -> B8 OK
+     top-4 board, both-order conf >= 0.00: n=266  gemini > iask_pro > arx_0314 > gpt  violations 1
+     top-4 board, both-order conf >= 0.85: n=202  gemini > iask_pro > arx_0314 > gpt  violations 1
+     top-4 board, both-order conf >= 0.95: n= 87  gemini > iask_pro > arx_0314 > gpt  violations 1
+     B2: flip rate top-4 pairs 0.135 (n=266) | other pairs 0.034 (n=678) | second-shown wins 0.531 of 3795 single-order decisive votes
+
+  STACK-v2 (v2+ref+anchor): 891 decisive key-decidable verdicts with confidence
+     AUC(conf -> correct) 0.766 | ECE 0.020 | mean conf 0.930 | accuracy 0.917  -> B8 OK
+     top-4 board, both-order conf >= 0.00: n=266  gemini > iask_pro > arx_0314 > gpt  violations 1
+     top-4 board, both-order conf >= 0.85: n=209  gemini > iask_pro > arx_0314 > gpt  violations 1
+     top-4 board, both-order conf >= 0.95: n=102  gemini > iask_pro > arx_0314 > gpt  violations 1
+     B2: flip rate top-4 pairs 0.117 (n=266) | other pairs 0.029 (n=678) | second-shown wins 0.525 of 3491 single-order decisive votes
