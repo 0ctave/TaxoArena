@@ -379,3 +379,27 @@ Prediction: held-out purity ~68–70%.
   overlapped chain's two nulls collided on Gradle's shared test-results directory once
   (serialised since, d25fc35). Artifacts: experiment_results/dimsweep4/ (d4_outcome.txt,
   site_null_arrive_*.csv; the void runs kept as *_VOID for the record).
+
+- LEAF-PROFILE (2026-09-10 02:07–02:25, registered in tools/analysis/leaf_profile_evidence.py before
+  running; zero calls): **A REAL, B NOT RESOLVED — exactly as predicted. The per-leaf capability
+  profile exists in the ground truth; the judged arena cannot resolve it at R2's budget.**
+  A (key, 46 models × 10,925 questions, clean bareq512_s42 tree, leaf = nearest centroid): within-anchor
+  model×leaf interaction beyond model + leaf-difficulty, question-level permutation (200): pooled LRT
+  3,795 vs null p95 2,362, p = 0.005; 10/14 anchors individually p < 0.05 (Math LRT 520 vs 341 with a
+  leaf-over-anchor LOO Brier gain of +12.7/1000; Business +5.4; Biology +4.6; Engineering +3.9; Other,
+  Philosophy, Chemistry, Health, Physics, Economics significant; Computer science p = 0.065; Law,
+  Psychology, History not significant, Law/Psychology with negative Brier gains — their leaves are
+  difficulty strata, not skill strata).
+  B (R2 atlas, 36,871 Mistral verdicts, 12 models, per-leaf vs anchor-level BT within anchors, same
+  permutation): pooled p = 0.24; 4/14 anchors nominally significant (Business, History, Other,
+  Philosophy), none after pooling. Median verdicts per (leaf, model) cell = 54 (p25 = 35), against
+  the q ≥ k/S² requirement of ~120–190 distinct questions per cell for SE 0.15 (H6b). Caveat: the
+  statistic uses the atlas's registered penalised BT (0.5 pseudo-counts), so the contrast is negative
+  where shrinkage dominates (Physics −157, Biology −66): it is conservative for thin leaves, which is
+  the point — at this volume the leaf-level fit is prior-dominated.
+  Consequence for the thesis: "per-leaf capability profile" is a TRUE statement about the ground
+  truth captured by the taxonomy (F2/F5/LEAF-PROFILE-A) and a BUDGET statement about the arena
+  (M1 leaf-level hurts; LEAF-PROFILE-B; H6b). The arena resolves profiles at anchor granularity;
+  leaf granularity needs roughly 3–4× the verdicts per cell, or the key. Next (zero-call): price it
+  with the M3 synthetic arena — verdicts per cell at which the leaf profile beats the anchor profile
+  on held-out prediction. Output experiment_results/leaf_profile_evidence.txt.
