@@ -403,3 +403,25 @@ Prediction: held-out purity ~68–70%.
   leaf granularity needs roughly 3–4× the verdicts per cell, or the key. Next (zero-call): price it
   with the M3 synthetic arena — verdicts per cell at which the leaf profile beats the anchor profile
   on held-out prediction. Output experiment_results/leaf_profile_evidence.txt.
+
+- LEAF-POWER (2026-09-10 02:14–02:20, registered in tools/analysis/leaf_profile_power.py before
+  running; zero calls): **the leaf-level profile never beats the anchor-level profile on held-out
+  prediction, even with the key as oracle and 400 verdicts per (leaf, model) — prediction (V* ≈ 80–120
+  oracle) WRONG.** Clean bareq512_s42 tree, 84 leaves with ≥ 60 keyed questions, 12 arena models, 50/50
+  question split per leaf (train-half median 58 distinct questions per leaf), 5 seeds. Held-out
+  log-loss (leaf vs anchor): ORACLE V=54 0.465 vs 0.434, V=400 0.432 vs 0.429, leaf better in 0/5
+  seeds at every budget; top-1 agreement with the key's best model per leaf 0.64 vs 0.84 at V=54 and
+  0.80 vs 0.90 at V=400. NOISY (Mistral-like) judge: V=400 0.537 vs 0.534, top-1 0.54 vs 0.85; 0/5
+  everywhere. The gap narrows monotonically with V but does not close: beyond ~2 verdicts per question
+  the leaf fit is re-sampling the same ~58 questions, so the binding quantity is DISTINCT QUESTIONS
+  per leaf (H6b: q ≥ k/S², ~120–190 for SE 0.15), not verdicts — while the anchor fit pools ~6 leaves'
+  questions. Together with LEAF-PROFILE: the leaf-level interaction is real (p = 0.005 on 46 models
+  and all questions) but small relative to the between-model differences, so a separately estimated
+  leaf profile is worse than the anchor profile at any verdict budget the current reserved pool
+  (median 40 arena questions per leaf; 58 keyed train questions here) can supply. What this means for
+  the design: (i) per-leaf profiles need either more distinct questions per cell (a larger or harder
+  keyed pool) or partial pooling — leaf = anchor + shrunken deviation (a LEAF-SHRINK zero-call test
+  is the natural next; M1's hierarchical prior hurt on next-verdict prediction, so it must be tested,
+  not assumed); (ii) the R2 strata (20 cells at SE ≤ 0.15) were the right granularity for the arena;
+  (iii) the honest thesis claim is "anchor-level profiles from the arena; sub-anchor structure shown
+  on the key". Output experiment_results/leaf_profile_power.txt.
