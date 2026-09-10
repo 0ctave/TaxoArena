@@ -22,7 +22,7 @@ cannot verify; a contrastive gain > +2pp would overturn that and reopen inductio
   python tools/analysis/j6_rubrics.py [--pilot N] [--workers N]   # ~12k Mistral calls
   python tools/analysis/j6_rubrics.py --analyze
 """
-import os, sys, re, json, time, random, sqlite3, argparse, threading
+import os, sys, re, json, time, random, sqlite3, argparse, threading, urllib.error
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -96,12 +96,22 @@ def induce(model="grok-4-1-fast-reasoning"):
             if (new_kind, unit) in done: continue
             partials = []
             for i in range(0, len(corpus), rl.CHUNK):
-                prompt = t1.replace("$items", "\n---\n".join(corpus[i:i + rl.CHUNK])).replace("$domainLabel", label)
+                base = t1.replace("$items", "\n---\n".join(corpus[i:i + rl.CHUNK])).replace("$domainLabel", label)
                 if new_kind == "contrastive_anchor":
                     ws = wrong.get(label, []); rng.shuffle(ws)
-                    block = "\n---\n".join("Q: %s\nModel chose %s, correct is %s. Response excerpt: %s" % w for w in ws[:N_WRONG])
-                    prompt += CONTRAST_INSTRUCTION.replace("$wrong", block or "(none available)")
-                partials.append(rr.strip_think(rr.call_judge("", prompt)[0]))
+                    out = None
+                    for n_w in (N_WRONG, N_WRONG // 2, N_WRONG // 4):   # HTTP 400 = Azure content filter on an excerpt: reshuffle and shrink
+                        block = "\n---\n".join("Q: %s\nModel chose %s, correct is %s. Response excerpt: %s" % w for w in ws[:n_w])
+                        try:
+                            out = rr.strip_think(rr.call_judge("", base + CONTRAST_INSTRUCTION.replace("$wrong", block or "(none available)"))[0]); break
+                        except urllib.error.HTTPError as e:
+                            if e.code != 400: raise
+                            print("  400 on %s chunk %d with %d wrong answers; reshuffling smaller" % (label, i // rl.CHUNK, n_w), flush=True); rng.shuffle(ws)
+                    if out is None:
+                        out = rr.strip_think(rr.call_judge("", base)[0]); print("  chunk %d of %s induced WITHOUT the contrastive block (filtered)" % (i // rl.CHUNK, label), flush=True)
+                    partials.append(out)
+                else:
+                    partials.append(rr.strip_think(rr.call_judge("", base)[0]))
             master = partials[0] if len(partials) == 1 else rr.strip_think(rr.call_judge("", t2.replace("$partials", "\n\n".join(partials)))[0])
             raw = rr.strip_think(rr.call_judge("", t3.replace("$masterGuidelines", master).replace("$domainLabel", label))[0])
             m = re.search(r"\{.*\}", raw, re.S)

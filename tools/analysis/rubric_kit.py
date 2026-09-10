@@ -18,7 +18,7 @@ Computer science} > gain in the discursive anchors. Prediction: +1 to +3pp, quan
   python tools/analysis/rubric_kit.py --judge [--pilot N] [--workers N]   # ~8k Mistral calls
   python tools/analysis/rubric_kit.py --analyze
 """
-import os, sys, re, json, time, random, sqlite3, struct, argparse, threading
+import os, sys, re, json, time, random, sqlite3, struct, argparse, threading, urllib.error
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
@@ -118,15 +118,25 @@ def induce(pilot):
     for l in leaves:
         m = mat[l]; items = m["items"][:]; rng.shuffle(items)
         if (l, "card") not in done:
-            prompt = CARD_PROMPT.replace("$leaf", m["label"]).replace("$anchor", m["anchor"]).replace("$items", "\n---\n".join(fmt_item(it) for it in items[:N_CARD_ITEMS]))
-            raw = rr.strip_think(rr.call_judge("", prompt)[0])
+            raw = None
+            for n_i in (N_CARD_ITEMS, N_CARD_ITEMS // 2, N_CARD_ITEMS // 4):
+                prompt = CARD_PROMPT.replace("$leaf", m["label"]).replace("$anchor", m["anchor"]).replace("$items", "\n---\n".join(fmt_item(it) for it in items[:n_i]))
+                try: raw = rr.strip_think(rr.call_judge("", prompt)[0]); break
+                except urllib.error.HTTPError as e:
+                    if e.code != 400: raise
+                    print("  400 on card %s with %d items; shrinking" % (m["label"][:40], n_i), flush=True); rng.shuffle(items)
             con.execute("INSERT OR REPLACE INTO kit VALUES (?,?,?,?,?,?,?,?)", (l, "card", m["label"], m["anchor"], raw.strip(), raw, min(len(items), N_CARD_ITEMS), time.time())); con.commit()
             print("card      %s (%s): %d ch from %d items" % (m["label"][:40], m["anchor"], len(raw), min(len(items), N_CARD_ITEMS)), flush=True)
         if (l, "catalogue") not in done:
             ws = [(it[0], w) for it in items for w in wrong.get(it[0], [])]; rng.shuffle(ws)
-            block = "\n---\n".join("Q: %s\nChose %s, correct %s. Excerpt: %s" % (q, w[0], w[1], w[2]) for q, w in ws[:N_WRONG])
-            prompt = CATALOGUE_PROMPT.replace("$leaf", m["label"]).replace("$anchor", m["anchor"]).replace("$wrong", block or "(no wrong answers available)")
-            raw = rr.strip_think(rr.call_judge("", prompt)[0])
+            raw = None
+            for n_w in (N_WRONG, N_WRONG // 2, N_WRONG // 4, 0):   # HTTP 400 = content filter on an excerpt: shrink/reshuffle; last resort no excerpts
+                block = "\n---\n".join("Q: %s\nChose %s, correct %s. Excerpt: %s" % (q, w[0], w[1], w[2]) for q, w in ws[:n_w])
+                prompt = CATALOGUE_PROMPT.replace("$leaf", m["label"]).replace("$anchor", m["anchor"]).replace("$wrong", block or "(no wrong answers available — derive plausible failure modes from the subdomain alone)")
+                try: raw = rr.strip_think(rr.call_judge("", prompt)[0]); break
+                except urllib.error.HTTPError as e:
+                    if e.code != 400: raise
+                    print("  400 on %s with %d wrong answers; reshuffling smaller" % (m["label"][:40], n_w), flush=True); rng.shuffle(ws)
             con.execute("INSERT OR REPLACE INTO kit VALUES (?,?,?,?,?,?,?,?)", (l, "catalogue", m["label"], m["anchor"], raw.strip(), raw, min(len(ws), N_WRONG), time.time())); con.commit()
             print("catalogue %s (%s): %d ch from %d wrong answers" % (m["label"][:40], m["anchor"], len(raw), min(len(ws), N_WRONG)), flush=True)
 
