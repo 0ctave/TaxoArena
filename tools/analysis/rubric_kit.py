@@ -209,7 +209,9 @@ def judge(pilot, workers):
     p8.load_env(); rref.set_reference("grok-reasoning"); refs = rref.references()
     rubrics = sj.anchor_rubrics(); route = r512.primary_routing(TREE); anchors = sj.routed_anchor()
     kcon = open_kit(); kit = {(l, k): t for l, k, t in kcon.execute("SELECT leaf, kind, text FROM kit")}
+    labels = {l: lab for l, lab in kcon.execute("SELECT leaf, label FROM kit WHERE kind='card'")}
     neigh = {q: json.loads(p) for q, p in kcon.execute("SELECT qid, payload FROM neighbours")}
+    kcon.close()   # SQLite handles are thread-bound; everything the workers need is now in dicts
     sample = rj.sample_matches()
     assert leakage_audit(kit, sample), "kit leaks option text — not judging"
     leaves_needed = {route[int(m[1])] for m in sample if int(m[1]) in route}
@@ -231,7 +233,7 @@ def judge(pilot, workers):
         q = rref.with_reference(ra[0], ref)
         if arm == "kit":
             system += ("\n\nCell knowledge card — facts that must hold in this subdomain (\"%s\"):\n%s\n\nCell failure catalogue — how answers in this subdomain typically go wrong:\n%s"
-                       % (leaf and kcon.execute("SELECT label FROM kit WHERE leaf=? AND kind='card'", (leaf,)).fetchone()[0], kit[(leaf, "card")], kit[(leaf, "catalogue")]))
+                       % (labels.get(leaf, leaf), kit[(leaf, "card")], kit[(leaf, "catalogue")]))
             ex = neigh.get(qid, [])
             if ex: q = "[Two solved examples from the same subdomain — training problems, for reference only; the judged question below is different]\n%s\n\n%s" % ("\n---\n".join(e["text"] for e in ex), q)
         system += "\n\n" + rj.SCHEMA_INSTRUCTION
