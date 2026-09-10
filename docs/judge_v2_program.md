@@ -254,7 +254,9 @@ card to the judge verbatim; it is the cleaner test of the idea.
 - Reference coverage for deployment (2026-09-10 04:35): 644 of the 3,445 pool-of-record questions had
   no reasoning reference (S1 covered the 2,801 judged in x12); generation launched on grok-reasoning
   (`judge_solve_map.py --judge grok-reasoning --all-reserved`, ~644 calls) so STACK-v2 can judge any
-  arena match on the pool of record.
+  arena match on the pool of record. DONE 04:50: 3432 of 3445 pool questions now carry a reasoning
+  reference (13 rejected by the endpoint's content filter, the known class); reference accuracy 0.860
+  over the whole pool.
 
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
