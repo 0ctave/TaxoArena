@@ -24,7 +24,12 @@ import rubric_p8 as p8
 import rubric_512 as r512
 import judge_free_tests as jf
 
+PROMPT = "v1"   # --prompt v2 = STACK-v2 (v2 mechanics on the anchor rubric); separate cache
 CACHE = os.path.join(ROOT, "experiment_results", "x12_crossdomain", "stack_v2.db")
+
+
+def cache_path():
+    return CACHE if PROMPT == "v1" else CACHE.replace("stack_v2.db", "stack_v2_promptv2.db")
 LADDER = os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rubric_ladder.db")
 J2R = os.path.join(ROOT, "experiment_results", "x12_crossdomain", "rejudge_mistral_reference_grok_reasoning.db")
 TOP4 = ["iask_pro", "gemini-3.1-pro_5-shots", "gpt-4o-2024-08-06", "arx_0314"]
@@ -42,11 +47,14 @@ def routed_anchor():
 
 def system_for(anchor, rubrics):
     sp, rb = rubrics[anchor]
+    if PROMPT == "v2":
+        import prompt_v2
+        return prompt_v2.v2_system_template().replace("$systemPrompt", sp).replace("$rubric", rb) + "\n\n" + rj.SCHEMA_INSTRUCTION
     return rj.SYSTEM_TEMPLATE.replace("$systemPrompt", sp).replace("$rubric", rb) + "\n\n" + rj.SCHEMA_INSTRUCTION
 
 
 def open_cache():
-    con = sqlite3.connect(CACHE)
+    con = sqlite3.connect(cache_path())
     con.execute("CREATE TABLE IF NOT EXISTS verdicts (match_id INTEGER PRIMARY KEY, model_a TEXT, model_b TEXT, node_id TEXT, qid INTEGER, anchor TEXT, "
                 "ref_letter TEXT, ref_correct INTEGER, vote1 TEXT, vote2_raw TEXT, conf1 REAL, conf2 REAL, winner TEXT, flip INTEGER, invalid INTEGER, raw1 TEXT, raw2 TEXT, ts REAL)")
     con.commit()
@@ -117,7 +125,7 @@ def analyze():
     acc = sum(rows[k]["st"] for k in keys) / n
     top = [k for k in keys if rows[k]["top"]]; acc_top = sum(rows[k]["st"] for k in top) / max(1, len(top))
     ties = sum(rows[k]["tie"] for k in keys) / n
-    print("=== STACK (reference + v1 mechanics + anchor rubric), Mistral, %d judged (%d invalid), %d key-decidable ===" % (len(st), len(st) - len(valid), n))
+    print("=== STACK%s (reference + %s mechanics + anchor rubric), Mistral, %d judged (%d invalid), %d key-decidable ===" % ("-v2" if PROMPT == "v2" else "", PROMPT, len(st), len(st) - len(valid), n))
     checks = []
     checks.append(("(1) all-decidable accuracy >= 0.839", acc, acc >= 0.839))
     checks.append(("(2) top-cluster accuracy >= 0.645 (n=%d)" % len(top), acc_top, acc_top >= 0.645))
@@ -149,6 +157,8 @@ if __name__ == "__main__":
     ap.add_argument("--pilot", type=int, default=None)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--analyze", action="store_true")
+    ap.add_argument("--prompt", choices=["v1", "v2"], default="v1")
     a = ap.parse_args()
+    PROMPT = a.prompt
     if a.analyze: analyze()
     else: run(a.pilot, a.workers); analyze()
