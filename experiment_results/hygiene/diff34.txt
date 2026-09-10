@@ -1,0 +1,21 @@
+== experiment_results\hygiene\bareq512_s42_labelfree3\seed_42 vs experiment_results\hygiene\bareq512_s42_labelfree4\seed_42 ==
+  -- STRUCTURE (must be identical)
+     dag_snapshots.jsonl                           DIFFERS  first diff: (8, '{"iteration":8,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"', '{"iteration":8,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"')
+     diagnostics/dag_snapshots.jsonl               DIFFERS  first diff: (8, '{"iteration":8,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"', '{"iteration":8,"nodes":[{"id":"n00000001","label":"MMLU_PRO","depth":0,"isLeaf":false,"isBridge":false,"kappa"')
+  -- EVALUATION PATH (P7 caveat)
+     diagnostics/proposals.csv                     DIFFERS  first diff: (161, '6,GROW,n00000186,Emergent Concept #171,0.000145491,0.000081068,1.7947,2,REJECTED,z_gate(need>0.000162135),0', '6,GROW,n00000186,Emergent Concept #171,0.000145491,0.000083675,1.7388,2,REJECTED,z_gate(need>0.000167349),0')
+     fixed_point_certificate.txt                   DIFFERS  first diff: (4, 'final iteration : 13', 'final iteration : 12')
+     diagnostics/iteration_metrics.csv             DIFFERS  first diff: (9, '8,157,86,6,0.235543,0.235543,0.000000000958,0.000143391455,4,1848,463,1,15,447,8278.000,0', '8,155,85,6,0.235400,0.235400,0.000000000958,0.000000000000,0,0,465,0,18,447,8278.000,0')
+     diagnostics/rank_history.csv                  IDENTICAL
+     validation\MAIN_bridge_quality.csv            IDENTICAL
+     validation\MAIN_centroid_routing_results.csv  DIFFERS  first diff: (3, 'Top1Accuracy,0.7816060016671298', 'Top1Accuracy,0.7810502917477077')
+     validation\MAIN_graph_validity.csv            DIFFERS  first diff: (6, 'DepthDistribution,0:1;1:14;2:28;3:50;4:48;5:14;6:2', 'DepthDistribution,0:1;1:14;2:28;3:50;4:48;5:12;6:2')
+     validation\MAIN_heldout_leaf_support.csv      DIFFERS  first diff: (12, 'n00000446,Emergent Concept #431,25,28', 'n00000141,Emergent Concept #126,59,62')
+     validation\MAIN_migration_flow_matrix.csv     IDENTICAL
+     validation\MAIN_routing_calibration.csv       DIFFERS  first diff: (2, 'RoutingECE,0.19439618687957747', 'RoutingECE,0.19483813119810886')
+     validation\MAIN_routing_diagnostics.txt       DIFFERS  first diff: (1207, 'Top-1 Leaf: Emergent Concept #430 (ID: n00000445) | Dominant: Physics | Conf: 1,0000', 'Top-1 Leaf: Emergent Concept #126 (ID: n00000141) | Dominant: Physics | Conf: 1,0000')
+     validation\MAIN_taxonomy_quality.csv          DIFFERS  first diff: (2, 'SeparationJ,0.23554333135868777', 'SeparationJ,0.23539994279800758')
+     validation\MAIN_trickle_validation_results.csv DIFFERS  first diff: (7, 'MeanLeafPurity,0.7687715848952997', 'MeanLeafPurity,0.7685161110888973')
+     validation\bridge_nodes.csv                   IDENTICAL
+     validation\bridge_residuals.csv               IDENTICAL
+  GATE: FAIL

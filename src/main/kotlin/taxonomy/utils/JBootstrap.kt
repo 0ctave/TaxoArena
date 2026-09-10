@@ -60,19 +60,26 @@ object JBootstrap {
         }
         val rawEmbMap = allEmbeddings.associateBy { it.rawText }
 
+        // DETERMINISM: queryWeights is a ConcurrentHashMap filled by parallel routing, so its
+        // iteration order is thread-timing dependent. That order fixed (a) the insertion order of
+        // perQuery, hence which bootstrap weight each affected query draws, and (b) the
+        // floating-point accumulation order of every cell row. Measured 2026-09-10: the same
+        // proposal (GROW n00000191, dJ 0.000152082) got SE_dJ 0.0000761 in one run and 0.0000757
+        // in another, z 1.999 vs 2.010 at the z = 2.0 gate, and the two trees diverged from there.
+        // Sorted traversal makes the SE, and therefore the gate, run-invariant.
         val perQuery = LinkedHashMap<String, Capture.QueryView>()
         val visited = mutableSetOf<String>()
         fun walk(n: GraphNode) {
             if (!visited.add(n.id)) return
             if (n.isLeaf) {
-                for ((text, weight) in n.queryWeights) {
+                for ((text, weight) in n.queryWeights.entries.sortedBy { it.key }) {
                     val emb = GraphNode.getEmbedding(text) ?: continue
                     perQuery.getOrPut(text) { Capture.QueryView(emb.projectTo(d)) }.cells.add(n.id to weight)
                 }
             } else {
                 if (n.residualQueries.isNotEmpty()) {
                     val cell = n.id + "_residual"
-                    for (key in n.residualQueries) {
+                    for (key in n.residualQueries.sorted()) {
                         val emb = GraphNode.getEmbedding(key) ?: embMap[key] ?: rawEmbMap[key] ?: continue
                         perQuery.getOrPut(key) { Capture.QueryView(emb.projectTo(d)) }.cells.add(cell to 1.0)
                     }
@@ -114,7 +121,9 @@ object JBootstrap {
         fun sig(v: Capture.QueryView?): List<Pair<String, Double>> =
             v?.cells?.sortedBy { it.first } ?: emptyList()
 
-        val keys = LinkedHashSet<String>().apply { addAll(before.perQuery.keys); addAll(after.perQuery.keys) }
+        // Sorted for the same reason as in capture(): the affected order maps bootstrap draws to
+        // queries and fixes the accumulation order.
+        val keys = (before.perQuery.keys + after.perQuery.keys).toSortedSet()
         val affected = keys.filter { sig(before.perQuery[it]) != sig(after.perQuery[it]) }
         if (affected.isEmpty()) return 0.0
 
@@ -124,7 +133,7 @@ object JBootstrap {
         class Fixed(val n: HashMap<String, Double> = HashMap(), val s: HashMap<String, DoubleArray> = HashMap())
         fun fixedOf(cap: Capture): Fixed {
             val f = Fixed()
-            for ((k, v) in cap.perQuery) {
+            for ((k, v) in cap.perQuery.entries.sortedBy { it.key }) {
                 if (k in affectedSet) continue
                 for ((cell, w) in v.cells) {
                     f.n[cell] = (f.n[cell] ?: 0.0) + w
@@ -174,6 +183,12 @@ object JBootstrap {
         }
 
         val idx = affected.withIndex().associate { it.value to it.index }
+        if (System.getenv("JBOOT_DEBUG") != null) {
+            // Determinism diagnostic (2026-09-10): prints what the SE is computed FROM, so two runs
+            // can be compared line by line. Off unless JBOOT_DEBUG is set.
+            fun h(cap: Capture) = affected.joinToString("|") { k -> sig(cap.perQuery[k]).joinToString(",") { "${it.first}:${"%.6f".format(it.second)}" } }.hashCode()
+            System.err.println("[JBOOT] affected=${affected.size} keys=${affected.hashCode()} sigBefore=${h(before)} sigAfter=${h(after)} fixedN=${fb.n.size}/${fa.n.size} fixedMass=${"%.6f".format(fb.n.values.sum())}/${"%.6f".format(fa.n.values.sum())}")
+        }
         val rng = kotlin.random.Random(seed)
         val deltas = ArrayList<Double>(replicates)
         val w = DoubleArray(affected.size)
@@ -230,17 +245,18 @@ object JBootstrap {
         residualParents.forEachIndexed { i, n -> cellIndex[n.id + "_residual"] = leaves.size + i }
 
         // Group contributions by query so a bootstrap draw scales the whole query at once.
+        // Sorted traversal (see capture()): the multinomial draw indexes queries by insertion order.
         val byQuery = LinkedHashMap<String, Contribution>()
         for (leaf in leaves) {
             val ci = cellIndex[leaf.id] ?: continue
-            for ((text, weight) in leaf.queryWeights) {
+            for ((text, weight) in leaf.queryWeights.entries.sortedBy { it.key }) {
                 val emb = GraphNode.getEmbedding(text) ?: continue
                 byQuery.getOrPut(text) { Contribution(emb.projectTo(d)) }.cells.add(ci to weight)
             }
         }
         for (parent in residualParents) {
             val ci = cellIndex[parent.id + "_residual"] ?: continue
-            for (key in parent.residualQueries) {
+            for (key in parent.residualQueries.sorted()) {
                 val emb = GraphNode.getEmbedding(key) ?: embMap[key] ?: rawEmbMap[key] ?: continue
                 byQuery.getOrPut(key) { Contribution(emb.projectTo(d)) }.cells.add(ci to 1.0)
             }

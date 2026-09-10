@@ -456,3 +456,17 @@ Prediction: held-out purity ~68–70%.
   gate deterministic. Until then, the promoted snapshot 20260909_212117 is the tree of record (its
   rubrics, routing CSV and every RUBRIC-512 / STACK verdict use it); the replica is not promoted.
   Artifacts: experiment_results/hygiene/ (diff.txt, the two run dirs).
+  UPDATE 04:47: replica 2 (identical code and config) diverged from replica 1 at the same iteration-7
+  decision and took the promoted tree's path (18 iterations): identical code is run-to-run
+  nondeterministic on this config. First fix (sorted traversal of queryWeights / residualQueries /
+  the affected set in JBootstrap.capture, estimate and pairedDeltaSe): two fixed builds now agree on
+  the first 160 proposals INCLUDING SE_dJ (before the fix, SE differed from proposal 1), then differ on
+  one proposal's SE at iteration 6 (0.000081068 vs 0.000083675, same dJ) while the DAG stays identical
+  in every field through iteration 7, and diverge at iteration 8 on a gate flip. So the residual
+  nondeterminism (~3% of SE) enters through the INPUT of the SE (the affected set or its weights after
+  the temporary edit), not through the sorted accumulation — an instrumented pair of builds
+  (JBOOT_DEBUG prints the affected-set hash and fixed mass per proposal) is running to pin it. Until it
+  is pinned: the paper's P7 statement becomes "structure reproducible except at borderline z-gate
+  decisions (|z − 2| ≲ 0.05); the bootstrap SE varies ~3% run to run"; every tree of record is a
+  saved snapshot, which is what the arena and the analyses load, so no published number depends on
+  re-running construction.
