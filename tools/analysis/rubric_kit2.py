@@ -92,7 +92,8 @@ def datacard():
                 # Only CONCEPTUAL pairs transfer to other questions (a numeric pair is question-specific;
                 # the aggregate error signature carries the numeric information). Drop empty/nan options.
                 if (k / nw >= 0.4 and 0 <= pi < len(opts) and opts[ki].strip().lower() not in judged_correct
-                        and vals[ki] is None and vals[pi] is None and opts[ki].strip().lower() not in ("", "nan") and opts[pi].strip().lower() not in ("", "nan")):
+                        and vals[ki] is None and vals[pi] is None and opts[ki].strip().lower() not in ("", "nan") and opts[pi].strip().lower() not in ("", "nan")
+                        and sum(ch.isdigit() for ch in opts[ki]) < 3 and sum(ch.isdigit() for ch in opts[pi]) < 3):   # conceptual text only
                     pairs.append((k / nw, nw, opts[ki].strip(), opts[pi].strip()))
         pairs.sort(key=lambda x: -x[0] * x[1])
         lines = ["Answer form in this subdomain: %d%% of questions have numeric options" % round(100 * numeric / max(1, len(lq)))]
