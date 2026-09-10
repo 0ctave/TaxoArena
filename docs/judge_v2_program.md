@@ -171,6 +171,16 @@ the six STACK checks, with (3) evaluated on the ungated board; PRIMARY = check (
 (1)–(2) hold. Prediction: (1),(2),(4),(5),(6) pass; (3) 50/50 — the iask/gemini gap is a 1.7pp key
 gap and the v2 long-wrong preference (0.241) may or may not be enough to flip it.
 
+- **RUBRIC-512-R (2026-09-10 02:20): exactly zero for the reasoning judge — B4 closed for both
+  tiers, as predicted.** grok-4-1-fast-reasoning, both arms fresh in one session, 3,956 jobs, 0
+  errors, 946 key-decidable: cell 0.842 vs generic 0.842 (24:24, p = 1.0); top cluster 0.665 vs 0.665
+  (12:12); discursive +0.4 (18:16), quantitative −0.5 (6:8); no anchor beyond ±7pp on n ≤ 144 (all on
+  ≤ 4 discordant pairs). Secondary (gain > Mistral's +1.8) fails. Four clean measurements now agree:
+  induced cell rubrics are worth 0 to +1pp to any judge tier on keyed questions; the reasoning judge
+  reads the answer, not the rubric. Rubric induction is a construction-side cost that buys nothing in
+  judging; the anchor rubric is the production choice. Caches
+  experiment_results/rubric_512/grok_reasoning_{cell,generic}.db, output grok_reasoning_outcome.txt.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
