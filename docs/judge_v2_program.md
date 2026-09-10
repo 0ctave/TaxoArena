@@ -229,6 +229,16 @@ discursive; leakage audit clean (5-grams vs correct options). Prediction: +1 to 
 Pilot card/catalogue (Chemistry thermodynamics leaf) recorded in the harness log: the card is a list of
 formulas with validity conditions, the catalogue is error / sign / check triples — the intended shape.
 
+J6 CAVEAT (recorded 2026-09-10 03:42, after induction and before any judged result): inspection of the
+induced texts shows the ladder pipeline's third stage (`synthesizeFinalJudge`, "a short bullet-point
+checklist … do NOT include …") compresses the contrastive material into a near-generic checklist again
+(the Physics contrastive rubric reads "unit/dimensional consistency (CRITICAL) … force/torque balances
+complete (CRITICAL)"; the failure modes survive as one line, "penalizes misconceptions: sign errors,
+frame confusion"). So J6 tests authorship and contrastive CORPUS under the existing pipeline, not
+contrastive CONTENT delivered to the judge: a null is evidence that the pipeline launders content, not
+that failure catalogues are worthless. RK-1 (the kit) bypasses the pipeline and hands the catalogue and
+card to the judge verbatim; it is the cleaner test of the idea.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
