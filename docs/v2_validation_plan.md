@@ -425,3 +425,15 @@ Prediction: held-out purity ~68–70%.
   not assumed); (ii) the R2 strata (20 cells at SE ≤ 0.15) were the right granularity for the arena;
   (iii) the honest thesis claim is "anchor-level profiles from the arena; sub-anchor structure shown
   on the key". Output experiment_results/leaf_profile_power.txt.
+
+- LEAF-SHRINK (2026-09-10 02:24–02:30, registered before running; zero calls): **NOT RESCUED —
+  partial pooling does not beat the anchor-only profile at any budget.** Same synthetic arena as
+  LEAF-POWER, leaf profile = anchor + λ·(free leaf − anchor). NOISY judge at R2's V = 54: λ = 0 0.538,
+  λ = 0.25 0.543, λ = 1 0.564 (held-out log-loss; anchor-only best in 5/5 seeds); at V = 400 the same
+  order. ORACLE: anchor-only best at V = 54 and 120; at V = 400 λ = 0.25 ties it (0.4287 vs 0.4287,
+  3/5 seeds). Top-1 agreement with the key's best model per leaf falls monotonically with λ at every
+  budget (V = 54 noisy: 0.51 → 0.32). Closure: for judged arenas on this question pool the ANCHOR
+  profile is the right estimator; the leaf-level deviation, though real on the key (LEAF-PROFILE A), is
+  too small and too under-determined to be worth estimating from verdicts until a cell holds several
+  hundred distinct questions. Prediction (λ = 0.25 wins at V ≥ 120 oracle) wrong except at 400.
+  Output experiment_results/leaf_profile_shrink.txt.

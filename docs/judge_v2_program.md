@@ -181,6 +181,20 @@ gap and the v2 long-wrong preference (0.241) may or may not be enough to flip it
   judging; the anchor rubric is the production choice. Caches
   experiment_results/rubric_512/grok_reasoning_{cell,generic}.db, output grok_reasoning_outcome.txt.
 
+### J6 — are the rubrics just not good enough? (registered 2026-09-10 02:30, before any call)
+Rubric-quality audit (free, 2026-09-10): the 87 leaf rubrics of bareq512_s42 are specific, not
+boilerplate — median 2,861 chars, pairwise vocabulary Jaccard 0.08 (p90 0.14), 7% of each rubric's
+vocabulary shared by ≥ 50% of rubrics — but they are PROCESS checklists ("apply the governing law,
+check dimensional consistency, justify assumptions") with no discriminating content about how answers
+in the cell actually go wrong. Hypothesis to test: rubric TEXT can matter if it is (a) written by a
+stronger model, or (b) contrastive — induced with the cell's real wrong answers in view.
+Design and criteria: tools/analysis/j6_rubrics.py docstring (induction on grok-4-1-fast-reasoning from
+the ladder's clean anchor corpora ± 25 key-labelled WRONG train-side answers per anchor; judging by
+Mistral without reference on R3's 1,980 matches, three arms interleaved in one session: Mistral-induced
+anchor rubric, frontier-induced, contrastive; ~12k calls). PRIMARY contrastive > Mistral-induced, paired
+McNemar p < 0.05; SECONDARY frontier > Mistral-induced; leakage audit clean. Prediction: both null
+(+0 to +1pp); a contrastive gain > +2pp reopens induction as a design axis.
+
 ## Deployment rule
 The production judge changes only after STACK passes, and the change ships with the measured
 before/after table for B1–B8. Cost model of the adopted design: one reasoning call per question
